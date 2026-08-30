@@ -109,7 +109,7 @@ VAR_INPUT
     ModelStepSpeedMps       : ARRAY[0..5] OF REAL; // vitesse m/s par palier (table de la suite)
     ModelSeedPosM1          : REAL := 2.0;         // position de départ M1 (cohérente COD défaut)
     ModelSeedPosM2          : REAL := 2.0;
-    ModelMachineReferenceReady : BOOL := TRUE;     // qualification de référence du modèle de banc
+    ModelMachineHomed : BOOL := TRUE;     // qualification de référence du modèle de banc
     ContactorFeedbackTimeout : TIME := T#500ms;
 
     // === 🧪 Injections modèle (doctrine SPEC §2.1 : capteurs pilotés depuis la suite) ===
@@ -146,6 +146,14 @@ VAR_OUTPUT
     // === 📤 Faits publics Kobold (miroir GVL_IHM.Commun) ===
     KoboldImmersionConfirmed : BOOL;
     KoboldBottomTouchLatched : BOOL;
+
+    // === 🔄 Observation Séquenceur Cycle (miroir FB_TestHarness_PRG_03) ===
+    // Sorties de DIAG uniquement (aucun impact sur la chaîne) : exposent l'état du
+    // séquenceur FB_Cycle pour les scénarios e2e homme-mort / timeout (T169-A S3/S4).
+    CycleStep               : E_CycleStep;
+    CycleBusy               : BOOL;
+    CycleError              : BOOL;
+    CycleStateStr           : STRING(80);
 END_VAR
 
 VAR
@@ -342,13 +350,17 @@ BusAcq.Network.EncoderM2.Operational := TRUE;
 prg03(
     SelMode                 := CmdMode,
     SelJoystickWinch        := CmdWinchSelect,
-    MachineReferenceReady   := ModelMachineReferenceReady,
+    MachineHomed   := ModelMachineHomed,
     PowerContactorEngaged   := PowerContactorEngaged,
     DeadmanArmed            := BusAcq.JoystickDeadmanArmed,
     JoystickDeflected       := NOT BusAcq.JoystickYNeutral,
     BtnModeReset            := BtnResetMachine
 );
 BusModes := prg03.Auth;
+CycleStep     := prg03.CycleStep;
+CycleBusy     := prg03.CycleBusy;
+CycleError    := prg03.CycleError;
+CycleStateStr := prg03.CycleStateStr;
 
 // ── 3. PRG_04 (MIROIR T181-00) : Contrôle Treuils M1/M2 et Benne ──
 reqProgramLocal.ReqWinchM1 := SeqReqWinchM1;

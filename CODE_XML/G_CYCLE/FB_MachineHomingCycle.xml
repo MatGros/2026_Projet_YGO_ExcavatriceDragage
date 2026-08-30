@@ -1,0 +1,1442 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:19:53.541707" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:19:53.541707">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="E_MachineHomingStep">
+        <baseType>
+          <enum>
+            <values>
+              <value name="IDLE" value="0" />
+              <value name="LOSS_SAFESTOP" value="5" />
+              <value name="BOTH_NOT_HOMED" value="10" />
+              <value name="M1_NOT_HOMED" value="11" />
+              <value name="M2_NOT_HOMED" value="12" />
+              <value name="OFFSET_UNKNOWN" value="20" />
+              <value name="NEED_TOP_POSITION" value="30" />
+              <value name="NEED_MECHANICAL_STOP" value="40" />
+              <value name="AWAIT_BUCKET_CONFIRM" value="45" />
+              <value name="HOMING_IN_PROGRESS" value="50" />
+              <value name="VALID" value="60" />
+              <value name="FAILED" value="70" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>IDLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement indisponible (Enable=FALSE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>LOSS_SAFESTOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte de datum en mouvement : arret controle en cours</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BOTH_NOT_HOMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeurs M1 et M2 non references : passer en MAINT_N2</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>M1_NOT_HOMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur M1 non reference ou mesure douteuse : homer M1</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>M2_NOT_HOMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur M2 non reference ou mesure douteuse : homer M2</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>OFFSET_UNKNOWN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Offset benne inconnu : passer en MAINT_N2</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>NEED_TOP_POSITION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Monter Both a vitesse lente jusqu au capteur haut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>NEED_MECHANICAL_STOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur haut atteint : relacher la commande et attendre l arret</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AWAIT_BUCKET_CONFIRM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmer visuellement la benne : Fermee ou Ouverte</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HOMING_IN_PROGRESS</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement conjoint M1/M2 en cours : ne pas manoeuvrer</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>VALID</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement machine valide : mode nominal disponible</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAILED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement incomplet : rester en N2 et recommencer</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>91b3da89-8226-5d1f-92ee-cf29483801dd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_Mode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLE" value="0" />
+              <value name="MAINT_N1" value="1" />
+              <value name="MAINT_N2" value="2" />
+              <value name="SEMI_AUTO" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N1</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N2</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEMI_AUTO</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="ST_Fault">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu'au front Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] ErrorId figé à l'apparition du défaut, effacé au Reset</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ffe904a3-501c-5aac-bc38-202f178a61f2</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l'état défaut d'un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu'au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l'acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_FaultCause">
+        <baseType>
+          <struct>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause présente maintenant (interlock sur cette valeur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latching">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause à acquitter (arme Latched) ; 0 = live seulement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Texte">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>dafea4e6-0b73-5895-8c57-ef302142ebf7</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n'alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Lifecycle">
+        <baseType>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b6983c9c-4d76-5d4e-899b-e996cbf34849</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d'exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l'avancement d'une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbMachineHomingCycle_AxisHomingStatus">
+        <baseType>
+          <struct>
+            <variable name="HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur reference ET mesure jugee fiable (gate strict)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence de homing en cours sur l'axe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing termine avec succes (HomingLifecycle.Done cote FB_Encoder)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing en erreur sur l'axe (HomingFault.Error)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>796b0dad-a243-58d0-a47d-362338c07aeb</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_fbMachineHomingCycle_AxisHomingStatus — Statut homing d'un axe treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe l'etat de homing d'un axe (M1 ou M2) consomme par
+             FB_MachineHomingCycle pour piloter le guide et la transaction.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbMachineHomingCycle_BucketCommit">
+        <baseType>
+          <struct>
+            <variable name="CommitOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Publier "benne ouverte" (impulsion 1 scan)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommitClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Publier "benne fermee" (impulsion 1 scan)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8bbe6b1c-b915-5c25-90f5-ca9c8b430b97</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_fbMachineHomingCycle_BucketCommit — Commit atomique de l'etat benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Impulsion 1 scan emise par FB_MachineHomingCycle vers FB_Bucket
+             apres succes des DEUX homings. FB_Bucket reste seul proprietaire
+             de IsOpen / IsClosed.
+   🔒 Sécurité : CommitOpen et CommitClose mutuellement exclusifs (garanti
+                 par le corps du FB — rejet du double-confirm, cf. C-2).
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbMachineHomingCycle_HomingDemand">
+        <baseType>
+          <struct>
+            <variable name="HomeReq">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de prise d'origine pour cet axe (vocab reserve Homing)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="UseDynamicTarget">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE =&gt; cible = DynamicTarget_M (M2 uniquement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DynamicTarget_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible geometrique benne (m) : CfgTopHomingTargetM + offset</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a0819120-1e85-5b22-8a6d-414f9c7d9a11</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_fbMachineHomingCycle_HomingDemand — Demande de homing conjoint vers un axe
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Ordre de prise d'origine emis par FB_MachineHomingCycle vers
+             une facade FB_Encoder. M1 : cible configuree. M2 : cible
+             geometrique dynamique (top M1 configure +/- offset benne),
+             jamais une position M1 live.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="FB_MachineHomingCycle" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Enable + Reset) ===
+--&gt; [CMD] Autorisation generale (FALSE =&gt; sorties sures, retour IDLE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front, jamais conditionne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MODE ARBITRE ===
+--&gt; [CMD] Mode machine (confirmation benne : MAINT_N2 seul)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS SECURITE ===
+--&gt; [SAFE] Capteur haut commun au contact</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchesMechanicallyStopped">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] M1 ET M2 arret mecanique confirme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Status">
+              <type>
+                <derived name="ST_fbMachineHomingCycle_AxisHomingStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACQUISITION HOMING (M1 / M2) ===
+--&gt; [HW] Statut homing axe M1 (Retenue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Status">
+              <type>
+                <derived name="ST_fbMachineHomingCycle_AxisHomingStatus" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Statut homing axe M2 (Benne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketOffsetValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAT BENNE ===
+--&gt; [HW] Offset benne actif valide (FB_Bucket) — bootstrap datum seulement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmOpenPosition">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES OPERATEUR (IHM) ===
+--&gt; [CMD] Confirmation visuelle "benne ouverte" (niveau, front interne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmClosePosition">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Confirmation visuelle "benne fermee" (niveau, front interne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTopHomingTargetM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES &amp; CONFIGURATION ===
+--&gt; [CFG] Cible haute configuree M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgOffsetOpenM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Ecart geometrique benne ouverte (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgOffsetCloseM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Ecart geometrique benne fermee (m)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Ready + Fault) ===
+&lt;-- [STAT] FB actif (Enable ET NOT Fault.Latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Socle defaut (rempli par FB_FaultCore)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Lifecycle">
+              <type>
+                <derived name="ST_Lifecycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Cycle transaction (Busy = homing conjoint en cours)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== QUALIFICATION MACHINE ===
+&lt;-- [SAFE] Datum machine valide (gate SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomingStep">
+              <type>
+                <derived name="E_MachineHomingStep" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_MachineHomingStep.IDLE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etape du guide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomingStepAtError">
+              <type>
+                <derived name="E_MachineHomingStep" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_MachineHomingStep.IDLE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etape figee a l'apparition du defaut (R9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomingInstruction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Consigne operateur en clair (ASCII)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomingActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Transaction en cours (= Lifecycle.Busy)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomingLossSafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Demande d'arret controle suite perte de datum en mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomingFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Derniere transaction abandonnee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Demand">
+              <type>
+                <derived name="ST_fbMachineHomingCycle_HomingDemand" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DEMANDES HOMING (M1 / M2) ===
+&lt;-- [ACT] Demande de homing conjoint axe M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Demand">
+              <type>
+                <derived name="ST_fbMachineHomingCycle_HomingDemand" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Demande de homing conjoint axe M2 (cible dynamique)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketCommit">
+              <type>
+                <derived name="ST_fbMachineHomingCycle_BucketCommit" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMIT BENNE ===
+&lt;-- [ACT] Publication atomique de l'etat benne (vers FB_Bucket)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Socle defaut transverse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmOpenEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant ConfirmOpenPosition</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmCloseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant ConfirmClosePosition</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant Fault.Latched (capture R9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TABLE DES CAUSES DE DEFAUT ===
+. [LOC] Causes en clair pour FB_FaultCore</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PendingOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS INTERNES TRANSACTION ===
+. [LOC] Confirmation "ouverte" en attente de commit</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PendingClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation "fermee" en attente de commit</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingStarted">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Transaction homing conjoint armee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingBusyObserved">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Au moins un Busy observe depuis le debut de la transaction</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommitPublished">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Commit benne deja publie sur ce datum</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineWasHomed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memorise un datum valide (detection de perte)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingLossLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Perte de datum en mouvement latchee jusqu'a l'arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReHomingAckRequired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] C-1 : bloque MachineHomed jusqu'a un Reset conscient</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DoubleConfirmRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONDITIONS INTERMEDIAIRES NOMMEES (std 2quater : &lt;= 3 termes) ===
+. [LOC] Les deux fronts confirmation au meme scan (C-2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SingleConfirm">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Exactement un front confirmation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmWhileHoming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation pendant un homing d'axe en cours (C-4.3)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WindowSafe">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fenetre mecanique sure (N2 + capteur haut + arret)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisHomed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] M1 ET M2 references et fiables</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommitOrOffsetValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Datum benne connu (commit publie OU offset valide)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TransactionAbort">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition d'abandon fail-safe de la transaction</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomedRaw">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Qualification hors Fault (detection de perte, evite la circularite)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CAUSE_HOMING_LOST_IN_MOTION">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INDICES DE CAUSES (instCauses[]) ===
+Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CAUSE_TX_ABORT_TOP_LOST">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur haut perdu pendant la transaction (Latching)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CAUSE_TX_ABORT_MOTION">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mouvement detecte pendant la transaction (Latching)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CAUSE_HOMING_ERROR_M1">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Encoder M1 signale une erreur de homing (Latching)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CAUSE_HOMING_ERROR_M2">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Encoder M2 signale une erreur de homing (Latching)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CAUSE_DOUBLE_CONFIRM">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ConfirmOpen ET ConfirmClose au meme scan (Latching) — C-2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CAUSE_CONFIRM_WHILE_HOMING">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation pendant un homing d'axe en cours (Latching) — C-4.3</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🎯 FB_MachineHomingCycle — Guide de referencement machine M1/M2/benne
+   ───────────────────────────────────────────────────────────────
+   🎯 Role : Qualifier le datum machine (2 codeurs cales + etat benne
+             confirme) et guider le homing conjoint M1/M2 + le commit
+             atomique de l'etat benne. N'emet AUCUN ordre de mouvement.
+   🔒 Securite : SEMI_AUTO interdit tant que MachineHomed=FALSE. Perte de
+                 datum en mouvement -&gt; SafeStop ; reprise sur Reset conscient
+                 uniquement (aucun redemarrage automatique).
+   🔌 Interface : contrat standard (Enable/Reset, Ready/Fault/Lifecycle).
+                  Producteur UNIQUE de la qualification machine — ne relit
+                  jamais un ActiveOffsetValid aval (T185 C-3).
+   📄 Doc metier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+                   + DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+   🧩 Dependances : FB_FaultCore, FB_Encoder (M1/M2), FB_Bucket, FB_Modes
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === 🔑 §1 FRONTS, CIBLE DYNAMIQUE, CAUSES ET SOCLE DEFAUT ===
+{region "§1 Fronts &amp; causes"}
+
+// Sorties impulsionnelles remises a FALSE en tete de scan (1 scan actif au commit / a la demande).
+M1Demand.HomeReq := FALSE;
+M2Demand.HomeReq := FALSE;
+BucketCommit.CommitOpen := FALSE;
+BucketCommit.CommitClose := FALSE;
+
+// Cible dynamique M2 : recalculee chaque scan (jamais une position M1 live).
+M2Demand.UseDynamicTarget := PendingOpen OR PendingClose OR HomingStarted;
+IF PendingClose THEN
+    M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetCloseM;
+ELSE
+    M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetOpenM;
+END_IF;
+M1Demand.UseDynamicTarget := FALSE;
+
+// Detection de fronts.
+ResetEdge(CLK := Reset);
+ConfirmOpenEdge(CLK := ConfirmOpenPosition);
+ConfirmCloseEdge(CLK := ConfirmClosePosition);
+LatchedEdge(CLK := Fault.Latched);
+
+// Purge sur front Reset (inclut C-1 : ReHomingAckRequired).
+IF ResetEdge.Q THEN
+    PendingOpen         := FALSE;
+    PendingClose        := FALSE;
+    HomingStarted       := FALSE;
+    HomingBusyObserved  := FALSE;
+    CommitPublished     := FALSE;
+    MachineHomingFailed := FALSE;
+    MachineWasHomed     := FALSE;
+    HomingLossLatched   := FALSE;
+    ReHomingAckRequired := FALSE;
+END_IF;
+
+// Conditions intermediaires nommees (std 2quater).
+DoubleConfirmRequested := ConfirmOpenEdge.Q AND ConfirmCloseEdge.Q;
+SingleConfirm          := ConfirmOpenEdge.Q XOR ConfirmCloseEdge.Q;
+ConfirmWhileHoming     := SingleConfirm AND (M1Status.HomingBusy OR M2Status.HomingBusy);
+WindowSafe             := (Mode = E_Mode.MAINT_N2) AND TopPositionActive AND WinchesMechanicallyStopped;
+AxisHomed              := M1Status.HomedAndReliable AND M2Status.HomedAndReliable;
+CommitOrOffsetValid    := CommitPublished OR BucketOffsetValid;
+
+// Qualification "brute" (sans Fault) : sert a la detection de perte sans creer de circularite
+// avec le socle defaut appele plus bas.
+MachineHomedRaw := AxisHomed AND CommitOrOffsetValid
+                   AND NOT MachineHomingFailed AND NOT ReHomingAckRequired;
+
+// Perte d'un datum auparavant valide EN MOUVEMENT : latch jusqu'a l'arret mecanique.
+IF MachineHomedRaw THEN
+    MachineWasHomed := TRUE;
+END_IF;
+IF MachineWasHomed AND NOT MachineHomedRaw AND NOT WinchesMechanicallyStopped THEN
+    HomingLossLatched := TRUE;
+END_IF;
+IF NOT MachineHomedRaw AND WinchesMechanicallyStopped THEN
+    MachineWasHomed := FALSE;
+END_IF;
+IF HomingLossLatched AND WinchesMechanicallyStopped THEN
+    HomingLossLatched := FALSE;
+END_IF;
+
+(* T185 C-1 : pas de redemarrage automatique. Une perte de datum en mouvement exige un
+   acquittement conscient (front Reset) avant que MachineHomed puisse revenir. *)
+IF HomingLossLatched AND NOT ReHomingAckRequired THEN
+    ReHomingAckRequired := TRUE;
+END_IF;
+
+// Table des causes (toutes Latching : acquittables au front Reset).
+instCauses[CAUSE_HOMING_LOST_IN_MOTION].Active   := HomingLossLatched OR ReHomingAckRequired;
+instCauses[CAUSE_HOMING_LOST_IN_MOTION].Latching := TRUE;
+instCauses[CAUSE_HOMING_LOST_IN_MOTION].Texte    := 'Perte de datum machine en mouvement : re-referencer';
+
+instCauses[CAUSE_TX_ABORT_TOP_LOST].Active   := HomingStarted AND NOT TopPositionActive;
+instCauses[CAUSE_TX_ABORT_TOP_LOST].Latching := TRUE;
+instCauses[CAUSE_TX_ABORT_TOP_LOST].Texte    := 'Capteur haut perdu pendant le referencement conjoint';
+
+instCauses[CAUSE_TX_ABORT_MOTION].Active   := HomingStarted AND NOT WinchesMechanicallyStopped;
+instCauses[CAUSE_TX_ABORT_MOTION].Latching := TRUE;
+instCauses[CAUSE_TX_ABORT_MOTION].Texte    := 'Mouvement detecte pendant le referencement conjoint';
+
+instCauses[CAUSE_HOMING_ERROR_M1].Active   := HomingStarted AND M1Status.HomingError;
+instCauses[CAUSE_HOMING_ERROR_M1].Latching := TRUE;
+instCauses[CAUSE_HOMING_ERROR_M1].Texte    := 'Erreur de homing codeur M1 pendant le referencement conjoint';
+
+instCauses[CAUSE_HOMING_ERROR_M2].Active   := HomingStarted AND M2Status.HomingError;
+instCauses[CAUSE_HOMING_ERROR_M2].Latching := TRUE;
+instCauses[CAUSE_HOMING_ERROR_M2].Texte    := 'Erreur de homing codeur M2 pendant le referencement conjoint';
+
+(* T185 C-2 : confirmation Ouverte ET Fermee au meme scan = rejet total, cause a acquitter. *)
+instCauses[CAUSE_DOUBLE_CONFIRM].Active   := DoubleConfirmRequested;
+instCauses[CAUSE_DOUBLE_CONFIRM].Latching := TRUE;
+instCauses[CAUSE_DOUBLE_CONFIRM].Texte    := 'Confirmation benne Ouverte et Fermee simultanee : refusee';
+
+(* T185 C-4.3 : confirmation recue pendant un homing d'axe deja en cours = ignoree. *)
+instCauses[CAUSE_CONFIRM_WHILE_HOMING].Active   := ConfirmWhileHoming;
+instCauses[CAUSE_CONFIRM_WHILE_HOMING].Latching := TRUE;
+instCauses[CAUSE_CONFIRM_WHILE_HOMING].Texte    := 'Confirmation benne pendant un homing codeur en cours : ignoree';
+
+// Socle defaut : appele AVANT la gate NOT Enable (Reset jamais conditionne, std 9).
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+
+// === 🔑 §2 DEMANDE SAFESTOP SUR PERTE DE DATUM ===
+{region "§2 Perte datum"}
+// Demande d'arret controle tant que la perte n'est pas mecaniquement resolue.
+// La qualification de sortie MachineHomed est calculee en §6, APRES le deroule de
+// transaction (commit ou abandon du meme scan pris en compte) — calcul unique.
+MachineHomingLossSafeStop := HomingLossLatched;
+{endregion}
+
+// === 🔑 §3 GATE D'INITIALISATION (NOT Enable) ===
+{region "§3 Gate init NOT Enable"}
+IF NOT Enable THEN
+    MachineHomingStep         := E_MachineHomingStep.IDLE;
+    MachineHomingInstruction  := 'Referencement indisponible';
+    MachineHomed              := FALSE;
+    MachineHomingActive       := FALSE;
+    M1Demand.HomeReq          := FALSE;
+    M2Demand.HomeReq          := FALSE;
+    M1Demand.UseDynamicTarget := FALSE;
+    M2Demand.UseDynamicTarget := FALSE;
+    BucketCommit.CommitOpen   := FALSE;
+    BucketCommit.CommitClose  := FALSE;
+    Lifecycle.Busy            := FALSE;
+    Lifecycle.Done            := FALSE;
+    Ready                     := FALSE;
+    RETURN;
+END_IF;
+{endregion}
+
+// === 🔑 §4 OUVERTURE DE LA TRANSACTION DE REFERENCEMENT CONJOINT ===
+{region "§4 Ouverture transaction"}
+(* T185 C-4.1 : jamais "au vol" par-dessus un homing d'axe deja en cours.
+   Demande acceptee uniquement dans la fenetre mecanique sure, front unique, hors double. *)
+IF SingleConfirm AND NOT HomingStarted AND NOT DoubleConfirmRequested AND NOT ConfirmWhileHoming
+   AND WindowSafe
+   AND NOT M1Status.HomingBusy AND NOT M2Status.HomingBusy THEN
+    PendingOpen        := ConfirmOpenEdge.Q;
+    PendingClose       := ConfirmCloseEdge.Q;
+    HomingStarted      := TRUE;
+    HomingBusyObserved := FALSE;
+    CommitPublished    := FALSE;
+    MachineHomingFailed := FALSE;
+    M1Demand.HomeReq          := TRUE;
+    M2Demand.HomeReq          := TRUE;
+    M2Demand.UseDynamicTarget := TRUE;
+    IF PendingClose THEN
+        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetCloseM;
+    ELSE
+        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetOpenM;
+    END_IF;
+END_IF;
+{endregion}
+
+// === 🔑 §5 DEROULE DE LA TRANSACTION &amp; COMMIT ATOMIQUE ===
+{region "§5 Deroule transaction &amp; commit atomique"}
+IF HomingStarted THEN
+    M2Demand.UseDynamicTarget := TRUE;
+    IF PendingClose THEN
+        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetCloseM;
+    ELSE
+        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetOpenM;
+    END_IF;
+
+    TransactionAbort := (NOT TopPositionActive) OR (NOT WinchesMechanicallyStopped)
+                        OR M1Status.HomingError OR M2Status.HomingError;
+
+    IF TransactionAbort THEN
+        MachineHomingFailed := TRUE;
+        HomingStarted       := FALSE;
+        PendingOpen         := FALSE;
+        PendingClose        := FALSE;
+    ELSIF M1Status.HomingBusy OR M2Status.HomingBusy THEN
+        HomingBusyObserved := TRUE;
+    ELSIF HomingBusyObserved AND M1Status.HomedAndReliable AND M2Status.HomedAndReliable
+          AND M1Status.HomingDone AND M2Status.HomingDone THEN
+        (* Publication atomique : les deux etats benne ecrits par FB_Bucket dans le meme
+           scan, uniquement apres les deux succes observes. *)
+        BucketCommit.CommitOpen  := PendingOpen;
+        BucketCommit.CommitClose := PendingClose;
+        CommitPublished := TRUE;
+        HomingStarted   := FALSE;
+        PendingOpen     := FALSE;
+        PendingClose    := FALSE;
+    END_IF;
+END_IF;
+{endregion}
+
+// === 🔑 §6 CYCLE DE VIE, R9 ET GUIDE OPERATEUR ===
+{region "§6 Guide operateur &amp; sorties"}
+MachineHomingActive := HomingStarted;
+Lifecycle.Busy      := HomingStarted;
+Lifecycle.Done      := CommitPublished;
+
+// Qualification de sortie — calcul UNIQUE, apres le deroule de transaction (§5) : un commit
+// atomique OU un abandon du meme scan est immediatement reflete (comportement d'origine).
+CommitOrOffsetValid := CommitPublished OR BucketOffsetValid;
+MachineHomed := AxisHomed AND CommitOrOffsetValid
+                AND NOT MachineHomingFailed AND NOT ReHomingAckRequired
+                AND NOT Fault.Latched;
+
+// R9 : capture de l'etape au front d'apparition du defaut latche, avant recalcul du guide.
+IF LatchedEdge.Q THEN
+    MachineHomingStepAtError := MachineHomingStep;
+END_IF;
+
+// Guide operateur — priorite decroissante, textes conserves a l'identique.
+IF MachineHomingFailed THEN
+    MachineHomingStep := E_MachineHomingStep.FAILED;
+    MachineHomingInstruction := 'Referencement incomplet : rester en N2 et recommencer';
+ELSIF MachineHomingLossSafeStop THEN
+    MachineHomingStep := E_MachineHomingStep.LOSS_SAFESTOP;
+    MachineHomingInstruction := 'Reference perdue en mouvement : arret controle en cours';
+ELSIF HomingStarted OR M1Status.HomingBusy OR M2Status.HomingBusy THEN
+    MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
+    MachineHomingInstruction := 'Referencement conjoint M1/M2 en cours : ne pas manoeuvrer';
+ELSIF NOT M1Status.HomedAndReliable AND NOT M2Status.HomedAndReliable THEN
+    MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;
+    MachineHomingInstruction := 'Codeurs M1 et M2 non references : passer en maintenance N2';
+ELSIF NOT M1Status.HomedAndReliable THEN
+    MachineHomingStep := E_MachineHomingStep.M1_NOT_HOMED;
+    MachineHomingInstruction := 'Codeur M1 non reference ou mesure douteuse : homer M1';
+ELSIF NOT M2Status.HomedAndReliable THEN
+    MachineHomingStep := E_MachineHomingStep.M2_NOT_HOMED;
+    MachineHomingInstruction := 'Codeur M2 non reference ou mesure douteuse : homer M2';
+ELSIF NOT (CommitPublished OR BucketOffsetValid) THEN
+    IF Mode &lt;&gt; E_Mode.MAINT_N2 THEN
+        MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
+        MachineHomingInstruction := 'Offset benne inconnu : passer en maintenance N2';
+    ELSIF NOT TopPositionActive THEN
+        MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
+        MachineHomingInstruction := 'Monter Both a vitesse lente jusqu au capteur haut';
+    ELSIF NOT WinchesMechanicallyStopped THEN
+        MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
+        MachineHomingInstruction := 'Capteur haut atteint : relacher la commande et attendre l arret';
+    ELSE
+        MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
+        MachineHomingInstruction := 'Confirmer visuellement la benne : Fermee ou Ouverte';
+    END_IF;
+ELSE
+    MachineHomingStep := E_MachineHomingStep.VALID;
+    MachineHomingInstruction := 'Referencement machine valide : mode nominal disponible';
+END_IF;
+
+Ready := Enable AND NOT Fault.Latched;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>107b39d9-e311-549c-ac0a-91b020a05df9</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_FaultCore" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation générale du FB porteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement (jamais conditionné, §9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Causes">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB porteur autorisé (= Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latch">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bit laté par cause, jusqu'au Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="i">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de parcours de la liste</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d'une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l'apparition d'une
+          cause `Active AND Latching`, conservé jusqu'au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d'effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Reset (front, toujours effectif)"}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region "§2 Vue LIVE — Error / ErrorId"}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region "§3 Armement des latches (causes à acquitter)"}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu'au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region "§4 Vue LATCHÉE — Latched / LatchedId"}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>182a55ac-4f1f-5204-b2e2-869f3904964e</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="G_CYCLE">
+          <Object Name="FB_MachineHomingCycle" ObjectId="107b39d9-e311-549c-ac0a-91b020a05df9" />
+          <Folder Name="_TYPES">
+            <Object Name="E_MachineHomingStep" ObjectId="91b3da89-8226-5d1f-92ee-cf29483801dd" />
+            <Object Name="ST_fbMachineHomingCycle_AxisHomingStatus" ObjectId="796b0dad-a243-58d0-a47d-362338c07aeb" />
+            <Object Name="ST_fbMachineHomingCycle_BucketCommit" ObjectId="8bbe6b1c-b915-5c25-90f5-ca9c8b430b97" />
+            <Object Name="ST_fbMachineHomingCycle_HomingDemand" ObjectId="a0819120-1e85-5b22-8a6d-414f9c7d9a11" />
+          </Folder>
+        </Folder>
+        <Folder Name="F_MODES">
+          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
+            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

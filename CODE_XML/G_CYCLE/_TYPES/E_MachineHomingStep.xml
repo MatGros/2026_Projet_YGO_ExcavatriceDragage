@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:15:59.807181" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:15:59.807181">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="E_MachineHomingStep">
+        <baseType>
+          <enum>
+            <values>
+              <value name="IDLE" value="0" />
+              <value name="LOSS_SAFESTOP" value="5" />
+              <value name="BOTH_NOT_HOMED" value="10" />
+              <value name="M1_NOT_HOMED" value="11" />
+              <value name="M2_NOT_HOMED" value="12" />
+              <value name="OFFSET_UNKNOWN" value="20" />
+              <value name="NEED_TOP_POSITION" value="30" />
+              <value name="NEED_MECHANICAL_STOP" value="40" />
+              <value name="AWAIT_BUCKET_CONFIRM" value="45" />
+              <value name="HOMING_IN_PROGRESS" value="50" />
+              <value name="VALID" value="60" />
+              <value name="FAILED" value="70" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>IDLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement indisponible (Enable=FALSE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>LOSS_SAFESTOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte de datum en mouvement : arret controle en cours</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BOTH_NOT_HOMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeurs M1 et M2 non references : passer en MAINT_N2</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>M1_NOT_HOMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur M1 non reference ou mesure douteuse : homer M1</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>M2_NOT_HOMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Codeur M2 non reference ou mesure douteuse : homer M2</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>OFFSET_UNKNOWN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Offset benne inconnu : passer en MAINT_N2</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>NEED_TOP_POSITION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Monter Both a vitesse lente jusqu au capteur haut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>NEED_MECHANICAL_STOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur haut atteint : relacher la commande et attendre l arret</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AWAIT_BUCKET_CONFIRM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmer visuellement la benne : Fermee ou Ouverte</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HOMING_IN_PROGRESS</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement conjoint M1/M2 en cours : ne pas manoeuvrer</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>VALID</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement machine valide : mode nominal disponible</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAILED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement incomplet : rester en N2 et recommencer</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>91b3da89-8226-5d1f-92ee-cf29483801dd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="G_CYCLE">
+          <Folder Name="_TYPES">
+            <Object Name="E_MachineHomingStep" ObjectId="91b3da89-8226-5d1f-92ee-cf29483801dd" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

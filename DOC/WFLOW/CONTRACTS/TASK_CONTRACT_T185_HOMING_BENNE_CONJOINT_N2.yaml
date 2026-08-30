@@ -35,9 +35,18 @@ contract:
     - id: AC9
       statement: "L'operateur peut demander M1, M2 ou choisir l'etat benne dans un ordre libre ; le choix benne est memorise comme attente et ne devient valide qu'apres les deux homings fiables."
       verified_by: "TC integration : trois ordres d'action distincts, meme etat final ReferenceMachineReady."
+    - id: AC10
+      statement: "L'IHM propose Benne fermee comme choix initial du parcours, mais aucune valeur IsClosed/IsOpen n'est forcee sans confirmation explicite de l'operateur."
+      verified_by: "À vérifier par un TC IHM/intégration : présélection fermée sans front = aucun commit ; confirmation fermée = commit fermé."
+    - id: AC11
+      statement: "L'operateur peut remplacer le choix propose par Benne ouverte ; le homing conjoint et le commit atomique suivent le meme contrat."
+      verified_by: "À vérifier par un TC IHM/intégration : confirmation ouverte après changement de choix = commit ouvert exclusif."
+    - id: AC12
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU ; aucun suffixe de langage _CFC/_LD n'est ajouté et le suffixe reste identique au langage généré dans le bundle."
+      verified_by: "G310 structure + génération bundle PLCopenXML."
   scope:
     allowed:
-      - CODE/G_CYCLE/FB_ReferenceCycle.st
+      - CODE/G_CYCLE/FB_MachineHomingCycle.st
       - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
       - CODE/F_MODES/FB_Modes.st
       - CODE/M_MAIN/PRG_02_Acquisition.st
@@ -52,7 +61,7 @@ contract:
       - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st
       - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_03.st
       - TOOLS/TEST_AUTO_CI/RESULTS/F_MODES/tests/test_fb_modes.st
-      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_referencecycle.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_machinehomingcycle.st
       - TOOLS/TEST_AUTO_CI/registry.yaml
       - DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
       - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
@@ -84,8 +93,13 @@ execution:
   executed_by: "Codex + Ollama deepseek-v4-flash:cloud (revue contradictoire)"
   completed_at: ""
   status: IN_PROGRESS
-  summary: "Architecture atomique validee humainement ; implementation en cours."
-  evidence_submitted: []
+  summary: "T132 absorbee : choix ferme propose par defaut IHM, confirmation ouverte possible, aucun forçage PLC. FB_MachineHomingCycle et appel PRG02 adaptes ; validation cible 18/18 PASS. Controle de schema du contrat PASS, mais AC6 (G200/gates globales) reste ouvert : orphelin T181-15 et G340/G430 hors perimetre fonctionnel T185."
+  evidence_submitted:
+    - "TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.html — 18/18 tests PASS + chronogramme"
+    - "TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.txt — compilation et execution"
+    - "CODE_XML/CODE_Bundle.xml — bundle frais 216/216 objets, 0 erreur"
+    - "G200_check_linkage.py --report — 101 liaisons T185 OK ; échec global uniquement sur FB_WinchSpeedLearning orphelin"
+    - "run_all_gates.py --palier C — 24/26 PASS ; G340/G430 bloquants documentaires et commentaires REX"
 validation:
   status: APPROVED
   validated_by: "Utilisateur"

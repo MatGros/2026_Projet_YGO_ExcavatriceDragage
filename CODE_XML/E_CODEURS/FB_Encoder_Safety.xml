@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T19:40:50.707500" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T19:40:50.707500">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:43:51.297714" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:43:51.297714">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -284,7 +284,7 @@
    🎯 Rôle : Bornage physique absolu [-99; +99]m et relais d'incohérence redémarrage
    🔒 Polarité : EncoderIncoherent=TRUE en cas de hors bornes ou HomingSuspect
    🛡️ Sécurité : Verrouillage de la position câble sûre
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

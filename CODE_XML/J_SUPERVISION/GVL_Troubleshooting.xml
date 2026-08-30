@@ -122,7 +122,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) en direct</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx113_MachineReferenceReady">
+            <variable name="Idx113_MachineHomed">
               <type>
                 <BOOL />
               </type>
@@ -130,7 +130,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference M1/M2/benne qualifiee</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx114_ReferenceStep">
+            <variable name="Idx114_MachineHomingStep">
               <type>
                 <INT />
               </type>
@@ -138,7 +138,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee reference machine</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx115_ReferenceFailed">
+            <variable name="Idx115_MachineHomingFailed">
               <type>
                 <BOOL />
               </type>
@@ -178,7 +178,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx120_ReferenceLossSafeStop">
+            <variable name="Idx120_MachineHomingLossSafeStop">
               <type>
                 <BOOL />
               </type>

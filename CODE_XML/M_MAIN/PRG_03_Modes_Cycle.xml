@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T18:15:33.977933" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T18:15:33.977933">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:16:09.690271" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:16:09.690271">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1613,7 +1613,7 @@ instModes(
     // assumé : PRG_04 est de rang 04, ce programme de rang 03)
     M1PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM1,
     M2PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM2,
-    MachineReferenceReady     := PRG_02_Acquisition.MachineReferenceReady,
+    MachineHomed     := PRG_02_Acquisition.MachineHomed,
     // Restauration boot des drapeaux de re-homing (miroir PERSISTENT)
     BootHomingRequiredM1      := GVL_PERSISTENT._MaintM1HomingRequired,
     BootHomingRequiredM2      := GVL_PERSISTENT._MaintM2HomingRequired
@@ -3234,6 +3234,7 @@ CASE State OF
         TranslationCmd.Start := FALSE;
         BucketCmd.Open := FALSE;
         BucketCmd.Close := FALSE;
+        BucketCmd.KoboldContactorCmd := FALSE;   // Coupure contacteur Kobold au repli defaut (0 ordre residuel)
         Lifecycle.Busy := FALSE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -3257,7 +3258,7 @@ IF Lifecycle.Busy AND NOT CycleMotionPermit THEN
     BucketCmd.KoboldContactorCmd := FALSE;
 END_IF;
 
-RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.Start OR BucketCmd.Open OR BucketCmd.Close;
+RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.Start OR BucketCmd.Open OR BucketCmd.Close OR BucketCmd.KoboldContactorCmd; // Somme logique complete des demandes (contacteur Kobold inclus)
 {endregion}
 </xhtml>
           </ST>
@@ -5030,7 +5031,7 @@ ET frein serré, redondés par la mesure de vitesse.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] M2 : limite de position levée (override N1 ou bypass N2 effectif)</xhtml>
               </documentation>
             </variable>
-            <variable name="MachineReferenceReady">
+            <variable name="MachineHomed">
               <type>
                 <BOOL />
               </type>
@@ -5182,7 +5183,7 @@ ET frein serré, redondés par la mesure de vitesse.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch refus semi-auto pour re-homing obligatoire</xhtml>
               </documentation>
             </variable>
-            <variable name="SemiAutoRefusedReference">
+            <variable name="SemiAutoRefusedMachineHoming">
               <type>
                 <BOOL />
               </type>
@@ -5265,7 +5266,7 @@ END_IF;
 IF (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
     SemiAutoRefusedHoming := TRUE;
 END_IF;
-SemiAutoRefusedReference := (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineReferenceReady;
+SemiAutoRefusedMachineHoming := (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed;
 
 instCauses[0].Active   := SemiAutoRefusedFault;
 instCauses[0].Latching := TRUE;
@@ -5275,7 +5276,7 @@ instCauses[2].Active   := SemiAutoRefusedHoming;
 instCauses[2].Latching := TRUE;
 instCauses[2].Texte    := 'Mode Semi-Auto refuse car re-homing obligatoire (depassement de limite de position)';
 
-instCauses[3].Active   := SemiAutoRefusedReference;
+instCauses[3].Active   := SemiAutoRefusedMachineHoming;
 instCauses[3].Latching := FALSE;
 instCauses[3].Texte    := 'Mode Semi-Auto refuse : referencement M1/M2/benne incomplet';
 
@@ -5331,7 +5332,7 @@ ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
 
 // 3.2 ARBITRAGE — priorité du refus de sécurité, puis du refus de bascule
 IF (SelMode = E_Mode.SEMI_AUTO)
-   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2 OR NOT MachineReferenceReady) THEN
+   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2 OR NOT MachineHomed) THEN
     // Défaut codeur ou re-homing obligatoire : SEMI_AUTO interdit, repli MAINT_N1.
     Auth.Mode := E_Mode.MAINT_N1;
     Auth.ModeChangePendingBlocked := FALSE;

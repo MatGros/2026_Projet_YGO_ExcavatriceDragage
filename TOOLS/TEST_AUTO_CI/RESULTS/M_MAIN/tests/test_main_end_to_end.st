@@ -94,3 +94,41 @@ TEST 'MAIN_GLOBAL : Coupure Puissance AU Propagee a tous les Actionneurs'
     ASSERT_FALSE(mainMachine.BusOutputs.M1BrakeCmd, 'Frein M1 retombe');
     ASSERT_FALSE(mainMachine.BusOutputs.TranslationBrakeCmd, 'Frein M3 bloque');
 END_TEST
+
+TEST 'MAIN_GLOBAL : Relachement homme-mort en contexte cycle -> sequenceur observe + demande actionneur neutralisee (T169-A S3)'
+    // 1. Armement homme-mort + passage Semi-Auto : le séquenceur FB_Cycle quitte X0
+    mainMachine(
+        JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
+        CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 1,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+    );
+    mainMachine(
+        JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := TRUE,
+        CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 1,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+    );
+    ADVANCE_TIME(150000000); // > 100 ms DeadmanArmHoldTime
+    mainMachine(
+        JoyRawX := 5000, JoyRawY := 8000, JoyDeadmanBtn := TRUE,
+        CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 1,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+    );
+    mainMachine(
+        JoyRawX := 5000, JoyRawY := 8000, JoyDeadmanBtn := TRUE,
+        CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 1,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+    );
+
+    // 2. Le séquenceur est observé actif (diag e2e) et le mode arbitre est SEMI_AUTO
+    ASSERT_TRUE(mainMachine.CycleStep <> E_CycleStep.X0_PREPARATION, 'Sequenceur sorti de X0 en Semi-Auto');
+    ASSERT_TRUE(mainMachine.BusModes.Mode = E_Mode.SEMI_AUTO, 'Mode SEMI_AUTO arbitre');
+
+    // 3. Relâchement homme-mort / manche au neutre -> demande actionneur neutralisée
+    mainMachine(
+        JoyRawX := 5000, JoyRawY := 5000, JoyDeadmanBtn := FALSE,
+        CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 1,
+        EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE
+    );
+    ASSERT_FALSE(mainMachine.BusWinch.WinchM1FinalInterlockRequest.RequestedRelayFwd, 'Demande M1 coupee au relache homme-mort');
+    ASSERT_FALSE(mainMachine.BusWinch.WinchM1FinalInterlockRequest.RequestedContactor1, 'Contactor M1 coupe au relache');
+END_TEST

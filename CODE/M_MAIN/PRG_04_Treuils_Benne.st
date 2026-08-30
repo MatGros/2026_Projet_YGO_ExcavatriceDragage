@@ -248,10 +248,10 @@ instBucket(
     HomedM2             := PRG_02_Acquisition.Data.EncoderM2.Homed,
     M1_Busy             := (instWinchM1.StepNumber > 0),
     M2_Busy             := (instWinchM2.StepNumber > 0),
-    ReferenceCommitOpen  := PRG_02_Acquisition.ReferenceCommitOpen,
-    ReferenceCommitClose := PRG_02_Acquisition.ReferenceCommitClose,
-    MachineReferenceReady := PRG_02_Acquisition.MachineReferenceReady,
-    ReferenceTransactionActive := PRG_02_Acquisition.ReferenceTransactionActive,
+    MachineHomingCommitOpen  := PRG_02_Acquisition.MachineHomingCommitOpen,
+    MachineHomingCommitClose := PRG_02_Acquisition.MachineHomingCommitClose,
+    MachineHomed := PRG_02_Acquisition.MachineHomed,
+    MachineHomingActive := PRG_02_Acquisition.MachineHomingActive,
     Config              := _BucketCfgPersist.Config,
     CfgTimeoutDuration     := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     BucketState        := _BucketState,
@@ -498,9 +498,9 @@ END_IF;
 // deux treuils, sans PowerCutOff additionnel. Le cycle libere la demande
 // seulement apres le composite d'arret mecanique confirme.
 SafeStopM1_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) <> 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModuleFault
-                       OR PRG_02_Acquisition.ReferenceLossSafeStop;
+                       OR PRG_02_Acquisition.MachineHomingLossSafeStop;
 SafeStopM2_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) <> 16#0000) OR PRG_02_Acquisition.Data.InputModuleFault
-                       OR PRG_02_Acquisition.ReferenceLossSafeStop;
+                       OR PRG_02_Acquisition.MachineHomingLossSafeStop;
 
 // Surveillance Kobold descente normale (hors FB_DiveSearch)
 // : signal HwIn.Machine.M1_M2_KoboldBottomTouch_DI (même que instDiveSearch §1).
@@ -1200,12 +1200,12 @@ BucketState.OpenActive := instBucket.OpenReq;
 BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ExtractionControlActive;
 BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
 BucketState.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
-BucketState.MachineReferenceReady := PRG_02_Acquisition.MachineReferenceReady;
-BucketState.ReferenceStep := PRG_02_Acquisition.ReferenceStep;
-BucketState.ReferenceInstruction := PRG_02_Acquisition.ReferenceInstruction;
-BucketState.ReferenceFailed := PRG_02_Acquisition.ReferenceFailed;
-BucketState.ReferenceTransactionActive := PRG_02_Acquisition.ReferenceTransactionActive;
-BucketState.ReferenceLossSafeStop := PRG_02_Acquisition.ReferenceLossSafeStop;
+BucketState.MachineHomed := PRG_02_Acquisition.MachineHomed;
+BucketState.MachineHomingStep := PRG_02_Acquisition.MachineHomingStep;
+BucketState.MachineHomingInstruction := PRG_02_Acquisition.MachineHomingInstruction;
+BucketState.MachineHomingFailed := PRG_02_Acquisition.MachineHomingFailed;
+BucketState.MachineHomingActive := PRG_02_Acquisition.MachineHomingActive;
+BucketState.MachineHomingLossSafeStop := PRG_02_Acquisition.MachineHomingLossSafeStop;
 BucketState.ExtractionControlActive := ExtractionControlActive;
 BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;

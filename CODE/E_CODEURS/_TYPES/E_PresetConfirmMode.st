@@ -2,7 +2,7 @@
    ⚙️ E_PresetConfirmMode — Mode de confirmation du preset codeur
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : sélectionner le fait public utilisé pour valider un preset.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE E_PresetConfirmMode :

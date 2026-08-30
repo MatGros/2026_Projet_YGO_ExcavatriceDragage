@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T16:59:27.517569" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T16:59:27.517569">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:43:54.081042" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:43:54.081042">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -61,7 +61,7 @@
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
    🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -150,7 +150,7 @@
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : restauration et synchronisation bidirectionnelle IHM / Persist.
    💾 Persistance : transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

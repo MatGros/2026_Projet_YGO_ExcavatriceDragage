@@ -20,7 +20,7 @@ VAR_INPUT
     // === 🛡️ Sécurités Machine ===
     PowerContactorEngaged   : BOOL := TRUE;
     EncoderFaultPresent     : BOOL := FALSE;
-    MachineReferenceReady   : BOOL := TRUE; // Fixture: machine déjà référencée par défaut
+    MachineHomed   : BOOL := TRUE; // Fixture: machine déjà référencée par défaut
     
     // === 🔄 Commandes Cycle Semi-Auto ===
     BtnStartCycle           : BOOL;
@@ -72,7 +72,7 @@ instModes(
     InhibitM2Request        := InhibitM2Request,
     SelHomingApproachEnable := SelHomingApproachEnable,
     EncoderFaultPresent     := EncoderFaultPresent,
-    MachineReferenceReady   := MachineReferenceReady,
+    MachineHomed   := MachineHomed,
     JoystickWinchSelectRequest := SelJoystickWinch,
     SelMaintenanceZoneAccess := TglMaintenanceZoneAccess
 );

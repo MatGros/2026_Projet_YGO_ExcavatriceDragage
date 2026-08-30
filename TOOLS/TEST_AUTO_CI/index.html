@@ -305,184 +305,85 @@
 <body>
 <div class="page">
 
-    <div class="header card-neon-fail" style="justify-content:space-between;">
+    <div class="header card-neon-ok" style="justify-content:space-between;">
         <div>
             <h1 style="display:flex;align-items:center;gap:14px;font-size:32px;font-weight:900;letter-spacing:-0.5px;">⚡ DASHBOARD <span style="font-size:20px;color:var(--accent);font-weight:800;font-family:monospace;">TEST_AUTO_CI</span></h1>
             <div style="color:var(--muted);font-size:15px;font-weight:600;margin-top:6px;">Excavatrice de Dragage · Validation Automate CODESYS 3.5 & STruCpp</div>
         </div>
         <div style="display:flex;align-items:center;gap:16px;">
             <button class="theme-toggle-btn" onclick="toggleTheme()" style="font-size:14px;padding:9px 18px;">☀️ Mode Clair</button>
-            <span class="badge badge-fail badge-strong">FAIL</span>
+            <span class="badge badge-pass badge-strong">PASS</span>
         </div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:16px;margin:24px 0;">
         <div class="card-neon-blue" style="background:var(--surface);border-radius:12px;padding:18px;text-align:center;">
-            <div style="font-size:30px;font-weight:900;color:var(--accent);font-family:monospace;">13</div>
+            <div style="font-size:30px;font-weight:900;color:var(--accent);font-family:monospace;">4</div>
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">POU & Composants</div>
         </div>
         <div class="card-neon-ok" style="background:var(--surface);border-radius:12px;padding:18px;text-align:center;">
-            <div style="font-size:30px;font-weight:900;color:var(--green-text);font-family:monospace;">10</div>
+            <div style="font-size:30px;font-weight:900;color:var(--green-text);font-family:monospace;">4</div>
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Succès (PASS)</div>
         </div>
-        <div class="card-neon-fail" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
-            <div style="font-size:30px;font-weight:900;color:var(--red-text);font-family:monospace;">3</div>
+        <div class="" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
+            <div style="font-size:30px;font-weight:900;color:var(--muted);font-family:monospace;">0</div>
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Échecs (FAIL)</div>
         </div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
-            <div style="font-size:16px;font-weight:800;color:var(--text);margin-top:8px;font-family:monospace;">2026-08-30 18:15:39</div>
+            <div style="font-size:16px;font-weight:800;color:var(--text);margin-top:8px;font-family:monospace;">2026-08-30 21:37:27</div>
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Horodatage Exécution</div>
         </div>
     </div>
     
-        <div class="card-neon-fail" style="background:var(--surface);border-radius:12px;padding:20px 24px;margin-bottom:22px;transition:all 0.2s ease;">
+        <div class="card-neon-ok" style="background:var(--surface);border-radius:12px;padding:20px 24px;margin-bottom:22px;transition:all 0.2s ease;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
-                <h2 style="margin:0;font-size:19px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px;">📁 <span style="color:var(--accent);font-family:monospace;font-weight:800;">CODE/H_TREUILS_BENNE</span></h2>
-                <div style="display:flex;align-items:center;gap:10px;"><span class="badge badge-fail">FAIL</span> <span style="font-size:14px;color:var(--muted);font-weight:700;">10/13 composant(s)</span></div>
+                <h2 style="margin:0;font-size:19px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px;">📁 <span style="color:var(--accent);font-family:monospace;font-weight:800;">CODE/G_CYCLE</span></h2>
+                <div style="display:flex;align-items:center;gap:10px;"><span class="badge badge-pass">PASS</span> <span style="font-size:14px;color:var(--muted);font-weight:700;">4/4 composant(s)</span></div>
             </div>
             <table style="width:100%;border-collapse:collapse;font-size:14px;">
                 <tbody>
             <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_Bucket.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Bucket</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">21/22 test(s) OK</span>
+                        <a href="RESULTS/G_CYCLE/reports/FB_Cycle.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Cycle</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">7/7 test(s) OK</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_Bucket.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_Cycle.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_DriftGuard.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_DriftGuard</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
-                    </div>
-                </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_DriftGuard.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
-                <td style="padding: 12px 14px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_Safety_Winch.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Safety_Winch</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">15/15 test(s) OK</span>
-                    </div>
-                </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_Safety_Winch.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
-                <td style="padding: 12px 14px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_SpeedStep.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_SpeedStep</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
-                    </div>
-                </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_SpeedStep.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
-                <td style="padding: 12px 14px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_Winch.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Winch</a>
+                        <a href="RESULTS/G_CYCLE/reports/FB_DiveSearch.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_DiveSearch</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">8/8 test(s) OK</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_Winch.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_DiveSearch.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchDirectionInterlock.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchDirectionInterlock</a>
+                        <a href="RESULTS/G_CYCLE/reports/FB_ExtractionSequence.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_ExtractionSequence</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">8/8 test(s) OK</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_ExtractionSequence.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
+                        <a href="RESULTS/G_CYCLE/reports/FB_ReferenceCycle.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_ReferenceCycle</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchDirectionInterlock.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
-                <td style="padding: 12px 14px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchLoadEstimator.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchLoadEstimator</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">5/5 test(s) OK</span>
-                    </div>
-                </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchLoadEstimator.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
-                <td style="padding: 12px 14px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchOutputInterlock.txt" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchOutputInterlock</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/1 test(s) OK</span>
-                    </div>
-                </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchOutputInterlock.txt" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
-                <td style="padding: 12px 14px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchSpeedLearning.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchSpeedLearning</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">9/9 test(s) OK</span>
-                    </div>
-                </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchSpeedLearning.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
-                <td style="padding: 12px 14px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchStepShaper.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchStepShaper</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
-                    </div>
-                </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchStepShaper.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
-                <td style="padding: 12px 14px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchSync.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchSync</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
-                    </div>
-                </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchSync.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
-                <td style="padding: 12px 14px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_Winch_Symmetry.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Winch_Symmetry</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
-                    </div>
-                </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_Winch_Symmetry.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
-                <td style="padding: 12px 14px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/WINCH_INTEG.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">WINCH_INTEG</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">15/32 test(s) OK</span>
-                    </div>
-                </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/WINCH_INTEG.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_ReferenceCycle.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr></tbody>
             </table>
         </div>

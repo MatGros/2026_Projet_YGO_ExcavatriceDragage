@@ -17,12 +17,12 @@ VAR_INPUT
     CmdClose_IHM                    : BOOL;                           // --> [CMD] Demande fermeture depuis IHM
     MotionRequestActive             : BOOL;                           // --> [CMD] Intention mouvement arbitree
     MotionDirection                 : INT;                            // --> [CMD] Sens arbitre (1: montee, -1: descente)
-    ReferenceCommitOpen             : BOOL;                           // --> [CMD] Commit atomique reference benne ouverte
-    ReferenceCommitClose            : BOOL;                           // --> [CMD] Commit atomique reference benne fermee
-    MachineReferenceReady           : BOOL;                           // --> [STAT] Qualification conjointe M1/M2/benne
-    ReferenceTransactionActive      : BOOL;                           // --> [STAT] Homing conjoint en cours
-    ConfirmOpenPosition             : BOOL;                           // --> [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle
-    ConfirmClosePosition            : BOOL;                           // --> [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle
+    MachineHomingCommitOpen             : BOOL;                           // --> [CMD] Commit atomique reference benne ouverte
+    MachineHomingCommitClose            : BOOL;                           // --> [CMD] Commit atomique reference benne fermee
+    MachineHomed           : BOOL;                           // --> [STAT] Qualification conjointe M1/M2/benne
+    MachineHomingActive      : BOOL;                           // --> [STAT] Homing conjoint en cours
+    ConfirmOpenPosition             : BOOL;                           // --> [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle
+    ConfirmClosePosition            : BOOL;                           // --> [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle
 
     // === SECOURS ET HARDWARE ===
     PowerContactorEngaged           : BOOL;                           // --> [SAFE] Condition d'arret d'urgence / puissance
@@ -202,14 +202,14 @@ IF FirstCycle THEN
     END_IF;
 END_IF;
 
-IF ReferenceCommitOpen AND NOT Lifecycle.Busy THEN
+IF MachineHomingCommitOpen AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
     BucketState.StateIncoherent := FALSE;
 END_IF;
 
-IF ReferenceCommitClose AND NOT Lifecycle.Busy THEN
+IF MachineHomingCommitClose AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
@@ -364,8 +364,8 @@ END_IF;
 ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND NOT BucketState.StateIncoherent
                      AND (Fault.ErrorId = 16#0000)
-                     AND (MachineReferenceReady OR (BucketState.IsOpen XOR BucketState.IsClosed))
-                     AND NOT ReferenceTransactionActive;
+                     AND (MachineHomed OR (BucketState.IsOpen XOR BucketState.IsClosed))
+                     AND NOT MachineHomingActive;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
 {endregion}
 

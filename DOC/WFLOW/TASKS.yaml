@@ -795,19 +795,21 @@ tasks:
   - T165-A
 - id: T132
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C4
   domaine: SÉCURITÉ
   agent: —
   titre: 'Référencement benne fermée : étape cycle + mise à jour AF P...   avec option config IHM possibilité homing benne
     ouverte  dans le cas d''un changement d''avis'
   contexte: 'Intitulé complet : Référencement benne fermée : étape cycle + mise à jour AF P09 §5'
-  description: '✅ **AF P09 §5 corrigée (2026-08-24)** : §5 étape 1 « Confirmation visuelle benne ouverte » → **benne fermée**
-    (mâchoires tendues sur câbles), conforme T132. ⚠️ Pas de bump v2.2 (≈120 refs CODE/bundle/Device.export → refactor disproportionné)
-    — correction gardée dans la v2.1 active, à valider utilisateur. ⏳ **Étape cycle** (opérateur ferme/valide benne dans le
-    grafcet) reste à implémenter (code, validation humaine).'
-  objectifs: []
-  contrat: ''
+  description: '✅ **Absorbée par T185** : la benne fermée est le choix proposé par défaut dans le parcours IHM de référencement,
+    sans forçage PLC ; l''opérateur peut confirmer « ouverte » s''il constate cet état. AF P09 §5 est alignée et le cycle conjoint
+    M1/M2, les commits atomiques et les tests sont désormais portés par T185. Aucun second producteur ni second séquenceur créé.'
+  objectifs:
+  - La présélection IHM « benne fermée » est informative et ne vaut pas confirmation opérateur
+  - Une confirmation « ouverte » reste possible et produit le même chemin de homing conjoint
+  - Aucun commit IsClosed/IsOpen sans front de confirmation explicite
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T185_HOMING_BENNE_CONJOINT_N2.yaml
   date: '2026-08-28T21:08:44'
   bloque_par: []
 - id: T135
@@ -2428,17 +2430,21 @@ tasks:
   - T168
 - id: T169-A
   parent_id: T169
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: TEST_AUTO_CI
   agent: AGY-01
-  date: '2026-08-28T16:38:00+02:00'
+  date: '2026-08-30T19:40:00+02:00'
+  updated_at: '2026-08-30T19:40:00+02:00'
+  completed_at: '2026-08-30T19:40:00+02:00'
   titre: Harnais de tests CI et validation des scénarios
   contexte: Intégration des tests dans le pipeline.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml.'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml. Complété 2026-08-30 par DSH : scénarios 3 (homme-mort en cours d''étape) & 4 (timeout fond/Kobold 60 s) ajoutés au harnais FB_Cycle (TC-P04-020/021), + exposition CycleStep et test e2e homme-mort dans FB_Main_EndToEnd. G481/CI PASS ; G200 KO = orphelin FB_WinchSpeedLearning pré-existant (T181-15/16, hors scope).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml
   objectifs:
   - Couverture 100% des use-cases critiques
+  - Scénario 3 : homme-mort en cours d'étape (maintien étape, non-redémarrage sans réarmement)
+  - Scénario 4 : timeout fond/Kobold (perte signal, tempo max étape 60 s)
   bloque_par:
   - T169
 - id: T170
@@ -3647,4 +3653,73 @@ tasks:
   - Conversion 2D runtime compatible
   - Conversion 3D/4D compilable
   - WINCH_INTEG exécutable
+  bloque_par: []
+- id: T184
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: TRANSLATION / SECURITE / IHM
+  agent: DSH (DeepSeek)
+  date: '2026-08-30T18:30:00+02:00'
+  titre: Homogénéisation cohérence « sens par axe » M1/M2/M3 — permit directionnel M3 (Fwd/Rev) + nettoyage redondance MotionPermit
+  contexte: 'Audit cohérence WT5_SIMBENCH (verdict MAJOR) : M1/M2 exposent un permit directionnel exemplaire (FB_Safety_Winch.AscentPermit/DescendPermit → EffectivePermitM1/M2_* → GVL_IHM.M1TreuilRetenue.Safety / M2TreuilBenne.Safety), producteur unique respecté. M3 n''a AUCUN permit directionnel : FB_Safety_Translation.st:50-64 ne sort que Ready/SafeStop/PowerCutOff/erreurs ; ST_SafetyTranslation et ST_TranslationState n''ont pas de FwdPermit/RevPermit. Le diagnostic bricole un proxy NON directionnel : MotionM3.Step6_DirectionAllowed := NOT Translation.State.HeightInterlockBlocking (FB_TroubleshootingView.st:632). Redondance : MotionPermit (PRG_07:476) == JoystickMotionActive (PRG_07:475) == CycleMotionPermit (PRG_03:202) == NOT AtNeutralXY (3 noms pour le même « manche défléchi », dont un nom trompeur qui prétend inclure l''homme-mort via commentaire ST_CycleState:27).'
+  description: 'Homogénéiser la cohérence « peut-on aller dans un sens ou l''autre » sur les 3 axes (M1 treuil, M2 treuil, M3 translation), à l''unisson des treuils (modèle FB_Safety_Winch). 1) Ajouter FwdPermit/RevPermit à FB_Safety_Translation (+ champs ST_SafetyTranslation + câblage PRG_05 + projection GVL_IHM.TranslationM3.Safety) — producteur unique, 1 source safety / 1 projection IHM par axe. 2) Corriger MotionM3.Step6_DirectionAllowed pour n''utiliser que les nouveaux permits (≠ interlock hauteur, qui reste un blocage non directionnel séparé). 3) Renommer MotionPermit → JoystickDeflected (ou éliminer le doublon avec JoystickMotionActive/CycleMotionPermit) et corriger les commentaires trompeurs. 4) Correction doc ST_SafetyWinch.st:11 (DescendPermit = effectif, pas safety simple). 5) MàJ spec AF_Partie-11 (fiches FB_Translation / FB_Safety_Translation) + registre/TC si besoin. Analyse livrée par le worktree WT5_SIMBENCH (gates 491/492/493, rewire HwIn, TC-P13-014) ; à EXÉCUTER sur main (hors worktree).'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T184_PERMITS_DIRECTIONNELS_M3.yaml
+  objectifs:
+  - FB_Safety_Translation expose FwdPermit et RevPermit (permit directionnel effectif, producteur unique), miroir de FB_Safety_Winch.AscentPermit/DescendPermit
+  - GVL_IHM.TranslationM3.Safety projette FwdPermit/RevPermit à l'IHM (pré-commande : savoir si M3 peut aller vers Trémie ou Maintenance)
+  - MotionM3.Step6_DirectionAllowed utilise les nouveaux permits Fwd/Rev (ne plus utiliser le proxy non-directionnel HeightInterlockBlocking, qui reste un blocage séparé)
+  - Un seul signal « joystick défléchi » (MotionPermit/JoystickMotionActive/CycleMotionPermit) — aucun nom trompeur ni doublon
+  - Gates G200 / bundle / palier C PASS ; spec AF-11 et fiches à jour ; tests CI (TC-P11/FB_Safety_Translation) étendus
+  - Contrat TASK_CONTRACT_T184 rédigé et conforme avant implémentation (obligatoire dès C2)
+  bloque_par: [Analyse fournie par WT5_SIMBENCH ; exécution à faire hors worktree sur main ; confirmer la sémantique DriveStatusWord.0 AC600 (T110)]
+- id: T185
+  parent_id: ''
+  statut: ⏳
+  criticite: C4
+  domaine: CYCLE / CODEURS / BENNE / SECURITE
+  agent: Claude Code (orchestrateur) + sous-agent py Ollama deepseek-v4-flash:cloud
+  date: '2026-08-30T19:05:00'
+  titre: Refactor conformité FB_ReferenceCycle → FB_MachineHomingCycle (guide référencement machine M1/M2/benne)
+  contexte: 'Le FB_ReferenceCycle livré par le checkpoint d94c2c58 (ex-contrat T184 homing benne, mal numéroté — T184 = permits M3) est fonctionnellement intégré et vert au CI (4/4 TC) mais NON conforme : pas de Fault:ST_Fault / FB_FaultCore / Lifecycle, ReferenceStep:INT + 12 littéraux magiques, 25 I/O à plat sans DUT, double calcul MachineReferenceReady, cartouche/regions/bannières absents, vocabulaire « Reference* » en collision avec le vocabulaire réservé Homing (NAMING_CONVENTION §1quater + NC-090). 3 défauts latents identifiés (C-1 requalif auto après perte de datum, C-2 double-confirm contradictoire, C-3 boucle croisée FB_Bucket↔MachineHomed) + 1 clarif spec C-4 (séparation homing en mouvement / homing benne).'
+  description: 'Renommage global Reference*→MachineHoming* (FB_MachineHomingCycle), interface contrat standard (Fault/Ready/Lifecycle via FB_FaultCore), enum E_MachineHomingStep, 3 DUT ST_fbMachineHomingCycle_*, régions + bannières, R8/R9. Fixes : C-1 acquittement conscient obligatoire (front Reset) avant requalif ; C-2 rejet total double-confirm + cause latchée ; C-3 retrait du terme croisé MachineHomed dans FB_Bucket.ActiveOffsetValid (producteur unique) ; C-4.1/.3 gate ouverture transaction + NOT MxHomingBusy + cause ConfirmWhileHoming ; C-4.4 reste à prouver dans l''intégration PRG_02. Exécutant corps : sous-agent py Ollama deepseek ; orchestrateur relit/corrige le diff. Test isolé : `TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.html` (16/16, compilation OK). T132 absorbée : présélection fermée IHM, confirmation ouverte possible, aucun forçage PLC.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T185_HOMING_BENNE_CONJOINT_N2.yaml
+  objectifs:
+  - FB_MachineHomingCycle porte le contrat standard (Fault:ST_Fault via FB_FaultCore, Ready, Lifecycle) + enum E_MachineHomingStep + DUT ST_fbMachineHomingCycle_* (NC-110)
+  - Vocabulaire MachineHoming* aligné NAMING_CONVENTION §1quater / NC-090 ; aucun « Reference* » résiduel
+  - C-1 aucun redémarrage automatique après perte de datum en mouvement (front Reset conscient obligatoire)
+  - C-2 confirmation Ouverte+Fermée même scan = rejet total + cause latchée ; C-4.1/.3 pas de ref benne « au vol » sur homing d'axe
+  - C-3 FB_Bucket.ActiveOffsetValid ne reboucle plus sur MachineHomed (producteur unique)
+  - C-4.4 HomingPermit resserré (PRG_02) : homing unitaire/at-zero exige treuils arrêtés ; homing nominal capteur-TOP reste permis en mouvement
+  - test_fb_machinehomingcycle.st couvre AC1..AC9 + C-1/C-2/C-4 (16 tests) ; G200 L1-L7=100, bundle + gates palier C PASS ; aucun TC vert existant régressé
+  bloque_par: []
+- id: T186
+  parent_id: T169-A
+  statut: ⏳
+  criticite: C2
+  domaine: G_CYCLE / SECURITE
+  agent: DSH (DeepSeek) + audit indépendant subagent
+  date: '2026-08-30T20:01:00'
+  titre: 'Fix+guard : FB_Cycle ne neutralise pas KoboldContactorCmd en STABILIZING (découverte par challenge chronogramme T169-A)'
+  contexte: >-
+    Le challenge des chronogrammes TC-P04-021 (T169-A) a exposé une faille réelle de FB_Cycle :
+    (1) en X4, `BucketCmd.KoboldContactorCmd := TRUE` est armé inconditionnellement (non-gaté par Permit) ;
+    (2) la branche STABILIZING coupe W1/W2/Translation/Open/Close mais JAMAIS `KoboldContactorCmd` ;
+    (3) le repli §4 est mort en STABILIZING (conditionné `Lifecycle.Busy`=FALSE, et Permit reste TRUE sur défaut) ;
+    (4) `RequestActive` (somme logique demandes) omet `KoboldContactorCmd` → un ordre de puissance vers le
+    contacteur capteur fond reste collé pendant tout le séjour en STABILIZING/attente de Reset.
+    Conséquence sécurité : non-respect de l'invariant « 0 mouvement/ordre résiduel hors permis au repli »,
+    et risque échauffement contacteur (contraire à H1 de FB_DiveSearch, AF_Partie-04 §8.4).
+  description: >-
+    Correction FB_Cycle (patch, C2) : neutraliser `BucketCmd.KoboldContactorCmd := FALSE` dans la branche
+    STABILIZING (et cohérence au repli homme-mort), et intégrer `KoboldContactorCmd` à `RequestActive`
+    (somme logique complète des demandes actionneur). Garde-fou CI : durcir TC-P04-021 en oracle complet
+    (assert Kobold neutralisé au STABILIZING + Latch persistant + Reset efface). Aucune régression des 9 TC
+    existants (FB_Cycle) ni de la chaîne e2e MAIN_GLOBAL. Découverte validée par audit indépendant subagent.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T186_NEUTRALISATION_KOBOLD_STABILIZING.yaml
+  objectifs:
+  - KoboldContactorCmd coupé (FALSE) dés l'entrée en STABILIZING, sans attendre Reset ni Permit
+  - RequestActive inclut KoboldContactorCmd (somme logique complète des demandes actionneur)
+  - TC-P04-021 durci : oracle vérifie Kobold neutralisé en STABILIZING, Latch persistant sans Reset, Reset efface tout
+  - Aucune régression : FB_Cycle 9/9 (ou 10/10), MAIN_GLOBAL 3/3, G200 L1-L7 PASS sur FB_Cycle, gates palier C PASS
   bloque_par: []
