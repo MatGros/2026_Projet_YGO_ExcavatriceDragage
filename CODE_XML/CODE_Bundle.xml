@@ -35617,8 +35617,8 @@ IF CollectAllowed THEN
             CurrentCell.SpeedMps := MeasuredSpeedMps;
             CurrentCell.SampleCount := 1;
         ELSE
-            CurrentCell.SpeedMps := (CurrentCell.SpeedMps * REAL(CurrentCell.SampleCount) + MeasuredSpeedMps)
-                                    / REAL(CurrentCell.SampleCount + 1);
+            CurrentCell.SpeedMps := (CurrentCell.SpeedMps * UDINT_TO_REAL(CurrentCell.SampleCount) + MeasuredSpeedMps)
+                                    / UDINT_TO_REAL(CurrentCell.SampleCount + 1);
             CurrentCell.SampleCount := CurrentCell.SampleCount + 1;
         END_IF;
         CurrentCell.Valid := (CurrentCell.SampleCount &gt;= Config.MinSamples);

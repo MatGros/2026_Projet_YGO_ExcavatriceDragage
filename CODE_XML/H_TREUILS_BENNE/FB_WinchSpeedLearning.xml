@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T22:39:51.067927" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T22:39:51.067927">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T11:47:33.671962" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T11:47:33.671962">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -545,8 +545,8 @@ IF CollectAllowed THEN
             CurrentCell.SpeedMps := MeasuredSpeedMps;
             CurrentCell.SampleCount := 1;
         ELSE
-            CurrentCell.SpeedMps := (CurrentCell.SpeedMps * REAL(CurrentCell.SampleCount) + MeasuredSpeedMps)
-                                    / REAL(CurrentCell.SampleCount + 1);
+            CurrentCell.SpeedMps := (CurrentCell.SpeedMps * UDINT_TO_REAL(CurrentCell.SampleCount) + MeasuredSpeedMps)
+                                    / UDINT_TO_REAL(CurrentCell.SampleCount + 1);
             CurrentCell.SampleCount := CurrentCell.SampleCount + 1;
         END_IF;
         CurrentCell.Valid := (CurrentCell.SampleCount &gt;= Config.MinSamples);
