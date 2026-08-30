@@ -121,7 +121,28 @@
       </dataType>
       <dataType name="ST_fbWinchSpeedLearning_Table">
         <baseType>
-          <struct />
+          <struct>
+            <variable name="Cell">
+              <type>
+                <array>
+                  <dimension lower="1" upper="2" />
+                  <dimension lower="1" upper="2" />
+                  <dimension lower="1" upper="2" />
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <derived name="ST_fbWinchSpeedLearning_Cell" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[axe][sens][charge][palier]
+axe    : 1=M1, 2=M2
+sens   : 1=montee, 2=descente
+charge : 1=vide, 2=charge
+palier : 1..5</xhtml>
+              </documentation>
+            </variable>
+          </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">

@@ -27,7 +27,11 @@ _STRING_RE = re.compile(r"^STRING\s*\(\s*(\d+)\s*\)$")
 # 🔧 Borne = littéral entier OU constante (qualifiée ou non), ex. GVL_PLC_Tests_Const.MaxSteps
 # (ARRAY[1..N] OF T avec N symbolique — voir docs/PLCOPENXML_FORMAT.md, note "non vérifié").
 _BOUND = r"(-?\d+|[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)"
-_ARRAY_RE = re.compile(rf"^ARRAY\s*\[\s*{_BOUND}\s*\.\.\s*{_BOUND}\s*\]\s*OF\s+(.+)$", re.IGNORECASE | re.DOTALL)
+_DIM_RE = re.compile(rf"^\s*{_BOUND}\s*\.\.\s*{_BOUND}\s*$")
+# Multi-dimensionnel : ARRAY[1..2, 1..3] OF T — une seule paire de crochets, dimensions
+# séparées par des virgules (confirmé PLCopenXML : plusieurs <dimension> dans un <array>,
+# voir docs/PLCOPENXML_FORMAT.md). Distinct de ARRAY[1..2] OF ARRAY[1..3] OF T (imbriqué).
+_ARRAY_RE = re.compile(r"^ARRAY\s*\[\s*(?P<dims>.+?)\s*\]\s*OF\s+(?P<base>.+)$", re.IGNORECASE | re.DOTALL)
 _REFERENCE_RE = re.compile(r"^REFERENCE\s+TO\s+(.+)$", re.IGNORECASE | re.DOTALL)
 
 
@@ -51,6 +55,9 @@ class ArrayType:
     lower: int | str  # str = borne symbolique (ex. constante GVL), passée telle quelle en sortie XML
     upper: int | str
     base: "TypeRef"
+    # Dimensions supplémentaires (2e, 3e, ... N) pour ARRAY[1..2, 1..2, ...] OF T — vide pour
+    # un tableau à une dimension (comportement historique inchangé).
+    extra_dims: tuple[tuple[int | str, int | str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -80,8 +87,17 @@ def parse_type(text: str) -> TypeRef:
 
     array_match = _ARRAY_RE.match(text)
     if array_match:
-        lower_text, upper_text, base_text = array_match.groups()
-        return ArrayType(_parse_bound(lower_text), _parse_bound(upper_text), parse_type(base_text))
+        dims_text = array_match.group("dims")
+        base_text = array_match.group("base")
+        dims: list[tuple[int | str, int | str]] = []
+        for dim_text in dims_text.split(","):
+            dim_match = _DIM_RE.match(dim_text)
+            if not dim_match:
+                raise ValueError(f"invalid array dimension expression: {dim_text!r}")
+            lower_text, upper_text = dim_match.groups()
+            dims.append((_parse_bound(lower_text), _parse_bound(upper_text)))
+        first_lower, first_upper = dims[0]
+        return ArrayType(first_lower, first_upper, parse_type(base_text), extra_dims=tuple(dims[1:]))
 
     string_match = _STRING_RE.match(text)
     if string_match:
