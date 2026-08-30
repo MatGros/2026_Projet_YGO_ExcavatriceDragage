@@ -29,6 +29,16 @@ VAR
     instWinchLoadEstimatorM1 : FB_WinchLoadEstimator;
     instWinchLoadEstimatorM2 : FB_WinchLoadEstimator;
 
+    // === REQUETES D'AXE ASSEMBLEES AVANT APPEL FB_WINCH ===
+    // CODESYS n'accepte pas l'initialiseur de struct anonyme en parametre d'appel :
+    // les structs DriveRequest / Sensors / Config sont remplies champ par champ ici.
+    M1DriveRequest               : ST_fbWinch_DriveRequest;   // . [LOC] Requete axe M1 (ordre, palier, bornes)
+    M2DriveRequest               : ST_fbWinch_DriveRequest;   // . [LOC] Requete axe M2 (ordre, palier, bornes)
+    M1WinchSensors               : ST_fbWinch_Sensors;        // . [LOC] Mesures et feedbacks M1
+    M2WinchSensors               : ST_fbWinch_Sensors;        // . [LOC] Mesures et feedbacks M2
+    M1WinchCfg                   : ST_fbWinch_Cfg;            // . [LOC] Config statique M1 (table paliers, ralentissement)
+    M2WinchCfg                   : ST_fbWinch_Cfg;            // . [LOC] Config statique M2 (table paliers, ralentissement)
+
     // === 📊 STRUCTS INTERNES (publiés via Data) ===
     WinchM1FinalInterlockRequest : ST_WinchFinalInterlockRequest; // . [LOC] Demande finale et interlocks treuil M1
     WinchM2FinalInterlockRequest : ST_WinchFinalInterlockRequest; // . [LOC] Demande finale et interlocks treuil M2
@@ -835,6 +845,33 @@ instWinchLoadEstimatorM2(
     LoadTable               := _WinchLoadEstimateTable
 );
 
+// --- M1 : assemblage des structs (CODESYS refuse l'initialiseur inline en appel) ---
+M1DriveRequest.StartStop            := M1LogicRequestStartStop;
+M1DriveRequest.Direction            := M1LogicRequestDirection;
+M1DriveRequest.SpeedTgt_Pct         := M1LogicRequestSpeedCmd_Pct;
+M1DriveRequest.MaxStepUp            := CommonMaxStepUp;
+M1DriveRequest.MaxStepDown          := CommonMaxStepDown;
+// Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
+// sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
+M1DriveRequest.MinStepDown          := CommonMinStepDown;
+M1DriveRequest.HomingApproachActive := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable;
+// Même limite haute active que FB_Safety_Winch (7,5 m / 8,5 m sous override).
+M1DriveRequest.TopLimitM            := TopLimitM1_M;
+M1DriveRequest.BottomLimitM         := BottomLimitM1_Active;
+M1DriveRequest.SyncCoupled          := instWinchSync.SyncActive;
+
+M1WinchSensors.CablePosM          := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
+M1WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM1.Homed;
+M1WinchSensors.HomingSuspect      := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect;
+M1WinchSensors.ContactorsAllOff   := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;
+M1WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM1.SpeedBand;
+M1WinchSensors.SpeedGuardEnable   := TRUE;
+M1WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
+
+M1WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
+M1WinchCfg.SlowdownDistance_M     := _CommunCfgPersist.WinchSlowdownDistance_M;
+M1WinchCfg.SlowdownMaxStep        := _CommunCfgPersist.WinchSlowdownMaxStep;
+
 instWinchM1(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -842,33 +879,45 @@ instWinchM1(
     SafeStop                := SafeStopM1_Active,
     DescendPermit           := EffectivePermitM1_Descend,
     AscentPermit            := EffectivePermitM1_Ascent,
-    DriveRequest            := (StartStop := M1LogicRequestStartStop,
-                                Direction := M1LogicRequestDirection,
-                                SpeedTgt_Pct := M1LogicRequestSpeedCmd_Pct,
-                                MaxStepUp := CommonMaxStepUp,
-                                MaxStepDown := CommonMaxStepDown,
-                                // Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
-                                // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
-                                MinStepDown := CommonMinStepDown,
-                                HomingApproachActive := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
-                                // Même limite haute active que FB_Safety_Winch (7,5 m / 8,5 m sous override).
-                                TopLimitM := TopLimitM1_M,
-                                BottomLimitM := BottomLimitM1_Active,
-                                SyncCoupled := instWinchSync.SyncActive),
-    Sensors                 := (CablePosM := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
-                                Homed := PRG_02_Acquisition.Data.EncoderM1.Homed,
-                                HomingSuspect := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
-                                ContactorsAllOff := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
-                                MeasuredSpeedBand := instWinchLoadEstimatorM1.SpeedBand,
-                                SpeedGuardEnable := TRUE,
-                                SpeedGuardReady := NOT instWinchSync.Fault.Error),
-    Config                  := (SpeedStepTable := _WinchSpeedStepTable,
-                                SlowdownDistance_M := _CommunCfgPersist.WinchSlowdownDistance_M,
-                                SlowdownMaxStep := _CommunCfgPersist.WinchSlowdownMaxStep),
+    DriveRequest            := M1DriveRequest,
+    Sensors                 := M1WinchSensors,
+    Config                  := M1WinchCfg,
     // ContactorFeedback (n°3 de la matrice) et Global, gatés MAINT_N2.
     BypassContactorCheck    := MaintN2 AND (GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback),
     BypassGlobal            := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
+
+// --- M2 : assemblage des structs ---
+M2DriveRequest.StartStop            := M2LogicRequestStartStop;
+M2DriveRequest.Direction            := M2LogicRequestDirection;
+M2DriveRequest.SpeedTgt_Pct         := M2LogicRequestSpeedCmd_Pct;
+// Clamp de palier agrégé en §5ter : bornes communes M1=M2 (CommonMaxStep*) puis
+// M2-propre (M2MaxStep*) — M2_BucketJogLimit, ManualBucketLimitsActive,
+// BucketNotClosedAscentStep1, SlackCableAscentStep1 ne réduisent jamais M1.
+// D13 : reconstruction de table M2 supprimée — le clamp M2MaxStep* := 1 suffit
+// (StepNumber ≤ 1 → seuls les états P1 sont commandés).
+M2DriveRequest.MaxStepUp            := M2MaxStepUp;
+M2DriveRequest.MaxStepDown          := M2MaxStepDown;
+// Plancher palier descente plongée Kobold : plancher M2-propre agrégé en §5ter, injecté
+// sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
+M2DriveRequest.MinStepDown          := M2MinStepDown;
+M2DriveRequest.HomingApproachActive := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable;
+// Même limite haute active que FB_Safety_Winch (M2_LimitShift conservé).
+M2DriveRequest.TopLimitM            := TopLimitM2_M;
+M2DriveRequest.BottomLimitM         := BottomLimitM2_Active;
+M2DriveRequest.SyncCoupled          := instWinchSync.SyncActive;
+
+M2WinchSensors.CablePosM          := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
+M2WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM2.Homed;
+M2WinchSensors.HomingSuspect      := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect;
+M2WinchSensors.ContactorsAllOff   := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI;
+M2WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM2.SpeedBand;
+M2WinchSensors.SpeedGuardEnable   := TRUE;
+M2WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
+
+M2WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
+M2WinchCfg.SlowdownDistance_M     := _CommunCfgPersist.WinchSlowdownDistance_M;
+M2WinchCfg.SlowdownMaxStep        := _CommunCfgPersist.WinchSlowdownMaxStep;
 
 instWinchM2(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
@@ -877,34 +926,9 @@ instWinchM2(
     SafeStop                := SafeStopM2_Active,
     DescendPermit           := EffectivePermitM2_Descend,
     AscentPermit            := EffectivePermitM2_Ascent,
-    DriveRequest            := (StartStop := M2LogicRequestStartStop,
-                                Direction := M2LogicRequestDirection,
-                                SpeedTgt_Pct := M2LogicRequestSpeedCmd_Pct,
-                                // Clamp de palier agrégé en §5ter : bornes communes M1=M2 (CommonMaxStep*) puis
-                                // M2-propre (M2MaxStep*) — M2_BucketJogLimit, ManualBucketLimitsActive,
-                                // BucketNotClosedAscentStep1, SlackCableAscentStep1 ne réduisent jamais M1.
-                                // D13 : reconstruction de table M2 supprimée — le clamp M2MaxStep* := 1 suffit
-                                // (StepNumber ≤ 1 → seuls les états P1 sont commandés).
-                                MaxStepUp := M2MaxStepUp,
-                                MaxStepDown := M2MaxStepDown,
-                                // Plancher palier descente plongée Kobold : plancher M2-propre agrégé en §5ter, injecté
-                                // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
-                                MinStepDown := M2MinStepDown,
-                                HomingApproachActive := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
-                                // Même limite haute active que FB_Safety_Winch (M2_LimitShift conservé).
-                                TopLimitM := TopLimitM2_M,
-                                BottomLimitM := BottomLimitM2_Active,
-                                SyncCoupled := instWinchSync.SyncActive),
-    Sensors                 := (CablePosM := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
-                                Homed := PRG_02_Acquisition.Data.EncoderM2.Homed,
-                                HomingSuspect := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
-                                ContactorsAllOff := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
-                                MeasuredSpeedBand := instWinchLoadEstimatorM2.SpeedBand,
-                                SpeedGuardEnable := TRUE,
-                                SpeedGuardReady := NOT instWinchSync.Fault.Error),
-    Config                  := (SpeedStepTable := _WinchSpeedStepTable,
-                                SlowdownDistance_M := _CommunCfgPersist.WinchSlowdownDistance_M,
-                                SlowdownMaxStep := _CommunCfgPersist.WinchSlowdownMaxStep),
+    DriveRequest            := M2DriveRequest,
+    Sensors                 := M2WinchSensors,
+    Config                  := M2WinchCfg,
     // Idem M1 ci-dessus
     BypassContactorCheck    := MaintN2 AND (GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback),
     BypassGlobal            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Global

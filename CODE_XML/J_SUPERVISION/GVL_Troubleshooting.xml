@@ -250,12 +250,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Cible Atteinte | 0 = En cours</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx403_ControlAscentActive">
+            <variable name="Idx403_ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 1 = Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 1 = Phase vitesse contrôlée montée en cours</xhtml>
               </documentation>
             </variable>
             <variable name="Idx501_M2_CmdRev_DQ">

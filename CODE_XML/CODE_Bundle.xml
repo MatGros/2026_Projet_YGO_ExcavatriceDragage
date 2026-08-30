@@ -1487,12 +1487,12 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande direction forcée vers M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2ForceSlowSpeed">
+            <variable name="M2BucketJogLimit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Blocage vitesse rapide de M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Plafond palier du jog benne M2</xhtml>
               </documentation>
             </variable>
             <variable name="Ready">
@@ -1599,12 +1599,12 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: Fermeture auto armée (montée couplée demandée, benne pas fermée)</xhtml>
               </documentation>
             </variable>
-            <variable name="ControlAscentActive">
+            <variable name="ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Phase vitesse contrôlée montée en cours</xhtml>
               </documentation>
             </variable>
             <variable name="CoupledMotionBlockedByBucket">
@@ -2449,12 +2449,12 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Position Cible Atteinte | 0 = En cours</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx403_ControlAscentActive">
+            <variable name="Idx403_ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 1 = Phase vitesse contrôlée montée en cours (post-fermeture auto)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: 1 = Phase vitesse contrôlée montée en cours</xhtml>
               </documentation>
             </variable>
             <variable name="Idx501_M2_CmdRev_DQ">
@@ -7864,12 +7864,12 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation de descente conditionnée benne ouverte (DiveSearch)</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceMinSpeedStep">
+            <variable name="ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Forçage vitesse minimale (palier de contrôle extraction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier 1 pendant la montée contrôlée</xhtml>
               </documentation>
             </variable>
             <variable name="MinStepDown">
@@ -12611,6 +12611,394 @@ palier : 1..5</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbWinch_Cfg">
+        <baseType>
+          <struct>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TABLE DES PALIERS ===
+Table de seuils des paliers de vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionInterlockDelayUp">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#900ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTERLOCK CHANGEMENT DE SENS ===
+Delai interlock changement de sens montee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionInterlockDelayDown">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#400ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock changement de sens descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepRampDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1000ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CADENCE DE RAMPE PALIER ===
+[cible] Tempo de rampe palier (usage aval)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepRampDelayAscent">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1000ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier montee (D10, dedie)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepRampDelayDescente">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier descente (D10, dedie)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorFeedbackTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOMBÃ‰E CONTACTEURS ===
+Delai d'attente retombee des contacteurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowdownDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RALENTISSEMENT BORDURE ===
+Distance d'approche avant limite pour ralentir (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowdownMaxStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier dans zone de ralentissement (1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepHystMargin">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DÃ‰CODAGE %â†’PALIER (conservÃ©) ===
+[08a] Marge d'hysteresis palier (%)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6e031a4e-ea7c-5444-b4f1-495452dd1ae8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ðŸª ST_fbWinch_Cfg â€” Configuration statique d'un treuil
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   ðŸŽ¯ RÃ´le : RÃ©glages persistants propres Ã  l'instance treuil (statique)
+   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   ðŸ“¤ Producteur : configuration persistante
+   ðŸ“¥ Consommateur : FB_Winch (statique uniquement)
+   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+      et les deux cadences de rampe DANS FB_Winch (comportement
+      bit-identique). Le champ StepRampDelay est dÃ©clarÃ© mais non
+      consommÃ© (usage aval).
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinch_DriveRequest">
+        <baseType>
+          <struct>
+            <variable name="StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRE DE MOUVEMENT ===
+TRUE = mouvement demandÃ©</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1: Descente, 0: Stop, 1: Montee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepReq">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Palier demandÃ© dÃ©codÃ© en amont (usage aval)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedTgt_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Consigne vitesse % (0.0..100.0) â€” dÃ©codage conservÃ© dans FB_Winch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepUp">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DE CLAMP (agrÃ©gÃ©es PRG_04) ===
+[cible] Plancher palier montÃ©e (usage aval)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepUp">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier montÃ©e (1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher palier descente (0 = aucun) -- plongee Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier descente (1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopLimitM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== LIMITES EFFECTIVES DU CYCLE ===
+Position limite haute active (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomLimitM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position limite basse active (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncCoupled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC (jamais lu par la logique FB_Winch) ===
+[diag] Couplage synchro actif (garde de revue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingApproachActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAMPS CONSERVÃ‰S (clamp interne FB_Winch) ===
+[08a] Vitesse limitÃ©e au palier 1 (approche homing)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>45e51157-f25e-5b78-83e7-e1b47077800c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ðŸª ST_fbWinch_DriveRequest â€” RequÃªte d'axe treuil (producteur PRG_04)
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   ðŸŽ¯ RÃ´le : Demande de mouvement, palier et bornes de clamp d'un treuil
+   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   ðŸ“¤ Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
+   ðŸ“¥ Consommateur : FB_Winch
+   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+      et le clamp DANS FB_Winch (comportement bit-identique). Les champs
+      SpeedStepReq / MinStepUp sont dÃ©clarÃ©s mais non consommÃ©s (usage aval).
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinch_Sensors">
+        <baseType>
+          <struct>
+            <variable name="CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== POSITION ET RÃ‰FÃ‰RENCEMENT ===
+Position actuelle du cable (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Statut treuil reference</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Incertitude / doute sur le referencement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorsAllOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS CONTACTEURS ===
+TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE VITESSE ===
+[cible] Mesure vitesse rÃ©elle (m/s) â€” usage aval</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Mesure exploitable â€” usage aval</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MeasuredSpeedBand">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Bande vitesse rÃ©elle validÃ©e (garde-fou conservÃ© dans FB_Winch)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedGuardEnable">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GARDE-FOU VITESSE (conservÃ©) ===
+[08a] Activation garde-fou changement de palier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedGuardReady">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Conditions de stabilitÃ© validÃ©es</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ba625d91-b679-557f-bae8-bd35a0a8e716</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ðŸª ST_fbWinch_Sensors â€” Mesures et feedbacks d'un treuil
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   ðŸŽ¯ RÃ´le : Retours physiques et mesures propres Ã  l'instance treuil
+   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   ðŸ“¤ Producteur : PRG_04_Treuils_Benne / acquisition
+   ðŸ“¥ Consommateur : FB_Winch
+   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le garde-fou vitesse
+      DANS FB_Winch (comportement bit-identique). Les champs
+      MeasuredSpeedMps / MeasuredSpeedValid sont dÃ©clarÃ©s mais non
+      consommÃ©s (usage aval).
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_fbWinch_Symmetry_Cfg">
         <baseType>
           <struct>
@@ -13842,12 +14230,12 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre Direction vers Winch M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2_ForceSlowSpeed">
+            <variable name="M2_BucketJogLimit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Forcage vitesse lente sur M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Plafond palier 1 du jog benne M2</xhtml>
               </documentation>
             </variable>
             <variable name="M1SlipDetected">
@@ -14167,7 +14555,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Lifecycle.Done := FALSE;
     M2_StartStop := FALSE;
     M2_Direction := 0;
-    M2_ForceSlowSpeed := FALSE;
+    M2_BucketJogLimit := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
     RETURN;
@@ -14207,7 +14595,7 @@ SevereError := Fault.Error;
 IF SevereError THEN
     M2_StartStop := FALSE;
     M2_Direction := 0;
-    M2_ForceSlowSpeed := FALSE;
+    M2_BucketJogLimit := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
     Lifecycle.Busy := FALSE;
@@ -14238,7 +14626,7 @@ ELSE
     IF Lifecycle.Busy THEN
         IF CloseReq THEN
             RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
-            M2_ForceSlowSpeed := TRUE;
+            M2_BucketJogLimit := TRUE;
             IF MotionRequestActive AND (MotionDirection = 1) THEN
                 M2_StartStop := TRUE;
                 M2_Direction := 1;
@@ -14251,7 +14639,7 @@ ELSE
             END_IF;
         ELSIF OpenReq THEN
             RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
-            M2_ForceSlowSpeed := TRUE;
+            M2_BucketJogLimit := TRUE;
             IF MotionRequestActive AND (MotionDirection = -1) THEN
                 M2_StartStop := TRUE;
                 M2_Direction := -1;
@@ -14265,7 +14653,7 @@ ELSE
         ELSE
             M2_StartStop := FALSE;
             M2_Direction := 0;
-            M2_ForceSlowSpeed := FALSE;
+            M2_BucketJogLimit := FALSE;
         END_IF;
 
         IF (CloseReq AND (CablePosM2 &gt; M2StartPosM)) OR (OpenReq AND (CablePosM2 &lt; M2StartPosM)) THEN
@@ -14320,7 +14708,7 @@ ELSE
     ELSIF Lifecycle.Done THEN
         M2_StartStop := FALSE;
         M2_Direction := 0;
-        M2_ForceSlowSpeed := FALSE;
+        M2_BucketJogLimit := FALSE;
         RemainingTravelM := 0.0;
         IF NOT MotionRequestActive THEN
             Lifecycle.Done := FALSE;
@@ -20627,12 +21015,12 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Autorisation de remontee assistee</xhtml>
               </documentation>
             </variable>
-            <variable name="ForceMinSpeedStep">
+            <variable name="ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Forcage vitesse minimale (palier de controle)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Plafond palier 1 pendant la montee controlee</xhtml>
               </documentation>
             </variable>
             <variable name="BottomConfirmationConsumed">
@@ -21017,7 +21405,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Lifecycle.Done := FALSE;
     BucketCloseRequest := FALSE;
     AscentPermit := FALSE;
-    ForceMinSpeedStep := FALSE;
+    ExtractionControlActive := FALSE;
     BottomConfirmationConsumed := FALSE;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
     // StepAtFault / StepAtFaultCaptured NON reinitialises ici : l'etape figee au defaut reste
@@ -21036,7 +21424,7 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Machine etat fermeture remontee"}
 BucketCloseRequest := FALSE;
 AscentPermit := FALSE;
-ForceMinSpeedStep := FALSE;
+ExtractionControlActive := FALSE;
 BottomConfirmationConsumed := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
@@ -21095,7 +21483,7 @@ ELSE
         E_ExtractionSequenceState.CONTROL_ASCENT:
             Lifecycle.Busy := TRUE;
             AscentPermit := AssistPermit AND AscentControlSafe; // coupure meme-scan sur defaut synchro/capteurs (H2)
-            ForceMinSpeedStep := AscentPermit;                  // bridage suit le permis (F1), jamais actif sans montee autorisee
+            ExtractionControlActive := AscentPermit;            // plafond palier 1 suit le permis de montee
             OperatorActionId := 16#0203;
             OperatorAction := 'Maintenir la montée : contrôle charge au palier minimal.';
             IF NOT AscentControlSafe THEN
@@ -32636,7 +33024,7 @@ GVL_Troubleshooting.BenneOuvertureFermeture.Idx305_KoboldBottomTouchLatched := C
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx306_ErrorIdRaw := WinchM2.Bucket.State.ErrorId;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
-GVL_Troubleshooting.BenneOuvertureFermeture.Idx403_ControlAscentActive := WinchM2.Bucket.State.ControlAscentActive;
+GVL_Troubleshooting.BenneOuvertureFermeture.Idx403_ExtractionControlActive := WinchM2.Bucket.State.ExtractionControlActive;
 GVL_Troubleshooting.BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // TBD non câblé - voir fiche §6 (pas de DQ relais benne dédié publié, benne pilote M2_StartStop/M2_Direction, pas un relais propre)
 
 {endregion}
@@ -33032,28 +33420,39 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front)</xhtml>
               </documentation>
             </variable>
-            <variable name="StartStop">
+            <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ordre de marche/arret mouvement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Statut contacteur de ligne / puissance</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="DriveRequest">
               <type>
-                <INT />
+                <derived name="ST_fbWinch_DriveRequest" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REQUÊTE D'AXE (struct) ===
+--&gt; [REQ] Ordre, palier, bornes et limites effectives</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedTgt_Pct">
+            <variable name="Sensors">
               <type>
-                <REAL />
+                <derived name="ST_fbWinch_Sensors" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible % (0.0 a 100.0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES ET FEEDBACKS (struct) ===
+--&gt; [HW] Position, referencement, contacteurs, vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Config">
+              <type>
+                <derived name="ST_fbWinch_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION STATIQUE (struct) ===
+--&gt; [CFG] Table paliers, delais, ralentissement</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -33085,240 +33484,6 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis de montee (fin de course haut)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Statut contacteur de ligne / puissance</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepTable">
-              <type>
-                <derived name="ST_SpeedStepTable" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET CONFIGURATION ===
---&gt; [CFG] Table de seuils des paliers de vitesse</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgMaxStepDescente">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond palier en descente (1..5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaxStepAscent">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond palier en montee (1..5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingApproachActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse limitee au palier 1 (approche homing)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepHystMargin">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Marge d'hysteresis palier (%)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DirectionInterlockDelayDescent">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#400ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai interlock changement de sens descente</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DirectionInterlockDelayAscent">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#900ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai interlock changement de sens montee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepRampDelayAscent">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#1000ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cadence palier montee (D10, dedie)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepRampDelayDescente">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#500ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Cadence palier descente (D10, dedie)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ContactorFeedbackTimeout">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#500ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai d'attente retombee des contacteurs</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TopLimitM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="8.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position limite haute active (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BottomLimitM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="-20" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Position limite basse active (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgSlowdownDistanceM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Distance d'approche avant limite pour ralentir (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgSlowdownMaxStep">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond palier dans zone de ralentissement (1..5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MinStepDown">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plancher palier en descente impose (0 = aucun) -- plongee Kobold</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FwdRevSpeedFeedbackOff">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES ET FEEDBACKS SENSORS ===
---&gt; [HW] Retour unique contacteurs sens+vitesse retombes</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Homed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Statut treuil reference</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingSuspect">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Incertitude / doute sur le referencement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position actuelle du cable (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MeasuredSpeedBand">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Bande vitesse reelle validee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedGuardEnable">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="TRUE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Activation garde-fou changement de palier</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedGuardReady">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Conditions de stabilite validees</xhtml>
               </documentation>
             </variable>
             <variable name="BypassContactorCheck">
@@ -33657,8 +33822,10 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage d'un treuil individuel (contacteurs de sens et de vitesse)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop)
+   🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop via DriveRequest)
    🔒 Sécurité : Interlock inversion de sens et gestion des autorisations
+   🔧 Interface plate → structs (DriveRequest / Sensors / Config),
+      logique interne conservée (comportement bit-identique).
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -33701,11 +33868,11 @@ Fault := instFault.Fault;
 {region "§2 Gate neutralisation"}
 // 🛑 2. GATE
 IF NOT Enable THEN
-    SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := SpeedStepTable);
+    SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := Config.SpeedStepTable);
     DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqDirection := 0,
-                       ChangeDelayUp := DirectionInterlockDelayAscent,
-                       ChangeDelayDown := DirectionInterlockDelayDescent);
-    StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := StepRampDelayAscent);
+                       ChangeDelayUp := Config.DirectionInterlockDelayUp,
+                       ChangeDelayDown := Config.DirectionInterlockDelayDown);
+    StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := Config.StepRampDelayAscent);
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -33715,7 +33882,7 @@ IF NOT Enable THEN
     DirectionChangePending := DirectionInterlock.DirectionChangePending;
     TonContactorsDropped(IN := FALSE);
     ContactorsCheck.Command := FALSE;
-    ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
+    ContactorsCheck.Feedback := NOT Sensors.ContactorsAllOff;
     InTopSlowdownZone := FALSE;
     InBottomSlowdownZone := FALSE;
     Ready := FALSE;
@@ -33726,26 +33893,26 @@ Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region "§3 Permis et zones de ralentissement"}
-EffectiveSafeStop := SafeStop OR (Direction &gt; 0 AND NOT AscentPermit) OR (Direction &lt; 0 AND NOT DescendPermit);
+EffectiveSafeStop := SafeStop OR (DriveRequest.Direction &gt; 0 AND NOT AscentPermit) OR (DriveRequest.Direction &lt; 0 AND NOT DescendPermit);
 
-InTopSlowdownZone := Homed AND NOT HomingSuspect AND (CablePosM &gt;= (TopLimitM - CfgSlowdownDistanceM));
-InBottomSlowdownZone := Homed AND NOT HomingSuspect AND (CablePosM &lt;= (BottomLimitM + CfgSlowdownDistanceM));
+InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &gt;= (DriveRequest.TopLimitM - Config.SlowdownDistance_M));
+InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &lt;= (DriveRequest.BottomLimitM + Config.SlowdownDistance_M));
 
-IF Direction &gt; 0 THEN
-    ActiveMaxStep := MaxStepAscent;
+IF DriveRequest.Direction &gt; 0 THEN
+    ActiveMaxStep := DriveRequest.MaxStepUp;
     IF InTopSlowdownZone THEN
-        ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
+        ActiveMaxStep := MIN(ActiveMaxStep, Config.SlowdownMaxStep);
     END_IF;
-ELSIF Direction &lt; 0 THEN
-    ActiveMaxStep := CfgMaxStepDescente;
+ELSIF DriveRequest.Direction &lt; 0 THEN
+    ActiveMaxStep := DriveRequest.MaxStepDown;
     IF InBottomSlowdownZone THEN
-        ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
+        ActiveMaxStep := MIN(ActiveMaxStep, Config.SlowdownMaxStep);
     END_IF;
 ELSE
-    ActiveMaxStep := MaxStepAscent;
+    ActiveMaxStep := DriveRequest.MaxStepUp;
 END_IF;
 
-IF HomingApproachActive THEN
+IF DriveRequest.HomingApproachActive THEN
     ActiveMaxStep := 1;
 END_IF;
 {endregion}
@@ -33753,12 +33920,12 @@ END_IF;
 {region "§4 Interlock direction"}
 // 🔀 4. INTERLOCK DIRECTION (extrait dans FB_WinchDirectionInterlock, D18)
 DirectionInterlock(
-    Enable := (StepNumber = 0) AND FwdRevSpeedFeedbackOff,
+    Enable := (StepNumber = 0) AND Sensors.ContactorsAllOff,
     EnableRising := EnableRisingEdge.Q,
     Reset := Reset,
-    ReqDirection := Direction,
-    ChangeDelayUp := DirectionInterlockDelayAscent,
-    ChangeDelayDown := DirectionInterlockDelayDescent
+    ReqDirection := DriveRequest.Direction,
+    ChangeDelayUp := Config.DirectionInterlockDelayUp,
+    ChangeDelayDown := Config.DirectionInterlockDelayDown
 );
 CommandedDirection := DirectionInterlock.CommandedDirection;
 DirectionChangePending := DirectionInterlock.DirectionChangePending;
@@ -33766,18 +33933,18 @@ DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
 {region "§5 Paliers vitesse et contacteurs"}
-IF DirectionChangePending OR (Direction = 0) OR EffectiveSafeStop OR NOT StartStop THEN
+IF DirectionChangePending OR (DriveRequest.Direction = 0) OR EffectiveSafeStop OR NOT DriveRequest.StartStop THEN
     RampTargetPct := 0.0;
 ELSE
-    RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
+    RampTargetPct := LIMIT(0.0, DriveRequest.SpeedTgt_Pct, 100.0);
 END_IF;
 
 // Décodage consigne % -&gt; palier conservé ici, immédiatement en amont du
 // décodeur contacteurs. FB_SpeedStep ne reçoit plus que le palier discret.
-SpeedStepHyst1(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[1] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[1] - SpeedStepHystMargin));
-SpeedStepHyst2(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[2] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[2] - SpeedStepHystMargin));
-SpeedStepHyst3(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[3] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[3] - SpeedStepHystMargin));
-SpeedStepHyst4(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[4] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[4] - SpeedStepHystMargin));
+SpeedStepHyst1(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[1] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[1] - Config.SpeedStepHystMargin));
+SpeedStepHyst2(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[2] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[2] - Config.SpeedStepHystMargin));
+SpeedStepHyst3(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[3] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[3] - Config.SpeedStepHystMargin));
+SpeedStepHyst4(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[4] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[4] - Config.SpeedStepHystMargin));
 
 IF RampTargetPct &lt;= 0.1 THEN
     RampTargetStep := 0;
@@ -33792,7 +33959,7 @@ END_IF;
 SpeedStep(
     Enable := (RampTargetPct &gt; 0.1),
     SpeedStepReq := RampTargetStep,
-    Table := SpeedStepTable,
+    Table := Config.SpeedStepTable,
     MaxStepNumber := ActiveMaxStep
 );
 RequestedStep := SpeedStep.StepNumber;
@@ -33801,14 +33968,14 @@ RequestedStep := SpeedStep.StepNumber;
 // (SpeedGuardReady=FALSE -&gt; palier 1) ou si la bande mesuree est inferieure au
 // palier demande (pas de passage aux paliers superieurs sans vitesse confirmee).
 SpeedGuardLimited := FALSE;
-IF SpeedGuardEnable THEN
-    IF NOT SpeedGuardReady THEN
+IF Sensors.SpeedGuardEnable THEN
+    IF NOT Sensors.SpeedGuardReady THEN
         IF RequestedStep &gt; 1 THEN
             RequestedStep := 1;
             SpeedGuardLimited := TRUE;
         END_IF;
-    ELSIF (MeasuredSpeedBand &gt;= 1) AND (MeasuredSpeedBand &lt;= 5) AND (RequestedStep &gt; MeasuredSpeedBand) THEN
-        RequestedStep := MeasuredSpeedBand;
+    ELSIF (Sensors.MeasuredSpeedBand &gt;= 1) AND (Sensors.MeasuredSpeedBand &lt;= 5) AND (RequestedStep &gt; Sensors.MeasuredSpeedBand) THEN
+        RequestedStep := Sensors.MeasuredSpeedBand;
         SpeedGuardLimited := TRUE;
     END_IF;
 END_IF;
@@ -33820,9 +33987,9 @@ END_IF;
 // l'arret franc RequestedStep=0 / RampTargetPct=0 est preserve.
 // Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
 // ActiveMaxStep (ex. SlowdownMaxStep -&gt; palier 1 en bordure basse), on borne au plafond.
-IF StartStop AND (Direction = -1) AND (MinStepDown &gt; 0) THEN
-    IF RequestedStep &lt; MinStepDown THEN
-        RequestedStep := MinStepDown;
+IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown &gt; 0) THEN
+    IF RequestedStep &lt; DriveRequest.MinStepDown THEN
+        RequestedStep := DriveRequest.MinStepDown;
     END_IF;
     IF RequestedStep &gt; ActiveMaxStep THEN
         RequestedStep := ActiveMaxStep;
@@ -33833,9 +34000,9 @@ END_IF;
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
 IF CommandedDirection = -1 THEN
-    EffectiveStepRampDelay := StepRampDelayDescente;
+    EffectiveStepRampDelay := Config.StepRampDelayDescente;
 ELSE
-    EffectiveStepRampDelay := StepRampDelayAscent;
+    EffectiveStepRampDelay := Config.StepRampDelayAscent;
 END_IF;
 StepShaper(
     Enable := Enable,
@@ -33865,8 +34032,8 @@ AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);
 
 ContactorsCheck.Command  := NOT AllContactorsCommandedOff;
-ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
-TonContactorsDropped(IN := FALSE, PT := ContactorFeedbackTimeout);
+ContactorsCheck.Feedback := NOT Sensors.ContactorsAllOff;
+TonContactorsDropped(IN := FALSE, PT := Config.ContactorFeedbackTimeout);
 ContactorsCheck.StuckClosed := FALSE; // force a FALSE (Phase 0) : detection contacteur colle produite par FB_Safety_Winch, re-alimentee a la phase suivante
 ContactorsCheck.StuckOpen := FALSE;
 
@@ -37774,7 +37941,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.ReqProgram.ReqBucket.ReqClose                    := instCycleSemiAuto.BucketCmd.Close;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instCycleSemiAuto.BucketCmd.KoboldContactorCmd;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
-    Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := FALSE;
+    Data.ReqProgram.ReqBucket.ExtractionControlActive     := FALSE;
     // SEMI_AUTO : aucun assistant de plongee actif -&gt; plancher neutre (0 = aucun).
     Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 
@@ -37853,7 +38020,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequestActive
                                                                 AND (CoupledUserRequestDirection = -1)
                                                                 AND NOT PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
-    Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := instExtractionSequence.ForceMinSpeedStep;
+    Data.ReqProgram.ReqBucket.ExtractionControlActive     := instExtractionSequence.ExtractionControlActive;
     // Plancher de plongee : produit par FB_DiveSearch, consomme par PRG_04 §5ter.
     Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.MinStepDown;
 
@@ -37937,7 +38104,7 @@ ELSE
     Data.ReqProgram.ReqBucket.ReqClose                    := FALSE;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := FALSE;
     Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := TRUE;
-    Data.ReqProgram.ReqBucket.ForceMinSpeedStep           := FALSE;
+    Data.ReqProgram.ReqBucket.ExtractionControlActive     := FALSE;
     // DISABLE : plancher neutre (0 = aucun).
     Data.ReqProgram.ReqBucket.MinStepDown                 := 0;
 
@@ -38056,6 +38223,57 @@ via MeasuredSpeedBand, 1 instance par treuil, mêmes sources que FB_Safety_Winch
               <type>
                 <derived name="FB_WinchLoadEstimator" />
               </type>
+            </variable>
+            <variable name="M1DriveRequest">
+              <type>
+                <derived name="ST_fbWinch_DriveRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REQUETES D'AXE ASSEMBLEES AVANT APPEL FB_WINCH ===
+CODESYS n'accepte pas l'initialiseur de struct anonyme en parametre d'appel :
+les structs DriveRequest / Sensors / Config sont remplies champ par champ ici.
+. [LOC] Requete axe M1 (ordre, palier, bornes)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2DriveRequest">
+              <type>
+                <derived name="ST_fbWinch_DriveRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Requete axe M2 (ordre, palier, bornes)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1WinchSensors">
+              <type>
+                <derived name="ST_fbWinch_Sensors" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mesures et feedbacks M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2WinchSensors">
+              <type>
+                <derived name="ST_fbWinch_Sensors" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mesures et feedbacks M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1WinchCfg">
+              <type>
+                <derived name="ST_fbWinch_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Config statique M1 (table paliers, ralentissement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2WinchCfg">
+              <type>
+                <derived name="ST_fbWinch_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Config statique M2 (table paliers, ralentissement)</xhtml>
+              </documentation>
             </variable>
             <variable name="WinchM1FinalInterlockRequest">
               <type>
@@ -38226,7 +38444,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémorise si LA fermeture en cours a été armée par ce mécanisme</xhtml>
               </documentation>
             </variable>
-            <variable name="ControlAscentActive">
+            <variable name="ExtractionControlActive">
               <type>
                 <BOOL />
               </type>
@@ -38905,16 +39123,16 @@ IF BucketBusyRiseEdge.Q THEN
     ControlAscentArmedForThisClose := CoupledAscentBucketCloseArmed;
 END_IF;
 IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
-    ControlAscentActive := TRUE;
+    ExtractionControlActive := TRUE;
     ControlAscentStartM1PosM := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
     ControlAscentStartM2PosM := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
 END_IF;
-IF ControlAscentActive THEN
+IF ExtractionControlActive THEN
     IF (ABS(PRG_02_Acquisition.Data.Encoders.M1.CablePosM - ControlAscentStartM1PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M)
        AND (ABS(PRG_02_Acquisition.Data.Encoders.M2.CablePosM - ControlAscentStartM2PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
-        ControlAscentActive := FALSE;             // Distance de contrôle parcourue : paliers normaux
+        ExtractionControlActive := FALSE;         // Distance de contrôle parcourue : paliers normaux
     ELSIF NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)) THEN
-        ControlAscentActive := FALSE;             // Montée relâchée/interrompue : annule la phase
+        ExtractionControlActive := FALSE;         // Montée relâchée/interrompue : annule la phase
     END_IF;
 END_IF;
 
@@ -39292,7 +39510,7 @@ IF instWinchSync.SyncDeviationWarn THEN
     CommonMaxStepUp   := 1;
     CommonMaxStepDown := 1;
 END_IF;
-IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAscentActive THEN
+IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ExtractionControlActive OR ExtractionControlActive THEN
     CommonMaxStepUp := 1;
 END_IF;
 
@@ -39306,7 +39524,7 @@ CommonMinStepDown := MAX(1, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStep
 // --- M2-propre (jamais vu par M1) ---
 M2MaxStepUp   := CommonMaxStepUp;
 M2MaxStepDown := CommonMaxStepDown;
-IF instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive THEN
+IF instBucket.M2_BucketJogLimit OR ManualBucketLimitsActive THEN
     M2MaxStepUp   := 1;
     M2MaxStepDown := 1;
 END_IF;
@@ -39347,76 +39565,92 @@ instWinchLoadEstimatorM2(
     LoadTable               := _WinchLoadEstimateTable
 );
 
+// --- M1 : assemblage des structs (CODESYS refuse l'initialiseur inline en appel) ---
+M1DriveRequest.StartStop            := M1LogicRequestStartStop;
+M1DriveRequest.Direction            := M1LogicRequestDirection;
+M1DriveRequest.SpeedTgt_Pct         := M1LogicRequestSpeedCmd_Pct;
+M1DriveRequest.MaxStepUp            := CommonMaxStepUp;
+M1DriveRequest.MaxStepDown          := CommonMaxStepDown;
+// Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
+// sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
+M1DriveRequest.MinStepDown          := CommonMinStepDown;
+M1DriveRequest.HomingApproachActive := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable;
+// Même limite haute active que FB_Safety_Winch (7,5 m / 8,5 m sous override).
+M1DriveRequest.TopLimitM            := TopLimitM1_M;
+M1DriveRequest.BottomLimitM         := BottomLimitM1_Active;
+M1DriveRequest.SyncCoupled          := instWinchSync.SyncActive;
+
+M1WinchSensors.CablePosM          := PRG_02_Acquisition.Data.Encoders.M1.CablePosM;
+M1WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM1.Homed;
+M1WinchSensors.HomingSuspect      := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect;
+M1WinchSensors.ContactorsAllOff   := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI;
+M1WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM1.SpeedBand;
+M1WinchSensors.SpeedGuardEnable   := TRUE;
+M1WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
+
+M1WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
+M1WinchCfg.SlowdownDistance_M     := _CommunCfgPersist.WinchSlowdownDistance_M;
+M1WinchCfg.SlowdownMaxStep        := _CommunCfgPersist.WinchSlowdownMaxStep;
+
 instWinchM1(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    StartStop               := M1LogicRequestStartStop,
     SafeStop                := SafeStopM1_Active,
     DescendPermit           := EffectivePermitM1_Descend,
     AscentPermit            := EffectivePermitM1_Ascent,
-    Direction               := M1LogicRequestDirection,
-    SpeedTgt_Pct            := M1LogicRequestSpeedCmd_Pct,
-    SpeedStepTable          := _WinchSpeedStepTable,
-    CfgMaxStepDescente      := CommonMaxStepDown,
-    MaxStepAscent           := CommonMaxStepUp,
-    // Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
-    // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
-    MinStepDown             := CommonMinStepDown,
-    MeasuredSpeedBand       := instWinchLoadEstimatorM1.SpeedBand,
-    SpeedGuardEnable        := TRUE,
-    SpeedGuardReady         := NOT instWinchSync.Fault.Error,
-    HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
-    FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
+    DriveRequest            := M1DriveRequest,
+    Sensors                 := M1WinchSensors,
+    Config                  := M1WinchCfg,
     // ContactorFeedback (n°3 de la matrice) et Global, gatés MAINT_N2.
     BypassContactorCheck    := MaintN2 AND (GVL_IHM.M1TreuilRetenue.Bypass.Global OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback),
-    Homed                   := PRG_02_Acquisition.Data.EncoderM1.Homed,
-    HomingSuspect           := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
-    CablePosM               := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
-    // Même limite haute active que FB_Safety_Winch (7,5 m / 8,5 m sous override).
-    TopLimitM               := TopLimitM1_M,
-    BottomLimitM            := BottomLimitM1_Active,
-    CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
-    CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,
     BypassGlobal            := MaintN2 AND GVL_IHM.M1TreuilRetenue.Bypass.Global
 );
+
+// --- M2 : assemblage des structs ---
+M2DriveRequest.StartStop            := M2LogicRequestStartStop;
+M2DriveRequest.Direction            := M2LogicRequestDirection;
+M2DriveRequest.SpeedTgt_Pct         := M2LogicRequestSpeedCmd_Pct;
+// Clamp de palier agrégé en §5ter : bornes communes M1=M2 (CommonMaxStep*) puis
+// M2-propre (M2MaxStep*) — M2_BucketJogLimit, ManualBucketLimitsActive,
+// BucketNotClosedAscentStep1, SlackCableAscentStep1 ne réduisent jamais M1.
+// D13 : reconstruction de table M2 supprimée — le clamp M2MaxStep* := 1 suffit
+// (StepNumber ≤ 1 → seuls les états P1 sont commandés).
+M2DriveRequest.MaxStepUp            := M2MaxStepUp;
+M2DriveRequest.MaxStepDown          := M2MaxStepDown;
+// Plancher palier descente plongée Kobold : plancher M2-propre agrégé en §5ter, injecté
+// sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
+M2DriveRequest.MinStepDown          := M2MinStepDown;
+M2DriveRequest.HomingApproachActive := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable;
+// Même limite haute active que FB_Safety_Winch (M2_LimitShift conservé).
+M2DriveRequest.TopLimitM            := TopLimitM2_M;
+M2DriveRequest.BottomLimitM         := BottomLimitM2_Active;
+M2DriveRequest.SyncCoupled          := instWinchSync.SyncActive;
+
+M2WinchSensors.CablePosM          := PRG_02_Acquisition.Data.Encoders.M2.CablePosM;
+M2WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM2.Homed;
+M2WinchSensors.HomingSuspect      := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect;
+M2WinchSensors.ContactorsAllOff   := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI;
+M2WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM2.SpeedBand;
+M2WinchSensors.SpeedGuardEnable   := TRUE;
+M2WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
+
+M2WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
+M2WinchCfg.SlowdownDistance_M     := _CommunCfgPersist.WinchSlowdownDistance_M;
+M2WinchCfg.SlowdownMaxStep        := _CommunCfgPersist.WinchSlowdownMaxStep;
 
 instWinchM2(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
-    StartStop               := M2LogicRequestStartStop,
     SafeStop                := SafeStopM2_Active,
     DescendPermit           := EffectivePermitM2_Descend,
     AscentPermit            := EffectivePermitM2_Ascent,
-    Direction               := M2LogicRequestDirection,
-    SpeedTgt_Pct            := M2LogicRequestSpeedCmd_Pct,
-    SpeedStepTable          := _WinchSpeedStepTable,
-    // Clamp de palier agrégé en §5ter : bornes communes M1=M2 (CommonMaxStep*) puis
-    // M2-propre (M2MaxStep*) — M2_ForceSlowSpeed, ManualBucketLimitsActive,
-    // BucketNotClosedAscentStep1, SlackCableAscentStep1 ne réduisent jamais M1.
-    // D13 : reconstruction de table M2 supprimée — le clamp M2MaxStep* := 1 suffit
-    // (StepNumber ≤ 1 → seuls les états P1 sont commandés).
-    CfgMaxStepDescente      := M2MaxStepDown,
-    MaxStepAscent           := M2MaxStepUp,
-    // Plancher palier descente plongée Kobold : plancher M2-propre agrégé en §5ter, injecté
-    // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
-    MinStepDown             := M2MinStepDown,
-    MeasuredSpeedBand       := instWinchLoadEstimatorM2.SpeedBand,
-    SpeedGuardEnable        := TRUE,
-    SpeedGuardReady         := NOT instWinchSync.Fault.Error,
-    HomingApproachActive    := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable,
-    FwdRevSpeedFeedbackOff  := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
+    DriveRequest            := M2DriveRequest,
+    Sensors                 := M2WinchSensors,
+    Config                  := M2WinchCfg,
     // Idem M1 ci-dessus
     BypassContactorCheck    := MaintN2 AND (GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback),
-    Homed                   := PRG_02_Acquisition.Data.EncoderM2.Homed,
-    HomingSuspect           := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
-    CablePosM               := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
-    // Même limite haute active que FB_Safety_Winch (M2_LimitShift conservé).
-    TopLimitM               := TopLimitM2_M,
-    BottomLimitM            := BottomLimitM2_Active,
-    CfgSlowdownDistanceM    := _CommunCfgPersist.WinchSlowdownDistance_M,
-    CfgSlowdownMaxStep      := _CommunCfgPersist.WinchSlowdownMaxStep,
     BypassGlobal            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
@@ -39655,7 +39889,7 @@ BucketState.FBState := E_State.READY;
 BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
 BucketState.M2StartStop := instBucket.M2_StartStop;
 BucketState.M2Direction := instBucket.M2_Direction;
-BucketState.M2ForceSlowSpeed := instBucket.M2_ForceSlowSpeed;
+BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
 BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.Encoders.M2.CablePosM - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;
@@ -39668,10 +39902,10 @@ BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
 // Reflète le séquencement auto : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase
 // vitesse contrôlée post-fermeture.
-BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ControlAscentActive;
+BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ExtractionControlActive;
 BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
 BucketState.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
-BucketState.ControlAscentActive := ControlAscentActive;
+BucketState.ExtractionControlActive := ExtractionControlActive;
 BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
@@ -42882,6 +43116,9 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
             <Object Name="ST_fbWinchSpeedLearning_Cell" ObjectId="8341fe63-7ea1-5607-8731-d295248cd6cb" />
             <Object Name="ST_fbWinchSpeedLearning_Cfg" ObjectId="e33b18ad-d4ff-5cd1-939b-74be82c01450" />
             <Object Name="ST_fbWinchSpeedLearning_Table" ObjectId="e53cb50d-fd3d-5709-9494-4694f689ff17" />
+            <Object Name="ST_fbWinch_Cfg" ObjectId="6e031a4e-ea7c-5444-b4f1-495452dd1ae8" />
+            <Object Name="ST_fbWinch_DriveRequest" ObjectId="45e51157-f25e-5b78-83e7-e1b47077800c" />
+            <Object Name="ST_fbWinch_Sensors" ObjectId="ba625d91-b679-557f-bae8-bd35a0a8e716" />
             <Object Name="ST_fbWinch_Symmetry_Cfg" ObjectId="b3edf443-a7a8-5125-8877-3148f355844d" />
             <Object Name="ST_fbWinch_Symmetry_Data" ObjectId="30d10f2c-209a-59ac-ab89-aae03e9399fe" />
           </Folder>
