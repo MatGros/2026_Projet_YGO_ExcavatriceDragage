@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.152938" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.152938">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T23:48:29.754266" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T23:48:29.754266">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -30,6 +30,7 @@
               <value name="NONE" value="0" />
               <value name="BRAKE_COMMAND_NOT_CONFIRMED" value="1" />
               <value name="RESTART_INHIBITED" value="2" />
+              <value name="SENSE_DROP_TIMEOUT" value="3" />
             </values>
           </enum>
         </baseType>
@@ -52,6 +53,12 @@
                 <Name>RESTART_INHIBITED</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SENSE_DROP_TIMEOUT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">T_max §3bis depasse sans confirmation retombee (AC7)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

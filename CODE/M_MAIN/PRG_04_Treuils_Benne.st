@@ -68,7 +68,6 @@ VAR
     M2LogicRequestStartStop     : BOOL;
     M2LogicRequestDirection     : INT;
     M2LogicRequestSpeedCmd_Pct      : REAL;
-    M2_SpeedStepTableActive : ST_SpeedStepTable;
 
     SpeedGuardEnableM1 : BOOL := FALSE;
     SpeedGuardEnableM2 : BOOL := FALSE;
@@ -130,6 +129,16 @@ VAR
 
     EffectiveMaxStepAscent    : INT;
     EffectiveMaxStepDescente  : INT;
+
+    // Agrégateur de clamp de palier (T181-10) — bornes communes M1=M2 puis M2-propre
+    CommonMaxStepUp   : INT;
+    CommonMaxStepDown : INT;
+    CommonMinStepUp   : INT;
+    CommonMinStepDown : INT;
+    M2MaxStepUp       : INT;
+    M2MaxStepDown     : INT;
+    M2MinStepUp       : INT;
+    M2MinStepDown     : INT;
 
     // Mémoire scan précédent pour SpeedDelta_Mps (IHM)
     M1_PrevSpeed_Mps : REAL;
@@ -438,31 +447,9 @@ instWinchSync(
     BypassGlobal    := GVL_IHM.M1M2Sync.Bypass.Global
 );
 
-IF instBucket.M2_ForceSlowSpeed THEN
-    M2_SpeedStepTableActive.P1R1 := _WinchSpeedStepTable.P1R1;
-    M2_SpeedStepTableActive.P1R2 := _WinchSpeedStepTable.P1R2;
-    M2_SpeedStepTableActive.P1R3 := _WinchSpeedStepTable.P1R3;
-    M2_SpeedStepTableActive.P1R4 := _WinchSpeedStepTable.P1R4;
-    M2_SpeedStepTableActive.P2R1 := _WinchSpeedStepTable.P1R1;
-    M2_SpeedStepTableActive.P2R2 := _WinchSpeedStepTable.P1R2;
-    M2_SpeedStepTableActive.P2R3 := _WinchSpeedStepTable.P1R3;
-    M2_SpeedStepTableActive.P2R4 := _WinchSpeedStepTable.P1R4;
-    M2_SpeedStepTableActive.P3R1 := _WinchSpeedStepTable.P1R1;
-    M2_SpeedStepTableActive.P3R2 := _WinchSpeedStepTable.P1R2;
-    M2_SpeedStepTableActive.P3R3 := _WinchSpeedStepTable.P1R3;
-    M2_SpeedStepTableActive.P3R4 := _WinchSpeedStepTable.P1R4;
-    M2_SpeedStepTableActive.P4R1 := _WinchSpeedStepTable.P1R1;
-    M2_SpeedStepTableActive.P4R2 := _WinchSpeedStepTable.P1R2;
-    M2_SpeedStepTableActive.P4R3 := _WinchSpeedStepTable.P1R3;
-    M2_SpeedStepTableActive.P4R4 := _WinchSpeedStepTable.P1R4;
-    M2_SpeedStepTableActive.P5R1 := _WinchSpeedStepTable.P1R1;
-    M2_SpeedStepTableActive.P5R2 := _WinchSpeedStepTable.P1R2;
-    M2_SpeedStepTableActive.P5R3 := _WinchSpeedStepTable.P1R3;
-    M2_SpeedStepTableActive.P5R4 := _WinchSpeedStepTable.P1R4;
-    M2_SpeedStepTableActive.StepThreshold_Pct := _WinchSpeedStepTable.StepThreshold_Pct;
-ELSE
-    M2_SpeedStepTableActive := _WinchSpeedStepTable;
-END_IF;
+// D13 (T181-10) : reconstruction de table M2 supprimée — le clamp de palier agrégé
+// (§5ter, M2MaxStep* := 1) suffit : StepNumber ≤ 1 → seuls les états P1 sont commandés.
+// M2 consomme directement _WinchSpeedStepTable (table normale).
 
 
 {endregion}
@@ -775,6 +762,41 @@ EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinch
 
 {endregion}
 
+{region "§5ter Agrégateur de clamp de palier (commun M1=M2 + M2-propre)"}
+// === 🧮 §5ter AGRÉGATEUR DE CLAMP DE PALIER (T181-10) ===
+// Bornes communes identiques M1=M2, puis M2 applique ses limites benne propres.
+// Plafond = MIN des sources plafond ; plancher = MAX des sources plancher ; plafond gagne.
+// Synchro (instWinchSync) calculée en §4, en amont : SyncDeviationWarn réduit les DEUX treuils.
+
+// --- Sources communes (M1 = M2) ---
+CommonMaxStepUp   := EffectiveMaxStepAscent;
+CommonMaxStepDown := EffectiveMaxStepDescente;
+IF instWinchSync.SyncDeviationWarn THEN
+    CommonMaxStepUp   := 1;
+    CommonMaxStepDown := 1;
+END_IF;
+IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAscentActive THEN
+    CommonMaxStepUp := 1;
+END_IF;
+
+// Planchers communs : aucune source actuelle (réservé T181-12, MinStepDown DiveSearch).
+CommonMinStepUp   := 1;
+CommonMinStepDown := 1;
+
+// --- M2-propre (jamais vu par M1) ---
+M2MaxStepUp   := CommonMaxStepUp;
+M2MaxStepDown := CommonMaxStepDown;
+IF instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive THEN
+    M2MaxStepUp   := 1;
+    M2MaxStepDown := 1;
+END_IF;
+IF BucketNotClosedAscentStep1 OR SlackCableAscentStep1 THEN
+    M2MaxStepUp := 1;
+END_IF;
+M2MinStepUp   := CommonMinStepUp;
+M2MinStepDown := CommonMinStepDown;
+{endregion}
+
 {region "§6 Execution treuils M1/M2"}
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 & M2) ===
 
@@ -789,9 +811,8 @@ instWinchM1(
     Direction               := M1LogicRequestDirection,
     SpeedTgt_Pct            := M1LogicRequestSpeedCmd_Pct,
     SpeedStepTable          := _WinchSpeedStepTable,
-    CfgMaxStepDescente      := SEL(instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
-    // Plafonnement au Palier 1 pour mou de câble, synchro dégradée et benne non fermée
-    MaxStepAscent           := SEL(PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAscentActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
+    CfgMaxStepDescente      := CommonMaxStepDown,
+    MaxStepAscent           := CommonMaxStepUp,
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM1,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,
@@ -820,15 +841,14 @@ instWinchM2(
     AscentPermit            := EffectivePermitM2_Ascent,
     Direction               := M2LogicRequestDirection,
     SpeedTgt_Pct            := M2LogicRequestSpeedCmd_Pct,
-    SpeedStepTable          := M2_SpeedStepTableActive,
-    // instBucket.M2_ForceSlowSpeed
-    // ("Bloque les contacteurs de vitesse de M2", commentaire FB_Bucket.st) plafonne le palier
-    // autorisé pendant CLOSING_BUCKET/ouverture benne : MaxStepAscent et CfgMaxStepDescente
-    // suivent instBucket.M2_ForceSlowSpeed en plus des conditions existantes.
-    // instWinchSync.SyncDeviationWarn dégrade M2 au Palier 1 sur écart modéré.
-    // BucketNotClosedAscentStep1 et SlackCableAscentStep1 dégradent la montée au Palier 1.
-    CfgMaxStepDescente      := SEL(instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn, EffectiveMaxStepDescente, 1),
-    MaxStepAscent           := SEL(PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ForceMinSpeedStep OR ControlAscentActive OR instBucket.M2_ForceSlowSpeed OR ManualBucketLimitsActive OR instWinchSync.SyncDeviationWarn OR BucketNotClosedAscentStep1 OR SlackCableAscentStep1, EffectiveMaxStepAscent, 1),
+    SpeedStepTable          := _WinchSpeedStepTable,
+    // Clamp de palier agrégé en §5ter : bornes communes M1=M2 (CommonMaxStep*) puis
+    // M2-propre (M2MaxStep*) — M2_ForceSlowSpeed, ManualBucketLimitsActive,
+    // BucketNotClosedAscentStep1, SlackCableAscentStep1 ne réduisent jamais M1.
+    // D13 : reconstruction de table M2 supprimée — le clamp M2MaxStep* := 1 suffit
+    // (StepNumber ≤ 1 → seuls les états P1 sont commandés).
+    CfgMaxStepDescente      := M2MaxStepDown,
+    MaxStepAscent           := M2MaxStepUp,
     MeasuredSpeedBand       := 0,
     SpeedGuardEnable        := SpeedGuardEnableM2,
     SpeedGuardReady         := NOT instWinchSync.Fault.Error,

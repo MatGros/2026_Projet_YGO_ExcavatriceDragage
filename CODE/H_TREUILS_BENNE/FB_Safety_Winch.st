@@ -90,6 +90,7 @@ VAR_OUTPUT
     MecaADriftM                     : REAL;                           // <-- [DIAG] Derive mesuree Meca A (m)
     MecaCDriftM                     : REAL;                           // <-- [DIAG] Derive mesuree Meca C (m)
     MecaBElapsedTime                : TIME;                           // <-- [DIAG] Ecoule confirmation contacteurs/frein
+    ContactorStuck                  : BOOL;                           // <-- [DIAG] Contacteur colle (proprietaire unique, re-alimente IHM/Troubleshooting a la phase suivante)
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
@@ -334,6 +335,12 @@ ELSE
     TonNoMovement(IN := FALSE);
 END_IF;
 
+// ContactorStuck : proprietaire UNIQUE de la detection contacteur colle.
+// Escalade : Meca B (bit8) -> SafeStop + PowerCutOff apres PostRampTimeout si le
+// collage persiste. Le champ ContactorsCheck.StuckClosed de FB_Winch est force a
+// FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
+ContactorStuck := MecaBFaultLatched;
+
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
@@ -381,7 +388,10 @@ AscentPermit := NOT (
     (((Fault.ErrorId AND 16#0020) <> 16#0000
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
-    OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM >= TopLimitM)) AND NOT BypassTopLimitSoftware)
+    // TopLimitM porte deja la relaxation 7,5->8,5 m (override N1 / bypass N2, bornee par la
+    // bande de ralentissement, PRG_04 TopLimitM1_M/TopLimitM2_M) : la butee logicielle reste
+    // active a la valeur relevee. Bypasser le logiciel releve la butee, il ne la supprime pas.
+    OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM >= TopLimitM))
 );
 
 PowerCutOff := (Fault.ErrorId AND 16#2F84) <> 16#0000;

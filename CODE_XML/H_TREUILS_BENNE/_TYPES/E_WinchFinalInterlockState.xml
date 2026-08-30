@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.154444" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.154444">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T23:48:29.738092" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T23:48:29.738092">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -33,6 +33,7 @@
               <value name="WAIT_STEP_DELAY" value="3" />
               <value name="WAIT_RESTART_DELAY" value="4" />
               <value name="FAULT" value="5" />
+              <value name="WAIT_SENSE_DROP_CONFIRM" value="6" />
             </values>
           </enum>
         </baseType>
@@ -73,6 +74,12 @@
                 <Name>FAULT</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Etat de defaut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WAIT_SENSE_DROP_CONFIRM</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien §3bis du contacteur de sens (AC6/AC7)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

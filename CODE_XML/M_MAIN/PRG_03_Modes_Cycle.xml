@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T22:50:34.643839" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T22:50:34.643839">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T23:30:15.044134" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T23:30:15.044134">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -48,6 +48,21 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">État public de la séquence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModesFault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Défaut de l'arbitre de mode (FB_Modes), forme cible ST_Fault (AF03 §3).
+Producteur unique : FB_Modes (instancié par PRG_03_Modes_Cycle).
+Causes : [0] refus Semi-Auto pour défaut codeur (latchée) ;
+[1] changement de mode refusé, treuils non à l'arrêt confirmé (live) ;
+[2] refus Semi-Auto pour re-homing obligatoire (latchée).
+⚠️ Sans cette publication, les refus de mode restaient invisibles de l'IHM :
+un interlock qu'on ne voit pas est un interlock qu'on contourne.
+🚨 Défauts d'arbitrage de mode (consommé PRG_07 → IHM)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -745,6 +760,38 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 §4bis — matrice de maintenance
+⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
+vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l'IHM).
+🚦 Demande de changement de mode REFUSÉE : les treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas à l'arrêt mécanique confirmé
+(contacteurs retombés ET frein serré ET |v| &lt; seuil).
+Le mode courant est maintenu. IHM : « arrêter les
+treuils avant de changer de mode ».
+🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(usage effectif d'un override/bypass position en maintenance)
+🧭 M2 : idem</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1539,8 +1586,34 @@ instModes(
     SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable,
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState &lt;&gt; DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState &lt;&gt; DEVICE_STATE.RUNNING),
     JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch,
-    SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess
+    SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess,
+    // Arrêt mécanique confirmé des treuils (condition de bascule N1/N2, AF-05 §4bis)
+    M1ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
+    M1BrakeIsOpen             := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
+    M1SpeedAbsMps             := PRG_02_Acquisition.Data.Encoders.M1.Speed_Mps,
+    M2ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
+    M2BrakeIsOpen             := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
+    M2SpeedAbsMps             := PRG_02_Acquisition.Data.Encoders.M2.Speed_Mps,
+    // États homing (levée du re-homing obligatoire)
+    M1HomingDone              := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Done,
+    M1Homed                   := PRG_02_Acquisition.Data.EncoderM1.Homed,
+    M1HomingSuspect           := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
+    M2HomingDone              := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Done,
+    M2Homed                   := PRG_02_Acquisition.Data.EncoderM2.Homed,
+    M2HomingSuspect           := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
+    // Usage effectif d'un override/bypass de position (producteur PRG_04, lag 1 scan
+    // assumé : PRG_04 est de rang 04, ce programme de rang 03)
+    M1PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM1,
+    M2PositionLimitOverridden := PRG_04_Treuils_Benne.Data.PositionLimitOverriddenM2,
+    // Restauration boot des drapeaux de re-homing (miroir PERSISTENT)
+    BootHomingRequiredM1      := GVL_PERSISTENT._MaintM1HomingRequired,
+    BootHomingRequiredM2      := GVL_PERSISTENT._MaintM2HomingRequired
 );
+
+// Miroir persistant du re-homing obligatoire (pattern FB_MirrorBypassRetain) :
+// FB_Modes est le producteur unique de la décision ; GVL_PERSISTENT n'est que la mémoire.
+GVL_PERSISTENT._MaintM1HomingRequired := instModes.Auth.HomingRequiredM1;
+GVL_PERSISTENT._MaintM2HomingRequired := instModes.Auth.HomingRequiredM2;
 
 // Qualification de l'intention opérateur couplée (M1+M2) dans le même scan
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
@@ -1697,6 +1770,9 @@ instCycleSemiAuto(
 
 // 1. Autorisations machine
 Data.Auth := instModes.Auth;
+// 1bis. Défauts de l'arbitre de mode (refus Semi-Auto, changement de mode refusé) —
+// publiés pour que l'IHM les affiche : un interlock invisible est un interlock contourné.
+Data.ModesFault := instModes.Fault;
 
 // 1bis. Intention couplée continue opérateur (inconditionnelle, TOUS modes)
 Data.ReqProgram.OperatorCoupledIntent.Active    := CoupledUserRequestActive;
@@ -4775,6 +4851,150 @@ PrevState := ExtractionState;
 --&gt; [HW] Defaut codeur agrege (1 cycle retard)</xhtml>
               </documentation>
             </variable>
+            <variable name="M1ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ARRÊT MÉCANIQUE CONFIRMÉ DES TREUILS (bascule de mode, AF-05 §4bis) ===
+Même composite que l'armement Méca B (FB_Safety_Winch.st:247) : contacteurs retombés
+ET frein serré, redondés par la mesure de vitesse.
+--&gt; [HW] M1 : feedback retombée contacteurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M1 : feedback frein ouvert</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedAbsMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M1 : vitesse absolue mesurée (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M2 : feedback retombée contacteurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M2 : feedback frein ouvert</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedAbsMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M2 : vitesse absolue mesurée (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MovementSpeedThresholdMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil « vitesse quasi nulle » (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1HomingDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ÉTATS HOMING &amp; USAGE EFFECTIF D'UN OVERRIDE/BYPASS DE POSITION ===
+--&gt; [HW] M1 : cycle de homing terminé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M1 : treuil référencé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M1 : référencement suspect</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2HomingDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M2 : cycle de homing terminé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M2 : treuil référencé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] M2 : référencement suspect</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1PositionLimitOverridden">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] M1 : limite de position levée (override N1 ou bypass N2 effectif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2PositionLimitOverridden">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] M2 : limite de position levée (override N1 ou bypass N2 effectif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BootHomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESTAURATION BOOT DES DRAPEAUX PERSISTANTS ===
+--&gt; [CFG] M1 : valeur PERSISTENT relue au premier scan</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BootHomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] M2 : valeur PERSISTENT relue au premier scan</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -4861,17 +5081,69 @@ PrevState := ExtractionState;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire etat inhibition M2 (exclusion mutuelle)</xhtml>
               </documentation>
             </variable>
+            <variable name="PrevArbitratedMode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MAINTENANCE : BASCULE DE MODE &amp; RE-HOMING ===
+. [LOC] Mode arbitré au scan précédent (maintien si bascule refusée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangeAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Treuils à l'arrêt mécanique confirmé (condition de bascule)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintHomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] M1 : re-homing obligatoire avant tout SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintHomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] M2 : re-homing obligatoire avant tout SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SemiAutoRefusedHoming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch refus semi-auto pour re-homing obligatoire</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FirstScanDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation premier scan (restauration PERSISTENT)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Source unique du mode arbitré et calcul du bus d'autorisations
-   🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur
-   🔌 Interface : Standard composant d'arbitrage applicatif
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
-                   DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
-   =======================================================================</xhtml>
+    🎯 Rôle : Source unique du mode arbitré et calcul du bus d'autorisations
+    🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur ou de re-homing requis ;
+                  refus de toute bascule N1/N2/SEMI_AUTO tant que les treuils ne sont pas
+                  à l'arrêt mécanique confirmé ; re-homing obligatoire après usage effectif
+                  d'un override/bypass de position (AF-05 §4bis)
+    🔌 Interface : Standard composant d'arbitrage applicatif
+    📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                    DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
+    =======================================================================</xhtml>
           </documentation>
         </interface>
         <body>
@@ -4884,17 +5156,63 @@ PrevState := ExtractionState;
 // 🔑 1. RESET FRONT
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    SemiAutoRefusedFault := FALSE;
+    SemiAutoRefusedFault  := FALSE;
+    SemiAutoRefusedHoming := FALSE;
 END_IF;
 
-// Refus semi-auto si défaut codeur
+// 🔑 1bis. RESTAURATION BOOT DES DRAPEAUX PERSISTANTS
+// Non-RETAIN -&gt; réinitialisé à chaque warm/cold reset ; relu depuis GVL_PERSISTENT (miroir
+// réécrit chaque scan par PRG_03). Aucune perte du re-homing obligatoire sur coupure.
+IF NOT FirstScanDone THEN
+    FirstScanDone         := TRUE;
+    MaintHomingRequiredM1 := BootHomingRequiredM1;
+    MaintHomingRequiredM2 := BootHomingRequiredM2;
+    PrevArbitratedMode    := E_Mode.DISABLE;
+END_IF;
+
+// 🔑 1ter. RE-HOMING OBLIGATOIRE — ARMEMENT IMMÉDIAT (AF-05 §4bis)
+// Armé AVANT l'arbitrage de mode (§3) et non à la sortie du mode maintenance :
+//   1. pas de fenêtre d'un scan où SEMI_AUTO serait arbitré malgré un re-homing requis ;
+//   2. pas de perte de l'obligation sur coupure / download pendant la maintenance
+//      (la valeur est écrite dans le miroir PERSISTENT dès le scan courant, pas à la sortie).
+IF M1PositionLimitOverridden THEN
+    MaintHomingRequiredM1 := TRUE;
+END_IF;
+IF M2PositionLimitOverridden THEN
+    MaintHomingRequiredM2 := TRUE;
+END_IF;
+
+// Levée : UNIQUEMENT sur cycle de homing complet réussi (Done + Homed + non suspect).
+IF MaintHomingRequiredM1 AND M1HomingDone AND M1Homed AND NOT M1HomingSuspect THEN
+    MaintHomingRequiredM1 := FALSE;
+END_IF;
+IF MaintHomingRequiredM2 AND M2HomingDone AND M2Homed AND NOT M2HomingSuspect THEN
+    MaintHomingRequiredM2 := FALSE;
+END_IF;
+
+// Refus semi-auto — une cause = un fait (AF03 §4) : défaut codeur et re-homing sont distincts.
 IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
     SemiAutoRefusedFault := TRUE;
+END_IF;
+IF (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
+    SemiAutoRefusedHoming := TRUE;
 END_IF;
 
 instCauses[0].Active   := SemiAutoRefusedFault;
 instCauses[0].Latching := TRUE;
 instCauses[0].Texte    := 'Mode Semi-Auto refuse car defaut codeur present';
+
+instCauses[2].Active   := SemiAutoRefusedHoming;
+instCauses[2].Latching := TRUE;
+instCauses[2].Texte    := 'Mode Semi-Auto refuse car re-homing obligatoire (depassement de limite de position)';
+
+// Cause 1 — changement de mode refusé : treuils non à l'arrêt mécanique confirmé.
+// Non latchée (live) : l'information disparaît dès que la condition redevient vraie, sans
+// acquittement — c'est une consigne d'action IHM (« arrêter les treuils »), pas un défaut machine.
+// 📌 Lag 1 scan assumé : la cause est évaluée avant l'arbitrage §3 du cycle courant.
+instCauses[1].Active   := Auth.ModeChangePendingBlocked;
+instCauses[1].Latching := FALSE;
+instCauses[1].Texte    := 'Changement de mode refuse : arreter les treuils avant de changer de mode';
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -4911,6 +5229,13 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Auth.HomingApproachEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
     Auth.MaintenanceM3TargetEnable := FALSE;
+    // Faits persistants : PUBLIÉS même neutralisé (l'IHM doit continuer à voir
+    // qu'un re-homing est requis tant que la machine n'est pas réarmée). Aucune autorisation
+    // n'est accordée ici : Auth.Mode := DISABLE verrouille tout le reste.
+    Auth.ModeChangePendingBlocked := FALSE;
+    Auth.HomingRequiredM1 := MaintHomingRequiredM1;
+    Auth.HomingRequiredM2 := MaintHomingRequiredM2;
+    PrevArbitratedMode := Auth.Mode;
     Ready := FALSE;
     PrevInhibitM1 := FALSE;
     PrevInhibitM2 := FALSE;
@@ -4922,11 +5247,43 @@ Ready := Enable AND NOT Fault.Latched;
 
 {region "§3 Arbitrage du mode"}
 // ⚙️ 3. ARBITRAGE DU MODE
-IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
+
+// 3.1 ARRÊT MÉCANIQUE CONFIRMÉ DES DEUX TREUILS (condition de bascule, AF-05 §4bis)
+// Même composite que l'armement Méca B : contacteurs retombés + frein serré, redondé par
+// la mesure absolue de vitesse. Vaut pour les DEUX treuils (M1 ET M2).
+ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
+                     AND (ABS(M1SpeedAbsMps) &lt; MovementSpeedThresholdMps)
+                     AND M2ContactorsReleased AND NOT M2BrakeIsOpen
+                     AND (ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps);
+
+// 3.2 ARBITRAGE — priorité du refus de sécurité, puis du refus de bascule
+IF (SelMode = E_Mode.SEMI_AUTO)
+   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
+    // Défaut codeur ou re-homing obligatoire : SEMI_AUTO interdit, repli MAINT_N1.
     Auth.Mode := E_Mode.MAINT_N1;
+    Auth.ModeChangePendingBlocked := FALSE;
+ELSIF (SelMode &lt;&gt; PrevArbitratedMode)
+      AND (SelMode &lt;&gt; E_Mode.DISABLE) AND (PrevArbitratedMode &lt;&gt; E_Mode.DISABLE)
+      AND NOT ModeChangeAllowed THEN
+    // Bascule N1/N2/SEMI_AUTO refusée : le mode courant est MAINTENU.
+    // ⚠️ Exception de sécurité (contrat D2) : une transition vers ou depuis DISABLE n'est
+    // JAMAIS bloquée — sortir d'un mode maintenance ne doit jamais dépendre d'un treuil à l'arrêt.
+    Auth.Mode := PrevArbitratedMode;
+    Auth.ModeChangePendingBlocked := TRUE;
 ELSE
     Auth.Mode := SelMode;
+    Auth.ModeChangePendingBlocked := FALSE;
 END_IF;
+
+PrevArbitratedMode := Auth.Mode;
+{endregion}
+
+{region "§3bis Publication du re-homing obligatoire"}
+// 🧭 3bis. PUBLICATION DU RE-HOMING OBLIGATOIRE
+// Armement et levée réalisés en §1ter, AVANT l'arbitrage de mode — voir le commentaire §1ter
+// (pas de fenêtre d'un scan, pas de perte sur coupure en cours de maintenance).
+Auth.HomingRequiredM1 := MaintHomingRequiredM1;
+Auth.HomingRequiredM2 := MaintHomingRequiredM2;
 {endregion}
 
 {region "§4 Calcul autorisations machine"}

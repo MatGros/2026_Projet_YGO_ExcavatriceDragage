@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:26:36.729891" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:26:36.729891">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T10:55:24.775966" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T10:55:24.775966">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -806,6 +806,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule confirmation contacteurs/frein</xhtml>
               </documentation>
             </variable>
+            <variable name="ContactorStuck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Contacteur colle (proprietaire unique, re-alimente IHM/Troubleshooting a la phase suivante)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="DriftGuardA">
@@ -1219,6 +1227,12 @@ ELSE
     TonNoMovement(IN := FALSE);
 END_IF;
 
+// ContactorStuck : proprietaire UNIQUE de la detection contacteur colle.
+// Escalade : Meca B (bit8) -&gt; SafeStop + PowerCutOff apres PostRampTimeout si le
+// collage persiste. Le champ ContactorsCheck.StuckClosed de FB_Winch est force a
+// FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
+ContactorStuck := MecaBFaultLatched;
+
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
@@ -1266,7 +1280,10 @@ AscentPermit := NOT (
     (((Fault.ErrorId AND 16#0020) &lt;&gt; 16#0000
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
-    OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM)) AND NOT BypassTopLimitSoftware)
+    // TopLimitM porte deja la relaxation 7,5-&gt;8,5 m (override N1 / bypass N2, bornee par la
+    // bande de ralentissement, PRG_04 TopLimitM1_M/TopLimitM2_M) : la butee logicielle reste
+    // active a la valeur relevee. Bypasser le logiciel releve la butee, il ne la supprime pas.
+    OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM))
 );
 
 PowerCutOff := (Fault.ErrorId AND 16#2F84) &lt;&gt; 16#0000;
