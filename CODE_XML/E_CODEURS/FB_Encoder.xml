@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:49:13.245353" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:49:13.245353">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:43:49.884729" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:43:49.884729">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -85,7 +85,7 @@ TRUE des qu'un referencement a reussi</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de calibration RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib)
    💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -237,7 +237,7 @@ TRUE des qu'un referencement a reussi</xhtml>
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
    🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -302,7 +302,7 @@ TRUE des qu'un referencement a reussi</xhtml>
    🛡️ PresetStatusBit : bit du mot d'état codeur, réservé site futur —
       câblé à FALSE tant qu'aucun bit n'est identifié (aucun signal absent
       ne confirme implicitement le preset).
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -902,7 +902,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
    🧩 Defaut : Fault:ST_Fault rempli par FB_FaultCore (instFault) depuis une liste
       de causes en clair (instCauses) — pattern FB_Joystick. Ready = Enable ET pas de
       defaut late. Interlocks machine sur les faits bruts, jamais sur Fault.Latched.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -1131,7 +1131,7 @@ Ready := Enable AND NOT Fault.Latched;
       HomedAndReliable = EncoderAvailable AND Homed AND NOT EncoderIncoherent (gate STRICT M3)
    🧩 Responsabilite scindee (D-A2bis) : Homing = referencement, Safety = coherence,
       ce FB = « le codeur est fiable ». Aucune recomposition chez les consommateurs.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -1434,7 +1434,7 @@ HomedAndReliable := EncoderAvailable AND Homed AND (NOT EncoderIncoherent);
    🎯 Rôle : Accès bus EtherCAT, extraction positions brutes et séquence de Preset SDO
    🔒 Polarité : EncoderAvailable=TRUE si communication bus et esclave OK
    🔌 Architecture : Module d'acquisition codeur absolu
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===</xhtml>
           </documentation>
@@ -2074,7 +2074,7 @@ Tolerance mesure cible (m)</xhtml>
    🎯 Rôle : Séquence de référencement nominal (capteur haut) ou unitaire (MAINT_N2)
    🔒 Polarité : Homed=TRUE dès qu'un référencement valide est enregistré
    🔌 Architecture : Expose ST_Encoder_Calib en VAR_IN_OUT
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Homing) ===</xhtml>
           </documentation>
@@ -2422,7 +2422,7 @@ HomingRefRaw := Calib.HomingRefRaw;
    🎯 Rôle : Bornage physique absolu [-99; +99]m et relais d'incohérence redémarrage
    🔒 Polarité : EncoderIncoherent=TRUE en cas de hors bornes ou HomingSuspect
    🛡️ Sécurité : Verrouillage de la position câble sûre
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -2549,7 +2549,7 @@ EncoderIncoherent := Fault.Error;
    🎯 Rôle : Calcul de la position câble en mètres par conversion arithmétique signée
    🔒 Polarité : CablePosM signée (+ enroulé, - sous l'eau)
    🔌 Architecture : Convertisseur de mesure unitaire par treuil
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================
 === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===</xhtml>
           </documentation>
@@ -2770,7 +2770,7 @@ Fenetre glissante de mesure</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul de la vitesse absolue et signée sur fenêtre glissante horodatée
    🔒 Polarité : Valid=TRUE après 6 échantillons couvrant au moins 50ms
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
           </documentation>
         </interface>

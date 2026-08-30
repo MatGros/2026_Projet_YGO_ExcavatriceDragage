@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : restauration et synchronisation bidirectionnelle IHM / Persist.
    💾 Persistance : transfert GVL_PERSISTENT <-> GVL_IHM sur Initialized.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 FUNCTION_BLOCK FB_CfgPersistBridge_fbEncoder_Cfg
 VAR_OUTPUT

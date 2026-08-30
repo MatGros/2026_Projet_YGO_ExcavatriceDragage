@@ -315,11 +315,11 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-30 20:31:40</div>
+    <div class="exec-time">2026-08-30 22:46:48</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (32 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-fail"><a href="#test-winch-integ-0">HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-1">HARN-11 : Extraction montee ExtractionControlActive -&gt; plafond palier 1 M1 ET M2</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-2">HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-3">HARN-13a : Table de verite etape remontee 20 pourcent -&gt; palier 2</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-4">HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-5">HARN-13c : Table de verite etape remontee 90 pourcent -&gt; palier 5</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-6">HARN-20 : Rampe deflexion 0 a 100 pourcent -&gt; paliers monotones, jamais de saut brutal</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-7">HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-8">HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-9">HARN-23 : Homme-mort relache en mouvement -&gt; arret immediat, frein retombe</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-10">HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -&gt; immersion confirmee puis arret latche</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-11">HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-12">HARN-32 : Relache joystick en contexte plongee -&gt; palier 0 immediat, pas de plancher residuel</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-13">HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-14">HARN-40 : Jog benne -&gt; M2 bride palier 1, treuils coupes pendant Busy (anti-traversee amont)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-15">HARN-41 : SyncDeviationWarn -&gt; plafond palier 1 sur M1 ET M2 (bornes communes identiques)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-16">HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-17">HARN-50 : Nominal filet passif -&gt; FinalInterlockGoverned FALSE sur toute la montee couplee</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-18">HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-19">HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-20">HARN-60 : Deviation croissante -&gt; warn plafond 1 puis critique SafeStop des 2</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-21">HARN-61 : Retour dans la tolerance -&gt; plafond relache, pas de latch intempestif</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-22">HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-23">HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-24">HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-25">HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-26">HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-27">HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-28">HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-29">HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-30">HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-31">HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-winch-integ-0">HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-1">HARN-11 : Extraction montee ExtractionControlActive -&gt; plafond palier 1 M1 ET M2</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-2">HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-3">HARN-13a : Table de verite etape remontee 20 pourcent -&gt; palier 2</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-4">HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-5">HARN-13c : Table de verite etape remontee 90 pourcent -&gt; palier 5</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-6">HARN-20 : Rampe deflexion 0 a 100 pourcent -&gt; paliers monotones, jamais de saut brutal</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-7">HARN-21 : Rampe retour 100 a 0 -&gt; decroissance propre, neutre -&gt; palier 0</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-8">HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -&gt; palier 1 stable, pas de plancher</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-9">HARN-23 : Homme-mort relache en mouvement -&gt; arret immediat, frein retombe</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-10">HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -&gt; immersion confirmee puis arret latche</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-11">HARN-31 : Interdiction palier 5 en Kobold (D12) -&gt; plafond 4 (CIBLE T181-12/16, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-12">HARN-32 : Relache joystick en contexte plongee -&gt; palier 0 immediat, pas de plancher residuel</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-13">HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-14">HARN-40 : Jog benne -&gt; M2 bride palier 1, treuils coupes pendant Busy (anti-traversee amont)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-15">HARN-41 : SyncDeviationWarn -&gt; plafond palier 1 sur M1 ET M2 (bornes communes identiques)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-16">HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-17">HARN-50 : Nominal filet passif -&gt; FinalInterlockGoverned FALSE sur toute la montee couplee</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-18">HARN-51 : Injection cadence hors instance FB_Winch -&gt; barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-19">HARN-52 : Pas de double-freinage -&gt; barriere PRG_06 passive en marge interne FB_Winch</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-20">HARN-60 : Deviation croissante -&gt; warn plafond 1 puis critique SafeStop des 2</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-21">HARN-61 : Retour dans la tolerance -&gt; plafond relache, pas de latch intempestif</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-22">HARN-70 : Chute chaine AU en mouvement couple -&gt; relais FALSE immediat, freins retombent</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-23">HARN-71 : Enable=FALSE sur FB_Winch en marche -&gt; sorties sures ; re-Enable sans relache</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-24">HARN-72 : Watchdog frein (retour frein ne suit pas) -&gt; barriere coupe apres timeout</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-25">HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -&gt; RelayRev retenu (CIBLE T175/T181-05)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-26">HARN-74a : Coast-down apres relache lourd -&gt; PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-27">HARN-74b : Coast-down prolonge -&gt; Meca B arme a 3 s (CIBLE T178, ROUGE baseline)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-28">HARN-75 : Redemarrage a chaud (FirstScanDone) -&gt; temps mort directionnel NON bypassse (D18, ROUGE baseline)</a></li><li class="toc-item toc-fail"><a href="#test-winch-integ-29">HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-30">HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)</a></li><li class="toc-item toc-pass"><a href="#test-winch-integ-31">HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -328,7 +328,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            11/32 vérifications validées
+            16/32 vérifications validées
         </div>
     </div>
     
@@ -1390,7 +1390,7 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Main_EndToEnd</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 74 flux entrants · 35 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Main_EndToEnd</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 75 flux entrants · 39 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg02 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_02)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg03 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_03)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg04 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_04)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg05 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_05)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg06 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_06)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ prg07 <span style="color:var(--muted);font-weight:500;">(FB_TestHarness_PRG_07)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ firstScan <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m1ContactorsEngagedLatch <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m2ContactorsEngagedLatch <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m1ContactorsReleasedModel <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m2ContactorsReleasedModel <span style="color:var(--muted);font-weight:500;">(BOOL := TRUE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m1BrakeFeedbackModel <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ m2BrakeFeedbackModel <span style="color:var(--muted);font-weight:500;">(BOOL := FALSE)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ tonContactorsDroppedM1 <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ tonContactorsDroppedM2 <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ reqProgramLocal <span style="color:var(--muted);font-weight:500;">(ST_ProgramRequest)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ seqStateLocal <span style="color:var(--muted);font-weight:500;">(ST_SequencePublicState)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ bucketPersistLocal <span style="color:var(--muted);font-weight:500;">(ST_fbBucket_Config)</span></span></div>
@@ -1401,7 +1401,7 @@
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_FIXTURE_HOMING_REF_RAW</b> : UDINT := 1000000</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_FIXTURE_PTS_PER_REV</b> : REAL := 8192.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_FIXTURE_M_PER_REV</b> : REAL := 2.0</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_FIXTURE_CYCLE_S</b> : REAL := 0.010</span></div>
         </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyRawX <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyRawY <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyDeadmanBtn <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnResetMachine <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CmdMode <span class="pin-type" style="color:var(--muted);">E_Mode := E_Mode.MAINT_N1</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CmdWinchSelect <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyChainClosed <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM1Up <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM1Down <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM2Up <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM2Down <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchBothUp <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchBothDown <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglJoystickMaster <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCmdOpen <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCmdClose <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketConfirmOpenPos <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketConfirmClosePos <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglManualBucketLimits <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketSeedOpen <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">KoboldImmersed <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglEnableKoboldAutoStopDescent <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ImmersionLowerM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ImmersionUpperM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ExtractionControlDistanceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqReqWinchM1 <span class="pin-type" style="color:var(--muted);">ST_ProgramWinchRequest</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqReqWinchM2 <span class="pin-type" style="color:var(--muted);">ST_ProgramWinchRequest</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqReqBucket <span class="pin-type" style="color:var(--muted);">ST_ProgramBucketRequest</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CoupledIntentActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CoupledIntentDirection <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqBottomTouchConfirmed <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqDumpAtTremieDescentLocked <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTable <span class="pin-type" style="color:var(--muted);">ST_SpeedStepTable</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgMaxStepAscent <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MaxStepDescent <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgAscentLimitM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgDescentLimitM1 <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgDescentLimitM2 <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownDistanceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownMaxStep <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SyncToleranceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SyncCriticalToleranceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SyncSoftStopEnable <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitLegalEnabled <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitLegalDepthMinAllowedM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitLegalReached <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketOffsetOpenM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketOffsetCloseM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCoherenceLimitM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketOpenAnticipationM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCloseAnticipationM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCfgTimeoutDuration <span class="pin-type" style="color:var(--muted);">TIME := T#60s</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglEnableCoupledBucketSequencing <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HeartbeatIhmOk <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CanBusOperational <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyOperational <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassM1 <span class="pin-type" style="color:var(--muted);">ST_BypassWinch</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassM2 <span class="pin-type" style="color:var(--muted);">ST_BypassWinch</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassCommun <span class="pin-type" style="color:var(--muted);">ST_BypassCommun</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassSync <span class="pin-type" style="color:var(--muted);">ST_BypassSync</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelStepSpeedMps <span class="pin-type" style="color:var(--muted);">ARRAY[0..5] OF REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelSeedPosM1 <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelSeedPosM2 <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ContactorFeedbackTimeout <span class="pin-type" style="color:var(--muted);">TIME := T#500ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelM2SpeedFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelReloadPositions <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelBrakeFeedbackFaultM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelBrakeFeedbackFaultM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelContactorsReleaseFaultM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelContactorsReleaseFaultM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InjectRateBypassFbWinch <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InjectRateStep <span class="pin-type" style="color:var(--muted);">INT := 1</span></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyRawX <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyRawY <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyDeadmanBtn <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnResetMachine <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CmdMode <span class="pin-type" style="color:var(--muted);">E_Mode := E_Mode.MAINT_N1</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CmdWinchSelect <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyChainClosed <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM1Up <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM1Down <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM2Up <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchM2Down <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchBothUp <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnWinchBothDown <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglJoystickMaster <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCmdOpen <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCmdClose <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketConfirmOpenPos <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketConfirmClosePos <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglManualBucketLimits <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketSeedOpen <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">KoboldImmersed <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglEnableKoboldAutoStopDescent <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ImmersionLowerM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ImmersionUpperM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ExtractionControlDistanceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqReqWinchM1 <span class="pin-type" style="color:var(--muted);">ST_ProgramWinchRequest</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqReqWinchM2 <span class="pin-type" style="color:var(--muted);">ST_ProgramWinchRequest</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqReqBucket <span class="pin-type" style="color:var(--muted);">ST_ProgramBucketRequest</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CoupledIntentActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CoupledIntentDirection <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqBottomTouchConfirmed <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SeqDumpAtTremieDescentLocked <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTable <span class="pin-type" style="color:var(--muted);">ST_SpeedStepTable</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgMaxStepAscent <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MaxStepDescent <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgAscentLimitM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgDescentLimitM1 <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgDescentLimitM2 <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownDistanceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownMaxStep <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SyncToleranceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SyncCriticalToleranceM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SyncSoftStopEnable <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitLegalEnabled <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitLegalDepthMinAllowedM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitLegalReached <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketOffsetOpenM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketOffsetCloseM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCoherenceLimitM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketOpenAnticipationM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCloseAnticipationM <span class="pin-type" style="color:var(--muted);">REAL := 0.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BucketCfgTimeoutDuration <span class="pin-type" style="color:var(--muted);">TIME := T#60s</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TglEnableCoupledBucketSequencing <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HeartbeatIhmOk <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CanBusOperational <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">JoyOperational <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassM1 <span class="pin-type" style="color:var(--muted);">ST_BypassWinch</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassM2 <span class="pin-type" style="color:var(--muted);">ST_BypassWinch</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassCommun <span class="pin-type" style="color:var(--muted);">ST_BypassCommun</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassSync <span class="pin-type" style="color:var(--muted);">ST_BypassSync</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelStepSpeedMps <span class="pin-type" style="color:var(--muted);">ARRAY[0..5] OF REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelSeedPosM1 <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelSeedPosM2 <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelMachineHomed <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ContactorFeedbackTimeout <span class="pin-type" style="color:var(--muted);">TIME := T#500ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelM2SpeedFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelReloadPositions <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelBrakeFeedbackFaultM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelBrakeFeedbackFaultM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelContactorsReleaseFaultM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ModelContactorsReleaseFaultM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InjectRateBypassFbWinch <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InjectRateStep <span class="pin-type" style="color:var(--muted);">INT := 1</span></div></div>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(225,29,72,0.18);border:1px solid #9f1239;cursor:pointer;">
@@ -1423,15 +1423,15 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">73</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">74</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">15</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">19</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">22</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">74 IN</b> / <b style="color:#ffffff;">35 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">75 IN</b> / <b style="color:#ffffff;">39 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -1599,6 +1599,22 @@
             </div>
             <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
                 <div class="pin-name"><b>KoboldBottomTouchLatched</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>CycleStep</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">E_CycleStep</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>CycleBusy</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>CycleError</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">BOOL</span></div>
+                <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
+            </div>
+            <div class="pin-row pin-row-wired pin-row-out" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;">
+                <div class="pin-name"><b>CycleStateStr</b> <span class="pin-type" style="color:var(--accent);font-weight:600;">STRING(80)</span></div>
                 <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-family:monospace;">[VAR_OUTPUT]</span></div>
             </div></div>
         </div>
@@ -1974,7 +1990,7 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_TestHarness_PRG_03</code></td>
-                <td>25</td><td>6</td>
+                <td>26</td><td>6</td>
                 <td>0</td><td>3</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
@@ -2009,7 +2025,7 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Main_EndToEnd</code></td>
-                <td>73</td><td>15</td>
+                <td>74</td><td>19</td>
                 <td>0</td><td>34</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (34 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
@@ -2027,9 +2043,9 @@
         <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 32 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
-        <article id="test-winch-integ-0" class="test-card test-card-fail">
+        <article id="test-winch-integ-0" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -2045,13 +2061,13 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (9)</span></summary>
                 <ul class="checks-list"><li>HARN-10: precondition homme-mort arme</li><li>HARN-10: SEMI_AUTO doit etre arbitre</li><li>HARN-10: ErrorId M1 nominal</li><li>HARN-10: la demande doit atteindre FB_Winch M1</li><li>HARN-10: M1 palier 3 attendu pour 50 pourcent</li><li>HARN-10: M2 palier 3 attendu pour 50 pourcent</li><li>HARN-10: RelayRev M1 commande la descente</li><li>HARN-10: RelayRev M2 commande la descente</li><li>HARN-10: filet PRG_06 passif en nominal</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.BUSMODES.MODE expected 3, got 1</div><div class='failure-loc'>test_winch_integ.st:120</div><div class='failure-msg'>HARN-10: SEMI_AUTO doit etre arbitre</div><div class='failure-diff'>attendu <code class='val-expected'>3</code> · obtenu <code class='val-actual'>1</code></div></div>
+                
                 
             </div>
         </article>
-        <article id="test-winch-integ-1" class="test-card test-card-fail">
+        <article id="test-winch-integ-1" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-11 : Extraction montee ExtractionControlActive -&gt; plafond palier 1 M1 ET M2 </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -2066,13 +2082,13 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
                 <ul class="checks-list"><li>HARN-11: precondition homme-mort arme</li><li>HARN-11: M1 plafonne palier 1 (ExtractionControlActive)</li><li>HARN-11: M2 plafonne palier 1 (ExtractionControlActive)</li><li>HARN-11: montee maintenue au palier 1</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 1, got 0</div><div class='failure-loc'>test_winch_integ.st:170</div><div class='failure-msg'>HARN-11: M1 plafonne palier 1 (ExtractionControlActive)</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
-        <article id="test-winch-integ-2" class="test-card test-card-fail">
+        <article id="test-winch-integ-2" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -2089,7 +2105,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (7)</span></summary>
                 <ul class="checks-list"><li>HARN-12: precondition homme-mort arme</li><li>HARN-12: precondition - montee en zone haute engagee M1</li><li>HARN-12: precondition - montee en zone haute engagee M2</li><li>HARN-12: M1 plafonne au SlowdownMaxStep en zone haute</li><li>HARN-12: M2 plafonne au SlowdownMaxStep en zone haute</li><li>HARN-12: position M1 jamais au-dela de la limite haute</li><li>HARN-12: position M2 jamais au-dela de la limite haute</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:220</div><div class='failure-msg'>HARN-12: precondition - montee en zone haute engagee M1</div></div>
+                
                 
             </div>
         </article>
@@ -2110,13 +2126,13 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-13a: precondition homme-mort arme</li><li>HARN-13a: 20 pourcent -&gt; palier 2 (table reference)</li><li>HARN-13a: 20 pourcent -&gt; palier 2 M2</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 2, got 0</div><div class='failure-loc'>test_winch_integ.st:269</div><div class='failure-msg'>HARN-13a: 20 pourcent -&gt; palier 2 (table reference)</div><div class='failure-diff'>attendu <code class='val-expected'>2</code> · obtenu <code class='val-actual'>0</code></div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 2, got 1</div><div class='failure-loc'>test_winch_integ.st:269</div><div class='failure-msg'>HARN-13a: 20 pourcent -&gt; palier 2 (table reference)</div><div class='failure-diff'>attendu <code class='val-expected'>2</code> · obtenu <code class='val-actual'>1</code></div></div>
                 
             </div>
         </article>
-        <article id="test-winch-integ-4" class="test-card test-card-fail">
+        <article id="test-winch-integ-4" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -2131,7 +2147,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-13b: precondition homme-mort arme</li><li>HARN-13b: 70 pourcent descendu au clamp descente 3</li><li>HARN-13b: idem M2</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 3, got 0</div><div class='failure-loc'>test_winch_integ.st:313</div><div class='failure-msg'>HARN-13b: 70 pourcent descendu au clamp descente 3</div><div class='failure-diff'>attendu <code class='val-expected'>3</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
                 
             </div>
         </article>
@@ -2152,7 +2168,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>HARN-13c: precondition homme-mort arme</li><li>HARN-13c: 90 pourcent -&gt; palier 5 (table reference)</li><li>HARN-13c: 90 pourcent -&gt; palier 5 M2</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 5, got 0</div><div class='failure-loc'>test_winch_integ.st:356</div><div class='failure-msg'>HARN-13c: 90 pourcent -&gt; palier 5 (table reference)</div><div class='failure-diff'>attendu <code class='val-expected'>5</code> · obtenu <code class='val-actual'>0</code></div></div>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — MACHINE.M1_STEPNUMBER expected 5, got 1</div><div class='failure-loc'>test_winch_integ.st:356</div><div class='failure-msg'>HARN-13c: 90 pourcent -&gt; palier 5 (table reference)</div><div class='failure-diff'>attendu <code class='val-expected'>5</code> · obtenu <code class='val-actual'>1</code></div></div>
                 
             </div>
         </article>
@@ -2701,9 +2717,9 @@
                 
             </div>
         </article>
-        <article id="test-winch-integ-31" class="test-card test-card-fail">
+        <article id="test-winch-integ-31" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-fail">FAIL</span>
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -2718,7 +2734,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
                 <ul class="checks-list"><li>HARN-82: precondition - mouvement semi-auto</li><li>HARN-82: coupure propre a l AU</li><li>HARN-82: pas de reprise apres rearmement sans ordre</li><li>HARN-82: idem M2</li><li>HARN-82: etat coherent (palier 0)</li></ul>
             </details>
-                <div class='failure'><div class='failure-head'>ASSERT_TRUE — MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE</div><div class='failure-loc'>test_winch_integ.st:1223</div><div class='failure-msg'>HARN-82: precondition - mouvement semi-auto</div></div>
+                
                 
             </div>
         </article>
@@ -4130,7 +4146,7 @@ END_FUNCTION_BLOCK
    ⚙️ E_PresetConfirmMode — Mode de confirmation du preset codeur
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : sélectionner le fait public utilisé pour valider un preset.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE E_PresetConfirmMode :
@@ -4149,7 +4165,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
    🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE ST_fbEncoder_Cfg :
@@ -4171,7 +4187,7 @@ END_TYPE
    🛡️ PresetStatusBit : bit du mot d&#x27;état codeur, réservé site futur —
       câblé à FALSE tant qu&#x27;aucun bit n&#x27;est identifié (aucun signal absent
       ne confirme implicitement le preset).
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE ST_fbEncoder_HwIn :
@@ -4216,7 +4232,7 @@ END_TYPE
    🎯 Regroupe les entrées/sorties hardware d&#x27;un codeur absolu EtherCAT
       pour exposer l&#x27;interface physique de FB_Encoder de façon testable.
    🔌 Producteur/consommateur : PRG_02_Acquisition câble ce bus vers le device.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_EncoderHw :
 STRUCT
@@ -4243,7 +4259,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de calibration RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib)
    💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE ST_Encoder_Calib :
@@ -4324,7 +4340,7 @@ END_TYPE
    🎯 Rôle : Accès bus EtherCAT, extraction positions brutes et séquence de Preset SDO
    🔒 Polarité : EncoderAvailable=TRUE si communication bus et esclave OK
    🔌 Architecture : Module d&#x27;acquisition codeur absolu
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===
@@ -4487,7 +4503,7 @@ END_CASE;
    🎯 Rôle : Séquence de référencement nominal (capteur haut) ou unitaire (MAINT_N2)
    🔒 Polarité : Homed=TRUE dès qu&#x27;un référencement valide est enregistré
    🔌 Architecture : Expose ST_Encoder_Calib en VAR_IN_OUT
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Homing) ===
@@ -4784,7 +4800,7 @@ HomingRefRaw := Calib.HomingRefRaw;
    🎯 Rôle : Calcul de la position câble en mètres par conversion arithmétique signée
    🔒 Polarité : CablePosM signée (+ enroulé, - sous l&#x27;eau)
    🔌 Architecture : Convertisseur de mesure unitaire par treuil
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===
@@ -4829,7 +4845,7 @@ END_IF;
    🎯 Rôle : Bornage physique absolu [-99; +99]m et relais d&#x27;incohérence redémarrage
    🔒 Polarité : EncoderIncoherent=TRUE en cas de hors bornes ou HomingSuspect
    🛡️ Sécurité : Verrouillage de la position câble sûre
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_Safety
@@ -4920,7 +4936,7 @@ EncoderIncoherent := Fault.Error;
       HomedAndReliable = EncoderAvailable AND Homed AND NOT EncoderIncoherent (gate STRICT M3)
    🧩 Responsabilite scindee (D-A2bis) : Homing = referencement, Safety = coherence,
       ce FB = « le codeur est fiable ». Aucune recomposition chez les consommateurs.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_EncoderReliability
@@ -4952,7 +4968,7 @@ HomedAndReliable := EncoderAvailable AND Homed AND (NOT EncoderIncoherent);
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul de la vitesse absolue et signée sur fenêtre glissante horodatée
    🔒 Polarité : Valid=TRUE après 6 échantillons couvrant au moins 50ms
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_SpeedMeasure
@@ -5106,7 +5122,7 @@ END_IF;
    🧩 Defaut : Fault:ST_Fault rempli par FB_FaultCore (instFault) depuis une liste
       de causes en clair (instCauses) — pattern FB_Joystick. Ready = Enable ET pas de
       defaut late. Interlocks machine sur les faits bruts, jamais sur Fault.Latched.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder
@@ -5403,7 +5419,7 @@ VAR_INPUT
     M2HomingSuspect           : BOOL; // --&gt; [HW] M2 : référencement suspect
     M1PositionLimitOverridden : BOOL; // --&gt; [CMD] M1 : limite de position levée (override N1 ou bypass N2 effectif)
     M2PositionLimitOverridden : BOOL; // --&gt; [CMD] M2 : limite de position levée (override N1 ou bypass N2 effectif)
-    MachineReferenceReady     : BOOL; // --&gt; [STAT] M1/M2 fiables et offset benne valide
+    MachineHomed     : BOOL; // --&gt; [STAT] M1/M2 fiables et offset benne valide
 
     // === RESTAURATION BOOT DES DRAPEAUX PERSISTANTS ===
     BootHomingRequiredM1      : BOOL; // --&gt; [CFG] M1 : valeur PERSISTENT relue au premier scan
@@ -5437,7 +5453,7 @@ VAR
     MaintHomingRequiredM1   : BOOL;   // . [LOC] M1 : re-homing obligatoire avant tout SEMI_AUTO
     MaintHomingRequiredM2   : BOOL;   // . [LOC] M2 : re-homing obligatoire avant tout SEMI_AUTO
     SemiAutoRefusedHoming   : BOOL;   // . [LOC] Latch refus semi-auto pour re-homing obligatoire
-    SemiAutoRefusedReference : BOOL;   // . [LOC] Refus live : reference machine incomplete
+    SemiAutoRefusedMachineHoming : BOOL;   // . [LOC] Refus live : reference machine incomplete
     FirstScanDone           : BOOL;   // . [LOC] Initialisation premier scan (restauration PERSISTENT)
 END_VAR
 
@@ -5488,7 +5504,7 @@ END_IF;
 IF (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
     SemiAutoRefusedHoming := TRUE;
 END_IF;
-SemiAutoRefusedReference := (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineReferenceReady;
+SemiAutoRefusedMachineHoming := (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed;
 
 instCauses[0].Active   := SemiAutoRefusedFault;
 instCauses[0].Latching := TRUE;
@@ -5498,7 +5514,7 @@ instCauses[2].Active   := SemiAutoRefusedHoming;
 instCauses[2].Latching := TRUE;
 instCauses[2].Texte    := &#x27;Mode Semi-Auto refuse car re-homing obligatoire (depassement de limite de position)&#x27;;
 
-instCauses[3].Active   := SemiAutoRefusedReference;
+instCauses[3].Active   := SemiAutoRefusedMachineHoming;
 instCauses[3].Latching := FALSE;
 instCauses[3].Texte    := &#x27;Mode Semi-Auto refuse : referencement M1/M2/benne incomplet&#x27;;
 
@@ -5554,7 +5570,7 @@ ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
 
 // 3.2 ARBITRAGE — priorité du refus de sécurité, puis du refus de bascule
 IF (SelMode = E_Mode.SEMI_AUTO)
-   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2 OR NOT MachineReferenceReady) THEN
+   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2 OR NOT MachineHomed) THEN
     // Défaut codeur ou re-homing obligatoire : SEMI_AUTO interdit, repli MAINT_N1.
     Auth.Mode := E_Mode.MAINT_N1;
     Auth.ModeChangePendingBlocked := FALSE;
@@ -7088,6 +7104,7 @@ CASE State OF
         TranslationCmd.Start := FALSE;
         BucketCmd.Open := FALSE;
         BucketCmd.Close := FALSE;
+        BucketCmd.KoboldContactorCmd := FALSE;   // 🔒 T186 : coupure contacteur Kobold au repli (0 ordre résiduel)
         Lifecycle.Busy := FALSE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -7111,7 +7128,7 @@ IF Lifecycle.Busy AND NOT CycleMotionPermit THEN
     BucketCmd.KoboldContactorCmd := FALSE;
 END_IF;
 
-RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.Start OR BucketCmd.Open OR BucketCmd.Close;
+RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.Start OR BucketCmd.Open OR BucketCmd.Close OR BucketCmd.KoboldContactorCmd; // 🔒 T186 : somme logique complète (Kobold inclus)
 {endregion}
 
 END_FUNCTION_BLOCK
@@ -7161,12 +7178,12 @@ VAR_INPUT
     CmdClose_IHM                    : BOOL;                           // --&gt; [CMD] Demande fermeture depuis IHM
     MotionRequestActive             : BOOL;                           // --&gt; [CMD] Intention mouvement arbitree
     MotionDirection                 : INT;                            // --&gt; [CMD] Sens arbitre (1: montee, -1: descente)
-    ReferenceCommitOpen             : BOOL;                           // --&gt; [CMD] Commit atomique reference benne ouverte
-    ReferenceCommitClose            : BOOL;                           // --&gt; [CMD] Commit atomique reference benne fermee
-    MachineReferenceReady           : BOOL;                           // --&gt; [STAT] Qualification conjointe M1/M2/benne
-    ReferenceTransactionActive      : BOOL;                           // --&gt; [STAT] Homing conjoint en cours
-    ConfirmOpenPosition             : BOOL;                           // --&gt; [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle
-    ConfirmClosePosition            : BOOL;                           // --&gt; [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle
+    MachineHomingCommitOpen             : BOOL;                           // --&gt; [CMD] Commit atomique reference benne ouverte
+    MachineHomingCommitClose            : BOOL;                           // --&gt; [CMD] Commit atomique reference benne fermee
+    MachineHomed           : BOOL;                           // --&gt; [STAT] Qualification conjointe M1/M2/benne
+    MachineHomingActive      : BOOL;                           // --&gt; [STAT] Homing conjoint en cours
+    ConfirmOpenPosition             : BOOL;                           // --&gt; [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle
+    ConfirmClosePosition            : BOOL;                           // --&gt; [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle
 
     // === SECOURS ET HARDWARE ===
     PowerContactorEngaged           : BOOL;                           // --&gt; [SAFE] Condition d&#x27;arret d&#x27;urgence / puissance
@@ -7346,14 +7363,14 @@ IF FirstCycle THEN
     END_IF;
 END_IF;
 
-IF ReferenceCommitOpen AND NOT Lifecycle.Busy THEN
+IF MachineHomingCommitOpen AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
     BucketState.StateIncoherent := FALSE;
 END_IF;
 
-IF ReferenceCommitClose AND NOT Lifecycle.Busy THEN
+IF MachineHomingCommitClose AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
@@ -7508,8 +7525,8 @@ END_IF;
 ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND NOT BucketState.StateIncoherent
                      AND (Fault.ErrorId = 16#0000)
-                     AND (MachineReferenceReady OR (BucketState.IsOpen XOR BucketState.IsClosed))
-                     AND NOT ReferenceTransactionActive;
+                     AND (MachineHomed OR (BucketState.IsOpen XOR BucketState.IsClosed))
+                     AND NOT MachineHomingActive;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
 {endregion}
 
@@ -11087,12 +11104,12 @@ STRUCT
     CoupledAscentCloseArmed : BOOL;         (* : Fermeture auto armée (montée couplée demandée, benne pas fermée) *)
     ExtractionControlActive : BOOL;         (* : Phase vitesse contrôlée montée en cours *)
     CoupledMotionBlockedByBucket : BOOL;    (* : Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition) *)
-    MachineReferenceReady : BOOL;           (* Reference M1/M2/benne atomiquement valide *)
-    ReferenceStep         : INT;            (* Etape guidee de recuperation reference machine *)
-    ReferenceInstruction  : STRING(120);    (* Instruction IHM unique et actionnable *)
-    ReferenceFailed       : BOOL;           (* Transaction de homing conjoint abandonnee *)
-    ReferenceTransactionActive : BOOL;      (* Homing conjoint en cours *)
-    ReferenceLossSafeStop : BOOL;           (* Perte reference en mouvement : arret controle *)
+    MachineHomed : BOOL;           (* Reference M1/M2/benne atomiquement valide *)
+    MachineHomingStep         : INT;            (* Etape guidee de recuperation reference machine *)
+    MachineHomingInstruction  : STRING(120);    (* Instruction IHM unique et actionnable *)
+    MachineHomingFailed       : BOOL;           (* Transaction de homing conjoint abandonnee *)
+    MachineHomingActive : BOOL;      (* Homing conjoint en cours *)
+    MachineHomingLossSafeStop : BOOL;           (* Perte reference en mouvement : arret controle *)
 END_STRUCT
 END_TYPE
 </pre>
@@ -13183,6 +13200,7 @@ VAR_INPUT
     // === 🛡️ Sécurités Machine ===
     PowerContactorEngaged   : BOOL := TRUE;
     EncoderFaultPresent     : BOOL := FALSE;
+    MachineHomed   : BOOL := TRUE; // Fixture: machine déjà référencée par défaut
     
     // === 🔄 Commandes Cycle Semi-Auto ===
     BtnStartCycle           : BOOL;
@@ -13234,6 +13252,7 @@ instModes(
     InhibitM2Request        := InhibitM2Request,
     SelHomingApproachEnable := SelHomingApproachEnable,
     EncoderFaultPresent     := EncoderFaultPresent,
+    MachineHomed   := MachineHomed,
     JoystickWinchSelectRequest := SelJoystickWinch,
     SelMaintenanceZoneAccess := TglMaintenanceZoneAccess
 );
@@ -14860,6 +14879,7 @@ VAR_INPUT
     ModelStepSpeedMps       : ARRAY[0..5] OF REAL; // vitesse m/s par palier (table de la suite)
     ModelSeedPosM1          : REAL := 2.0;         // position de départ M1 (cohérente COD défaut)
     ModelSeedPosM2          : REAL := 2.0;
+    ModelMachineHomed : BOOL := TRUE;     // qualification de référence du modèle de banc
     ContactorFeedbackTimeout : TIME := T#500ms;
 
     // === 🧪 Injections modèle (doctrine SPEC §2.1 : capteurs pilotés depuis la suite) ===
@@ -14896,6 +14916,14 @@ VAR_OUTPUT
     // === 📤 Faits publics Kobold (miroir GVL_IHM.Commun) ===
     KoboldImmersionConfirmed : BOOL;
     KoboldBottomTouchLatched : BOOL;
+
+    // === 🔄 Observation Séquenceur Cycle (miroir FB_TestHarness_PRG_03) ===
+    // Sorties de DIAG uniquement (aucun impact sur la chaîne) : exposent l&#x27;état du
+    // séquenceur FB_Cycle pour les scénarios e2e homme-mort / timeout (T169-A S3/S4).
+    CycleStep               : E_CycleStep;
+    CycleBusy               : BOOL;
+    CycleError              : BOOL;
+    CycleStateStr           : STRING(80);
 END_VAR
 
 VAR
@@ -15092,12 +15120,17 @@ BusAcq.Network.EncoderM2.Operational := TRUE;
 prg03(
     SelMode                 := CmdMode,
     SelJoystickWinch        := CmdWinchSelect,
+    MachineHomed   := ModelMachineHomed,
     PowerContactorEngaged   := PowerContactorEngaged,
     DeadmanArmed            := BusAcq.JoystickDeadmanArmed,
     JoystickDeflected       := NOT BusAcq.JoystickYNeutral,
     BtnModeReset            := BtnResetMachine
 );
 BusModes := prg03.Auth;
+CycleStep     := prg03.CycleStep;
+CycleBusy     := prg03.CycleBusy;
+CycleError    := prg03.CycleError;
+CycleStateStr := prg03.CycleStateStr;
 
 // ── 3. PRG_04 (MIROIR T181-00) : Contrôle Treuils M1/M2 et Benne ──
 reqProgramLocal.ReqWinchM1 := SeqReqWinchM1;
@@ -15337,27 +15370,15 @@ END_FUNCTION_BLOCK
         <pre>STruC++ Test Runner v1.0
 
 test_winch_integ.st
-         ASSERT_EQ failed: MACHINE.BUSMODES.MODE expected 3, got 1
-         at test_winch_integ.st:120
-         Message: HARN-10: SEMI_AUTO doit etre arbitre
-  [FAIL] HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 1, got 0
-         at test_winch_integ.st:170
-         Message: HARN-11: M1 plafonne palier 1 (ExtractionControlActive)
-  [FAIL] HARN-11 : Extraction montee ExtractionControlActive -&gt; plafond palier 1 M1 ET M2
-         ASSERT_TRUE failed: MACHINE.M1_STEPNUMBER &gt;= 1 expected TRUE, got FALSE
-         at test_winch_integ.st:220
-         Message: HARN-12: precondition - montee en zone haute engagee M1
-  [FAIL] HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 2, got 0
+  [PASS] HARN-10 : Cycle semi-auto descente 50 pourcent -&gt; palier 3 M1 ET M2, RelayRev
+  [PASS] HARN-11 : Extraction montee ExtractionControlActive -&gt; plafond palier 1 M1 ET M2
+  [PASS] HARN-12 : Zone ralentissement bordure haute -&gt; plafond palier 1, jamais au-dela de 7.5 m
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 2, got 1
          at test_winch_integ.st:269
          Message: HARN-13a: 20 pourcent -&gt; palier 2 (table reference)
   [FAIL] HARN-13a : Table de verite etape remontee 20 pourcent -&gt; palier 2
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 3, got 0
-         at test_winch_integ.st:313
-         Message: HARN-13b: 70 pourcent descendu au clamp descente 3
-  [FAIL] HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)
-         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 5, got 0
+  [PASS] HARN-13b : Table de verite etape descente 70 pourcent -&gt; palier 3 (clamp descente effective)
+         ASSERT_EQ failed: MACHINE.M1_STEPNUMBER expected 5, got 1
          at test_winch_integ.st:356
          Message: HARN-13c: 90 pourcent -&gt; palier 5 (table reference)
   [FAIL] HARN-13c : Table de verite etape remontee 90 pourcent -&gt; palier 5
@@ -15428,13 +15449,10 @@ test_winch_integ.st
          Message: HARN-80: CAS-001 detecte (defaut Error, cible T180)
   [FAIL] HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -&gt; defaut + neutralisation (CIBLE T180)
   [PASS] HARN-81 : CAS-012 demande benne pendant mouvement treuil -&gt; demande REFUSEE (CIBLE T175 AC3)
-         ASSERT_TRUE failed: MACHINE.BUSOUTPUTS.M1RELAYFWD expected TRUE, got FALSE
-         at test_winch_integ.st:1223
-         Message: HARN-82: precondition - mouvement semi-auto
-  [FAIL] HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement
+  [PASS] HARN-82 : CAS-002 AU pendant transition d etape -&gt; coupure propre, pas d etat incoherent au rearmement
 
 -----------------------------------------
-32 tests, 11 passed, 21 failed
+32 tests, 16 passed, 16 failed
 </pre>
     </details>
 </div>

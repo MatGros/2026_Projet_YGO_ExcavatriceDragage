@@ -1,0 +1,118 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# T186 — Neutralisation KoboldContactorCmd en STABILIZING + RequestActive complet
+#
+# Source de la découverte : challenge des chronogrammes TC-P04-020/021
+#   (tâche T169-A, harnais CI FB_Cycle). Audit indépendant subagent + re-vérif
+#   code par DSH. Correction safety sur FB_Cycle (CODE).
+#
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T186_NEUTRALISATION_KOBOLD_STABILIZING
+  criticality: C2            # C0 | C1 | C2 | C3 | C4 — sécurité machine, repli défaut
+  strategy: patch              # correction ciblée + intégration RequestActive
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Garantir la neutralisation COMPLETE du bloc FB_Cycle au repli défaut : le
+    contacteur capteur fond Kobold (KoboldContactorCmd) ne doit JAMAIS rester
+    activé pendant la phase STABILIZING (hold sûr) ni pendant un repli
+    homme-mort, en cohérence avec l'invariant machine « 0 mouvement / 0 ordre
+    résiduel hors permis » et avec H1 anti-chauffe de FB_DiveSearch
+    (AF_Partie-04 §8.4).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_Cycle coupe BucketCmd.KoboldContactorCmd := FALSE dès l'entrée en STABILIZING, sans attendre Reset ni relâchement de CycleMotionPermit."
+      verified_by: "Lecture FB_Cycle.st branche STABILIZING + chronogramme TC-P04-021 scan STABILIZING"
+    - id: AC2
+      statement: "Le repli §4 (Lifecycle.Busy AND NOT CycleMotionPermit) et le gate §2 (NOT Enable/Power) continuent de couper KoboldContactorCmd (aucune régression)."
+      verified_by: "Grep KoboldContactorCmd dans FB_Cycle.st + TC-P04-020 inchangé vert"
+    - id: AC3
+      statement: "RequestActive intègre BucketCmd.KoboldContactorCmd dans sa somme logique : un ordre Kobold actif fait monter RequestActive, conformément au rôle 'demande de mouvement active'."
+      verified_by: "Lecture FB_Cycle.st ligne RequestActive + chronogramme"
+    - id: AC4
+      statement: "TC-P04-021 durci en oracle COMPLET : assert KoboldContactorCmd=FALSE au STABILIZING, Fault.Latched persiste sans Reset, Reset efface Error+Latched+Kobold. Le test est ROUGE avant fix et VERT après fix (preuve non-creuse)."
+      verified_by: "Exécution FB_Cycle CI avant/après fix"
+    - id: AC5
+      statement: "Aucune régression : FB_Cycle (9/9 ou +), MAIN_GLOBAL e2e (3/3), bundle régénéré, G200 L1-L7 PASS, gates palier C PASS."
+      verified_by: "run_tests.py --fb FB_Cycle / --fb MAIN_GLOBAL + generate_codesys_bundle + G200 + run_all_gates --palier C"
+    - id: AC6
+      statement: "Spec AF_Partie-04 ne contredit pas la coupure (neutralisation complète au repli). Aucun changement hors scope."
+      verified_by: "Relecture diff restreint aux fichiers allowed"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_Cycle.st                     # correction safety (fix)
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cycle.st   # durcissement oracle (guard)
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T186_*.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - FB_DiveSearch / FB_Bucket / PRG_03 / PRG_04 / PRG_06  # comportement des autres FB intouché
+      - CODE/H_TREUILS_BENNE/**   # treuils & benne hors périmètre
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Comportement nominal du cycle (X0→X13, STABILIZING sur défaut, reprise Cause+Reset+ordre)."
+      - "KoboldContactorCmd armé en X4 lors d'une plongée active réelle (Permit=TRUE) — coupure uniquement au repli, pas en plongée."
+      - "Sémantique RequestActive : 'demande de mouvement/d'action active' — enrichie, pas inversée."
+      - "Compatibilité chaîne CI existante (FB_Cycle 9 TC, MAIN_GLOBAL e2e, run_all_gates)."
+    dropped_on_purpose:
+      - "L'anomalie 'KoboldContactorCmd laissé actif en STABILIZING' (défaut découvert, corrigé)."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage            # bloc "Auto-verification liaison" G200
+    - run_all_gates            # résultat des gates (palier C)
+    - bundle                   # CODE_XML/CODE_Bundle.xml regenere
+    - check_task_contract      # python .../check_task_contract.py (ce fichier)
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "deepseek"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Toute incoherence (spec vs code, autre faille de neutralisation découverte,
+    régression inattendue) est remontée IMMEDIATEMENT à l'orchestrateur, pas à la
+    fin et jamais silencieusement. Le fix est RESTREINT au périmètre allowed ;
+    signaler n'est pas élargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN
+# ═══════════════════════════════════════════════════════════════════════════
+status: COMPLETED             # PENDING | IN_PROGRESS | COMPLETED | VALIDATED
+
+execution:
+  executed_by: "DSH (DeepSeek)"          # qui a exécuté (à remplir en fin)
+  completed_at: "2026-08-30T20:20:00+02:00"
+  status: COMPLETED             # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Fix safety appliqué : FB_Cycle coupe KoboldContactorCmd en STABILIZING et
+    RequestActive inclut désormais KoboldContactorCmd. TC-P04-021 durci en oracle
+    complet : ROUGE avant fix (Kobold restait TRUE) puis VERT après fix. FB_Cycle
+    9/9, MAIN_GLOBAL 3/3, bundle frais, G200 L1-L7 101 OK (0 KO), gates palier C
+    24/26 (2 échecs pré-existants hors scope : G340 docs AF Encoder v2.3->v2.4,
+    G430 REX T185/T181). Aucune régression introduite.
+  evidence_submitted:
+    - "FB_Cycle 9/9 PASS (dont TC-P04-021 oracle complet)"
+    - "TC-P04-021 ROUGE avant fix (Kobold TRUE) -> VERT après"
+    - "MAIN_GLOBAL e2e 3/3 PASS"
+    - "G200 L1-L7 101 OK, 0 KO (seul KO L13 = FB_WinchSpeedLearning pré-existant T181-15/16)"
+    - "Gates palier C 24/26 (G340/G430 pré-existants, hors scope)"
+
+validation:
+  status: PENDING                # PENDING | APPROVED | REJECTED
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Visa de validation humaine obligatoire avant clôture (C2, sécurité machine).
+    Le fix est restreint au périmètre allowed contractuel.

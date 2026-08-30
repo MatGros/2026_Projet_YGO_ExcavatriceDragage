@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
    🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE ST_fbEncoder_Cfg :

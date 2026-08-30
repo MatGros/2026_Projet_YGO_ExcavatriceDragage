@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T18:18:43.094385" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T18:18:43.094385">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:16:09.692359" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:16:09.692359">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -194,7 +194,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</xhtml>
               </documentation>
             </variable>
-            <variable name="MachineReferenceReady">
+            <variable name="MachineHomed">
               <type>
                 <BOOL />
               </type>
@@ -202,7 +202,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference M1/M2/benne atomiquement valide</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceStep">
+            <variable name="MachineHomingStep">
               <type>
                 <INT />
               </type>
@@ -210,7 +210,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee de recuperation reference machine</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceInstruction">
+            <variable name="MachineHomingInstruction">
               <type>
                 <string length="120" />
               </type>
@@ -218,7 +218,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Instruction IHM unique et actionnable</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceFailed">
+            <variable name="MachineHomingFailed">
               <type>
                 <BOOL />
               </type>
@@ -226,7 +226,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction de homing conjoint abandonnee</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceTransactionActive">
+            <variable name="MachineHomingActive">
               <type>
                 <BOOL />
               </type>
@@ -234,7 +234,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceLossSafeStop">
+            <variable name="MachineHomingLossSafeStop">
               <type>
                 <BOOL />
               </type>
@@ -3515,10 +3515,10 @@ instBucket(
     HomedM2             := PRG_02_Acquisition.Data.EncoderM2.Homed,
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
     M2_Busy             := (instWinchM2.StepNumber &gt; 0),
-    ReferenceCommitOpen  := PRG_02_Acquisition.ReferenceCommitOpen,
-    ReferenceCommitClose := PRG_02_Acquisition.ReferenceCommitClose,
-    MachineReferenceReady := PRG_02_Acquisition.MachineReferenceReady,
-    ReferenceTransactionActive := PRG_02_Acquisition.ReferenceTransactionActive,
+    MachineHomingCommitOpen  := PRG_02_Acquisition.MachineHomingCommitOpen,
+    MachineHomingCommitClose := PRG_02_Acquisition.MachineHomingCommitClose,
+    MachineHomed := PRG_02_Acquisition.MachineHomed,
+    MachineHomingActive := PRG_02_Acquisition.MachineHomingActive,
     Config              := _BucketCfgPersist.Config,
     CfgTimeoutDuration     := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     BucketState        := _BucketState,
@@ -3765,9 +3765,9 @@ END_IF;
 // deux treuils, sans PowerCutOff additionnel. Le cycle libere la demande
 // seulement apres le composite d'arret mecanique confirme.
 SafeStopM1_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModuleFault
-                       OR PRG_02_Acquisition.ReferenceLossSafeStop;
+                       OR PRG_02_Acquisition.MachineHomingLossSafeStop;
 SafeStopM2_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.Data.InputModuleFault
-                       OR PRG_02_Acquisition.ReferenceLossSafeStop;
+                       OR PRG_02_Acquisition.MachineHomingLossSafeStop;
 
 // Surveillance Kobold descente normale (hors FB_DiveSearch)
 // : signal HwIn.Machine.M1_M2_KoboldBottomTouch_DI (même que instDiveSearch §1).
@@ -4467,12 +4467,12 @@ BucketState.OpenActive := instBucket.OpenReq;
 BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ExtractionControlActive;
 BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
 BucketState.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
-BucketState.MachineReferenceReady := PRG_02_Acquisition.MachineReferenceReady;
-BucketState.ReferenceStep := PRG_02_Acquisition.ReferenceStep;
-BucketState.ReferenceInstruction := PRG_02_Acquisition.ReferenceInstruction;
-BucketState.ReferenceFailed := PRG_02_Acquisition.ReferenceFailed;
-BucketState.ReferenceTransactionActive := PRG_02_Acquisition.ReferenceTransactionActive;
-BucketState.ReferenceLossSafeStop := PRG_02_Acquisition.ReferenceLossSafeStop;
+BucketState.MachineHomed := PRG_02_Acquisition.MachineHomed;
+BucketState.MachineHomingStep := PRG_02_Acquisition.MachineHomingStep;
+BucketState.MachineHomingInstruction := PRG_02_Acquisition.MachineHomingInstruction;
+BucketState.MachineHomingFailed := PRG_02_Acquisition.MachineHomingFailed;
+BucketState.MachineHomingActive := PRG_02_Acquisition.MachineHomingActive;
+BucketState.MachineHomingLossSafeStop := PRG_02_Acquisition.MachineHomingLossSafeStop;
 BucketState.ExtractionControlActive := ExtractionControlActive;
 BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
@@ -4579,7 +4579,7 @@ Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens arbitre (1: montee, -1: descente)</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceCommitOpen">
+            <variable name="MachineHomingCommitOpen">
               <type>
                 <BOOL />
               </type>
@@ -4587,7 +4587,7 @@ Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commit atomique reference benne ouverte</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceCommitClose">
+            <variable name="MachineHomingCommitClose">
               <type>
                 <BOOL />
               </type>
@@ -4595,7 +4595,7 @@ Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commit atomique reference benne fermee</xhtml>
               </documentation>
             </variable>
-            <variable name="MachineReferenceReady">
+            <variable name="MachineHomed">
               <type>
                 <BOOL />
               </type>
@@ -4603,7 +4603,7 @@ Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Qualification conjointe M1/M2/benne</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceTransactionActive">
+            <variable name="MachineHomingActive">
               <type>
                 <BOOL />
               </type>
@@ -4616,7 +4616,7 @@ Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle</xhtml>
               </documentation>
             </variable>
             <variable name="ConfirmClosePosition">
@@ -4624,7 +4624,7 @@ Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_ReferenceCycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -5134,14 +5134,14 @@ IF FirstCycle THEN
     END_IF;
 END_IF;
 
-IF ReferenceCommitOpen AND NOT Lifecycle.Busy THEN
+IF MachineHomingCommitOpen AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
     BucketState.StateIncoherent := FALSE;
 END_IF;
 
-IF ReferenceCommitClose AND NOT Lifecycle.Busy THEN
+IF MachineHomingCommitClose AND NOT Lifecycle.Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
@@ -5296,8 +5296,8 @@ END_IF;
 ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND NOT BucketState.StateIncoherent
                      AND (Fault.ErrorId = 16#0000)
-                     AND (MachineReferenceReady OR (BucketState.IsOpen XOR BucketState.IsClosed))
-                     AND NOT ReferenceTransactionActive;
+                     AND (MachineHomed OR (BucketState.IsOpen XOR BucketState.IsClosed))
+                     AND NOT MachineHomingActive;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
 {endregion}
 </xhtml>

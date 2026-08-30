@@ -22,14 +22,14 @@ VAR_OUTPUT
     HwReal                   : ST_HardwareImage; // <-- [STAT] Image brute reelle physique
     HwSim                    : ST_HardwareImage; // <-- [STAT] Image simulee banc
     HwIn                     : ST_HardwareImage; // <-- [STAT] Image utilisee par le metier (arbitree)
-    MachineReferenceReady    : BOOL;             // <-- [STAT] Qualification conjointe reference machine
-    ReferenceCommitOpen      : BOOL;             // <-- [CMD] Commit atomique benne ouverte
-    ReferenceCommitClose     : BOOL;             // <-- [CMD] Commit atomique benne fermee
-    ReferenceTransactionActive : BOOL;           // <-- [STAT] Homing conjoint en cours
-    ReferenceLossSafeStop    : BOOL;             // <-- [SAFE] Perte reference en mouvement : arret controle
-    ReferenceStep            : INT;              // <-- [STAT] Etape guidee reference
-    ReferenceInstruction     : STRING(120);      // <-- [STAT] Consigne IHM reference
-    ReferenceFailed          : BOOL;             // <-- [STAT] Transaction reference abandonnee
+    MachineHomed    : BOOL;             // <-- [STAT] Qualification conjointe reference machine
+    MachineHomingCommitOpen      : BOOL;             // <-- [CMD] Commit atomique benne ouverte
+    MachineHomingCommitClose     : BOOL;             // <-- [CMD] Commit atomique benne fermee
+    MachineHomingActive : BOOL;           // <-- [STAT] Homing conjoint en cours
+    MachineHomingLossSafeStop    : BOOL;             // <-- [SAFE] Perte reference en mouvement : arret controle
+    MachineHomingStep            : INT;              // <-- [STAT] Etape guidee reference
+    MachineHomingInstruction     : STRING(120);      // <-- [STAT] Consigne IHM reference
+    MachineHomingFailed          : BOOL;             // <-- [STAT] Transaction reference abandonnee
 END_VAR
 
 VAR
@@ -40,11 +40,14 @@ VAR
     instDiagEthercat         : FB_Diag_Ethercat;              // * [INST] Diagnostic reseau EtherCAT (codeurs/variateur) — rang 02
     instEncoderM1            : FB_Encoder;                    // * [INST] Facade codeur complet M1 (Abs+Homing+Scale+Safety+Rel+Speed)
     instEncoderM2            : FB_Encoder;                    // * [INST] Facade codeur complet M2
-    instReferenceCycle       : FB_ReferenceCycle;             // * [INST] Guide reference machine et homing conjoint benne
+    instMachineHomingCycle       : FB_MachineHomingCycle;             // * [INST] Guide reference machine et homing conjoint benne
 
     // === 🎛️ VARIABLES LOCALES & DÉTECTEURS ===
     HwInM1                   : ST_fbEncoder_HwIn; // . [LOC] Entrees hardware codeur M1
     HwInM2                   : ST_fbEncoder_HwIn; // . [LOC] Entrees hardware codeur M2
+    MachineHomingM1Status    : ST_fbMachineHomingCycle_AxisHomingStatus; // . [LOC] Statut homing M1
+    MachineHomingM2Status    : ST_fbMachineHomingCycle_AxisHomingStatus; // . [LOC] Statut homing M2
+    MachineHomingMechanicalStopOk : BOOL; // . [LOC] Arret mecanique conjoint M1/M2 confirme
 
     WinchInputSourceSimulated         : BOOL; // . [LOC] Source Winch simulee active
     TranslationInputSourceSimulated   : BOOL; // . [LOC] Source Translation simulee active
@@ -364,23 +367,26 @@ Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
 (* Centralise les fronts IHM avant les deux facades codeur. La polarite du DI
    est explicite : Free=TRUE signifie capteur haut non atteint. *)
-instReferenceCycle(
+MachineHomingM1Status.HomedAndReliable := Data.EncoderM1.HomedAndReliable;
+MachineHomingM1Status.HomingBusy       := Data.EncoderM1.Measurement.HomingLifecycle.Busy;
+MachineHomingM1Status.HomingDone       := Data.EncoderM1.Measurement.HomingLifecycle.Done;
+MachineHomingM1Status.HomingError      := Data.EncoderM1.Measurement.HomingFault.Error;
+MachineHomingM2Status.HomedAndReliable := Data.EncoderM2.HomedAndReliable;
+MachineHomingM2Status.HomingBusy       := Data.EncoderM2.Measurement.HomingLifecycle.Busy;
+MachineHomingM2Status.HomingDone       := Data.EncoderM2.Measurement.HomingLifecycle.Done;
+MachineHomingM2Status.HomingError      := Data.EncoderM2.Measurement.HomingFault.Error;
+MachineHomingMechanicalStopOk := HwIn.Winch.M1_ContactorsReleased_DI AND NOT HwIn.Winch.M1_BrakeIsOpen_DI
+                                 AND (ABS(Data.Encoders.M1.Speed_Mps) < 0.02)
+                                 AND HwIn.Winch.M2_ContactorsReleased_DI AND NOT HwIn.Winch.M2_BrakeIsOpen_DI
+                                 AND (ABS(Data.Encoders.M2.Speed_Mps) < 0.02);
+instMachineHomingCycle(
     Enable                     := TRUE,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
     TopPositionActive          := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
-    WinchesMechanicallyStopped := HwIn.Winch.M1_ContactorsReleased_DI AND NOT HwIn.Winch.M1_BrakeIsOpen_DI
-                                  AND (ABS(Data.Encoders.M1.Speed_Mps) < 0.02)
-                                  AND HwIn.Winch.M2_ContactorsReleased_DI AND NOT HwIn.Winch.M2_BrakeIsOpen_DI
-                                  AND (ABS(Data.Encoders.M2.Speed_Mps) < 0.02),
-    M1HomedAndReliable         := Data.EncoderM1.HomedAndReliable,
-    M2HomedAndReliable         := Data.EncoderM2.HomedAndReliable,
-    M1HomingBusy               := Data.EncoderM1.Measurement.HomingLifecycle.Busy,
-    M2HomingBusy               := Data.EncoderM2.Measurement.HomingLifecycle.Busy,
-    M1HomingDone               := Data.EncoderM1.Measurement.HomingLifecycle.Done,
-    M2HomingDone               := Data.EncoderM2.Measurement.HomingLifecycle.Done,
-    M1HomingError              := Data.EncoderM1.Measurement.HomingFault.Error,
-    M2HomingError              := Data.EncoderM2.Measurement.HomingFault.Error,
+    WinchesMechanicallyStopped  := MachineHomingMechanicalStopOk,
+    M1Status                   := MachineHomingM1Status,
+    M2Status                   := MachineHomingM2Status,
     BucketOffsetValid          := PRG_04_Treuils_Benne.Data.BucketState.MechState.ActiveOffsetValid,
     ConfirmOpenPosition        := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
     ConfirmClosePosition       := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos,
@@ -388,14 +394,14 @@ instReferenceCycle(
     CfgOffsetOpenM             := _BucketCfgPersist.Config.OffsetOpenM,
     CfgOffsetCloseM            := _BucketCfgPersist.Config.OffsetCloseM
 );
-MachineReferenceReady := instReferenceCycle.MachineReferenceReady;
-ReferenceCommitOpen := instReferenceCycle.CommitOpenPosition;
-ReferenceCommitClose := instReferenceCycle.CommitClosePosition;
-ReferenceTransactionActive := instReferenceCycle.ReferenceTransactionActive;
-ReferenceLossSafeStop := instReferenceCycle.ReferenceLossSafeStop;
-ReferenceStep := instReferenceCycle.ReferenceStep;
-ReferenceInstruction := instReferenceCycle.ReferenceInstruction;
-ReferenceFailed := instReferenceCycle.ReferenceFailed;
+MachineHomed := instMachineHomingCycle.MachineHomed;
+MachineHomingCommitOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
+MachineHomingCommitClose := instMachineHomingCycle.BucketCommit.CommitClose;
+MachineHomingActive := instMachineHomingCycle.MachineHomingActive;
+MachineHomingLossSafeStop := instMachineHomingCycle.MachineHomingLossSafeStop;
+MachineHomingStep := instMachineHomingCycle.MachineHomingStep;
+MachineHomingInstruction := instMachineHomingCycle.MachineHomingInstruction;
+MachineHomingFailed := instMachineHomingCycle.MachineHomingFailed;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
@@ -404,9 +410,12 @@ HwInM1.PresetStatusBit    := FALSE;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    HomingPermit          := ((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 2)) OR instReferenceCycle.HomingRequestM1,
-    HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR instReferenceCycle.HomingRequestM1,
+    HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                               AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 2)
+                               AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
+                                                                       AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
+                              OR instMachineHomingCycle.M1Demand.HomeReq),
+    HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR instMachineHomingCycle.M1Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
     CfgHomingTargetM      := _WinchM1CfgPersist.CfgHomingTarget_M,
@@ -453,15 +462,18 @@ HwInM2.PresetStatusBit    := FALSE;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    HomingPermit          := ((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                             AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 1)) OR instReferenceCycle.HomingRequestM2,
-    HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR instReferenceCycle.HomingRequestM2,
+    HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                               AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 1)
+                               AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
+                                                                       AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
+                              OR instMachineHomingCycle.M2Demand.HomeReq),
+    HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR instMachineHomingCycle.M2Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
     CfgHomingTargetM      := _WinchM2CfgPersist.CfgHomingTarget_M,
     CfgTopSensorPosM      := _WinchM2CfgPersist.CfgTopSensorPos_M,
-    UseDynamicTarget      := instReferenceCycle.M2UseDynamicTarget,
-    DynamicHomingTargetM  := instReferenceCycle.M2DynamicTargetM,
+    UseDynamicTarget      := instMachineHomingCycle.M2Demand.UseDynamicTarget,
+    DynamicHomingTargetM  := instMachineHomingCycle.M2Demand.DynamicTarget_M,
     TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
     HwIn                  := HwInM2,
     PointsPerRev          := ENCODER_POINTS_PER_REV,

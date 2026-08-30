@@ -354,12 +354,20 @@ FB_Translation:
     - CODE/I_TRANSLATION/FB_Translation.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
 
-FB_ReferenceCycle:
+FB_MachineHomingCycle:
   domain: G_CYCLE
   sources:
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
-    - CODE/G_CYCLE/FB_ReferenceCycle.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_referencecycle.st
+    - CODE/G_CYCLE/_TYPES/E_MachineHomingStep.st
+    - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_AxisHomingStatus.st
+    - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_HomingDemand.st
+    - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_BucketCommit.st
+    - CODE/G_CYCLE/FB_MachineHomingCycle.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_machinehomingcycle.st
 
 FB_SimBench:
   domain: L_SIMULATION

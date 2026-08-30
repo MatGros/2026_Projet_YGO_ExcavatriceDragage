@@ -131,6 +131,16 @@ python TOOLS/TEST_AUTO_CI/run_tests.py --fb WINCH_INTEG
 
 ## 8. À faire par l'agent suivant (ordre suggéré)
 
+### Mise à jour checkpoint 2026-08-30
+
+- `T181-20 / FB_Winch_Symmetry` vérifié : **3/3 PASS** (`TC-P10-T181-18a/b/c`) avec
+  compilation STruCpp et câblage PRG_07/IHM confirmés. Le diagnostic reste passif.
+- Revue Ollama locale demandée pour prioriser les lots indépendants ; aucune autorité
+  de mouvement supplémentaire ne doit être introduite avant validation humaine.
+- `G200` après bundle frais : **FAIL uniquement sur l'orphelin préexistant
+  `FB_WinchSpeedLearning` (L13)** ; les avertissements de liaison restants sont hors
+  périmètre T181-20/T184 et doivent rester tracés, pas masqués.
+
 1. **Trancher avec l'humain** la question ouverte §4 : homing benne = préalable à la montée couplée,
    ou trou d'intégration `ActiveOffsetM` ? Ça conditionne « winch utilisable ».
 2. Selon la réponse : corriger HARN-13a/13c/20 (§4, options a/b/c) **ou** corriger le câblage
@@ -143,3 +153,18 @@ python TOOLS/TEST_AUTO_CI/run_tests.py --fb WINCH_INTEG
 6. Faire valider le correctif `SpeedGuardEnable := FALSE` (PRG_04) par l'humain, puis commit séparé
    (conformité AF, indépendant de T181-01).
 7. Ne jamais committer les 2 fichiers §6.
+
+### Mise à jour T185 — 2026-08-30 (refactor et revue contradictoire)
+
+- `FB_ReferenceCycle` est devenu `FB_MachineHomingCycle` ; l'interface utilise l'enum
+  `E_MachineHomingStep` et les DUT `ST_fbMachineHomingCycle_*`.
+- `PRG_02_Acquisition` publie les statuts M1/M2, applique la condition d'arrêt mécanique
+  pour les homings unitaires/at-zero et relaie les demandes de homing et le commit atomique.
+- T132 est absorbée : l'IHM propose « benne fermée » par défaut ; aucune position ouverte/fermée
+  n'est forcée sans confirmation visuelle explicite de l'opérateur.
+- Preuves ciblées : contrôle de schéma du contrat T185 PASS (AC6 globale encore ouverte), G100/G110 PASS sur le périmètre, bundle 216/216,
+  rapport `FB_MachineHomingCycle.html` 18/18 PASS avec chronogramme, G200 T185 101 liaisons OK.
+- Revue Ollama : T185 est structurellement clôturable et doit rester gelée. Le G200 global reste
+  rouge uniquement sur `FB_WinchSpeedLearning` orphelin (T181-15) ; ne pas l'instancier dans PRG_04.
+- La livraison projet reste suspendue aux gates externes G200/G340/G430 ; aucune correction de ces
+  sujets ne doit être absorbée dans T185.

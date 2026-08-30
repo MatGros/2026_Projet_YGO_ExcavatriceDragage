@@ -1,67 +1,47 @@
 {
   "version": 1,
-  "file": "test_fb_safety_winch.st",
+  "file": "test_fb_cycle.st",
   "results": [
     {
-      "name": "TC-P10-001 Meca A : derive >2.0m a l arret (joystick neutre) -> SafeStop + PowerCutOff",
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
       "passed": true
     },
     {
-      "name": "TC-P10-002 Meca B : non confirmation arret 3s -> SafeStop + PowerCutOff",
+      "name": "TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape",
       "passed": true
     },
     {
-      "name": "TC-P10-003 Meca C : glissement M1 >2.0m pendant maintien benne -> SafeStop + PowerCutOff",
+      "name": "TC-P04-002 : Le cycle produit des demandes et passe a X1_HOMING sur Start",
       "passed": true
     },
     {
-      "name": "TC-P10-004 Meca D : capteur haut sans arret 3s -> SafeStop (immediat) puis PowerCutOff (3s)",
+      "name": "TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en STABILIZING et fige l etape",
       "passed": true
     },
     {
-      "name": "TC-P10-005 Meca E bit12 : ecart >2.5m -> SafeStop SEUL (pas PowerCutOff)",
+      "name": "TC-P04-004 : Reprise apres STABILIZING necessite Cause disparue + Reset + StartCycle",
       "passed": true
     },
     {
-      "name": "TC-P10-006 Meca E bit13 : bit12 non confirme 3s -> escalade PowerCutOff",
+      "name": "TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur X13_DONE_SYNC",
       "passed": true
     },
     {
-      "name": "TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -> SafeStop SEUL",
+      "name": "TC-P04-013 : Bascule Semi-Auto vers Maintenance preserve l etape et neutralise les demandes sans redemarrage auto",
       "passed": true
     },
     {
-      "name": "TC-P10-008 Meca G : vitesse nulle malgre commande 3s -> SafeStop SEUL",
+      "name": "TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutralisees, etape maintenue, PAS de redemarrage auto (T169-A S3)",
       "passed": true
     },
     {
-      "name": "TC-P10-009 Masque PowerCutOff : bit2 (surchauffe moteur) coupe, bit14 (sens oppose) ne coupe pas",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-010 SafeStop exclut bit3 (mou cable) si SyncEnable=FALSE",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-036.1 Warmup 3s : perte com operateur ignoree pendant 3s puis SafeStop",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves, re-Enable exige Reset",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-044.1 Mou cable : SyncEnable=FALSE -> DescendPermit=FALSE, AscentPermit autorise, blocage leve au retension",
-      "passed": true
-    },
-    {
-      "name": "TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chaine PRG_04->PRG_06->AU = essai site",
+      "name": "TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> STABILIZING, pas de redemarrage auto (T169-A S4)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 14,
-    "passed": 14,
+    "total": 9,
+    "passed": 9,
     "failed": 0
   }
 }

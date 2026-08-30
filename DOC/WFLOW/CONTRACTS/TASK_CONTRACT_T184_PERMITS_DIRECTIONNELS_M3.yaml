@@ -1,0 +1,129 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# T184 — Homogénéisation cohérence « sens par axe » M1/M2/M3 :
+#        permit directionnel M3 (Fwd/Rev) + nettoyage redondance MotionPermit
+#
+# Source de l'analyse : audit cohérence WT5_SIMBENCH (verdict MAJOR).
+# Exécution : sur la base MAIN (hors worktree).
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T184_PERMITS_DIRECTIONNELS_M3
+  criticality: C2
+  strategy: patch            # indépendant de la criticité : ajouts de signaux + projections
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Doter la translation M3 d'un permit directionnel Fwd/Rev (montée/descente,
+    vers Maintenance / vers Trémie) projeté à l'IHM, à l'unisson des treuils
+    M1/M2 (FB_Safety_Winch.AscentPermit/DescendPermit), afin que l'opérateur
+    sache AVANT toute commande si un sens est autorisé ; et supprimer la
+    redondance/tromperie du signal « joystick défléchi » (MotionPermit).
+    Sans changer aucun interlock de sécurité ni aucun blocage de mouvement.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_Safety_Translation expose deux sorties FwdPermit et RevPermit (permit directionnel effectif), calculées par le FB comme seule source (producteur unique), en fonction des conditions bloquant chaque sens."
+      verified_by: "Lecture FB_Safety_Translation.st (VAR_OUTPUT + logique) + gate G200 (liaison)"
+    - id: AC2
+      statement: "ST_SafetyTranslation porte les champs FwdPermit et RevPermit (type de l'axe M3), alimentés par FB_Safety_Translation."
+      verified_by: "Lecture du type + import bundle (champs présents)"
+    - id: AC3
+      statement: "GVL_IHM.TranslationM3.Safety projette FwdPermit/RevPermit à l'IHM (via PRG_05 puis PRG_07)."
+      verified_by: "grep 'GVL_IHM.TranslationM3.Safety' dans PRG_07 + vérif bundle"
+    - id: AC4
+      statement: "MotionM3.Step6_DirectionAllowed (FB_TroubleshootingView) utilise FwdPermit/RevPermit et NE réutilise PLUS le proxy non-directionnel HeightInterlockBlocking (qui reste un blocage séparé)."
+      verified_by: "Lecture FB_TroubleshootingView.st (zone MotionM3)"
+    - id: AC5
+      statement: "Un seul signal « joystick défléchi » subsiste : MotionPermit ou JoystickMotionActive ou CycleMotionPermit est consolidé/renommé (ex. JoystickDeflected) ; plus aucun commentaire ne prétend inclure l'homme-mort si ce n'est pas le cas."
+      verified_by: "grep MotionPermit/JoystickMotionActive/CycleMotionPermit + lecture ST_CycleState"
+    - id: AC6
+      statement: "Corrections documentation : ST_SafetyWinch.st:11 (DescendPermit = effectif, pas safety simple) et spec AF_Partie-11 + fiches FB_Translation / FB_Safety_Translation mises à jour."
+      verified_by: "G340 + relecture"
+    - id: AC7
+      statement: "Aucun interlock de sécurité M3 existant (Méca A/B, LimitSwitch, SensorIncoherent, PowerCutOff, SafeStop) n'est modifié dans son comportement ; aucun changement hors scope déclaré."
+      verified_by: "Diff code restreint aux fichiers du scope + gates"
+    - id: AC8
+      statement: "Gates mécaniques : bundle régénéré (CODE_XML/CODE_Bundle.xml), G200 liaisons PASS, palier C PASS ; tests CI FB_Safety_Translation + TC-P11/TC-P13-0x étendus selon registre."
+      verified_by: "run_all_gates.py --palier C + G200_check_linkage.py --report"
+    - id: AC9
+      statement: "Critère structurel CODE/MAIN : chaque fichier du scope conserve un nom de fichier identique au nom du POU et un suffixe identique au langage généré dans le bundle ; aucun suffixe _CFC/_LD ajouté (PRG_03/05/07 et FB_Safety_Translation restent du ST pur en '.st')."
+      verified_by: "G310_check_code_structure.py + inspection du bundle (objets de langage ST)"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - CODE/I_TRANSLATION/_TYPES/ST_SafetyTranslation.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st            # CycleMotionPermit si renommage/fusion
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st  # MotionM3.Step6_DirectionAllowed
+      - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_CycleState.st  # commentaire
+      - CODE/H_TREUILS_BENNE/_TYPES/ST_SafetyWinch.st # doc DescendPermit
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md (+ fiches FB_Translation*, FB_Safety_Translation*)
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T184_*.yaml
+      - TOOLS/TEST_AUTO_CI/**  # tests CI associés si besoin
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md   # pas de convention de nommage modifiée sans validation humaine
+      - Code hors liste allowed (surtout FB_Safety_Winch / PRG_04 / FB_Winch : comportement M1/M2 intouché)
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Interlocks de sécurité M3 existants : Méca A/B, LimitSwitch, SensorIncoherent, PowerCutOff, SafeStop (FB_Safety_Translation)."
+      - "Comportement des treuils M1/M2 (permits + interlocks) strictement inchangé."
+      - "'HwIn' reste la seule image consommée ; aucun OR (GVL_Simulation...); producteur unique des nouveaux permits = FB_Safety_Translation."
+      - "Sémantique de DriveStatusWord.0 (T110) : le nouveau permit Fwd/Rev NE dépend PAS d'une hypothèse non tranchée sur le bit0 réel AC600 (à confirmer / documenter, pas à forcer)."
+    dropped_on_purpose:
+      - "Le signal trompeur 'MotionPermit' (ou la redondance 3-fois 'manche défléchi') est consolidé en un seul signal clairement nommé (ex. JoystickDeflected) — décision de conception tracée."
+      - "Le proxy non-directionnel MotionM3.Step6_DirectionAllowed := HeightInterlockBlocking est remplacé par les permits Fwd/Rev."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage            # bloc "Auto-verification liaison"
+    - run_all_gates            # résultat des gates
+    - bundle                   # CODE_XML/CODE_Bundle.xml regenere
+    - check_task_contract      # python .../check_task_contract.py (ce fichier)
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "deepseek"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, sémantique
+    réelle AC600 DriveStatusWord.0 / T110 non tranchée, bug preexistant, risque
+    hors scope) est remonte IMMEDIATEMENT a l'orchestrateur, pas a la fin et
+    jamais silencieusement. Le nouveau permit Fwd/Rev ne DOIT PAS reposer sur une
+    hypothese non confirmee du bit0 reel du variateur. Signaler n'est pas elargir
+    le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING                # PENDING | IN_PROGRESS | COMPLETED | VALIDATED
+
+execution:
+  executed_by: "DSH (DeepSeek)"   # qui a exécuté (à remplir en fin)
+  completed_at: ""
+  status: PENDING                # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Contrat rédigé à partir de l'audit de cohérence WT5_SIMBENCH (verdict MAJOR) :
+    trou structurel M3 (pas de permit directionnel) + redondance signal joystick
+    défléchi. Implémentation à venir sur main, hors worktree.
+  evidence_submitted: []
+
+validation:
+  status: PENDING                # PENDING | APPROVED | REJECTED
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Visa de validation humaine obligatoire avant toute implémentation (C2).

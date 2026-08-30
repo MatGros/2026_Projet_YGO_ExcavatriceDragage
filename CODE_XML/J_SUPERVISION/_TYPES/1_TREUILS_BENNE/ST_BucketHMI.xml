@@ -350,7 +350,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition)</xhtml>
               </documentation>
             </variable>
-            <variable name="MachineReferenceReady">
+            <variable name="MachineHomed">
               <type>
                 <BOOL />
               </type>
@@ -358,7 +358,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference M1/M2/benne atomiquement valide</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceStep">
+            <variable name="MachineHomingStep">
               <type>
                 <INT />
               </type>
@@ -366,7 +366,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee de recuperation reference machine</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceInstruction">
+            <variable name="MachineHomingInstruction">
               <type>
                 <string length="120" />
               </type>
@@ -374,7 +374,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Instruction IHM unique et actionnable</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceFailed">
+            <variable name="MachineHomingFailed">
               <type>
                 <BOOL />
               </type>
@@ -382,7 +382,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction de homing conjoint abandonnee</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceTransactionActive">
+            <variable name="MachineHomingActive">
               <type>
                 <BOOL />
               </type>
@@ -390,7 +390,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
               </documentation>
             </variable>
-            <variable name="ReferenceLossSafeStop">
+            <variable name="MachineHomingLossSafeStop">
               <type>
                 <BOOL />
               </type>

@@ -11,7 +11,7 @@
    🧩 Defaut : Fault:ST_Fault rempli par FB_FaultCore (instFault) depuis une liste
       de causes en clair (instCauses) — pattern FB_Joystick. Ready = Enable ET pas de
       defaut late. Interlocks machine sur les faits bruts, jamais sur Fault.Latched.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder

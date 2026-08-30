@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T18:24:17.247055" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T18:24:17.247055">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:43:53.749884" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:43:53.749884">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -84,7 +84,7 @@
    🛡️ PresetStatusBit : bit du mot d'état codeur, réservé site futur —
       câblé à FALSE tant qu'aucun bit n'est identifié (aucun signal absent
       ne confirme implicitement le preset).
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
