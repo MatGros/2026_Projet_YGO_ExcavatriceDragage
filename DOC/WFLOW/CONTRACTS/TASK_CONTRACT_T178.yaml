@@ -8,20 +8,21 @@ contract:
   objective: >
     Rendre FB_DriftGuard / Méca A conforme à l'AF : armer la surveillance de dérive uniquement
     à l'arrêt mécanique confirmé (contacteurs retombés + frein serré), et non sur joystick neutre,
-    pour ne plus mesurer le coast-down normal comme une dérive (faux PowerCutOff).
+    pour ne plus mesurer la phase avant arrêt mécanique confirmé comme une dérive
+    (faux PowerCutOff).
 
   acceptance:
     - id: AC1
       statement: "DriftGuardA.Arm := NOT(BypassSafety OR BypassMecaA) AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback [AND NOT BenneHoldStillActive] (calage identique à l'arrêt confirmé Méca B, FB_Safety_Winch.st:247)."
       verified_by: "lecture FB_Safety_Winch.st:235 (Arm) + diff"
     - id: AC2
-      statement: "Zéro faux PowerCutOff au relâcher joystick : le coast-down normal (inertie + jeu frein) n'est plus mesuré comme dérive (fenêtre d'armement = arrêt mécanique confirmé)."
+      statement: "Zéro faux PowerCutOff au relâcher joystick : la phase avant arrêt mécanique confirmé n'est plus mesurée comme dérive."
       verified_by: "harnais TEST_AUTO_CI treuils (TC-P10-001) + observation mise en service"
     - id: AC3
       statement: "Méca A détecte encore un frein qui lâche APRES arrêt confirmé (dérive > UncommandedDriftToleranceM=2.0 m -> SafeStop+PowerCutOff)."
       verified_by: "TC-P10-001 (scenario dérive à l'arrêt) exécutable et PASS"
     - id: AC4
-      statement: "Aucun nouveau paramètre CfgWinchCoastMax_M, aucune nouvelle fonction RunOn : la redondance avec Méca B (PostRampTimeout:=T#3s) est évitée."
+      statement: "Aucun nouveau paramètre de mouvement résiduel, aucune nouvelle fonction RunOn : la redondance avec Méca B (PostRampTimeout:=T#3s) est évitée."
       verified_by: "diff ST_WinchCfg.st (aucun champ ajouté) + grep RunOn/DriftGuard"
     - id: AC5
       statement: "Fiche FB_DriftGuard_v1.0.md + TC-P10-001 alignées au code sur preuve (calage d'armement = contacteurs-off + frein serré)."
@@ -31,6 +32,7 @@ contract:
     allowed:
       - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
       - CODE/H_TREUILS_BENNE/FB_DriftGuard.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_safety_winch.st # isolation TC impacte par le nouvel armement
     forbidden:
       - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st   # aucun nouveau champ config
       - CODE/A_COMMUN/**
@@ -50,17 +52,22 @@ contract:
 status: PENDING
 
 execution:
-  executed_by: ""
-  completed_at: ""
-  status: PENDING
+  executed_by: "Agent externe"
+  completed_at: "2026-08-30T15:00:00+02:00"
+  status: IMPLEMENTED_PENDING_HUMAN_CHECKPOINT
   summary: >
-    À remplir après implémentation (code ST différé : utilisateur a demandé STOP sur le code).
-  evidence_submitted: []
+    DriftGuardA.Arm est désormais calé sur contacteurs retombés ET frein serré ;
+    aucune nouvelle constante ni fonction n'a été ajoutée.
+  evidence_submitted:
+    - "Bundle frais ; G200 ne comporte aucun nouveau KO du lot."
+    - "Gates palier C : G340/G430 rouges pré-existants hors scope."
+    - "FB_Safety_Winch : 15/15 PASS apres isolation de TC-P10-005 (Meca E ne doit pas armer Meca A)."
 
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
   notes: >
-    Rescope 2026-08-29 : T178 initial (seuil coast-down) annulé comme redondant ; cible = conformité
-    AF DriftGuard (une seule fonction, pas de 2e). Implémentation code en attente de go de l'utilisateur.
+    Rescope 2026-08-29 : T178 initial (seuil de mouvement résiduel) annulé comme redondant ; cible = conformité
+    AF DriftGuard (une seule fonction, pas de 2e). GO utilisateur reçu 2026-08-30 ;
+    implémentation livrée, attente checkpoint humain.

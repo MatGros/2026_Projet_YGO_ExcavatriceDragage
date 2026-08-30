@@ -31,7 +31,7 @@ STRUCT
 
     Idx401_BucketBusy            : BOOL; // 1 = Mouvement Mâchoires en cours | 0 = Repos
     Idx402_BucketDone            : BOOL; // 1 = Position Cible Atteinte | 0 = En cours
-    Idx403_ControlAscentActive   : BOOL; // : 1 = Phase vitesse contrôlée montée en cours (post-fermeture auto)
+    Idx403_ExtractionControlActive : BOOL; // : 1 = Phase vitesse contrôlée montée en cours
 
     Idx501_M2_CmdRev_DQ          : BOOL; // 1 = Relais Action Benne M2 ON
 END_STRUCT

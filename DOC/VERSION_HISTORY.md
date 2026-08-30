@@ -4,6 +4,11 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `AF09_v2.4_CENTRE_PLAGE_PRESET` — 2026-08-30 — exigence preset centre-plage (spec seule, code non modifié)
+- **Diagnostic C0** : `TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md` — le preset neutre (`PresetValue := RawPos`, commit `73fa758d`) a perdu la garde anti-dépassement du design d'origine (`26217dd9`) : référencement près d'une borne → wrap-around UDINT → `CablePosM` aberrant (~±8192 m) + défauts en cascade.
+- **Spec AF09 v2.3→v2.4** : fonction `F09.08` + `TC-P09-070` — tout homing écrit le centre de plage `(8192×4096)/2 = 16#1000000` au codeur ET grave `HomingRefRaw` dans le référentiel post-preset ; gate `HomedAndReliable` M1 sur cible dynamique benne M2 ; gel consommateurs pendant la fenêtre de saut. Sous-fiche `FB_Encoder_Homing` v1.1→v1.2 (TC-P09-070.1/.2/.3, invariant anti-régression `PresetValue := RawPos`).
+- **Divergence spec/code ouverte** : implémentation + garde-fou (simu wrap + TC) à charger en tâche dédiée · validation matérielle preset (PDO Rx) requise avant tout mouvement réel.
+
 ### `T166_T170_REFONTE_CYCLES_ET_DIAGNOSTICS` — 2026-08-28 — refonte unifiée cycles, assistances & projection diagnostic
 - **Architecture Décision/Muscle** : Centralisation stricte de toutes les machines d'état de cycles (`FB_Cycle`, `FB_DiveSearch`, `FB_ExtractionSequence`, `DumpAtTremie`) dans `PRG_03_Modes_Cycle`. `PRG_04` allégé en muscle exécutif et garant de la sécurité physique des treuils.
 - **Intention Opérateur Découplée (R3-ter)** : DUT `ST_OperatorCoupledIntent` à la racine de `ST_ProgramRequest`, publication inconditionnelle par `PRG_03` pour l'arbitrage physique dans `PRG_04`. Préservation stricte de la synoptique IHM.

@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-30 11:39:43</div>
+    <div class="exec-time">2026-08-30 16:09:35</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (8 tests)</summary>
@@ -333,7 +333,7 @@
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 19 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 22 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -418,6 +418,30 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
+                <td><code>ST_fbWinch_DriveRequest.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbWinch_Sensors.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_fbWinch_Cfg.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
                 <td><code>E_WinchFinalInterlockReason.st</code></td>
                 <td>DUT</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -494,14 +518,14 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Winch</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 34 flux entrants · 21 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Winch</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 13 flux entrants · 21 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedStep <span style="color:var(--muted);font-weight:500;">(FB_SpeedStep)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ DirectionInterlock <span style="color:var(--muted);font-weight:500;">(FB_WinchDirectionInterlock)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ StepShaper <span style="color:var(--muted);font-weight:500;">(FB_WinchStepShaper)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedStepHyst1 <span style="color:var(--muted);font-weight:500;">(HYSTERESIS)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedStepHyst2 <span style="color:var(--muted);font-weight:500;">(HYSTERESIS)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedStepHyst3 <span style="color:var(--muted);font-weight:500;">(HYSTERESIS)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedStepHyst4 <span style="color:var(--muted);font-weight:500;">(HYSTERESIS)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ EnableRisingEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonContactorsDropped <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instFault <span style="color:var(--muted);font-weight:500;">(FB_FaultCore)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">StartStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Direction <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTgt_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SafeStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DescendPermit <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">AscentPermit <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedStepTable <span class="pin-type" style="color:var(--muted);">ST_SpeedStepTable</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgMaxStepDescente <span class="pin-type" style="color:var(--muted);">INT := 3</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MaxStepAscent <span class="pin-type" style="color:var(--muted);">INT := 5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomingApproachActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedStepHystMargin <span class="pin-type" style="color:var(--muted);">REAL := 2.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DirectionInterlockDelayDescent <span class="pin-type" style="color:var(--muted);">TIME := T#400ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DirectionInterlockDelayAscent <span class="pin-type" style="color:var(--muted);">TIME := T#900ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">StepRampDelayAscent <span class="pin-type" style="color:var(--muted);">TIME := T#1000ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">StepRampDelayDescente <span class="pin-type" style="color:var(--muted);">TIME := T#500ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ContactorFeedbackTimeout <span class="pin-type" style="color:var(--muted);">TIME := T#500ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TopLimitM <span class="pin-type" style="color:var(--muted);">REAL := 8.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BottomLimitM <span class="pin-type" style="color:var(--muted);">REAL := -20.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgSlowdownDistanceM <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgSlowdownMaxStep <span class="pin-type" style="color:var(--muted);">INT := 1</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">FwdRevSpeedFeedbackOff <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Homed <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HomingSuspect <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CablePosM <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">MeasuredSpeedBand <span class="pin-type" style="color:var(--muted);">INT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedGuardEnable <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedGuardReady <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassContactorCheck <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassGlobal <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveRequest <span class="pin-type" style="color:var(--muted);">ST_fbWinch_DriveRequest</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Sensors <span class="pin-type" style="color:var(--muted);">ST_fbWinch_Sensors</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Config <span class="pin-type" style="color:var(--muted);">ST_fbWinch_Cfg</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SafeStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DescendPermit <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">AscentPermit <span class="pin-type" style="color:var(--muted);">BOOL := TRUE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassContactorCheck <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassGlobal <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(225,29,72,0.18);border:1px solid #9f1239;cursor:pointer;">
@@ -527,7 +551,7 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">32</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">11</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
@@ -535,7 +559,7 @@
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">18</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">4</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">34 IN</b> / <b style="color:#ffffff;">21 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">13 IN</b> / <b style="color:#ffffff;">21 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -644,10 +668,10 @@
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 50 écarts</span></summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 29 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 50 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ASCENTPERMIT</code> jamais câblé en production</li><li>Pin <code>BOTTOMLIMITM</code> jamais câblé en production</li><li>Pin <code>BUSINESSSTEPDELAYELAPSED</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BYPASSGLOBAL</code> jamais câblé en production</li><li>Pin <code>CABLEPOSM</code> jamais câblé en production</li><li>Pin <code>CFGMAXSTEPDESCENTE</code> jamais câblé en production</li><li>Pin <code>CFGSLOWDOWNDISTANCEM</code> jamais câblé en production</li><li>Pin <code>CFGSLOWDOWNMAXSTEP</code> jamais câblé en production</li><li>Pin <code>COMMANDEDDIRECTION</code> jamais câblé en production</li><li>Pin <code>CONTACTOR1</code> jamais câblé en production</li><li>Pin <code>CONTACTOR2</code> jamais câblé en production</li><li>Pin <code>CONTACTOR3</code> jamais câblé en production</li><li>Pin <code>CONTACTOR4</code> jamais câblé en production</li><li>Pin <code>CONTACTORFEEDBACKTIMEOUT</code> jamais câblé en production</li><li>Pin <code>CONTACTORSCHECK</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIRECTION</code> jamais câblé en production</li><li>Pin <code>DIRECTIONCHANGEDELAYELAPSED</code> jamais câblé en production</li><li>Pin <code>DIRECTIONCHANGEPENDING</code> jamais câblé en production</li><li>Pin <code>DIRECTIONINTERLOCKDELAYASCENT</code> jamais câblé en production</li><li>Pin <code>DIRECTIONINTERLOCKDELAYDESCENT</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>FWDREVSPEEDFEEDBACKOFF</code> jamais câblé en production</li><li>Pin <code>HOMED</code> jamais câblé en production</li><li>Pin <code>HOMINGAPPROACHACTIVE</code> jamais câblé en production</li><li>Pin <code>HOMINGSUSPECT</code> jamais câblé en production</li><li>Pin <code>INBOTTOMSLOWDOWNZONE</code> jamais câblé en production</li><li>Pin <code>INTOPSLOWDOWNZONE</code> jamais câblé en production</li><li>Pin <code>MAXSTEPASCENT</code> jamais câblé en production</li><li>Pin <code>MEASUREDSPEEDBAND</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RELAYFWD</code> jamais câblé en production</li><li>Pin <code>RELAYREV</code> jamais câblé en production</li><li>Pin <code>REQUESTEDSTEP</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SAFESTOP</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDENABLE</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDLIMITED</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDREADY</code> jamais câblé en production</li><li>Pin <code>SPEEDSTEPHYSTMARGIN</code> jamais câblé en production</li><li>Pin <code>SPEEDSTEPTABLE</code> jamais câblé en production</li><li>Pin <code>SPEEDTGT_PCT</code> jamais câblé en production</li><li>Pin <code>STARTSTOP</code> jamais câblé en production</li><li>Pin <code>STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>STEPRAMPDELAYASCENT</code> jamais câblé en production</li><li>Pin <code>STEPRAMPDELAYDESCENTE</code> jamais câblé en production</li><li>Pin <code>TOPLIMITM</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 29 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>ASCENTPERMIT</code> jamais câblé en production</li><li>Pin <code>BUSINESSSTEPDELAYELAPSED</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BYPASSGLOBAL</code> jamais câblé en production</li><li>Pin <code>COMMANDEDDIRECTION</code> jamais câblé en production</li><li>Pin <code>CONFIG</code> jamais câblé en production</li><li>Pin <code>CONTACTOR1</code> jamais câblé en production</li><li>Pin <code>CONTACTOR2</code> jamais câblé en production</li><li>Pin <code>CONTACTOR3</code> jamais câblé en production</li><li>Pin <code>CONTACTOR4</code> jamais câblé en production</li><li>Pin <code>CONTACTORSCHECK</code> jamais câblé en production</li><li>Pin <code>DESCENDPERMIT</code> jamais câblé en production</li><li>Pin <code>DIRECTIONCHANGEDELAYELAPSED</code> jamais câblé en production</li><li>Pin <code>DIRECTIONCHANGEPENDING</code> jamais câblé en production</li><li>Pin <code>DRIVEREQUEST</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>INBOTTOMSLOWDOWNZONE</code> jamais câblé en production</li><li>Pin <code>INTOPSLOWDOWNZONE</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>RELAYFWD</code> jamais câblé en production</li><li>Pin <code>RELAYREV</code> jamais câblé en production</li><li>Pin <code>REQUESTEDSTEP</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SAFESTOP</code> jamais câblé en production</li><li>Pin <code>SENSORS</code> jamais câblé en production</li><li>Pin <code>SPEEDGUARDLIMITED</code> jamais câblé en production</li><li>Pin <code>STEPNUMBER</code> jamais câblé en production</li></ul>
         </div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
@@ -658,13 +682,16 @@
             <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">STARTSTOP <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIRECTION <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-name">DRIVEREQUEST <span class="pin-type">ST_FBWINCH_DRIVEREQUEST</span></div>
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDTGT_PCT <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-name">SENSORS <span class="pin-type">ST_FBWINCH_SENSORS</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">CONFIG <span class="pin-type">ST_FBWINCH_CFG</span></div>
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
             <div class="pin-name">SAFESTOP <span class="pin-type">IEC_BOOL</span></div>
@@ -674,72 +701,6 @@
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
             <div class="pin-name">ASCENTPERMIT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDSTEPTABLE <span class="pin-type">ST_SPEEDSTEPTABLE</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CFGMAXSTEPDESCENTE <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MAXSTEPASCENT <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMINGAPPROACHACTIVE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDSTEPHYSTMARGIN <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIRECTIONINTERLOCKDELAYDESCENT <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIRECTIONINTERLOCKDELAYASCENT <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">STEPRAMPDELAYASCENT <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">STEPRAMPDELAYDESCENTE <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CONTACTORFEEDBACKTIMEOUT <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">TOPLIMITM <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BOTTOMLIMITM <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CFGSLOWDOWNDISTANCEM <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CFGSLOWDOWNMAXSTEP <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">FWDREVSPEEDFEEDBACKOFF <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMED <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HOMINGSUSPECT <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CABLEPOSM <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MEASUREDSPEEDBAND <span class="pin-type">IEC_INT</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDGUARDENABLE <span class="pin-type">IEC_BOOL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDGUARDREADY <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
             <div class="pin-name">BYPASSCONTACTORCHECK <span class="pin-type">IEC_BOOL</span></div>
@@ -944,7 +905,7 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Winch</code></td>
-                <td>32</td><td>18</td>
+                <td>11</td><td>18</td>
                 <td>0</td><td>19</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
@@ -1140,11 +1101,11 @@
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (19)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li></ul>
+        <summary>Fichiers source compilés (22)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_DriveRequest.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Sensors.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Cfg.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_SpeedStep.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_DriftGuard.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Safety_Winch.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st</code></li><li><code>CODE/H_TREUILS_BENNE/FB_Winch.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (19)</summary>
+        <summary>Code source ST original (22)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\HYSTERESIS.st</code></summary>
@@ -1654,6 +1615,129 @@ STRUCT
     StepThreshold_Pct : ARRAY[1..5] OF REAL;                          // Seuils de changement de palier (0..100%)
 END_STRUCT
 END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\_TYPES\ST_fbWinch_DriveRequest.st</code></summary>
+                <pre>(* =======================================================================
+   ðŸª ST_fbWinch_DriveRequest â€” RequÃªte d&#x27;axe treuil (producteur PRG_04)
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   ðŸŽ¯ RÃ´le : Demande de mouvement, palier et bornes de clamp d&#x27;un treuil
+   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   ðŸ“¤ Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
+   ðŸ“¥ Consommateur : FB_Winch
+   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+      et le clamp DANS FB_Winch (comportement bit-identique). Les champs
+      SpeedStepReq / MinStepUp sont dÃ©clarÃ©s mais non consommÃ©s (usage aval).
+   ======================================================================= *)
+TYPE ST_fbWinch_DriveRequest :
+STRUCT
+    // === ORDRE DE MOUVEMENT ===
+    StartStop                       : BOOL;   // TRUE = mouvement demandÃ©
+    Direction                       : INT;    // -1: Descente, 0: Stop, 1: Montee
+    SpeedStepReq                    : INT;    // [cible] Palier demandÃ© dÃ©codÃ© en amont (usage aval)
+    SpeedTgt_Pct                    : REAL;   // [08a] Consigne vitesse % (0.0..100.0) â€” dÃ©codage conservÃ© dans FB_Winch
+
+    // === BORNES DE CLAMP (agrÃ©gÃ©es PRG_04) ===
+    MinStepUp                       : INT;    // [cible] Plancher palier montÃ©e (usage aval)
+    MaxStepUp                       : INT := 5;    // Plafond palier montÃ©e (1..5)
+    MinStepDown                     : INT := 0;    // Plancher palier descente (0 = aucun) -- plongee Kobold
+    MaxStepDown                     : INT := 3;    // Plafond palier descente (1..5)
+
+    // === LIMITES EFFECTIVES DU CYCLE ===
+    TopLimitM                       : REAL := 8.5;   // Position limite haute active (m)
+    BottomLimitM                    : REAL := -20.0; // Position limite basse active (m)
+
+    // === DIAGNOSTIC (jamais lu par la logique FB_Winch) ===
+    SyncCoupled                     : BOOL;   // [diag] Couplage synchro actif (garde de revue)
+
+    // === CHAMPS CONSERVÃ‰S (clamp interne FB_Winch) ===
+    HomingApproachActive            : BOOL;   // [08a] Vitesse limitÃ©e au palier 1 (approche homing)
+END_STRUCT
+END_TYPE
+
+
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\_TYPES\ST_fbWinch_Sensors.st</code></summary>
+                <pre>(* =======================================================================
+   ðŸª ST_fbWinch_Sensors â€” Mesures et feedbacks d&#x27;un treuil
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   ðŸŽ¯ RÃ´le : Retours physiques et mesures propres Ã  l&#x27;instance treuil
+   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   ðŸ“¤ Producteur : PRG_04_Treuils_Benne / acquisition
+   ðŸ“¥ Consommateur : FB_Winch
+   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le garde-fou vitesse
+      DANS FB_Winch (comportement bit-identique). Les champs
+      MeasuredSpeedMps / MeasuredSpeedValid sont dÃ©clarÃ©s mais non
+      consommÃ©s (usage aval).
+   ======================================================================= *)
+TYPE ST_fbWinch_Sensors :
+STRUCT
+    // === POSITION ET RÃ‰FÃ‰RENCEMENT ===
+    CablePosM                       : REAL;   // Position actuelle du cable (m)
+    Homed                           : BOOL;   // Statut treuil reference
+    HomingSuspect                   : BOOL;   // Incertitude / doute sur le referencement
+
+    // === RETOURS CONTACTEURS ===
+    ContactorsAllOff                : BOOL;   // TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)
+
+    // === MESURE VITESSE ===
+    MeasuredSpeedMps                : REAL;   // [cible] Mesure vitesse rÃ©elle (m/s) â€” usage aval
+    MeasuredSpeedValid              : BOOL;   // [cible] Mesure exploitable â€” usage aval
+    MeasuredSpeedBand               : INT := 0;   // [08a] Bande vitesse rÃ©elle validÃ©e (garde-fou conservÃ© dans FB_Winch)
+
+    // === GARDE-FOU VITESSE (conservÃ©) ===
+    SpeedGuardEnable                : BOOL := TRUE;   // [08a] Activation garde-fou changement de palier
+    SpeedGuardReady                 : BOOL := FALSE;  // [08a] Conditions de stabilitÃ© validÃ©es
+END_STRUCT
+END_TYPE
+
+
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\_TYPES\ST_fbWinch_Cfg.st</code></summary>
+                <pre>(* =======================================================================
+   ðŸª ST_fbWinch_Cfg â€” Configuration statique d&#x27;un treuil
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   ðŸŽ¯ RÃ´le : RÃ©glages persistants propres Ã  l&#x27;instance treuil (statique)
+   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   ðŸ“¤ Producteur : configuration persistante
+   ðŸ“¥ Consommateur : FB_Winch (statique uniquement)
+   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+      et les deux cadences de rampe DANS FB_Winch (comportement
+      bit-identique). Le champ StepRampDelay est dÃ©clarÃ© mais non
+      consommÃ© (usage aval).
+   ======================================================================= *)
+TYPE ST_fbWinch_Cfg :
+STRUCT
+    // === TABLE DES PALIERS ===
+    SpeedStepTable                  : ST_SpeedStepTable;   // Table de seuils des paliers de vitesse
+
+    // === INTERLOCK CHANGEMENT DE SENS ===
+    DirectionInterlockDelayUp       : TIME := T#900ms;   // Delai interlock changement de sens montee
+    DirectionInterlockDelayDown     : TIME := T#400ms;   // Delai interlock changement de sens descente
+
+    // === CADENCE DE RAMPE PALIER ===
+    StepRampDelay                   : TIME := T#1000ms;  // [cible] Tempo de rampe palier (usage aval)
+    StepRampDelayAscent             : TIME := T#1000ms;  // [08a] Cadence palier montee (D10, dedie)
+    StepRampDelayDescente           : TIME := T#500ms;   // [08a] Cadence palier descente (D10, dedie)
+
+    // === RETOMBÃ‰E CONTACTEURS ===
+    ContactorFeedbackTimeout        : TIME := T#500ms;   // Delai d&#x27;attente retombee des contacteurs
+
+    // === RALENTISSEMENT BORDURE ===
+    SlowdownDistance_M              : REAL := 1.0;   // Distance d&#x27;approche avant limite pour ralentir (m)
+    SlowdownMaxStep                 : INT := 1;      // Plafond palier dans zone de ralentissement (1..5)
+
+    // === DÃ‰CODAGE %â†’PALIER (conservÃ©) ===
+    SpeedStepHystMargin             : REAL := 2.0;   // [08a] Marge d&#x27;hysteresis palier (%)
+END_STRUCT
+END_TYPE
+
+
 </pre>
             </details>
             <details>
@@ -2478,7 +2562,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 7 : Méca A dérive à l&#x27;arrêt (latched)
     DriftGuardA(
-        Arm        := NOT (BypassSafety OR BypassMecaA) AND JoystickYNeutral AND NOT BenneHoldStillActive,
+        Arm        := NOT (BypassSafety OR BypassMecaA) AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT BenneHoldStillActive,
         PositionM  := CablePosM,
         ToleranceM := UncommandedDriftToleranceM
     );
@@ -2633,7 +2717,10 @@ AscentPermit := NOT (
     (((Fault.ErrorId AND 16#0020) &lt;&gt; 16#0000
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
-    OR ((Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM)) AND NOT BypassTopLimitSoftware)
+    // TopLimitM porte deja la relaxation 7,5-&gt;8,5 m (override N1 / bypass N2, bornee par la
+    // bande de ralentissement, PRG_04 TopLimitM1_M/TopLimitM2_M) : la butee logicielle reste
+    // active a la valeur relevee. Bypasser le logiciel releve la butee, il ne la supprime pas.
+    OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM))
 );
 
 PowerCutOff := (Fault.ErrorId AND 16#2F84) &lt;&gt; 16#0000;
@@ -2813,8 +2900,10 @@ END_FUNCTION_BLOCK
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage d&#x27;un treuil individuel (contacteurs de sens et de vitesse)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop)
+   🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop via DriveRequest)
    🔒 Sécurité : Interlock inversion de sens et gestion des autorisations
+   🔧 Interface plate → structs (DriveRequest / Sensors / Config),
+      logique interne conservée (comportement bit-identique).
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Winch
@@ -2822,40 +2911,21 @@ VAR_INPUT
     // === COMMANDES ET CONSIGNES ===
     Enable                          : BOOL;                           // --&gt; [CMD] Autorisation generale FB (TRUE=Autorise)
     Reset                           : BOOL;                           // --&gt; [CMD] Acquittement defaut (front)
-    StartStop                       : BOOL;                           // --&gt; [CMD] Ordre de marche/arret mouvement
-    Direction                       : INT;                            // --&gt; [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)
-    SpeedTgt_Pct                    : REAL;                           // --&gt; [CMD] Vitesse cible % (0.0 a 100.0)
+    PowerContactorEngaged           : BOOL;                           // --&gt; [SAFE] Statut contacteur de ligne / puissance
+
+    // === REQUÊTE D&#x27;AXE (struct) ===
+    DriveRequest                    : ST_fbWinch_DriveRequest;         // --&gt; [REQ] Ordre, palier, bornes et limites effectives
+
+    // === MESURES ET FEEDBACKS (struct) ===
+    Sensors                         : ST_fbWinch_Sensors;             // --&gt; [HW] Position, referencement, contacteurs, vitesse
+
+    // === CONFIGURATION STATIQUE (struct) ===
+    Config                          : ST_fbWinch_Cfg;                 // --&gt; [CFG] Table paliers, delais, ralentissement
 
     // === SECOURS ET PERMIS DE SÉCURITÉ ===
     SafeStop                        : BOOL;                           // --&gt; [SAFE] Arret rapide de securite
     DescendPermit                   : BOOL := TRUE;                  // --&gt; [SAFE] Permis de descente (mou de cable)
     AscentPermit                    : BOOL := TRUE;                  // --&gt; [SAFE] Permis de montee (fin de course haut)
-    PowerContactorEngaged           : BOOL;                           // --&gt; [SAFE] Statut contacteur de ligne / puissance
-
-    // === REGLAGES ET CONFIGURATION ===
-    SpeedStepTable                  : ST_SpeedStepTable;              // --&gt; [CFG] Table de seuils des paliers de vitesse
-    CfgMaxStepDescente              : INT := 3;                       // --&gt; [CFG] Plafond palier en descente (1..5)
-    MaxStepAscent                   : INT := 5;                       // --&gt; [CFG] Plafond palier en montee (1..5)
-    HomingApproachActive            : BOOL;                           // --&gt; [CFG] Vitesse limitee au palier 1 (approche homing)
-    SpeedStepHystMargin             : REAL := 2.0;                    // --&gt; [CFG] Marge d&#x27;hysteresis palier (%)
-    DirectionInterlockDelayDescent  : TIME := T#400ms;                // --&gt; [CFG] Delai interlock changement de sens descente
-    DirectionInterlockDelayAscent   : TIME := T#900ms;                // --&gt; [CFG] Delai interlock changement de sens montee
-    StepRampDelayAscent             : TIME := T#1000ms;               // --&gt; [CFG] Cadence palier montee (D10, dedie)
-    StepRampDelayDescente            : TIME := T#500ms;                // --&gt; [CFG] Cadence palier descente (D10, dedie)
-    ContactorFeedbackTimeout        : TIME := T#500ms;                // --&gt; [CFG] Delai d&#x27;attente retombee des contacteurs
-    TopLimitM                       : REAL := 8.5;                    // --&gt; [CFG] Position limite haute active (m)
-    BottomLimitM                    : REAL := -20.0;                  // --&gt; [CFG] Position limite basse active (m)
-    CfgSlowdownDistanceM            : REAL := 1.0;                    // --&gt; [CFG] Distance d&#x27;approche avant limite pour ralentir (m)
-    CfgSlowdownMaxStep              : INT := 1;                       // --&gt; [CFG] Plafond palier dans zone de ralentissement (1..5)
-
-    // === MESURES ET FEEDBACKS SENSORS ===
-    FwdRevSpeedFeedbackOff          : BOOL;                           // --&gt; [HW] Retour unique contacteurs sens+vitesse retombes
-    Homed                           : BOOL;                           // --&gt; [HW] Statut treuil reference
-    HomingSuspect                   : BOOL;                           // --&gt; [HW] Incertitude / doute sur le referencement
-    CablePosM                       : REAL;                           // --&gt; [HW] Position actuelle du cable (m)
-    MeasuredSpeedBand               : INT := 0;                       // --&gt; [HW] Bande vitesse reelle validee
-    SpeedGuardEnable                : BOOL := TRUE;                   // --&gt; [HW] Activation garde-fou changement de palier
-    SpeedGuardReady                 : BOOL := FALSE;                  // --&gt; [HW] Conditions de stabilite validees
 
     // === BYPASSES ET SIMULATION ===
     BypassContactorCheck            : BOOL;                           // --&gt; [TST] Bypass diagnostic contacteurs (simu)
@@ -2953,11 +3023,11 @@ Fault := instFault.Fault;
 {region &quot;§2 Gate neutralisation&quot;}
 // 🛑 2. GATE
 IF NOT Enable THEN
-    SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := SpeedStepTable);
+    SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := Config.SpeedStepTable);
     DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqDirection := 0,
-                       ChangeDelayUp := DirectionInterlockDelayAscent,
-                       ChangeDelayDown := DirectionInterlockDelayDescent);
-    StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := StepRampDelayAscent);
+                       ChangeDelayUp := Config.DirectionInterlockDelayUp,
+                       ChangeDelayDown := Config.DirectionInterlockDelayDown);
+    StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := Config.StepRampDelayAscent);
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -2967,7 +3037,7 @@ IF NOT Enable THEN
     DirectionChangePending := DirectionInterlock.DirectionChangePending;
     TonContactorsDropped(IN := FALSE);
     ContactorsCheck.Command := FALSE;
-    ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
+    ContactorsCheck.Feedback := NOT Sensors.ContactorsAllOff;
     InTopSlowdownZone := FALSE;
     InBottomSlowdownZone := FALSE;
     Ready := FALSE;
@@ -2978,26 +3048,26 @@ Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region &quot;§3 Permis et zones de ralentissement&quot;}
-EffectiveSafeStop := SafeStop OR (Direction &gt; 0 AND NOT AscentPermit) OR (Direction &lt; 0 AND NOT DescendPermit);
+EffectiveSafeStop := SafeStop OR (DriveRequest.Direction &gt; 0 AND NOT AscentPermit) OR (DriveRequest.Direction &lt; 0 AND NOT DescendPermit);
 
-InTopSlowdownZone := Homed AND NOT HomingSuspect AND (CablePosM &gt;= (TopLimitM - CfgSlowdownDistanceM));
-InBottomSlowdownZone := Homed AND NOT HomingSuspect AND (CablePosM &lt;= (BottomLimitM + CfgSlowdownDistanceM));
+InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &gt;= (DriveRequest.TopLimitM - Config.SlowdownDistance_M));
+InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &lt;= (DriveRequest.BottomLimitM + Config.SlowdownDistance_M));
 
-IF Direction &gt; 0 THEN
-    ActiveMaxStep := MaxStepAscent;
+IF DriveRequest.Direction &gt; 0 THEN
+    ActiveMaxStep := DriveRequest.MaxStepUp;
     IF InTopSlowdownZone THEN
-        ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
+        ActiveMaxStep := MIN(ActiveMaxStep, Config.SlowdownMaxStep);
     END_IF;
-ELSIF Direction &lt; 0 THEN
-    ActiveMaxStep := CfgMaxStepDescente;
+ELSIF DriveRequest.Direction &lt; 0 THEN
+    ActiveMaxStep := DriveRequest.MaxStepDown;
     IF InBottomSlowdownZone THEN
-        ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
+        ActiveMaxStep := MIN(ActiveMaxStep, Config.SlowdownMaxStep);
     END_IF;
 ELSE
-    ActiveMaxStep := MaxStepAscent;
+    ActiveMaxStep := DriveRequest.MaxStepUp;
 END_IF;
 
-IF HomingApproachActive THEN
+IF DriveRequest.HomingApproachActive THEN
     ActiveMaxStep := 1;
 END_IF;
 {endregion}
@@ -3005,12 +3075,12 @@ END_IF;
 {region &quot;§4 Interlock direction&quot;}
 // 🔀 4. INTERLOCK DIRECTION (extrait dans FB_WinchDirectionInterlock, D18)
 DirectionInterlock(
-    Enable := (StepNumber = 0) AND FwdRevSpeedFeedbackOff,
+    Enable := (StepNumber = 0) AND Sensors.ContactorsAllOff,
     EnableRising := EnableRisingEdge.Q,
     Reset := Reset,
-    ReqDirection := Direction,
-    ChangeDelayUp := DirectionInterlockDelayAscent,
-    ChangeDelayDown := DirectionInterlockDelayDescent
+    ReqDirection := DriveRequest.Direction,
+    ChangeDelayUp := Config.DirectionInterlockDelayUp,
+    ChangeDelayDown := Config.DirectionInterlockDelayDown
 );
 CommandedDirection := DirectionInterlock.CommandedDirection;
 DirectionChangePending := DirectionInterlock.DirectionChangePending;
@@ -3018,18 +3088,18 @@ DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
 {region &quot;§5 Paliers vitesse et contacteurs&quot;}
-IF DirectionChangePending OR (Direction = 0) OR EffectiveSafeStop OR NOT StartStop THEN
+IF DirectionChangePending OR (DriveRequest.Direction = 0) OR EffectiveSafeStop OR NOT DriveRequest.StartStop THEN
     RampTargetPct := 0.0;
 ELSE
-    RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
+    RampTargetPct := LIMIT(0.0, DriveRequest.SpeedTgt_Pct, 100.0);
 END_IF;
 
 // Décodage consigne % -&gt; palier conservé ici, immédiatement en amont du
 // décodeur contacteurs. FB_SpeedStep ne reçoit plus que le palier discret.
-SpeedStepHyst1(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[1] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[1] - SpeedStepHystMargin));
-SpeedStepHyst2(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[2] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[2] - SpeedStepHystMargin));
-SpeedStepHyst3(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[3] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[3] - SpeedStepHystMargin));
-SpeedStepHyst4(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[4] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[4] - SpeedStepHystMargin));
+SpeedStepHyst1(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[1] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[1] - Config.SpeedStepHystMargin));
+SpeedStepHyst2(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[2] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[2] - Config.SpeedStepHystMargin));
+SpeedStepHyst3(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[3] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[3] - Config.SpeedStepHystMargin));
+SpeedStepHyst4(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[4] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[4] - Config.SpeedStepHystMargin));
 
 IF RampTargetPct &lt;= 0.1 THEN
     RampTargetStep := 0;
@@ -3044,7 +3114,7 @@ END_IF;
 SpeedStep(
     Enable := (RampTargetPct &gt; 0.1),
     SpeedStepReq := RampTargetStep,
-    Table := SpeedStepTable,
+    Table := Config.SpeedStepTable,
     MaxStepNumber := ActiveMaxStep
 );
 RequestedStep := SpeedStep.StepNumber;
@@ -3053,15 +3123,31 @@ RequestedStep := SpeedStep.StepNumber;
 // (SpeedGuardReady=FALSE -&gt; palier 1) ou si la bande mesuree est inferieure au
 // palier demande (pas de passage aux paliers superieurs sans vitesse confirmee).
 SpeedGuardLimited := FALSE;
-IF SpeedGuardEnable THEN
-    IF NOT SpeedGuardReady THEN
+IF Sensors.SpeedGuardEnable THEN
+    IF NOT Sensors.SpeedGuardReady THEN
         IF RequestedStep &gt; 1 THEN
             RequestedStep := 1;
             SpeedGuardLimited := TRUE;
         END_IF;
-    ELSIF (MeasuredSpeedBand &gt;= 1) AND (MeasuredSpeedBand &lt;= 5) AND (RequestedStep &gt; MeasuredSpeedBand) THEN
-        RequestedStep := MeasuredSpeedBand;
+    ELSIF (Sensors.MeasuredSpeedBand &gt;= 1) AND (Sensors.MeasuredSpeedBand &lt;= 5) AND (RequestedStep &gt; Sensors.MeasuredSpeedBand) THEN
+        RequestedStep := Sensors.MeasuredSpeedBand;
         SpeedGuardLimited := TRUE;
+    END_IF;
+END_IF;
+
+// 🤿 Plancher palier descente -- plongee Kobold.
+// Injecte MinStepDown sur la CIBLE (RequestedStep, consommee par le shaper ci-dessous),
+// JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
+// (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -&gt; aucun plancher,
+// l&#x27;arret franc RequestedStep=0 / RampTargetPct=0 est preserve.
+// Regle d&#x27;agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
+// ActiveMaxStep (ex. SlowdownMaxStep -&gt; palier 1 en bordure basse), on borne au plafond.
+IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown &gt; 0) THEN
+    IF RequestedStep &lt; DriveRequest.MinStepDown THEN
+        RequestedStep := DriveRequest.MinStepDown;
+    END_IF;
+    IF RequestedStep &gt; ActiveMaxStep THEN
+        RequestedStep := ActiveMaxStep;
     END_IF;
 END_IF;
 
@@ -3069,9 +3155,9 @@ END_IF;
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d&#x27;interlock direction : 1 s en montee, 500 ms en descente.
 IF CommandedDirection = -1 THEN
-    EffectiveStepRampDelay := StepRampDelayDescente;
+    EffectiveStepRampDelay := Config.StepRampDelayDescente;
 ELSE
-    EffectiveStepRampDelay := StepRampDelayAscent;
+    EffectiveStepRampDelay := Config.StepRampDelayAscent;
 END_IF;
 StepShaper(
     Enable := Enable,
@@ -3101,8 +3187,8 @@ AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);
 
 ContactorsCheck.Command  := NOT AllContactorsCommandedOff;
-ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
-TonContactorsDropped(IN := FALSE, PT := ContactorFeedbackTimeout);
+ContactorsCheck.Feedback := NOT Sensors.ContactorsAllOff;
+TonContactorsDropped(IN := FALSE, PT := Config.ContactorFeedbackTimeout);
 ContactorsCheck.StuckClosed := FALSE; // force a FALSE (Phase 0) : detection contacteur colle produite par FB_Safety_Winch, re-alimentee a la phase suivante
 ContactorsCheck.StuckOpen := FALSE;
 

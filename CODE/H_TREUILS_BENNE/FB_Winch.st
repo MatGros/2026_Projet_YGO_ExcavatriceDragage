@@ -3,8 +3,10 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage d'un treuil individuel (contacteurs de sens et de vitesse)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop)
+   🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop via DriveRequest)
    🔒 Sécurité : Interlock inversion de sens et gestion des autorisations
+   🔧 Interface plate → structs (DriveRequest / Sensors / Config),
+      logique interne conservée (comportement bit-identique).
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Winch
@@ -12,41 +14,21 @@ VAR_INPUT
     // === COMMANDES ET CONSIGNES ===
     Enable                          : BOOL;                           // --> [CMD] Autorisation generale FB (TRUE=Autorise)
     Reset                           : BOOL;                           // --> [CMD] Acquittement defaut (front)
-    StartStop                       : BOOL;                           // --> [CMD] Ordre de marche/arret mouvement
-    Direction                       : INT;                            // --> [CMD] Sens demande (-1: Descente, 0: Stop, 1: Montee)
-    SpeedTgt_Pct                    : REAL;                           // --> [CMD] Vitesse cible % (0.0 a 100.0)
+    PowerContactorEngaged           : BOOL;                           // --> [SAFE] Statut contacteur de ligne / puissance
+
+    // === REQUÊTE D'AXE (struct) ===
+    DriveRequest                    : ST_fbWinch_DriveRequest;         // --> [REQ] Ordre, palier, bornes et limites effectives
+
+    // === MESURES ET FEEDBACKS (struct) ===
+    Sensors                         : ST_fbWinch_Sensors;             // --> [HW] Position, referencement, contacteurs, vitesse
+
+    // === CONFIGURATION STATIQUE (struct) ===
+    Config                          : ST_fbWinch_Cfg;                 // --> [CFG] Table paliers, delais, ralentissement
 
     // === SECOURS ET PERMIS DE SÉCURITÉ ===
     SafeStop                        : BOOL;                           // --> [SAFE] Arret rapide de securite
     DescendPermit                   : BOOL := TRUE;                  // --> [SAFE] Permis de descente (mou de cable)
     AscentPermit                    : BOOL := TRUE;                  // --> [SAFE] Permis de montee (fin de course haut)
-    PowerContactorEngaged           : BOOL;                           // --> [SAFE] Statut contacteur de ligne / puissance
-
-    // === REGLAGES ET CONFIGURATION ===
-    SpeedStepTable                  : ST_SpeedStepTable;              // --> [CFG] Table de seuils des paliers de vitesse
-    CfgMaxStepDescente              : INT := 3;                       // --> [CFG] Plafond palier en descente (1..5)
-    MaxStepAscent                   : INT := 5;                       // --> [CFG] Plafond palier en montee (1..5)
-    HomingApproachActive            : BOOL;                           // --> [CFG] Vitesse limitee au palier 1 (approche homing)
-    SpeedStepHystMargin             : REAL := 2.0;                    // --> [CFG] Marge d'hysteresis palier (%)
-    DirectionInterlockDelayDescent  : TIME := T#400ms;                // --> [CFG] Delai interlock changement de sens descente
-    DirectionInterlockDelayAscent   : TIME := T#900ms;                // --> [CFG] Delai interlock changement de sens montee
-    StepRampDelayAscent             : TIME := T#1000ms;               // --> [CFG] Cadence palier montee (D10, dedie)
-    StepRampDelayDescente            : TIME := T#500ms;                // --> [CFG] Cadence palier descente (D10, dedie)
-    ContactorFeedbackTimeout        : TIME := T#500ms;                // --> [CFG] Delai d'attente retombee des contacteurs
-    TopLimitM                       : REAL := 8.5;                    // --> [CFG] Position limite haute active (m)
-    BottomLimitM                    : REAL := -20.0;                  // --> [CFG] Position limite basse active (m)
-    CfgSlowdownDistanceM            : REAL := 1.0;                    // --> [CFG] Distance d'approche avant limite pour ralentir (m)
-    CfgSlowdownMaxStep              : INT := 1;                       // --> [CFG] Plafond palier dans zone de ralentissement (1..5)
-    MinStepDown                     : INT := 0;                       // --> [CFG] Plancher palier en descente impose (0 = aucun) -- plongee Kobold
-
-    // === MESURES ET FEEDBACKS SENSORS ===
-    FwdRevSpeedFeedbackOff          : BOOL;                           // --> [HW] Retour unique contacteurs sens+vitesse retombes
-    Homed                           : BOOL;                           // --> [HW] Statut treuil reference
-    HomingSuspect                   : BOOL;                           // --> [HW] Incertitude / doute sur le referencement
-    CablePosM                       : REAL;                           // --> [HW] Position actuelle du cable (m)
-    MeasuredSpeedBand               : INT := 0;                       // --> [HW] Bande vitesse reelle validee
-    SpeedGuardEnable                : BOOL := TRUE;                   // --> [HW] Activation garde-fou changement de palier
-    SpeedGuardReady                 : BOOL := FALSE;                  // --> [HW] Conditions de stabilite validees
 
     // === BYPASSES ET SIMULATION ===
     BypassContactorCheck            : BOOL;                           // --> [TST] Bypass diagnostic contacteurs (simu)
@@ -144,11 +126,11 @@ Fault := instFault.Fault;
 {region "§2 Gate neutralisation"}
 // 🛑 2. GATE
 IF NOT Enable THEN
-    SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := SpeedStepTable);
+    SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := Config.SpeedStepTable);
     DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqDirection := 0,
-                       ChangeDelayUp := DirectionInterlockDelayAscent,
-                       ChangeDelayDown := DirectionInterlockDelayDescent);
-    StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := StepRampDelayAscent);
+                       ChangeDelayUp := Config.DirectionInterlockDelayUp,
+                       ChangeDelayDown := Config.DirectionInterlockDelayDown);
+    StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := Config.StepRampDelayAscent);
     RelayFwd := FALSE;
     RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -158,7 +140,7 @@ IF NOT Enable THEN
     DirectionChangePending := DirectionInterlock.DirectionChangePending;
     TonContactorsDropped(IN := FALSE);
     ContactorsCheck.Command := FALSE;
-    ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
+    ContactorsCheck.Feedback := NOT Sensors.ContactorsAllOff;
     InTopSlowdownZone := FALSE;
     InBottomSlowdownZone := FALSE;
     Ready := FALSE;
@@ -169,26 +151,26 @@ Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region "§3 Permis et zones de ralentissement"}
-EffectiveSafeStop := SafeStop OR (Direction > 0 AND NOT AscentPermit) OR (Direction < 0 AND NOT DescendPermit);
+EffectiveSafeStop := SafeStop OR (DriveRequest.Direction > 0 AND NOT AscentPermit) OR (DriveRequest.Direction < 0 AND NOT DescendPermit);
 
-InTopSlowdownZone := Homed AND NOT HomingSuspect AND (CablePosM >= (TopLimitM - CfgSlowdownDistanceM));
-InBottomSlowdownZone := Homed AND NOT HomingSuspect AND (CablePosM <= (BottomLimitM + CfgSlowdownDistanceM));
+InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM >= (DriveRequest.TopLimitM - Config.SlowdownDistance_M));
+InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM <= (DriveRequest.BottomLimitM + Config.SlowdownDistance_M));
 
-IF Direction > 0 THEN
-    ActiveMaxStep := MaxStepAscent;
+IF DriveRequest.Direction > 0 THEN
+    ActiveMaxStep := DriveRequest.MaxStepUp;
     IF InTopSlowdownZone THEN
-        ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
+        ActiveMaxStep := MIN(ActiveMaxStep, Config.SlowdownMaxStep);
     END_IF;
-ELSIF Direction < 0 THEN
-    ActiveMaxStep := CfgMaxStepDescente;
+ELSIF DriveRequest.Direction < 0 THEN
+    ActiveMaxStep := DriveRequest.MaxStepDown;
     IF InBottomSlowdownZone THEN
-        ActiveMaxStep := MIN(ActiveMaxStep, CfgSlowdownMaxStep);
+        ActiveMaxStep := MIN(ActiveMaxStep, Config.SlowdownMaxStep);
     END_IF;
 ELSE
-    ActiveMaxStep := MaxStepAscent;
+    ActiveMaxStep := DriveRequest.MaxStepUp;
 END_IF;
 
-IF HomingApproachActive THEN
+IF DriveRequest.HomingApproachActive THEN
     ActiveMaxStep := 1;
 END_IF;
 {endregion}
@@ -196,12 +178,12 @@ END_IF;
 {region "§4 Interlock direction"}
 // 🔀 4. INTERLOCK DIRECTION (extrait dans FB_WinchDirectionInterlock, D18)
 DirectionInterlock(
-    Enable := (StepNumber = 0) AND FwdRevSpeedFeedbackOff,
+    Enable := (StepNumber = 0) AND Sensors.ContactorsAllOff,
     EnableRising := EnableRisingEdge.Q,
     Reset := Reset,
-    ReqDirection := Direction,
-    ChangeDelayUp := DirectionInterlockDelayAscent,
-    ChangeDelayDown := DirectionInterlockDelayDescent
+    ReqDirection := DriveRequest.Direction,
+    ChangeDelayUp := Config.DirectionInterlockDelayUp,
+    ChangeDelayDown := Config.DirectionInterlockDelayDown
 );
 CommandedDirection := DirectionInterlock.CommandedDirection;
 DirectionChangePending := DirectionInterlock.DirectionChangePending;
@@ -209,18 +191,18 @@ DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
 {region "§5 Paliers vitesse et contacteurs"}
-IF DirectionChangePending OR (Direction = 0) OR EffectiveSafeStop OR NOT StartStop THEN
+IF DirectionChangePending OR (DriveRequest.Direction = 0) OR EffectiveSafeStop OR NOT DriveRequest.StartStop THEN
     RampTargetPct := 0.0;
 ELSE
-    RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
+    RampTargetPct := LIMIT(0.0, DriveRequest.SpeedTgt_Pct, 100.0);
 END_IF;
 
 // Décodage consigne % -> palier conservé ici, immédiatement en amont du
 // décodeur contacteurs. FB_SpeedStep ne reçoit plus que le palier discret.
-SpeedStepHyst1(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[1] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[1] - SpeedStepHystMargin));
-SpeedStepHyst2(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[2] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[2] - SpeedStepHystMargin));
-SpeedStepHyst3(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[3] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[3] - SpeedStepHystMargin));
-SpeedStepHyst4(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[4] + SpeedStepHystMargin), LOW := REAL_TO_INT(SpeedStepTable.StepThreshold_Pct[4] - SpeedStepHystMargin));
+SpeedStepHyst1(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[1] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[1] - Config.SpeedStepHystMargin));
+SpeedStepHyst2(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[2] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[2] - Config.SpeedStepHystMargin));
+SpeedStepHyst3(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[3] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[3] - Config.SpeedStepHystMargin));
+SpeedStepHyst4(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[4] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[4] - Config.SpeedStepHystMargin));
 
 IF RampTargetPct <= 0.1 THEN
     RampTargetStep := 0;
@@ -235,7 +217,7 @@ END_IF;
 SpeedStep(
     Enable := (RampTargetPct > 0.1),
     SpeedStepReq := RampTargetStep,
-    Table := SpeedStepTable,
+    Table := Config.SpeedStepTable,
     MaxStepNumber := ActiveMaxStep
 );
 RequestedStep := SpeedStep.StepNumber;
@@ -244,14 +226,14 @@ RequestedStep := SpeedStep.StepNumber;
 // (SpeedGuardReady=FALSE -> palier 1) ou si la bande mesuree est inferieure au
 // palier demande (pas de passage aux paliers superieurs sans vitesse confirmee).
 SpeedGuardLimited := FALSE;
-IF SpeedGuardEnable THEN
-    IF NOT SpeedGuardReady THEN
+IF Sensors.SpeedGuardEnable THEN
+    IF NOT Sensors.SpeedGuardReady THEN
         IF RequestedStep > 1 THEN
             RequestedStep := 1;
             SpeedGuardLimited := TRUE;
         END_IF;
-    ELSIF (MeasuredSpeedBand >= 1) AND (MeasuredSpeedBand <= 5) AND (RequestedStep > MeasuredSpeedBand) THEN
-        RequestedStep := MeasuredSpeedBand;
+    ELSIF (Sensors.MeasuredSpeedBand >= 1) AND (Sensors.MeasuredSpeedBand <= 5) AND (RequestedStep > Sensors.MeasuredSpeedBand) THEN
+        RequestedStep := Sensors.MeasuredSpeedBand;
         SpeedGuardLimited := TRUE;
     END_IF;
 END_IF;
@@ -263,9 +245,9 @@ END_IF;
 // l'arret franc RequestedStep=0 / RampTargetPct=0 est preserve.
 // Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
 // ActiveMaxStep (ex. SlowdownMaxStep -> palier 1 en bordure basse), on borne au plafond.
-IF StartStop AND (Direction = -1) AND (MinStepDown > 0) THEN
-    IF RequestedStep < MinStepDown THEN
-        RequestedStep := MinStepDown;
+IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown > 0) THEN
+    IF RequestedStep < DriveRequest.MinStepDown THEN
+        RequestedStep := DriveRequest.MinStepDown;
     END_IF;
     IF RequestedStep > ActiveMaxStep THEN
         RequestedStep := ActiveMaxStep;
@@ -276,9 +258,9 @@ END_IF;
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
 IF CommandedDirection = -1 THEN
-    EffectiveStepRampDelay := StepRampDelayDescente;
+    EffectiveStepRampDelay := Config.StepRampDelayDescente;
 ELSE
-    EffectiveStepRampDelay := StepRampDelayAscent;
+    EffectiveStepRampDelay := Config.StepRampDelayAscent;
 END_IF;
 StepShaper(
     Enable := Enable,
@@ -308,8 +290,8 @@ AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);
 
 ContactorsCheck.Command  := NOT AllContactorsCommandedOff;
-ContactorsCheck.Feedback := NOT FwdRevSpeedFeedbackOff;
-TonContactorsDropped(IN := FALSE, PT := ContactorFeedbackTimeout);
+ContactorsCheck.Feedback := NOT Sensors.ContactorsAllOff;
+TonContactorsDropped(IN := FALSE, PT := Config.ContactorFeedbackTimeout);
 ContactorsCheck.StuckClosed := FALSE; // force a FALSE (Phase 0) : detection contacteur colle produite par FB_Safety_Winch, re-alimentee a la phase suivante
 ContactorsCheck.StuckOpen := FALSE;
 

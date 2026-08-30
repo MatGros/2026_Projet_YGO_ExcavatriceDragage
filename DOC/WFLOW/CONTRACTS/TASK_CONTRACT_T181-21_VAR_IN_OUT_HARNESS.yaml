@@ -1,0 +1,48 @@
+# Contrat T181-21 — STruCpp : restitution correcte des VAR_IN_OUT de tests
+
+contract:
+  task_id: T181-21_VAR_IN_OUT_HARNESS
+  criticality: C2
+  strategy: patch
+  objective: >
+    Le générateur de harnais STruCpp restitue toute VAR_IN_OUT modifiée par un FB
+    à la variable de test après l'appel du FB, comme en CODESYS. Cette évolution débloque
+    la preuve persistante de T181-15/T181-16.
+  acceptance:
+    - id: AC1
+      statement: "Après chaque appel FB, toute VAR_IN_OUT est copiée du membre d'instance vers la variable de test correspondante."
+      verified_by: "test généré minimal : une FB écrit VAR_IN_OUT, assertion test lit la valeur écrite."
+    - id: AC2
+      statement: "Les paramètres VAR_INPUT/VAR_OUTPUT existants ne changent pas de sens ni de comportement."
+      verified_by: "suite tests compilateur existante."
+    - id: AC3
+      statement: "Les tests FB_Bucket et FB_WinchSpeedLearning peuvent vérifier leurs structures persistantes sans copy-out manuel par scénario."
+      verified_by: "exécution des suites concernées."
+  scope:
+    allowed:
+      - TOOLS/COMPILER_ST2C_STruCpp/**
+      - TOOLS/TEST_AUTO_CI/**
+    forbidden:
+      - CODE/**
+      - DOC/WFLOW/TASKS.yaml # orchestration: cloture validee par l'utilisateur
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  evidence_required:
+    - "run_tests.py --fb FB_WinchSpeedLearning : 9/9 PASS"
+    - "run_tests.py --fb FB_Bucket : preuve T181-21 copy-out PASS ; TC-P10-047.2 rouge sécurité hors lot identifié"
+  alert_duty: >
+    Si le générateur ne peut pas identifier sans ambiguïté la variable test liée à une
+    VAR_IN_OUT, ne pas produire un copy-out heuristique : remonter avec l'extrait généré.
+
+status: VERIFIED
+execution:
+  executed_by: "Agent externe T181-21 + revue orchestrateur"
+  completed_at: "2026-08-30T16:30:00+02:00"
+  status: DELIVERED
+  evidence_submitted:
+    - "FB_WinchSpeedLearning : 9/9 PASS (2026-08-30)."
+    - "FB_Bucket : T181-21 Copy-out VAR_IN_OUT PASS sans recopie manuelle (2026-08-30)."
+validation:
+  status: APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-08-30T16:30:00+02:00"
+  notes: "Cloture explicite utilisateur. Gates globaux reportes au jalon d'integration T181."

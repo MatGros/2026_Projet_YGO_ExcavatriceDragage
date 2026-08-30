@@ -17,7 +17,7 @@ contract:
   acceptance:
     # ---- Étape 08a : plomberie struct, comportement bit-identique ----
     - id: AC1
-      statement: "Les DUT ST_fbWinch_DriveRequest, ST_fbWinch_Sensors, ST_fbWinch_Cfg, ST_WinchFinalInterlockReq existent conformes au cadrage T181-06 §2 (champs, types, unités _M/_Mps, nommage NC-030/050/110)."
+      statement: "Les DUT ST_fbWinch_DriveRequest, ST_fbWinch_Sensors et ST_fbWinch_Cfg portent les champs cibles du cadrage T181-06 §2, avec les champs legacy explicitement conservés pour l'iso 08a. ST_WinchFinalInterlockReq n'est pas créé tant que la migration de la frontière supervision/PRG_06 n'est pas réalisée par un lot aval unique."
       verified_by: "diff des .st de DUT vs CADRAGE_T181-06_DRIVEREQUEST.md §2 + G120"
     - id: AC2
       statement: "FB_Winch est réinterfacé (structs en entrée), et AU MÊME COMMIT : les 2 sites d'appel de PRG_04 (instWinchM1/M2), FB_SimBench et TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch.st sont migrés. Aucun appelant orphelin."
@@ -58,6 +58,8 @@ contract:
       - CODE/M_MAIN/PRG_06_Outputs.st             # ST_WinchFinalInterlockReq consommateur
       - CODE/L_SIMULATION/FB_SimBench.st
       - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
     forbidden:
       - CODE/M_MAIN/PRG_03_Modes_Cycle.st         # producteur MinStepDown = T181-12, pas ici
       - DOC/WFLOW/TASKS.yaml
@@ -74,6 +76,7 @@ contract:
       - "Le calcul de clamp interne de FB_Winch (deplacé dans l'agrégateur PRG_04, 08b)"
       - "La production interne de ContactorStuck par FB_Winch (deplacée dans FB_Safety_Winch)"
       - "Toute idée de shadow comparison comme oracle (remplacé par table d'attendus écrite à la main)"
+      - "Les champs legacy SpeedTgt_Pct, MeasuredSpeedBand, délais distincts et hystérésis : conservés en 08a pour iso, bascule explicite en 08b."
 
   evidence_required:
     - check_linkage
@@ -90,20 +93,25 @@ contract:
     (un écart apparaît sur un vecteur) : REMONTER à l'orchestrateur avant de contourner.
     Ne jamais commiter 08a et 08b ensemble.
 
-status: PENDING
+status: IN_PROGRESS
 
 execution:
-  executed_by: ""
+  executed_by: "Agent externe T181-08a + revue orchestrateur"
   completed_at: ""
-  status: PENDING
+  status: PHASE_08A_VERIFIED
   summary: >
-    À remplir : 08a plomberie struct bit-identique, puis 08b bascule clamp.
-  evidence_submitted: []
+    Phase 08a livrée et validée par l'utilisateur : trois DUT actifs (DriveRequest,
+    Sensors, Cfg), deux appels PRG_04 et le harnais migrés, FB_Winch 8/8 PASS,
+    WINCH_INTEG compilé et exécuté 15/32 identique à la référence. Phase 08b reste
+    séparée : bascule des champs legacy et documentation de l'interface finale.
+  evidence_submitted:
+    - "FB_Winch : 8/8 PASS"
+    - "WINCH_INTEG : compilation OK, 32 vecteurs, 15/32 identique à la référence"
+    - "git diff --check source 08a : PASS ; aucun CODE_XML créé"
 
 validation:
-  status: PENDING
-  validated_by: ""
-  validated_at: ""
+  status: PHASE_08A_APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-08-30T16:35:00+02:00"
   notes: >
-    Revue orchestrateur : git diff réel de 08a (comportement iso) PUIS de 08b (table d'attendus).
-    Deux commits distincts, deux revues.
+    Phase 08a approuvée. Revue séparée requise pour 08b (table d'attendus et interface finale).

@@ -232,6 +232,9 @@ FB_Winch:
     - CODE/A_COMMUN/FB_Brake.st
     - CODE/F_MODES/E_Mode.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_DriveRequest.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Sensors.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Cfg.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
     - CODE/H_TREUILS_BENNE/FB_SpeedStep.st
@@ -863,6 +866,9 @@ PRG_04_Treuils_Benne:
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
     - CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_DriveRequest.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Sensors.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Cfg.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_SpeedCfg.st
@@ -1100,6 +1106,9 @@ MAIN_GLOBAL:
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_DriveRequest.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Sensors.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Cfg.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st
 
@@ -1242,6 +1251,9 @@ WINCH_INTEG:
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
     - CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_DriveRequest.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Sensors.st
+    - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Cfg.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbCycle_BucketCmdDemand.st
 
@@ -1318,7 +1330,6 @@ WINCH_INTEG:
     - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_07.st
     - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_Main_EndToEnd.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st
-
 
 
 

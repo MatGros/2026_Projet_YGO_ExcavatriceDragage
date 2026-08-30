@@ -1,0 +1,82 @@
+# Contrat T183 — preset codeur centre-plage et garde anti-dépassement
+# Sources : AF_Partie-09_Fonction_Encoder_v2.4.md F09.01/F09.02/F09.08 ;
+# DECISION_ENCODER_PRESET_TRANSACTION.md ; TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md.
+
+contract:
+  task_id: T183_ENCODER_CENTRE_PLAGE
+  criticality: C3
+  strategy: patch
+  objective: >
+    Chaque homing M1/M2 charge le compteur absolu au centre de sa plage et
+    commit atomiquement la référence brute dans le référentiel post-preset,
+    uniquement après confirmation par relecture. Aucun consommateur de position
+    ne doit exploiter la mesure pendant la transaction de preset.
+
+  acceptance:
+    - id: AC1
+      statement: "FB_Encoder_Homing calcule CentrePts := (PointsPerRev * MultiTurnRevsMax) / 2, émet PresetValue = CentrePts et PendingHomingRefRaw = CentrePts - TargetPoints pour chaque chemin nominal, unitaire et dynamique."
+      verified_by: "tests unitaires homing couvrant les trois déclencheurs et lecture du corps exécutable."
+    - id: AC2
+      statement: "Homed et HomingRefRaw ne changent ensemble qu'après confirmation candidate CandidateCablePosM dans CST_HomingVerifyToleranceM ; un timeout ou un écart conserve la référence précédente et rend HomingSuspect actif."
+      verified_by: "TC-P09-070.1 succès, échec de relecture et front Reset sans réarmement automatique."
+    - id: AC3
+      statement: "FB_Sim_Encoder applique réellement PresetValue sans clamp à zéro ; un cycle complet descente-remontée autour des bornes ne produit ni wrap, ni CablePos_M aberrante, ni EncoderIncoherent."
+      verified_by: "TC-P09-070.2 sur modèle simulateur avec valeur proche d'une borne initiale."
+    - id: AC4
+      statement: "Le référencement dynamique M2 issu de la benne est refusé tant que M1.HomedAndReliable n'est pas TRUE ; aucune requête de preset ni écriture RETAIN ne part dans ce cas."
+      verified_by: "TC-P09-070.3 et lecture du gate PRG_02_Acquisition."
+    - id: AC5
+      statement: "Pendant la transaction preset, les états publics empêchent toute décision de mouvement fondée sur une position transitoire ; après succès, la position publiée retrouve la cible à ±0.010 m."
+      verified_by: "test intégration acquisition/homing et revue des consommateurs M1/M2."
+    - id: AC6
+      statement: "Les noms ajoutés respectent NC-030/NC-050 : unités _M ou _Pts explicites, états affirmatifs et aucune commande ambiguë."
+      verified_by: "G120 et revue des déclarations."
+    - id: AC7
+      statement: "Les fichiers POU modifiés sous CODE/M_MAIN ont un nom de fichier identique au nom de POU et le suffixe est identique au langage ST du bundle PLCopenXML."
+      verified_by: "contrôle structurel des POU et bundle."
+    - id: AC8
+      statement: "La validation sur codeur physique confirme la prise du preset PDO Rx et la relecture à la cible avant toute manœuvre réelle."
+      verified_by: "procès-verbal d'essai site humain, hors CI."
+
+  scope:
+    allowed:
+      - CODE/E_CODEURS/FB_Encoder.st
+      - CODE/E_CODEURS/FB_Encoder_Homing.st
+      - CODE/E_CODEURS/FB_Encoder_Abs.st
+      - CODE/E_CODEURS/_TYPES/**
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/L_SIMULATION/FB_Sim_Encoder.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/E_CODEURS/tests/**
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/**
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
+    forbidden:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/H_TREUILS_BENNE/**
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Reset reste un front d'acquittement : il ne valide jamais un preset et ne recrée jamais Homed."
+      - "Homed et HomingRefRaw RETAIN existants ne sont jamais déplacés dans GVL_PERSISTENT."
+      - "Aucun mouvement treuil n'est commandé par un FB codeur."
+      - "Les trois chemins existants de homing restent disponibles après migration."
+
+  evidence_required:
+    - "Tests ciblés FB_Encoder, FB_Encoder_Homing et modèle FB_Sim_Encoder."
+    - "Bundle + G200 + gates palier C au jalon d'intégration T181/T183."
+    - "Essai site humain PDO Rx obligatoire avant mouvement réel."
+
+  alert_duty: >
+    Si le codeur réel ne reflète pas PresetValue, si une cible post-preset est
+    incohérente, ou si un consommateur peut lire une position transitoire : arrêter
+    avant toute modification de sécurité aval et remonter avec le chemin précis.
+
+status: PENDING
+execution:
+  executed_by: ""
+  status: PENDING_HUMAN_GO
+validation:
+  status: PENDING
+  notes: "C3 : le code exige revue humaine du plan et essai matériel avant mouvement réel."

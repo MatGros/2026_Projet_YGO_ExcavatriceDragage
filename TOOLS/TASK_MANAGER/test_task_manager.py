@@ -10,6 +10,8 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[2]
 PORT = 8093
 BASE = f"http://127.0.0.1:{PORT}"
@@ -59,6 +61,29 @@ class TaskManagerApiTest(unittest.TestCase):
         self.assertGreaterEqual(reset["cleared"], 1)
         _, after = request("/api/tasks/json")
         self.assertEqual(revision, next(value for value in after if value["id"] == "T162")["revision"])
+
+    def test_broken_yaml_returns_precise_error(self):
+        """Regression REX 2026-08-30 : TASKS.yaml casse -> 500 avec ligne fautive, pas un message generique."""
+        tasks_path = ROOT / "DOC" / "WFLOW" / "TASKS.yaml"
+        original = tasks_path.read_text(encoding="utf-8")
+        # Meme defaut que la ligne 2775 historique : valeur non quotee contenant " : "
+        broken = original + "- id: T-TEST-ERR\n  agent: Codex — rework : bits saturés\n"
+        tasks_path.write_text(broken, encoding="utf-8")
+        try:
+            with self.assertRaises(HTTPError) as context:
+                request("/api/tasks/json")
+            self.assertEqual(context.exception.code, 500)
+            body = json.loads(context.exception.read().decode("utf-8"))
+            context.exception.close()
+            self.assertEqual(body.get("kind"), "data_error")
+            error = body["error"]
+            self.assertIn("ligne fautive", error)           # la ligne entiere est montree
+            self.assertIn("tache T-TEST-ERR", error)        # l'ID fautif est designe precisement
+            self.assertIn("rework : bits saturés", error)
+        finally:
+            tasks_path.write_text(original, encoding="utf-8")
+        _, status = request("/api/status")  # catalogue restaure : le serveur doit se retablir seul
+        self.assertEqual(status["status"], "ok")
 
 
 if __name__ == "__main__":

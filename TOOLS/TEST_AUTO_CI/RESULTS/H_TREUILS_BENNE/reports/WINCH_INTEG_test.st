@@ -56,7 +56,7 @@ TEST 'HARN-10 : Cycle semi-auto descente 50 pourcent -> palier 3 M1 ET M2, Relay
     modelSpeeds[3] := 0.9; modelSpeeds[4] := 1.4; modelSpeeds[5] := 2.0;
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
 
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
@@ -127,10 +127,10 @@ TEST 'HARN-10 : Cycle semi-auto descente 50 pourcent -> palier 3 M1 ET M2, Relay
     ASSERT_TRUE(machine.FinalInterlockGovernedM1 = FALSE, 'HARN-10: filet PRG_06 passif en nominal');
 END_TEST
 
-TEST 'HARN-11 : Extraction montee ForceMinSpeedStep -> plafond palier 1 M1 ET M2'
+TEST 'HARN-11 : Extraction montee ExtractionControlActive -> plafond palier 1 M1 ET M2'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -147,7 +147,7 @@ TEST 'HARN-11 : Extraction montee ForceMinSpeedStep -> plafond palier 1 M1 ET M2
     ASSERT_TRUE(machine.BusAcq.JoystickDeadmanArmed, 'HARN-11: precondition homme-mort arme');
     seqReqM1.ReqStartStop := TRUE; seqReqM1.ReqDirection := 1; seqReqM1.SpeedTgtPct := 100.0;
     seqReqM2.ReqStartStop := TRUE; seqReqM2.ReqDirection := 1; seqReqM2.SpeedTgtPct := 100.0;
-    seqReqBucket.ForceMinSpeedStep := TRUE;
+    seqReqBucket.ExtractionControlActive := TRUE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         ModelReloadPositions := FALSE,
         SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket,
@@ -167,15 +167,15 @@ TEST 'HARN-11 : Extraction montee ForceMinSpeedStep -> plafond palier 1 M1 ET M2
     ADVANCE_TIME(300000000); machine(CanBusOperational := TRUE, JoyOperational := TRUE, SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket, CmdMode := E_Mode.SEMI_AUTO, JoyRawX := 5000, JoyRawY := 4200, JoyDeadmanBtn := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
 
     (* ORACLE (main) : plafond ascension effectif = 1 sur M1 ET M2 malgré demande 100 % *)
-    ASSERT_EQ(machine.M1_StepNumber, 1, 'HARN-11: M1 plafonne palier 1 (ForceMinSpeedStep)');
-    ASSERT_EQ(machine.M2_StepNumber, 1, 'HARN-11: M2 plafonne palier 1 (ForceMinSpeedStep)');
+    ASSERT_EQ(machine.M1_StepNumber, 1, 'HARN-11: M1 plafonne palier 1 (ExtractionControlActive)');
+    ASSERT_EQ(machine.M2_StepNumber, 1, 'HARN-11: M2 plafonne palier 1 (ExtractionControlActive)');
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd, 'HARN-11: montee maintenue au palier 1');
 END_TEST
 
 TEST 'HARN-12 : Zone ralentissement bordure haute -> plafond palier 1, jamais au-dela de 7.5 m'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -230,7 +230,7 @@ END_TEST
 TEST 'HARN-13a : Table de verite etape remontee 20 pourcent -> palier 2'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -273,7 +273,7 @@ END_TEST
 TEST 'HARN-13b : Table de verite etape descente 70 pourcent -> palier 3 (clamp descente effective)'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -317,7 +317,7 @@ END_TEST
 TEST 'HARN-13c : Table de verite etape remontee 90 pourcent -> palier 5'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -362,7 +362,7 @@ END_TEST
 TEST 'HARN-20 : Rampe deflexion 0 a 100 pourcent -> paliers monotones, jamais de saut brutal'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -406,7 +406,7 @@ END_TEST
 TEST 'HARN-21 : Rampe retour 100 a 0 -> decroissance propre, neutre -> palier 0'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -441,7 +441,7 @@ END_TEST
 TEST 'HARN-22 : Effleurement maintenu (juste au-dessus du seuil 1) -> palier 1 stable, pas de plancher'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -464,7 +464,7 @@ END_TEST
 TEST 'HARN-23 : Homme-mort relache en mouvement -> arret immediat, frein retombe'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -500,7 +500,7 @@ END_TEST
 TEST 'HARN-30 : Descente couplee benne ouverte + toucher fond Kobold -> immersion confirmee puis arret latche'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N2, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         TglEnableKoboldAutoStopDescent := TRUE, ImmersionLowerM := 1.0, ImmersionUpperM := 3.0,
@@ -542,7 +542,7 @@ END_TEST
 TEST 'HARN-31 : Interdiction palier 5 en Kobold (D12) -> plafond 4 (CIBLE T181-12/16, ROUGE baseline)'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N2, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         TglEnableKoboldAutoStopDescent := TRUE, ImmersionLowerM := 1.0, ImmersionUpperM := 3.0,
@@ -567,7 +567,7 @@ END_TEST
 TEST 'HARN-32 : Relache joystick en contexte plongee -> palier 0 immediat, pas de plancher residuel'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N2, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         TglEnableKoboldAutoStopDescent := TRUE, ImmersionLowerM := 1.0, ImmersionUpperM := 3.0,
@@ -604,7 +604,7 @@ END_TEST
 TEST 'HARN-33 : Precedence plancher Min vs plafond Max pres bordure basse (amendement B, CIBLE T181-12, ROUGE baseline)'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N2, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -633,7 +633,7 @@ TEST 'HARN-40 : Jog benne -> M2 bride palier 1, treuils coupes pendant Busy (ant
        Le clamp M2-only sans conflit Busy est couvert par HARN-42. Oracle baseline écrit à la main. *)
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -670,7 +670,7 @@ END_TEST
 TEST 'HARN-41 : SyncDeviationWarn -> plafond palier 1 sur M1 ET M2 (bornes communes identiques)'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -698,7 +698,7 @@ END_TEST
 TEST 'HARN-42 : Plafond M2 propre (ManualBucketLimits) bride M2 a 1, M1 libre'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 2, TglJoystickMaster := FALSE,
         TglManualBucketLimits := TRUE,
@@ -732,7 +732,7 @@ END_TEST
 TEST 'HARN-50 : Nominal filet passif -> FinalInterlockGoverned FALSE sur toute la montee couplee'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -766,7 +766,7 @@ END_TEST
 TEST 'HARN-51 : Injection cadence hors instance FB_Winch -> barriere PRG_06 coupe (CIBLE T181-01, ROUGE baseline)'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := FALSE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -805,7 +805,7 @@ END_TEST
 TEST 'HARN-52 : Pas de double-freinage -> barriere PRG_06 passive en marge interne FB_Winch'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -835,7 +835,7 @@ END_TEST
 TEST 'HARN-60 : Deviation croissante -> warn plafond 1 puis critique SafeStop des 2'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -873,7 +873,7 @@ END_TEST
 TEST 'HARN-61 : Retour dans la tolerance -> plafond relache, pas de latch intempestif'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -903,7 +903,7 @@ END_TEST
 TEST 'HARN-70 : Chute chaine AU en mouvement couple -> relais FALSE immediat, freins retombent'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -936,7 +936,7 @@ END_TEST
 TEST 'HARN-71 : Enable=FALSE sur FB_Winch en marche -> sorties sures ; re-Enable sans relache'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -972,7 +972,7 @@ END_TEST
 TEST 'HARN-72 : Watchdog frein (retour frein ne suit pas) -> barriere coupe apres timeout'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -1000,7 +1000,7 @@ END_TEST
 TEST 'HARN-73 : Temps mort directionnel apres arret (inversion 200 ms) -> RelayRev retenu (CIBLE T175/T181-05)'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -1036,7 +1036,7 @@ END_TEST
 TEST 'HARN-74a : Coast-down apres relache lourd -> PAS de faux PowerCutOff pendant la fenetre contacteurs (T178)'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -1068,7 +1068,7 @@ END_TEST
 TEST 'HARN-74b : Coast-down prolonge -> Meca B arme a 3 s (CIBLE T178, ROUGE baseline)'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -1097,7 +1097,7 @@ TEST 'HARN-75 : Redemarrage a chaud (FirstScanDone) -> temps mort directionnel N
        l'interlock directionnel doit s'appliquer au front montant Enable — PAS via FirstScanDone. *)
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -1135,7 +1135,7 @@ END_TEST
 TEST 'HARN-80 : CAS-001 retombee contacteur EN MARCHE (feedback incoherent) -> defaut + neutralisation (CIBLE T180)'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 1, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -1165,7 +1165,7 @@ END_TEST
 TEST 'HARN-81 : CAS-012 demande benne pendant mouvement treuil -> demande REFUSEE (CIBLE T175 AC3)'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.MAINT_N1, CmdWinchSelect := 0, TglJoystickMaster := TRUE,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,
@@ -1196,7 +1196,7 @@ END_TEST
 TEST 'HARN-82 : CAS-002 AU pendant transition d etape -> coupure propre, pas d etat incoherent au rearmement'
     seqReqM1.ReqStartStop := FALSE; seqReqM1.ReqDirection := 0; seqReqM1.SpeedTgtPct := 0.0;
     seqReqM2.ReqStartStop := FALSE; seqReqM2.ReqDirection := 0; seqReqM2.SpeedTgtPct := 0.0;
-    seqReqBucket.ForceMinSpeedStep := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
+    seqReqBucket.ExtractionControlActive := FALSE; seqReqBucket.DescendPermitDiveBucketOpen := FALSE;
     machine(HeartbeatIhmOk := TRUE, CanBusOperational := TRUE, JoyOperational := TRUE,
         CmdMode := E_Mode.SEMI_AUTO, CmdWinchSelect := 0,
         SpeedTable := speedTable, ModelStepSpeedMps := modelSpeeds,

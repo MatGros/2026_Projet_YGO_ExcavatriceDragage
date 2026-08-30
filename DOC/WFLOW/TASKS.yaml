@@ -290,9 +290,10 @@ tasks:
   titre: Intégrer latence boucle automate (~10 ms) au calcul temps d'arrêt
   contexte: ''
   description: 'ABSORBÉE (décision 2026-08-29, voir T178). Étude livrée (`DOC/WFLOW/AUDITS/ETUDE_T54_LATENCE_BOUCLE_v0.1.md`)
-    : la latence scan 10 ms sous-estime la distance d''arrêt de ~2-3 cm à vitesse max (2-3 m/s) — négligeable devant le coast-down
-    freinage réel (1-2 m au relâcher joystick). Pas d''implémentation `CST_ScanLatencyMs` : la correction rentre dans la marge
-    fixe de sécurité. Le vrai paramètre à sécuriser (déplacement toléré après retombée contacteurs) est porté par T178.'
+    : la latence scan 10 ms sous-estime la distance d''arrêt de ~2-3 cm à vitesse max (2-3 m/s) — négligeable devant la phase
+    de décélération freinage réel (1-2 m au relâcher joystick). Pas d''implémentation `CST_ScanLatencyMs` : la correction
+    rentre dans la marge fixe de sécurité. Le vrai paramètre à sécuriser (déplacement toléré après retombée contacteurs) est
+    porté par T178.'
   objectifs: []
   contrat: ''
   bloque_par: []
@@ -2772,11 +2773,13 @@ tasks:
   statut: ⏸️
   criticite: C0
   domaine: TREUILS
-  agent: Codex — rework cadrage : bits ErrorId saturés / classe arrêt à trancher
+  agent: 'Codex — rework cadrage : bits ErrorId saturés / classe arrêt à trancher'
   date: '2026-08-30T10:25:00+02:00'
   titre: Glissement M2 pendant manoeuvre benne — qualification sécurité C0
-  contexte: 'Audit T175 : FB_Bucket surveille M1 à 1 m ; aucun équivalent M2. Meca E à 2,5 m ne remplace pas une surveillance de glissement. Le déplacement M2 est normal pendant la manoeuvre benne : la sémantique doit être tranchée avant patch.'
-  description: 'fix: uniquement après visa — producteur unique du mouvement M2 non commandé, chaîne SafeStop/PowerCutOff et TC. guard: TC nominal M2 sans faux défaut + TC injection mouvement non commandé.'
+  contexte: 'Audit T175 : FB_Bucket surveille M1 à 1 m ; aucun équivalent M2. Meca E à 2,5 m ne remplace pas une surveillance
+    de glissement. Le déplacement M2 est normal pendant la manoeuvre benne : la sémantique doit être tranchée avant patch.'
+  description: 'fix: uniquement après visa — producteur unique du mouvement M2 non commandé, chaîne SafeStop/PowerCutOff et
+    TC. guard: TC nominal M2 sans faux défaut + TC injection mouvement non commandé.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T175-01_M2_SLIP_SAFETY.yaml
   objectifs:
   - Définition physique et propriétaire unique du défaut M2 validés
@@ -2790,11 +2793,13 @@ tasks:
   statut: ⏸️
   criticite: C0
   domaine: TREUILS
-  agent: Codex — challenge C0 : correctif possible après visas précis
+  agent: 'Codex — challenge C0 : correctif possible après visas précis'
   date: '2026-08-30T10:25:00+02:00'
   titre: Benne — anti-traversée multi-scan et boot contradictoire
-  contexte: 'Audit externe T175 : le contrôle Busy ne couvre que l entrée de demande ; M1_Busy/M2_Busy arrivant après engagement ne sont pas relus. Au boot, IsOpen=TRUE et IsClosed=TRUE est traité comme fermé valide, avec offset ambigu.'
-  description: 'fix: interdire/arrêter la manoeuvre lors d un conflit d axe tardif et classer TRUE/TRUE incohérent. guard: TC multi-scan M1/M2 Busy, TC 047.2 et non-régressions nominales.'
+  contexte: 'Audit externe T175 : le contrôle Busy ne couvre que l entrée de demande ; M1_Busy/M2_Busy arrivant après engagement
+    ne sont pas relus. Au boot, IsOpen=TRUE et IsClosed=TRUE est traité comme fermé valide, avec offset ambigu.'
+  description: 'fix: interdire/arrêter la manoeuvre lors d un conflit d axe tardif et classer TRUE/TRUE incohérent. guard:
+    TC multi-scan M1/M2 Busy, TC 047.2 et non-régressions nominales.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T175-02_BUCKET_CROSSING_BOOT_SAFETY.yaml
   objectifs:
   - Conflit M1/M2 entrant pendant manoeuvre traité par comportement sécurité validé
@@ -2841,28 +2846,28 @@ tasks:
   - Fiche FB_Winch alignée au code (note 🆕 activation par défaut)
   bloque_par: []
 - id: T178
-  statut: ⬜
+  statut: ⏳
   criticite: C4
   domaine: TREUILS
-  agent: ''
+  agent: Agent externe — implémentation livrée, réception Codex OK ; checkpoint humain en attente
   date: '2026-08-29T16:30:00'
   titre: Mise en conformité AF DriftGuard (Méca A) — armement sur contacteurs-off + frein serré
   contexte: 'Revue AF indépendante (2026-08-29) : FB_DriftGuard / Méca A est armé sur JoystickYNeutral (FB_Safety_Winch.st:235)
     au lieu de « contacteurs au repos + frein serré » (FB_DriftGuard_v1.0.md:13,25 ; AF_Partie-10 F10.09 TC l.293 « Treuil
-    à l''arrêt, frein serré, position captée »). Conséquence : le coast-down normal (inertie + jeu frein après retombée contacteurs)
-    est mesuré comme une dérive -> faux PowerCutOff à chaque arrêt lourd. T178 initial (seuil coast-down CfgWinchCoastMax_M
-    + note AF) jugé REDONDANT : le volet temps 3 s est déjà couvert par Méca B (PostRampTimeout:=T#3s, FB_Safety_Winch.st:246-249)
-    ; la dérive statique relève de Méca A. Aucun nouveau paramètre ni aucune 2e fonction à créer. T054 hors ressort (utilisateur
-    : « T054 pas mon problème »).'
+    à l''arrêt, frein serré, position captée »). Conséquence : la phase avant arrêt mécanique confirmé est mesurée comme une
+    dérive -> faux PowerCutOff à chaque arrêt lourd. T178 initial (seuil de mouvement résiduel + note AF) jugé REDONDANT :
+    le volet temps 3 s est déjà couvert par Méca B (PostRampTimeout:=T#3s, FB_Safety_Winch.st:246-249) ; la dérive statique
+    relève de Méca A. Aucun nouveau paramètre ni aucune 2e fonction à créer. T054 hors ressort (utilisateur : « T054 pas mon
+    problème »).'
   description: 'Corriger DriftGuardA.Arm pour être conforme AF : DriftGuardA.Arm := NOT(BypassSafety OR BypassMecaA) AND FwdRevSpeedFeedbackOff
     AND NOT BrakeFeedback [AND NOT BenneHoldStillActive]. Même composite que « arrêt confirmé » Méca B (FB_Safety_Winch.st:247).
-    Aucun nouveau paramètre CfgWinchCoastMax_M, aucune nouvelle fonction RunOn. Mettre à jour FB_DriftGuard_v1.0.md + TC-P10-001
-    si le calage d''armement change. Le coast-down normal n''est plus mesuré (fenêtre = arrêt mécanique confirmé) ; un frein
-    qui lâche APRES arrêt reste détecté.'
+    Aucun nouveau paramètre de mouvement résiduel, aucune nouvelle fonction RunOn. Mettre à jour FB_DriftGuard_v1.0.md + TC-P10-001
+    si le calage d''armement change. La phase avant arrêt mécanique confirmé n''est plus mesurée ; un frein qui lâche APRES
+    arrêt reste détecté.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T178.yaml
   objectifs:
   - DriftGuardA.Arm conforme AF = FwdRevSpeedFeedbackOff AND NOT BrakeFeedback (hors bypass/holdstill)
-  - Zéro faux PowerCutOff au relâcher joystick (coast normal non mesuré comme dérive)
+  - Zéro faux PowerCutOff au relâcher joystick (phase avant arrêt mécanique confirmé non mesurée comme dérive)
   - Méca A détecte encore un frein qui lâche après arrêt confirmé
   - Aucun nouveau paramètre / aucune 2e fonction (redondance Méca B évitée)
   - Gates palier C PASS + G200 liaison PASS après implémentation
@@ -3022,8 +3027,10 @@ tasks:
   agent: Codex — stimulus réel WINCH_INTEG en cours
   date: '2026-08-30T10:35:00+02:00'
   titre: Réparer le stimulus réel du harnais WINCH_INTEG
-  contexte: 'Audit T181-00b : oracles durcis à 32/32 rouges, mais rouges majoritairement causés par le banc. Miroir PRG_02 ne publie pas AxisY, montées testées avec benne ouverte plafonnée à 1, RestartRequired jamais purgé.'
-  description: 'fix: fidéliser miroir AxisY, préconditions benne et purge RestartRequired. guard: préconditions de mouvement réellement atteignables, pas de SUITE_CALIBREE avant calibration TC-par-TC.'
+  contexte: 'Audit T181-00b : oracles durcis à 32/32 rouges, mais rouges majoritairement causés par le banc. Miroir PRG_02
+    ne publie pas AxisY, montées testées avec benne ouverte plafonnée à 1, RestartRequired jamais purgé.'
+  description: 'fix: fidéliser miroir AxisY, préconditions benne et purge RestartRequired. guard: préconditions de mouvement
+    réellement atteignables, pas de SUITE_CALIBREE avant calibration TC-par-TC.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-00b_STIMULUS_WINCH_INTEG.yaml
   objectifs:
   - Joystick maître établit Direction, SpeedTgt et StepNumber réel dans le miroir
@@ -3036,14 +3043,16 @@ tasks:
   statut: ⏸️
   criticite: C4
   domaine: TREUILS
-  agent: Codex — BLOQUÉ audit C4 : maintien §3bis inatteignable avec feedback actuel
+  agent: 'Codex — BLOQUÉ audit C4 : maintien §3bis inatteignable avec feedback actuel'
   date: '2026-08-30T10:15:00+02:00'
   titre: FB_WinchOutputInterlock 7/7 + contrat d'autorité des 2 interlocks + FB_WinchRateInterlock
-  contexte: 'GEL audit C4 2026-08-30 : §3bis est inatteignable (RequestedStep=0 implique RequestedRelayFwd/Rev=FALSE) et le feedback Mx_ContactorsReleased_DI est incompatible avec un maintien du sens. Le patch non committé ne doit pas être importé. Redesign protocole requis. Barrière finale C4 : 2/7 TC PASS (FAIL TC-P10-012 watchdog frein, 013 latches hors Enable, 021/022 temps morts
-    directionnels, 020 SITE). Décision Q6 : interlock de cadence unifié 2 niveaux (1 FB FB_WinchRateInterlock instancié dans
-    FB_Winch avec seuils safety+marge ET dans PRG_06 avec seuils safety nus), diag FinalInterlockGoverned DOIT rester FALSE
-    en nominal. Phase 0, interface FB_WinchOutputInterlock INCHANGÉE. TC-021/022 : se coordonner avec T175 AC2 (une seule
-    implémentation du temps mort directionnel, pas deux).
+  contexte: 'GEL audit C4 2026-08-30 : §3bis est inatteignable (RequestedStep=0 implique RequestedRelayFwd/Rev=FALSE) et le
+    feedback Mx_ContactorsReleased_DI est incompatible avec un maintien du sens. Le patch non committé ne doit pas être importé.
+    Redesign protocole requis. Barrière finale C4 : 2/7 TC PASS (FAIL TC-P10-012 watchdog frein, 013 latches hors Enable,
+    021/022 temps morts directionnels, 020 SITE). Décision Q6 : interlock de cadence unifié 2 niveaux (1 FB FB_WinchRateInterlock
+    instancié dans FB_Winch avec seuils safety+marge ET dans PRG_06 avec seuils safety nus), diag FinalInterlockGoverned DOIT
+    rester FALSE en nominal. Phase 0, interface FB_WinchOutputInterlock INCHANGÉE. TC-021/022 : se coordonner avec T175 AC2
+    (une seule implémentation du temps mort directionnel, pas deux).
 
     '
   description: 'fix: TC-P10-012/013/021/022 verts + FB_WinchRateInterlock (2 jeux de seuils). guard: G4xx_check_final_interlock_governed_false
@@ -3052,7 +3061,8 @@ tasks:
 
     '
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-01_AUTORITE_2_INTERLOCKS.yaml
-  validation_humaine: "✅ APPROUVÉE — utilisateur, 2026-08-29T23:35:00+02:00 (arrêt Phase A levé ; implémentation distincte à faire)"
+  validation_humaine: ✅ APPROUVÉE — utilisateur, 2026-08-29T23:35:00+02:00 (arrêt Phase A levé ; implémentation distincte
+    à faire)
   objectifs:
   - CI FB_WinchOutputInterlock 7/7 PASS sur interface inchangée (TC-P10-012/013/021/022)
   - FB_WinchRateInterlock existe, instancié dans FB_Winch (seuils +marge) ET PRG_06 (seuils nus)
@@ -3185,7 +3195,7 @@ tasks:
 
     '
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-06_DRIVEREQUEST_CADRAGE.yaml
-  validation_humaine: "✅ APPROUVÉE — utilisateur, 2026-08-29T23:35:00+02:00 (arrêt Phase A levé ; note de cadrage à livrer)"
+  validation_humaine: ✅ APPROUVÉE — utilisateur, 2026-08-29T23:35:00+02:00 (arrêt Phase A levé ; note de cadrage à livrer)
   objectifs:
   - DUT ST_fbWinch_DriveRequest / _Sensors / _Cfg spécifiés champ par champ (type, unité, polarité)
   - Tableau « source de borne → sens → portée commun/M2 → lieu de calcul » complet (≥ 8 sources)
@@ -3223,10 +3233,10 @@ tasks:
   - T181-06
 - id: T181-08
   parent_id: T181
-  statut: ⬜
+  statut: ⏳
   criticite: C4
   domaine: TREUILS
-  agent: ''
+  agent: 'Agent externe + utilisateur — 08a validée ; 08b reste distincte'
   date: '2026-08-29T20:30:00+02:00'
   titre: Refonte interface FB_Winch (struct DriveRequest) + 2 sites PRG_04 + SimBench — shadow comparison
   contexte: 'L''interface FB_Winch passe de plate (≈15 scalaires) à struct DriveRequest/Sensors/Cfg. 2 seuls sites d''appel
@@ -3250,10 +3260,10 @@ tasks:
   - T181-07
 - id: T181-09
   parent_id: T181
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: TREUILS
-  agent: ''
+  agent: 'Agent delegue — renommage clamp bit-identique'
   date: '2026-08-29T20:30:00+02:00'
   titre: Renommage vocabulaire clamp + fusion ExtractionControlActive / ControlAscentActive
   contexte: 'Décision utilisateur : pas de « Force » dans le vocabulaire du clamp — Min/Max seulement. ForceMinSpeedStep (sémantiquement
@@ -3267,7 +3277,7 @@ tasks:
     « Force*Step » / « Force*Speed » dans la chaîne de clamp).
 
     '
-  contrat: null
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-09_CLAMP_VOCABULARY.yaml
   objectifs:
   - grep « ForceMinSpeedStep » / « Force*SlowSpeed » / « CfgMaxStepDescente » dans CODE/ = 0
   - Un seul flag de montée contrôlée (ExtractionControlActive) ; ControlAscentActive supprimé
@@ -3322,7 +3332,7 @@ tasks:
 
     '
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-11_MATRICE_MAINT_N1_N2.yaml
-  validation_humaine: "✅ APPROUVÉE — utilisateur, 2026-08-29T23:35:00+02:00 (arrêt Phase A levé ; note de cadrage à livrer)"
+  validation_humaine: ✅ APPROUVÉE — utilisateur, 2026-08-29T23:35:00+02:00 (arrêt Phase A levé ; note de cadrage à livrer)
   objectifs:
   - Matrice « mode × bypass » explicite (chaque Bypass* rattaché à N1, N2, ou retiré)
   - Règle de bascule de mode = « contacteurs retombés + frein serré » formalisée
@@ -3443,18 +3453,20 @@ tasks:
   statut: ⏸️
   criticite: C4
   domaine: TREUILS
-  agent: Codex — gel audit : apprentissage multi-scan non prouvé par harnais actuel
+  agent: 'Codex — gel audit : apprentissage multi-scan non prouvé par harnais actuel'
   date: '2026-08-30T10:15:00+02:00'
   titre: Surveillance survitesse FB_Safety_Winch (2 seuils fixes) + réactivation SpeedGuard
-  contexte: 'GEL audit 2026-08-30 : STruCpp ne restitue pas VAR_IN_OUT ; la moyenne SpeedMps/RETAIN de T181-15 n est pas prouvée. Ne pas armer une survitesse sur cette table avant adaptateur/copy-out + TC intégration persistant. D06 : garde-fou survitesse mort (MeasuredSpeedBand:=0 en dur, SpeedGuardEnable=FALSE). Décision Q4 : marge fixe
-    appris+0,5 m/s (soft→diag) / appris+1,5 m/s (hard→SafeStop), active SSI table {sens,charge} complète + flag débrayable.
-    PRÉREQUIS T177 (SpeedGuardEnable:=TRUE par défaut) — T181-16 ne double PAS T177, il consomme son résultat. Anti-calage
-    passage palier via MeasuredSpeedBand. Phase B.
+  contexte: 'GEL audit 2026-08-30 : STruCpp ne restitue pas VAR_IN_OUT ; la moyenne SpeedMps/RETAIN de T181-15 n est pas prouvée.
+    Ne pas armer une survitesse sur cette table avant adaptateur/copy-out + TC intégration persistant. D06 : garde-fou survitesse
+    mort (MeasuredSpeedBand:=0 en dur, SpeedGuardEnable=FALSE). Décision Q4 : marge fixe appris+0,5 m/s (soft→diag) / appris+1,5
+    m/s (hard→SafeStop), active SSI table {sens,charge} complète + flag débrayable. PRÉREQUIS T177 (SpeedGuardEnable:=TRUE
+    par défaut) — T181-16 ne double PAS T177, il consomme son résultat. Anti-calage passage palier via MeasuredSpeedBand.
+    Phase B.
 
     '
   description: 'fix: FB_Safety_Winch — 2 seuils survitesse (marge fixe sur vitesse apprise), armé si TableComplete AND NOT
-    bypass ; câblage MeasuredSpeedBand/MeasuredSpeedValid via Sensors (D06). guard: TC-P10-055 (coast-down ≠ dérive), TC-P10-060
-    (apprentissage), G4xx_check_measuredspeedband_wired.
+    bypass ; câblage MeasuredSpeedBand/MeasuredSpeedValid via Sensors (D06). guard: TC-P10-055 (arrêt mécanique confirmé ≠
+    dérive), TC-P10-060 (apprentissage), G4xx_check_measuredspeedband_wired.
 
     '
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-16_SURVITESSE.yaml
@@ -3478,15 +3490,15 @@ tasks:
   domaine: TREUILS
   agent: ''
   date: '2026-08-29T20:30:00+02:00'
-  titre: RETIRÉE — coast-down borné est couvert par T178 (Méca A) + Méca B, sans CfgWinchCoastMax_M
-  contexte: 'Le plan consolidé prévoyait CfgWinchCoastMax_M (~3 m) + timeout + note AF. La T178 vivante (contrat DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T178.yaml,
-    AC4) a EXPLICITEMENT rejeté ce paramètre et toute 2ᵉ fonction RunOn comme redondants : le volet temps est couvert par
-    Méca B (PostRampTimeout T#3s), la dérive statique par Méca A (armement contacteurs-off + frein serré). T054 « hors ressort
-    » (décision utilisateur). Aucune tâche T181 propre.
+  titre: RETIRÉE — mouvement résiduel borné est couvert par T178 (Méca A) + Méca B, sans nouveau paramètre
+  contexte: 'Le plan consolidé prévoyait un paramètre de mouvement résiduel (~3 m) + timeout + note AF. La T178 vivante (contrat
+    DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T178.yaml, AC4) a EXPLICITEMENT rejeté ce paramètre et toute 2ᵉ fonction RunOn comme
+    redondants : le volet temps est couvert par Méca B (PostRampTimeout T#3s), la dérive statique par Méca A (armement contacteurs-off
+    + frein serré). T054 « hors ressort » (décision utilisateur). Aucune tâche T181 propre.
 
     '
-  description: 'Aucune action propre. Prérequis : T178 livrée et validée. Le harnais T181-00 vérifie « coast-down normal →
-    pas de faux PowerCutOff » via le scénario TC-P10-001 une fois T178 en place.
+  description: 'Aucune action propre. Prérequis : T178 livrée et validée. Le harnais T181-00 vérifie « phase avant arrêt mécanique
+    confirmé → pas de faux PowerCutOff » via le scénario TC-P10-001 une fois T178 en place.
 
     '
   contrat: null
@@ -3519,10 +3531,10 @@ tasks:
   - T181-10
 - id: T181-19
   parent_id: T181
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: TREUILS
-  agent: ''
+  agent: 'Agent délégué + orchestrateur — preuves ciblées validées'
   date: '2026-08-29T20:30:00+02:00'
   titre: Câbler SyncCoupled (diag) + garde de revue « FB_Winch ne lit jamais SyncCoupled en logique »
   contexte: 'SyncCoupled dans DriveRequest est DIAG STRICT : information de couplage synchro pour le diagnostic/IHM, jamais
@@ -3533,7 +3545,7 @@ tasks:
     (grep : SyncCoupled n''apparaît jamais dans une condition exécutable du corps de FB_Winch).
 
     '
-  contrat: null
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-19_SYNC_COUPLED_DIAG.yaml
   objectifs:
   - DriveRequest.SyncCoupled est renseigné à chaque cycle depuis SyncActive (G200)
   - grep: SyncCoupled absent de toute condition IF/CASE/expression logique du corps FB_Winch
@@ -3541,3 +3553,97 @@ tasks:
   - Aucune régression CI FB_Winch ; gates palier C PASS
   bloque_par:
   - T181-08
+- id: T181-20
+  parent_id: T181
+  statut: ⏳
+  criticite: C2
+  domaine: SUPERVISION
+  agent: Agent externe — implémentation livrée, réception Codex OK ; checkpoint humain en attente
+  date: '2026-08-30T15:00:00+02:00'
+  titre: Diagnostic passif de symétrie M1/M2 — câblage PRG_07 + IHM
+  contexte: 'Audit T181-16 : FB_Winch_Symmetry est spécifié AF-10 §7.3bis et dispose déjà de ses structures persistantes/IHM,
+    mais reste orphelin. Fonction diagnostic uniquement : aucune autorité mouvement.'
+  description: 'fix livré : FB_Winch_Symmetry instancié dans PRG_07 et publié vers ST_WinchSymmetryHMI ; exemption G200 périmée
+    FB_Acquisition_Preflight supprimée. G200 : Symmetry non orphelin ; seul FB_WinchSpeedLearning reste KO (T181-16 gelée).
+    Attente checkpoint humain, aucun commit.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-20_WINCH_SYMMETRY_DIAG.yaml
+  objectifs:
+  - FB_Winch_Symmetry appelé dans PRG_07 avec données M1/M2 et données persistantes
+  - Publication IHM existante alimentée
+  - Aucun chemin vers commande moteur, SafeStop, PowerCutOff ou Enable
+  - G200 sans orphelin Symmetry ni exemption Preflight périmée
+  bloque_par: []
+- id: T181-21
+  parent_id: T181
+  statut: ✅
+  criticite: C2
+  domaine: TEST_AUTO_CI
+  agent: 'Agent externe + utilisateur — clôturée'
+  date: '2026-08-30T15:20:00+02:00'
+  titre: Harnais STruCpp — restitution VAR_IN_OUT après appel FB
+  contexte: 'Bloquant T181-16 : le générateur réinjecte VAR_IN_OUT avant fb(...) mais ne recopie jamais la valeur modifiée
+    vers la variable de test. La persistance apprentissage ne peut donc pas être prouvée.'
+  description: 'fix livré : générer le copy-out VAR_IN_OUT après appel FB, conforme CODESYS. preuve : FB_WinchSpeedLearning 9/9
+    et test direct T181-21 dans FB_Bucket verts. TC-P10-047.2 reste rouge sécurité hors lot. Attente checkpoint humain ; gates globaux au jalon intégration T181.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-21_VAR_IN_OUT_HARNESS.yaml
+  objectifs:
+  - Les VAR_IN_OUT modifiées deviennent visibles dans les assertions de test
+  - Aucune régression VAR_INPUT/VAR_OUTPUT
+  - Débloque la validation persistante T181-15/T181-16
+  bloque_par: []
+- id: T181-22
+  parent_id: T181
+  statut: ⬜
+  criticite: C1
+  domaine: DOCUMENTATION
+  agent: ''
+  date: '2026-08-30T15:30:00+02:00'
+  titre: Nettoyage liens documentaires actifs G340 — livraison T181
+  contexte: 'Les liens AF actifs périmés et documents actifs sans H1 empêchent un palier C propre. Archives et transcripts hors scope.'
+  description: 'fix: liens actifs vers versions AF courantes et H1 des prompts ; aucun masquage de contrôle. guard: G340 avant/après, restes hors scope séparés.'
+  contrat: ''
+  objectifs:
+  - Liens AF actifs v2.3/v1.0 remplacés par les versions courantes
+  - Documents actifs sans H1 corrigés
+  - Aucun fichier CODE ni archive modifié
+  bloque_par: []
+- id: T183
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: CODEURS
+  agent: 'Orchestrateur — contrat C3 prêt ; délégation code dès créneau et GO humain'
+  titre: Preset codeur centre-plage — restauration de la garde anti-dépassement (spec AF09 v2.4)
+  contexte: 'Diagnostic TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md : le preset neutre (PresetValue := RawPos,
+    commit 73fa758d) a perdu la garde anti-dépassement du design d origine (26217dd9). Référencement près d une borne = wrap-around
+    UDINT = CablePosM aberrant (~±8192 m) + défauts en cascade en pleine manœuvre. Verrou Abs auto-réussi : convergence tautologique,
+    plus aucune preuve matérielle. Spec cible : AF09 v2.4 (F09.08, TC-P09-070) + sous-fiche FB_Encoder_Homing v1.2.'
+  description: 'fix: PresetValue := (PointsPerRev × MultiTurnRevsMax)/2 (centre-plage) ET PendingHomingRefRaw := CentrePts
+    − TargetPoints (référentiel post-preset, readback T164-4C reste valide) ; gate HomedAndReliable M1 sur cible dynamique
+    benne M2 ; gel des consommateurs de position pendant la fenêtre de saut. guard: FB_Sim_Encoder wrap réel (retrait du clamp
+    à 0) + TC-P09-070.1/.2/.3 au harnais CI + validation matérielle preset PDO Rx (bloquante avant tout mouvement réel).'
+  objectifs:
+  - Tout homing écrit le centre de plage au codeur et grave HomingRefRaw dans le même référentiel
+  - Readback ±0.010 m vérifie le chargement réel du centre par le codeur (verrou non tautologique)
+  - Descente course complète + remontée sans wrap ni EncoderIncoherent (TC-P09-070.2)
+  - Cible dynamique benne M2 refusée si M1 non HomedAndReliable (TC-P09-070.3)
+  - Aucune régression CI AF-09/AF-10 ; G200, bundle et gates palier C PASS
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T183_ENCODER_CENTRE_PLAGE.yaml
+  date: '2026-08-30T13:14:57'
+  bloque_par: []
+- id: T181-23
+  parent_id: T181
+  statut: ✅
+  criticite: C2
+  domaine: TEST_AUTO_CI
+  agent: 'Agent délégué + orchestrateur — preuves ciblées validées'
+  date: '2026-08-30T15:55:00+02:00'
+  titre: STruCpp — préserver l'accès 2D et convertir seulement 3D/4D
+  contexte: 'WINCH_INTEG compile les tableaux 2D avec at(i,j). Le correctif 4D récent les transforme à tort en at(i).at(j), qui ne compile pas.'
+  description: 'fix livré et vérifié : 2D inchangé ; 3D/4D crochets imbriqués. guard : 4/4 tests convertisseur + WINCH_INTEG compile/exécute 32 vecteurs (15/32 référence). Aucun CODE production modifié.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-23_STRUCPP_ARRAY_INDEXING.yaml
+  objectifs:
+  - Conversion 2D runtime compatible
+  - Conversion 3D/4D compilable
+  - WINCH_INTEG exécutable
+  bloque_par: []

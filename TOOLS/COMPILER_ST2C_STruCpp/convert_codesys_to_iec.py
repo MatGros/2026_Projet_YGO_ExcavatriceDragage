@@ -156,6 +156,26 @@ def _convert_nested_array_access(text: str) -> str:
     )
 
 
+def _convert_comma_multi_dim_to_nested(text: str) -> str:
+    """STruCpp ne supporte l'acces multi-dimensionnel a virgules que jusqu'a 2D
+    (il genere .at(i, j), qui compile). Au-dela (3D/4D), il genere .at(i, j, k, l)
+    qui ECHOUE car at() ne prend qu'un argument. On convertit l'acces a virgules
+    en crochets imbriques (arr[i][j][k][l]) pour que STruCpp genere des .at()
+    chaines. No-op pour un indice unique (arr[i]) et pour la DECLARATION
+    ARRAY[...] (qui doit rester a virgules)."""
+    def _replace(m):
+        base = m.group(1)
+        if base.upper() == "ARRAY":
+            return m.group(0)
+        idx = [x.strip() for x in m.group(2).split(",")]
+        # Le runtime IEC accepte deux indices dans un seul appel .at(i, j).
+        # Seuls les tableaux de dimension 3+ doivent rester en acces imbrique.
+        if len(idx) <= 2:
+            return m.group(0)
+        return base + "[" + "][".join(idx) + "]"
+    return re.sub(r"(\b\w+(?:\.\w+)*)\[([^\[\]]+)\]", _replace, text)
+
+
 def convert_text(text: str, source_name: str, warnings: list) -> str:
     text = _convert_enum_blocks(text, source_name, warnings)
     text = _strip_pragmas(text)
@@ -164,6 +184,7 @@ def convert_text(text: str, source_name: str, warnings: list) -> str:
     text = _map_hysteresis(text)
     text = _convert_nested_arrays(text)
     text = _convert_nested_array_access(text)
+    text = _convert_comma_multi_dim_to_nested(text)
     text = _convert_binary_literals_in_case(text)
     text = _convert_case_multiple_labels(text)
     return text

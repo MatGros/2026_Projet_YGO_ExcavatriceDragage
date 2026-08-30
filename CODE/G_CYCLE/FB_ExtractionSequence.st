@@ -45,7 +45,7 @@ VAR_OUTPUT
     // === ORDRES & AUTORISATIONS ===
     BucketCloseRequest          : BOOL;     // <-- [ACT] Demande de fermeture benne
     AscentPermit                : BOOL;     // <-- [ACT] Autorisation de remontee assistee
-    ForceMinSpeedStep           : BOOL;     // <-- [ACT] Forcage vitesse minimale (palier de controle)
+    ExtractionControlActive     : BOOL;     // <-- [ACT] Plafond palier 1 pendant la montee controlee
     BottomConfirmationConsumed  : BOOL;     // <-- [STAT] Signal confirmation fond consomme
 
     // === DIAGNOSTIC IHM ===
@@ -191,7 +191,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Lifecycle.Done := FALSE;
     BucketCloseRequest := FALSE;
     AscentPermit := FALSE;
-    ForceMinSpeedStep := FALSE;
+    ExtractionControlActive := FALSE;
     BottomConfirmationConsumed := FALSE;
     ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
     // StepAtFault / StepAtFaultCaptured NON reinitialises ici : l'etape figee au defaut reste
@@ -210,7 +210,7 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Machine etat fermeture remontee"}
 BucketCloseRequest := FALSE;
 AscentPermit := FALSE;
-ForceMinSpeedStep := FALSE;
+ExtractionControlActive := FALSE;
 BottomConfirmationConsumed := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
@@ -269,7 +269,7 @@ ELSE
         E_ExtractionSequenceState.CONTROL_ASCENT:
             Lifecycle.Busy := TRUE;
             AscentPermit := AssistPermit AND AscentControlSafe; // coupure meme-scan sur defaut synchro/capteurs (H2)
-            ForceMinSpeedStep := AscentPermit;                  // bridage suit le permis (F1), jamais actif sans montee autorisee
+            ExtractionControlActive := AscentPermit;            // plafond palier 1 suit le permis de montee
             OperatorActionId := 16#0203;
             OperatorAction := 'Maintenir la montée : contrôle charge au palier minimal.';
             IF NOT AscentControlSafe THEN

@@ -34,6 +34,7 @@ VAR
     instCfgPersistBridgeEncoder        : FB_CfgPersistBridge_fbEncoder_Cfg;       // * [INST] Pont persistance config codeur commune M1/M2
     instDiagIhmHeartbeat   : FB_Diag_IhmHeartbeat;            // * [INST] Surveillance heartbeat IHM
     instPreflight          : FB_Acquisition_Preflight;        // * [INST] Preflight acquisition avant demarrage
+    instWinchSymmetry      : FB_Winch_Symmetry;               // * [INST] Diagnostic passif symetrie M1/M2 (observateur strict)
     instHmiBannerFormatter : FB_Hmi_BannerFormatter;          // * [INST] Formatage bandeau IHM (alarmes/etats)
     instTroubleshootingView : FB_TroubleshootingView;         // * [INST] Vue troubleshooting (diagnostic IHM)
     instMirrorBypassTranslation      : FB_MirrorBypassRetain; // * [INST] Miroir bypass Translation IHM<->RETAIN
@@ -338,6 +339,38 @@ GVL_IHM.Commun.Preflight.PreflightOk      := instPreflight.PreflightOk;
 GVL_IHM.Commun.Preflight.PreflightDone    := instPreflight.PreflightDone;
 GVL_IHM.Commun.Preflight.PreflightBusy    := instPreflight.PreflightBusy;
 GVL_IHM.Commun.Preflight.PreflightErrorId := instPreflight.PreflightErrorId;
+
+// ---------- §3c-bis. Diagnostic passif symétrie M1/M2 (FB_Winch_Symmetry) ----------
+// ⚖️ Observateur STRICT (AF-10 §7.3bis) : aucune écriture de commande, de
+// sécurité ou de mouvement. Sources : états publics M1/M2 (PRG_04 Data), encodeurs
+// (PRG_02), synchro (PRG_04). Config & données persistantes : GVL_PERSISTENT.
+instWinchSymmetry(
+    Reset           := GVL_IHM.Commun.WinchSymmetry.BtnReset,
+    M1CommandActive := PRG_04_Treuils_Benne.Data.WinchM1State.Busy,
+    M2CommandActive := PRG_04_Treuils_Benne.Data.WinchM2State.Busy,
+    M1Direction     := PRG_04_Treuils_Benne.Data.WinchM1State.CommandedDirection,
+    M2Direction     := PRG_04_Treuils_Benne.Data.WinchM2State.CommandedDirection,
+    M1BrakeCmd      := PRG_04_Treuils_Benne.Data.WinchM1State.BrakeCmd,
+    M2BrakeCmd      := PRG_04_Treuils_Benne.Data.WinchM2State.BrakeCmd,
+    M1BrakeApplied  := NOT PRG_04_Treuils_Benne.Data.WinchM1State.BrakeCommandOpenConfirmed,
+    M2BrakeApplied  := NOT PRG_04_Treuils_Benne.Data.WinchM2State.BrakeCommandOpenConfirmed,
+    M1Position_M    := PRG_04_Treuils_Benne.Data.WinchM1State.Position_M,
+    M2Position_M    := PRG_04_Treuils_Benne.Data.WinchM2State.Position_M,
+    M1Speed_Mps     := PRG_04_Treuils_Benne.Data.WinchM1State.MeasuredSpeed_Mps,
+    M2Speed_Mps     := PRG_04_Treuils_Benne.Data.WinchM2State.MeasuredSpeed_Mps,
+    SyncDeviation_M := ABS(PRG_04_Treuils_Benne.Data.WinchSyncSignedDeltaPosM),
+    Config          := _WinchSymmetryCfgPersist,
+    Data            := _WinchSymmetryDataPersist
+);
+// Publication IHM (ST_WinchSymmetryHMI via GVL_IHM.Commun.WinchSymmetry) — lecture seule.
+GVL_IHM.Commun.WinchSymmetry.SymmetryOk        := instWinchSymmetry.SymmetryOk;
+GVL_IHM.Commun.WinchSymmetry.SymmetryValid     := instWinchSymmetry.SymmetryValid;
+GVL_IHM.Commun.WinchSymmetry.DeltaStartDelay_Ms       := _WinchSymmetryDataPersist.DeltaStartDelay_Ms;
+GVL_IHM.Commun.WinchSymmetry.DeltaBrakeReleaseTime_Ms := _WinchSymmetryDataPersist.DeltaBrakeReleaseTime_Ms;
+GVL_IHM.Commun.WinchSymmetry.DeltaBrakeApplyTime_Ms   := _WinchSymmetryDataPersist.DeltaBrakeApplyTime_Ms;
+GVL_IHM.Commun.WinchSymmetry.DeltaStopDistance_M      := UDINT_TO_REAL(_WinchSymmetryDataPersist.DeltaStopDistance_Mm) / 1000.0;
+GVL_IHM.Commun.WinchSymmetry.DeltaStopTime_Ms         := _WinchSymmetryDataPersist.DeltaStopTime_Ms;
+GVL_IHM.Commun.WinchSymmetry.MaxSyncDeviation_M       := _WinchSymmetryDataPersist.MaxSyncDeviation_M;
 
 // ---------- §3d. Bypass simulation (retours simulés vers IHM) ----------
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;

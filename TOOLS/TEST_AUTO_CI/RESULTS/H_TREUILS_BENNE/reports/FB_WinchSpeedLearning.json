@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "file": "test_fb_winch_speed_learning.st",
+  "results": [
+    {
+      "name": "TC-T181-15a LearnStart=FALSE : aucune collecte, table inchangee (AC3)",
+      "passed": true
+    },
+    {
+      "name": "TC-T181-15b Conditions de collecte manquantes une a une : aucune ecriture (AC4)",
+      "passed": true
+    },
+    {
+      "name": "TC-T181-15c Valid seulement a MinSamples : frontiere via CellsFilled (AC2/AC5)",
+      "passed": true
+    },
+    {
+      "name": "TC-T181-15d Hors enveloppe : cellule invalidee (Valid=FALSE, SampleCount=0, SpeedMps=0) (AC5)",
+      "passed": true
+    },
+    {
+      "name": "TC-T181-15e TableComplete : FALSE si une cellule manque, TRUE avec 40 cellules valides (AC6)",
+      "passed": true
+    },
+    {
+      "name": "TC-T181-15f Passivite : sorties limitees au statut/diagnostic, aucune commande moteur (AC1/AC7)",
+      "passed": true
+    },
+    {
+      "name": "TC-T181-15g Sens descente : cellule descente [1,2,1,1] ecrite, montee inchangee (AC2)",
+      "passed": true
+    },
+    {
+      "name": "TC-T181-15h Charge presente : cellule charge [1,1,2,1] ecrite, vide inchangee (AC2)",
+      "passed": true
+    },
+    {
+      "name": "TC-T181-15i Axe M2 (WinchId=2) : cellule [2,1,1,1] ecrite, M1 inchangee (AC2)",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 9,
+    "passed": 9,
+    "failed": 0
+  }
+}

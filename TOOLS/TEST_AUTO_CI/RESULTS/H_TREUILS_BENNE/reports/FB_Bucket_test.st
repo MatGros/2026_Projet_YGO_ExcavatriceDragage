@@ -682,3 +682,28 @@ TEST 'TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle'
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(FB.Ready, 'Config OffsetCloseM=15.0 consommee (persistance RETAIN = cote GVL)');
 END_TEST
+
+TEST 'T181-21 Copy-out VAR_IN_OUT : BucketState ecrit par FB_Bucket restitue a la variable de test'
+    (* Preuve du correctif T181-21 : STruCpp ne genere qu'un copy-in (s.FB.X = s.X;) sans
+       copy-out. Le post-traitement injecte s.X = s.FB.X; apres chaque appel. Ce test lit
+       la valeur ecrite par le FB sur la VAR_IN_OUT BucketState DIRECTEMENT sur la variable
+       de test (sans copy-out manuel) : il ne passe QUE si le copy-out automatique est actif. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := FALSE;
+
+    (* Scan 1 : premier cycle, ni IsOpen ni IsClosed -> FB_Bucket ecrit StateIncoherent=TRUE
+       sur la VAR_IN_OUT BucketState (FB_Bucket.st L198-200). *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+
+    (* Aucun copy-out manuel : la valeur doit etre restituee par le harnais. *)
+    ASSERT_TRUE(BucketState.StateIncoherent, 'Copy-out auto : BucketState.StateIncoherent restitue TRUE');
+    ASSERT_FALSE(BucketState.IsOpen, 'Copy-out auto : BucketState.IsOpen reste FALSE');
+    ASSERT_FALSE(BucketState.IsClosed, 'Copy-out auto : BucketState.IsClosed reste FALSE');
+END_TEST

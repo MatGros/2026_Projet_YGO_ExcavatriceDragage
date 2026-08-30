@@ -43,10 +43,14 @@ if str(SCRIPT_DIR) not in sys.path:
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
 TEST_AUTO_CI = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI"
 COMPILER_DIR = REPO_ROOT / "TOOLS" / "COMPILER_ST2C_STruCpp"
+if str(COMPILER_DIR) not in sys.path:
+    sys.path.insert(0, str(COMPILER_DIR))
 CONVERTER = COMPILER_DIR / "convert_codesys_to_iec.py"
 STRUCPP = COMPILER_DIR / "bin" / "win32-x64" / "strucpp.exe"
 RUNTIME_INCLUDE = COMPILER_DIR / "bin" / "win32-x64" / "runtime" / "include"
 RUNTIME_TEST = COMPILER_DIR / "bin" / "win32-x64" / "runtime" / "test"
+
+import inject_var_in_out_copyout
 
 WORKING_COPY = TEST_AUTO_CI / "WORKING_COPY"
 FULL_TEST = WORKING_COPY / "tests" / "test_fb_cycle_full.st"
@@ -136,6 +140,19 @@ def run_tests(src_root: pathlib.Path, test_file: pathlib.Path, label: str) -> in
         if strucpp_dir is None:
             print(f"[ERREUR] Dossier temp STruCpp introuvable ({label})")
             return 1
+
+        # 2bis. T181-21 : post-traitement VAR_IN_OUT (copy-out) sur test_main.cpp.
+        # STruCpp ne genere qu'un copy-in (s.FB.X = s.X;) sans copy-out. On injecte
+        # le copy-out des VAR_IN_OUT du FB testé apres chaque appel, avant la
+        # compilation manuelle g++ ci-dessous. Mapping sans ambiguïté (ligne de
+        # copy-in s.FB.X = s.Y;). No-op si le FB n'a pas de VAR_IN_OUT.
+        fb_st_path = next((src_root / s for s in SOURCES if pathlib.Path(s).name == "FB_Cycle.st"), None)
+        if fb_st_path is not None:
+            try:
+                inject_var_in_out_copyout.postprocess_file(
+                    strucpp_dir / "test_main.cpp", fb_st_path, fb_var="FB")
+            except Exception as exc:
+                print(f"[var_in_out] post-traitement indisponible : {exc}")
 
         # 3. Compilation manuelle g++ (test_main.cpp + generated.cpp)
         exe = strucpp_dir / "manual_test.exe"

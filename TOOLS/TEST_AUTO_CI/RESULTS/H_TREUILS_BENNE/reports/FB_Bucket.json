@@ -92,11 +92,15 @@
     {
       "name": "TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle",
       "passed": true
+    },
+    {
+      "name": "T181-21 Copy-out VAR_IN_OUT : BucketState ecrit par FB_Bucket restitue a la variable de test",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 21,
-    "passed": 20,
+    "total": 22,
+    "passed": 21,
     "failed": 1
   }
 }

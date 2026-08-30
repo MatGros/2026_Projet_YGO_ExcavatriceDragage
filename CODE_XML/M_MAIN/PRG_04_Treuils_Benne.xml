@@ -5708,7 +5708,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 7 : Méca A dérive à l'arrêt (latched)
     DriftGuardA(
-        Arm        := NOT (BypassSafety OR BypassMecaA) AND JoystickYNeutral AND NOT BenneHoldStillActive,
+        Arm        := NOT (BypassSafety OR BypassMecaA) AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT BenneHoldStillActive,
         PositionM  := CablePosM,
         ToleranceM := UncommandedDriftToleranceM
     );

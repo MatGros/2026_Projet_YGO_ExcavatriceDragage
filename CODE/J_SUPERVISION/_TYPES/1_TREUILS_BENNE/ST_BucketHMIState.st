@@ -8,7 +8,7 @@ STRUCT
     ActiveOffset_M        : REAL;             (* 📐 Offset actif injecté dans la synchro *)
     M2StartStop         : BOOL;             (* 🛗 Commande Start/Stop forcée vers M2 *)
     M2Direction         : INT;              (* 🛗 Commande direction forcée vers M2 *)
-    M2ForceSlowSpeed    : BOOL;             (* 🐢 Blocage vitesse rapide de M2 *)
+    M2BucketJogLimit    : BOOL;             (* 🐢 Plafond palier du jog benne M2 *)
     Ready               : BOOL;             (* 🟢 Bloc opérationnel *)
     Busy                : BOOL;             (* ⚙️ Mouvement d'ouverture/fermeture en cours *)
     Done                : BOOL;             (* ✅ Mouvement terminé avec succès *)
@@ -22,7 +22,7 @@ STRUCT
     AutoBucketSeqActive : BOOL;             (* ⚙️ Séquencement automatique benne en cours (ouverture/fermeture auto) *)
     CoupledDiveOpenArmed    : BOOL;         (* : Ouverture auto armée (descente couplée demandée, benne pas ouverte) *)
     CoupledAscentCloseArmed : BOOL;         (* : Fermeture auto armée (montée couplée demandée, benne pas fermée) *)
-    ControlAscentActive     : BOOL;         (* : Phase vitesse contrôlée montée en cours (post-fermeture auto) *)
+    ExtractionControlActive : BOOL;         (* : Phase vitesse contrôlée montée en cours *)
     CoupledMotionBlockedByBucket : BOOL;    (* : Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition) *)
 END_STRUCT
 END_TYPE

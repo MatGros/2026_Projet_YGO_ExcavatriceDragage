@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T10:55:24.775966" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T10:55:24.775966">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T12:55:40.191366" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T12:55:40.191366">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1125,7 +1125,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 7 : Méca A dérive à l'arrêt (latched)
     DriftGuardA(
-        Arm        := NOT (BypassSafety OR BypassMecaA) AND JoystickYNeutral AND NOT BenneHoldStillActive,
+        Arm        := NOT (BypassSafety OR BypassMecaA) AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT BenneHoldStillActive,
         PositionM  := CablePosM,
         ToleranceM := UncommandedDriftToleranceM
     );
