@@ -129,6 +129,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "482", "G482 — Clamp bornes FB_SpeedStep (T181-07 AC6)", [sys.executable, f"{S}/G482_check_speedstep_clamp_bounds.py"]),
     ("C", "483", "G483 - Matrice maintenance N1/N2 : bypass gates MAINT_N2, override FDC borne, re-homing (T181-14 AC1-AC12)", [sys.executable, f"{S}/G483_check_bypass_matrix_mode_gated.py"]),
     ("C", "484", "G484 - ContactorStuck proprietaire unique (T181-02/03 AC7)", [sys.executable, f"{S}/G484_check_stuckclosed_single_owner.py"]),
+    ("C", "487", "G487 - Initialiseur struct anonyme en appel FB interdit (CODESYS 3.5, REX 2026-08-30 PRG_04/T181-08)", [sys.executable, f"{S}/G487_check_no_inline_struct_literal.py", "."]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]
@@ -252,6 +253,9 @@ def main() -> int:
         if args.compact:
             if code != 0:
                 failure_outputs[title] = out
+            # Remonter le resultat du gate des qu'il se termine (temps reel),
+            # pas seulement a la fin du batch.
+            print(f"  {color_status(status_icon, code == 0)} {clean_title} Â· {duration:.2f}s", flush=True)
         else:
             print(f"\n[{status_icon}] DurÃ©e gate : {duration:.2f}s", flush=True)
         results.append((title, code == 0, duration))
