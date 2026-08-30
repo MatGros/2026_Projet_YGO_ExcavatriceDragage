@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:43:55.522573" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:43:55.522573">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:48:06.580434" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:48:06.580434">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -76,78 +76,30 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 État homing conjoint machine (M1/M2/benne)</xhtml>
               </documentation>
             </variable>
-            <variable name="LocalDigitalIoOk">
+            <variable name="InputModules">
               <type>
-                <BOOL />
+                <derived name="ST_IOModuleDiag" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🩺 Diagnostics modules E/S ===
-🟢 Module Local_Digital_IO OK (DI8/DO8)</xhtml>
+🩺 Diagnostic carte des 5 modules E/S (AF06 §3bis)</xhtml>
               </documentation>
             </variable>
-            <variable name="Vh0800EndOk">
+            <variable name="InputSource">
               <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0800END OK (DI8)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Vh0808EtpOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0808ETP OK (DI8/DO8)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Vh0008ErOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Vh0008Er1Ok">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InputModuleFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur au moins un module E/S</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchInputSourceChanged">
-              <type>
-                <BOOL />
+                <derived name="ST_InputSource" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧪 Simulation &amp; variateur M3 filtré ===
-🔀 Impulsion 1 cycle si source Winch bascule (IHM)</xhtml>
+🔀 Flags de bascule de source (réel/simu) par domaine</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_StatusWord_Filtered">
+            <variable name="M3">
               <type>
-                <UINT />
+                <derived name="ST_M3DriveFeedback" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat variateur M3 filtre (consommé PRG_05)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_ActualFrequencyHz_Filtered">
-              <type>
-                <UINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Frequence reelle M3 filtree (consommé PRG_05)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Retours variateur M3 filtrés (consommé PRG_05)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -422,6 +374,172 @@
       et EtherCAT produits par PRG_02_Acquisition.
    📤 Producteur unique : PRG_02_Acquisition (Data.Network).
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_IOModuleDiag">
+        <baseType>
+          <struct>
+            <variable name="LocalDigitalIoOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module Local_Digital_IO OK (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0800END OK (DI8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0808EtpOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0808ETP OK (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008ErOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0008ER OK (DO8 Relais Freins/Kobold)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008Er1Ok">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut sur au moins un module E/S</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>99ce8dd2-5922-55d3-a0f2-73eba184a540</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🩺 ST_IOModuleDiag — Diagnostic carte des 5 modules E/S physiques
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3bis
+   🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
+      pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
+      TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
+   🔗 Producteur : PRG_02_Acquisition (5 appels GetDeviceState()).
+   🔌 Consommateurs : PRG_04 (SafeStop treuils), PRG_05 (SafeStop M3),
+      PRG_07 (recopie IHM GVL_IHM.Network.InputModules + FB_TroubleshootingView).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_InputSource">
+        <baseType>
+          <struct>
+            <variable name="WinchInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source Winch a basculé (réel/simu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source Translation a basculé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source Opérateur a basculé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source Machine a basculé</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>be238798-69ec-57f8-bbd0-dda01f682a8e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔀 ST_InputSource — Flags de bascule de source (réel/simu) par domaine
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les 4 impulsions 1 cycle signalant qu'une source
+      d'entrée a basculé (réel ↔ simu) pour un domaine donné.
+   📤 Producteur unique : PRG_02_Acquisition (Data.InputSource).
+   📥 Consommateur : PRG_07_Supervision (Data.InputSource.* → GVL_IHM).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_M3DriveFeedback">
+        <baseType>
+          <struct>
+            <variable name="StatusWord">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'état variateur M3 filtré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActualFrequencyHz">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Fréquence réelle M3 filtrée</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b6456aff-33b8-5284-8a0c-a5cec984f598</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ↔️ ST_M3DriveFeedback — Retours variateur M3 filtrés
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les retours variateur M3 (mot d'état + fréquence réelle)
+      conditionnés par PRG_02_Acquisition et consommés par PRG_05_Translation.
+   📤 Producteur unique : PRG_02_Acquisition (Data.M3).
+   📥 Consommateur : PRG_05_Translation (Data.M3.StatusWord / Data.M3.ActualFrequencyHz).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1010,6 +1128,11 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
               <Object Name="ST_AcquisitionEncoderQualified" ObjectId="bc4dc502-575b-5c03-a159-0fc9e08c35c2" />
               <Object Name="ST_AcquisitionJoystickQualified" ObjectId="e915927d-33f8-504a-9060-48dca13140d7" />
               <Object Name="ST_AcquisitionNetworkDiagnostics" ObjectId="0c2483c3-e64e-5f3f-bfcc-41828a26d24e" />
+              <Object Name="ST_InputSource" ObjectId="be238798-69ec-57f8-bbd0-dda01f682a8e" />
+              <Object Name="ST_M3DriveFeedback" ObjectId="b6456aff-33b8-5284-8a0c-a5cec984f598" />
+            </Folder>
+            <Folder Name="6_DIAG_ET_CHAINES">
+              <Object Name="ST_IOModuleDiag" ObjectId="99ce8dd2-5922-55d3-a0f2-73eba184a540" />
             </Folder>
           </Folder>
         </Folder>

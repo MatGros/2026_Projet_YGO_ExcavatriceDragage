@@ -999,78 +999,30 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 État homing conjoint machine (M1/M2/benne)</xhtml>
               </documentation>
             </variable>
-            <variable name="LocalDigitalIoOk">
+            <variable name="InputModules">
               <type>
-                <BOOL />
+                <derived name="ST_IOModuleDiag" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🩺 Diagnostics modules E/S ===
-🟢 Module Local_Digital_IO OK (DI8/DO8)</xhtml>
+🩺 Diagnostic carte des 5 modules E/S (AF06 §3bis)</xhtml>
               </documentation>
             </variable>
-            <variable name="Vh0800EndOk">
+            <variable name="InputSource">
               <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0800END OK (DI8)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Vh0808EtpOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0808ETP OK (DI8/DO8)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Vh0008ErOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Vh0008Er1Ok">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InputModuleFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur au moins un module E/S</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WinchInputSourceChanged">
-              <type>
-                <BOOL />
+                <derived name="ST_InputSource" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🧪 Simulation &amp; variateur M3 filtré ===
-🔀 Impulsion 1 cycle si source Winch bascule (IHM)</xhtml>
+🔀 Flags de bascule de source (réel/simu) par domaine</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_StatusWord_Filtered">
+            <variable name="M3">
               <type>
-                <UINT />
+                <derived name="ST_M3DriveFeedback" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat variateur M3 filtre (consommé PRG_05)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_ActualFrequencyHz_Filtered">
-              <type>
-                <UINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Frequence reelle M3 filtree (consommé PRG_05)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Retours variateur M3 filtrés (consommé PRG_05)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -6723,6 +6675,78 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_IOModuleDiag">
+        <baseType>
+          <struct>
+            <variable name="LocalDigitalIoOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module Local_Digital_IO OK (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0800END OK (DI8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0808EtpOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0808ETP OK (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008ErOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0008ER OK (DO8 Relais Freins/Kobold)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008Er1Ok">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut sur au moins un module E/S</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>99ce8dd2-5922-55d3-a0f2-73eba184a540</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🩺 ST_IOModuleDiag — Diagnostic carte des 5 modules E/S physiques
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3bis
+   🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
+      pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
+      TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
+   🔗 Producteur : PRG_02_Acquisition (5 appels GetDeviceState()).
+   🔌 Consommateurs : PRG_04 (SafeStop treuils), PRG_05 (SafeStop M3),
+      PRG_07 (recopie IHM GVL_IHM.Network.InputModules + FB_TroubleshootingView).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_InputModuleDiagHMI">
         <baseType>
           <struct>
@@ -6790,6 +6814,61 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
       pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
       TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
    🔗 Producteur : PRG_02_Acquisition (3 appels GetDeviceState()).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_InputSource">
+        <baseType>
+          <struct>
+            <variable name="WinchInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source Winch a basculé (réel/simu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source Translation a basculé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source Opérateur a basculé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineInputSourceChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔀 Source Machine a basculé</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>be238798-69ec-57f8-bbd0-dda01f682a8e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔀 ST_InputSource — Flags de bascule de source (réel/simu) par domaine
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les 4 impulsions 1 cycle signalant qu'une source
+      d'entrée a basculé (réel ↔ simu) pour un domaine donné.
+   📤 Producteur unique : PRG_02_Acquisition (Data.InputSource).
+   📥 Consommateur : PRG_07_Supervision (Data.InputSource.* → GVL_IHM).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -7168,6 +7247,45 @@ Valeur brute axe X (0..10000)</xhtml>
    🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
    📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
    =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_M3DriveFeedback">
+        <baseType>
+          <struct>
+            <variable name="StatusWord">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'état variateur M3 filtré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActualFrequencyHz">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Fréquence réelle M3 filtrée</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b6456aff-33b8-5284-8a0c-a5cec984f598</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ↔️ ST_M3DriveFeedback — Retours variateur M3 filtrés
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les retours variateur M3 (mot d'état + fréquence réelle)
+      conditionnés par PRG_02_Acquisition et consommés par PRG_05_Translation.
+   📤 Producteur unique : PRG_02_Acquisition (Data.M3).
+   📥 Consommateur : PRG_05_Translation (Data.M3.StatusWord / Data.M3.ActualFrequencyHz).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_MachineHoming">
@@ -39649,6 +39767,54 @@ PreviousQualified := Qualified;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur initialisation source Winch</xhtml>
               </documentation>
             </variable>
+            <variable name="PreviousTranslationInputSourceSimulated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire cycle precedent source Translation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationInputSourceInitialized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur initialisation source Translation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PreviousOperatorInputSourceSimulated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire cycle precedent source Operateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorInputSourceInitialized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur initialisation source Operateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PreviousMachineInputSourceSimulated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire cycle precedent source Machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineInputSourceInitialized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur initialisation source Machine</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimulationModeRise">
               <type>
                 <derived name="R_TRIG" />
@@ -39821,19 +39987,19 @@ HwReal.Machine.TremieFull_OR_GateRaised_DI := TremieFull_OR_GateRaised_DI; // �
 // GetDeviceState() = RUNNING =&gt; module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
 IF MachineInputSourceSimulated OR GVL_IHM.Network.Bypass.Global OR GVL_IHM.Network.Bypass.InputModules THEN
-    Data.LocalDigitalIoOk := TRUE;
-    Data.Vh0800EndOk      := TRUE;
-    Data.Vh0808EtpOk      := TRUE;
-    Data.Vh0008ErOk       := TRUE;
-    Data.Vh0008Er1Ok      := TRUE;
+    Data.InputModules.LocalDigitalIoOk := TRUE;
+    Data.InputModules.Vh0800EndOk      := TRUE;
+    Data.InputModules.Vh0808EtpOk      := TRUE;
+    Data.InputModules.Vh0008ErOk       := TRUE;
+    Data.InputModules.Vh0008Er1Ok      := TRUE;
 ELSE
-    Data.LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
-    Data.Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
-    Data.Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
-    Data.Vh0008ErOk       := (VH_0008ER.GetDeviceState() = DEVICE_STATE.RUNNING);
-    Data.Vh0008Er1Ok      := (VH_0008ER_1.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.InputModules.LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.InputModules.Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.InputModules.Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.InputModules.Vh0008ErOk       := (VH_0008ER.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.InputModules.Vh0008Er1Ok      := (VH_0008ER_1.GetDeviceState() = DEVICE_STATE.RUNNING);
 END_IF;
-Data.InputModuleFault := NOT (Data.LocalDigitalIoOk AND Data.Vh0800EndOk AND Data.Vh0808EtpOk AND Data.Vh0008ErOk AND Data.Vh0008Er1Ok);
+Data.InputModules.Fault := NOT (Data.InputModules.LocalDigitalIoOk AND Data.InputModules.Vh0800EndOk AND Data.InputModules.Vh0808EtpOk AND Data.InputModules.Vh0008ErOk AND Data.InputModules.Vh0008Er1Ok);
 {endregion}
 
 {region "§1ter Diagnostic reseaux (CANopen + EtherCAT)"}
@@ -39946,13 +40112,42 @@ HwSim.Translation := instSimBench.Translation;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;
 
+// 🔀 Détection de bascule de source (réel/simu) par domaine — impulsion 1 cycle.
+// Même pattern que Winch : mémoire Previous*InputSourceSimulated + comparaison.
 IF NOT WinchInputSourceInitialized THEN
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
     WinchInputSourceInitialized := TRUE;
-    Data.WinchInputSourceChanged := FALSE;
+    Data.InputSource.WinchInputSourceChanged := FALSE;
 ELSE
-    Data.WinchInputSourceChanged := (WinchInputSourceSimulated &lt;&gt; PreviousWinchInputSourceSimulated);
+    Data.InputSource.WinchInputSourceChanged := (WinchInputSourceSimulated &lt;&gt; PreviousWinchInputSourceSimulated);
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
+END_IF;
+
+IF NOT TranslationInputSourceInitialized THEN
+    PreviousTranslationInputSourceSimulated := TranslationInputSourceSimulated;
+    TranslationInputSourceInitialized := TRUE;
+    Data.InputSource.TranslationInputSourceChanged := FALSE;
+ELSE
+    Data.InputSource.TranslationInputSourceChanged := (TranslationInputSourceSimulated &lt;&gt; PreviousTranslationInputSourceSimulated);
+    PreviousTranslationInputSourceSimulated := TranslationInputSourceSimulated;
+END_IF;
+
+IF NOT OperatorInputSourceInitialized THEN
+    PreviousOperatorInputSourceSimulated := OperatorInputSourceSimulated;
+    OperatorInputSourceInitialized := TRUE;
+    Data.InputSource.OperatorInputSourceChanged := FALSE;
+ELSE
+    Data.InputSource.OperatorInputSourceChanged := (OperatorInputSourceSimulated &lt;&gt; PreviousOperatorInputSourceSimulated);
+    PreviousOperatorInputSourceSimulated := OperatorInputSourceSimulated;
+END_IF;
+
+IF NOT MachineInputSourceInitialized THEN
+    PreviousMachineInputSourceSimulated := MachineInputSourceSimulated;
+    MachineInputSourceInitialized := TRUE;
+    Data.InputSource.MachineInputSourceChanged := FALSE;
+ELSE
+    Data.InputSource.MachineInputSourceChanged := (MachineInputSourceSimulated &lt;&gt; PreviousMachineInputSourceSimulated);
+    PreviousMachineInputSourceSimulated := MachineInputSourceSimulated;
 END_IF;
 
 // 🔧 SEL(G, IN0, IN1) : brique standard IEC 61131-3, retourne IN1 si G=TRUE, IN0 sinon
@@ -40138,14 +40333,14 @@ COD2_PresetValue    := instEncoderM2.HwOut.PresetValueOut;
 // === ↔️ §5 RETOURS VARIATEUR M3 (décodage position migré vers PRG_05, AF-02 TBD §8 #5) ===
 
 // 📊 Retours variateur M3 conditionnés (HwIn arbitré en §2)
-Data.M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
-Data.M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
+Data.M3.StatusWord        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
+Data.M3.ActualFrequencyHz := HwIn.Translation.M3_ActualFrequencyHz;
 {endregion}
 
 {region "§6 Qualification globale du bus Data"}
 // === 🛡️ §6 QUALIFICATION GLOBALE DU BUS DATA ===
 // DataValid = TRUE uniquement si les modules E/S physiques et les bus réseaux sont opérationnels.
-Data.DataValid := NOT Data.InputModuleFault 
+Data.DataValid := NOT Data.InputModules.Fault 
                   AND instDiagCanOpen.Ready 
                   AND instDiagEthercat.Ready;
 {endregion}
@@ -41884,9 +42079,9 @@ END_IF;
 // Perte d'une reference auparavant valide en mouvement : arret controle des
 // deux treuils, sans PowerCutOff additionnel. Le cycle libere la demande
 // seulement apres le composite d'arret mecanique confirme.
-SafeStopM1_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModuleFault
+SafeStopM1_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModules.Fault
                        OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
-SafeStopM2_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.Data.InputModuleFault
+SafeStopM2_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.Data.InputModules.Fault
                        OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
 
 // Surveillance Kobold descente normale (hors FB_DiveSearch)
@@ -42964,7 +43159,7 @@ END_IF;
 // les autres (jeton "dernier point franchi" unique). Libéré
 // (RAZ complet) UNIQUEMENT sur mouvement CONFIRMÉ (fréquence réelle mesurée, pas juste la consigne
 // de sens) soutenu ≥1.5s — pas un rebond capteur ni un changement de sens instantané.
-M3_ConfirmedMoving := (UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0) &gt; 0.5;
+M3_ConfirmedMoving := (UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0) &gt; 0.5;
 TonM3ConfirmedMoving(IN := M3_ConfirmedMoving, PT := T#1s500ms);
 
 IF instPosDecoderM3.TranslationAtTremie THEN
@@ -43019,7 +43214,7 @@ M3_SpeedCmd_Active := instArbM3.SpeedPct;
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
-M3_SafeStop_Active := PRG_02_Acquisition.Data.InputModuleFault;
+M3_SafeStop_Active := PRG_02_Acquisition.Data.InputModules.Fault;
 
 // En mode manuel (SelTarget=0), n'importe quel des 3 points d'arrêt (Trémie/P1/Maintenance)
 // arme le verrou anti-rebond §4ter de FB_Translation (DirectionAtArrival). Mot EXACT
@@ -43069,8 +43264,8 @@ instSafetyTranslationM3(
     BrakeThermalFeedback    := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     DriveOnline             := PRG_02_Acquisition.Data.Network.DriveM3.Online,
     DriveOperational        := PRG_02_Acquisition.Data.Network.DriveM3.Operational,
-    DriveStatusWord         := PRG_02_Acquisition.Data.M3_StatusWord_Filtered,
-    DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
+    DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
+    DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BrakeCmd                := instTranslationM3.BrakeReleaseRequest,
     Direction               := M3_Direction_Active,
@@ -43124,8 +43319,8 @@ instTranslationM3(
                                    AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
     LimitSwitchFwd          := M3_LimitSwitchFwdStable,
     LimitSwitchRev          := M3_LimitSwitchRevStable,
-    DriveStatusWord         := PRG_02_Acquisition.Data.M3_StatusWord_Filtered,
-    DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
+    DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
+    DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     CfgRampAccelRate        := _TranslationRampAccelRate_Pct,
     CfgRampDecelNormalRate  := _TranslationRampDecelNormal_Pct,
     CfgRampDecelFastRate    := _TranslationRampDecelFast_Pct,
@@ -43142,7 +43337,7 @@ instTranslationM3(
 instPosEstimatorM3(
     Enable               := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE),
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
-    DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0,
+    DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     Direction            := M3_Direction_Active,
     SensorMaintenance    := instPosDecoderM3.TranslationPosMaintenance,
     SensorP1             := instPosDecoderM3.TranslationPosP1,
@@ -43217,15 +43412,15 @@ TranslationState.SensorsWord := instPosDecoderM3.SensorsWord;
 TranslationState.SensorWordIncoherent := instPosDecoderM3.Incoherent;
 TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
 TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
-TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3_ActualFrequencyHz_Filtered) / 100.0;
+TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 TranslationState.FinalInterlockState := E_State.READY;
 TranslationState.FinalInterlockReason := PRG_06_Outputs.instTranslationOutputInterlockM3.Reason;
 TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Fault.Error;
 TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.Fault.ErrorId;
 TranslationState.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instTranslationOutputInterlockM3.BrakeTimeoutElapsed;
-TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0080) &lt;&gt; 0;
-TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3_StatusWord_Filtered AND 16#0001) &lt;&gt; 0;
+TranslationState.DriveCommReady := (PRG_02_Acquisition.Data.M3.StatusWord AND 16#0080) &lt;&gt; 0;
+TranslationState.DrivePowerReady := (PRG_02_Acquisition.Data.M3.StatusWord AND 16#0001) &lt;&gt; 0;
 TranslationState.MaintenanceTargetEnable := PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable;
 TranslationState.SimulationModeActive := GVL_Simulation.SimulationModeActive;
 
@@ -44604,7 +44799,7 @@ GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationMod
 GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
-GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.WinchInputSourceChanged;
+GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.InputSource.WinchInputSourceChanged;
 
 // ---------- §3e. Structures d'état &amp; safety (recopies directes des bus) ----------
 GVL_IHM.M1TreuilRetenue.State := PRG_04_Treuils_Benne.Data.WinchM1State;
@@ -44627,7 +44822,7 @@ GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs.EmergencyDiag.ArmFai
 // OR avec les défauts d'arbitrage de mode (refus Semi-Auto, bascule de mode refusée) —
 // publiés par PRG_03 : sans eux ces refus restaient silencieux pour l'opérateur.
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
-                                      OR PRG_02_Acquisition.Data.InputModuleFault
+                                      OR PRG_02_Acquisition.Data.InputModules.Fault
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Error
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Latched;
 GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs.PowerCutOffActive;
@@ -44668,12 +44863,12 @@ GVL_IHM.Network.EcatErrorId := GVL_IHM.Network.BusEthercat.ErrorId OR GVL_IHM.Ne
 
 // 🩺 Diagnostic carte des 5 modules d'E/S physiques (AF06 §3bis) — lecture seule, calculé
 // dans PRG_02_Acquisition, simple recopie ici pour l'IHM (même patron que Network.*).
-GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.Data.LocalDigitalIoOk;
-GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Data.Vh0800EndOk;
-GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Data.Vh0808EtpOk;
-GVL_IHM.Network.InputModules.Vh0008ErOk       := PRG_02_Acquisition.Data.Vh0008ErOk;
-GVL_IHM.Network.InputModules.Vh0008Er1Ok      := PRG_02_Acquisition.Data.Vh0008Er1Ok;
-GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputModuleFault;
+GVL_IHM.Network.InputModules.LocalDigitalIoOk := PRG_02_Acquisition.Data.InputModules.LocalDigitalIoOk;
+GVL_IHM.Network.InputModules.Vh0800EndOk      := PRG_02_Acquisition.Data.InputModules.Vh0800EndOk;
+GVL_IHM.Network.InputModules.Vh0808EtpOk      := PRG_02_Acquisition.Data.InputModules.Vh0808EtpOk;
+GVL_IHM.Network.InputModules.Vh0008ErOk       := PRG_02_Acquisition.Data.InputModules.Vh0008ErOk;
+GVL_IHM.Network.InputModules.Vh0008Er1Ok      := PRG_02_Acquisition.Data.InputModules.Vh0008Er1Ok;
+GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputModules.Fault;
 
 // ---------- §3g. État cycle semi-auto &amp; bandeau ----------
 GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.Data.SequenceState.Ready;
@@ -44790,10 +44985,10 @@ instTroubleshootingView(
     Enable               := TRUE,
     HwIn                 := PRG_02_Acquisition.HwIn,
     HwReal               := PRG_02_Acquisition.HwReal,
-    InputModuleFault     := PRG_02_Acquisition.Data.InputModuleFault,
-    LocalDigitalIoOk     := PRG_02_Acquisition.Data.LocalDigitalIoOk,
-    Vh0800EndOk          := PRG_02_Acquisition.Data.Vh0800EndOk,
-    Vh0808EtpOk          := PRG_02_Acquisition.Data.Vh0808EtpOk,
+    InputModuleFault     := PRG_02_Acquisition.Data.InputModules.Fault,
+    LocalDigitalIoOk     := PRG_02_Acquisition.Data.InputModules.LocalDigitalIoOk,
+    Vh0800EndOk          := PRG_02_Acquisition.Data.InputModules.Vh0800EndOk,
+    Vh0808EtpOk          := PRG_02_Acquisition.Data.InputModules.Vh0808EtpOk,
     Auth                 := PRG_03_Modes_Cycle.Data.Auth,
     M1LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedCmd_Pct,
     M1LogicRequestDirection := PRG_04_Treuils_Benne.M1LogicRequestDirection,
@@ -45671,10 +45866,12 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
               <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
               <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
               <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
+              <Object Name="ST_InputSource" ObjectId="be238798-69ec-57f8-bbd0-dda01f682a8e" />
               <Object Name="ST_JoystickChecklist" ObjectId="8b2fb21c-dcd0-5811-a8c3-9d96f9130525" />
               <Object Name="ST_JoystickCmd" ObjectId="486d3dcf-ebc5-586d-9a94-ea39a076f411" />
               <Object Name="ST_JoystickHMI" ObjectId="5f006dc4-3bb9-55fd-9755-c378359d9979" />
               <Object Name="ST_JoystickState" ObjectId="f7e9804f-8654-5e66-a418-611d9f5fae02" />
+              <Object Name="ST_M3DriveFeedback" ObjectId="b6456aff-33b8-5284-8a0c-a5cec984f598" />
             </Folder>
             <Folder Name="8_BANDEAU_ET_IHM">
               <Object Name="ST_AlarmBanner" ObjectId="51a442bb-120a-5a1f-856e-eba247651394" />
@@ -45739,6 +45936,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
             <Folder Name="6_DIAG_ET_CHAINES">
               <Object Name="ST_ChainContextGlobal" ObjectId="601b64cb-498b-5fca-a2a0-11b24726fea1" />
               <Object Name="ST_HomingChecklist" ObjectId="2d6561f4-76da-5ede-affd-bb7892225e3b" />
+              <Object Name="ST_IOModuleDiag" ObjectId="99ce8dd2-5922-55d3-a0f2-73eba184a540" />
               <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
               <Object Name="ST_MotionChecklist" ObjectId="6d9cfeb3-7f24-5c22-8bb6-161cefc2f0eb" />
               <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />

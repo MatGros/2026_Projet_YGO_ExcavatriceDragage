@@ -48,6 +48,12 @@ VAR
 
     PreviousWinchInputSourceSimulated : BOOL; // . [LOC] Memoire cycle precedent source Winch
     WinchInputSourceInitialized       : BOOL; // . [LOC] Indicateur initialisation source Winch
+    PreviousTranslationInputSourceSimulated : BOOL; // . [LOC] Memoire cycle precedent source Translation
+    TranslationInputSourceInitialized        : BOOL; // . [LOC] Indicateur initialisation source Translation
+    PreviousOperatorInputSourceSimulated     : BOOL; // . [LOC] Memoire cycle precedent source Operateur
+    OperatorInputSourceInitialized           : BOOL; // . [LOC] Indicateur initialisation source Operateur
+    PreviousMachineInputSourceSimulated      : BOOL; // . [LOC] Memoire cycle precedent source Machine
+    MachineInputSourceInitialized            : BOOL; // . [LOC] Indicateur initialisation source Machine
 
     SimulationModeRise                : R_TRIG; // . [LOC] Front montant activation simulation
     SimulationModeFall                : F_TRIG; // . [LOC] Front descendant desactivation simulation
@@ -165,19 +171,19 @@ HwReal.Machine.TremieFull_OR_GateRaised_DI := TremieFull_OR_GateRaised_DI; // �
 // GetDeviceState() = RUNNING => module opérationnel. Si la simulation globale/machine est active,
 // les cartes physiques absentes sont simulées OK pour permettre le fonctionnement banc.
 IF MachineInputSourceSimulated OR GVL_IHM.Network.Bypass.Global OR GVL_IHM.Network.Bypass.InputModules THEN
-    Data.LocalDigitalIoOk := TRUE;
-    Data.Vh0800EndOk      := TRUE;
-    Data.Vh0808EtpOk      := TRUE;
-    Data.Vh0008ErOk       := TRUE;
-    Data.Vh0008Er1Ok      := TRUE;
+    Data.InputModules.LocalDigitalIoOk := TRUE;
+    Data.InputModules.Vh0800EndOk      := TRUE;
+    Data.InputModules.Vh0808EtpOk      := TRUE;
+    Data.InputModules.Vh0008ErOk       := TRUE;
+    Data.InputModules.Vh0008Er1Ok      := TRUE;
 ELSE
-    Data.LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
-    Data.Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
-    Data.Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
-    Data.Vh0008ErOk       := (VH_0008ER.GetDeviceState() = DEVICE_STATE.RUNNING);
-    Data.Vh0008Er1Ok      := (VH_0008ER_1.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.InputModules.LocalDigitalIoOk := (Local_Digital_IO.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.InputModules.Vh0800EndOk      := (VH_0800END.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.InputModules.Vh0808EtpOk      := (VH_0808ETP.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.InputModules.Vh0008ErOk       := (VH_0008ER.GetDeviceState() = DEVICE_STATE.RUNNING);
+    Data.InputModules.Vh0008Er1Ok      := (VH_0008ER_1.GetDeviceState() = DEVICE_STATE.RUNNING);
 END_IF;
-Data.InputModuleFault := NOT (Data.LocalDigitalIoOk AND Data.Vh0800EndOk AND Data.Vh0808EtpOk AND Data.Vh0008ErOk AND Data.Vh0008Er1Ok);
+Data.InputModules.Fault := NOT (Data.InputModules.LocalDigitalIoOk AND Data.InputModules.Vh0800EndOk AND Data.InputModules.Vh0808EtpOk AND Data.InputModules.Vh0008ErOk AND Data.InputModules.Vh0008Er1Ok);
 {endregion}
 
 {region "§1ter Diagnostic reseaux (CANopen + EtherCAT)"}
@@ -290,13 +296,42 @@ HwSim.Translation := instSimBench.Translation;
 HwSim.Operator    := instSimBench.Operator;
 HwSim.Machine     := instSimBench.Machine;
 
+// 🔀 Détection de bascule de source (réel/simu) par domaine — impulsion 1 cycle.
+// Même pattern que Winch : mémoire Previous*InputSourceSimulated + comparaison.
 IF NOT WinchInputSourceInitialized THEN
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
     WinchInputSourceInitialized := TRUE;
-    Data.WinchInputSourceChanged := FALSE;
+    Data.InputSource.WinchInputSourceChanged := FALSE;
 ELSE
-    Data.WinchInputSourceChanged := (WinchInputSourceSimulated <> PreviousWinchInputSourceSimulated);
+    Data.InputSource.WinchInputSourceChanged := (WinchInputSourceSimulated <> PreviousWinchInputSourceSimulated);
     PreviousWinchInputSourceSimulated := WinchInputSourceSimulated;
+END_IF;
+
+IF NOT TranslationInputSourceInitialized THEN
+    PreviousTranslationInputSourceSimulated := TranslationInputSourceSimulated;
+    TranslationInputSourceInitialized := TRUE;
+    Data.InputSource.TranslationInputSourceChanged := FALSE;
+ELSE
+    Data.InputSource.TranslationInputSourceChanged := (TranslationInputSourceSimulated <> PreviousTranslationInputSourceSimulated);
+    PreviousTranslationInputSourceSimulated := TranslationInputSourceSimulated;
+END_IF;
+
+IF NOT OperatorInputSourceInitialized THEN
+    PreviousOperatorInputSourceSimulated := OperatorInputSourceSimulated;
+    OperatorInputSourceInitialized := TRUE;
+    Data.InputSource.OperatorInputSourceChanged := FALSE;
+ELSE
+    Data.InputSource.OperatorInputSourceChanged := (OperatorInputSourceSimulated <> PreviousOperatorInputSourceSimulated);
+    PreviousOperatorInputSourceSimulated := OperatorInputSourceSimulated;
+END_IF;
+
+IF NOT MachineInputSourceInitialized THEN
+    PreviousMachineInputSourceSimulated := MachineInputSourceSimulated;
+    MachineInputSourceInitialized := TRUE;
+    Data.InputSource.MachineInputSourceChanged := FALSE;
+ELSE
+    Data.InputSource.MachineInputSourceChanged := (MachineInputSourceSimulated <> PreviousMachineInputSourceSimulated);
+    PreviousMachineInputSourceSimulated := MachineInputSourceSimulated;
 END_IF;
 
 // 🔧 SEL(G, IN0, IN1) : brique standard IEC 61131-3, retourne IN1 si G=TRUE, IN0 sinon
@@ -482,14 +517,14 @@ COD2_PresetValue    := instEncoderM2.HwOut.PresetValueOut;
 // === ↔️ §5 RETOURS VARIATEUR M3 (décodage position migré vers PRG_05, AF-02 TBD §8 #5) ===
 
 // 📊 Retours variateur M3 conditionnés (HwIn arbitré en §2)
-Data.M3_StatusWord_Filtered        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
-Data.M3_ActualFrequencyHz_Filtered := HwIn.Translation.M3_ActualFrequencyHz;
+Data.M3.StatusWord        := WORD_TO_UINT(HwIn.Translation.M3_StatusWord);
+Data.M3.ActualFrequencyHz := HwIn.Translation.M3_ActualFrequencyHz;
 {endregion}
 
 {region "§6 Qualification globale du bus Data"}
 // === 🛡️ §6 QUALIFICATION GLOBALE DU BUS DATA ===
 // DataValid = TRUE uniquement si les modules E/S physiques et les bus réseaux sont opérationnels.
-Data.DataValid := NOT Data.InputModuleFault 
+Data.DataValid := NOT Data.InputModules.Fault 
                   AND instDiagCanOpen.Ready 
                   AND instDiagEthercat.Ready;
 {endregion}

@@ -22,16 +22,10 @@ STRUCT
     MachineHoming                : ST_MachineHoming;                   // 🎯 État homing conjoint machine (M1/M2/benne)
 
     // === 🩺 Diagnostics modules E/S ===
-    LocalDigitalIoOk             : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
-    Vh0800EndOk                  : BOOL; // 🟢 Module VH_0800END OK (DI8)
-    Vh0808EtpOk                  : BOOL; // 🟢 Module VH_0808ETP OK (DI8/DO8)
-    Vh0008ErOk                   : BOOL; // 🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)
-    Vh0008Er1Ok                  : BOOL; // 🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
-    InputModuleFault             : BOOL; // ❌ Defaut sur au moins un module E/S
+    InputModules                 : ST_IOModuleDiag; // 🩺 Diagnostic carte des 5 modules E/S (AF06 §3bis)
 
     // === 🧪 Simulation & variateur M3 filtré ===
-    WinchInputSourceChanged       : BOOL; // 🔀 Impulsion 1 cycle si source Winch bascule (IHM)
-    M3_StatusWord_Filtered        : UINT; // 📊 Mot d'etat variateur M3 filtre (consommé PRG_05)
-    M3_ActualFrequencyHz_Filtered : UINT; // 📊 Frequence reelle M3 filtree (consommé PRG_05)
+    InputSource                  : ST_InputSource; // 🔀 Flags de bascule de source (réel/simu) par domaine
+    M3                           : ST_M3DriveFeedback; // ↔️ Retours variateur M3 filtrés (consommé PRG_05)
 END_STRUCT
 END_TYPE
