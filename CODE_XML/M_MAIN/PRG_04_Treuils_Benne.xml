@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T10:57:27.132940" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T10:57:27.132940">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T11:38:00.609665" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T11:38:00.609665">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2845,6 +2845,19 @@ l'armement du re-homing obligatoire publié vers PRG_03 (PositionLimitOverridden
               </type>
             </variable>
             <variable name="BypassM2MecaDEff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PositionLimitOverriddenM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Usage effectif d'un override/bypass de position -&gt; arme le re-homing obligatoire (PRG_03).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionLimitOverriddenM2">
               <type>
                 <BOOL />
               </type>
