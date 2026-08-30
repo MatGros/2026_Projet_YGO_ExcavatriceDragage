@@ -43,7 +43,7 @@ TEST 'TC-P10-012 Watchdog frein : BrakeCmd sans confirmation 500ms -> bit0, Rest
        RequestedStep := 1);
     ASSERT_TRUE(fb.RelayFwd, 'Demande montee -> RelayFwd');
     ASSERT_TRUE(fb.BrakeCmd, 'Demande montee -> BrakeCmd');
-    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_BRAKE_COMMAND_CONFIRMATION, 'Etat WAIT_BRAKE_COMMAND_CONFIRMATION (2)');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState.WAIT_BRAKE_COMMAND_CONFIRMATION, 'Etat WAIT_BRAKE_COMMAND_CONFIRMATION (2)');
 
     (* Scan 3 : apres 500ms sans confirmation -> defaut frein *)
     ADVANCE_TIME(500000000);
@@ -56,8 +56,8 @@ TEST 'TC-P10-012 Watchdog frein : BrakeCmd sans confirmation 500ms -> bit0, Rest
     ASSERT_TRUE(fb.Error, 'Timeout frein 500ms -> Error');
     ASSERT_EQ(fb.ErrorId, 1, 'Timeout frein -> bit0 (1)');
     ASSERT_TRUE(fb.RestartInhibit, 'Timeout frein -> RestartInhibit=TRUE');
-    ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason#BRAKE_COMMAND_NOT_CONFIRMED, 'Reason=BRAKE_COMMAND_NOT_CONFIRMED (1)');
-    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#FAULT, 'Etat FAULT (5)');
+    ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED, 'Reason=BRAKE_COMMAND_NOT_CONFIRMED (1)');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState.FAULT, 'Etat FAULT (5)');
 END_TEST
 
 TEST 'TC-P10-012bis Pas de faux defaut au RestartRequired : BrakeCmd retenu ne doit pas armer le watchdog'
@@ -105,7 +105,7 @@ TEST 'TC-P10-012bis Pas de faux defaut au RestartRequired : BrakeCmd retenu ne d
        RequestedStep := 1);
     ASSERT_FALSE(fb.RelayFwd, 'RestartRequired -> RelayFwd retenu');
     ASSERT_FALSE(fb.BrakeCmd, 'RestartRequired -> BrakeCmd retenu (FALSE)');
-    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState.WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
 
     (* Scan 5 : apres 500ms, BrakeCmd=FALSE -> PAS de faux defaut *)
     ADVANCE_TIME(500000000);
@@ -230,7 +230,7 @@ TEST 'TC-P10-020 Watchdog frein reel terrain : temps/contacteur/bobine'
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 1);
     ASSERT_TRUE(fb.Error, 'Watchdog frein logiciel 500ms -> Error (brique du diagnostic terrain)');
-    ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason#BRAKE_COMMAND_NOT_CONFIRMED, 'Reason=BRAKE_COMMAND_NOT_CONFIRMED');
+    ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED, 'Reason=BRAKE_COMMAND_NOT_CONFIRMED');
 END_TEST
 
 TEST 'TC-P10-021 Temps mort meme sens : 1s apres arret -> nouvelle demande (DeadTimeSameDir)'
@@ -279,7 +279,7 @@ TEST 'TC-P10-021 Temps mort meme sens : 1s apres arret -> nouvelle demande (Dead
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 1, DeadTimeSameDir := T#2s, DeadTimeOppositeDir := T#2s);
     ASSERT_FALSE(fb.RelayFwd, 'DeadTimeSameDir pas ecoule -> demande meme sens retenue');
-    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState.WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
 
     (* Scan 5 : apres 2s (DeadTimeSameDir ecoule) -> demande meme sens acceptee *)
     ADVANCE_TIME(500000000);
@@ -337,7 +337,7 @@ TEST 'TC-P10-022 Temps mort inversion : 1s apres arret + inversion sens (DeadTim
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 1, DeadTimeSameDir := T#1s, DeadTimeOppositeDir := T#2s);
     ASSERT_FALSE(fb.RelayRev, 'DeadTimeOppositeDir pas ecoule -> inversion retenue');
-    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState.WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
 
     (* Scan 5 : apres 2s (DeadTimeOppositeDir ecoule) -> inversion acceptee *)
     ADVANCE_TIME(500000000);
@@ -431,7 +431,7 @@ TEST 'TC-P10-023a §3bis : sens maintenu apres chute de palier a 0 tant que cont
     ASSERT_TRUE(fb.RelayFwd, 'Chute palier -> contacteur de sens MAINTENU (§3bis)');
     ASSERT_TRUE(fb.BrakeCmd, 'Maintien -> BrakeCmd reste TRUE (couple direct)');
     ASSERT_TRUE(fb.SenseHoldActive, 'Diag SenseHoldActive');
-    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_SENSE_DROP_CONFIRM, 'Etat WAIT_SENSE_DROP_CONFIRM (6)');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState.WAIT_SENSE_DROP_CONFIRM, 'Etat WAIT_SENSE_DROP_CONFIRM (6)');
 
     (* Scan 4 : feedback retombee percu (FwdRevSpeedFeedbackOff=TRUE) mais debounce pas ecoule -> tenu *)
     ADVANCE_TIME(100000000);
@@ -454,7 +454,7 @@ TEST 'TC-P10-023a §3bis : sens maintenu apres chute de palier a 0 tant que cont
     ASSERT_FALSE(fb.RelayFwd, 'Confirmation retombee -> chute du sens (§3bis)');
     ASSERT_FALSE(fb.BrakeCmd, 'Apres chute -> BrakeCmd=FALSE');
     ASSERT_FALSE(fb.SenseHoldActive, 'Fin du maintien');
-    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#READY, 'Retour READY');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState.READY, 'Retour READY');
 END_TEST
 
 TEST 'TC-P10-023b §3bis : T_max atteint sans confirmation -> chute du sens FORCEE + latch ContactorStuck'
@@ -516,8 +516,8 @@ TEST 'TC-P10-023b §3bis : T_max atteint sans confirmation -> chute du sens FORC
     ASSERT_TRUE(fb.ContactorStuck, 'Diag ContactorStuck latche');
     ASSERT_FALSE(fb.SenseHoldActive, 'Fin du maintien');
     ASSERT_FALSE(fb.Ready, 'Latch -> barriere non pret (pas de redemarrage auto)');
-    ASSERT_EQ(fb.State, E_WinchFinalInterlockState#FAULT, 'Etat FAULT');
-    ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason#SENSE_DROP_TIMEOUT, 'Reason=SENSE_DROP_TIMEOUT');
+    ASSERT_EQ(fb.State, E_WinchFinalInterlockState.FAULT, 'Etat FAULT');
+    ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason.SENSE_DROP_TIMEOUT, 'Reason=SENSE_DROP_TIMEOUT');
 
     (* Scan 5 : acquittement conscient (front Reset) -> latch leve (cause disparue = demande neutre) *)
     ADVANCE_TIME(10000000);
