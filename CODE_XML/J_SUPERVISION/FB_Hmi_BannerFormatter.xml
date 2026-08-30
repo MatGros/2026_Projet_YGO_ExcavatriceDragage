@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T10:03:52.601724" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T10:03:52.601724">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:48:59.965378" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:48:59.965378">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -209,7 +209,7 @@
           </data>
         </addData>
       </dataType>
-      <dataType name="E_ExtractionSequenceState">
+      <dataType name="E_ExtractionAssistState">
         <baseType>
           <enum>
             <values>
@@ -270,7 +270,7 @@
             </Attributes>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6ae0d8f0-4bfe-5792-a167-697e4476a91d</ObjectId>
+            <ObjectId>52924d25-cfcc-5dc2-a673-d7581dfb2d37</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -1356,7 +1356,7 @@
             </variable>
             <variable name="ExtractionState">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] État extraction</xhtml>
@@ -1634,7 +1634,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut extraction (FB_ExtractionSequence.ErrorId)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut extraction (FB_ExtractionAssist.ErrorId)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyErrorId">
@@ -2575,7 +2575,7 @@ IF ((SyncErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAl
     AlarmArray[AlarmCount] := '[SYNC] incoherence commande'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionSequence)
+// 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionAssist)
 IF ((DiveErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[DIVE] timeout immersion'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -2812,7 +2812,7 @@ END_IF;
           <Folder Name="_TYPES">
             <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
             <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
-            <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+            <Object Name="E_ExtractionAssistState" ObjectId="52924d25-cfcc-5dc2-a673-d7581dfb2d37" />
           </Folder>
         </Folder>
         <Folder Name="F_MODES">

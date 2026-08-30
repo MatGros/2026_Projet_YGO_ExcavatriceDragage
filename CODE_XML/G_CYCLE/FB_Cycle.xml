@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:47:09.393963" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:47:09.393963">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:28:48.640569" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:28:48.640569">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1266,6 +1266,7 @@ AbortEdge(CLK := AbortCycle);
 EnableEdge(CLK := Enable);
 
 // ⏱️ Surveillance indépendante de la remontée lente
+// X7_CTRL_ASCENT -&gt; X8_ASCENT_LOADED : TON de stabilisation palier 1.
 StabilizationTimer(IN := (State = E_CycleStep.X7_CTRL_ASCENT), PT := CtrlAscentTimeout);
 
 // 📏 Comparaison vitesse réelle M1/M2
@@ -1275,10 +1276,12 @@ SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
                        AND (SpeedMismatchThresholdMps &gt; 0.0)
                        AND (SpeedMismatchTimeout &gt; T#0ms)
                        AND (SpeedMismatchMps &gt; SpeedMismatchThresholdMps);
+// X7_CTRL_ASCENT -&gt; STABILIZING : TON confirmation écart vitesse.
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
 // Tempo max d'étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
+// Xi -&gt; STABILIZING : TON backstop durée d'état pour tous les états de mouvement.
 StepMaxTimer(IN := CycleMotionPermit AND (State &lt;&gt; E_CycleStep.X0_PREPARATION)
                   AND (State &lt;&gt; E_CycleStep.X13_DONE_SYNC)
                   AND (State &lt;&gt; E_CycleStep.STABILIZING),
@@ -1564,7 +1567,9 @@ CASE State OF
         OperatorAction := 'Maintenir la commande : fermeture de la benne.';
 
         WinchM1Cmd.StartStop := FALSE;
-        BucketCmd.Close := TRUE;
+        // L'ordre benne reste soumis au même homme-mort que le cycle : aucune
+        // commande d'actionneur ne doit survivre à la perte du permis opérateur.
+        BucketCmd.Close := CycleMotionPermit;
 
         IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.Close := FALSE;
@@ -1674,11 +1679,14 @@ CASE State OF
         OperatorActionId := 16#040B;
         OperatorAction := 'Deflechir vers le bas pour ouvrir la benne et vider la charge.';
 
-        WinchM1Cmd.StartStop := CycleMotionPermit AND (WinchM1Cmd.Direction = 1);
-        WinchM1Cmd.Direction := 1;
+        // X11 est une ouverture par déflexion vers le bas : la direction doit
+        // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
+        // précédent). Les deux treuils restent synchrones et sous homme-mort.
+        WinchM1Cmd.Direction := -1;
+        WinchM1Cmd.StartStop := CycleMotionPermit;
         WinchM1Cmd.SpeedPct  := 20.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit AND (WinchM2Cmd.Direction = 1);
-        WinchM2Cmd.Direction := 1;
+        WinchM2Cmd.Direction := -1;
+        WinchM2Cmd.StartStop := CycleMotionPermit;
         WinchM2Cmd.SpeedPct  := 20.0;
 
         BucketCmd.Open := CycleMotionPermit AND (WinchM1Cmd.Direction = -1);
@@ -1953,7 +1961,9 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
           </Folder>
         </Folder>
         <Folder Name="I_TRANSLATION">
-          <Object Name="ST_fbCycle_TranslationCmdDemand" ObjectId="e3302f93-57a8-5949-b90f-a1621e17cb50" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbCycle_TranslationCmdDemand" ObjectId="e3302f93-57a8-5949-b90f-a1621e17cb50" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

@@ -21,7 +21,7 @@ STRUCT
     TglEnableKoboldAutoStopDescent : BOOL := FALSE; (* : Arrêt auto descente sur détection fond Kobold (pilotage normal) *)
     // Coupe-circuit d'urgence pour le séquencement auto benne.
     // Défaut FALSE = mouvement M1/M2 synchro jamais
-    // gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).
+    // gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionAssist).
     TglEnableCoupledBucketSequencing : BOOL := FALSE;
     Initialized                 : BOOL := FALSE; (* 🚦 flag restauration boot *)
 END_STRUCT

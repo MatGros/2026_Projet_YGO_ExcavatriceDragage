@@ -445,7 +445,7 @@ pas une vitesse continue.
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupe-circuit d'urgence pour le séquencement auto benne.
 Défaut FALSE = mouvement M1/M2 synchro jamais
-gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</xhtml>
+gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionAssist).</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">

@@ -452,7 +452,9 @@
           </Folder>
         </Folder>
         <Folder Name="I_TRANSLATION">
-          <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+          <Folder Name="_TYPES">
+            <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>

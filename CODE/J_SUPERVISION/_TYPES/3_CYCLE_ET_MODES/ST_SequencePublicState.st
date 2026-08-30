@@ -38,8 +38,8 @@ STRUCT
     ExtractionDone              : BOOL;                    // Assistance extraction terminée
     ExtractionError             : BOOL;                    // Défaut assistance extraction
     ExtractionErrorId           : WORD;                    // Code défaut extraction
-    ExtractionState             : E_ExtractionSequenceState;// Phase interne séquence extraction
-    ExtractionStepAtFault       : E_ExtractionSequenceState;// Phase interne mémorisée au défaut extraction
+    ExtractionState             : E_ExtractionAssistState;// Phase interne séquence extraction
+    ExtractionStepAtFault       : E_ExtractionAssistState;// Phase interne mémorisée au défaut extraction
     DumpAtTremieArmed           : BOOL;                    // Option vidage trémie armée IHM
     DumpAtTremieAssistActive    : BOOL;                    // Assistance vidage trémie active
     DumpAtTremieAtTremie        : BOOL;                    // Chariot M3 positionné à la trémie

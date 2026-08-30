@@ -1,11 +1,11 @@
 (* =======================================================================
-   ⚙️ E_ExtractionSequenceState — Phases d'extraction assistée
+   ⚙️ E_ExtractionAssistState — Phases d'extraction assistée
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des phases de la séquence d'extraction assistée
    📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
-TYPE E_ExtractionSequenceState :
+TYPE E_ExtractionAssistState :
 (
     WAIT_BOTTOM_CONFIRMATION := 0, (* Attente fond Kobold ou attestation opérateur *)
     READY_TO_CLOSE            := 1, (* Prêt à fermer la benne *)

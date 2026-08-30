@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T17:46:26.424281" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T17:46:26.424281">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:47:33.717973" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:47:33.717973">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -93,12 +93,12 @@
             </variable>
             <variable name="ExtractionState">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
             </variable>
             <variable name="ExtractionStepAtFault">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
             </variable>
             <variable name="OperatorActionId">
@@ -253,7 +253,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
           </data>
         </addData>
       </dataType>
-      <dataType name="E_ExtractionSequenceState">
+      <dataType name="E_ExtractionAssistState">
         <baseType>
           <enum>
             <values>
@@ -314,7 +314,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
             </Attributes>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6ae0d8f0-4bfe-5792-a167-697e4476a91d</ObjectId>
+            <ObjectId>52924d25-cfcc-5dc2-a673-d7581dfb2d37</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -337,7 +337,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
         <Folder Name="G_CYCLE">
           <Folder Name="_TYPES">
             <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
-            <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+            <Object Name="E_ExtractionAssistState" ObjectId="52924d25-cfcc-5dc2-a673-d7581dfb2d37" />
           </Folder>
         </Folder>
       </ProjectStructure>

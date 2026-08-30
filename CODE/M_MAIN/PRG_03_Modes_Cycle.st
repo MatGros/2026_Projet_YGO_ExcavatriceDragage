@@ -28,11 +28,11 @@ VAR
     instModes              : FB_Modes;              // * [INST] Arbitrage des modes machine et calcul autorisations
     instCycleSemiAuto      : FB_Cycle;              // * [INST] Séquenceur de cycle semi-automatique (privé)
     instDiveSearch         : FB_DiveSearch;         // * [INST] Assistance plongée et recherche fond Kobold
-    instExtractionSequence : FB_ExtractionSequence; // * [INST] Séquence d'extraction et remontée assistée
+    instExtractionAssist : FB_ExtractionAssist; // * [INST] Séquence d'extraction et remontée assistée
 
     // === 🎛️ VARIABLES LOCALES & DÉTECTEURS ===
-    CoupledUserRequestActive      : BOOL;   // . [LOC] Intention de mouvement couplé active (joystick ou boutons)
-    CoupledUserRequestDirection   : INT;    // . [LOC] Sens mouvement couplé (-1: Descente, 0: Neutre, +1: Montée)
+    WinchBothMotionActive      : BOOL;   // . [LOC] Intention de mouvement both active (joystick ou boutons)
+    WinchBothMotionDirection   : INT;    // . [LOC] Sens mouvement both (-1: Descente, 0: Neutre, +1: Montée)
     ManualBottomPositionConfirmed : BOOL;   // . [LOC] Confirmation manuelle "fond touché" opérateur
     BottomPositionConfirmed       : BOOL;   // . [LOC] Synthèse fond touché (Kobold OR Manuel OR Bypass)
     BypassKoboldBottomTouched     : BOOL;   // . [LOC] Détection fond sur front Kobold en mode bypass
@@ -88,18 +88,18 @@ GVL_PERSISTENT._MaintM2HomingRequired := instModes.Auth.HomingRequiredM2;
 
 // Qualification de l'intention opérateur couplée (M1+M2) dans le même scan
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    CoupledUserRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
-    CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
+    WinchBothMotionDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
+    WinchBothMotionActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
                                      AND (instModes.Auth.JoystickWinchSelectArbitrated = 0);
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
-        CoupledUserRequestDirection := 1;
+        WinchBothMotionDirection := 1;
     ELSIF GVL_IHM.Commun.BtnWinchBothDown THEN
-        CoupledUserRequestDirection := -1;
+        WinchBothMotionDirection := -1;
     ELSE
-        CoupledUserRequestDirection := 0;
+        WinchBothMotionDirection := 0;
     END_IF;
-    CoupledUserRequestActive := (CoupledUserRequestDirection <> 0);
+    WinchBothMotionActive := (WinchBothMotionDirection <> 0);
 END_IF;
 
 {endregion}
@@ -112,7 +112,7 @@ END_IF;
 IF NOT (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
-   OR (CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)) THEN
+   OR (WinchBothMotionActive AND (WinchBothMotionDirection = -1)) THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
     BypassKoboldBottomTouched := FALSE;
 END_IF;
@@ -121,7 +121,7 @@ ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomCon
 // 2. Détection front descendant Kobold sous bypass
 BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
-   AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
+   AND WinchBothMotionActive AND (WinchBothMotionDirection = -1)
    AND BypassKoboldFallEdge.Q THEN
     BypassKoboldBottomTouched := TRUE;
 END_IF;
@@ -133,8 +133,8 @@ instDiveSearch(
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode := instModes.Auth.Mode,
-    MotionRequestActive := CoupledUserRequestActive,
-    MotionDirection := CoupledUserRequestDirection,
+    MotionRequestActive := WinchBothMotionActive,
+    MotionDirection := WinchBothMotionDirection,
     BucketIsOpen := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     M1Position_M := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
@@ -157,15 +157,15 @@ instDiveSearch(
 // Synthèse de confirmation fond
 BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed OR BypassKoboldBottomTouched;
 
-// 4. Instance FB_ExtractionSequence (Fermeture et décollage assisté)
-instExtractionSequence(
+// 4. Instance FB_ExtractionAssist (Fermeture et décollage assisté)
+instExtractionAssist(
     Enable := (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode := instModes.Auth.Mode,
-    MotionRequestActive := CoupledUserRequestActive,
-    MotionDirection := CoupledUserRequestDirection,
+    MotionRequestActive := WinchBothMotionActive,
+    MotionDirection := WinchBothMotionDirection,
     BottomPositionConfirmed := BottomPositionConfirmed,
     BucketIsClosed := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     BucketBusy := PRG_04_Treuils_Benne.Data.BucketBusy,
@@ -183,7 +183,7 @@ instExtractionSequence(
     CycleTime := T#10ms
 );
 
-IF instExtractionSequence.BottomConfirmationConsumed THEN
+IF instExtractionAssist.BottomConfirmationConsumed THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
 END_IF;
 
@@ -250,8 +250,8 @@ Data.Auth := instModes.Auth;
 Data.ModesFault := instModes.Fault;
 
 // 1bis. Intention couplée continue opérateur (inconditionnelle, TOUS modes)
-Data.ReqProgram.OperatorCoupledIntent.Active    := CoupledUserRequestActive;
-Data.ReqProgram.OperatorCoupledIntent.Direction := CoupledUserRequestDirection;
+Data.ReqProgram.OperatorCoupledIntent.Active    := WinchBothMotionActive;
+Data.ReqProgram.OperatorCoupledIntent.Direction := WinchBothMotionDirection;
 
 // 2. Demandes programme et état public de séquence
 IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -303,8 +303,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.DiveState              := E_DiveSearchState.WAIT_PRECONDITIONS;
     Data.SequenceState.DiveStepAtFault        := E_DiveSearchState.WAIT_PRECONDITIONS;
     Data.SequenceState.BottomTouchConfirmed   := FALSE;
-    Data.SequenceState.ExtractionState        := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-    Data.SequenceState.ExtractionStepAtFault  := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.ExtractionState        := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.ExtractionStepAtFault  := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
@@ -345,14 +345,14 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
 
     Data.ReqProgram.ReqBucket.ReqOpen                     := DumpAtTremieBucketOpenArmed;
-    Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionSequence.BucketCloseRequest;
+    Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionAssist.BucketCloseRequest;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.KoboldMeasureEnable
                                                             OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
-                                                                AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1));
-    Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequestActive
-                                                                AND (CoupledUserRequestDirection = -1)
+                                                                AND WinchBothMotionActive AND (WinchBothMotionDirection = -1));
+    Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND WinchBothMotionActive
+                                                                AND (WinchBothMotionDirection = -1)
                                                                 AND NOT PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
-    Data.ReqProgram.ReqBucket.ExtractionControlActive     := instExtractionSequence.ExtractionControlActive;
+    Data.ReqProgram.ReqBucket.ExtractionControlActive     := instExtractionAssist.ExtractionControlActive;
     // Plancher de plongee : produit par FB_DiveSearch, consomme par PRG_04 §5ter.
     Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.MinStepDown;
 
@@ -361,26 +361,26 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
         Data.SequenceState.SequenceId        := E_ProgramSequence.DIVE_SEARCH;
         Data.SequenceState.OperatorActionId  := instDiveSearch.OperatorActionId;
         Data.SequenceState.OperatorAction    := instDiveSearch.OperatorAction;
-    ELSIF instExtractionSequence.Lifecycle.Busy THEN
+    ELSIF instExtractionAssist.Lifecycle.Busy THEN
         Data.SequenceState.SequenceId        := E_ProgramSequence.EXTRACTION;
-        Data.SequenceState.OperatorActionId  := instExtractionSequence.OperatorActionId;
-        Data.SequenceState.OperatorAction    := instExtractionSequence.OperatorAction;
+        Data.SequenceState.OperatorActionId  := instExtractionAssist.OperatorActionId;
+        Data.SequenceState.OperatorAction    := instExtractionAssist.OperatorAction;
     ELSE
         Data.SequenceState.SequenceId        := E_ProgramSequence.NONE;
         Data.SequenceState.OperatorActionId  := 0;
         Data.SequenceState.OperatorAction    := '';
     END_IF;
 
-    Data.SequenceState.Ready                  := instDiveSearch.Ready OR instExtractionSequence.Ready;
-    Data.SequenceState.Lifecycle.Busy         := instDiveSearch.Lifecycle.Busy OR instExtractionSequence.Lifecycle.Busy;
-    Data.SequenceState.Lifecycle.Done         := instDiveSearch.Lifecycle.Done OR instExtractionSequence.Lifecycle.Done;
-    Data.SequenceState.Fault.Error            := instDiveSearch.Fault.Error OR instExtractionSequence.Fault.Error;
+    Data.SequenceState.Ready                  := instDiveSearch.Ready OR instExtractionAssist.Ready;
+    Data.SequenceState.Lifecycle.Busy         := instDiveSearch.Lifecycle.Busy OR instExtractionAssist.Lifecycle.Busy;
+    Data.SequenceState.Lifecycle.Done         := instDiveSearch.Lifecycle.Done OR instExtractionAssist.Lifecycle.Done;
+    Data.SequenceState.Fault.Error            := instDiveSearch.Fault.Error OR instExtractionAssist.Fault.Error;
     IF instDiveSearch.Fault.Error THEN
         Data.SequenceState.Fault.ErrorId      := instDiveSearch.Fault.ErrorId;
         Data.SequenceState.Fault.Latched      := instDiveSearch.Fault.Latched;
-    ELSIF instExtractionSequence.Fault.Error THEN
-        Data.SequenceState.Fault.ErrorId      := instExtractionSequence.Fault.ErrorId;
-        Data.SequenceState.Fault.Latched      := instExtractionSequence.Fault.Latched;
+    ELSIF instExtractionAssist.Fault.Error THEN
+        Data.SequenceState.Fault.ErrorId      := instExtractionAssist.Fault.ErrorId;
+        Data.SequenceState.Fault.Latched      := instExtractionAssist.Fault.Latched;
     ELSE
         Data.SequenceState.Fault.ErrorId      := 0;
         Data.SequenceState.Fault.Latched      := FALSE;
@@ -389,10 +389,10 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.StepStr                := 'ASSIST_MODE';
     Data.SequenceState.StepAtFault            := E_CycleStep.X0_PREPARATION;
     Data.SequenceState.ExpectedAxis           := E_OperatorAxis.JOYSTICK_Y;
-    Data.SequenceState.ExpectedDirection      := CoupledUserRequestDirection;
+    Data.SequenceState.ExpectedDirection      := WinchBothMotionDirection;
     Data.SequenceState.WaitingForOperator     := FALSE;
     Data.SequenceState.WaitingForProcess      := FALSE;
-    Data.SequenceState.RequestActive          := CoupledUserRequestActive;
+    Data.SequenceState.RequestActive          := WinchBothMotionActive;
     Data.SequenceState.SpeedMismatchMps       := 0.0;
     Data.SequenceState.SpeedMismatchActive    := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
@@ -404,13 +404,13 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.DiveState                  := instDiveSearch.DiveState;
     Data.SequenceState.DiveStepAtFault             := instDiveSearch.StepAtFault;
     Data.SequenceState.BottomTouchConfirmed       := BottomPositionConfirmed;
-    Data.SequenceState.ExtractionReady             := instExtractionSequence.Ready;
-    Data.SequenceState.ExtractionBusy              := instExtractionSequence.Lifecycle.Busy;
-    Data.SequenceState.ExtractionDone              := instExtractionSequence.Lifecycle.Done;
-    Data.SequenceState.ExtractionError             := instExtractionSequence.Fault.Error;
-    Data.SequenceState.ExtractionErrorId           := instExtractionSequence.Fault.ErrorId;
-    Data.SequenceState.ExtractionState             := instExtractionSequence.ExtractionState;
-    Data.SequenceState.ExtractionStepAtFault       := instExtractionSequence.StepAtFault;
+    Data.SequenceState.ExtractionReady             := instExtractionAssist.Ready;
+    Data.SequenceState.ExtractionBusy              := instExtractionAssist.Lifecycle.Busy;
+    Data.SequenceState.ExtractionDone              := instExtractionAssist.Lifecycle.Done;
+    Data.SequenceState.ExtractionError             := instExtractionAssist.Fault.Error;
+    Data.SequenceState.ExtractionErrorId           := instExtractionAssist.Fault.ErrorId;
+    Data.SequenceState.ExtractionState             := instExtractionAssist.ExtractionState;
+    Data.SequenceState.ExtractionStepAtFault       := instExtractionAssist.StepAtFault;
     Data.SequenceState.DumpAtTremieArmed           := DumpAtTremieActive;
     Data.SequenceState.DumpAtTremieAssistActive      := DumpAtTremieAssistActive;
     Data.SequenceState.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
@@ -473,8 +473,8 @@ ELSE
     Data.SequenceState.ExtractionDone              := FALSE;
     Data.SequenceState.ExtractionError             := FALSE;
     Data.SequenceState.ExtractionErrorId           := 0;
-    Data.SequenceState.ExtractionState             := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-    Data.SequenceState.ExtractionStepAtFault       := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.ExtractionState             := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.ExtractionStepAtFault       := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
     Data.SequenceState.DumpAtTremieArmed           := FALSE;
     Data.SequenceState.DumpAtTremieAssistActive      := FALSE;
     Data.SequenceState.DumpAtTremieAtTremie          := FALSE;

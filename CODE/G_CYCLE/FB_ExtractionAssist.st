@@ -1,11 +1,11 @@
 (* =======================================================================
-   ⚙️ FB_ExtractionSequence — Fermeture benne et remontée assistée
+   ⚙️ FB_ExtractionAssist — Fermeture benne et remontée assistée
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Séquence d'extraction (fermeture benne, remontée de contrôle, remontée nominale)
    🛡️ Sécurité : Aucune remontée assistée sans fond confirmé, contrôle palier 1
    📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
-FUNCTION_BLOCK FB_ExtractionSequence
+FUNCTION_BLOCK FB_ExtractionAssist
 VAR_INPUT
     // === COMMANDES & AUTORISATIONS ===
     Enable                      : BOOL;     // --> [CMD] Activation generale du FB (TRUE=Autorise)
@@ -39,8 +39,8 @@ VAR_OUTPUT
     // 🧩 Statut transverse (forme cible ST_Fault + ST_Lifecycle)
     Fault                       : ST_Fault;
     Lifecycle                   : ST_Lifecycle;
-    ExtractionState             : E_ExtractionSequenceState; // <-- [STAT] Phase interne extraction
-    StepAtFault                 : E_ExtractionSequenceState; // <-- [DIAG] Phase active memorisee lors du defaut
+    ExtractionState             : E_ExtractionAssistState; // <-- [STAT] Phase interne extraction
+    StepAtFault                 : E_ExtractionAssistState; // <-- [DIAG] Phase active memorisee lors du defaut
 
     // === ORDRES & AUTORISATIONS ===
     BucketCloseRequest          : BOOL;     // <-- [ACT] Demande de fermeture benne
@@ -60,7 +60,7 @@ VAR
     // === MEMORISATIONS & POSITIONS INTERNES ===
     ControlStartM1Position_M    : REAL;     // . [LOC] Position M1 au debut du palier de controle (m)
     ControlStartM2Position_M    : REAL;     // . [LOC] Position M2 au debut du palier de controle (m)
-    PrevState                   : E_ExtractionSequenceState; // . [LOC] Phase au scan precedent (survit au gate)
+    PrevState                   : E_ExtractionAssistState; // . [LOC] Phase au scan precedent (survit au gate)
 
     // === CALCUL DYNAMIQUE RUNTIME DU TIMEOUT DECOLLAGE ===
     CalculatedControlAscentTimeout : TIME;  // . [LOC] Plafond anti-blocage decollage calcule au runtime
@@ -115,14 +115,14 @@ CalculatedControlAscentTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
     / CST_MinSpeed_Mps * CST_ControlAscentMargin * CST_SecToMs));
 
 // ⏱️ Integrateurs de temps de montee effective (anti-pompage homme-mort)
-IF (ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET) AND MotionRequestActive AND (MotionDirection = 1) THEN
+IF (ExtractionState = E_ExtractionAssistState.CLOSING_BUCKET) AND MotionRequestActive AND (MotionDirection = 1) THEN
     BucketCloseTimerAcc := BucketCloseTimerAcc + CycleTime;
     IF BucketCloseTimerAcc >= CfgBucketCloseTimeout THEN
         TimeoutBucketCloseFault := TRUE;
     END_IF;
 END_IF;
 
-IF (ExtractionState = E_ExtractionSequenceState.CONTROL_ASCENT) AND MotionRequestActive AND (MotionDirection = 1) THEN
+IF (ExtractionState = E_ExtractionAssistState.CONTROL_ASCENT) AND MotionRequestActive AND (MotionDirection = 1) THEN
     ControlAscentTimerAcc := ControlAscentTimerAcc + CycleTime;
     IF ControlAscentTimerAcc >= CalculatedControlAscentTimeout THEN
         TimeoutControlAscentFault := TRUE;
@@ -139,7 +139,7 @@ IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
     BucketCloseTimerAcc       := T#0ms;
     ControlAscentTimerAcc     := T#0ms;
     StepAtFaultCaptured       := FALSE;
-    ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    ExtractionState := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
     // Latches de cause physique : acquittables SEULEMENT si l'entree de defaut est revenue saine (F2).
     IF CausesPhysiquesEffacees THEN
         BucketErrorFault      := FALSE;
@@ -179,7 +179,7 @@ IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
     StepAtFault := PrevState;
     StepAtFaultCaptured := TRUE;
 ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
-    StepAtFault := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    StepAtFault := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
 END_IF;
 {endregion}
 
@@ -193,10 +193,10 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     AscentPermit := FALSE;
     ExtractionControlActive := FALSE;
     BottomConfirmationConsumed := FALSE;
-    ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    ExtractionState := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
     // StepAtFault / StepAtFaultCaptured NON reinitialises ici : l'etape figee au defaut reste
     // lisible pour l'IHM/diagnostic apres un cycle Enable OFF->ON ; seul un front Reset l'efface.
-    PrevState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    PrevState := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
     BucketCloseTimerAcc := T#0ms;
     ControlAscentTimerAcc := T#0ms;
     OperatorActionId := 0;
@@ -225,30 +225,30 @@ AscentNominalSafe := NOT WinchSyncError AND PositionsValid;
 // Garde-fou non-redemarrage auto : un defaut latche non acquitte verrouille la machine
 // d'etat en ERROR_HOLD, meme si la vue live Fault.Error retombe (cause disparue).
 IF Fault.Error OR Fault.Latched THEN
-    ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
+    ExtractionState := E_ExtractionAssistState.ERROR_HOLD;
     OperatorActionId := 16#0280;
     OperatorAction := 'Vérifier la benne et les treuils puis réarmer avant de reprendre.';
 ELSE
     CASE ExtractionState OF
-        E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION:
+        E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION:
             IF BottomPositionConfirmed THEN
-                ExtractionState := E_ExtractionSequenceState.READY_TO_CLOSE;
+                ExtractionState := E_ExtractionAssistState.READY_TO_CLOSE;
             ELSE
                 OperatorActionId := 16#0200;
                 OperatorAction := 'Confirmer que la benne est posée au fond avant extraction.';
             END_IF;
 
-        E_ExtractionSequenceState.READY_TO_CLOSE:
+        E_ExtractionAssistState.READY_TO_CLOSE:
             Ready := TRUE;
             OperatorActionId := 16#0201;
             OperatorAction := 'Demander la montée pour fermer la benne.';
             IF MotionRequestActive AND (MotionDirection = 1) THEN
                 BottomConfirmationConsumed := TRUE;
                 BucketCloseTimerAcc := T#0ms;   // ⏱️ RAZ a l'entree exacte de CLOSING_BUCKET
-                ExtractionState := E_ExtractionSequenceState.CLOSING_BUCKET;
+                ExtractionState := E_ExtractionAssistState.CLOSING_BUCKET;
             END_IF;
 
-        E_ExtractionSequenceState.CLOSING_BUCKET:
+        E_ExtractionAssistState.CLOSING_BUCKET:
             Lifecycle.Busy := TRUE;
             BucketCloseRequest := AssistPermit AND NOT BucketError; // coupure meme-scan sur defaut benne (H2)
             OperatorActionId := 16#0202;
@@ -263,10 +263,10 @@ ELSE
                 ControlStartM1Position_M := M1Position_M;
                 ControlStartM2Position_M := M2Position_M;
                 ControlAscentTimerAcc := T#0ms;   // ⏱️ RAZ a l'entree exacte de CONTROL_ASCENT
-                ExtractionState := E_ExtractionSequenceState.CONTROL_ASCENT;
+                ExtractionState := E_ExtractionAssistState.CONTROL_ASCENT;
             END_IF;
 
-        E_ExtractionSequenceState.CONTROL_ASCENT:
+        E_ExtractionAssistState.CONTROL_ASCENT:
             Lifecycle.Busy := TRUE;
             AscentPermit := AssistPermit AND AscentControlSafe; // coupure meme-scan sur defaut synchro/capteurs (H2)
             ExtractionControlActive := AscentPermit;            // plafond palier 1 suit le permis de montee
@@ -280,10 +280,10 @@ ELSE
                 SyncOrSpeedErrorFault := TRUE;
             ELSIF (M1Position_M >= (ControlStartM1Position_M + ControlAscentDistance_M))
                AND (M2Position_M >= (ControlStartM2Position_M + ControlAscentDistance_M)) THEN
-                ExtractionState := E_ExtractionSequenceState.NOMINAL_ASCENT;
+                ExtractionState := E_ExtractionAssistState.NOMINAL_ASCENT;
             END_IF;
 
-        E_ExtractionSequenceState.NOMINAL_ASCENT:
+        E_ExtractionAssistState.NOMINAL_ASCENT:
             Lifecycle.Busy := TRUE;
             AscentPermit := AssistPermit AND AscentNominalSafe; // coupure meme-scan sur defaut synchro/position (H2)
             OperatorActionId := 16#0204;
@@ -296,7 +296,7 @@ ELSE
                 SyncOrSpeedErrorFault := TRUE;
             END_IF;
 
-        E_ExtractionSequenceState.ERROR_HOLD:
+        E_ExtractionAssistState.ERROR_HOLD:
             ;
     END_CASE;
 END_IF;

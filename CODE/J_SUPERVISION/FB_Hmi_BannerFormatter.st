@@ -22,7 +22,7 @@ VAR_INPUT
     CycleErrorId         : WORD;   // --> [DIAG] Code défaut cycle (FB_Cycle.ErrorId) — notifié à STABILIZING
     CycleStepAtError     : E_CycleStep;   // --> [DIAG] Dernière étape avant le défaut (FB_Cycle.CycleStepAtError)
     DiveState            : E_DiveSearchState;   // --> [HW] État plongée
-    ExtractionState      : E_ExtractionSequenceState;   // --> [HW] État extraction
+    ExtractionState      : E_ExtractionAssistState;   // --> [HW] État extraction
     HomingActive         : BOOL;   // --> [HW] Référencement en cours
     HomingStepM1         : INT;   // --> [HW] Étape homing M1
     HomingStepM2         : INT;   // --> [HW] Étape homing M2
@@ -62,7 +62,7 @@ VAR_INPUT
     BucketErrorId        : WORD;   // --> [DIAG] Code défaut benne (FB_Bucket.ErrorId)
     SyncErrorId          : WORD;   // --> [DIAG] Code défaut synchro M1/M2 (FB_WinchSync.ErrorId)
     DiveErrorId          : WORD;   // --> [DIAG] Code défaut plongée (FB_DiveSearch.ErrorId)
-    ExtractionErrorId    : WORD;   // --> [DIAG] Code défaut extraction (FB_ExtractionSequence.ErrorId)
+    ExtractionErrorId    : WORD;   // --> [DIAG] Code défaut extraction (FB_ExtractionAssist.ErrorId)
     EmergencyErrorId     : WORD;   // --> [DIAG] Code défaut chaîne AU (FB_Safety_EmergencyManagement.Diag.ErrorId)
     RedundancyTestFailed : BOOL;   // --> [DIAG] Defaut redondance contacteurs AU (lisee -> message explicite)
     EmergencyArmingFailed: BOOL;   // --> [DIAG] Echec rearmement contacteur AU (lisee -> message explicite)
@@ -623,7 +623,7 @@ IF ((SyncErrorId AND 16#0002) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) TH
     AlarmArray[AlarmCount] := '[SYNC] incoherence commande'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionSequence)
+// 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionAssist)
 IF ((DiveErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[DIVE] timeout immersion'; AlarmCount := AlarmCount + 1;
 END_IF;

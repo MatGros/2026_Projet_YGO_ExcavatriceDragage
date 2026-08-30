@@ -274,7 +274,7 @@
           </data>
         </addData>
       </dataType>
-      <dataType name="E_ExtractionSequenceState">
+      <dataType name="E_ExtractionAssistState">
         <baseType>
           <enum>
             <values>
@@ -335,7 +335,7 @@
             </Attributes>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6ae0d8f0-4bfe-5792-a167-697e4476a91d</ObjectId>
+            <ObjectId>52924d25-cfcc-5dc2-a673-d7581dfb2d37</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -3179,7 +3179,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
             </variable>
             <variable name="Idx304_ExtractionState">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">État interne séquenceur extraction</xhtml>
@@ -3203,7 +3203,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
             </variable>
             <variable name="Idx307_ExtractionStepAtFault">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape figée à l'apparition du défaut extraction (ERROR_HOLD masque l'état vivant)</xhtml>
@@ -4599,7 +4599,7 @@ pas une vitesse continue.
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupe-circuit d'urgence pour le séquencement auto benne.
 Défaut FALSE = mouvement M1/M2 synchro jamais
-gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).</xhtml>
+gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionAssist).</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -5594,12 +5594,12 @@ seule source de confirmation).</xhtml>
             </variable>
             <variable name="ExtractionState">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
             </variable>
             <variable name="ExtractionStepAtFault">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
             </variable>
             <variable name="OperatorActionId">
@@ -9309,7 +9309,7 @@ Assistance plongée prête</xhtml>
             </variable>
             <variable name="ExtractionState">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne séquence extraction</xhtml>
@@ -9317,7 +9317,7 @@ Assistance plongée prête</xhtml>
             </variable>
             <variable name="ExtractionStepAtFault">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase interne mémorisée au défaut extraction</xhtml>
@@ -12051,6 +12051,339 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbDiveSearch_Config">
+        <baseType>
+          <struct>
+            <variable name="DiveSpeedMin_Mps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse minimale de calcul du timeout (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutMarginFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge appliquee au temps theorique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutMinCourse_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Course minimale prise en compte (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutMaxCourse_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="200" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Course maximale prise en compte (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SecToMs">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1000" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Conversion secondes vers millisecondes</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a0057069-451b-5e0e-ad42-ec2a185a596c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_fbDiveSearch_Config - Reglages du cycle de recherche du fond
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbDiveSearch_Inputs">
+        <baseType>
+          <struct>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== AUTORISATIONS &amp; COMMANDE ===
+Chaine de puissance engagee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitre courant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionRequestActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de mouvement couplee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demande (-1 = descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS &amp; MESURES ===
+Benne ouverte confirmee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldImmersed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Kobold immerge</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position cable M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2Position_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position cable M2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionsValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mesures M1/M2 valides</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CurrentSpeedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier reel courant (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveStartMin_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES METIER ===
+Position minimale avant descente (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionUpper_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute fenetre immersion (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionLower_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse fenetre immersion (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableLimitAscent_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Limite haute exploitation (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LimitLegalDepthMin_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Limite basse legale (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgDiveFloorStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher palier descente (0..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Periode d'execution du cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassPreconditions">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass reserve au mode maintenance N2/test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Config">
+              <type>
+                <derived name="ST_fbDiveSearch_Config" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Parametres timeout</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a95550e0-af41-55b8-bdc1-94cdc5e2e412</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_fbDiveSearch_Inputs - Bus d'entree du cycle FB_DiveSearch
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbDiveSearch_Outputs">
+        <baseType>
+          <struct>
+            <variable name="StepState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAT DU CYCLE ===
+Etape courante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepAtFault">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape figee au defaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS &amp; ORDRES ASSISTES ===
+Autorisation de descente assistee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldMeasureEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Activation mesure Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldContactorCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commande alimentation Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomTouchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher palier descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorActionId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC OPERATEUR ===
+Identifiant numerique de l'action</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorAction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne operateur ASCII</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>bc4f838d-ad60-580e-ba9f-12e889929093</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_fbDiveSearch_Outputs - Bus de sortie du cycle FB_DiveSearch
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_fbEncoder_Cfg">
         <baseType>
           <struct>
@@ -12744,6 +13077,303 @@ treuils avant de changer de mode ».
    🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
       Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
    🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbTranslationCmdArbitration_Context">
+        <baseType>
+          <struct>
+            <variable name="HeightInterlockOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Hauteur mini M1/M2 OK (anti-collision translation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Fréquence max (échelle FreqPct, _TranslationMaxFreq_Hz)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>51283f1a-e013-501f-a126-0ba75d0b9a1a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧩 ST_fbTranslationCmdArbitration_Context — Contexte de gating M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les faits de gating consommés par FB_TranslationCommandArbitration
+       (interlock hauteur M1/M2, échelle fréquence max).
+   📤 Producteur : PRG_05_Translation (câblage).
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbTranslationCmdArbitration_IHM">
+        <baseType>
+          <struct>
+            <variable name="TglJoystickMaster">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation avant (TranslationM3.Cmd.BtnFwd)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation arrière (TranslationM3.Cmd.BtnRev)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelPositioning">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sélecteur positionnement (TranslationM3.Cmd.SelPositioning)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne fréquence (TranslationM3.Cmd.SetFreq_Hz)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass global translation (TranslationM3.Bypass.Global)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ce120c8d-0245-5e38-851c-8c02205c89fc</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎛️ ST_fbTranslationCmdArbitration_IHM — Entrées IHM de l'arbitrage M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les commandes IHM consommées par FB_TranslationCommandArbitration
+       (boutons, sélecteur positionnement, consigne fréquence, toggle joystick maître).
+   📤 Producteur : PRG_05_Translation (câblage GVL_IHM).
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchCmdArbitration_Cfg">
+        <baseType>
+          <struct>
+            <variable name="BucketOverrideSpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse M2 pendant action benne (ex littéral 15.0)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>975ccf22-73db-5c3e-bfac-c985552bde6f</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_fbWinchCmdArbitration_Cfg — Config treuil (partagé M1/M2)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Config statique de FB_WinchCommandArbitrationM1/M2.
+       Structure UNIQUE partagée : M2 consomme BucketOverrideSpeedPct (chemin benne),
+       M1 l'ignore (pas de chemin benne).
+   📤 Producteur : PRG_04_Treuils_Benne (câblage).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Remplace le littéral 15.0 (PRG_04 §3) par une constante nommée.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchCmdArbitration_Context">
+        <baseType>
+          <struct>
+            <variable name="BucketBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Action benne en cours (instBucket.Lifecycle.Busy)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketM2StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande M2 par la benne active (instBucket.M2_StartStop)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketM2Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ouverture benne (instBucket.M2_Direction = 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketM2Close">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Fermeture benne (instBucket.M2_Direction = -1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchBothMotionBlockedByBucket">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncBlocksUp">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncBlocksDown">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>58dd8b92-25cb-5b24-b149-4d148f2014bb</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧩 ST_fbWinchCmdArbitration_Context — Contexte de gating treuil (partagé M1/M2)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les faits de gating consommés par FB_WinchCommandArbitrationM1/M2
+       (benne, synchro, blocage both). Structure UNIQUE partagée par les 2 axes,
+       identifiée par l'instance : M1 ignore le chemin benne, M2 le consomme.
+   📤 Producteur : PRG_04_Treuils_Benne (câblage).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Action benne : 2 bits BOOL (BucketM2Open/Close) dérivés de instBucket.M2_Direction.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbWinchCmdArbitration_IHM">
+        <baseType>
+          <struct>
+            <variable name="TglJoystickMaster">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnUpM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée treuil M1 (nommage hardware)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnDownM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton descente treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnUpM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnDownM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton descente treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnWinchBothUp">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée couplée both (Commun)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnWinchBothDown">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton descente couplée both (Commun)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b2c6293b-40b7-50ed-85f4-51c0c572dd06</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎛️ ST_fbWinchCmdArbitration_IHM — Entrées IHM de l'arbitrage treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les commandes IHM consommées par FB_WinchCommandArbitrationM1/M2
+       (boutons par treuil, nommage hardware propagé, toggle joystick maître).
+   📤 Producteur : PRG_04_Treuils_Benne (câblage GVL_IHM).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Nommage : BtnUpM1/BtnUpM2 = nommage hardware propagé (convention projet).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -16452,6 +17082,7 @@ AbortEdge(CLK := AbortCycle);
 EnableEdge(CLK := Enable);
 
 // ⏱️ Surveillance indépendante de la remontée lente
+// X7_CTRL_ASCENT -&gt; X8_ASCENT_LOADED : TON de stabilisation palier 1.
 StabilizationTimer(IN := (State = E_CycleStep.X7_CTRL_ASCENT), PT := CtrlAscentTimeout);
 
 // 📏 Comparaison vitesse réelle M1/M2
@@ -16461,10 +17092,12 @@ SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
                        AND (SpeedMismatchThresholdMps &gt; 0.0)
                        AND (SpeedMismatchTimeout &gt; T#0ms)
                        AND (SpeedMismatchMps &gt; SpeedMismatchThresholdMps);
+// X7_CTRL_ASCENT -&gt; STABILIZING : TON confirmation écart vitesse.
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
 // Tempo max d'étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
+// Xi -&gt; STABILIZING : TON backstop durée d'état pour tous les états de mouvement.
 StepMaxTimer(IN := CycleMotionPermit AND (State &lt;&gt; E_CycleStep.X0_PREPARATION)
                   AND (State &lt;&gt; E_CycleStep.X13_DONE_SYNC)
                   AND (State &lt;&gt; E_CycleStep.STABILIZING),
@@ -16750,7 +17383,9 @@ CASE State OF
         OperatorAction := 'Maintenir la commande : fermeture de la benne.';
 
         WinchM1Cmd.StartStop := FALSE;
-        BucketCmd.Close := TRUE;
+        // L'ordre benne reste soumis au même homme-mort que le cycle : aucune
+        // commande d'actionneur ne doit survivre à la perte du permis opérateur.
+        BucketCmd.Close := CycleMotionPermit;
 
         IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.Close := FALSE;
@@ -16860,11 +17495,14 @@ CASE State OF
         OperatorActionId := 16#040B;
         OperatorAction := 'Deflechir vers le bas pour ouvrir la benne et vider la charge.';
 
-        WinchM1Cmd.StartStop := CycleMotionPermit AND (WinchM1Cmd.Direction = 1);
-        WinchM1Cmd.Direction := 1;
+        // X11 est une ouverture par déflexion vers le bas : la direction doit
+        // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
+        // précédent). Les deux treuils restent synchrones et sous homme-mort.
+        WinchM1Cmd.Direction := -1;
+        WinchM1Cmd.StartStop := CycleMotionPermit;
         WinchM1Cmd.SpeedPct  := 20.0;
-        WinchM2Cmd.StartStop := CycleMotionPermit AND (WinchM2Cmd.Direction = 1);
-        WinchM2Cmd.Direction := 1;
+        WinchM2Cmd.Direction := -1;
+        WinchM2Cmd.StartStop := CycleMotionPermit;
         WinchM2Cmd.SpeedPct  := 20.0;
 
         BucketCmd.Open := CycleMotionPermit AND (WinchM1Cmd.Direction = -1);
@@ -17945,8 +18583,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES &amp; AUTORISATIONS ===
---&gt; [CMD] Activation generale du FB (TRUE=Autorise)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD ===
+--&gt; [CMD] Autorisation generale du FB</xhtml>
               </documentation>
             </variable>
             <variable name="Reset">
@@ -17954,168 +18592,16 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerContactorEngaged">
+            <variable name="Inputs">
               <type>
-                <BOOL />
+                <derived name="ST_fbDiveSearch_Inputs" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine de securite OK</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode de fonctionnement arbitre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MotionRequestActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention de mouvement active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MotionDirection">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens de mouvement (-1 = descente)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketIsOpen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAPTEURS &amp; ETATS BENNE ===
---&gt; [HW] Benne ouverte confirmee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldImmersed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur Kobold immerge (FALSE=hors eau, TRUE=immerge)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1Position_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position codeur treuil M1 (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2Position_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position codeur treuil M2 (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PositionsValid">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Validite des mesures de position</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CurrentSpeedStep">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Palier de vitesse actuel (1..5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DiveStartMin_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIGURATION &amp; SEUILS ===
---&gt; [CFG] Seuil position min pour debut plongee (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionUpper_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Borne haute fenetre d'immersion (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionLower_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Borne basse fenetre d'immersion (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CableLimitAscent_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="7.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite haute d'exploitation (m), plafond de course immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="LimitLegalDepthMin_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="-35" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite legale basse autorisee (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgDiveFloorStep">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier plancher de descente impose pendant la plongee (1..5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CycleTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#10ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Base de temps d'integration (periode MainTask)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassPreconditions">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass preconditions et seuils (mode test)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS FONCTIONNEL ===
+--&gt; [BUS] Commande, capteurs et reglages</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -18125,7 +18611,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC &amp; DEFECTUOSITES ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STATUT IEC ===
 &lt;-- [STAT] FB pret a fonctionner</xhtml>
               </documentation>
             </variable>
@@ -18134,87 +18620,24 @@ END_IF;
                 <derived name="ST_Fault" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Statut transverse (forme cible ST_Fault + ST_Lifecycle)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut live et latche</xhtml>
               </documentation>
             </variable>
             <variable name="Lifecycle">
               <type>
                 <derived name="ST_Lifecycle" />
               </type>
-            </variable>
-            <variable name="DiveState">
-              <type>
-                <derived name="E_DiveSearchState" />
-              </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase interne de recherche fond</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Cycle en cours / termine</xhtml>
               </documentation>
             </variable>
-            <variable name="StepAtFault">
+            <variable name="Outputs">
               <type>
-                <derived name="E_DiveSearchState" />
+                <derived name="ST_fbDiveSearch_Outputs" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etape active mémorisée lors du défaut</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DescendPermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PERMIS &amp; AUTORISATIONS ===
-&lt;-- [ACT] Autorisation de descente assistee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldMeasureEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Activation mesure/acquisition Kobold</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldContactorCmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Commande alimentation contacteur Kobold (anti-chauffe)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BottomTouchConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contact fond valide et confirme</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MinStepDown">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PLANCHER DE PALIER EN DESCENTE (consomme par PRG_03 -&gt; PRG_04) ===
-&lt;-- [STAT] Palier minimum impose en descente pendant la plongee (0 = aucun plancher)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OperatorActionId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC IHM ===
-&lt;-- [DIAG] ID action operateur requise</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OperatorAction">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Message explicatif operateur</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS FONCTIONNEL ===
+&lt;-- [BUS] Etat, permis et diagnostic</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -18224,8 +18647,8 @@ END_IF;
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONTS ===
-. [LOC] Detecteur front montant Reset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES &amp; FRONTS ===
+. [LOC] Front Reset</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorEdge">
@@ -18233,7 +18656,7 @@ END_IF;
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant apparition defaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Apparition d'un defaut</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldRiseEdge">
@@ -18241,7 +18664,7 @@ END_IF;
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front entrant eau (0-&gt;1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Entree dans l'eau</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldFallEdge">
@@ -18249,136 +18672,7 @@ END_IF;
                 <derived name="F_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front sortie eau / fond (1-&gt;0)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionCourse_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCUL DYNAMIQUE RUNTIME DES TIMEOUTS ===
-. [LOC] Course credible max recherche immersion (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BottomCourse_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Course credible max recherche fond (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CalculatedImmersionTimeout">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plafond anti-blocage immersion calcule au runtime</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CalculatedBottomTimeout">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plafond anti-blocage fond calcule au runtime</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionTimerAcc">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#0ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACCUMULATEURS DE TEMPS ANTI-POMPAGE ===
-. [LOC] Temps cumule recherche immersion sous mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BottomTimerAcc">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#0ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps cumule recherche fond sous mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PrevState">
-              <type>
-                <derived name="E_DiveSearchState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etape au scan precedent (maintien survivant au gate)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
-. [LOC] Immersion dans la fenetre d'eau validee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ErrorCausePresent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Presence d'une cause de defaut parametrage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SeqErrorFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch erreur séquence immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Palier5ForbiddenFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch tentative descente en Palier 5 sous Kobold</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TimeoutImmersionFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch timeout recherche immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TimeoutBottomFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch timeout recherche fond</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DescentActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Descente reellement demandee et sans cause de coupure immediate</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepAtFaultCaptured">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] StepAtFault deja fige pour l'episode de defaut courant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sortie de l'eau / fond</xhtml>
               </documentation>
             </variable>
             <variable name="instFault">
@@ -18386,8 +18680,7 @@ END_IF;
                 <derived name="FB_FaultCore" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOCLE DEFAUT ===
-* [INST] Socle défaut transverse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle defaut transverse</xhtml>
               </documentation>
             </variable>
             <variable name="instCauses">
@@ -18400,74 +18693,185 @@ END_IF;
                 </array>
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Causes nommees</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_DiveSpeedMin_Mps">
+            <variable name="ImmersionCourse_M">
               <type>
                 <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="0.15" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSTANTES DERIVATION TIMEOUT ANTI-BLOCAGE ===
-Vitesse Palier 1 mini sous charge/mou (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CALCULS DE GARDE ===
+. [LOC] Course maximale vers immersion (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_TimeoutMarginFactor">
+            <variable name="BottomCourse_M">
               <type>
                 <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="1.5" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Facteur de marge de securite sur la course theorique</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Course maximale vers fond (m)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_TimeoutMinCourse_M">
+            <variable name="CalculatedImmersionTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timeout immersion calcule</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CalculatedBottomTimeout">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timeout fond calcule</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectiveDiveSpeedMin_Mps">
               <type>
                 <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher de course pour le calcul (evite timeout degenere)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vitesse minimale appliquee (m/s)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_TimeoutMaxCourse_M">
+            <variable name="EffectiveTimeoutMargin">
               <type>
                 <REAL />
               </type>
-              <initialValue>
-                <simpleValue value="200" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond de course : borne le calcul avant REAL_TO_UDINT (anti-overflow)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Marge appliquee au calcul</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_SecToMs">
+            <variable name="EffectiveTimeoutMinCourse_M">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plancher de course applique (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectiveTimeoutMaxCourse_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plafond de course applique (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectiveSecToMs">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Conversion secondes/millisecondes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionTimerAcc">
+              <type>
+                <TIME />
+              </type>
               <initialValue>
-                <simpleValue value="1000" />
+                <simpleValue value="TIME#0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Conversion secondes -&gt; millisecondes</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MEMORISATIONS &amp; TEMPORISATIONS ===
+. [LOC] Temps effectif de recherche immersion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomTimerAcc">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps effectif de recherche fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat du scan precedent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Immersion validee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepAtFaultCaptured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etape de defaut deja figee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorCausePresent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES INTERNES ===
+. [LOC] Parametrage invalide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SeqErrorFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Incoherence de sequence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Palier5ForbiddenFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier 5 interdit sous Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutImmersionFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timeout recherche immersion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TimeoutBottomFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timeout recherche fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescentActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Descente demandee et autorisee</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ FB_DiveSearch — Assistance plongée et recherche du fond Kobold
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Qualification du capteur Kobold et autorisation de descente
-   🛡️ Sécurité : Verrouillage si séquence d'immersion 0-&gt;1-&gt;0 invalide
-   🔌 Interface : Intention de descente et mesures vers permis de descente
-   📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+   FB_DiveSearch - Assistance plongee et recherche du fond Kobold
+   Role : qualifier l'immersion et autoriser la descente assistee.
+   Interface : contrat standard + bus Inputs/Outputs.
+   Documentation : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -18475,201 +18879,192 @@ Vitesse Palier 1 mini sous charge/mou (m/s)</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === IMPLEMENTATION ===
-
-{region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
-// 🔑 1. FRONTS
+{region "§1 Fronts, calculs et causes"}
 ResetEdge(CLK := Reset);
-KoboldRiseEdge(CLK := KoboldImmersed);
-KoboldFallEdge(CLK := KoboldImmersed);
+KoboldRiseEdge(CLK := Inputs.KoboldImmersed);
+KoboldFallEdge(CLK := Inputs.KoboldImmersed);
 
-// Base de temps nulle = timers de garde inoperants : defaut de parametrage inconditionnel.
-ErrorCausePresent := (CycleTime &lt;= T#0ms)
-                  OR (NOT BypassPreconditions AND ((DiveStartMin_M &lt; ImmersionUpper_M)
-                       OR (ImmersionUpper_M &lt;= ImmersionLower_M)
-                       OR (ImmersionLower_M &lt;= LimitLegalDepthMin_M)
-                       OR (CableLimitAscent_M &lt;= ImmersionLower_M)));
+// Les valeurs par defaut du DUT couvrent l'appel sans configuration explicite.
+// Le repli runtime protege aussi un appel avec une structure entierement nulle.
+EffectiveDiveSpeedMin_Mps := Inputs.Config.DiveSpeedMin_Mps;
+IF EffectiveDiveSpeedMin_Mps &lt;= 0.0 THEN EffectiveDiveSpeedMin_Mps := 0.15; END_IF;
+EffectiveTimeoutMargin := Inputs.Config.TimeoutMarginFactor;
+IF EffectiveTimeoutMargin &lt;= 0.0 THEN EffectiveTimeoutMargin := 1.5; END_IF;
+EffectiveTimeoutMinCourse_M := Inputs.Config.TimeoutMinCourse_M;
+IF EffectiveTimeoutMinCourse_M &lt;= 0.0 THEN EffectiveTimeoutMinCourse_M := 1.0; END_IF;
+EffectiveTimeoutMaxCourse_M := Inputs.Config.TimeoutMaxCourse_M;
+IF EffectiveTimeoutMaxCourse_M &lt; EffectiveTimeoutMinCourse_M THEN EffectiveTimeoutMaxCourse_M := 200.0; END_IF;
+EffectiveSecToMs := Inputs.Config.SecToMs;
+IF EffectiveSecToMs &lt;= 0.0 THEN EffectiveSecToMs := 1000.0; END_IF;
 
-// ⏱️ Plafonds anti-blocage calcules au runtime : course credible max / vitesse Palier 1 mini x marge.
-// Course immersion = du plafond haut d'exploitation a la borne basse d'immersion (depart de plongee
-// possible n'importe ou entre DiveStartMin_M et CableLimitAscent_M -&gt; on prend la borne la plus large).
-// Course bornee [plancher .. plafond] avant conversion REAL-&gt;UDINT-&gt;TIME : une valeur IHM
-// aberrante ne peut pas provoquer d'overflow silencieux sur le timeout de garde (CQS §6).
-ImmersionCourse_M   := LIMIT(CST_TimeoutMinCourse_M, CableLimitAscent_M - ImmersionLower_M, CST_TimeoutMaxCourse_M);
-BottomCourse_M      := LIMIT(CST_TimeoutMinCourse_M, ImmersionLower_M - LimitLegalDepthMin_M, CST_TimeoutMaxCourse_M);
+ErrorCausePresent := (Inputs.CycleTime &lt;= T#0ms)
+                 OR (NOT Inputs.BypassPreconditions AND (
+                       (Inputs.DiveStartMin_M &lt; Inputs.ImmersionUpper_M)
+                    OR (Inputs.ImmersionUpper_M &lt;= Inputs.ImmersionLower_M)
+                    OR (Inputs.ImmersionLower_M &lt;= Inputs.LimitLegalDepthMin_M)
+                    OR (Inputs.CableLimitAscent_M &lt;= Inputs.ImmersionLower_M)));
+
+ImmersionCourse_M := LIMIT(EffectiveTimeoutMinCourse_M,
+                           Inputs.CableLimitAscent_M - Inputs.ImmersionLower_M,
+                           EffectiveTimeoutMaxCourse_M);
+BottomCourse_M := LIMIT(EffectiveTimeoutMinCourse_M,
+                        Inputs.ImmersionLower_M - Inputs.LimitLegalDepthMin_M,
+                        EffectiveTimeoutMaxCourse_M);
 CalculatedImmersionTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
-    ImmersionCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
-CalculatedBottomTimeout    := UDINT_TO_TIME(REAL_TO_UDINT(
-    BottomCourse_M / CST_DiveSpeedMin_Mps * CST_TimeoutMarginFactor * CST_SecToMs));
+    ImmersionCourse_M / EffectiveDiveSpeedMin_Mps * EffectiveTimeoutMargin * EffectiveSecToMs));
+CalculatedBottomTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
+    BottomCourse_M / EffectiveDiveSpeedMin_Mps * EffectiveTimeoutMargin * EffectiveSecToMs));
 
-// ⏱️ Intégrateurs de temps de mouvement effectif (D1 anti-pompage)
-IF (DiveState = E_DiveSearchState.SEARCHING_IMMERSION) AND MotionRequestActive AND (MotionDirection = -1) THEN
-    ImmersionTimerAcc := ImmersionTimerAcc + CycleTime;
-    IF ImmersionTimerAcc &gt;= CalculatedImmersionTimeout THEN
-        TimeoutImmersionFault := TRUE;
-    END_IF;
+IF (Outputs.StepState = E_DiveSearchState.SEARCHING_IMMERSION)
+   AND Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1) THEN
+    ImmersionTimerAcc := ImmersionTimerAcc + Inputs.CycleTime;
+    IF ImmersionTimerAcc &gt;= CalculatedImmersionTimeout THEN TimeoutImmersionFault := TRUE; END_IF;
 END_IF;
 
-IF (DiveState = E_DiveSearchState.SEARCHING_BOTTOM) AND MotionRequestActive AND (MotionDirection = -1) THEN
-    BottomTimerAcc := BottomTimerAcc + CycleTime;
-    IF BottomTimerAcc &gt;= CalculatedBottomTimeout THEN
-        TimeoutBottomFault := TRUE;
-    END_IF;
+IF (Outputs.StepState = E_DiveSearchState.SEARCHING_BOTTOM)
+   AND Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1) THEN
+    BottomTimerAcc := BottomTimerAcc + Inputs.CycleTime;
+    IF BottomTimerAcc &gt;= CalculatedBottomTimeout THEN TimeoutBottomFault := TRUE; END_IF;
 END_IF;
 
-IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep &gt; 4) THEN
-    SeqErrorFault         := FALSE;
+IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT Inputs.KoboldImmersed
+   AND NOT Inputs.MotionRequestActive AND NOT (Inputs.CurrentSpeedStep &gt; 4) THEN
+    SeqErrorFault := FALSE;
     Palier5ForbiddenFault := FALSE;
     TimeoutImmersionFault := FALSE;
-    TimeoutBottomFault    := FALSE;
-    ImmersionTimerAcc     := T#0ms;
-    BottomTimerAcc        := T#0ms;
-    ImmersionConfirmed    := FALSE;
-    BottomTouchConfirmed  := FALSE;
-    StepAtFaultCaptured   := FALSE;
-    DiveState             := E_DiveSearchState.WAIT_PRECONDITIONS;
+    TimeoutBottomFault := FALSE;
+    ImmersionTimerAcc := T#0ms;
+    BottomTimerAcc := T#0ms;
+    ImmersionConfirmed := FALSE;
+    Outputs.BottomTouchConfirmed := FALSE;
+    Outputs.StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
+    StepAtFaultCaptured := FALSE;
+    Outputs.StepState := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 
-instCauses[0].Active   := SeqErrorFault;
+instCauses[0].Active := SeqErrorFault;
 instCauses[0].Latching := TRUE;
-instCauses[0].Texte    := 'Incoherence sequence immersion Kobold';
-
-instCauses[2].Active   := ErrorCausePresent;
+instCauses[0].Texte := 'Incoherence sequence immersion Kobold';
+instCauses[1].Active := ErrorCausePresent;
+instCauses[1].Latching := TRUE;
+instCauses[1].Texte := 'Parametrage invalide des seuils de plongee';
+instCauses[2].Active := Palier5ForbiddenFault;
 instCauses[2].Latching := TRUE;
-instCauses[2].Texte    := 'Parametrage invalide des seuils de plongee';
-
-instCauses[3].Active   := Palier5ForbiddenFault;
+instCauses[2].Texte := 'Palier 5 interdit pendant la mesure Kobold';
+instCauses[3].Active := TimeoutImmersionFault;
 instCauses[3].Latching := TRUE;
-instCauses[3].Texte    := 'Mesure Kobold impossible : vitesse trop elevee (Palier 5 interdit)';
-
-instCauses[4].Active   := TimeoutImmersionFault;
+instCauses[3].Texte := 'Timeout recherche immersion Kobold';
+instCauses[4].Active := TimeoutBottomFault;
 instCauses[4].Latching := TRUE;
-instCauses[4].Texte    := 'Depassement tempo recherche immersion Kobold';
+instCauses[4].Texte := 'Timeout recherche fond Kobold';
 
-instCauses[5].Active   := TimeoutBottomFault;
-instCauses[5].Latching := TRUE;
-instCauses[5].Texte    := 'Depassement tempo recherche fond Kobold';
-
-// Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
 
-// 📸 Capture ordonnée de StepAtFault (D2). Les défauts levés dans le CASE se figent au site du
-// latch (voir §3) ; ce bloc ne couvre que les défauts détectés en §1 (timeouts, paramétrage),
-// où DiveState/PrevState sont encore l'étape réelle. StepAtFaultCaptured évite l'écrasement.
 ErrorEdge(CLK := Fault.Error);
 IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
-    StepAtFault := PrevState;
+    Outputs.StepAtFault := PrevState;
     StepAtFaultCaptured := TRUE;
-ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT KoboldImmersed AND NOT MotionRequestActive AND NOT (CurrentSpeedStep &gt; 4) THEN
-    StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
+ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT Inputs.KoboldImmersed
+      AND NOT Inputs.MotionRequestActive AND NOT (Inputs.CurrentSpeedStep &gt; 4) THEN
+    Outputs.StepAtFault := E_DiveSearchState.WAIT_PRECONDITIONS;
 END_IF;
 {endregion}
 
-{region "§2 Gate neutralisation"}
-// 🛑 2. GATE
-IF NOT Enable OR NOT PowerContactorEngaged THEN
+{region "§2 Neutralisation et machine d'etat"}
+IF NOT Enable OR NOT Inputs.PowerContactorEngaged THEN
     Ready := FALSE;
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
-    DescendPermit := FALSE;
-    KoboldMeasureEnable := FALSE;
-    KoboldContactorCmd := FALSE;
-    BottomTouchConfirmed := FALSE;
-    DiveState := E_DiveSearchState.WAIT_PRECONDITIONS;
-    // StepAtFault / StepAtFaultCaptured NON reinitialises ici : l'etape figee au defaut reste
-    // lisible pour l'IHM/diagnostic apres un cycle Enable OFF-&gt;ON ; seul un front Reset l'efface.
-    OperatorActionId := 0;
-    OperatorAction := '';
+    Outputs.DescendPermit := FALSE;
+    Outputs.KoboldMeasureEnable := FALSE;
+    Outputs.KoboldContactorCmd := FALSE;
+    Outputs.BottomTouchConfirmed := FALSE;
+    Outputs.StepState := E_DiveSearchState.WAIT_PRECONDITIONS;
+    Outputs.OperatorActionId := 0;
+    Outputs.OperatorAction := '';
     ImmersionConfirmed := FALSE;
     ImmersionTimerAcc := T#0ms;
     BottomTimerAcc := T#0ms;
-    MinStepDown := 0;
+    Outputs.MinStepDown := 0;
     PrevState := E_DiveSearchState.WAIT_PRECONDITIONS;
     RETURN;
 END_IF;
 
 Ready := Enable AND NOT Fault.Latched;
-{endregion}
-
-{region "§3 Machine etat plongee recherche fond"}
-DescendPermit := FALSE;
-KoboldMeasureEnable := FALSE;
-KoboldContactorCmd := FALSE;
+Outputs.DescendPermit := FALSE;
+Outputs.KoboldMeasureEnable := FALSE;
+Outputs.KoboldContactorCmd := FALSE;
 Lifecycle.Busy := FALSE;
 Lifecycle.Done := FALSE;
+Outputs.OperatorActionId := 0;
+Outputs.OperatorAction := '';
 
-// Descente reellement demandee ET sans cause de coupure immediate : anti-chauffe contacteur Kobold
-// (H1 : jamais alimente hors descente active), coupure meme-scan sur Palier 5 interdit et incoherence
-// sequence (H2), et double garde sur le mode maintenance (H5, en plus du gate Enable de PRG_03).
-DescentActive := MotionRequestActive AND (MotionDirection = -1)
-             AND (Mode = E_Mode.MAINT_N1 OR Mode = E_Mode.MAINT_N2)
-             AND NOT (CurrentSpeedStep &gt; 4)
-             AND NOT SeqErrorFault;
+DescentActive := Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1)
+              AND ((Inputs.Mode = E_Mode.MAINT_N1) OR (Inputs.Mode = E_Mode.MAINT_N2))
+              AND NOT (Inputs.CurrentSpeedStep &gt; 4)
+              AND NOT SeqErrorFault;
 
-// Garde-fou non-redemarrage auto : un defaut latche non acquitte verrouille la machine
-// d'etat en ERROR_HOLD, meme si la vue live Fault.Error retombe (cause disparue).
 IF Fault.Error OR Fault.Latched THEN
-    DiveState := E_DiveSearchState.ERROR_HOLD;
-    KoboldContactorCmd := FALSE;
-    OperatorActionId := 16#0180;
-    OperatorAction := 'Vérifier les conditions puis réarmer avant une nouvelle plongée.';
+    Outputs.StepState := E_DiveSearchState.ERROR_HOLD;
+    Outputs.KoboldContactorCmd := FALSE;
+    Outputs.OperatorActionId := 384;
+    Outputs.OperatorAction := 'Verifier les conditions puis rearmer avant une nouvelle plongee.';
 ELSE
-    CASE DiveState OF
+    CASE Outputs.StepState OF
         E_DiveSearchState.WAIT_PRECONDITIONS:
-            KoboldContactorCmd := FALSE;
-            IF NOT BypassPreconditions
-               AND (NOT BucketIsOpen OR NOT PositionsValid OR KoboldImmersed
-                    OR (M1Position_M &lt; DiveStartMin_M) OR (M2Position_M &lt; DiveStartMin_M)) THEN
-                OperatorActionId := 16#0100;
-                OperatorAction := 'Vérifier les conditions initiales de plongée.';
+            IF NOT Inputs.BypassPreconditions
+               AND (NOT Inputs.BucketIsOpen OR NOT Inputs.PositionsValid OR Inputs.KoboldImmersed
+                    OR (Inputs.M1Position_M &lt; Inputs.DiveStartMin_M)
+                    OR (Inputs.M2Position_M &lt; Inputs.DiveStartMin_M)) THEN
+                Outputs.OperatorActionId := 256;
+                Outputs.OperatorAction := 'Verifier benne ouverte, positions et Kobold au repos.';
             ELSE
-                DiveState := E_DiveSearchState.READY_TO_DESCEND;
+                Outputs.StepState := E_DiveSearchState.READY_TO_DESCEND;
             END_IF;
 
         E_DiveSearchState.READY_TO_DESCEND:
             Ready := TRUE;
-            KoboldContactorCmd := FALSE;
-            OperatorActionId := 16#0101;
-            OperatorAction := 'Demander une descente pour rechercher le fond.';
-            IF MotionRequestActive AND (MotionDirection = -1) THEN
-                ImmersionTimerAcc := T#0ms; // ⏱️ RAZ à l'entrée exacte de SEARCHING_IMMERSION
-                DiveState := E_DiveSearchState.SEARCHING_IMMERSION;
+            Outputs.OperatorActionId := 257;
+            Outputs.OperatorAction := 'Demander une descente pour rechercher le fond.';
+            IF Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1) THEN
+                ImmersionTimerAcc := T#0ms;
+                Outputs.StepState := E_DiveSearchState.SEARCHING_IMMERSION;
             END_IF;
 
         E_DiveSearchState.SEARCHING_IMMERSION:
             Lifecycle.Busy := TRUE;
-            DescendPermit := DescentActive;
-            KoboldMeasureEnable := DescentActive;
-            KoboldContactorCmd := DescentActive; // Alimentation contacteur uniquement sous descente active (anti-chauffe)
-            OperatorActionId := 16#0102;
-            OperatorAction := 'Maintenir la descente : recherche immersion Kobold.';
-
-            // 🛑 Interdiction du Palier 5 pendant la détection Kobold
-            IF (CurrentSpeedStep &gt; 4) AND NOT StepAtFaultCaptured THEN
-                StepAtFault := DiveState;          // fige l'etape reelle avant tout basculement
-                StepAtFaultCaptured := TRUE;
-            END_IF;
-            IF CurrentSpeedStep &gt; 4 THEN
+            Outputs.DescendPermit := DescentActive;
+            Outputs.KoboldMeasureEnable := DescentActive;
+            Outputs.KoboldContactorCmd := DescentActive;
+            Outputs.OperatorActionId := 258;
+            Outputs.OperatorAction := 'Maintenir la descente : recherche immersion Kobold.';
+            IF Inputs.CurrentSpeedStep &gt; 4 THEN
+                IF NOT StepAtFaultCaptured THEN
+                    Outputs.StepAtFault := Outputs.StepState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
                 Palier5ForbiddenFault := TRUE;
             END_IF;
-
             IF KoboldRiseEdge.Q THEN
-                IF (M1Position_M &lt;= ImmersionUpper_M) AND (M1Position_M &gt;= ImmersionLower_M)
-                   AND (M2Position_M &lt;= ImmersionUpper_M) AND (M2Position_M &gt;= ImmersionLower_M) THEN
+                IF (Inputs.M1Position_M &lt;= Inputs.ImmersionUpper_M)
+                   AND (Inputs.M1Position_M &gt;= Inputs.ImmersionLower_M)
+                   AND (Inputs.M2Position_M &lt;= Inputs.ImmersionUpper_M)
+                   AND (Inputs.M2Position_M &gt;= Inputs.ImmersionLower_M) THEN
                     ImmersionConfirmed := TRUE;
-                    BottomTimerAcc := T#0ms; // ⏱️ RAZ à l'entrée exacte de SEARCHING_BOTTOM
-                    DiveState := E_DiveSearchState.SEARCHING_BOTTOM;
+                    BottomTimerAcc := T#0ms;
+                    Outputs.StepState := E_DiveSearchState.SEARCHING_BOTTOM;
                 ELSE
                     IF NOT StepAtFaultCaptured THEN
-                        StepAtFault := DiveState;
+                        Outputs.StepAtFault := Outputs.StepState;
                         StepAtFaultCaptured := TRUE;
                     END_IF;
                     SeqErrorFault := TRUE;
                 END_IF;
-            ELSIF (M1Position_M &lt; ImmersionLower_M) OR (M2Position_M &lt; ImmersionLower_M) THEN
+            ELSIF (Inputs.M1Position_M &lt; Inputs.ImmersionLower_M)
+               OR (Inputs.M2Position_M &lt; Inputs.ImmersionLower_M) THEN
                 IF NOT StepAtFaultCaptured THEN
-                    StepAtFault := DiveState;
+                    Outputs.StepAtFault := Outputs.StepState;
                     StepAtFaultCaptured := TRUE;
                 END_IF;
                 SeqErrorFault := TRUE;
@@ -18677,53 +19072,44 @@ ELSE
 
         E_DiveSearchState.SEARCHING_BOTTOM:
             Lifecycle.Busy := TRUE;
-            DescendPermit := DescentActive;
-            KoboldMeasureEnable := DescentActive;
-            KoboldContactorCmd := DescentActive; // Alimentation uniquement sous descente active (anti-chauffe)
-            OperatorActionId := 16#0103;
-            OperatorAction := 'Maintenir la descente : immersion validée, recherche du fond.';
-
-            // 🛑 Interdiction du Palier 5 pendant la détection Kobold
-            IF (CurrentSpeedStep &gt; 4) AND NOT StepAtFaultCaptured THEN
-                StepAtFault := DiveState;
-                StepAtFaultCaptured := TRUE;
-            END_IF;
-            IF CurrentSpeedStep &gt; 4 THEN
+            Outputs.DescendPermit := DescentActive;
+            Outputs.KoboldMeasureEnable := DescentActive;
+            Outputs.KoboldContactorCmd := DescentActive;
+            Outputs.OperatorActionId := 259;
+            Outputs.OperatorAction := 'Maintenir la descente : immersion validee, recherche du fond.';
+            IF Inputs.CurrentSpeedStep &gt; 4 THEN
+                IF NOT StepAtFaultCaptured THEN
+                    Outputs.StepAtFault := Outputs.StepState;
+                    StepAtFaultCaptured := TRUE;
+                END_IF;
                 Palier5ForbiddenFault := TRUE;
             END_IF;
-
             IF KoboldFallEdge.Q AND ImmersionConfirmed THEN
-                BottomTouchConfirmed := TRUE;
+                Outputs.BottomTouchConfirmed := TRUE;
                 ImmersionConfirmed := FALSE;
-                KoboldContactorCmd := FALSE; // Coupure immédiate à la détection pour éviter surchauffe
-                DiveState := E_DiveSearchState.BOTTOM_CONFIRMED;
+                Outputs.KoboldContactorCmd := FALSE;
+                Outputs.StepState := E_DiveSearchState.BOTTOM_CONFIRMED;
             END_IF;
 
         E_DiveSearchState.BOTTOM_CONFIRMED:
             Lifecycle.Done := TRUE;
-            KoboldContactorCmd := FALSE; // Coupure anti-chauffe
-            OperatorActionId := 16#0104;
-            OperatorAction := 'Fond détecté : demander la fermeture ou l extraction.';
+            Outputs.KoboldContactorCmd := FALSE;
+            Outputs.OperatorActionId := 260;
+            Outputs.OperatorAction := 'Fond detecte : demander la fermeture ou extraction.';
 
         E_DiveSearchState.ERROR_HOLD:
-            KoboldContactorCmd := FALSE;
+            Outputs.KoboldContactorCmd := FALSE;
     END_CASE;
 END_IF;
 
-// 🤿 Plancher de palier en descente impose pendant la plongee.
-// Actif uniquement en phase de recherche (immersion/fond) ET sous descente reellement
-// demandee (DescentActive) : retombe a 0 au front de sortie de plongee (BOTTOM_CONFIRMED /
-// ERROR_HOLD / WAIT_PRECONDITIONS), donc aucun plancher residuel. Ne cree jamais de mouvement
-// par lui-meme : il ne fait que majorer le palier d'une descente deja demandee et permise.
-IF DescentActive AND (DiveState = E_DiveSearchState.SEARCHING_IMMERSION
-                  OR DiveState = E_DiveSearchState.SEARCHING_BOTTOM) THEN
-    MinStepDown := CfgDiveFloorStep;
+IF DescentActive AND ((Outputs.StepState = E_DiveSearchState.SEARCHING_IMMERSION)
+                   OR (Outputs.StepState = E_DiveSearchState.SEARCHING_BOTTOM)) THEN
+    Outputs.MinStepDown := LIMIT(0, Inputs.CfgDiveFloorStep, 5);
 ELSE
-    MinStepDown := 0;
+    Outputs.MinStepDown := 0;
 END_IF;
 
-// 💾 Mémorisation de l'étape précédente en toute fin de scan
-PrevState := DiveState;
+PrevState := Outputs.StepState;
 {endregion}
 </xhtml>
           </ST>
@@ -21164,7 +21550,7 @@ END_IF;
           </data>
         </addData>
       </pou>
-      <pou name="FB_ExtractionSequence" pouType="functionBlock">
+      <pou name="FB_ExtractionAssist" pouType="functionBlock">
         <interface>
           <inputVars>
             <variable name="Enable">
@@ -21365,7 +21751,7 @@ END_IF;
             </variable>
             <variable name="ExtractionState">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Phase interne extraction</xhtml>
@@ -21373,7 +21759,7 @@ END_IF;
             </variable>
             <variable name="StepAtFault">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Phase active memorisee lors du defaut</xhtml>
@@ -21467,7 +21853,7 @@ END_IF;
             </variable>
             <variable name="PrevState">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Phase au scan precedent (survit au gate)</xhtml>
@@ -21678,7 +22064,7 @@ Vitesse Palier 1 mini sous charge/mou (m/s)</xhtml>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ FB_ExtractionSequence — Fermeture benne et remontée assistée
+   ⚙️ FB_ExtractionAssist — Fermeture benne et remontée assistée
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Séquence d'extraction (fermeture benne, remontée de contrôle, remontée nominale)
    🛡️ Sécurité : Aucune remontée assistée sans fond confirmé, contrôle palier 1
@@ -21710,14 +22096,14 @@ CalculatedControlAscentTimeout := UDINT_TO_TIME(REAL_TO_UDINT(
     / CST_MinSpeed_Mps * CST_ControlAscentMargin * CST_SecToMs));
 
 // ⏱️ Integrateurs de temps de montee effective (anti-pompage homme-mort)
-IF (ExtractionState = E_ExtractionSequenceState.CLOSING_BUCKET) AND MotionRequestActive AND (MotionDirection = 1) THEN
+IF (ExtractionState = E_ExtractionAssistState.CLOSING_BUCKET) AND MotionRequestActive AND (MotionDirection = 1) THEN
     BucketCloseTimerAcc := BucketCloseTimerAcc + CycleTime;
     IF BucketCloseTimerAcc &gt;= CfgBucketCloseTimeout THEN
         TimeoutBucketCloseFault := TRUE;
     END_IF;
 END_IF;
 
-IF (ExtractionState = E_ExtractionSequenceState.CONTROL_ASCENT) AND MotionRequestActive AND (MotionDirection = 1) THEN
+IF (ExtractionState = E_ExtractionAssistState.CONTROL_ASCENT) AND MotionRequestActive AND (MotionDirection = 1) THEN
     ControlAscentTimerAcc := ControlAscentTimerAcc + CycleTime;
     IF ControlAscentTimerAcc &gt;= CalculatedControlAscentTimeout THEN
         TimeoutControlAscentFault := TRUE;
@@ -21734,7 +22120,7 @@ IF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
     BucketCloseTimerAcc       := T#0ms;
     ControlAscentTimerAcc     := T#0ms;
     StepAtFaultCaptured       := FALSE;
-    ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    ExtractionState := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
     // Latches de cause physique : acquittables SEULEMENT si l'entree de defaut est revenue saine (F2).
     IF CausesPhysiquesEffacees THEN
         BucketErrorFault      := FALSE;
@@ -21774,7 +22160,7 @@ IF ErrorEdge.Q AND NOT StepAtFaultCaptured THEN
     StepAtFault := PrevState;
     StepAtFaultCaptured := TRUE;
 ELSIF ResetEdge.Q AND NOT ErrorCausePresent AND NOT MotionRequestActive THEN
-    StepAtFault := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    StepAtFault := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
 END_IF;
 {endregion}
 
@@ -21788,10 +22174,10 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     AscentPermit := FALSE;
     ExtractionControlActive := FALSE;
     BottomConfirmationConsumed := FALSE;
-    ExtractionState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    ExtractionState := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
     // StepAtFault / StepAtFaultCaptured NON reinitialises ici : l'etape figee au defaut reste
     // lisible pour l'IHM/diagnostic apres un cycle Enable OFF-&gt;ON ; seul un front Reset l'efface.
-    PrevState := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    PrevState := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
     BucketCloseTimerAcc := T#0ms;
     ControlAscentTimerAcc := T#0ms;
     OperatorActionId := 0;
@@ -21820,30 +22206,30 @@ AscentNominalSafe := NOT WinchSyncError AND PositionsValid;
 // Garde-fou non-redemarrage auto : un defaut latche non acquitte verrouille la machine
 // d'etat en ERROR_HOLD, meme si la vue live Fault.Error retombe (cause disparue).
 IF Fault.Error OR Fault.Latched THEN
-    ExtractionState := E_ExtractionSequenceState.ERROR_HOLD;
+    ExtractionState := E_ExtractionAssistState.ERROR_HOLD;
     OperatorActionId := 16#0280;
     OperatorAction := 'Vérifier la benne et les treuils puis réarmer avant de reprendre.';
 ELSE
     CASE ExtractionState OF
-        E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION:
+        E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION:
             IF BottomPositionConfirmed THEN
-                ExtractionState := E_ExtractionSequenceState.READY_TO_CLOSE;
+                ExtractionState := E_ExtractionAssistState.READY_TO_CLOSE;
             ELSE
                 OperatorActionId := 16#0200;
                 OperatorAction := 'Confirmer que la benne est posée au fond avant extraction.';
             END_IF;
 
-        E_ExtractionSequenceState.READY_TO_CLOSE:
+        E_ExtractionAssistState.READY_TO_CLOSE:
             Ready := TRUE;
             OperatorActionId := 16#0201;
             OperatorAction := 'Demander la montée pour fermer la benne.';
             IF MotionRequestActive AND (MotionDirection = 1) THEN
                 BottomConfirmationConsumed := TRUE;
                 BucketCloseTimerAcc := T#0ms;   // ⏱️ RAZ a l'entree exacte de CLOSING_BUCKET
-                ExtractionState := E_ExtractionSequenceState.CLOSING_BUCKET;
+                ExtractionState := E_ExtractionAssistState.CLOSING_BUCKET;
             END_IF;
 
-        E_ExtractionSequenceState.CLOSING_BUCKET:
+        E_ExtractionAssistState.CLOSING_BUCKET:
             Lifecycle.Busy := TRUE;
             BucketCloseRequest := AssistPermit AND NOT BucketError; // coupure meme-scan sur defaut benne (H2)
             OperatorActionId := 16#0202;
@@ -21858,10 +22244,10 @@ ELSE
                 ControlStartM1Position_M := M1Position_M;
                 ControlStartM2Position_M := M2Position_M;
                 ControlAscentTimerAcc := T#0ms;   // ⏱️ RAZ a l'entree exacte de CONTROL_ASCENT
-                ExtractionState := E_ExtractionSequenceState.CONTROL_ASCENT;
+                ExtractionState := E_ExtractionAssistState.CONTROL_ASCENT;
             END_IF;
 
-        E_ExtractionSequenceState.CONTROL_ASCENT:
+        E_ExtractionAssistState.CONTROL_ASCENT:
             Lifecycle.Busy := TRUE;
             AscentPermit := AssistPermit AND AscentControlSafe; // coupure meme-scan sur defaut synchro/capteurs (H2)
             ExtractionControlActive := AscentPermit;            // plafond palier 1 suit le permis de montee
@@ -21875,10 +22261,10 @@ ELSE
                 SyncOrSpeedErrorFault := TRUE;
             ELSIF (M1Position_M &gt;= (ControlStartM1Position_M + ControlAscentDistance_M))
                AND (M2Position_M &gt;= (ControlStartM2Position_M + ControlAscentDistance_M)) THEN
-                ExtractionState := E_ExtractionSequenceState.NOMINAL_ASCENT;
+                ExtractionState := E_ExtractionAssistState.NOMINAL_ASCENT;
             END_IF;
 
-        E_ExtractionSequenceState.NOMINAL_ASCENT:
+        E_ExtractionAssistState.NOMINAL_ASCENT:
             Lifecycle.Busy := TRUE;
             AscentPermit := AssistPermit AND AscentNominalSafe; // coupure meme-scan sur defaut synchro/position (H2)
             OperatorActionId := 16#0204;
@@ -21891,7 +22277,7 @@ ELSE
                 SyncOrSpeedErrorFault := TRUE;
             END_IF;
 
-        E_ExtractionSequenceState.ERROR_HOLD:
+        E_ExtractionAssistState.ERROR_HOLD:
             ;
     END_CASE;
 END_IF;
@@ -21904,7 +22290,7 @@ PrevState := ExtractionState;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>db0a276d-2eae-5fdc-b5fd-93390d06b89e</ObjectId>
+            <ObjectId>8b9bdcda-4c34-51c8-981b-7a07151907c3</ObjectId>
           </data>
         </addData>
       </pou>
@@ -22249,7 +22635,7 @@ END_IF;
             </variable>
             <variable name="ExtractionState">
               <type>
-                <derived name="E_ExtractionSequenceState" />
+                <derived name="E_ExtractionAssistState" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] État extraction</xhtml>
@@ -22527,7 +22913,7 @@ END_IF;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut extraction (FB_ExtractionSequence.ErrorId)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut extraction (FB_ExtractionAssist.ErrorId)</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyErrorId">
@@ -23468,7 +23854,7 @@ IF ((SyncErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAl
     AlarmArray[AlarmCount] := '[SYNC] incoherence commande'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionSequence)
+// 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionAssist)
 IF ((DiveErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[DIVE] timeout immersion'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -32342,6 +32728,220 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_TranslationCmdArbitrationM3" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation FB (TRUE=arbitre actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <derived name="ST_AcquisitionJoystickQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Données joystick qualifiées (AxisX, DeadmanArmed)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Auth">
+              <type>
+                <derived name="ST_fbModes_Autorisations" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisations mode (Mode, MaintenanceM3TargetEnable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqTranslation">
+              <type>
+                <derived name="ST_ProgramTranslationRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [REQ] Demande cycle translation (SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IHM">
+              <type>
+                <derived name="ST_fbTranslationCmdArbitration_IHM" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM, sélecteur, fréquence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Context">
+              <type>
+                <derived name="ST_fbTranslationCmdArbitration_Context" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Interlock hauteur + échelle fréquence</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt à arbitrer (Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande marche/arrêt arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Rev, 0: Stop, 1: Fwd)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Consigne vitesse arbitrée (0..100 %)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositioningActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Mode positionnement actif (SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelTarget">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Cible position (1=Trémie, 2=P2, 3=P1, 4=Maintenance) — SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="FreqPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Échelle fréquence (0..100 %)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ↔️ FB_TranslationCmdArbitrationM3 — Arbitrage de commande M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Arbitrer la source de commande M3 (joystick jog / boutons IHM /
+       demande cycle selon le mode) et produire la commande arbitrée.
+   🔌 FB d'arbitrage (non-mouvement) : ne porte ni SafeStop ni StartStop
+       de sécurité — il produit la commande logique, la safety reste dans
+       FB_Safety_Translation / FB_Translation.
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   🔒 Bit-identique à l'ancien PRG_05 §1 (refactor POO).
+   ⚠️ Tautologie (BypassGlobal OR NOT Tgl OR Tgl) conservée bit-identique
+       (bug latent conservateur, documenté — ne pas corriger ici).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+Ready := Enable;
+
+IF NOT Enable THEN
+    StartStop         := FALSE;
+    Direction         := 0;
+    SpeedPct          := 0.0;
+    PositioningActive := FALSE;
+    SelTarget         := 0;
+ELSE
+    // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
+    IF Auth.Mode = E_Mode.SEMI_AUTO THEN
+        PositioningActive := TRUE;
+        SelTarget := ReqTranslation.PositionTgt;
+        StartStop := ReqTranslation.ReqStart;
+        IF StartStop THEN
+            SpeedPct := 100.0;
+            IF SelTarget = 1 THEN
+                Direction := 1;
+            ELSE
+                Direction := -1;
+            END_IF;
+        ELSE
+            SpeedPct := 0.0;
+            Direction := 0;
+        END_IF;
+    ELSIF (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2) THEN
+        // ── Mode maintenance : jog joystick ou boutons IHM ──
+        PositioningActive := IHM.SelPositioning;
+        SelTarget := 0;
+
+        IF NOT IHM.TglJoystickMaster AND IHM.BtnFwd THEN
+            Direction := 1;
+        ELSIF NOT IHM.TglJoystickMaster AND IHM.BtnRev THEN
+            Direction := -1;
+        ELSIF IHM.TglJoystickMaster THEN
+            Direction := Joystick.AxisX.Direction;
+        ELSE
+            Direction := 0;
+        END_IF;
+
+        // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2.
+        // ⚠️ Tautologie conservée bit-identique : (BypassGlobal OR NOT Tgl OR Tgl) = toujours TRUE.
+        StartStop := (Direction &lt;&gt; 0)
+                     AND (IHM.BypassGlobal OR NOT IHM.TglJoystickMaster OR IHM.TglJoystickMaster)
+                     AND Joystick.DeadmanArmed
+                     AND Context.HeightInterlockOk;
+
+        // Échelle fréquence : SetFreq_Hz (ou 100% si non renseignée), manche mis à l'échelle si joystick maître
+        FreqPct := SEL(IHM.SetFreq_Hz &gt; 0.0,
+                       100.0,
+                       (IHM.SetFreq_Hz / SEL(Context.MaxFreq_Hz &gt; 0.0, 50.0, Context.MaxFreq_Hz)) * 100.0);
+        SpeedPct := SEL(IHM.TglJoystickMaster,
+                        FreqPct,
+                        (ABS(Joystick.AxisX.SpeedTgt) / 100.0) * FreqPct);
+    ELSE
+        // ── Autres modes : neutralisé ──
+        PositioningActive := FALSE;
+        SelTarget := 0;
+        StartStop := FALSE;
+        Direction := 0;
+        SpeedPct  := 0.0;
+    END_IF;
+END_IF;
+
+// Clamp consigne (bit-identique PRG_05 §1)
+SpeedPct := LIMIT(0.0, ABS(SpeedPct), 100.0);
+
+// SelTarget = Maintenance (4) interdit si Maintenance non autorisée
+IF (SelTarget = 4) AND NOT Auth.MaintenanceM3TargetEnable THEN
+    SelTarget := 0;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>36ea547a-49af-554a-909b-ff3e7bde3897</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_TranslationOutputInterlock" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -35311,6 +35911,395 @@ PrevStepNumber := StepNumber;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>6f83143e-72ec-5e6b-80c8-39f828857ce4</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_WinchCmdArbitrationM1" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation FB (TRUE=arbitre actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <derived name="ST_AcquisitionJoystickQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Données joystick qualifiées (AxisY, DeadmanArmed)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Auth">
+              <type>
+                <derived name="ST_fbModes_Autorisations" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisations mode (Mode, JoystickWinchSelectArbitrated)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqWinch">
+              <type>
+                <derived name="ST_ProgramWinchRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [REQ] Demande cycle treuil M1 (SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BothIntent">
+              <type>
+                <derived name="ST_OperatorCoupledIntent" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both opérateur (WinchBothMotionActive/Direction)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IHM">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_IHM" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnUpM1/BtnDownM1, both)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Context">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_Context" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gating benne/synchro (partagé M1/M2)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt à arbitrer (Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande marche/arrêt arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descente, 0: Stop, 1: Montée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Consigne vitesse arbitrée (0..100 %)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="BenneBusyFallEdge">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant action benne (arrêt forcé)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🪝 FB_WinchCmdArbitrationM1 — Arbitrage de commande treuil M1
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Arbitrer la source de commande M1 (joystick / boutons IHM /
+       demande cycle selon le mode) et produire la commande arbitrée.
+   🔌 FB d'arbitrage (non-mouvement) : ne porte ni SafeStop ni StartStop
+       de sécurité — il produit la commande logique, la safety reste dans
+       FB_Safety_Winch / FB_Winch.
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔒 Bit-identique à l'ancien PRG_04 §3 (refactor POO).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+Ready := Enable;
+
+// Front de fin d'action benne (détecté en interne, mécanisme de sécurité)
+BenneBusyFallEdge(CLK := Context.BucketBusy);
+
+IF NOT Enable THEN
+    StartStop := FALSE;
+    Direction := 0;
+    SpeedPct  := 0.0;
+ELSE
+    // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
+    IF Auth.Mode = E_Mode.SEMI_AUTO THEN
+        StartStop := ReqWinch.ReqStartStop;
+        Direction := ReqWinch.ReqDirection;
+        SpeedPct  := ReqWinch.SpeedTgtPct;
+    ELSE
+        // ── Mode manuel : boutons IHM ou joystick maître ──
+        IF NOT IHM.TglJoystickMaster THEN
+            // Mode Boutons IHM
+            IF IHM.BtnWinchBothUp OR IHM.BtnUpM1 THEN
+                Direction := 1;
+                SpeedPct  := 100.0;
+            ELSIF IHM.BtnWinchBothDown OR IHM.BtnDownM1 THEN
+                Direction := -1;
+                SpeedPct  := 100.0;
+            ELSE
+                Direction := 0;
+                SpeedPct  := 0.0;
+            END_IF;
+        ELSE
+            // Mode Joystick Maître — M1 autorisé si Select = 0 (both) ou 1 (M1)
+            IF (Auth.JoystickWinchSelectArbitrated = 0 OR Auth.JoystickWinchSelectArbitrated = 1) THEN
+                Direction := Joystick.AxisY.Direction;
+                SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+            ELSE
+                Direction := 0;
+                SpeedPct  := 0.0;
+            END_IF;
+        END_IF;
+
+        // Gating StartStop (bit-identique PRG_04 §3)
+        StartStop := (Direction &lt;&gt; 0)
+                  AND NOT Context.BucketBusy
+                  AND NOT Context.WinchBothMotionBlockedByBucket
+                  AND NOT ((Context.SyncBlocksUp   AND (Direction = 1))
+                        OR (Context.SyncBlocksDown AND (Direction = -1)))
+                  AND (NOT IHM.TglJoystickMaster OR Joystick.DeadmanArmed);
+    END_IF;
+
+    // Front de fin d'action benne : arrêt forcé sauf mouvement both actif
+    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.Direction &lt;&gt; 0)) THEN
+        StartStop := FALSE;
+    END_IF;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ed58a992-e090-5b40-8cf2-91ea992d9d52</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_WinchCmdArbitrationM2" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation FB (TRUE=arbitre actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <derived name="ST_AcquisitionJoystickQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Données joystick qualifiées (AxisY, DeadmanArmed)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Auth">
+              <type>
+                <derived name="ST_fbModes_Autorisations" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisations mode (Mode, JoystickWinchSelectArbitrated)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqWinch">
+              <type>
+                <derived name="ST_ProgramWinchRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [REQ] Demande cycle treuil M2 (SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BothIntent">
+              <type>
+                <derived name="ST_OperatorCoupledIntent" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both opérateur (WinchBothMotionActive/Direction)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IHM">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_IHM" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnUpM2/BtnDownM2, both)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Context">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_Context" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gating benne/synchro + chemin benne (partagé M1/M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse override benne</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt à arbitrer (Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande marche/arrêt arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descente, 0: Stop, 1: Montée)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Consigne vitesse arbitrée (0..100 %)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="BenneBusyFallEdge">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant action benne (arrêt forcé)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🪝 FB_WinchCmdArbitrationM2 — Arbitrage de commande treuil M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Arbitrer la source de commande M2 (joystick / boutons IHM /
+       demande cycle / chemin benne selon le mode) et produire la commande arbitrée.
+   🔌 FB d'arbitrage (non-mouvement) : ne porte ni SafeStop ni StartStop
+       de sécurité — il produit la commande logique, la safety reste dans
+       FB_Safety_Winch / FB_Winch.
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔒 Bit-identique à l'ancien PRG_04 §3 (refactor POO).
+   ⚠️ Asymétries M2 vs M1 : chemin benne (override), Select=0/2, synchro inversée.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+Ready := Enable;
+
+// Front de fin d'action benne (détecté en interne, mécanisme de sécurité)
+BenneBusyFallEdge(CLK := Context.BucketBusy);
+
+IF NOT Enable THEN
+    StartStop := FALSE;
+    Direction := 0;
+    SpeedPct  := 0.0;
+ELSE
+    // ── Chemin benne : M2 piloté par l'action benne (override) ──
+    IF Context.BucketBusy AND Context.BucketM2StartStop THEN
+        StartStop := Context.BucketM2StartStop;
+        Direction := SEL(Context.BucketM2Open, -1, 1);  // Open → +1, Close → -1
+        SpeedPct  := Cfg.BucketOverrideSpeedPct;
+    ELSE
+        // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
+        IF Auth.Mode = E_Mode.SEMI_AUTO THEN
+            StartStop := ReqWinch.ReqStartStop;
+            Direction := ReqWinch.ReqDirection;
+            SpeedPct  := ReqWinch.SpeedTgtPct;
+        ELSE
+            // ── Mode manuel : boutons IHM ou joystick maître ──
+            IF NOT IHM.TglJoystickMaster THEN
+                // Mode Boutons IHM
+                IF IHM.BtnWinchBothUp OR IHM.BtnUpM2 THEN
+                    Direction := 1;
+                    SpeedPct  := 100.0;
+                ELSIF IHM.BtnWinchBothDown OR IHM.BtnDownM2 THEN
+                    Direction := -1;
+                    SpeedPct  := 100.0;
+                ELSE
+                    Direction := 0;
+                    SpeedPct  := 0.0;
+                END_IF;
+            ELSE
+                // Mode Joystick Maître — M2 autorisé si Select = 0 (both) ou 2 (M2)
+                IF (Auth.JoystickWinchSelectArbitrated = 0 OR Auth.JoystickWinchSelectArbitrated = 2) THEN
+                    Direction := Joystick.AxisY.Direction;
+                    SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+                ELSE
+                    Direction := 0;
+                    SpeedPct  := 0.0;
+                END_IF;
+            END_IF;
+
+            // Gating StartStop (bit-identique PRG_04 §3) — synchro INVERSÉE vs M1
+            StartStop := (Direction &lt;&gt; 0)
+                      AND NOT Context.WinchBothMotionBlockedByBucket
+                      AND NOT ((Context.SyncBlocksUp   AND (Direction = -1))
+                            OR (Context.SyncBlocksDown AND (Direction = 1)))
+                      AND (NOT IHM.TglJoystickMaster OR Joystick.DeadmanArmed);
+        END_IF;
+    END_IF;
+
+    // Front de fin d'action benne : arrêt forcé sauf mouvement both actif
+    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.Direction &lt;&gt; 0)) THEN
+        StartStop := FALSE;
+    END_IF;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7b19e1be-7f57-5fd6-90fc-6767873f41ea</ObjectId>
           </data>
         </addData>
       </pou>
@@ -38982,29 +39971,29 @@ Data.DataValid := NOT Data.InputModuleFault
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Assistance plongée et recherche fond Kobold</xhtml>
               </documentation>
             </variable>
-            <variable name="instExtractionSequence">
+            <variable name="instExtractionAssist">
               <type>
-                <derived name="FB_ExtractionSequence" />
+                <derived name="FB_ExtractionAssist" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Séquence d'extraction et remontée assistée</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledUserRequestActive">
+            <variable name="WinchBothMotionActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎛️ VARIABLES LOCALES &amp; DÉTECTEURS ===
-. [LOC] Intention de mouvement couplé active (joystick ou boutons)</xhtml>
+. [LOC] Intention de mouvement both active (joystick ou boutons)</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledUserRequestDirection">
+            <variable name="WinchBothMotionDirection">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens mouvement couplé (-1: Descente, 0: Neutre, +1: Montée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens mouvement both (-1: Descente, 0: Neutre, +1: Montée)</xhtml>
               </documentation>
             </variable>
             <variable name="ManualBottomPositionConfirmed">
@@ -39130,18 +40119,18 @@ GVL_PERSISTENT._MaintM2HomingRequired := instModes.Auth.HomingRequiredM2;
 
 // Qualification de l'intention opérateur couplée (M1+M2) dans le même scan
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-    CoupledUserRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
-    CoupledUserRequestActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
+    WinchBothMotionDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
+    WinchBothMotionActive := PRG_02_Acquisition.HwIn.Operator.JoyBtnRaw
                                      AND (instModes.Auth.JoystickWinchSelectArbitrated = 0);
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothUp THEN
-        CoupledUserRequestDirection := 1;
+        WinchBothMotionDirection := 1;
     ELSIF GVL_IHM.Commun.BtnWinchBothDown THEN
-        CoupledUserRequestDirection := -1;
+        WinchBothMotionDirection := -1;
     ELSE
-        CoupledUserRequestDirection := 0;
+        WinchBothMotionDirection := 0;
     END_IF;
-    CoupledUserRequestActive := (CoupledUserRequestDirection &lt;&gt; 0);
+    WinchBothMotionActive := (WinchBothMotionDirection &lt;&gt; 0);
 END_IF;
 
 {endregion}
@@ -39154,7 +40143,7 @@ END_IF;
 IF NOT (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2)
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
-   OR (CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)) THEN
+   OR (WinchBothMotionActive AND (WinchBothMotionDirection = -1)) THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
     BypassKoboldBottomTouched := FALSE;
 END_IF;
@@ -39163,7 +40152,7 @@ ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomCon
 // 2. Détection front descendant Kobold sous bypass
 BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
 IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
-   AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
+   AND WinchBothMotionActive AND (WinchBothMotionDirection = -1)
    AND BypassKoboldFallEdge.Q THEN
     BypassKoboldBottomTouched := TRUE;
 END_IF;
@@ -39175,8 +40164,8 @@ instDiveSearch(
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode := instModes.Auth.Mode,
-    MotionRequestActive := CoupledUserRequestActive,
-    MotionDirection := CoupledUserRequestDirection,
+    MotionRequestActive := WinchBothMotionActive,
+    MotionDirection := WinchBothMotionDirection,
     BucketIsOpen := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     KoboldImmersed := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     M1Position_M := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
@@ -39199,15 +40188,15 @@ instDiveSearch(
 // Synthèse de confirmation fond
 BottomPositionConfirmed := instDiveSearch.BottomTouchConfirmed OR ManualBottomPositionConfirmed OR BypassKoboldBottomTouched;
 
-// 4. Instance FB_ExtractionSequence (Fermeture et décollage assisté)
-instExtractionSequence(
+// 4. Instance FB_ExtractionAssist (Fermeture et décollage assisté)
+instExtractionAssist(
     Enable := (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2)
               AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode := instModes.Auth.Mode,
-    MotionRequestActive := CoupledUserRequestActive,
-    MotionDirection := CoupledUserRequestDirection,
+    MotionRequestActive := WinchBothMotionActive,
+    MotionDirection := WinchBothMotionDirection,
     BottomPositionConfirmed := BottomPositionConfirmed,
     BucketIsClosed := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     BucketBusy := PRG_04_Treuils_Benne.Data.BucketBusy,
@@ -39225,7 +40214,7 @@ instExtractionSequence(
     CycleTime := T#10ms
 );
 
-IF instExtractionSequence.BottomConfirmationConsumed THEN
+IF instExtractionAssist.BottomConfirmationConsumed THEN
     GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
 END_IF;
 
@@ -39292,8 +40281,8 @@ Data.Auth := instModes.Auth;
 Data.ModesFault := instModes.Fault;
 
 // 1bis. Intention couplée continue opérateur (inconditionnelle, TOUS modes)
-Data.ReqProgram.OperatorCoupledIntent.Active    := CoupledUserRequestActive;
-Data.ReqProgram.OperatorCoupledIntent.Direction := CoupledUserRequestDirection;
+Data.ReqProgram.OperatorCoupledIntent.Active    := WinchBothMotionActive;
+Data.ReqProgram.OperatorCoupledIntent.Direction := WinchBothMotionDirection;
 
 // 2. Demandes programme et état public de séquence
 IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -39345,8 +40334,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.DiveState              := E_DiveSearchState.WAIT_PRECONDITIONS;
     Data.SequenceState.DiveStepAtFault        := E_DiveSearchState.WAIT_PRECONDITIONS;
     Data.SequenceState.BottomTouchConfirmed   := FALSE;
-    Data.SequenceState.ExtractionState        := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-    Data.SequenceState.ExtractionStepAtFault  := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.ExtractionState        := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.ExtractionStepAtFault  := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
@@ -39387,14 +40376,14 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
 
     Data.ReqProgram.ReqBucket.ReqOpen                     := DumpAtTremieBucketOpenArmed;
-    Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionSequence.BucketCloseRequest;
+    Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionAssist.BucketCloseRequest;
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.KoboldMeasureEnable
                                                             OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
-                                                                AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1));
-    Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND CoupledUserRequestActive
-                                                                AND (CoupledUserRequestDirection = -1)
+                                                                AND WinchBothMotionActive AND (WinchBothMotionDirection = -1));
+    Data.ReqProgram.ReqBucket.DescendPermitDiveBucketOpen := NOT (instDiveSearch.Enable AND WinchBothMotionActive
+                                                                AND (WinchBothMotionDirection = -1)
                                                                 AND NOT PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
-    Data.ReqProgram.ReqBucket.ExtractionControlActive     := instExtractionSequence.ExtractionControlActive;
+    Data.ReqProgram.ReqBucket.ExtractionControlActive     := instExtractionAssist.ExtractionControlActive;
     // Plancher de plongee : produit par FB_DiveSearch, consomme par PRG_04 §5ter.
     Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.MinStepDown;
 
@@ -39403,26 +40392,26 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
         Data.SequenceState.SequenceId        := E_ProgramSequence.DIVE_SEARCH;
         Data.SequenceState.OperatorActionId  := instDiveSearch.OperatorActionId;
         Data.SequenceState.OperatorAction    := instDiveSearch.OperatorAction;
-    ELSIF instExtractionSequence.Lifecycle.Busy THEN
+    ELSIF instExtractionAssist.Lifecycle.Busy THEN
         Data.SequenceState.SequenceId        := E_ProgramSequence.EXTRACTION;
-        Data.SequenceState.OperatorActionId  := instExtractionSequence.OperatorActionId;
-        Data.SequenceState.OperatorAction    := instExtractionSequence.OperatorAction;
+        Data.SequenceState.OperatorActionId  := instExtractionAssist.OperatorActionId;
+        Data.SequenceState.OperatorAction    := instExtractionAssist.OperatorAction;
     ELSE
         Data.SequenceState.SequenceId        := E_ProgramSequence.NONE;
         Data.SequenceState.OperatorActionId  := 0;
         Data.SequenceState.OperatorAction    := '';
     END_IF;
 
-    Data.SequenceState.Ready                  := instDiveSearch.Ready OR instExtractionSequence.Ready;
-    Data.SequenceState.Lifecycle.Busy         := instDiveSearch.Lifecycle.Busy OR instExtractionSequence.Lifecycle.Busy;
-    Data.SequenceState.Lifecycle.Done         := instDiveSearch.Lifecycle.Done OR instExtractionSequence.Lifecycle.Done;
-    Data.SequenceState.Fault.Error            := instDiveSearch.Fault.Error OR instExtractionSequence.Fault.Error;
+    Data.SequenceState.Ready                  := instDiveSearch.Ready OR instExtractionAssist.Ready;
+    Data.SequenceState.Lifecycle.Busy         := instDiveSearch.Lifecycle.Busy OR instExtractionAssist.Lifecycle.Busy;
+    Data.SequenceState.Lifecycle.Done         := instDiveSearch.Lifecycle.Done OR instExtractionAssist.Lifecycle.Done;
+    Data.SequenceState.Fault.Error            := instDiveSearch.Fault.Error OR instExtractionAssist.Fault.Error;
     IF instDiveSearch.Fault.Error THEN
         Data.SequenceState.Fault.ErrorId      := instDiveSearch.Fault.ErrorId;
         Data.SequenceState.Fault.Latched      := instDiveSearch.Fault.Latched;
-    ELSIF instExtractionSequence.Fault.Error THEN
-        Data.SequenceState.Fault.ErrorId      := instExtractionSequence.Fault.ErrorId;
-        Data.SequenceState.Fault.Latched      := instExtractionSequence.Fault.Latched;
+    ELSIF instExtractionAssist.Fault.Error THEN
+        Data.SequenceState.Fault.ErrorId      := instExtractionAssist.Fault.ErrorId;
+        Data.SequenceState.Fault.Latched      := instExtractionAssist.Fault.Latched;
     ELSE
         Data.SequenceState.Fault.ErrorId      := 0;
         Data.SequenceState.Fault.Latched      := FALSE;
@@ -39431,10 +40420,10 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.StepStr                := 'ASSIST_MODE';
     Data.SequenceState.StepAtFault            := E_CycleStep.X0_PREPARATION;
     Data.SequenceState.ExpectedAxis           := E_OperatorAxis.JOYSTICK_Y;
-    Data.SequenceState.ExpectedDirection      := CoupledUserRequestDirection;
+    Data.SequenceState.ExpectedDirection      := WinchBothMotionDirection;
     Data.SequenceState.WaitingForOperator     := FALSE;
     Data.SequenceState.WaitingForProcess      := FALSE;
-    Data.SequenceState.RequestActive          := CoupledUserRequestActive;
+    Data.SequenceState.RequestActive          := WinchBothMotionActive;
     Data.SequenceState.SpeedMismatchMps       := 0.0;
     Data.SequenceState.SpeedMismatchActive    := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
@@ -39446,13 +40435,13 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.DiveState                  := instDiveSearch.DiveState;
     Data.SequenceState.DiveStepAtFault             := instDiveSearch.StepAtFault;
     Data.SequenceState.BottomTouchConfirmed       := BottomPositionConfirmed;
-    Data.SequenceState.ExtractionReady             := instExtractionSequence.Ready;
-    Data.SequenceState.ExtractionBusy              := instExtractionSequence.Lifecycle.Busy;
-    Data.SequenceState.ExtractionDone              := instExtractionSequence.Lifecycle.Done;
-    Data.SequenceState.ExtractionError             := instExtractionSequence.Fault.Error;
-    Data.SequenceState.ExtractionErrorId           := instExtractionSequence.Fault.ErrorId;
-    Data.SequenceState.ExtractionState             := instExtractionSequence.ExtractionState;
-    Data.SequenceState.ExtractionStepAtFault       := instExtractionSequence.StepAtFault;
+    Data.SequenceState.ExtractionReady             := instExtractionAssist.Ready;
+    Data.SequenceState.ExtractionBusy              := instExtractionAssist.Lifecycle.Busy;
+    Data.SequenceState.ExtractionDone              := instExtractionAssist.Lifecycle.Done;
+    Data.SequenceState.ExtractionError             := instExtractionAssist.Fault.Error;
+    Data.SequenceState.ExtractionErrorId           := instExtractionAssist.Fault.ErrorId;
+    Data.SequenceState.ExtractionState             := instExtractionAssist.ExtractionState;
+    Data.SequenceState.ExtractionStepAtFault       := instExtractionAssist.StepAtFault;
     Data.SequenceState.DumpAtTremieArmed           := DumpAtTremieActive;
     Data.SequenceState.DumpAtTremieAssistActive      := DumpAtTremieAssistActive;
     Data.SequenceState.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
@@ -39515,8 +40504,8 @@ ELSE
     Data.SequenceState.ExtractionDone              := FALSE;
     Data.SequenceState.ExtractionError             := FALSE;
     Data.SequenceState.ExtractionErrorId           := 0;
-    Data.SequenceState.ExtractionState             := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
-    Data.SequenceState.ExtractionStepAtFault       := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.ExtractionState             := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
+    Data.SequenceState.ExtractionStepAtFault       := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION;
     Data.SequenceState.DumpAtTremieArmed           := FALSE;
     Data.SequenceState.DumpAtTremieAssistActive      := FALSE;
     Data.SequenceState.DumpAtTremieAtTremie          := FALSE;
@@ -39597,6 +40586,23 @@ via MeasuredSpeedBand, 1 instance par treuil, mêmes sources que FB_Safety_Winch
               <type>
                 <derived name="FB_WinchLoadEstimator" />
               </type>
+            </variable>
+            <variable name="instArbM1">
+              <type>
+                <derived name="FB_WinchCmdArbitrationM1" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FB D'ARBITRAGE DE COMMANDE (POO) ===
+* [INST] Arbitrage commande treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instArbM2">
+              <type>
+                <derived name="FB_WinchCmdArbitrationM2" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Arbitrage commande treuil M2</xhtml>
+              </documentation>
             </variable>
             <variable name="M1DriveRequest">
               <type>
@@ -39738,12 +40744,12 @@ les structs DriveRequest / Sensors / Config sont remplies champ par champ ici.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permission d'armement homme-mort (combiné interlock benne, Option B)</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledUserRequestActive">
+            <variable name="WinchBothMotionActive">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="CoupledUserRequestDirection">
+            <variable name="WinchBothMotionDirection">
               <type>
                 <INT />
               </type>
@@ -39763,22 +40769,22 @@ les structs DriveRequest / Sensors / Config sont remplies champ par champ ici.
                 <BOOL />
               </type>
             </variable>
-            <variable name="CoupledDiveBucketOpenArmed">
+            <variable name="WinchBothDiveBucketOpenArmed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquencement automatique benne en pilotage couplé (both) normal --
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquencement automatique benne en pilotage both normal --
 descente uniquement benne ouverte, montée uniquement benne
-fermée. Distinct de DumpAtTremie/DiveSearch/ExtractionSequence (fonctionnement normal,
-pas une assistance MAINT_N1/N2 dédiée). Réutilise CoupledUserRequestActive/
-CoupledUserRequestDirection (§1 ci-dessus) : déjà exactement "mouvement couplé (both)
+fermée. Distinct de DumpAtTremie/DiveSearch/ExtractionAssist (fonctionnement normal,
+pas une assistance MAINT_N1/N2 dédiée). Réutilise WinchBothMotionActive/
+WinchBothMotionDirection (§1 ci-dessus) : déjà exactement "mouvement both
 demandé" dans les 2 modes (joystick Select=0, ou BtnWinchBothUp/Down) — mêmes variables
-déjà utilisées par instBucket/instDiveSearch/instExtractionSequence.
+déjà utilisées par instBucket/instDiveSearch/instExtractionAssist.
 CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledMotionBlockedByBucket">
+            <variable name="WinchBothMotionBlockedByBucket">
               <type>
                 <BOOL />
               </type>
@@ -39786,7 +40792,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde-fou direct -- voir §3</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledAscentBucketCloseArmed">
+            <variable name="WinchBothAscentBucketCloseArmed">
               <type>
                 <BOOL />
               </type>
@@ -39835,6 +40841,48 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
               <type>
                 <REAL />
               </type>
+            </variable>
+            <variable name="BucketM2Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACTION BENNE M2 (dérivée de instBucket.M2_Direction, câblée au FB d'arbitrage) ===
+. [LOC] Ouverture benne active (instBucket.M2_Direction = 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketM2Close">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fermeture benne active (instBucket.M2_Direction = -1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArbIHM">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_IHM" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTS D'ARBITRAGE (remplis champ par champ, CODESYS refuse l'init anonyme en appel) ===
+. [LOC] Entrées IHM FB d'arbitrage (partagé M1/M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArbContext">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_Context" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Contexte gating FB d'arbitrage (partagé M1/M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArbM2Cfg">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Config M2 (vitesse override benne)</xhtml>
+              </documentation>
             </variable>
             <variable name="M1LogicRequestStartStop">
               <type>
@@ -40285,9 +41333,9 @@ l'armement du re-homing obligatoire publié vers PRG_03 (PositionLimitOverridden
 {region "§1 Intention maintenance et assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE &amp; ASSISTANTS ===
 
-// Consommation de l'intention couplée continue opérateur (cerveau unique PRG_03, tous modes)
-CoupledUserRequestActive    := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Active;
-CoupledUserRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Direction;
+// Consommation de l'intention both continue opérateur (cerveau unique PRG_03, tous modes)
+WinchBothMotionActive    := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Active;
+WinchBothMotionDirection := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent.Direction;
 
 // Récupération de l'état fond synthétisé par PRG_03
 BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
@@ -40298,21 +41346,21 @@ BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConf
 MaintN1 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1);
 MaintN2 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
 
-// Règle absolue en pilotage couplé (both) normal --
+// Règle absolue en pilotage both normal --
 // descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
-CoupledDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
+WinchBothDiveBucketOpenArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
     AND (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
-    AND CoupledUserRequestActive AND (CoupledUserRequestDirection = -1)
+    AND WinchBothMotionActive AND (WinchBothMotionDirection = -1)
     AND NOT _BucketState.IsOpen;
-CoupledAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
+WinchBothAscentBucketCloseArmed := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
     AND (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
-    AND CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)
+    AND WinchBothMotionActive AND (WinchBothMotionDirection = 1)
     AND NOT _BucketState.IsClosed;
 
 // Arbitrage de fermeture benne (CmdBucketCloseArbitrated)
 IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose THEN
     CmdBucketCloseArbitrated := TRUE;
-ELSIF CoupledAscentBucketCloseArmed THEN
+ELSIF WinchBothAscentBucketCloseArmed THEN
     CmdBucketCloseArbitrated := TRUE;
 ELSE
     CmdBucketCloseArbitrated := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
@@ -40331,11 +41379,11 @@ instBucket(
     Reset               := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
-    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR CoupledDiveBucketOpenArmed
+    CmdOpen_IHM         := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen OR WinchBothDiveBucketOpenArmed
                            OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
-    MotionRequestActive := CoupledUserRequestActive,
-    MotionDirection     := CoupledUserRequestDirection,
+    MotionRequestActive := WinchBothMotionActive,
+    MotionDirection     := WinchBothMotionDirection,
     CablePosM1          := PRG_02_Acquisition.Data.Encoders.M1.CablePosM,
     CablePosM2          := PRG_02_Acquisition.Data.Encoders.M2.CablePosM,
     HomedM1             := PRG_02_Acquisition.Data.EncoderM1.Homed,
@@ -40362,7 +41410,7 @@ instBucket(
 // protégeant ainsi la mécanique même en pilotage unitaire ou si l'auto-séquencement est désactivé.
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
-CoupledMotionBlockedByBucket := CoupledDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
+WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
 BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDirection = 1) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
@@ -40398,105 +41446,70 @@ END_IF;
 {region "§3 Arbitrage consignes M1/M2"}
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
 
-IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
-    // FB_Cycle produit déjà StartStop conditionné par CycleMotionPermit (homme-mort 3s, D2).
-    M1LogicRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDirection;
-    M1LogicRequestStartStop := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqStartStop;
-    M1LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.SpeedTgtPct;
-ELSE
-    IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-        // Mode Boutons IHM
-        IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M1TreuilRetenue.Cmd.BtnUp THEN
-            M1LogicRequestDirection := 1;
-            M1LogicRequestSpeedCmd_Pct  := 100.0;
-        ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M1TreuilRetenue.Cmd.BtnDown THEN
-            M1LogicRequestDirection := -1;
-            M1LogicRequestSpeedCmd_Pct  := 100.0;
-        ELSE
-            M1LogicRequestDirection := 0;
-            M1LogicRequestSpeedCmd_Pct  := 0.0;
-        END_IF;
-    ELSE
-        // Mode Joystick Maître
-        IF (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 1) THEN
-            M1LogicRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
-            M1LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.Data.Joystick.AxisY.SpeedTgt);
-        ELSE
-            M1LogicRequestDirection := 0;
-            M1LogicRequestSpeedCmd_Pct  := 0.0;
-        END_IF;
-    END_IF;
+// ── Arbitrage M1/M2 (FB_WinchCmdArbitrationM1/M2) ──
+// Dérivation des bits d'action benne M2 (consommés par les 2 FB d'arbitrage)
+BucketM2Open  := (instBucket.M2_Direction = 1);
+BucketM2Close := (instBucket.M2_Direction = -1);
 
-    M1LogicRequestStartStop := (M1LogicRequestDirection &lt;&gt; 0) AND NOT instBucket.Lifecycle.Busy
-                            AND NOT CoupledMotionBlockedByBucket
-                            AND NOT ((SyncMinorDeviationBlocksUp   AND (M1LogicRequestDirection = 1))
-                                 OR  (SyncMinorDeviationBlocksDown AND (M1LogicRequestDirection = -1)))
-                            AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.Data.JoystickDeadmanArmed);
-END_IF;
+// Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
+ArbIHM.TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+ArbIHM.BtnUpM1           := GVL_IHM.M1TreuilRetenue.Cmd.BtnUp;
+ArbIHM.BtnDownM1         := GVL_IHM.M1TreuilRetenue.Cmd.BtnDown;
+ArbIHM.BtnUpM2           := GVL_IHM.M2TreuilBenne.Cmd.BtnUp;
+ArbIHM.BtnDownM2         := GVL_IHM.M2TreuilBenne.Cmd.BtnDown;
+ArbIHM.BtnWinchBothUp    := GVL_IHM.Commun.BtnWinchBothUp;
+ArbIHM.BtnWinchBothDown  := GVL_IHM.Commun.BtnWinchBothDown;
 
-// Condition renforcée "instBucket.Busy AND instBucket.M2_StartStop" au lieu de
-// "instBucket.Busy" seul : si le mouvement couplé est toujours demandé, M2
-// reçoit sa commande de continuité le MÊME scan, sans dépendre d'un timing de bascule.
-IF instBucket.Lifecycle.Busy AND instBucket.M2_StartStop THEN
-    M2LogicRequestStartStop := instBucket.M2_StartStop;
-    M2LogicRequestDirection := instBucket.M2_Direction;
-    M2LogicRequestSpeedCmd_Pct  := 15.0;
-ELSE
-    IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
-        // Pont SEMI_AUTO : consomme les demandes du séquenceur de cycle.
-        M2LogicRequestDirection := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.ReqDirection;
-        M2LogicRequestStartStop := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.ReqStartStop;
-        M2LogicRequestSpeedCmd_Pct  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.SpeedTgtPct;
-    ELSE
-        IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-            // Mode Boutons IHM
-            IF GVL_IHM.Commun.BtnWinchBothUp OR GVL_IHM.M2TreuilBenne.Cmd.BtnUp THEN
-                M2LogicRequestDirection := 1;
-                M2LogicRequestSpeedCmd_Pct  := 100.0;
-            ELSIF GVL_IHM.Commun.BtnWinchBothDown OR GVL_IHM.M2TreuilBenne.Cmd.BtnDown THEN
-                M2LogicRequestDirection := -1;
-                M2LogicRequestSpeedCmd_Pct  := 100.0;
-            ELSE
-                M2LogicRequestDirection := 0;
-                M2LogicRequestSpeedCmd_Pct  := 0.0;
-            END_IF;
-        ELSE
-            // Mode Joystick Maître
-            IF (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0 OR PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2) THEN
-                M2LogicRequestDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
-                M2LogicRequestSpeedCmd_Pct  := ABS(PRG_02_Acquisition.Data.Joystick.AxisY.SpeedTgt);
-            ELSE
-                M2LogicRequestDirection := 0;
-                M2LogicRequestSpeedCmd_Pct  := 0.0;
-            END_IF;
-        END_IF;
+ArbContext.BucketBusy                     := instBucket.Lifecycle.Busy;
+ArbContext.BucketM2StartStop              := instBucket.M2_StartStop;
+ArbContext.BucketM2Open                   := BucketM2Open;
+ArbContext.BucketM2Close                  := BucketM2Close;
+ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
+ArbContext.SyncBlocksUp                   := SyncMinorDeviationBlocksUp;
+ArbContext.SyncBlocksDown                 := SyncMinorDeviationBlocksDown;
 
-        M2LogicRequestStartStop := (M2LogicRequestDirection &lt;&gt; 0)
-                                AND NOT CoupledMotionBlockedByBucket
-                                AND NOT ((SyncMinorDeviationBlocksUp   AND (M2LogicRequestDirection = -1))
-                                     OR  (SyncMinorDeviationBlocksDown AND (M2LogicRequestDirection = 1)))
-                                AND (NOT GVL_IHM.Modes.Cmd.TglJoystickMaster OR PRG_02_Acquisition.Data.JoystickDeadmanArmed);
-    END_IF;
-END_IF;
+ArbM2Cfg.BucketOverrideSpeedPct := 15.0;
 
-// Ne force plus l'arrêt si un mouvement couplé est toujours activement demandé
-// (CoupledUserRequestActive), auquel cas l'arbitrage normal (§3) prend le
-// relais sans interruption. Comportement inchangé pour toute fin d'action benne SANS mouvement
-// couplé en cours (ouverture/fermeture manuelle isolée, bouton IHM) : l'arrêt reste forcé.
+// ── Arbitrage M1 (FB_WinchCmdArbitrationM1) ──
+instArbM1(
+    Enable     := TRUE,
+    Joystick   := PRG_02_Acquisition.Data.Joystick,
+    Auth       := PRG_03_Modes_Cycle.Data.Auth,
+    ReqWinch   := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1,
+    BothIntent := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent,
+    IHM        := ArbIHM,
+    Context    := ArbContext
+);
+M1LogicRequestStartStop := instArbM1.StartStop;
+M1LogicRequestDirection := instArbM1.Direction;
+M1LogicRequestSpeedCmd_Pct := instArbM1.SpeedPct;
+
+// ── Arbitrage M2 (FB_WinchCmdArbitrationM2) ──
+instArbM2(
+    Enable     := TRUE,
+    Joystick   := PRG_02_Acquisition.Data.Joystick,
+    Auth       := PRG_03_Modes_Cycle.Data.Auth,
+    ReqWinch   := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2,
+    BothIntent := PRG_03_Modes_Cycle.Data.ReqProgram.OperatorCoupledIntent,
+    IHM        := ArbIHM,
+    Context    := ArbContext,
+    Cfg        := ArbM2Cfg
+);
+M2LogicRequestStartStop := instArbM2.StartStop;
+M2LogicRequestDirection := instArbM2.Direction;
+M2LogicRequestSpeedCmd_Pct := instArbM2.SpeedPct;
+
+// Front de fin d'action benne (F_TRIG conservé pour §3bis ArmingPermit et extraction control).
+// L'arrêt forcé de fin d'action benne est désormais géré en interne par les FB d'arbitrage.
 BenneBusyFallEdge(CLK := instBucket.Lifecycle.Busy);
-IF BenneBusyFallEdge.Q AND NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection &lt;&gt; 0)) THEN
-    M1LogicRequestStartStop := FALSE;
-    M2LogicRequestStartStop := FALSE;
-END_IF;
 
 // Après une fermeture benne armée PAR CE mécanisme
-// (pas ExtractionSequence, qui a déjà sa propre phase CONTROL_ASCENT), la montée couplée qui
+// (pas ExtractionAssist, qui a déjà sa propre phase CONTROL_ASCENT), la montée couplée qui
 // enchaîne démarre en vitesse contrôlée (palier 1) sur ExtractionControlDistance_M avant de
 // repasser en paliers normaux.
 BucketBusyRiseEdge(CLK := instBucket.Lifecycle.Busy);
 IF BucketBusyRiseEdge.Q THEN
-    ControlAscentArmedForThisClose := CoupledAscentBucketCloseArmed;
+    ControlAscentArmedForThisClose := WinchBothAscentBucketCloseArmed;
 END_IF;
 IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
     ExtractionControlActive := TRUE;
@@ -40507,7 +41520,7 @@ IF ExtractionControlActive THEN
     IF (ABS(PRG_02_Acquisition.Data.Encoders.M1.CablePosM - ControlAscentStartM1PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M)
        AND (ABS(PRG_02_Acquisition.Data.Encoders.M2.CablePosM - ControlAscentStartM2PosM) &gt;= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
         ExtractionControlActive := FALSE;         // Distance de contrôle parcourue : paliers normaux
-    ELSIF NOT (CoupledUserRequestActive AND (CoupledUserRequestDirection = 1)) THEN
+    ELSIF NOT (WinchBothMotionActive AND (WinchBothMotionDirection = 1)) THEN
         ExtractionControlActive := FALSE;         // Montée relâchée/interrompue : annule la phase
     END_IF;
 END_IF;
@@ -40607,13 +41620,13 @@ IF PRG_02_Acquisition.Data.Joystick.AtNeutralXY OR NOT GVL_IHM.Commun.Cfg.TglEna
     KoboldBottomTouchLatched := FALSE;
 END_IF;
 
-// CoupledUserRequestActive requis : cette surveillance ne s'arme qu'en pilotage
-// COUPLÉ (Select=0), pas en pilotage unitaire M1 (où CoupledUserRequestDirection reflète
+// WinchBothMotionActive requis : cette surveillance ne s'arme qu'en pilotage
+// BOTH (Select=0), pas en pilotage unitaire M1 (où WinchBothMotionDirection reflète
 // quand même l'axe joystick brut).
 // Qualification immersion : front montant Kobold dans la fenêtre [ImmersionLower_M..ImmersionUpper_M]
 IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
-   AND CoupledUserRequestActive
-   AND (CoupledUserRequestDirection = -1)
+   AND WinchBothMotionActive
+   AND (WinchBothMotionDirection = -1)
    AND _BucketState.IsOpen
    AND KoboldAutoStopRiseEdge.Q THEN
     IF (PRG_02_Acquisition.Data.Encoders.M1.CablePosM &lt;= _DredgingAssistCfgPersist.ImmersionUpper_M)
@@ -41291,9 +42304,9 @@ BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
 // Reflète le séquencement auto : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase
 // vitesse contrôlée post-fermeture.
-BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (CoupledDiveBucketOpenArmed OR CoupledAscentBucketCloseArmed)) OR ExtractionControlActive;
-BucketState.CoupledDiveOpenArmed := CoupledDiveBucketOpenArmed;
-BucketState.CoupledAscentCloseArmed := CoupledAscentBucketCloseArmed;
+BucketState.AutoBucketSeqActive := (instBucket.Lifecycle.Busy AND (WinchBothDiveBucketOpenArmed OR WinchBothAscentBucketCloseArmed)) OR ExtractionControlActive;
+BucketState.CoupledDiveOpenArmed := WinchBothDiveBucketOpenArmed;
+BucketState.CoupledAscentCloseArmed := WinchBothAscentBucketCloseArmed;
 BucketState.MachineHomed := PRG_02_Acquisition.MachineHomed;
 BucketState.MachineHomingStep := PRG_02_Acquisition.MachineHomingStep;
 BucketState.MachineHomingInstruction := PRG_02_Acquisition.MachineHomingInstruction;
@@ -41301,7 +42314,7 @@ BucketState.MachineHomingFailed := PRG_02_Acquisition.MachineHomingFailed;
 BucketState.MachineHomingActive := PRG_02_Acquisition.MachineHomingActive;
 BucketState.MachineHomingLossSafeStop := PRG_02_Acquisition.MachineHomingLossSafeStop;
 BucketState.ExtractionControlActive := ExtractionControlActive;
-BucketState.CoupledMotionBlockedByBucket := CoupledMotionBlockedByBucket;
+BucketState.CoupledMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
 GVL_IHM.Commun.KoboldImmersionConfirmed := KoboldImmersionConfirmed;
 GVL_IHM.Commun.KoboldBottomTouchLatched := KoboldBottomTouchLatched;
 
@@ -41384,6 +42397,30 @@ Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Decodage position M3 (migre de PRG_02, AF-02 TBD §8 #5)</xhtml>
               </documentation>
             </variable>
+            <variable name="instArbM3">
+              <type>
+                <derived name="FB_TranslationCmdArbitrationM3" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Arbitrage commande translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArbM3_IHM">
+              <type>
+                <derived name="ST_fbTranslationCmdArbitration_IHM" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Entrées IHM FB d'arbitrage M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArbM3_Context">
+              <type>
+                <derived name="ST_fbTranslationCmdArbitration_Context" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Contexte gating FB d'arbitrage M3</xhtml>
+              </documentation>
+            </variable>
             <variable name="TranslationFinalInterlockRequest">
               <type>
                 <derived name="ST_TranslationFinalInterlockRequest" />
@@ -41437,11 +42474,6 @@ Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
             <variable name="SelTarget">
               <type>
                 <INT />
-              </type>
-            </variable>
-            <variable name="FreqPct">
-              <type>
-                <REAL />
               </type>
             </variable>
             <variable name="M3_SafeStop_Active">
@@ -41661,75 +42693,34 @@ END_IF;
 {region "§1 Arbitrage cible et direction"}
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
-IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO : consomme la demande du séquenceur de cycle.
-    // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
-    M3_PositioningActive  := TRUE;
-    SelTarget    := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt;
-    M3_StartStop_Active  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart;
+// ── Arbitrage M3 (FB_TranslationCmdArbitrationM3) ──
+// Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
+ArbM3_IHM.TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+ArbM3_IHM.BtnFwd            := GVL_IHM.TranslationM3.Cmd.BtnFwd;
+ArbM3_IHM.BtnRev            := GVL_IHM.TranslationM3.Cmd.BtnRev;
+ArbM3_IHM.SelPositioning    := GVL_IHM.TranslationM3.Cmd.SelPositioning;
+ArbM3_IHM.SetFreq_Hz        := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
+ArbM3_IHM.BypassGlobal      := GVL_IHM.TranslationM3.Bypass.Global;
 
-    // 🔒 Direction/vitesse M3 uniquement si le cycle commande réellement le mouvement (Start).
-    // Sans Start, M3 reste à l'arrêt (direction=0, vitesse=0) — aucun mouvement parasite.
-    IF M3_StartStop_Active THEN
-        M3_SpeedCmd_Active := 100.0;
-        // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
-        IF SelTarget = 1 THEN
-            M3_Direction_Active := 1;
-        ELSE
-            M3_Direction_Active := -1;
-        END_IF;
-    ELSE
-        M3_SpeedCmd_Active := 0.0;
-        M3_Direction_Active := 0;
-    END_IF;
-ELSIF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1)
-   OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2) THEN
-    M3_PositioningActive := GVL_IHM.TranslationM3.Cmd.SelPositioning;
-    SelTarget := 0;
+ArbM3_Context.HeightInterlockOk := M3_HeightInterlockOk;
+ArbM3_Context.MaxFreq_Hz        := GVL_PERSISTENT._TranslationMaxFreq_Hz;
 
-    IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnFwd THEN
-        M3_Direction_Active := 1;
-    ELSIF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
-        M3_Direction_Active := -1;
-    ELSIF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-        M3_Direction_Active := PRG_02_Acquisition.Data.JoystickDirectionX;
-    ELSE
-        M3_Direction_Active := 0;
-    END_IF;
-
-    // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2
-    // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
-    // TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd).
-    M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0)
-                           AND (GVL_IHM.TranslationM3.Bypass.Global
-                                OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
-                                OR GVL_IHM.Modes.Cmd.TglJoystickMaster)
-                           AND PRG_02_Acquisition.Data.JoystickDeadmanArmed
-                           AND M3_HeightInterlockOk; // Hauteur mini M1/M2 (risque collision)
-
-    FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz &gt; 0.0,
-                  100.0,
-                  (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / SEL(GVL_PERSISTENT._TranslationMaxFreq_Hz &gt; 0.0, 50.0, GVL_PERSISTENT._TranslationMaxFreq_Hz)) * 100.0);
-    // 🕹️ Si TglJoystickMaster (global) = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
-    M3_SpeedCmd_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
-                              FreqPct,
-                              (PRG_02_Acquisition.Data.JoystickSpeedPctX / 100.0) * FreqPct);
-ELSE
-    M3_PositioningActive := FALSE;
-    SelTarget    := 0;
-    M3_StartStop_Active  := FALSE;
-    M3_Direction_Active  := 0;
-    M3_SpeedCmd_Active   := 0.0;
-END_IF;
+instArbM3(
+    Enable         := TRUE,
+    Joystick       := PRG_02_Acquisition.Data.Joystick,
+    Auth           := PRG_03_Modes_Cycle.Data.Auth,
+    ReqTranslation := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation,
+    IHM            := ArbM3_IHM,
+    Context        := ArbM3_Context
+);
+M3_PositioningActive := instArbM3.PositioningActive;
+SelTarget := instArbM3.SelTarget;
+M3_StartStop_Active := instArbM3.StartStop;
+M3_Direction_Active := instArbM3.Direction;
+M3_SpeedCmd_Active := instArbM3.SpeedPct;
 
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
 // de commande variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
-
-M3_SpeedCmd_Active := LIMIT(0.0, ABS(M3_SpeedCmd_Active), 100.0);
-
-IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable THEN
-    SelTarget := 0;
-END_IF;
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
@@ -43473,7 +44464,7 @@ instHmiBannerFormatter(
     BucketIsClosed              := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     DiveActive                  := GVL_IHM.DredgingAssist.State.DiveBusy,
     TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent OR GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
-    CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
+    WinchBothMotionDirection := PRG_04_Treuils_Benne.WinchBothMotionDirection,
     M1LogicRequestDirection     := PRG_04_Treuils_Benne.M1LogicRequestDirection,
     M2LogicRequestDirection     := PRG_04_Treuils_Benne.M2LogicRequestDirection,
     CycleRequestDirection       := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDirection,
@@ -43513,8 +44504,8 @@ instTroubleshootingView(
     M1LogicRequestDirection := PRG_04_Treuils_Benne.M1LogicRequestDirection,
     M2LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedCmd_Pct,
     M2LogicRequestDirection := PRG_04_Treuils_Benne.M2LogicRequestDirection,
-    CoupledUserRequestDirection := PRG_04_Treuils_Benne.CoupledUserRequestDirection,
-    CoupledUserRequestActive := PRG_04_Treuils_Benne.CoupledUserRequestActive,
+    WinchBothMotionDirection := PRG_04_Treuils_Benne.WinchBothMotionDirection,
+    WinchBothMotionActive := PRG_04_Treuils_Benne.WinchBothMotionActive,
     CycleAutoBusy := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
     CycleM1SpeedTgt_Pct := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.SpeedTgtPct,
     CycleM2SpeedTgt_Pct := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.SpeedTgtPct,
@@ -44309,16 +45300,19 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Folder Name="_TYPES">
             <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
             <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
-            <Object Name="E_ExtractionSequenceState" ObjectId="6ae0d8f0-4bfe-5792-a167-697e4476a91d" />
+            <Object Name="E_ExtractionAssistState" ObjectId="52924d25-cfcc-5dc2-a673-d7581dfb2d37" />
             <Object Name="E_MachineHomingStep" ObjectId="91b3da89-8226-5d1f-92ee-cf29483801dd" />
             <Object Name="E_OperatorAxis" ObjectId="07a48a82-b7c8-54f5-9041-14c13244835f" />
+            <Object Name="ST_fbDiveSearch_Config" ObjectId="a0057069-451b-5e0e-ad42-ec2a185a596c" />
+            <Object Name="ST_fbDiveSearch_Inputs" ObjectId="a95550e0-af41-55b8-bdc1-94cdc5e2e412" />
+            <Object Name="ST_fbDiveSearch_Outputs" ObjectId="bc4f838d-ad60-580e-ba9f-12e889929093" />
             <Object Name="ST_fbMachineHomingCycle_AxisHomingStatus" ObjectId="796b0dad-a243-58d0-a47d-362338c07aeb" />
             <Object Name="ST_fbMachineHomingCycle_BucketCommit" ObjectId="8bbe6b1c-b915-5c25-90f5-ca9c8b430b97" />
             <Object Name="ST_fbMachineHomingCycle_HomingDemand" ObjectId="a0819120-1e85-5b22-8a6d-414f9c7d9a11" />
           </Folder>
           <Object Name="FB_Cycle" ObjectId="17fb99b4-f1ad-50d8-8736-de2357b93935" />
           <Object Name="FB_DiveSearch" ObjectId="0e6b7a8e-54c0-5c72-8612-9c2a76db57f8" />
-          <Object Name="FB_ExtractionSequence" ObjectId="db0a276d-2eae-5fdc-b5fd-93390d06b89e" />
+          <Object Name="FB_ExtractionAssist" ObjectId="8b9bdcda-4c34-51c8-981b-7a07151907c3" />
           <Object Name="FB_MachineHomingCycle" ObjectId="107b39d9-e311-549c-ac0a-91b020a05df9" />
         </Folder>
         <Folder Name="C_DIAG_RESEAUX">
@@ -44497,13 +45491,18 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="FB_Ramp" ObjectId="2e0d5247-7675-56fe-94d4-1cdd52e2e6fb" />
         </Folder>
         <Folder Name="I_TRANSLATION">
-          <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+          <Folder Name="_TYPES">
+            <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+            <Object Name="ST_fbCycle_TranslationCmdDemand" ObjectId="e3302f93-57a8-5949-b90f-a1621e17cb50" />
+            <Object Name="ST_fbTranslationCmdArbitration_Context" ObjectId="51283f1a-e013-501f-a126-0ba75d0b9a1a" />
+            <Object Name="ST_fbTranslationCmdArbitration_IHM" ObjectId="ce120c8d-0245-5e38-851c-8c02205c89fc" />
+          </Folder>
           <Object Name="FB_Safety_Translation" ObjectId="8774beae-e057-5af5-a522-7bfc99dfb4c8" />
           <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
+          <Object Name="FB_TranslationCmdArbitrationM3" ObjectId="36ea547a-49af-554a-909b-ff3e7bde3897" />
           <Object Name="FB_TranslationOutputInterlock" ObjectId="25b7b4af-7ad3-51bb-8a91-14df3a52f0a4" />
           <Object Name="FB_Translation_PositionDecoder" ObjectId="2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3" />
           <Object Name="FB_Translation_PositionEstimator" ObjectId="17c88093-da61-51d7-ad4f-b07c5ebb2eb5" />
-          <Object Name="ST_fbCycle_TranslationCmdDemand" ObjectId="e3302f93-57a8-5949-b90f-a1621e17cb50" />
         </Folder>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="_TYPES">
@@ -44511,6 +45510,9 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
             <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
             <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
             <Object Name="ST_fbCycle_WinchCmdDemand" ObjectId="c006fffa-8ec1-5ea5-83e5-adad08ef4202" />
+            <Object Name="ST_fbWinchCmdArbitration_Cfg" ObjectId="975ccf22-73db-5c3e-bfac-c985552bde6f" />
+            <Object Name="ST_fbWinchCmdArbitration_Context" ObjectId="58dd8b92-25cb-5b24-b149-4d148f2014bb" />
+            <Object Name="ST_fbWinchCmdArbitration_IHM" ObjectId="b2c6293b-40b7-50ed-85f4-51c0c572dd06" />
             <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
             <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />
             <Object Name="ST_fbWinchSpeedLearning_Cell" ObjectId="8341fe63-7ea1-5607-8731-d295248cd6cb" />
@@ -44536,6 +45538,8 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Object Name="FB_SyncContactor" ObjectId="afd229de-316d-5899-8a37-8c30dbfd06db" />
           <Object Name="FB_SyncDeviation" ObjectId="24ca6948-aaa5-587d-b1af-7e9dbd94d79d" />
           <Object Name="FB_Winch" ObjectId="6f83143e-72ec-5e6b-80c8-39f828857ce4" />
+          <Object Name="FB_WinchCmdArbitrationM1" ObjectId="ed58a992-e090-5b40-8cf2-91ea992d9d52" />
+          <Object Name="FB_WinchCmdArbitrationM2" ObjectId="7b19e1be-7f57-5fd6-90fc-6767873f41ea" />
           <Object Name="FB_WinchDirectionInterlock" ObjectId="97add528-91a0-5b3e-8fa4-2513b1dd5dca" />
           <Object Name="FB_WinchLoadEstimator" ObjectId="1ca57a3d-7abe-5417-80b9-b0b83cdad590" />
           <Object Name="FB_WinchOutputInterlock" ObjectId="2a1928e0-077f-59ff-bf93-fa875e0de69c" />

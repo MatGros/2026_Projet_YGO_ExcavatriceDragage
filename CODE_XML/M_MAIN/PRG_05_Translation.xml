@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:19:23.963396" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:19:23.963396">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:39:03.246989" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:39:03.246989">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -764,6 +764,112 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbTranslationCmdArbitration_Context">
+        <baseType>
+          <struct>
+            <variable name="HeightInterlockOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Hauteur mini M1/M2 OK (anti-collision translation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Fréquence max (échelle FreqPct, _TranslationMaxFreq_Hz)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>51283f1a-e013-501f-a126-0ba75d0b9a1a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧩 ST_fbTranslationCmdArbitration_Context — Contexte de gating M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les faits de gating consommés par FB_TranslationCommandArbitration
+       (interlock hauteur M1/M2, échelle fréquence max).
+   📤 Producteur : PRG_05_Translation (câblage).
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbTranslationCmdArbitration_IHM">
+        <baseType>
+          <struct>
+            <variable name="TglJoystickMaster">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Toggle joystick maître global (Modes.Cmd)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation avant (TranslationM3.Cmd.BtnFwd)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation arrière (TranslationM3.Cmd.BtnRev)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelPositioning">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sélecteur positionnement (TranslationM3.Cmd.SelPositioning)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetFreq_Hz">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne fréquence (TranslationM3.Cmd.SetFreq_Hz)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassGlobal">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bypass global translation (TranslationM3.Bypass.Global)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ce120c8d-0245-5e38-851c-8c02205c89fc</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎛️ ST_fbTranslationCmdArbitration_IHM — Entrées IHM de l'arbitrage M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les commandes IHM consommées par FB_TranslationCommandArbitration
+       (boutons, sélecteur positionnement, consigne fréquence, toggle joystick maître).
+   📤 Producteur : PRG_05_Translation (câblage GVL_IHM).
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_Mode">
         <baseType>
           <enum>
@@ -977,6 +1083,244 @@
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_AcquisitionJoystickQualified">
+        <baseType>
+          <struct>
+            <variable name="AxisX">
+              <type>
+                <derived name="ST_fbJoystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande et direction qualifiée axe X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisY">
+              <type>
+                <derived name="ST_fbJoystick_AxisCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Commande et direction qualifiée axe Y</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Homme-mort armé et valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AtNeutralXY">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Les deux axes X et Y sont au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingPermitDenied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Tentative d'armement sans permission</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Façade joystick prête et opérationnelle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Diagnostic défaut joystick</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralXAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Valeur ADC neutre calibré X</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralYAct">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Valeur ADC neutre calibré Y</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e915927d-33f8-504a-9060-48dca13140d7</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🕹️ ST_AcquisitionJoystickQualified — Données joystick qualifiées
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les commandes d'axes, statut homme-mort et diagnostics
+      produits par FB_Joystick dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.Joystick).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_ProgramTranslationRequest">
+        <baseType>
+          <struct>
+            <variable name="ReqStart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande de démarrage mouvement translation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionTgt">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible de position demandée (1=Trémie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>478a938b-bb21-5d74-8556-79842696e566</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🎯 ST_ProgramTranslationRequest — Demande de mouvement translation par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de translation M3 formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbModes_Autorisations">
+        <baseType>
+          <struct>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickWinchSelectArbitrated">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingApproachEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dépassement butée haut (N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceM3TargetEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 §4bis — matrice de maintenance
+⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
+vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l'IHM).
+🚦 Demande de changement de mode REFUSÉE : les treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas à l'arrêt mécanique confirmé
+(contacteurs retombés ET frein serré ET |v| &lt; seuil).
+Le mode courant est maintenu. IHM : « arrêter les
+treuils avant de changer de mode ».
+🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">(usage effectif d'un override/bypass position en maintenance)
+🧭 M2 : idem</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>98f7d0df-d5cd-5d76-b6a8-e5e391c63538</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
+   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
+      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
+   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_State">
         <baseType>
           <enum>
@@ -1064,6 +1408,92 @@
           </data>
         </addData>
       </dataType>
+      <dataType name="ST_fbJoystick_AxisCmd">
+        <baseType>
+          <struct>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES DE PILOTAGE AXE ===
+--&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedTgt">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionNegative">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction joystick ou intension de gestuelle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionPositive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction joystick ou intension de gestuelle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AtNeutral">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE si axes en zone morte (position centrale)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MONITORING IHM (derive des bits ci-dessus, jamais lu en interlock) ===
+&lt;-- [STAT] Sens -1=Rev / 0=Neutre / +1=Fwd (anim IHM fleche ; lu aussi logique treuils PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Deflection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Deflexion signee -100..+100 % (anim IHM jauge/barre)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b6fd2799-de8b-52a1-87c0-15b96ff2b5f6</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🕹️ ST_fbJoystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
+   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
     </dataTypes>
     <pous>
       <pou name="PRG_05_Translation" pouType="program">
@@ -1102,6 +1532,30 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Decodage position M3 (migre de PRG_02, AF-02 TBD §8 #5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instArbM3">
+              <type>
+                <derived name="FB_TranslationCmdArbitrationM3" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Arbitrage commande translation M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArbM3_IHM">
+              <type>
+                <derived name="ST_fbTranslationCmdArbitration_IHM" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Entrées IHM FB d'arbitrage M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArbM3_Context">
+              <type>
+                <derived name="ST_fbTranslationCmdArbitration_Context" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Contexte gating FB d'arbitrage M3</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationFinalInterlockRequest">
@@ -1157,11 +1611,6 @@
             <variable name="SelTarget">
               <type>
                 <INT />
-              </type>
-            </variable>
-            <variable name="FreqPct">
-              <type>
-                <REAL />
               </type>
             </variable>
             <variable name="M3_SafeStop_Active">
@@ -1381,75 +1830,34 @@ END_IF;
 {region "§1 Arbitrage cible et direction"}
 // === 🔀 §1 ARBITRAGE DU SÉLECTEUR DE CIBLE ET DE LA DIRECTION ===
 
-IF PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Pont SEMI_AUTO : consomme la demande du séquenceur de cycle.
-    // FB_Cycle produit TranslationCmd.Start conditionné par CycleMotionPermit (homme-mort 3s, D2).
-    M3_PositioningActive  := TRUE;
-    SelTarget    := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt;
-    M3_StartStop_Active  := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.ReqStart;
+// ── Arbitrage M3 (FB_TranslationCmdArbitrationM3) ──
+// Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
+ArbM3_IHM.TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster;
+ArbM3_IHM.BtnFwd            := GVL_IHM.TranslationM3.Cmd.BtnFwd;
+ArbM3_IHM.BtnRev            := GVL_IHM.TranslationM3.Cmd.BtnRev;
+ArbM3_IHM.SelPositioning    := GVL_IHM.TranslationM3.Cmd.SelPositioning;
+ArbM3_IHM.SetFreq_Hz        := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
+ArbM3_IHM.BypassGlobal      := GVL_IHM.TranslationM3.Bypass.Global;
 
-    // 🔒 Direction/vitesse M3 uniquement si le cycle commande réellement le mouvement (Start).
-    // Sans Start, M3 reste à l'arrêt (direction=0, vitesse=0) — aucun mouvement parasite.
-    IF M3_StartStop_Active THEN
-        M3_SpeedCmd_Active := 100.0;
-        // Direction déduite de la cible (Trémie=1 → Fwd, sinon Rev)
-        IF SelTarget = 1 THEN
-            M3_Direction_Active := 1;
-        ELSE
-            M3_Direction_Active := -1;
-        END_IF;
-    ELSE
-        M3_SpeedCmd_Active := 0.0;
-        M3_Direction_Active := 0;
-    END_IF;
-ELSIF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1)
-   OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2) THEN
-    M3_PositioningActive := GVL_IHM.TranslationM3.Cmd.SelPositioning;
-    SelTarget := 0;
+ArbM3_Context.HeightInterlockOk := M3_HeightInterlockOk;
+ArbM3_Context.MaxFreq_Hz        := GVL_PERSISTENT._TranslationMaxFreq_Hz;
 
-    IF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnFwd THEN
-        M3_Direction_Active := 1;
-    ELSIF NOT GVL_IHM.Modes.Cmd.TglJoystickMaster AND GVL_IHM.TranslationM3.Cmd.BtnRev THEN
-        M3_Direction_Active := -1;
-    ELSIF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
-        M3_Direction_Active := PRG_02_Acquisition.Data.JoystickDirectionX;
-    ELSE
-        M3_Direction_Active := 0;
-    END_IF;
-
-    // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2
-    // (AF_Partie-08 §6, AF_Partie-11 §4.2) — pas seulement pour un pilotage joystick réel.
-    // TglJoystickMaster consolidé — un seul switch machine (GVL_IHM.Modes.Cmd).
-    M3_StartStop_Active := (M3_Direction_Active &lt;&gt; 0)
-                           AND (GVL_IHM.TranslationM3.Bypass.Global
-                                OR NOT GVL_IHM.Modes.Cmd.TglJoystickMaster
-                                OR GVL_IHM.Modes.Cmd.TglJoystickMaster)
-                           AND PRG_02_Acquisition.Data.JoystickDeadmanArmed
-                           AND M3_HeightInterlockOk; // Hauteur mini M1/M2 (risque collision)
-
-    FreqPct := SEL(GVL_IHM.TranslationM3.Cmd.SetFreq_Hz &gt; 0.0,
-                  100.0,
-                  (GVL_IHM.TranslationM3.Cmd.SetFreq_Hz / SEL(GVL_PERSISTENT._TranslationMaxFreq_Hz &gt; 0.0, 50.0, GVL_PERSISTENT._TranslationMaxFreq_Hz)) * 100.0);
-    // 🕹️ Si TglJoystickMaster (global) = TRUE, le manche (0..100%) est mis à l'échelle sur la consigne SetFreq_Hz (ou 100% si non renseignée).
-    M3_SpeedCmd_Active := SEL(GVL_IHM.Modes.Cmd.TglJoystickMaster,
-                              FreqPct,
-                              (PRG_02_Acquisition.Data.JoystickSpeedPctX / 100.0) * FreqPct);
-ELSE
-    M3_PositioningActive := FALSE;
-    SelTarget    := 0;
-    M3_StartStop_Active  := FALSE;
-    M3_Direction_Active  := 0;
-    M3_SpeedCmd_Active   := 0.0;
-END_IF;
+instArbM3(
+    Enable         := TRUE,
+    Joystick       := PRG_02_Acquisition.Data.Joystick,
+    Auth           := PRG_03_Modes_Cycle.Data.Auth,
+    ReqTranslation := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation,
+    IHM            := ArbM3_IHM,
+    Context        := ArbM3_Context
+);
+M3_PositioningActive := instArbM3.PositioningActive;
+SelTarget := instArbM3.SelTarget;
+M3_StartStop_Active := instArbM3.StartStop;
+M3_Direction_Active := instArbM3.Direction;
+M3_SpeedCmd_Active := instArbM3.SpeedPct;
 
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
 // de commande variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
-
-M3_SpeedCmd_Active := LIMIT(0.0, ABS(M3_SpeedCmd_Active), 100.0);
-
-IF (SelTarget = 4) AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable THEN
-    SelTarget := 0;
-END_IF;
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
@@ -3158,6 +3566,220 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_TranslationCmdArbitrationM3" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation FB (TRUE=arbitre actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <derived name="ST_AcquisitionJoystickQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Données joystick qualifiées (AxisX, DeadmanArmed)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Auth">
+              <type>
+                <derived name="ST_fbModes_Autorisations" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisations mode (Mode, MaintenanceM3TargetEnable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqTranslation">
+              <type>
+                <derived name="ST_ProgramTranslationRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [REQ] Demande cycle translation (SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IHM">
+              <type>
+                <derived name="ST_fbTranslationCmdArbitration_IHM" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM, sélecteur, fréquence</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Context">
+              <type>
+                <derived name="ST_fbTranslationCmdArbitration_Context" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Interlock hauteur + échelle fréquence</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt à arbitrer (Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande marche/arrêt arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Direction">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Rev, 0: Stop, 1: Fwd)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Consigne vitesse arbitrée (0..100 %)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositioningActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Mode positionnement actif (SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SelTarget">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Cible position (1=Trémie, 2=P2, 3=P1, 4=Maintenance) — SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="FreqPct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Échelle fréquence (0..100 %)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ↔️ FB_TranslationCmdArbitrationM3 — Arbitrage de commande M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Arbitrer la source de commande M3 (joystick jog / boutons IHM /
+       demande cycle selon le mode) et produire la commande arbitrée.
+   🔌 FB d'arbitrage (non-mouvement) : ne porte ni SafeStop ni StartStop
+       de sécurité — il produit la commande logique, la safety reste dans
+       FB_Safety_Translation / FB_Translation.
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   🔒 Bit-identique à l'ancien PRG_05 §1 (refactor POO).
+   ⚠️ Tautologie (BypassGlobal OR NOT Tgl OR Tgl) conservée bit-identique
+       (bug latent conservateur, documenté — ne pas corriger ici).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// === IMPLEMENTATION ===
+
+Ready := Enable;
+
+IF NOT Enable THEN
+    StartStop         := FALSE;
+    Direction         := 0;
+    SpeedPct          := 0.0;
+    PositioningActive := FALSE;
+    SelTarget         := 0;
+ELSE
+    // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
+    IF Auth.Mode = E_Mode.SEMI_AUTO THEN
+        PositioningActive := TRUE;
+        SelTarget := ReqTranslation.PositionTgt;
+        StartStop := ReqTranslation.ReqStart;
+        IF StartStop THEN
+            SpeedPct := 100.0;
+            IF SelTarget = 1 THEN
+                Direction := 1;
+            ELSE
+                Direction := -1;
+            END_IF;
+        ELSE
+            SpeedPct := 0.0;
+            Direction := 0;
+        END_IF;
+    ELSIF (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2) THEN
+        // ── Mode maintenance : jog joystick ou boutons IHM ──
+        PositioningActive := IHM.SelPositioning;
+        SelTarget := 0;
+
+        IF NOT IHM.TglJoystickMaster AND IHM.BtnFwd THEN
+            Direction := 1;
+        ELSIF NOT IHM.TglJoystickMaster AND IHM.BtnRev THEN
+            Direction := -1;
+        ELSIF IHM.TglJoystickMaster THEN
+            Direction := Joystick.AxisX.Direction;
+        ELSE
+            Direction := 0;
+        END_IF;
+
+        // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2.
+        // ⚠️ Tautologie conservée bit-identique : (BypassGlobal OR NOT Tgl OR Tgl) = toujours TRUE.
+        StartStop := (Direction &lt;&gt; 0)
+                     AND (IHM.BypassGlobal OR NOT IHM.TglJoystickMaster OR IHM.TglJoystickMaster)
+                     AND Joystick.DeadmanArmed
+                     AND Context.HeightInterlockOk;
+
+        // Échelle fréquence : SetFreq_Hz (ou 100% si non renseignée), manche mis à l'échelle si joystick maître
+        FreqPct := SEL(IHM.SetFreq_Hz &gt; 0.0,
+                       100.0,
+                       (IHM.SetFreq_Hz / SEL(Context.MaxFreq_Hz &gt; 0.0, 50.0, Context.MaxFreq_Hz)) * 100.0);
+        SpeedPct := SEL(IHM.TglJoystickMaster,
+                        FreqPct,
+                        (ABS(Joystick.AxisX.SpeedTgt) / 100.0) * FreqPct);
+    ELSE
+        // ── Autres modes : neutralisé ──
+        PositioningActive := FALSE;
+        SelTarget := 0;
+        StartStop := FALSE;
+        Direction := 0;
+        SpeedPct  := 0.0;
+    END_IF;
+END_IF;
+
+// Clamp consigne (bit-identique PRG_05 §1)
+SpeedPct := LIMIT(0.0, ABS(SpeedPct), 100.0);
+
+// SelTarget = Maintenance (4) interdit si Maintenance non autorisée
+IF (SelTarget = 4) AND NOT Auth.MaintenanceM3TargetEnable THEN
+    SelTarget := 0;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>36ea547a-49af-554a-909b-ff3e7bde3897</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Translation_PositionDecoder" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -4644,9 +5266,14 @@ Current := LIMIT(-100.0, Current, 100.0);
         <Folder Name="I_TRANSLATION">
           <Object Name="FB_Safety_Translation" ObjectId="8774beae-e057-5af5-a522-7bfc99dfb4c8" />
           <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
+          <Object Name="FB_TranslationCmdArbitrationM3" ObjectId="36ea547a-49af-554a-909b-ff3e7bde3897" />
           <Object Name="FB_Translation_PositionDecoder" ObjectId="2e2541f0-1f0e-5f3b-9609-6ddfbb9631b3" />
           <Object Name="FB_Translation_PositionEstimator" ObjectId="17c88093-da61-51d7-ad4f-b07c5ebb2eb5" />
-          <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbTranslationCmdArbitration_Context" ObjectId="51283f1a-e013-501f-a126-0ba75d0b9a1a" />
+            <Object Name="ST_fbTranslationCmdArbitration_IHM" ObjectId="ce120c8d-0245-5e38-851c-8c02205c89fc" />
+            <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+          </Folder>
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
@@ -4655,6 +5282,13 @@ Current := LIMIT(-100.0, Current, 100.0);
               <Object Name="ST_TranslationFinalInterlockRequest" ObjectId="3d90836c-bd65-54ca-b2e2-f3d1ef3a1bd3" />
               <Object Name="ST_TranslationInterPrg" ObjectId="0d838c96-5f80-5add-9102-b8f7b35a3c53" />
               <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
+            </Folder>
+            <Folder Name="4_JOYSTICK_ACQUISITION">
+              <Object Name="ST_AcquisitionJoystickQualified" ObjectId="e915927d-33f8-504a-9060-48dca13140d7" />
+            </Folder>
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_ProgramTranslationRequest" ObjectId="478a938b-bb21-5d74-8556-79842696e566" />
+              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
             </Folder>
           </Folder>
         </Folder>
@@ -4672,6 +5306,9 @@ Current := LIMIT(-100.0, Current, 100.0);
             <Object Name="ST_ContactorCheck" ObjectId="cdabe1c4-dd5c-530c-a1a2-2825fa969858" />
             <Object Name="E_State" ObjectId="00d1a0b6-13af-5333-b67c-646a1ec9c1fc" />
           </Folder>
+        </Folder>
+        <Folder Name="D_JOYSTICK">
+          <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
         </Folder>
       </ProjectStructure>
     </data>

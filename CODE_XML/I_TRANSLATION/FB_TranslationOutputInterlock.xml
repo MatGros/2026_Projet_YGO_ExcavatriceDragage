@@ -701,7 +701,9 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
       <ProjectStructure>
         <Folder Name="I_TRANSLATION">
           <Object Name="FB_TranslationOutputInterlock" ObjectId="25b7b4af-7ad3-51bb-8a91-14df3a52f0a4" />
-          <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+          <Folder Name="_TYPES">
+            <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+          </Folder>
         </Folder>
         <Folder Name="A_COMMUN">
           <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />

@@ -3997,7 +3997,9 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
         </Folder>
         <Folder Name="I_TRANSLATION">
           <Object Name="FB_TranslationOutputInterlock" ObjectId="25b7b4af-7ad3-51bb-8a91-14df3a52f0a4" />
-          <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+          <Folder Name="_TYPES">
+            <Object Name="E_TranslationFinalInterlockReason" ObjectId="5edc74ff-df78-5968-b824-933c1970008c" />
+          </Folder>
         </Folder>
         <Folder Name="H_TREUILS_BENNE">
           <Object Name="FB_WinchOutputInterlock" ObjectId="2a1928e0-077f-59ff-bf93-fa875e0de69c" />
