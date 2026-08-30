@@ -1,0 +1,72 @@
+# Contrat T181-00b — stimulus réel du harnais WINCH_INTEG
+
+contract:
+  task_id: T181-00b_STIMULUS_WINCH_INTEG
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Rendre le stimulus du harnais WINCH_INTEG fidèle à PRG_02/PRG_04 afin que les
+    vecteurs produisent un mouvement réel avant d'évaluer leurs oracles.
+
+  acceptance:
+    - id: AC1
+      statement: "Le miroir PRG_02 publie Data.Joystick.AxisY avec la même source et la même polarité que PRG_02_Acquisition."
+      verified_by: "comparaison fichier:ligne production/miroir + HARN joystick"
+    - id: AC2
+      statement: "Chaque vecteur de montée qui demande un palier supérieur à 1 initialise explicitement une benne fermée cohérente avant le stimulus."
+      verified_by: "tests WINCH_INTEG HARN-42/HARN-50 avec StepNumber attendu >= 2"
+    - id: AC3
+      statement: "Le scénario purge RestartRequired par un retour neutre sans commande pendant le délai requis avant toute demande nominale."
+      verified_by: "TC multi-scan : RestartRequired FALSE puis relais/StepNumber réellement actifs"
+    - id: AC4
+      statement: "Les PRECOND des vecteurs HARN-12/31/50/51/73/75/80 deviennent atteignables par stimulus réel ; aucun oracle ne repasse vert par tautologie."
+      verified_by: "run_tests --fb WINCH_INTEG + inspection des assertions"
+    - id: AC5
+      statement: "SUITE_CALIBREE reste absente tant que les vecteurs nominalement attendus ne sont pas justifiés TC-par-TC et que les vrais rouges de cible ne sont pas séparés des défauts de stimulus."
+      verified_by: "G481 + grep SUITE_CALIBREE"
+    - id: AC6
+      statement: "Le nom de fichier est identique au nom de POU FB_TestHarness_PRG_02."
+      verified_by: "inspection source et bundle frais"
+    - id: AC7
+      statement: "Le suffixe est identique au langage généré dans le bundle ; FB_TestHarness_PRG_02.st reste du ST pur."
+      verified_by: "inspection source et bundle frais"
+
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_04.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/AGENT_WORKFLOW/scripts/G481_check_winch_integ.py
+    forbidden:
+      - CODE/**
+      - DOC/WFLOW/TASKS.yaml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Aucun contournement de permis ou défaut de production dans le harnais."
+      - "Les vecteurs rouges baseline restent rouges s'ils atteignent réellement la cible et constatent l'absence de fonction."
+      - "Les oracles stricts ajoutés par T181-00b restent discriminants."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - run_all_gates
+
+  alert_duty: >
+    STOP si le mouvement réel exige de forcer une variable de production ou de contourner
+    un permis : réparer le miroir/modèle, jamais masquer le défaut de chaîne réelle.
+
+status: APPROVED
+execution:
+  executed_by: "Codex (orchestrateur)"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Oracles durcis ; réparation stimulus réel requise."
+  evidence_submitted: []
+validation:
+  status: APPROVED
+  validated_by: "Humain (utilisateur)"
+  validated_at: "2026-08-30T10:35:00+02:00"
+  notes: "Découpage harnais uniquement, sans CODE production."

@@ -31,6 +31,13 @@ VAR_INPUT
     // === TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
     DeadTimeSameDir                 : TIME := T#1s;                  // --> [CFG] Temps mort redemarrage meme sens apres arret
     DeadTimeOppositeDir             : TIME := T#1s;                  // --> [CFG] Temps mort redemarrage inversion sens apres arret
+
+    // === MAINTIEN BORNÉ DU CONTACTEUR DE SENS (§3bis / AC6-AC8) ===
+    // Paramètres DÉDIÉS, distincts de DeadTimeSameDir/OppositeDir et de tout délai
+    // d'interlock direction (ne pas réutiliser ni recouvrir D10). Ordre garanti :
+    // DropConfirmDelay (100 ms) < MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
+    DropConfirmDelay                : TIME := T#100ms;               // --> [CFG] Debounce confirmation retombee contacteurs (AC7)
+    MaxSenseHoldTime                : TIME := T#1s;                  // --> [CFG] T_max : borne superieure du maintien §3bis (AC7)
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
@@ -59,6 +66,11 @@ VAR_OUTPUT
     RestartDelayElapsed             : TIME;                           // <-- [DIAG] Ecoule temporisation anti-court-cycle
     DeadTimeElapsed                 : TIME;                           // <-- [DIAG] Ecoule temps mort directionnel
     StepDelayElapsed                : TIME;                           // <-- [DIAG] Ecoule temporisation palier
+
+    // === DIAGNOSTICS MAINTIEN §3bis (AC6/AC7) ===
+    SenseHoldActive                 : BOOL;                           // <-- [DIAG] Maintien du contacteur de sens en cours
+    ContactorStuck                  : BOOL;                           // <-- [DIAG] Latch T_max depasse sans confirmation retombee (AC7)
+    SenseHoldElapsed                : TIME;                           // <-- [DIAG] Ecoule temporisation T_max maintien §3bis
 END_VAR
 VAR
     // === DETECTEURS ET TIMERS INTERNES ===
@@ -69,6 +81,8 @@ VAR
     StepDelay                       : TON;                            // . [LOC] Temporisation changement de palier
     RestartDelay                    : TON;                            // . [LOC] Temporisation anti-court-cycle redemarrage
     DeadTime                        : TON;                            // . [LOC] Temporisation temps mort directionnel
+    SenseHoldTimer                  : TON;                            // . [LOC] Temporisation T_max maintien §3bis (AC7)
+    SenseHoldFeedbackTimer          : TON;                            // . [LOC] Debounce DropConfirmDelay retombee contacteurs (AC7)
 
     // === VARIABLES LOCALES CALCULÉES ===
     RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage
@@ -83,6 +97,9 @@ VAR
     DeadTimePending                 : BOOL;                           // . [LOC] Temps mort directionnel en attente
     NewDirection                    : INT;                            // . [LOC] Sens de la nouvelle demande
     RequiredDeadTime                : TIME;                           // . [LOC] Temps mort requis selon sens de la demande
+    SenseHoldRequested              : BOOL;                           // . [LOC] Condition §3bis demandee (palier 0 + sens commande)
+    SenseHoldDone                   : BOOL;                           // . [LOC] One-shot maintien effectue (anti-bouclage)
+    ContactorStuckLatched           : BOOL;                           // . [LOC] Latch interne T_max depasse sans confirmation retombee
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
@@ -101,6 +118,11 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DeadTime(IN := FALSE);
     DeadTimePending := FALSE;
     DeadTimeElapsed := T#0ms;
+    // 🔒 Transitoires §3bis neutralisés à la gate (latches de sûreté conservés ci-dessous).
+    SenseHoldActive := FALSE; SenseHoldDone := FALSE;
+    SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
+    SenseHoldElapsed := T#0ms;
+    ContactorStuck := ContactorStuckLatched;
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     BrakeCmd := FALSE; AuthorizedStep := 0;
@@ -204,10 +226,64 @@ IF MotorRequest AND DeadTimePending THEN
     END_IF;
 END_IF;
 
+// ── 4ter. Maintien borné du contacteur de sens (§3bis) — AC6/AC7/AC8 ─────────
+// Règle §3bis : quand RequestedStep retombe à 0 mais RequestedRelayFwd/Rev reste
+// TRUE (demande transitoire de chute de palier portée par FB_Winch), la barrière NE
+// force PLUS RelayFwd/Rev à FALSE immédiatement — elle TIENT le contacteur de sens
+// (jamais relâché avant les contacteurs de vitesse) jusqu'à :
+//   - FwdRevSpeedFeedbackOff confirmé, debounced par DropConfirmDelay (AC7 : pas
+//     d'ouverture du sens sur retour simple voie seul) ; OU
+//   - T_max (MaxSenseHoldTime) écoulé -> chute du sens FORCÉE + latch ContactorStuck.
+// Le maintien indéfini du stator sous tension est INTERDIT (AC7). Les coupures dures
+// (NOT Enable / PowerContactorEngaged=FALSE / Error / RestartInhibit) ne passent
+// JAMAIS par ce maintien (AC9) : elles coupent RelayFwd/Rev immédiatement.
+SenseHoldRequested := (RequestedStepClamped = 0) AND (RequestedRelayFwd OR RequestedRelayRev)
+                      AND NOT Error AND NOT RestartInhibit AND NOT ContactorStuckLatched;
+
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    // 🔒 Gate dur : pas de maintien possible (les sorties sont déjà coupées §2).
+    SenseHoldActive := FALSE; SenseHoldDone := FALSE;
+    SenseHoldTimer(IN := FALSE, PT := MaxSenseHoldTime);
+    SenseHoldFeedbackTimer(IN := FALSE, PT := DropConfirmDelay);
+ELSIF Error OR RestartInhibit THEN
+    // Coupure par défaut : le maintien ne survit pas à un défaut (AC9).
+    SenseHoldActive := FALSE; SenseHoldDone := FALSE;
+    SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
+ELSE
+    IF MotorRequest THEN
+        SenseHoldDone := FALSE;
+        SenseHoldActive := FALSE;               // vraie nouvelle demande interrompt le maintien transitoire
+    END_IF;
+    IF NOT (RequestedRelayFwd OR RequestedRelayRev) THEN
+        SenseHoldDone := FALSE;
+        SenseHoldActive := FALSE;               // retour au neutre complet : plus rien a tenir
+    END_IF;
+    IF SenseHoldRequested AND NOT SenseHoldActive AND NOT SenseHoldDone THEN
+        SenseHoldActive := TRUE;              // entrée en maintien §3bis
+        SenseHoldTimer(IN := FALSE, PT := MaxSenseHoldTime);        // T_max arme au scan suivant
+        SenseHoldFeedbackTimer(IN := FALSE, PT := DropConfirmDelay);
+    ELSIF SenseHoldActive THEN
+        SenseHoldFeedbackTimer(IN := FwdRevSpeedFeedbackOff, PT := DropConfirmDelay);
+        SenseHoldTimer(IN := NOT FwdRevSpeedFeedbackOff, PT := MaxSenseHoldTime);
+        IF SenseHoldFeedbackTimer.Q THEN
+            // Retombée contacteurs CONFIRMÉE -> chute normale du sens (one-shot).
+            SenseHoldActive := FALSE; SenseHoldDone := TRUE;
+        ELSIF SenseHoldTimer.Q THEN
+            // T_max sans confirmation -> chute du sens FORCÉE + latch à acquitter (AC7).
+            SenseHoldActive := FALSE;
+            ContactorStuckLatched := TRUE;
+        END_IF;
+    ELSE
+        SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
+    END_IF;
+END_IF;
+SenseHoldElapsed := SenseHoldTimer.ET;
+ContactorStuck := ContactorStuckLatched;
+
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
-Busy := FALSE; Done := FALSE; Ready := NOT Error;
+Busy := FALSE; Done := FALSE; Ready := NOT Error AND NOT ContactorStuckLatched;
 
 IF Error THEN
     StepDelay(IN := FALSE, PT := T#1s250ms);
@@ -222,6 +298,28 @@ ELSIF RestartInhibit THEN
     AuthorizedStep := 0;
     Reason := E_WinchFinalInterlockReason.RESTART_INHIBITED;
     State := E_WinchFinalInterlockState.FAULT;
+ELSIF ContactorStuckLatched THEN
+    // AC7 : T_max §3bis dépassé sans confirmation retombée -> chute du sens FORCÉE.
+    // RelayFwd/Rev et BrakeCmd (= RelayFwd OR RelayRev) retombent à FALSE ci-dessus.
+    // Latch à acquittement conscient (ResetEdge) — jamais de redémarrage auto.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    Reason := E_WinchFinalInterlockReason.SENSE_DROP_TIMEOUT;
+    State := E_WinchFinalInterlockState.FAULT;
+ELSIF SenseHoldActive THEN
+    // §3bis : RequestedStep retombé à 0 mais sens encore commandé -> on TIENT le
+    // contacteur de sens jusqu'à FwdRevSpeedFeedbackOff (debounced DropConfirmDelay)
+    // OU T_max. AuthorizedStep=0 (aucun contacteur de vitesse), seul le sens est tenu.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    IF RequestedRelayFwd THEN RelayFwd := TRUE; END_IF;
+    IF RequestedRelayRev THEN RelayRev := TRUE; END_IF;
+    State := E_WinchFinalInterlockState.WAIT_SENSE_DROP_CONFIRM;
+    Busy := TRUE;
 ELSIF NOT MotorRequest THEN
     // Toute annulation de demande annule la temporisation de hausse en cours.
     StepDelay(IN := FALSE, PT := T#1s250ms);
@@ -298,6 +396,7 @@ END_IF;
 IF ResetEdge.Q THEN
     BrakeTimeoutAck := TRUE;     // toujours effectif, sans condition externe
     ResetRequired := FALSE;
+    ContactorStuckLatched := FALSE;   // acquittement conscient du latch T_max §3bis (AC7)
 END_IF;
 IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
     ErrorId := ErrorId OR 16#0001;

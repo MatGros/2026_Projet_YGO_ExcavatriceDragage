@@ -238,6 +238,8 @@ FB_Winch:
     - CODE/H_TREUILS_BENNE/FB_DriftGuard.st
     - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
     - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+    - CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st
+    - CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st
     - CODE/H_TREUILS_BENNE/FB_Winch.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_winch.st
 
@@ -877,6 +879,8 @@ PRG_04_Treuils_Benne:
     - CODE/H_TREUILS_BENNE/FB_WinchSync.st
     - CODE/H_TREUILS_BENNE/FB_SyncDeviation.st
     - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+    - CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st
+    - CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st
     - CODE/H_TREUILS_BENNE/FB_Winch.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st
@@ -1108,6 +1112,8 @@ MAIN_GLOBAL:
     - CODE/H_TREUILS_BENNE/FB_WinchSync.st
     - CODE/H_TREUILS_BENNE/FB_SyncDeviation.st
     - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+    - CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st
+    - CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st
     - CODE/H_TREUILS_BENNE/FB_Winch.st
     - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
     - CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st
@@ -1248,6 +1254,8 @@ WINCH_INTEG:
     - CODE/H_TREUILS_BENNE/FB_WinchSync.st
     - CODE/H_TREUILS_BENNE/FB_SyncDeviation.st
     - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+    - CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st
+    - CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st
     - CODE/H_TREUILS_BENNE/FB_Winch.st
     - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
     - CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st

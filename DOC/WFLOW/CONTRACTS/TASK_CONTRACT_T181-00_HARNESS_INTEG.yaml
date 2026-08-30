@@ -80,12 +80,12 @@ contract:
     minimal ne suffit pas à distinguer deux comportements de clamp : REMONTER à l'orchestrateur
     avant de contourner.
 
-status: PENDING
+status: IN_REVIEW
 
 execution:
-  executed_by: ""
-  completed_at: ""
-  status: PENDING
+  executed_by: "Agent externe B"
+  completed_at: "2026-08-30T02:15:00+02:00"
+  status: PARTIAL
   summary: >
     À remplir : reconstruction du stub, modèle physique, suite test_winch_integ.st, gate, plan de tir.
   evidence_submitted: []

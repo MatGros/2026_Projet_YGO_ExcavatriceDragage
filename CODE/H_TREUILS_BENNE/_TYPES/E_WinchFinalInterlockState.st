@@ -12,6 +12,7 @@ TYPE E_WinchFinalInterlockState :
     WAIT_BRAKE_COMMAND_CONFIRMATION := 2,                             // Attente confirmation feedback frein
     WAIT_STEP_DELAY                 := 3,                             // Temporisation changement de palier
     WAIT_RESTART_DELAY              := 4,                             // Temporisation anti-court-cycle redemarrage
-    FAULT                           := 5                              // Etat de defaut
+    FAULT                           := 5,                             // Etat de defaut
+    WAIT_SENSE_DROP_CONFIRM         := 6                              // Maintien §3bis du contacteur de sens (AC6/AC7)
 );
 END_TYPE

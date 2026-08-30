@@ -139,6 +139,78 @@ TEST 'TC-P10-025 Demande benne refusee si M1_Busy OR M2_Busy a l entree (READY)'
     ASSERT_FALSE(FB.Lifecycle.Busy, 'M1_Busy -> pas de Busy');
 END_TEST
 
+TEST 'TC-P10-025.1 Anti-traversee : M2_Busy seul refuse une demande benne a l entree (AC3)'
+    (* Symetrique de TC-P10-025 (qui ne couvre que M1_Busy) : prouve que M2_Busy est lui aussi
+       lu (FB_Bucket.st L234-240) et refuse une NOUVELLE demande benne a l entree READY. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    (* Scan 1 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 2 : M2_Busy=TRUE -> demande fermeture REFUSEE (anti-traversee) *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       M2_Busy := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.CloseReq, 'M2_Busy -> CloseReq refuse');
+    ASSERT_FALSE(FB.M2_StartStop, 'M2_Busy -> pas de mouvement benne');
+    ASSERT_FALSE(FB.Lifecycle.Busy, 'M2_Busy -> pas de Busy');
+END_TEST
+
+TEST 'TC-P10-025.2 Anti-traversee : mouvement deja engage + M2_Busy -> pas d avortement (AC3)'
+    (* L'anti-traversee (AC3) est scope a la REFUS d'une demande a l entree. Une fois la
+       manuvre engagee, la benne pilote M2 : le treuil agit donc logiquement (M2_Busy=TRUE).
+       Le FB ne doit PAS s'auto-avorter a ce moment (bloc Busy L254+ ne relit pas les _Busy). *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    (* Scan 1 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 2 : demarrage fermeture, M2_Busy encore FALSE *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       M2_Busy := FALSE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'Fermeture engagee -> Busy');
+
+    (* Scan 3 : toujours en fermeture, M2_Busy passe a TRUE (M2 agit sous ordre benne) *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       M2_Busy := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.5,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'M2_Busy pendant manuvre -> Busy conserve');
+    ASSERT_TRUE(FB.M2_StartStop, 'M2_Busy pendant manuvre -> pas d avortement');
+    ASSERT_EQ(FB.M2_Direction, 1, 'M2_Busy pendant manuvre -> direction conservee');
+END_TEST
+
 TEST 'TC-P10-026 Glissement M1 >1.0m pendant BUSY -> M1SlipDetected + coupe M2'
     Config.OffsetOpenM := 0.0;
     Config.OffsetCloseM := 3.0;
@@ -258,6 +330,80 @@ TEST 'TC-P10-029 Recul (sens inverse) borne a la position de depart, jamais au-d
        Config := Config, BucketState := BucketState);
     ASSERT_EQ(FB.M2_Direction, -1, 'Recul -> M2_Direction=-1');
     ASSERT_TRUE(FB.M2_StartStop, 'Recul commande (borne a M2StartPosM)');
+END_TEST
+
+TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Direction/StartStop)'
+    (* Etend TC-P10-029 (qui s'arrete a l'attente de Direction/StartStop) : simule le recul
+       jusqu'a la position de depart M2StartPosM et prouve l'ARRET reel (M2_StartStop=FALSE,
+       Busy=FALSE, Done=TRUE) et la restauration d'etat, jamais au-dela (FB_Bucket.st L303). *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+
+    (* Scan 1 : regime nominal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 2 : demarrage fermeture, M2StartPosM capture a 0.0 *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'Fermeture engagee -> Busy');
+
+    (* Scan 3 : M2 monte au-dessus de M2StartPosM -> LeftStartSinceArm arme *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       CablePosM1 := 0.0, CablePosM2 := 1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+
+    (* Scan 4 : inversion de sens (recul) -> M2 pilote en descente *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CablePosM1 := 0.0, CablePosM2 := 1.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_EQ(FB.M2_Direction, -1, 'Recul -> M2_Direction=-1');
+    ASSERT_TRUE(FB.M2_StartStop, 'Recul commande');
+
+    (* Scan 5 : le recul n'a pas encore atteint M2StartPosM -> pas d arret *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CablePosM1 := 0.0, CablePosM2 := 0.5,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.M2_StartStop, 'Recul avant M2StartPosM -> toujours commande');
+
+    (* Scan 6 : recul A M2StartPosM (0.0) -> ARRET reel, jamais au-dela *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       CablePosM1 := 0.0, CablePosM2 := 0.0,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    ASSERT_FALSE(FB.M2_StartStop, 'Recul a M2StartPosM -> M2_StartStop=FALSE (arret)');
+    ASSERT_EQ(FB.M2_Direction, 0, 'Recul a M2StartPosM -> M2_Direction=0');
+    ASSERT_FALSE(FB.Lifecycle.Busy, 'Recul a M2StartPosM -> Busy=FALSE');
+    ASSERT_TRUE(FB.Lifecycle.Done, 'Recul a M2StartPosM -> Done=TRUE');
+
+    (* Recopie etat memorise restaure (WasOpenAtStart=TRUE) *)
+    BucketState := FB.BucketState;
+    ASSERT_TRUE(BucketState.IsOpen, 'Recul a M2StartPosM -> IsOpen restaure TRUE');
+    ASSERT_FALSE(BucketState.IsClosed, 'Recul a M2StartPosM -> IsClosed restaure FALSE');
 END_TEST
 
 TEST 'TC-P10-030 ConfirmOpen/ClosePosition : effet seulement MAINT_N1/N2 arretes'
@@ -496,6 +642,28 @@ TEST 'TC-P10-047.1 Incoherence boot : 1er cycle ni IsOpen ni IsClosed -> StateIn
     BucketState := FB.BucketState; // STruCpp : émule le copy-out VAR_IN_OUT CODESYS.
     ASSERT_TRUE(BucketState.StateIncoherent, 'Boot incoherent -> StateIncoherent=TRUE');
     ASSERT_FALSE(FB.ActiveOffsetValid, 'Boot incoherent -> ActiveOffsetValid=FALSE');
+END_TEST
+
+TEST 'TC-P10-047.2 Boot incoherent IsOpen=TRUE ET IsClosed=TRUE -> StateIncoherent (attendu ROUGE)'
+    (* ⚠️ TC LEGITIMEMENT ROUGE (T175) : le code de boot (FB_Bucket.st L198) ne detecte que le
+       cas ni IsOpen ni IsClosed (L198). L'etat contradictoire IsOpen=TRUE ET IsClosed=TRUE
+       n'est PAS traite -> StateIncoherent reste FALSE, ActiveOffsetValid reste TRUE. Ce TC
+       documente l'ecart ; il doit rester ROUGE tant que le code ne traite pas ce cas. *)
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := TRUE;
+
+    (* Scan 1 : premier cycle, IsOpen ET IsClosed -> incoherence contradictoire *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE,
+       Config := Config, BucketState := BucketState);
+    BucketState := FB.BucketState;
+    ASSERT_TRUE(BucketState.StateIncoherent, 'Boot IsOpen ET IsClosed -> StateIncoherent=TRUE (code ne le traite pas)');
+    ASSERT_FALSE(FB.ActiveOffsetValid, 'Boot incoherent -> ActiveOffsetValid=FALSE (code ne le traite pas)');
 END_TEST
 
 TEST 'TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle'

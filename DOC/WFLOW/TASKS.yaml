@@ -2411,7 +2411,7 @@ tasks:
   - T168-B
 - id: T169
   parent_id: null
-  statut: ⏳
+  statut: ⏸️
   criticite: C4
   domaine: TEST_AUTO_CI
   agent: ORCHESTRATEUR
@@ -2752,8 +2752,8 @@ tasks:
   statut: ⏳
   criticite: C4
   domaine: TREUILS
-  agent: DSH/Claude (orchestrateur → délégation)
-  date: '2026-08-29T16:30:00'
+  agent: Codex — copy-out STruCpp déjà checkpointé ; validation finale à faire
+  date: '2026-08-30T02:20:00+02:00'
   titre: Écarts code treuils/benne (temps mort directionnel, anti-traversée benne, MAINT)
   contexte: 'Délegué 2026-08-29 (audits P3-1a) : temps mort directionnel (RetryDelay T#1500ms uniforme vs TC-P10-021/022 1s
     par direction — à trancher et documenter), M1_Busy/M2_Busy déclarés jamais lus (anti-traversée benne TC-P10-025), MAINT_N1/N2
@@ -2767,6 +2767,42 @@ tasks:
   - MAINT_N1/N2 tranché (code ou fiche, plus d écart silencieux)
   - G200 PASS + gates palier C PASS
   bloque_par: []
+- id: T175-01
+  parent_id: T175
+  statut: ⏸️
+  criticite: C0
+  domaine: TREUILS
+  agent: Codex — rework cadrage : bits ErrorId saturés / classe arrêt à trancher
+  date: '2026-08-30T10:25:00+02:00'
+  titre: Glissement M2 pendant manoeuvre benne — qualification sécurité C0
+  contexte: 'Audit T175 : FB_Bucket surveille M1 à 1 m ; aucun équivalent M2. Meca E à 2,5 m ne remplace pas une surveillance de glissement. Le déplacement M2 est normal pendant la manoeuvre benne : la sémantique doit être tranchée avant patch.'
+  description: 'fix: uniquement après visa — producteur unique du mouvement M2 non commandé, chaîne SafeStop/PowerCutOff et TC. guard: TC nominal M2 sans faux défaut + TC injection mouvement non commandé.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T175-01_M2_SLIP_SAFETY.yaml
+  objectifs:
+  - Définition physique et propriétaire unique du défaut M2 validés
+  - Mouvement M2 non commandé détecté et arrêté selon fonction sécurité validée
+  - Mouvement M2 commandé de la benne sans faux défaut
+  - G200, bundle et gates palier C PASS avant clôture
+  bloque_par:
+  - visas V3/V5/V6 et essai terrain V7 — voir DECISIONS_T175_C0_VISA_HUMAIN.md
+- id: T175-02
+  parent_id: T175
+  statut: ⏸️
+  criticite: C0
+  domaine: TREUILS
+  agent: Codex — challenge C0 : correctif possible après visas précis
+  date: '2026-08-30T10:25:00+02:00'
+  titre: Benne — anti-traversée multi-scan et boot contradictoire
+  contexte: 'Audit externe T175 : le contrôle Busy ne couvre que l entrée de demande ; M1_Busy/M2_Busy arrivant après engagement ne sont pas relus. Au boot, IsOpen=TRUE et IsClosed=TRUE est traité comme fermé valide, avec offset ambigu.'
+  description: 'fix: interdire/arrêter la manoeuvre lors d un conflit d axe tardif et classer TRUE/TRUE incohérent. guard: TC multi-scan M1/M2 Busy, TC 047.2 et non-régressions nominales.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T175-02_BUCKET_CROSSING_BOOT_SAFETY.yaml
+  objectifs:
+  - Conflit M1/M2 entrant pendant manoeuvre traité par comportement sécurité validé
+  - Boot TRUE/TRUE fail-safe sans offset actif ni commande
+  - Mouvement M2 nominal de benne conservé sans faux défaut
+  - G200, bundle et gates palier C PASS avant clôture
+  bloque_par:
+  - visas V1/V2/V4/V6/V7 — voir DECISIONS_T175_C0_VISA_HUMAIN.md
 - id: T176
   statut: ⏳
   criticite: C4
@@ -2918,11 +2954,11 @@ tasks:
   bloque_par: []
 - id: T181
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C4
   domaine: TREUILS
-  agent: ''
-  date: '2026-08-29T20:30:00+02:00'
+  agent: Codex — orchestration ; lots 00/01/02/03/05/07/14/15 actifs ou en validation
+  date: '2026-08-30T10:00:00+02:00'
   titre: Gel du sous-système treuil — chapô (assainir, clamp unifié, apprentissage, maintenance)
   contexte: 'Consolidation de 6 sources (2 revues expertes archi+fonctionnel, 2 challenges indépendants, rapports CI, décisions
     Q1–Q8). Plan maître : DOC/WFLOW/AUDITS/DESIGN/PLAN_GEL_TREUIL_T181_v0.1.md. Objectif : « un winch qui fonctionne du premier
@@ -2978,15 +3014,32 @@ tasks:
   - Liste des vecteurs croisée avec les CAS-xxx de T180 (au moins CAS-001, CAS-012)
   bloque_par:
   - T169-A
+- id: T181-00b
+  parent_id: T181-00
+  statut: ⏳
+  criticite: C3
+  domaine: TEST_AUTO_CI
+  agent: Codex — stimulus réel WINCH_INTEG en cours
+  date: '2026-08-30T10:35:00+02:00'
+  titre: Réparer le stimulus réel du harnais WINCH_INTEG
+  contexte: 'Audit T181-00b : oracles durcis à 32/32 rouges, mais rouges majoritairement causés par le banc. Miroir PRG_02 ne publie pas AxisY, montées testées avec benne ouverte plafonnée à 1, RestartRequired jamais purgé.'
+  description: 'fix: fidéliser miroir AxisY, préconditions benne et purge RestartRequired. guard: préconditions de mouvement réellement atteignables, pas de SUITE_CALIBREE avant calibration TC-par-TC.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-00b_STIMULUS_WINCH_INTEG.yaml
+  objectifs:
+  - Joystick maître établit Direction, SpeedTgt et StepNumber réel dans le miroir
+  - Montées palier >1 avec benne fermée cohérente
+  - RestartRequired purgé avant stimulus nominal
+  - Vrais rouges fonctionnels distingués des rouges de stimulus
+  bloque_par: []
 - id: T181-01
   parent_id: T181
-  statut: ⏳
+  statut: ⏸️
   criticite: C4
   domaine: TREUILS
-  agent: Codex (orchestrateur) — barrière 7/7 en cours ; cadence chiffrée hors lot
-  date: '2026-08-30T01:00:00+02:00'
+  agent: Codex — BLOQUÉ audit C4 : maintien §3bis inatteignable avec feedback actuel
+  date: '2026-08-30T10:15:00+02:00'
   titre: FB_WinchOutputInterlock 7/7 + contrat d'autorité des 2 interlocks + FB_WinchRateInterlock
-  contexte: 'Barrière finale C4 : 2/7 TC PASS (FAIL TC-P10-012 watchdog frein, 013 latches hors Enable, 021/022 temps morts
+  contexte: 'GEL audit C4 2026-08-30 : §3bis est inatteignable (RequestedStep=0 implique RequestedRelayFwd/Rev=FALSE) et le feedback Mx_ContactorsReleased_DI est incompatible avec un maintien du sens. Le patch non committé ne doit pas être importé. Redesign protocole requis. Barrière finale C4 : 2/7 TC PASS (FAIL TC-P10-012 watchdog frein, 013 latches hors Enable, 021/022 temps morts
     directionnels, 020 SITE). Décision Q6 : interlock de cadence unifié 2 niveaux (1 FB FB_WinchRateInterlock instancié dans
     FB_Winch avec seuils safety+marge ET dans PRG_06 avec seuils safety nus), diag FinalInterlockGoverned DOIT rester FALSE
     en nominal. Phase 0, interface FB_WinchOutputInterlock INCHANGÉE. TC-021/022 : se coordonner avec T175 AC2 (une seule
@@ -3009,6 +3062,7 @@ tasks:
   - Temps mort directionnel: une seule implémentation, cohérente avec T175 AC2 ; TC-021/022 exécutables
   - G200 PASS + gates palier C PASS
   bloque_par:
+  - redesign protocole phase-vitesse / feedback site qualifié
   - T181-00
   - T175
   - T181-05
@@ -3386,13 +3440,13 @@ tasks:
   - T181-05
 - id: T181-16
   parent_id: T181
-  statut: ⬜
+  statut: ⏸️
   criticite: C4
   domaine: TREUILS
-  agent: ''
-  date: '2026-08-29T20:30:00+02:00'
+  agent: Codex — gel audit : apprentissage multi-scan non prouvé par harnais actuel
+  date: '2026-08-30T10:15:00+02:00'
   titre: Surveillance survitesse FB_Safety_Winch (2 seuils fixes) + réactivation SpeedGuard
-  contexte: 'D06 : garde-fou survitesse mort (MeasuredSpeedBand:=0 en dur, SpeedGuardEnable=FALSE). Décision Q4 : marge fixe
+  contexte: 'GEL audit 2026-08-30 : STruCpp ne restitue pas VAR_IN_OUT ; la moyenne SpeedMps/RETAIN de T181-15 n est pas prouvée. Ne pas armer une survitesse sur cette table avant adaptateur/copy-out + TC intégration persistant. D06 : garde-fou survitesse mort (MeasuredSpeedBand:=0 en dur, SpeedGuardEnable=FALSE). Décision Q4 : marge fixe
     appris+0,5 m/s (soft→diag) / appris+1,5 m/s (hard→SafeStop), active SSI table {sens,charge} complète + flag débrayable.
     PRÉREQUIS T177 (SpeedGuardEnable:=TRUE par défaut) — T181-16 ne double PAS T177, il consomme son résultat. Anti-calage
     passage palier via MeasuredSpeedBand. Phase B.
@@ -3412,6 +3466,7 @@ tasks:
   - Anti-calage: passage de palier ne déclenche pas la survitesse (TC MeasuredSpeedBand)
   - TC-P10-055/060 PASS ; G200 PASS ; gates palier C PASS
   bloque_par:
+  - adaptateur/copy-out harnais et TC persistant apprentissage
   - T181-10
   - T181-14
   - T181-15

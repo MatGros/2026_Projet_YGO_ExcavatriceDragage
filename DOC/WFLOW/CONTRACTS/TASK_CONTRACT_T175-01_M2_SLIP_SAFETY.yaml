@@ -1,0 +1,75 @@
+# Contrat T175-01 — qualification sécurité du mouvement M2 pendant manoeuvre benne
+
+contract:
+  task_id: T175-01_M2_SLIP_SAFETY
+  criticality: C0
+  strategy: patch
+
+  objective: >
+    Définir et prouver la couverture sécurité du mouvement non attendu de M2 pendant une
+    manoeuvre de benne, sans confondre le déplacement M2 normalement commandé avec un glissement.
+
+  acceptance:
+    - id: AC1
+      statement: "Chaque scénario M2 est classé : déplacement commandé, mouvement non commandé, écart géométrique, ou arrêt atteint."
+      verified_by: "table de décision fichier:ligne FB_Bucket / FB_Safety_Winch / PRG_04"
+    - id: AC2
+      statement: "Un mouvement M2 non commandé est détecté par un producteur unique et provoque SafeStop ou PowerCutOff selon la fonction de sécurité validée."
+      verified_by: "chaîne producteur -> FB_Safety_Winch -> PRG_04 + TC d'injection"
+    - id: AC3
+      statement: "Le déplacement M2 commandé pour ouvrir ou fermer la benne ne déclenche pas de faux défaut de glissement."
+      verified_by: "TC ouverture et fermeture nominales"
+    - id: AC4
+      statement: "La responsabilité de Meca C et de Meca E est distincte et documentée ; aucune tolérance 2,5 m de synchronisme ne tient lieu de détection de glissement M2."
+      verified_by: "revue de contrat et tests de seuils"
+    - id: AC5
+      statement: "Aucune valeur de tolérance ni catégorie PLr n'est inventée : toute valeur nouvelle porte un visa humain/site."
+      verified_by: "contrat + visa humain avant écriture code"
+    - id: AC6
+      statement: "Le nom de fichier est identique au nom de POU PRG_04_Treuils_Benne."
+      verified_by: "inspection source et bundle frais"
+    - id: AC7
+      statement: "Le suffixe est identique au langage généré dans le bundle ; PRG_04_Treuils_Benne.st reste du ST pur."
+      verified_by: "inspection source et bundle frais"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/**
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_safety_winch.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/WFLOW/TASKS.yaml
+
+  conservation:
+    must_survive:
+      - "M2 commandé pendant l'ouverture/fermeture de benne reste autorisé."
+      - "Meca A, Meca C et Meca E gardent un producteur unique par défaut."
+      - "Aucun bypass existant n'est modifié sans décision de matrice maintenance."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    STOP avant toute écriture de code si la définition physique de « glissement M2 » exige une
+    mesure ou une tolérance non existante, ou si le classement PLr / SafeStop / PowerCutOff n'est
+    pas explicitement validé par l'humain.
+
+status: APPROVED
+execution:
+  executed_by: "Codex (orchestrateur)"
+  completed_at: ""
+  status: BLOCKED
+  summary: "Challenge C0 : ErrorId WORD sature et classe d'arret/timing doivent etre tranches avant patch."
+  evidence_submitted: []
+validation:
+  status: APPROVED
+  validated_by: "Humain (utilisateur)"
+  validated_at: "2026-08-30T09:50:00+02:00"
+  notes: "Visa général reçu ; visas V3/V5/V6/V7 complémentaires requis après challenge C0."
