@@ -459,6 +459,14 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">bit7 Mot capteurs position incohérent</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx317_ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Masque brut complet (latch cause) — source d'arbitrage PowerCutOff</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

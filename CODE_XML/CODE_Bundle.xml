@@ -3892,6 +3892,14 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">bit7 Mot capteurs position incohérent</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx317_ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Masque brut complet (latch cause) — source d'arbitrage PowerCutOff</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -34284,6 +34292,7 @@ GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx313_ErrorMecaB        := Tra
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx314_ErrorMecaA        := Translation.Safety.ErrorMecaA;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx315_ErrorLimitSwitch  := Translation.Safety.ErrorLimitSwitch;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent := Translation.Safety.ErrorSensorIncoherent;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx317_ErrorId := Translation.Safety.ErrorId; // Masque brut complet (latch cause, source d'arbitrage PowerCutOff)
 
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqCmd_Hz;

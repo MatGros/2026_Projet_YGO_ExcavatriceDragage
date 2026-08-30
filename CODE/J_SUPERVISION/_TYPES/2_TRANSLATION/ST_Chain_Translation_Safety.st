@@ -17,5 +17,6 @@ STRUCT
     Idx314_ErrorMecaA        : BOOL; // bit5 Mouvement non commandé
     Idx315_ErrorLimitSwitch  : BOOL; // bit6 Limite extrême atteinte
     Idx316_ErrorSensorIncoherent: BOOL; // bit7 Mot capteurs position incohérent
+    Idx317_ErrorId           : WORD; // Masque brut complet (latch cause) — source d'arbitrage PowerCutOff
 END_STRUCT
 END_TYPE

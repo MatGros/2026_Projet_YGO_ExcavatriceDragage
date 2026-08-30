@@ -639,6 +639,7 @@ CASE State OF
         TranslationCmd.Start := FALSE;
         BucketCmd.Open := FALSE;
         BucketCmd.Close := FALSE;
+        BucketCmd.KoboldContactorCmd := FALSE;   // coupure contacteur Kobold au repli defaut (0 ordre residuel)
         Lifecycle.Busy := FALSE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -662,7 +663,7 @@ IF Lifecycle.Busy AND NOT CycleMotionPermit THEN
     BucketCmd.KoboldContactorCmd := FALSE;
 END_IF;
 
-RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.Start OR BucketCmd.Open OR BucketCmd.Close;
+RequestActive := WinchM1Cmd.StartStop OR WinchM2Cmd.StartStop OR TranslationCmd.Start OR BucketCmd.Open OR BucketCmd.Close OR BucketCmd.KoboldContactorCmd; // somme logique complete des demandes (contacteur Kobold inclus)
 {endregion}
 
 END_FUNCTION_BLOCK

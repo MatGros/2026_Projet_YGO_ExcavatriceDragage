@@ -444,22 +444,6 @@ tasks:
   contrat: ''
   objectifs: []
   bloque_par: []
-- id: T110
-  parent_id: ''
-  statut: ⏸️
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: —
-  titre: Clarifier sémantique DriveStatusWord.0 AC600
-  contexte: 'Intitulé complet : Clarifier sémantique DriveStatusWord.0 AC600'
-  description: '✅ **Fiche de clarification livrée** (`DOC/WFLOW/AUDITS/CLARIFICATION_T110_DRIVESTATUSWORD_v0.1.md`) : DriveStatusWord.0
-    utilisé comme preuve de mouvement (Méca B, FB_Safety_Translation L180-182) mais sémantique AC600 ambiguë (Power Ready
-    vs mouvement). Proposition : baser Méca B sur ABS(DriveActualFreqHz)>0.5 (meilleure preuve). ⏳ **Résolution en attente**
-    : doc AC600 du bit 0 + validation humaine (C4).'
-  objectifs: []
-  contrat: ''
-  date: '2026-08-29T21:18:11'
-  bloque_par: []
 - id: T116
   parent_id: ''
   statut: ✅
@@ -739,31 +723,40 @@ tasks:
   bloque_par: []
 - id: T129
   parent_id: ''
-  statut: ⏸️
+  statut: ✅
   criticite: C2
   domaine: TRANSLATION
   agent: DSH-02
   titre: Trou dans la raquette troubleshooting
   contexte: 'Intitulé complet : Trou dans la raquette troubleshooting : exposer instSafetyTranslationM3.ErrorId + M3_Direction_Active
     dans GVL_Troubleshooting (absents des snapshots → impossible de diagnostiquer l''éjection SEMI_AUTO)'
-  description: '✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN_T129_RAQUETTE_TRANSLATION_M3_v0.1.md`) : constat vérifié
-    — la raquette Translation expose les 8 bits décapsulés (Idx309-316) mais NI `ErrorId` brut (masque/latch, source d''arbitrage
-    PowerCutOff) NI `M3_Direction_Active` (sens réel). Câblage proposé : Idx317_ErrorId (WORD) + Idx408_DirectionActive (INT),
-    sources producteurs uniques existants. ⏳ **Implémentation en attente** (code, validation humaine).'
-  objectifs: []
-  contrat: ''
-  date: '2026-08-29T21:18:50'
+  description: '✅ **Étude/design livrée** (`DOC/WFLOW/AUDITS/DESIGN/DESIGN_T129_RAQUETTE_TRANSLATION_M3_v0.1.md`) : constat
+    vérifié — la raquette Translation expose les 8 bits décapsulés (Idx309-316) mais NI `ErrorId` brut (masque/latch, source
+    d''arbitrage PowerCutOff) NI `M3_Direction_Active` (sens réel). ✅ **Implémentation faite (2026-08-31)** : ajout `Idx317_ErrorId`
+    (WORD) dans `ST_Chain_Translation_Safety` + câblage `FB_TroubleshootingView` §5 (source `Translation.Safety.ErrorId`,
+    producteur unique PRG_05:462). `Idx408_DirectionActive` **non ajouté** : la direction réelle est déjà exposée via `MotionM3.RequestedDirection`
+    (FB_TroubleshootingView §10) — ajout redondant. ✅ **Validé humain 2026-08-31** (code + spec AF_Partie-14 §5.5).'
+  objectifs:
+  - Exposer le masque brut ErrorId de la Translation M3 dans la raquette TranslationPontM3 (Idx317_ErrorId)
+  - Ne pas dupliquer la direction (déjà couverte par MotionM3.RequestedDirection)
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T129.yaml
+  date: '2026-08-31T00:00:00'
+  updated_at: '2026-08-31T00:00:00'
+  completed_at: '2026-08-31T00:00:00'
   bloque_par: []
 - id: T130
   parent_id: ''
-  statut: ⏸️
+  statut: ❌
   criticite: C4
   domaine: SÉCURITÉ
   agent: —
   titre: Standardiser le décodage d'intention joystick en amont (→ {Dir...
   contexte: 'Intitulé complet : Standardiser le décodage d''intention joystick en amont (→ {Direction, Palier} arbitré), consommé
     par le cycle et les FB mouvement ; relâchement = arrêt instantané universel'
-  description: '⏸️ SUPERSEDÉE par T165-A/B1/B2 : le design à deux FB d''intention ne correspond plus à la frontière retenue.
+  description: '❌ CLÔTURÉE 2026-08-31 (audit DSH) : périmée — le modèle « PRG_02 publie Data.Joystick qualifié → PRG_04/05
+    restent propriétaires de l''arbitrage métier » est entièrement intégré (code + AF_Partie-08_v2.5) ; supersédée par T165-A/B1/B2
+    (✅) et T181 (⏳). Design 2 blocs (FB_GestureIntention → FB_ActionIntention_*) jamais implémenté, abandonné. Historique
+    conservé : ⏸️ SUPERSEDÉE par T165-A/B1/B2 : le design à deux FB d''intention ne correspond plus à la frontière retenue.
     PRG_02 publie directement les sorties qualifiées de FB_Joystick dans Data ; PRG_04/05 restent propriétaires de l''arbitrage
     métier. Historique conservé : Session 2026-08-19 — FB_Cycle réinvente Direction := 1/SpeedPct := 10 au lieu de consommer
     AxisCmdY (AF P08 §6) ; le décodage doit vivre avant le cycle, pas dedans. **Décisions actées (2026-08-19)** : FB_IntentionDecoder
@@ -773,22 +766,25 @@ tasks:
     (11 décisions actées). 🔴 **Faire T136 d''abord** (contrats d''interface socle), sinon les FB neufs naissent non conformes'
   objectifs:
   - Conserver l'historique de design ; ne pas déléguer T130
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T130.yaml
-  date: '2026-08-28T11:51:18+02:00'
+  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T130.yaml
+  date: '2026-08-31T00:00:00+02:00'
   bloque_par:
   - T165-A
 - id: T131
   parent_id: ''
-  statut: ⏸️
+  statut: ❌
   criticite: C4
   domaine: SÉCURITÉ
   agent: —
-  date: '2026-08-28T11:51:18+02:00'
+  date: '2026-08-31T00:00:00+02:00'
   titre: Vitesse par paliers (1-5) dans le cycle au lieu de %
   contexte: 'Intitulé complet : Vitesse par paliers (1-5) dans le cycle au lieu de % : ST_WinchCmdDemand + FB_Cycle + PRG_04'
-  description: '⏸️ Décision D-03 de T165-A : conserver temporairement le % tant que le choix humain n''est pas visé. Historique
-    : ST_WinchCmdDemand.SpeedPct (REAL %) → FB_SpeedStep ; le cycle hardcode 10/50/20/70% ; l''éventuel palier 1-5 est une
-    évolution fonctionnelle séparée, pas un ride-along du remappage inter-PRG.'
+  description: '❌ CLÔTURÉE 2026-08-31 (audit DSH + décision utilisateur) : périmée — design retenu : % en amont (joystick/M3/cycle),
+    paliers 1-5 UNIQUEMENT treuils en aval (déjà implémenté via FB_Winch §5 + FB_SpeedStep + T181-06/07 DriveRequest/MinStepNumber).
+    Le cycle DOIT rester en % (SpeedPct:REAL), pas de conversion palier dans le cycle. Historique conservé : ⏸️ Décision D-03
+    de T165-A : conserver temporairement le % tant que le choix humain n''est pas visé. Historique : ST_WinchCmdDemand.SpeedPct
+    (REAL %) → FB_SpeedStep ; le cycle hardcode 10/50/20/70% ; l''éventuel palier 1-5 est une évolution fonctionnelle séparée,
+    pas un ride-along du remappage inter-PRG.'
   contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
   objectifs: []
   bloque_par:
@@ -803,8 +799,9 @@ tasks:
     ouverte  dans le cas d''un changement d''avis'
   contexte: 'Intitulé complet : Référencement benne fermée : étape cycle + mise à jour AF P09 §5'
   description: '✅ **Absorbée par T185** : la benne fermée est le choix proposé par défaut dans le parcours IHM de référencement,
-    sans forçage PLC ; l''opérateur peut confirmer « ouverte » s''il constate cet état. AF P09 §5 est alignée et le cycle conjoint
-    M1/M2, les commits atomiques et les tests sont désormais portés par T185. Aucun second producteur ni second séquenceur créé.'
+    sans forçage PLC ; l''opérateur peut confirmer « ouverte » s''il constate cet état. AF P09 §5 est alignée et le cycle
+    conjoint M1/M2, les commits atomiques et les tests sont désormais portés par T185. Aucun second producteur ni second séquenceur
+    créé.'
   objectifs:
   - La présélection IHM « benne fermée » est informative et ne vaut pas confirmation opérateur
   - Une confirmation « ouverte » reste possible et produit le même chemin de homing conjoint
@@ -976,8 +973,10 @@ tasks:
     IHM PRG_07 sur 2 bus), D2 (source unique `PowerCutOff` dans `…FinalInterlockRequest`), D3 (commande drive M3 sur `ST_OutputsInterPrg`).
     ⏳ **Implémentation en attente** : arbitrages Q1-Q4 (variante IHM A/B, D2-A/B, D3-A/B, fusion T181-01) + validation humaine.'
   objectifs:
-  - 'D1 : supprimer la boucle de lecture arrière PRG_04→PRG_06 (read-back instance + aller-retour diag) ; PRG_06 publie Data.Diag:ST_OutputsDiag ; PRG_07 assemble l''IHM depuis PRG_04.Data + PRG_06.Data.Diag'
-  - 'D2 : source de vérité unique PowerCutOff/SafeStop (recommandé : dans ST_WinchFinalInterlockRequest) ; ST_SafetyWinch ne garde que BlockedBySafety'
+  - 'D1 : supprimer la boucle de lecture arrière PRG_04→PRG_06 (read-back instance + aller-retour diag) ; PRG_06 publie Data.Diag:ST_OutputsDiag
+    ; PRG_07 assemble l''IHM depuis PRG_04.Data + PRG_06.Data.Diag'
+  - 'D2 : source de vérité unique PowerCutOff/SafeStop (recommandé : dans ST_WinchFinalInterlockRequest) ; ST_SafetyWinch
+    ne garde que BlockedBySafety'
   - 'D3 : monter la commande drive M3 (M3DriveControlWord/M3DriveFreqCmdWord) sur ST_OutputsInterPrg (producteur unique)'
   - '④ : regrouper les diag plats (M1/M2/M3*SafetyInfo, PowerCutOffActive…) dans un struct/bus diag propre'
   contrat: ''
@@ -2439,31 +2438,15 @@ tasks:
   completed_at: '2026-08-30T19:40:00+02:00'
   titre: Harnais de tests CI et validation des scénarios
   contexte: Intégration des tests dans le pipeline.
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml. Complété 2026-08-30 par DSH : scénarios 3 (homme-mort en cours d''étape) & 4 (timeout fond/Kobold 60 s) ajoutés au harnais FB_Cycle (TC-P04-020/021), + exposition CycleStep et test e2e homme-mort dans FB_Main_EndToEnd. G481/CI PASS ; G200 KO = orphelin FB_WinchSpeedLearning pré-existant (T181-15/16, hors scope).'
+  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml. Complété 2026-08-30 par DSH
+    : scénarios 3 (homme-mort en cours d''étape) & 4 (timeout fond/Kobold 60 s) ajoutés au harnais FB_Cycle (TC-P04-020/021),
+    + exposition CycleStep et test e2e homme-mort dans FB_Main_EndToEnd. G481/CI PASS ; G200 KO = orphelin FB_WinchSpeedLearning
+    pré-existant (T181-15/16, hors scope).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T169-A_HARNESS_TESTS_CYCLES_CI.yaml
   objectifs:
   - Couverture 100% des use-cases critiques
-  - Scénario 3 : homme-mort en cours d'étape (maintien étape, non-redémarrage sans réarmement)
-  - Scénario 4 : timeout fond/Kobold (perte signal, tempo max étape 60 s)
-  bloque_par:
-  - T169
-- id: T170
-  parent_id: null
-  statut: ⏳
-  criticite: C2
-  domaine: REVIEW
-  agent: CC
-  date: '2026-08-28T16:38:00+02:00'
-  updated_at: '2026-08-28T22:00:00+02:00'
-  titre: Clôture d'Ingénierie & Revue Globale du Système
-  contexte: 'Audit T170-A produit : DOC/WFLOW/T170-A_AUDIT_RELEASE_T166_T170.md. Release NON gelee. Blocages : T167-CR Extraction
-    (serveur Ollama timeout x5), visa humain T167-B/C (IN_REVIEW), T168-CR a re-verifier, T169-A scenarios end-to-end manquants
-    (mode/puissance/synchro), guard-fou CI --all non deterministe Windows.'
-  description: G200 PASS, run_all_gates PASS (tout), CODESYS 3.5 OK. Tests STruCpp verts en sequentiel (le mode --all est
-    flaky sous Windows, WinError 193/32).
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T170-A_AUDIT_RELEASE_ET_CLOTURE.yaml
-  objectifs:
-  - Clôturer le grand chantier des cycles
+  - Scénario 3: homme-mort en cours d'étape (maintien étape, non-redémarrage sans réarmement)
+  - Scénario 4: timeout fond/Kobold (perte signal, tempo max étape 60 s)
   bloque_par:
   - T169
 - id: T171
@@ -3243,7 +3226,7 @@ tasks:
   statut: ⏳
   criticite: C4
   domaine: TREUILS
-  agent: 'Agent externe + utilisateur — 08a validée ; 08b reste distincte'
+  agent: Agent externe + utilisateur — 08a validée ; 08b reste distincte
   date: '2026-08-29T20:30:00+02:00'
   titre: Refonte interface FB_Winch (struct DriveRequest) + 2 sites PRG_04 + SimBench — shadow comparison
   contexte: 'L''interface FB_Winch passe de plate (≈15 scalaires) à struct DriveRequest/Sensors/Cfg. 2 seuls sites d''appel
@@ -3270,7 +3253,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: TREUILS
-  agent: 'Agent delegue — renommage clamp bit-identique'
+  agent: Agent delegue — renommage clamp bit-identique
   date: '2026-08-29T20:30:00+02:00'
   titre: Renommage vocabulaire clamp + fusion ExtractionControlActive / ControlAscentActive
   contexte: 'Décision utilisateur : pas de « Force » dans le vocabulaire du clamp — Min/Max seulement. ForceMinSpeedStep (sémantiquement
@@ -3541,7 +3524,7 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: TREUILS
-  agent: 'Agent délégué + orchestrateur — preuves ciblées validées'
+  agent: Agent délégué + orchestrateur — preuves ciblées validées
   date: '2026-08-29T20:30:00+02:00'
   titre: Câbler SyncCoupled (diag) + garde de revue « FB_Winch ne lit jamais SyncCoupled en logique »
   contexte: 'SyncCoupled dans DriveRequest est DIAG STRICT : information de couplage synchro pour le diagnostic/IHM, jamais
@@ -3585,13 +3568,14 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: TEST_AUTO_CI
-  agent: 'Agent externe + utilisateur — clôturée'
+  agent: Agent externe + utilisateur — clôturée
   date: '2026-08-30T15:20:00+02:00'
   titre: Harnais STruCpp — restitution VAR_IN_OUT après appel FB
   contexte: 'Bloquant T181-16 : le générateur réinjecte VAR_IN_OUT avant fb(...) mais ne recopie jamais la valeur modifiée
     vers la variable de test. La persistance apprentissage ne peut donc pas être prouvée.'
-  description: 'fix livré : générer le copy-out VAR_IN_OUT après appel FB, conforme CODESYS. preuve : FB_WinchSpeedLearning 9/9
-    et test direct T181-21 dans FB_Bucket verts. TC-P10-047.2 reste rouge sécurité hors lot. Attente checkpoint humain ; gates globaux au jalon intégration T181.'
+  description: 'fix livré : générer le copy-out VAR_IN_OUT après appel FB, conforme CODESYS. preuve : FB_WinchSpeedLearning
+    9/9 et test direct T181-21 dans FB_Bucket verts. TC-P10-047.2 reste rouge sécurité hors lot. Attente checkpoint humain
+    ; gates globaux au jalon intégration T181.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-21_VAR_IN_OUT_HARNESS.yaml
   objectifs:
   - Les VAR_IN_OUT modifiées deviennent visibles dans les assertions de test
@@ -3606,8 +3590,10 @@ tasks:
   agent: ''
   date: '2026-08-30T15:30:00+02:00'
   titre: Nettoyage liens documentaires actifs G340 — livraison T181
-  contexte: 'Les liens AF actifs périmés et documents actifs sans H1 empêchent un palier C propre. Archives et transcripts hors scope.'
-  description: 'fix: liens actifs vers versions AF courantes et H1 des prompts ; aucun masquage de contrôle. guard: G340 avant/après, restes hors scope séparés.'
+  contexte: Les liens AF actifs périmés et documents actifs sans H1 empêchent un palier C propre. Archives et transcripts
+    hors scope.
+  description: 'fix: liens actifs vers versions AF courantes et H1 des prompts ; aucun masquage de contrôle. guard: G340 avant/après,
+    restes hors scope séparés.'
   contrat: ''
   objectifs:
   - Liens AF actifs v2.3/v1.0 remplacés par les versions courantes
@@ -3619,7 +3605,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: CODEURS
-  agent: 'Orchestrateur — contrat C3 prêt ; délégation code dès créneau et GO humain'
+  agent: Orchestrateur — contrat C3 prêt ; délégation code dès créneau et GO humain
   titre: Preset codeur centre-plage — restauration de la garde anti-dépassement (spec AF09 v2.4)
   contexte: 'Diagnostic TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md : le preset neutre (PresetValue := RawPos,
     commit 73fa758d) a perdu la garde anti-dépassement du design d origine (26217dd9). Référencement près d une borne = wrap-around
@@ -3643,11 +3629,13 @@ tasks:
   statut: ✅
   criticite: C2
   domaine: TEST_AUTO_CI
-  agent: 'Agent délégué + orchestrateur — preuves ciblées validées'
+  agent: Agent délégué + orchestrateur — preuves ciblées validées
   date: '2026-08-30T15:55:00+02:00'
   titre: STruCpp — préserver l'accès 2D et convertir seulement 3D/4D
-  contexte: 'WINCH_INTEG compile les tableaux 2D avec at(i,j). Le correctif 4D récent les transforme à tort en at(i).at(j), qui ne compile pas.'
-  description: 'fix livré et vérifié : 2D inchangé ; 3D/4D crochets imbriqués. guard : 4/4 tests convertisseur + WINCH_INTEG compile/exécute 32 vecteurs (15/32 référence). Aucun CODE production modifié.'
+  contexte: WINCH_INTEG compile les tableaux 2D avec at(i,j). Le correctif 4D récent les transforme à tort en at(i).at(j),
+    qui ne compile pas.
+  description: 'fix livré et vérifié : 2D inchangé ; 3D/4D crochets imbriqués. guard : 4/4 tests convertisseur + WINCH_INTEG
+    compile/exécute 32 vecteurs (15/32 référence). Aucun CODE production modifié.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-23_STRUCPP_ARRAY_INDEXING.yaml
   objectifs:
   - Conversion 2D runtime compatible
@@ -3662,17 +3650,35 @@ tasks:
   agent: DSH (DeepSeek)
   date: '2026-08-30T18:30:00+02:00'
   titre: Homogénéisation cohérence « sens par axe » M1/M2/M3 — permit directionnel M3 (Fwd/Rev) + nettoyage redondance MotionPermit
-  contexte: 'Audit cohérence WT5_SIMBENCH (verdict MAJOR) : M1/M2 exposent un permit directionnel exemplaire (FB_Safety_Winch.AscentPermit/DescendPermit → EffectivePermitM1/M2_* → GVL_IHM.M1TreuilRetenue.Safety / M2TreuilBenne.Safety), producteur unique respecté. M3 n''a AUCUN permit directionnel : FB_Safety_Translation.st:50-64 ne sort que Ready/SafeStop/PowerCutOff/erreurs ; ST_SafetyTranslation et ST_TranslationState n''ont pas de FwdPermit/RevPermit. Le diagnostic bricole un proxy NON directionnel : MotionM3.Step6_DirectionAllowed := NOT Translation.State.HeightInterlockBlocking (FB_TroubleshootingView.st:632). Redondance : MotionPermit (PRG_07:476) == JoystickMotionActive (PRG_07:475) == CycleMotionPermit (PRG_03:202) == NOT AtNeutralXY (3 noms pour le même « manche défléchi », dont un nom trompeur qui prétend inclure l''homme-mort via commentaire ST_CycleState:27).'
-  description: 'Homogénéiser la cohérence « peut-on aller dans un sens ou l''autre » sur les 3 axes (M1 treuil, M2 treuil, M3 translation), à l''unisson des treuils (modèle FB_Safety_Winch). 1) Ajouter FwdPermit/RevPermit à FB_Safety_Translation (+ champs ST_SafetyTranslation + câblage PRG_05 + projection GVL_IHM.TranslationM3.Safety) — producteur unique, 1 source safety / 1 projection IHM par axe. 2) Corriger MotionM3.Step6_DirectionAllowed pour n''utiliser que les nouveaux permits (≠ interlock hauteur, qui reste un blocage non directionnel séparé). 3) Renommer MotionPermit → JoystickDeflected (ou éliminer le doublon avec JoystickMotionActive/CycleMotionPermit) et corriger les commentaires trompeurs. 4) Correction doc ST_SafetyWinch.st:11 (DescendPermit = effectif, pas safety simple). 5) MàJ spec AF_Partie-11 (fiches FB_Translation / FB_Safety_Translation) + registre/TC si besoin. Analyse livrée par le worktree WT5_SIMBENCH (gates 491/492/493, rewire HwIn, TC-P13-014) ; à EXÉCUTER sur main (hors worktree).'
+  contexte: 'Audit cohérence WT5_SIMBENCH (verdict MAJOR) : M1/M2 exposent un permit directionnel exemplaire (FB_Safety_Winch.AscentPermit/DescendPermit
+    → EffectivePermitM1/M2_* → GVL_IHM.M1TreuilRetenue.Safety / M2TreuilBenne.Safety), producteur unique respecté. M3 n''a
+    AUCUN permit directionnel : FB_Safety_Translation.st:50-64 ne sort que Ready/SafeStop/PowerCutOff/erreurs ; ST_SafetyTranslation
+    et ST_TranslationState n''ont pas de FwdPermit/RevPermit. Le diagnostic bricole un proxy NON directionnel : MotionM3.Step6_DirectionAllowed
+    := NOT Translation.State.HeightInterlockBlocking (FB_TroubleshootingView.st:632). Redondance : MotionPermit (PRG_07:476)
+    == JoystickMotionActive (PRG_07:475) == CycleMotionPermit (PRG_03:202) == NOT AtNeutralXY (3 noms pour le même « manche
+    défléchi », dont un nom trompeur qui prétend inclure l''homme-mort via commentaire ST_CycleState:27).'
+  description: Homogénéiser la cohérence « peut-on aller dans un sens ou l'autre » sur les 3 axes (M1 treuil, M2 treuil, M3
+    translation), à l'unisson des treuils (modèle FB_Safety_Winch). 1) Ajouter FwdPermit/RevPermit à FB_Safety_Translation
+    (+ champs ST_SafetyTranslation + câblage PRG_05 + projection GVL_IHM.TranslationM3.Safety) — producteur unique, 1 source
+    safety / 1 projection IHM par axe. 2) Corriger MotionM3.Step6_DirectionAllowed pour n'utiliser que les nouveaux permits
+    (≠ interlock hauteur, qui reste un blocage non directionnel séparé). 3) Renommer MotionPermit → JoystickDeflected (ou
+    éliminer le doublon avec JoystickMotionActive/CycleMotionPermit) et corriger les commentaires trompeurs. 4) Correction
+    doc ST_SafetyWinch.st:11 (DescendPermit = effectif, pas safety simple). 5) MàJ spec AF_Partie-11 (fiches FB_Translation
+    / FB_Safety_Translation) + registre/TC si besoin. Analyse livrée par le worktree WT5_SIMBENCH (gates 491/492/493, rewire
+    HwIn, TC-P13-014) ; à EXÉCUTER sur main (hors worktree).
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T184_PERMITS_DIRECTIONNELS_M3.yaml
   objectifs:
   - FB_Safety_Translation expose FwdPermit et RevPermit (permit directionnel effectif, producteur unique), miroir de FB_Safety_Winch.AscentPermit/DescendPermit
-  - GVL_IHM.TranslationM3.Safety projette FwdPermit/RevPermit à l'IHM (pré-commande : savoir si M3 peut aller vers Trémie ou Maintenance)
-  - MotionM3.Step6_DirectionAllowed utilise les nouveaux permits Fwd/Rev (ne plus utiliser le proxy non-directionnel HeightInterlockBlocking, qui reste un blocage séparé)
+  - GVL_IHM.TranslationM3.Safety projette FwdPermit/RevPermit à l'IHM (pré-commande: savoir si M3 peut aller vers Trémie ou
+      Maintenance)
+  - MotionM3.Step6_DirectionAllowed utilise les nouveaux permits Fwd/Rev (ne plus utiliser le proxy non-directionnel HeightInterlockBlocking,
+    qui reste un blocage séparé)
   - Un seul signal « joystick défléchi » (MotionPermit/JoystickMotionActive/CycleMotionPermit) — aucun nom trompeur ni doublon
   - Gates G200 / bundle / palier C PASS ; spec AF-11 et fiches à jour ; tests CI (TC-P11/FB_Safety_Translation) étendus
   - Contrat TASK_CONTRACT_T184 rédigé et conforme avant implémentation (obligatoire dès C2)
-  bloque_par: [Analyse fournie par WT5_SIMBENCH ; exécution à faire hors worktree sur main ; confirmer la sémantique DriveStatusWord.0 AC600 (T110)]
+  bloque_par:
+  - Analyse fournie par WT5_SIMBENCH ; exécution à faire hors worktree sur main ; confirmer la sémantique DriveStatusWord.0
+    AC600 (T110)
 - id: T185
   parent_id: ''
   statut: ⏳
@@ -3681,45 +3687,201 @@ tasks:
   agent: Claude Code (orchestrateur) + sous-agent py Ollama deepseek-v4-flash:cloud
   date: '2026-08-30T19:05:00'
   titre: Refactor conformité FB_ReferenceCycle → FB_MachineHomingCycle (guide référencement machine M1/M2/benne)
-  contexte: 'Le FB_ReferenceCycle livré par le checkpoint d94c2c58 (ex-contrat T184 homing benne, mal numéroté — T184 = permits M3) est fonctionnellement intégré et vert au CI (4/4 TC) mais NON conforme : pas de Fault:ST_Fault / FB_FaultCore / Lifecycle, ReferenceStep:INT + 12 littéraux magiques, 25 I/O à plat sans DUT, double calcul MachineReferenceReady, cartouche/regions/bannières absents, vocabulaire « Reference* » en collision avec le vocabulaire réservé Homing (NAMING_CONVENTION §1quater + NC-090). 3 défauts latents identifiés (C-1 requalif auto après perte de datum, C-2 double-confirm contradictoire, C-3 boucle croisée FB_Bucket↔MachineHomed) + 1 clarif spec C-4 (séparation homing en mouvement / homing benne).'
-  description: 'Renommage global Reference*→MachineHoming* (FB_MachineHomingCycle), interface contrat standard (Fault/Ready/Lifecycle via FB_FaultCore), enum E_MachineHomingStep, 3 DUT ST_fbMachineHomingCycle_*, régions + bannières, R8/R9. Fixes : C-1 acquittement conscient obligatoire (front Reset) avant requalif ; C-2 rejet total double-confirm + cause latchée ; C-3 retrait du terme croisé MachineHomed dans FB_Bucket.ActiveOffsetValid (producteur unique) ; C-4.1/.3 gate ouverture transaction + NOT MxHomingBusy + cause ConfirmWhileHoming ; C-4.4 reste à prouver dans l''intégration PRG_02. Exécutant corps : sous-agent py Ollama deepseek ; orchestrateur relit/corrige le diff. Test isolé : `TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.html` (16/16, compilation OK). T132 absorbée : présélection fermée IHM, confirmation ouverte possible, aucun forçage PLC.'
+  contexte: 'Le FB_ReferenceCycle livré par le checkpoint d94c2c58 (ex-contrat T184 homing benne, mal numéroté — T184 = permits
+    M3) est fonctionnellement intégré et vert au CI (4/4 TC) mais NON conforme : pas de Fault:ST_Fault / FB_FaultCore / Lifecycle,
+    ReferenceStep:INT + 12 littéraux magiques, 25 I/O à plat sans DUT, double calcul MachineReferenceReady, cartouche/regions/bannières
+    absents, vocabulaire « Reference* » en collision avec le vocabulaire réservé Homing (NAMING_CONVENTION §1quater + NC-090).
+    3 défauts latents identifiés (C-1 requalif auto après perte de datum, C-2 double-confirm contradictoire, C-3 boucle croisée
+    FB_Bucket↔MachineHomed) + 1 clarif spec C-4 (séparation homing en mouvement / homing benne).'
+  description: 'Renommage global Reference*→MachineHoming* (FB_MachineHomingCycle), interface contrat standard (Fault/Ready/Lifecycle
+    via FB_FaultCore), enum E_MachineHomingStep, 3 DUT ST_fbMachineHomingCycle_*, régions + bannières, R8/R9. Fixes : C-1
+    acquittement conscient obligatoire (front Reset) avant requalif ; C-2 rejet total double-confirm + cause latchée ; C-3
+    retrait du terme croisé MachineHomed dans FB_Bucket.ActiveOffsetValid (producteur unique) ; C-4.1/.3 gate ouverture transaction
+    + NOT MxHomingBusy + cause ConfirmWhileHoming ; C-4.4 reste à prouver dans l''intégration PRG_02. Exécutant corps : sous-agent
+    py Ollama deepseek ; orchestrateur relit/corrige le diff. Test isolé : `TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.html`
+    (16/16, compilation OK). T132 absorbée : présélection fermée IHM, confirmation ouverte possible, aucun forçage PLC.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T185_HOMING_BENNE_CONJOINT_N2.yaml
   objectifs:
-  - FB_MachineHomingCycle porte le contrat standard (Fault:ST_Fault via FB_FaultCore, Ready, Lifecycle) + enum E_MachineHomingStep + DUT ST_fbMachineHomingCycle_* (NC-110)
+  - FB_MachineHomingCycle porte le contrat standard (Fault:ST_Fault via FB_FaultCore, Ready, Lifecycle) + enum E_MachineHomingStep
+    + DUT ST_fbMachineHomingCycle_* (NC-110)
   - Vocabulaire MachineHoming* aligné NAMING_CONVENTION §1quater / NC-090 ; aucun « Reference* » résiduel
   - C-1 aucun redémarrage automatique après perte de datum en mouvement (front Reset conscient obligatoire)
-  - C-2 confirmation Ouverte+Fermée même scan = rejet total + cause latchée ; C-4.1/.3 pas de ref benne « au vol » sur homing d'axe
+  - C-2 confirmation Ouverte+Fermée même scan = rejet total + cause latchée ; C-4.1/.3 pas de ref benne « au vol » sur homing
+    d'axe
   - C-3 FB_Bucket.ActiveOffsetValid ne reboucle plus sur MachineHomed (producteur unique)
-  - C-4.4 HomingPermit resserré (PRG_02) : homing unitaire/at-zero exige treuils arrêtés ; homing nominal capteur-TOP reste permis en mouvement
-  - test_fb_machinehomingcycle.st couvre AC1..AC9 + C-1/C-2/C-4 (16 tests) ; G200 L1-L7=100, bundle + gates palier C PASS ; aucun TC vert existant régressé
+  - C-4.4 HomingPermit resserré (PRG_02): homing unitaire/at-zero exige treuils arrêtés ; homing nominal capteur-TOP reste
+      permis en mouvement
+  - test_fb_machinehomingcycle.st couvre AC1..AC9 + C-1/C-2/C-4 (16 tests) ; G200 L1-L7=100, bundle + gates palier C PASS
+    ; aucun TC vert existant régressé
   bloque_par: []
 - id: T186
   parent_id: T169-A
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: G_CYCLE / SECURITE
   agent: DSH (DeepSeek) + audit indépendant subagent
-  date: '2026-08-30T20:01:00'
-  titre: 'Fix+guard : FB_Cycle ne neutralise pas KoboldContactorCmd en STABILIZING (découverte par challenge chronogramme T169-A)'
-  contexte: >-
-    Le challenge des chronogrammes TC-P04-021 (T169-A) a exposé une faille réelle de FB_Cycle :
-    (1) en X4, `BucketCmd.KoboldContactorCmd := TRUE` est armé inconditionnellement (non-gaté par Permit) ;
-    (2) la branche STABILIZING coupe W1/W2/Translation/Open/Close mais JAMAIS `KoboldContactorCmd` ;
-    (3) le repli §4 est mort en STABILIZING (conditionné `Lifecycle.Busy`=FALSE, et Permit reste TRUE sur défaut) ;
-    (4) `RequestActive` (somme logique demandes) omet `KoboldContactorCmd` → un ordre de puissance vers le
-    contacteur capteur fond reste collé pendant tout le séjour en STABILIZING/attente de Reset.
-    Conséquence sécurité : non-respect de l'invariant « 0 mouvement/ordre résiduel hors permis au repli »,
-    et risque échauffement contacteur (contraire à H1 de FB_DiveSearch, AF_Partie-04 §8.4).
-  description: >-
-    Correction FB_Cycle (patch, C2) : neutraliser `BucketCmd.KoboldContactorCmd := FALSE` dans la branche
-    STABILIZING (et cohérence au repli homme-mort), et intégrer `KoboldContactorCmd` à `RequestActive`
-    (somme logique complète des demandes actionneur). Garde-fou CI : durcir TC-P04-021 en oracle complet
-    (assert Kobold neutralisé au STABILIZING + Latch persistant + Reset efface). Aucune régression des 9 TC
-    existants (FB_Cycle) ni de la chaîne e2e MAIN_GLOBAL. Découverte validée par audit indépendant subagent.
+  date: '2026-08-30T23:30:00'
+  updated_at: '2026-08-30T23:30:00'
+  completed_at: '2026-08-30T23:30:00'
+  titre: 'Fix+guard : FB_Cycle ne neutralise pas KoboldContactorCmd en STABILIZING (découverte par challenge chronogramme
+    T169-A)'
+  contexte: 'Le challenge des chronogrammes TC-P04-021 (T169-A) a exposé une faille réelle de FB_Cycle : (1) en X4, `BucketCmd.KoboldContactorCmd
+    := TRUE` est armé inconditionnellement (non-gaté par Permit) ; (2) la branche STABILIZING coupe W1/W2/Translation/Open/Close
+    mais JAMAIS `KoboldContactorCmd` ; (3) le repli §4 est mort en STABILIZING (conditionné `Lifecycle.Busy`=FALSE, et Permit
+    reste TRUE sur défaut) ; (4) `RequestActive` (somme logique demandes) omet `KoboldContactorCmd` → un ordre de puissance
+    vers le contacteur capteur fond reste collé pendant tout le séjour en STABILIZING/attente de Reset. Conséquence sécurité
+    : non-respect de l''invariant « 0 mouvement/ordre résiduel hors permis au repli », et risque échauffement contacteur (contraire
+    à H1 de FB_DiveSearch, AF_Partie-04 §8.4).'
+  description: 'Correction FB_Cycle (patch, C2) : neutraliser `BucketCmd.KoboldContactorCmd := FALSE` dans la branche STABILIZING
+    (et cohérence au repli homme-mort), et intégrer `KoboldContactorCmd` à `RequestActive` (somme logique complète des demandes
+    actionneur). Garde-fou CI : durcir TC-P04-021 en oracle complet (assert Kobold neutralisé au STABILIZING + Latch persistant
+    + Reset efface). Aucune régression des 9 TC existants (FB_Cycle) ni de la chaîne e2e MAIN_GLOBAL. Découverte validée par
+    audit indépendant subagent.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T186_NEUTRALISATION_KOBOLD_STABILIZING.yaml
   objectifs:
   - KoboldContactorCmd coupé (FALSE) dés l'entrée en STABILIZING, sans attendre Reset ni Permit
   - RequestActive inclut KoboldContactorCmd (somme logique complète des demandes actionneur)
-  - TC-P04-021 durci : oracle vérifie Kobold neutralisé en STABILIZING, Latch persistant sans Reset, Reset efface tout
-  - Aucune régression : FB_Cycle 9/9 (ou 10/10), MAIN_GLOBAL 3/3, G200 L1-L7 PASS sur FB_Cycle, gates palier C PASS
+  - TC-P04-021 durci: oracle vérifie Kobold neutralisé en STABILIZING, Latch persistant sans Reset, Reset efface tout
+  - Aucune régression: FB_Cycle 9/9 (ou 10/10), MAIN_GLOBAL 3/3, G200 L1-L7 PASS sur FB_Cycle, gates palier C PASS
   bloque_par: []
+- id: T187
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: H_TREUILS_BENNE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Orphelin FB_WinchSpeedLearning (G200 L13-FB) — instancier ou retirer
+  contexte: 'Intitulé complet : FB_WinchSpeedLearning déclaré dans CODE/H_TREUILS_BENNE/FB_WinchSpeedLearning.st mais jamais
+    instancié (aucun `: FB_WinchSpeedLearning` ailleurs dans CODE/) → orphelin, gate G200 L13-FB en échec.'
+  description: '⏳ **Découvert 2026-08-31** (audit T129, gate G200) : `FB_WinchSpeedLearning` est déclaré mais jamais instancié
+    → échec G200 L13-FB (orphelin). Deux options : (1) l''instancier dans PRG_04_Treuils_Benne si l''apprentissage de vitesse
+    est requis (vérifier spec AF_Partie-10), ou (2) le retirer/archiver s''il est mort. ⚠️ **Pré-existant** (commit cef885f9),
+    indépendant de T129. À trancher avant implémentation.'
+  objectifs:
+  - Résoudre l'orphelin FB_WinchSpeedLearning (instancier si requis, sinon retirer/archiver)
+  - G200 L13-FB PASS (plus d'orphelin)
+  contrat: ''
+  bloque_par: []
+- id: T188
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: H_TREUILS_BENNE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Refactor POO — arbitrage de commande PRG_04/05 vers FB (bit-identique)
+  contexte: 'Intitulé complet : Déplacer l''arbitrage de commande (source joystick/boutons/cycle selon mode) de PRG_04 §3 et PRG_05 §1 vers FB_WinchCommandArbitration et FB_TranslationCommandArbitration, conformément à CODE_QUALITY_STANDARDS.md §5.'
+  description: '⚠️ **BLOQUÉ** sur la fin de T181 (implémentation actuelle). Refactor **bit-identique** (aucun changement de comportement machine). Violation POO : la décision combinant plusieurs causes est calculée dans le PRG, pas par son propriétaire fonctionnel. Contrat: TASK_CONTRACT_T188.yaml.'
+  objectifs:
+  - Créer FB_WinchCommandArbitration (2 instances M1/M2) bit-identique à PRG_04 §3
+  - Créer FB_TranslationCommandArbitration (1 instance M3) bit-identique à PRG_05 §1
+  - PRG_04 §3 et PRG_05 §1 réduits au câblage FB + publication (plus d'IF d'arbitrage)
+  - G200 liaison PASS + run_all_gates 100% PASS + bundle régénéré
+  contrat: TASK_CONTRACT_T188.yaml
+  bloque_par:
+  - T181
+- id: T188-A
+  parent_id: T188
+  statut: ⬜
+  criticite: C2
+  domaine: H_TREUILS_BENNE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Spec FB d'arbitrage + DUT interface (amendement AF_Partie-10/11)
+  contexte: 'Rédiger la spec des FB d''arbitrage et définir les DUT d''interface (ST_fbWinchCommandArbitration_*, ST_fbTranslationCommandArbitration_*).'
+  description: 'Définir l''interface typée (entrées joystick/Auth/ReqProgram/IHM/bucket/sync, sorties arbitrées) et les critères d''acceptation par mode. Valider la cible avec l''humain avant implémentation.'
+  objectifs:
+  - Spec FB_WinchCommandArbitration (interface + logique par mode) validée
+  - Spec FB_TranslationCommandArbitration (interface + logique par mode) validée
+  - DUT d'interface définis et nommés (PascalCase, NC-xxx)
+  contrat: ''
+  bloque_par:
+  - T188
+- id: T188-B
+  parent_id: T188
+  statut: ⬜
+  criticite: C2
+  domaine: H_TREUILS_BENNE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Implémenter FB_WinchCommandArbitration + tests unitaires
+  contexte: 'Implémenter le FB d''arbitrage treuils (M1/M2) et ses tests harness par mode.'
+  description: 'FB bit-identique à PRG_04 §3. Tests unitaires par mode (SEMI_AUTO, MAINT_N1/N2, manuel joystick, boutons IHM) : sorties FB == sorties §3 actuel.'
+  objectifs:
+  - FB_WinchCommandArbitration implémenté (bit-identique §3)
+  - Tests harness par mode PASS (sorties FB == sorties §3)
+  - Gates unitaires PASS
+  contrat: ''
+  bloque_par:
+  - T188-A
+- id: T188-C
+  parent_id: T188
+  statut: ⬜
+  criticite: C2
+  domaine: H_TREUILS_BENNE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Raccorder PRG_04 §3 → FB_WinchCommandArbitration
+  contexte: 'Remplacer la logique d''arbitrage §3 de PRG_04 par l''appel des 2 instances FB.'
+  description: 'PRG_04 §3 réduit au câblage des entrées FB + publication. Vérifier liaison G200 et tests d''intégration.'
+  objectifs:
+  - PRG_04 §3 sans IF d'arbitrage (câblage FB + publication uniquement)
+  - G200_check_linkage.py --report PASS (0 erreur)
+  - Tests d'intégration PRG_04 PASS
+  contrat: ''
+  bloque_par:
+  - T188-B
+- id: T188-D
+  parent_id: T188
+  statut: ⬜
+  criticite: C2
+  domaine: I_TRANSLATION
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Implémenter FB_TranslationCommandArbitration + tests unitaires
+  contexte: 'Implémenter le FB d''arbitrage translation (M3) et ses tests harness par mode.'
+  description: 'FB bit-identique à PRG_05 §1. Tests unitaires par mode (SEMI_AUTO, MAINT_N1/N2, manuel joystick, boutons IHM).'
+  objectifs:
+  - FB_TranslationCommandArbitration implémenté (bit-identique §1)
+  - Tests harness par mode PASS (sorties FB == sorties §1)
+  - Gates unitaires PASS
+  contrat: ''
+  bloque_par:
+  - T188-A
+- id: T188-E
+  parent_id: T188
+  statut: ⬜
+  criticite: C2
+  domaine: I_TRANSLATION
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Raccorder PRG_05 §1 → FB_TranslationCommandArbitration
+  contexte: 'Remplacer la logique d''arbitrage §1 de PRG_05 par l''appel du FB.'
+  description: 'PRG_05 §1 réduit au câblage des entrées FB + publication. Vérifier liaison G200 et tests d''intégration.'
+  objectifs:
+  - PRG_05 §1 sans IF d'arbitrage (câblage FB + publication uniquement)
+  - G200_check_linkage.py --report PASS (0 erreur)
+  - Tests d'intégration PRG_05 PASS
+  contrat: ''
+  bloque_par:
+  - T188-D
+- id: T188-F
+  parent_id: T188
+  statut: ⬜
+  criticite: C2
+  domaine: H_TREUILS_BENNE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Validation finale T188 — gates complets + revue humaine + docs
+  contexte: 'Validation globale du refactor POO : gates complets, revue humaine du diff, mise à jour docs.'
+  description: 'run_all_gates.py complet, revue humaine du diff réel, mise à jour AF_Partie-02/10/11, clôture T188.'
+  objectifs:
+  - run_all_gates.py 100% PASS
+  - Revue humaine du diff validée (aucune régression comportement)
+  - Docs AF_Partie-02/10/11 mis à jour
+  - T188 clôturée (statut ✅)
+  contrat: ''
+  bloque_par:
+  - T188-C
+  - T188-E

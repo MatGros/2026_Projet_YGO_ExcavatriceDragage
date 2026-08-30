@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:16:09.684614" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:16:09.684614">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T21:28:07.131055" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T21:28:07.131055">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6881,6 +6881,7 @@ GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx313_ErrorMecaB        := Tra
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx314_ErrorMecaA        := Translation.Safety.ErrorMecaA;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx315_ErrorLimitSwitch  := Translation.Safety.ErrorLimitSwitch;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent := Translation.Safety.ErrorSensorIncoherent;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx317_ErrorId := Translation.Safety.ErrorId; // Masque brut complet (latch cause, source d'arbitrage PowerCutOff)
 
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqCmd_Hz;
