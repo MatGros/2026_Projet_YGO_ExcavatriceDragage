@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.186986" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.186986">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:05:47.076807" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:05:47.076807">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -51,23 +51,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Acquittement défaut FB_Modes uniquement ()</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnEmergencyArming">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">— Séquence réarmement AU (voir DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md §5)
-🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnEmergencyCutOff">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commande IHM coupure d'urgence puissance amont (arrêt à distance)</xhtml>
               </documentation>
             </variable>
             <variable name="SelJoystickWinch">

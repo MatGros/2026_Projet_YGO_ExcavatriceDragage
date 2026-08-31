@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:18:15.821180" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:18:15.821180">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:23:17.871648" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:23:17.871648">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -7706,10 +7706,10 @@ GVL_Troubleshooting.Safety.SimSafetyActive            := SimSafetyActive;
 
 GVL_Troubleshooting.Safety.HwIn_EmergencyChainClosed_DI  := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.Safety.HwIn_PowerContactorEngaged_DI := HwIn.Machine.PowerContactorEngaged_DI;
-GVL_Troubleshooting.Safety.HwIn_EmergencyBtnCut_HMI      := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
+GVL_Troubleshooting.Safety.HwIn_EmergencyBtnCut_HMI      := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;
 
 GVL_Troubleshooting.Safety.Step1_InputModulesOk       := NOT InputModuleFault;
-GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut   := NOT GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
+GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut   := NOT GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;
 GVL_Troubleshooting.Safety.Step3_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.Safety.Step4_ContactorReleased     := NOT HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.Safety.Step5_ArmingAllowed        := EmergencyState.Armable;

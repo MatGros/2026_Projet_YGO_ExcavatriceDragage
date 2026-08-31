@@ -2975,7 +2975,10 @@ tasks:
     timeout restauration, autotest, front avalé) produit un message/erreur IHM explicite
     + remise à zéro propre du lockout. L''étude décide de la granularité (Cause/Ack
     ou message direct) sans jamais affaiblir l''interlock de sécurité (Cause brute
-    reste l''arbitre).'
+    reste l''arbitre). 🔁 **2026-08-31 : ABSORBÉ par le refactor emergency en cours**
+    (T197 + FB_Safety_EmergencyManagement) — le FB refactoré produit déjà
+    Status.OperatorMessage par état/problème ; T173-B se clôture quand OperatorMessage
+    est consommé dans l''IHM (câblage en cours de validation).'
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-B_ANTI_SILENT.yaml.
     Étude d''impact + modification de FB_Safety_EmergencyManagementLogic (+ affichage
     IHM) pour transformer chaque sortie silencieuse en erreur/message actionnable,
@@ -2997,7 +3000,9 @@ tasks:
   contexte: 'Après T173-B, valider les 4 scénarios d''armement (nominal, échec contacteur
     timeout, coupure volontaire, 1er boot) en simulation : chaque échec doit produire
     le message attendu, le nominal reste sans message. Non-régression CI (gates) et
-    snapshots GVL_Troubleshooting.'
+    snapshots GVL_Troubleshooting. 🔁 **2026-08-31 : ABSORBÉ par le refactor emergency
+    en cours** — la validation des 4 scénarios se fait sur la structure refactorée
+    (FB_Safety_EmergencyManagement + IHM OperatorMessage).'
   description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-C_TESTS.yaml. Suite
     de validation par snapshots en simulation + tests unitaires de la table de vérité
     des sorties de séquence, gates palier C.'
@@ -4526,10 +4531,10 @@ tasks:
   - T192
 - id: T193
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C1
   domaine: SÉCURITÉ
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
   titre: Corrections safety interfaces + PRG06 — permis fail-safe, ArmingPulse, RateInterlock
     (audits)
@@ -4538,13 +4543,16 @@ tasks:
   description: '🔴 S3 : DescendPermit/AscentPermit := TRUE par défaut dans FB_Winch
     (contraire au fail-safe NC-100) → passer à FALSE. 🟠 S4 : EmergencyArmingPulseActive
     jamais affectée dans PRG_06 → l''IHM n''affiche jamais l''impulsion de réarmement
-    ; correctif := instSafetyEmergencyManagement.ArmPulse_RQ. 🟠 S5 : FB_WinchRateInterlock
+    ; correctif := instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd (cohérent avec le
+    refactor AU en cours — ArmPulse_RQ inexistant). 🟠 S5 : FB_WinchRateInterlock
     (T181-01) inexistant dans CODE/ mais SpeedGuardEnable := FALSE justifié par lui
-    → trancher (créer/re-mapper/acter).'
+    → trancher (créer/re-mapper/acter). 🔁 **2026-08-31 : DÉJÀ IMPLÉMENTÉ** (commit
+    877f48ac) — S3 (FB_Winch.st:30-31 := FALSE) + S4 (PRG_06:324 := Cmd.ArmPulse_Cmd)
+    + S5 acté (dette différée à T181-01). Reste : clôture + G200 PASS.'
   objectifs:
   - FB_Winch DescendPermit/AscentPermit défaut FALSE (fail-safe)
-  - PRG_06 EmergencyArmingPulseActive affecté (= ArmPulse_RQ)
-  - Trancher la dette FB_WinchRateInterlock
+  - PRG_06 EmergencyArmingPulseActive affecté (= Cmd.ArmPulse_Cmd)
+  - Trancher la dette FB_WinchRateInterlock (acté, différé à T181-01)
   - G200 liaison PASS + tests
   contrat: ''
   bloque_par: []
@@ -4617,5 +4625,34 @@ tasks:
   - Identifier la cause (refactor, câblage, contexte)
   - Correction et vérification en simulation
   - G200 liaison PASS + tests
+  contrat: ''
+  bloque_par: []
+- id: T197
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: IHM / SUPERVISION
+  agent: DSH (DeepSeek)
+  date: '2026-08-31T03:00:00+02:00'
+  titre: Réorganiser GVL_IHM — sortir emergency/safety de Modes dans structure dédiée
+    (utilise DUT refactor AU)
+  contexte: 'Audit GVL_IHM.Modes (f6a1708d) : les champs emergency/safety (PowerContactorEngaged,
+    PowerCutOffActive, EmergencyChainOk, PowerContactorOk, EmergencyArmable, EmergencyArmingBusy,
+    RedundancyTestFailed, EmergencyArmingFailed, BtnEmergencyArming, BtnEmergencyCutOff)
+    n''ont rien à voir avec les modes. Décision utilisateur 2026-08-31 : les sortir
+    de Modes dans une structure dédiée GVL_IHM.Emergency, utilisant les DUT du refactor
+    AU (ST_Safety_Emergency_Cmd / ST_Safety_Emergency_Status).'
+  description: 'Créer GVL_IHM.Emergency (Cmd:ST_Safety_Emergency_Cmd + Status:ST_Safety_Emergency_Status)
+    + déplacer les 10 champs emergency/safety de Modes.State + alléger ST_ModesState
+    + MAJ PRG_07 (producteur) + consommateurs (PRG_02, PRG_03, PRG_06, FB_Hmi_BannerFormatter,
+    FB_TroubleshootingView) + migration IHM (bindings). Utilise les nouvelles structures
+    du refactor AU. Non-régression: G200 + bundle + gates + tests.'
+  objectifs:
+  - GVL_IHM.Emergency créé (Cmd + Status via DUT refactor AU)
+  - Les 10 champs emergency/safety déplacés de Modes.State vers Emergency
+  - ST_ModesState allégé (plus de champs emergency)
+  - PRG_07 + consommateurs mis à jour (producteur unique)
+  - Migration IHM documentée (bindings)
+  - G200 liaison PASS + bundle + gates palier C PASS
   contrat: ''
   bloque_par: []

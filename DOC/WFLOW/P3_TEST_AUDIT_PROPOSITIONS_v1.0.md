@@ -83,7 +83,7 @@ Verdict transversal : 33/33 nominal ✓ ; granulaire quasi absent partout (front
 > ⚠️ Correction de prémisse (orchestrateur, 2026-08-29 15:45) : `test_fb_safety_emergency.st` **EXISTE**
 > (créé 29/08 12:45) — la déclaration « aucun test CI actif » était fausse.
 
-- **Preuves exhaustives** : **10/12 TC = PREUVE COMPLÈTE** — code `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st`
+- **Preuves exhaustives** : **10/12 TC = PREUVE COMPLÈTE** — code `ARCHIVES/Code/AU/FB_Safety_EmergencyManagementLogic_v2.1_OLD.st` (archivé, fusionné dans `FB_Safety_EmergencyManagement`)
   + tests `RESULTS/B_AU_SECURITE/tests/test_fb_safety_emergency.st` + rapport daté
   `RESULTS/B_AU_SECURITE/reports/FB_Safety_EmergencyManagement.json|html` (29/08/2026 12:50:02, **10/10 PASS**).
 - **Les 2 résiduels** : `TC-P01-001` (essai **SITE** — boucle AU physique, non automatisable par nature) ;

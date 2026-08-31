@@ -296,17 +296,17 @@ PowerCutOffReq := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCu
 instSafetyEmergencyManagement(
     Enable := TRUE,
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
-    ArmRequest := GVL_IHM.Modes.Cmd.BtnEmergencyArming,
+    ArmRequest := GVL_IHM.Emergency.Cmd.BtnEmergencyArming,
     EmergencyChainClosed := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     PowerCutOffRequest := PowerCutOffReq,
-    BtnEmergencyCutOff := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff
+    BtnEmergencyCutOff := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff
 );
 
-// ── Ordres AU (logique) ──
-PowerKeepAliveACmd := instSafetyEmergencyManagement.MaintainA_RQ;
-PowerKeepAliveBCmd := instSafetyEmergencyManagement.MaintainB_RQ;
-EmergencyArmingCmd := instSafetyEmergencyManagement.ArmPulse_RQ;
+// ── Ordres AU (logique) — sorties structurées Status : ST_Safety_Emergency_Status + Cmd : ST_Safety_Emergency_Cmd ──
+PowerKeepAliveACmd := instSafetyEmergencyManagement.Cmd.MaintainA_Cmd;
+PowerKeepAliveBCmd := instSafetyEmergencyManagement.Cmd.MaintainB_Cmd;
+EmergencyArmingCmd := instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd;
 
 // ── Sorties physiques AU ──
 PowerKeepAlive_A_RQ          := PowerKeepAliveACmd;
@@ -318,16 +318,16 @@ Data.PowerKeepAliveACmd    := PowerKeepAliveACmd;
 Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
 Data.EmergencyArmingCmd    := EmergencyArmingCmd;
 
-// ── Diagnostics chaîne AU ──
+// ── Diagnostics chaîne AU (scalaires → State/Diag du DUT structuré) ──
 // ⚡ Impulsion de réarmement AU (miroir de l'ordre physique EmergencyArmingCmd) — l'IHM
 // affiche ainsi la fenêtre 1s du réarmement, pas seulement l'état "lockout"/"failed".
-EmergencyArmingPulseActive := instSafetyEmergencyManagement.ArmPulse_RQ;
-EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
-ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;
-RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;
-EmergencyArmingFailed := instSafetyEmergencyManagement.EmergencyArmingFailed;
-EmergencyState := instSafetyEmergencyManagement.State;
-EmergencyDiag := instSafetyEmergencyManagement.Diag;
+EmergencyArmingPulseActive := instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd;
+EmergencyArmingLockoutActive := instSafetyEmergencyManagement.Status.Diag.LockoutActive;
+ArmingSeqStep := instSafetyEmergencyManagement.Status.State.Step;
+RedundancyTestFailed := instSafetyEmergencyManagement.Status.Diag.RedundancyTestFailed;
+EmergencyArmingFailed := instSafetyEmergencyManagement.Status.Diag.ArmFailed;
+EmergencyState := instSafetyEmergencyManagement.Status.State;
+EmergencyDiag := instSafetyEmergencyManagement.Status.Diag;
 PowerCutOffActive := PowerCutOffReq;
 
 END_PROGRAM

@@ -497,10 +497,10 @@ GVL_Troubleshooting.Safety.SimSafetyActive            := SimSafetyActive;
 
 GVL_Troubleshooting.Safety.HwIn_EmergencyChainClosed_DI  := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.Safety.HwIn_PowerContactorEngaged_DI := HwIn.Machine.PowerContactorEngaged_DI;
-GVL_Troubleshooting.Safety.HwIn_EmergencyBtnCut_HMI      := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
+GVL_Troubleshooting.Safety.HwIn_EmergencyBtnCut_HMI      := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;
 
 GVL_Troubleshooting.Safety.Step1_InputModulesOk       := NOT InputModuleFault;
-GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut   := NOT GVL_IHM.Modes.Cmd.BtnEmergencyCutOff;
+GVL_Troubleshooting.Safety.Step2_EmergencyBtnNotCut   := NOT GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff;
 GVL_Troubleshooting.Safety.Step3_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.Safety.Step4_ContactorReleased     := NOT HwIn.Machine.PowerContactorEngaged_DI;
 GVL_Troubleshooting.Safety.Step5_ArmingAllowed        := EmergencyState.Armable;

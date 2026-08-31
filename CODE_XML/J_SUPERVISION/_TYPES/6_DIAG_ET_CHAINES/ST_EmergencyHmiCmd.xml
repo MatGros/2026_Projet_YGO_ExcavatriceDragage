@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:06:45.225124" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:06:45.225124">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_EmergencyHmiCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnEmergencyArming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnEmergencyCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commande IHM coupure d'urgence puissance amont (arrêt à distance)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9a2c0d66-8bae-533d-b16c-bdefa8d4d07d</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_EmergencyHmiCmd — Commandes IHM de la chaîne AU / sécurité
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Commandes opérateur (boutons IHM) de la chaîne d'arrêt
+      d'urgence, sorties de `Modes.Cmd`. Distinctes des
+      commandes physiques fail-safe `ST_Safety_Emergency_Cmd`
+      (MaintainA/B_Cmd, ArmPulse_Cmd) produites par le FB AU.
+   🔌 Interface : Produit par l'IHM, consommé par PRG_02 / PRG_06 /
+      FB_TroubleshootingView.
+   📄 Doc : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md §5
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="6_DIAG_ET_CHAINES">
+              <Object Name="ST_EmergencyHmiCmd" ObjectId="9a2c0d66-8bae-533d-b16c-bdefa8d4d07d" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

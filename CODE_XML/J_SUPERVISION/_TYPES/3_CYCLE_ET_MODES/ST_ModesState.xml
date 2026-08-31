@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T23:00:22.487700" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T23:00:22.487700">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:05:44.584185" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:05:44.584185">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -34,14 +34,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎚️ Mode de marche actuellement actif</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État de la chaîne d'arrêt d'urgence</xhtml>
-              </documentation>
-            </variable>
             <variable name="AnyFaultActive">
               <type>
                 <BOOL />
@@ -50,69 +42,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: au moins un défaut/alarme actif dans le domaine</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerCutOffActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 : au moins un Méca A/B/C (FB_Safety_Winch) ou</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyChainOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Boucle AU saine (coup-de-poing relâchés + pas de PowerCutOff PLC actif)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur de puissance confirmé engagé (miroir PowerContactorEngaged)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Réarmement possible maintenant (chaîne saine, ni séquence ni verrouillage en cours,</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingBusy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Auto-test A/B, pulse, confirmation OU verrouillage 5s en cours — nouvelle demande ignorée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyTestFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B non fonctionnel détecté à l'auto-test — bloque tout réarmement (front Reset requis)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis)</xhtml>
-              </documentation>
-            </variable>
             <variable name="ModeChangePendingBlocked">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir IHM des états de maintenance (AF-05 §4bis)
-🚦 Changement de mode refusé : treuils non à l'arrêt confirmé (contacteurs retombés + frein serré + |v| &lt; seuil)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Changement de mode refusé : treuils non à l'arrêt confirmé (contacteurs retombés + frein serré + |v| &lt; seuil)</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRequiredM1">

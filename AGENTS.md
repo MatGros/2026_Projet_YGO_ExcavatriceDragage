@@ -212,8 +212,9 @@ l'orchestrateur (lecture du `git diff` réel), jamais à l'agent qui a produit l
 Plugin antigravity : `antigravity:delegate` · `antigravity:resume` · `antigravity:review`.
 Workflow multi-agents et criticité C0–C4 : `TOOLS/AGENT_WORKFLOW/docs/WORKFLOW.md`.
 
-### 🧠 Modes de Délégation : Subagent Plateforme vs Subagent Ollama Local
+### 🧠 Modes de Délégation : Subagent Plateforme vs Multi-modèle vs Ollama Local
 - 🌐 **Subagent standard (`invoke_subagent` / `agent`)** : Utilise le modèle cloud de la plateforme (consomme le quota API).
+- 🔀 **Subagent multi-modèle (`workflow` + override `provider`/`model`)** : lance un sous-agent sur un autre modèle du catalogue (ex. `opencode-go`/`glm-5.2` — validé 2026-08-31 ; `omniroute`/`auto/best-reasoning`) pour réflexion, second avis ou test comparatif (ex. vs `deepseek-v4-flash:cloud` local). Routes, clés et caveats prompt court/lourd : `TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md`.
 - 💻 **Subagent Ollama Local (`ollama_subagent.py`)** : Quand l'utilisateur demande explicitement un *« subagent Ollama »* ou *« DeepSeek »*, déléguer l'analyse, l'audit ou la revue au modèle local sans consommer aucun quota cloud :
   ```bash
   python TOOLS/AGENT_WORKFLOW/scripts/ollama_subagent.py --prompt "..." --model deepseek-v4-flash:cloud
@@ -262,7 +263,7 @@ d'application → `4bis.` vérification mécanique **bloquante** → `5.` REX ve
 Toutes les specs dans **`DOC/`** — index complet et rôle de chaque document : [DOC/README.md](DOC/README.md).
 
 - [VERSION_HISTORY](DOC/VERSION_HISTORY.md) — historique CODESYS ↔ DOC (une ligne par jalon)
-- [DSH_PROVIDERS](TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) — 🔌 provider `omniroute` + délégation multi-modèles (workflow `provider`/`model`)
+- [DSH_PROVIDERS](TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md) — 🔌 providers `omniroute` + `opencode-go` (glm-5.2, etc.) + Ollama local · délégation multi-modèles (workflow `provider`/`model`)
 - [PLAN_TASK](DOC/WFLOW/TASKS.yaml) & [TASKS.yaml](DOC/WFLOW/TASKS.yaml) — 🗂️ **pilotage des tâches & contrats** : skill `.claude/skills/task-planner/SKILL.md` (bannière `WORKFLOW TÂCHES / TASK-PLANNER ACTIF` au lancement, horodatage ISO 8601 `locked_at`/`updated_at`/`completed_at` obligatoire, isolation `git worktree` et anti-destruction Git).
 - [TROUBLESHOOTING](DOC/WFLOW/TROUBLESHOOTING/README.md) — 🕵️ **recherche de blocage / diagnostic** : skill
   `.dsh/skills/troubleshooting/SKILL.md` (DSH) & `.claude/skills/troubleshooting/SKILL.md` (Claude Code),

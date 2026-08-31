@@ -375,3 +375,43 @@ TEST 'TC-P07-007 Warning auto-effacable vs Fault sur Reset (invariant structurel
     ASSERT_FALSE(FB_Banner.Banner.GlobalContextText = '', 'anti-clignotement gere par FB_AntiFlickerText (invariant)');
 END_TEST
 
+(* =========================================================================
+   REX 2026-08-27 — Réarmement AU échouant silencieusement à l'étape 5 (PowerCutOff).
+   TC-P07-030 : preuve du correctif IHM (Bug A gating + Bug B priorité + décodage
+   16#0010 en cause explicite M3 MecaA). Le comportement du FB_Safety_EmergencyManagement
+   (cause 16#0010, lockout, Error=FALSE, récupération Reset) est couvert par
+   TC-P01-011/012/013 dans le domaine B_AU_SECURITE.
+   ========================================================================= *)
+
+TEST 'TC-P07-030 Abandon AU 16#0010 decode en cause explicite M3 MecaA (Bug A+B)'
+    // Boot initial (reseau sain)
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(5000000000); // 5s BootInhibit
+
+    // Sequence AU en cours a l etape 5 (impulsion), contacteur pulse (PowerContactorEngaged=TRUE)
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              ArmingSeqStep := 5, LastAbortCause := 16#0000,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ADVANCE_TIME(10000000);
+
+    // Abandon a l etape 5 : PowerCutOff metier (16#0010) + cause M3 MecaA active.
+    // Le contacteur vient d etre pulse (PowerContactorEngaged=TRUE) : l ancien gating
+    // NOT PowerContactorEngaged supprimait ce message (Bug A). Il doit maintenant s afficher,
+    // et la cause 16#0010 doit etre decodee en M3 MecaA (Bug B : cause avant message generique).
+    TranslationSafety.ErrorMecaA := TRUE;
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.MAINT_N1,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              PowerCutOffActiveAny := TRUE,
+              ArmingSeqStep := 0, LastAbortCause := 16#0010,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              TranslationSafety := TranslationSafety,
+              Network := NetDiag);
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText, '[M3] MecaA (mouvement non commandé) - Reset puis réarmer',
+              'cause 16#0010 decodee en M3 MecaA (Bug A+B)');
+END_TEST
+

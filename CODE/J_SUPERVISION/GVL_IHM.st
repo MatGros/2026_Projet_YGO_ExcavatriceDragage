@@ -10,6 +10,7 @@ VAR_GLOBAL
     M1M2Sync : ST_SyncHMI;  (* ⚖️ Variables d'échange IHM Surveillance de synchro *)
     JOY1Joystick : ST_JoystickHMI; (* 🕹️ Variables d'échange IHM Joystick (noeud CANopen JOY1) *)
     Modes   : ST_ModesHMI;  (* 🎚️ Variables d'échange IHM Modes de marche *)
+    Emergency : ST_EmergencyHMI; (* 🛡️ Variables d'échange IHM chaîne AU / sécurité — sorties de Modes *)
     TranslationM3 : ST_TranslationHMI;(* ↔️ Variables d'échange IHM Translation M3 *)
     Cycle   : ST_CycleHMI;    (* 🔄 Commandes, états et diagnostic cycle semi-automatique *)
     DredgingAssist : ST_DredgingAssistHMI; (* 🪨 Assistance plongée/extraction MAINT_N1/N2 *)

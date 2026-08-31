@@ -115,11 +115,14 @@ FB_Safety_EmergencyManagement:
     file: CODE/M_MAIN/PRG_06_Outputs.st
     name: instSafetyEmergencyManagement
   sources:
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st
-    - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st
-    - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st
+    - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Status.st
+    - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Cmd.st
     - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/test_fb_safety_emergency.st
 

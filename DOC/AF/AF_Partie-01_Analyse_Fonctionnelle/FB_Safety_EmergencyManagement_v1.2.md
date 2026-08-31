@@ -70,13 +70,13 @@ Trait plein = composition/données transférées. `Logic` et `Output` sont des s
 
 #### 🧠 `FB_Safety_EmergencyManagementLogic` *(Décision & Machine d'État)*
 
-- **Fichier Source** : [`FB_Safety_EmergencyManagementLogic.st`](../../../../CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st)
+- **Fichier Source** : [`FB_Safety_EmergencyManagementLogic.st`](../../../../ARCHIVES/Code/AU/FB_Safety_EmergencyManagementLogic_v2.1_OLD.st) *(archivé — fusionné dans `FB_Safety_EmergencyManagement`)*
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Machine d'état, fronts Reset/Arm, calcul ErrorId & consignes logiques`
 - **Responsabilité** : Gère les étapes d'auto-test, les fronts `Reset`/`ArmRequest`, et produit le bus interne `ST_Safety_Emergency_InternalCmd`.
 
 #### 🔒 `FB_Safety_EmergencyManagementOutput` *(Pilote Physique Fail-Safe)*
 
-- **Fichier Source** : [`FB_Safety_EmergencyManagementOutput.st`](../../../../CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st)
+- **Fichier Source** : [`FB_Safety_EmergencyManagementOutput.st`](../../../../ARCHIVES/Code/AU/FB_Safety_EmergencyManagementOutput_v2.1_OLD.st) *(archivé — fusionné dans `FB_Safety_EmergencyManagement`)*
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Enable gate + copie consignes logiques vers sorties physiques`
 - **Responsabilité** : Barrière physique finale pour les signaux `MaintainA_RQ` et `MaintainB_RQ` (polarité maintien, `TRUE` = voie saine).
 
@@ -753,9 +753,11 @@ Les résultats d'exécution restent hors AF (scripts / checklists / registres).
 
 Fichiers code de référence :
 
-- `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st`
-- `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st`
-- `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st`
+- `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st` (FB fusionné)
+- `ARCHIVES/Code/AU/FB_Safety_EmergencyManagementLogic_v2.1_OLD.st` (archivé, fusionné)
+- `ARCHIVES/Code/AU/FB_Safety_EmergencyManagementOutput_v2.1_OLD.st` (archivé, fusionné)
+- `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Status.st` (DUT état/diagnostic)
+- `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Cmd.st` (DUT commandes de pilotage)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st` (interne Logic→Output)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st` (bus état public)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st` (bus diagnostic)

@@ -293,7 +293,7 @@ instSimBench(
     SimJoystickOvershoot_Active        := GVL_Simulation.SimJoystickOvershoot_Active,
     SimJoystickBagotement_Active       := GVL_Simulation.SimJoystickBagotement_Active,
     SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
-    BtnEmergencyStop         := GVL_IHM.Modes.Cmd.BtnEmergencyCutOff,
+    BtnEmergencyStop         := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff,
     HwReal                   := HwReal,
     RawPosM1                 := _SimEncoderRawPosM1,
     RawPosM2                 := _SimEncoderRawPosM2
