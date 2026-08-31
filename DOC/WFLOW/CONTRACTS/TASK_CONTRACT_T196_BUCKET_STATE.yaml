@@ -57,7 +57,11 @@ contract:
       - CODE/H_TREUILS_BENNE/FB_BucketCmdArbitration.st
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
       - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
       - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
       - DOC/WFLOW/AUDITS/T196_BUCKET_STATE_20260831.md
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T196_BUCKET_STATE.yaml
     forbidden:

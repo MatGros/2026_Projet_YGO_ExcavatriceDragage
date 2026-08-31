@@ -30480,6 +30480,17 @@ palier est encore engagé (fausse condition d'armement Méca A).
 --&gt; [CFG] Facteur vitesse codeur</xhtml>
               </documentation>
             </variable>
+            <variable name="SimTopPositionActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Capteur haut commun actif (référencement benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimSyncDeviationInjectM1">
               <type>
                 <BOOL />
@@ -30977,7 +30988,9 @@ Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
                                     OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
 Winch.M2_ThermalOk_DI          := TRUE;
 
-Winch.M1M2_TopPositionFree_DI  := TRUE; // Butée libre au repos en simu
+// Polarité matériel : le nom *_Free_DI vaut TRUE hors butée. Le stimulus de
+// banc est exprimé positivement (TopPositionActive) puis inversé ici.
+Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
 Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
@@ -36851,14 +36864,21 @@ ELSE
     RelayRev := FALSE;
 END_IF;
 
-// 🛡️ FIX contacteurs (audit CONTACTEURS_2026-08-31) : décodage THERMOMÈTRE CUMULATIF
-// (palier N = contacteurs 1..N tous pilotés), au lieu de l'ancien décodage one-hot
-// exclusif (ContactorN := StepNumber=N) qui éteignait les paliers inférieurs à
-// chaque montée de palier et ne couvrait pas le palier 5 (aucun contacteur).
-Contactor1 := (StepNumber &gt;= 1);
-Contactor2 := (StepNumber &gt;= 2);
-Contactor3 := (StepNumber &gt;= 3);
-Contactor4 := (StepNumber &gt;= 4);
+// 🛡️ FIX contacteurs (audit CONTACTEURS_2026-08-31) + SOLUTION : ré-émettre les
+// contacteurs depuis FB_SpeedStep (décodage TABLE ST_SpeedStepTable cumulatif :
+// P1=0, P2={K1}, P3={K1,K2}, P4={K1,K2,K3}, P5={K1,K2,K3,K4}) sur le palier SHAPÉ,
+// au lieu de l'ancien décodage one-hot exclusif (ContactorN := StepNumber=N) qui
+// éteignait les paliers inférieurs et ne couvrait pas le palier 5.
+SpeedStep(
+    Enable          := (StepNumber &gt; 0),
+    SpeedStepReq    := StepNumber,
+    Table           := Config.SpeedStepTable,
+    MaxStepNumber   := ActiveMaxStep
+);
+Contactor1 := SpeedStep.Contactor1;
+Contactor2 := SpeedStep.Contactor2;
+Contactor3 := SpeedStep.Contactor3;
+Contactor4 := SpeedStep.Contactor4;
 
 AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);
@@ -40588,6 +40608,7 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimJoystickOvershoot_Active := FALSE;
     GVL_Simulation.SimJoystickBagotement_Active := FALSE;
     GVL_Simulation.SimEncoderSpeedFactor := 1.0;
+    GVL_Simulation.SimTopPositionActive := FALSE;
     GVL_Simulation.SimSyncDeviationInjectM1 := FALSE;
     GVL_Simulation.SimSyncDeviationInjectM2 := FALSE;
     GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
@@ -40760,6 +40781,7 @@ instSimBench(
     EmergencyArming_RQ       := PRG_06_Outputs.Data.EmergencyArmingCmd
                                  OR (PRG_06_Outputs.ArmingSeqStep = 5),
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
+    SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
     SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
@@ -46392,6 +46414,18 @@ Permet de travailler en banc sans faux blocage Meca au homing sans mouvement.</x
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Activation par domaine (simulé si SimulationModeActive AND Sim&lt;Domaine&gt;Active)
 M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimTopPositionActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Stimulus explicite du capteur haut commun pour qualifier le référencement benne.
+TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.</xhtml>
           </documentation>
         </variable>
         <variable name="SimTranslationActive">

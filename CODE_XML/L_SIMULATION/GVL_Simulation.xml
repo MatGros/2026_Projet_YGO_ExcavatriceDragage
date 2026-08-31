@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:31.364458" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:31.364458">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:53:37.069782" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:53:37.069782">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -67,6 +67,18 @@ Permet de travailler en banc sans faux blocage Meca au homing sans mouvement.</x
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Activation par domaine (simulé si SimulationModeActive AND Sim&lt;Domaine&gt;Active)
 M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimTopPositionActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Stimulus explicite du capteur haut commun pour qualifier le référencement benne.
+TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.</xhtml>
           </documentation>
         </variable>
         <variable name="SimTranslationActive">

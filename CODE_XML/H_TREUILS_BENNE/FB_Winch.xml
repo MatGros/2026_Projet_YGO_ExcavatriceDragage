@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:45:12.189862" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:45:12.189862">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:54:13.596112" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:54:13.596112">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1381,14 +1381,21 @@ ELSE
     RelayRev := FALSE;
 END_IF;
 
-// 🛡️ FIX contacteurs (audit CONTACTEURS_2026-08-31) : décodage THERMOMÈTRE CUMULATIF
-// (palier N = contacteurs 1..N tous pilotés), au lieu de l'ancien décodage one-hot
-// exclusif (ContactorN := StepNumber=N) qui éteignait les paliers inférieurs à
-// chaque montée de palier et ne couvrait pas le palier 5 (aucun contacteur).
-Contactor1 := (StepNumber &gt;= 1);
-Contactor2 := (StepNumber &gt;= 2);
-Contactor3 := (StepNumber &gt;= 3);
-Contactor4 := (StepNumber &gt;= 4);
+// 🛡️ FIX contacteurs (audit CONTACTEURS_2026-08-31) + SOLUTION : ré-émettre les
+// contacteurs depuis FB_SpeedStep (décodage TABLE ST_SpeedStepTable cumulatif :
+// P1=0, P2={K1}, P3={K1,K2}, P4={K1,K2,K3}, P5={K1,K2,K3,K4}) sur le palier SHAPÉ,
+// au lieu de l'ancien décodage one-hot exclusif (ContactorN := StepNumber=N) qui
+// éteignait les paliers inférieurs et ne couvrait pas le palier 5.
+SpeedStep(
+    Enable          := (StepNumber &gt; 0),
+    SpeedStepReq    := StepNumber,
+    Table           := Config.SpeedStepTable,
+    MaxStepNumber   := ActiveMaxStep
+);
+Contactor1 := SpeedStep.Contactor1;
+Contactor2 := SpeedStep.Contactor2;
+Contactor3 := SpeedStep.Contactor3;
+Contactor4 := SpeedStep.Contactor4;
 
 AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);

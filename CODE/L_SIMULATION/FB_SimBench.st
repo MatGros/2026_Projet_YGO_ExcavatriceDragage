@@ -60,6 +60,7 @@ VAR_INPUT
 
     // ── Stimuli & Paramètres de banc ─────────────────────────────────────────
     SimEncoderSpeedFactor      : REAL := 1.0;   (* --> [CFG] Facteur vitesse codeur *)
+    SimTopPositionActive       : BOOL := FALSE; (* --> [TST] Capteur haut commun actif (référencement benne) *)
     SimSyncDeviationInjectM1   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M1 *)
     SimSyncDeviationInjectM2   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M2 *)
     SimSyncDeviationOffset_M   : REAL := 0.5;   (* --> [TST] Offset écart synchro *)
@@ -209,7 +210,9 @@ Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
                                     OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
 Winch.M2_ThermalOk_DI          := TRUE;
 
-Winch.M1M2_TopPositionFree_DI  := TRUE; // Butée libre au repos en simu
+// Polarité matériel : le nom *_Free_DI vaut TRUE hors butée. Le stimulus de
+// banc est exprimé positivement (TopPositionActive) puis inversé ici.
+Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
 Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;

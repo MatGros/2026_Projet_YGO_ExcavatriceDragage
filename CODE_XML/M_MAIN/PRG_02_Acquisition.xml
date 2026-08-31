@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:48:10.789178" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:48:10.789178">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:53:41.986299" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:53:41.986299">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2780,6 +2780,7 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimJoystickOvershoot_Active := FALSE;
     GVL_Simulation.SimJoystickBagotement_Active := FALSE;
     GVL_Simulation.SimEncoderSpeedFactor := 1.0;
+    GVL_Simulation.SimTopPositionActive := FALSE;
     GVL_Simulation.SimSyncDeviationInjectM1 := FALSE;
     GVL_Simulation.SimSyncDeviationInjectM2 := FALSE;
     GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
@@ -2952,6 +2953,7 @@ instSimBench(
     EmergencyArming_RQ       := PRG_06_Outputs.Data.EmergencyArmingCmd
                                  OR (PRG_06_Outputs.ArmingSeqStep = 5),
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
+    SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
     SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
@@ -5971,6 +5973,17 @@ palier est encore engagé (fausse condition d'armement Méca A).
 --&gt; [CFG] Facteur vitesse codeur</xhtml>
               </documentation>
             </variable>
+            <variable name="SimTopPositionActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Capteur haut commun actif (référencement benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimSyncDeviationInjectM1">
               <type>
                 <BOOL />
@@ -6468,7 +6481,9 @@ Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
                                     OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
 Winch.M2_ThermalOk_DI          := TRUE;
 
-Winch.M1M2_TopPositionFree_DI  := TRUE; // Butée libre au repos en simu
+// Polarité matériel : le nom *_Free_DI vaut TRUE hors butée. Le stimulus de
+// banc est exprimé positivement (TopPositionActive) puis inversé ici.
+Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
 Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;

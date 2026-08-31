@@ -21,6 +21,9 @@ VAR_GLOBAL
 
     // 🌐 Activation par domaine (simulé si SimulationModeActive AND Sim<Domaine>Active)
     SimWinchActive              : BOOL := FALSE; // M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu
+    // Stimulus explicite du capteur haut commun pour qualifier le référencement benne.
+    // TRUE = capteur haut actif; FALSE = position libre. Inopérant hors simulation.
+    SimTopPositionActive        : BOOL := FALSE;
     SimTranslationActive        : BOOL := FALSE; // M3 : AC600, fréquence, 5 capteurs et frein
     SimOperatorActive           : BOOL := FALSE; // Joystick : bus CANopen, axes RawX/RawY et homme-mort brut
     SimSafetyActive             : BOOL := FALSE; // AU, contacteur puissance, phases, thermiques, Kobold et auxiliaires communs
