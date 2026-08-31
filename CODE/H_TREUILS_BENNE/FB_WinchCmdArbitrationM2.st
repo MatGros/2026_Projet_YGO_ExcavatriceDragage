@@ -26,7 +26,6 @@ VAR_INPUT
     TglJoystickMaster : BOOL;  // --> [CMD] Toggle joystick maître global (Modes.Cmd, source unique)
     Context    : ST_fbWinchCmdArbitration_Context; // --> [STAT] Gating benne/synchro + chemin benne (partagé M1/M2)
     Cfg        : ST_fbWinchCmdArbitration_Cfg;     // --> [CFG] Vitesse override benne
-    SpeedStepTable : ST_SpeedStepTable;          // --> [CFG] Table paliers (conservée pour compat interface ; plus de conversion %→palier ici)
 END_VAR
 VAR_OUTPUT
     Ready     : BOOL;  // <-- [STAT] FB prêt à arbitrer (Enable)

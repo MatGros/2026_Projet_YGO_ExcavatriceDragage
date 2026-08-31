@@ -8,9 +8,6 @@
 |---|---|---|
 | Demandes/safety `PRG_04/05`, acquisition, IHM, reset `PRG_07` N‑1 | Q/PDO actionneurs, état AU, `PowerCutOff` agrégé | Produire une demande métier M1/M2/M3 |
 
-⚠️ `SafetyStructureNotValidated` est le garde‑fou de mise en service : tant qu'il est actif, aucune
-sortie moteur/frein n'est autorisée. Toute modification de son état exige validation safety dédiée.
-
 ## ⏱️ Ordre fonctionnel — lire de haut en bas
 
 | Phase | But | 🕒 Fraîcheur | Lire concrètement | Écrire / garantir |

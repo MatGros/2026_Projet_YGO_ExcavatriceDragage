@@ -4,8 +4,6 @@
    📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §5
    ⚙️ Exécuté en position 6 (après PRG_05_Translation).
    🛡️ Interlocks finaux M1/M2/M3 + agrégation PowerCutOff + chaîne AU.
-   🔒 SafetyStructureNotValidated reste TRUE : aucune sortie moteur/frein
-       autorisée tant que ce garde-fou n'est pas retiré.
    🎨 Organisation FONCTIONNELLE : chaque bloc regroupe la chaîne complète d'une
        fonction — conditions qui activent/désactivent la sortie (SafeStop / PowerCutOff /
        interlocks) → FB interlock → ordres → sorties physiques → bus inter-PRG. Lisible
@@ -32,7 +30,6 @@ VAR_OUTPUT
     EmergencyDiag                : ST_Safety_Emergency_Diag;  // <-- [DIAG] Diagnostic chaine AU
     PowerCutOffActive            : BOOL; // <-- [SAFE] Demande de coupure finale active
 
-    SafetyStructureNotValidated  : BOOL := FALSE; // 🔓 Garde-fou : autorisations M1/M2/M3 liees a leurs securites
     M1InterlockEnable            : BOOL; // <-- [SAFE] Gate finale M1 (Enable AND NOT PowerCutOff)
     M2InterlockEnable            : BOOL; // <-- [SAFE] Gate finale M2 (Enable AND NOT PowerCutOff)
     M3InterlockEnable            : BOOL; // <-- [SAFE] Gate finale M3 (Enable AND NOT PowerCutOff)

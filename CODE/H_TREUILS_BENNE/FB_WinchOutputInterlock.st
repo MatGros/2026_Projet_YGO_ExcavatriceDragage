@@ -44,8 +44,7 @@ VAR_OUTPUT
     Ready                           : BOOL;                           // <-- [STAT] FB pret a fonctionner
     Busy                            : BOOL;                           // <-- [STAT] Interlock actif
     Done                            : BOOL;                           // <-- [STAT] Action terminee
-    Error                           : BOOL;                           // <-- [STAT] Synthese defaut
-    ErrorId                         : WORD;                           // <-- [DIAG] Code erreur (bit0: timeout frein)
+    Fault                           : ST_Fault;                       // <-- [DIAG] Defaut transverse standard (socle FB_FaultCore, bit0: timeout frein)
     State                           : E_WinchFinalInterlockState;     // <-- [STAT] Etat courant machine d'etat interlock
     StateAtError                    : E_WinchFinalInterlockState;     // <-- [DIAG] Etat memorise lors du dernier defaut
     Reason                          : E_WinchFinalInterlockReason;    // <-- [DIAG] Cause de neutralisation ou blocage
