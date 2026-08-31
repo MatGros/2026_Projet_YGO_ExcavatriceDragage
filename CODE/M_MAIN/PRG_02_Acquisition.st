@@ -67,7 +67,6 @@ END_VAR
 VAR CONSTANT
     // === ⚙️ CONSTANTES MÉCANIQUES (AF09 §2) ===
     ENCODER_POINTS_PER_REV     : UDINT := 8192; // 13 bits single-turn (8192 pts/tour)
-    ENCODER_MULTITURN_REVS_MAX : UDINT := 4096; // 12 bits multi-turn (4096 tours max)
     WINCH_CABLE_M_PER_REV      : REAL  := 2.0;  // 2.0 metres de cable par tour tambour
 END_VAR
 

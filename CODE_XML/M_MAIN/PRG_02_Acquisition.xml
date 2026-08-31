@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:23:17.819381" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:23:17.819381">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:55:20.252000" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:55:20.252000">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2796,17 +2796,6 @@ Seuils de changement de palier (0..100%)</xhtml>
 13 bits single-turn (8192 pts/tour)</xhtml>
               </documentation>
             </variable>
-            <variable name="ENCODER_MULTITURN_REVS_MAX">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="4096" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">12 bits multi-turn (4096 tours max)</xhtml>
-              </documentation>
-            </variable>
             <variable name="WINCH_CABLE_M_PER_REV">
               <type>
                 <REAL />
@@ -4354,9 +4343,9 @@ IF NOT Enable THEN
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
-    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 16#0000;
+    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 0;
     Measurement.HomingLifecycle.Busy := FALSE; Measurement.HomingLifecycle.Done := FALSE;
-    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 16#0000;
+    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 0;
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
     // Frontiere HW sortie : aucun ordre preset publie hors autorisation
@@ -7151,7 +7140,7 @@ EncoderAvailable := NOT instCauses[0].Active;
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
     Ready := FALSE;
-    PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
+    PresetTriggerCmd := 0; CodeSeqTriggerCmd := 0; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetCompleted := FALSE;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
@@ -7182,7 +7171,7 @@ END_IF;
 // fonction n'est pas confirmée. Ne jamais lui donner une valeur arbitraire.
 PresetReqEdge(CLK := PresetRequest);
 PresetCompleted := FALSE;
-CodeSeqTriggerCmd := 16#0000;           // non piloté — rôle inconnu, voir note ci-dessus
+CodeSeqTriggerCmd := 0;                 // non piloté — rôle inconnu, voir note ci-dessus
 CASE PresetSeqStep OF
     0: // IDLE
         PresetTriggerCmd := 0;
