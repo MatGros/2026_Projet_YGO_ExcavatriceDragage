@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-31 21:42:47</div>
+    <div class="exec-time">2026-08-31 22:40:32</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (4 tests)</summary>
@@ -674,8 +674,8 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_SyncContactor</code></td>
                 <td>16</td><td>1</td>
-                <td>0</td><td>2</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (2 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>0</td><td>3</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (3 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1239,6 +1239,10 @@ END_IF;
       meme si les codeurs sont bypasses.
    🔌 Interface : Bloc de surveillance transverse (1 instance)
    🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee.
+   ⚖️ Concordance ACTIVE des que les 2 treuils sont commandes (relais ou
+      contacteur), independamment du mode synchronisme. Seul BypassGlobal
+      neutralise. (SyncEnable conserve en entree pour compatibilite
+      d&#x27;interface — inutilise, nettoyage differe.)
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 
@@ -1276,6 +1280,7 @@ VAR
 
     // === VARIABLES LOCALES INTERNES ===
     MismatchActive                  : BOOL;                           // . [LOC] Discordance commande active
+    BothCommanded                   : BOOL;                           // . [LOC] Les 2 treuils sont commandes (relais ou contacteur)
 END_VAR
 
 {region &quot;§1 Gate neutralisation&quot;}
@@ -1291,9 +1296,15 @@ END_IF;
 {region &quot;§2 Detection discordance&quot;}
 // 🔍 2. COHÉRENCE DES COMMANDES SÉCURITÉ — verifie que les commandes envoyees
 // aux deux treuils sont identiques (sens et contacteurs).
+// Concordance ACTIVE des que les 2 treuils sont commandes (relais ou contacteur),
+// independamment du mode synchronisme (SyncEnable). Seul BypassGlobal neutralise.
 // Filtre de 500ms pour tolerer les transitions et rampes.
 IF NOT BypassGlobal THEN
-    MismatchActive := SyncEnable AND (
+    BothCommanded := (RelayFwdM1 OR RelayRevM1 OR Contactor1_M1 OR Contactor2_M1
+                      OR Contactor3_M1 OR Contactor4_M1)
+                 AND (RelayFwdM2 OR RelayRevM2 OR Contactor1_M2 OR Contactor2_M2
+                      OR Contactor3_M2 OR Contactor4_M2);
+    MismatchActive := BothCommanded AND (
         (RelayFwdM1 &lt;&gt; RelayFwdM2) OR
         (RelayRevM1 &lt;&gt; RelayRevM2) OR
         (Contactor1_M1 &lt;&gt; Contactor1_M2) OR
@@ -1306,6 +1317,7 @@ IF NOT BypassGlobal THEN
 ELSE
     ContactorMismatch := FALSE;
     MismatchActive := FALSE;
+    BothCommanded := FALSE;
     MismatchTimer(IN := FALSE);
 END_IF;
 {endregion}

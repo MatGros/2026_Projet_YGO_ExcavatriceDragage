@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T14:23:51.966428" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T14:23:51.966428">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T22:04:22.768853" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T22:04:22.768853">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -734,17 +734,6 @@ palier est encore engagé (fausse condition d'armement Méca A).
 --&gt; [CFG] Facteur vitesse codeur</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgTopSensorRawPos">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil brut M1 du capteur haut commun; 0 désactive le modèle automatique</xhtml>
-              </documentation>
-            </variable>
             <variable name="SimTopPositionActive">
               <type>
                 <BOOL />
@@ -1107,14 +1096,6 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Offset synchro M2</xhtml>
               </documentation>
             </variable>
-            <variable name="TopPositionModelActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Capteur haut simulé depuis la position M1</xhtml>
-              </documentation>
-            </variable>
             <variable name="M3_RelayFwd">
               <type>
                 <BOOL />
@@ -1261,12 +1242,9 @@ Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
                                     OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
 Winch.M2_ThermalOk_DI          := TRUE;
 
-// Polarité matériel : le nom *_Free_DI vaut TRUE hors butée. Le capteur commun
-// suit normalement la référence M1 (seuil brut configuré par PRG_02); le
-// stimulus manuel reste disponible pour injecter un fait capteur au banc.
-// Le modèle ne s'arme jamais avec le seuil par défaut 0.
-TopPositionModelActive := (CfgTopSensorRawPos &gt; 0) AND (RawPosM1 &gt;= CfgTopSensorRawPos);
-Winch.M1M2_TopPositionFree_DI  := NOT (TopPositionModelActive OR SimTopPositionActive);
+// Cohérent avec M2_TensionedCable_DI (sain par défaut) : capteur TOP libre en simu,
+// sauf stimulus manuel SimTopPositionActive (injection de fait capteur au banc).
+Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
 Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;

@@ -5,9 +5,9 @@
 
 ## 🎯 Rôle et périmètre
 
-- **Rôle** : définir le mode semi-automatique, son séquenceur (grafcet `FB_Cycle`) et les briques de cycle transverses (`FB_DiveSearch`, `FB_ExtractionSequence`).
+- **Rôle** : définir le mode semi-automatique, son séquenceur (grafcet `FB_Cycle`) et les briques de cycle transverses (`FB_DiveSearch`, `FB_ExtractionAssist`).
 - **Périmètre & Architecture** : logique de séquence et demandes de mouvement produites. `PRG_03_Modes_Cycle` est l'unique instanciateur décisionnel de tous ces cycles. Les ordres sont transmis à `PRG_04_Treuils_Benne` via le bus public `Data.ReqProgram.ReqBucket`. Les sorties physiques directes restent hors de ce document (Partie 06/Outputs).
-- **Type de composant** : `FB_Cycle`, `FB_DiveSearch`, `FB_ExtractionSequence` (briques ST transverses partagées Maintenance + Semi-auto).
+- **Type de composant** : `FB_Cycle`, `FB_DiveSearch`, `FB_ExtractionAssist` (briques ST transverses partagées Maintenance + Semi-auto).
 - 🆕 Refonte du séquenceur conforme `GUIDE_SEQUENCEUR_v1.2.md` (§11bis R1-R9) : instance unique,
   homme-mort fenêtre 3 s, tempo max d'étape, `STABILIZING`.
   Conception : `DOC/WFLOW/AUDITS/DESIGN/DESIGN_SEMI_AUTO_CYCLE_v0.1.md`.
@@ -114,7 +114,7 @@
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-020</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b><code>FB_ExtractionSequence</code> : mise en service séquence extraction</b></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b><code>FB_ExtractionAssist</code> : mise en service séquence extraction</b></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">Transition READY -&gt; CLOSING</td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
@@ -126,6 +126,24 @@
       <td style="padding: 6px 8px; line-height: 1.55;">Fermeture $\rightarrow$ Décollage $\rightarrow$ Nominal sans à-coup</td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§3</small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P04-SCEN-NOM</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Scène nominale : parcours complet du Grafcet X0→X13→X0</b></small></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">
+        🏁 <b>Étape 0</b> : Départ à la trémie, treuils en position haute, homme-mort armé<br>
+        🚀 <b>Étape 1</b> : Front <code>StartCycle</code> → X0→X1 (référencement, déjà homé)<br>
+        🎯 <b>Étape 2</b> : X1→X2 (sélection cible P1) → X2→X3 (translation atteinte, ouverture benne)<br>
+        🌊 <b>Étape 3</b> : X3→X4 (plongée benne ouverte, contacteur Kobold armé) → X4→X5 (contact fond)<br>
+        ⬆️ <b>Étape 4</b> : X5→X6 (remontée à hauteur fermeture) → X6→X7 (benne fermée, remontée contrôle)<br>
+        ⚡ <b>Étape 5</b> : X7→X8 (palier contrôle franchi) → X8→X9 (limite haute, égouttage)<br>
+        🚚 <b>Étape 6</b> : X9→X10 (égouttage 5s, translation trémie) → X10→X11 (ouverture vidange)<br>
+        ✅ <b>Étape 7</b> : X11→X13 (cycle terminé, <code>SampleCount</code> +1 strict)<br>
+        🔄 <b>Étape 8</b> : X13→X0 (rebouclage sur <code>StartCycle</code>), <code>Done</code> retombe
+      </td>
+      <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small>§4</small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>V-I</code></small></td>
     </tr>
   </tbody>
@@ -160,7 +178,7 @@
   4. **Recherche de fond en Palier $\le 4$** : Vitesse plafonnée à $3.5$ m/s max (Palier 4). **Palier 5 strictement interdit** (parasites/saturation).
   5. **Contact fond validé** : Front descendant $\text{DI} = 0$ $\rightarrow$ validation fond (`BottomTouchConfirmed := TRUE`) et **coupure immédiate du contacteur Kobold** (`KoboldContactorCmd := FALSE`) pour éviter l'échauffement thermique.
 
-### ⛏️ `FB_ExtractionSequence` — Extraction
+### ⛏️ `FB_ExtractionAssist` — Extraction
 
 - **Enchaînement fluide sans rupture de mouvement** :
   1. **Attente fond validé** : Prêt à fermer dès que le fond est confirmé.
@@ -186,8 +204,8 @@ Toutes les temporisations de garde constituent un **plafond anti-blocage** (surv
      *(Pour les valeurs de référence $-0.5\text{ m} - (-35.0\text{ m}) = 34.5\text{ m} \Rightarrow \Delta T_{fond} = 345.0\text{ s}$)*.
    - 🛡️ **Garde de sécurité** : Si l'exploitant modifie la profondeur légale admissible sur le site, le plafond de temporisation s'ajuste automatiquement sans nécessiter de modification logicielle.
 3. **Fermeture benne (`CfgBucketCloseTimeout`)** — **backstop, pas garde primaire** :
-   - `FB_Bucket` porte déjà son propre watchdog de mouvement (`CfgTimeoutDuration`, défaut `T#60s`) et publie `BucketError`. `FB_ExtractionSequence.CLOSING_BUCKET` consomme ce `BucketError` → `BucketErrorFault`. Le backstop ne couvre QUE le cas où `FB_Bucket` lui-même n'a pas fauté (benne silencieusement bloquée).
-   - **Contrainte vérifiée au runtime** : `FB_ExtractionSequence` reçoit `BucketMoveTimeout` (référence = `FB_Bucket.CfgTimeoutDuration`, câblée depuis `PRG_03`) et lève `ErrorCausePresent` si `CfgBucketCloseTimeout <= BucketMoveTimeout` — le backstop ne peut pas fauter avant la benne, `BucketError` reste la cause visible en premier.
+   - `FB_Bucket` porte déjà son propre watchdog de mouvement (`CfgTimeoutDuration`, défaut `T#60s`) et publie `BucketError`. `FB_ExtractionAssist.CLOSING_BUCKET` consomme ce `BucketError` → `BucketErrorFault`. Le backstop ne couvre QUE le cas où `FB_Bucket` lui-même n'a pas fauté (benne silencieusement bloquée).
+   - **Contrainte vérifiée au runtime** : `FB_ExtractionAssist` reçoit `BucketMoveTimeout` (référence = `FB_Bucket.CfgTimeoutDuration`, câblée depuis `PRG_03`) et lève `ErrorCausePresent` si `CfgBucketCloseTimeout <= BucketMoveTimeout` — le backstop ne peut pas fauter avant la benne, `BucketError` reste la cause visible en premier.
    - **Valeur par défaut : `T#75s`** (watchdog benne `T#60s` + marge). Entrée `[CFG]` câblée dans `PRG_03`. `ErrorCausePresent` couvre aussi `CfgBucketCloseTimeout <= T#0ms` et `CycleTime <= T#0ms`.
 4. **Contrôle remontée lente (`CalculatedControlAscentTimeout`)** :
    - **Calcul dynamique en RUNTIME** car la distance $\text{ControlAscentDistance\_M}$ ($d_{ctrl}$) est paramétrable par l'opérateur sur l'IHM (ex: 1.0 m à 5.0 m). Facteurs en `VAR CONSTANT` : `CST_MinSpeed_Mps = 0.15`, `CST_ControlAscentMargin = 2.0`, plancher `CST_TimeoutMinDistance_M = 0.1` :

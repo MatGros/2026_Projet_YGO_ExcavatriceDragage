@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T15:05:07.206461" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T15:05:07.206461">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T22:04:22.789188" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T22:04:22.789188">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -944,31 +944,11 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
               <type>
                 <derived name="ST_SpeedStepTable" />
               </type>
-              <initialValue>
-                <structValue>
-                  <value member="StepThreshold_Pct">
-                    <arrayValue>
-                      <value>
-                        <simpleValue value="20" />
-                      </value>
-                      <value>
-                        <simpleValue value="40" />
-                      </value>
-                      <value>
-                        <simpleValue value="60" />
-                      </value>
-                      <value>
-                        <simpleValue value="80" />
-                      </value>
-                      <value>
-                        <simpleValue value="100" />
-                      </value>
-                    </arrayValue>
-                  </value>
-                </structValue>
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les initialiseurs imbriqués de STRUCT (notamment les ARRAY) ne sont pas
+acceptés par STruCpp/CODESYS dans une déclaration de type. La table est
+fournie par la configuration persistante de l'appelant.
+🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedStepHystMargin">
@@ -3028,8 +3008,6 @@ instSimBench(
     // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
     SimChainOkBit            := GVL_Simulation.SimChainOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
-    CfgTopSensorRawPos       := REAL_TO_UDINT(_WinchM1CfgPersist.CfgTopSensorPos_M
-                                 * (UDINT_TO_REAL(ENCODER_POINTS_PER_REV) / WINCH_CABLE_M_PER_REV)),
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
@@ -6083,17 +6061,6 @@ palier est encore engagé (fausse condition d'armement Méca A).
 --&gt; [CFG] Facteur vitesse codeur</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgTopSensorRawPos">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil brut M1 du capteur haut commun; 0 désactive le modèle automatique</xhtml>
-              </documentation>
-            </variable>
             <variable name="SimTopPositionActive">
               <type>
                 <BOOL />
@@ -6456,14 +6423,6 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Offset synchro M2</xhtml>
               </documentation>
             </variable>
-            <variable name="TopPositionModelActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Capteur haut simulé depuis la position M1</xhtml>
-              </documentation>
-            </variable>
             <variable name="M3_RelayFwd">
               <type>
                 <BOOL />
@@ -6610,12 +6569,9 @@ Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
                                     OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
 Winch.M2_ThermalOk_DI          := TRUE;
 
-// Polarité matériel : le nom *_Free_DI vaut TRUE hors butée. Le capteur commun
-// suit normalement la référence M1 (seuil brut configuré par PRG_02); le
-// stimulus manuel reste disponible pour injecter un fait capteur au banc.
-// Le modèle ne s'arme jamais avec le seuil par défaut 0.
-TopPositionModelActive := (CfgTopSensorRawPos &gt; 0) AND (RawPosM1 &gt;= CfgTopSensorRawPos);
-Winch.M1M2_TopPositionFree_DI  := NOT (TopPositionModelActive OR SimTopPositionActive);
+// Cohérent avec M2_TensionedCable_DI (sain par défaut) : capteur TOP libre en simu,
+// sauf stimulus manuel SimTopPositionActive (injection de fait capteur au banc).
+Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
 Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;

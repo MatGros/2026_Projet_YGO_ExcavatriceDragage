@@ -53,7 +53,7 @@ ArmRequest (front) → [Armable:BOOL] → [ArmingSeqStep=1..4 tests A/B] → [é
 ## 7. 🏁 Conclusion (challenge)
 
 - **Chaîne PowerCutOffRequest complète (PREUVE, lecture code)** :
-  1. `FB_Safety_Winch.st:415` → `PowerCutOff := (Fault.ErrorId AND 16#2F84)<>0` (bits 2,7,10,11,12,13 = MotorThermal, MecaA, BrakeThermal, MecaD, MecaE, MecaEEscalade — tous latched).
+  1. `FB_Safety_Winch.st:§3` → `PowerCutOff := CausesPowerCutOffActive` (bits 2,7,8,9,10,11,13 = MotorThermal, MecaA, MecaB, MecaC, BrakeThermal, MecaD, MecaEEscalade — tous latched). Ancien masque `16#2F84` (retiré T209) : SANS MecaE-écart (bit12, laissé au SafeStop tant que non confirmé).
   2. `FB_Safety_Translation.st:249` → `PowerCutOff := (Fault.ErrorId AND 16#00F8)<>0` (bits 3..7 = BrakeThermal, MecaB, MecaA, LimitSwitch, SensorIncoherent).
   3. `PRG_04_Treuils_Benne.st:1074,1089` → `WinchM1/M2FinalInterlockRequest.PowerCutOff := instSafetyWinchM1/M2.PowerCutOff`.
   4. `PRG_05_Translation.st:378` → `TranslationFinalInterlockRequest.PowerCutOff := instSafetyTranslationM3.PowerCutOff`.

@@ -1,9 +1,11 @@
-# FB_SimBench — Spec composant (v1.0)
+# FB_SimBench — Spec composant (v1.1)
 
 > Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.4.md`](../AF_Partie-13_Fonction_Simulation_v2.4.md) §2/§4.
 > Rôle de **ce** document : enveloppe unique de simulation banc — composition, câblage des
 > décalages 1-scan, table des sous-modèles — et **catalogue unique** des `TC-P13-010...`.
 > Source code : `CODE/L_SIMULATION/FB_SimBench.st` · instance `PRG_02_Acquisition.instSimBench`.
+> 🆕 v1.1 (2026-08-31) : capteur haut TOP simulé **sain (libre) par défaut**, cohérent avec le mou
+> de câble ; retrait du modèle piloté par la position M1 (régression `fc8115d9` corrigée) — §2.1, TC-P13-014.
 
 ## 🧭 Sommaire
 
@@ -60,6 +62,12 @@
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-014</span></td>
+      <td style="padding: 6px 8px; line-height: 1.55;">🆕 Capteur haut TOP simulé **libre (TRUE) par défaut**, cohérent avec le mou de câble (<code>M2_TensionedCable_DI := TRUE</code>) ; ne dépend plus de la position M1 ; seul <code>SimTopPositionActive</code> injecte un fait capteur</td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>💻 AUTO</code></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
+    </tr>
   </tbody>
 </table>
 
@@ -94,6 +102,21 @@ Instance : `PRG_02_Acquisition.instSimBench`, `Enable := GVL_Simulation.Simulati
 
 Chaque sous-modèle reste indépendant (pas d'inter-dépendance directe) ; `FB_SimBench` se contente
 de les appeler et d'assembler leurs sorties dans les 4 sous-images `ST_HardwareImage`.
+
+### 2.1 Capteur haut TOP & mou de câble — générés directement dans l'enveloppe
+
+Le capteur haut commun et le mou de câble ne sont pas des sous-modèles : ils sont générés
+directement dans `FB_SimBench` (sous-image `Winch`).
+
+| Signal | Comportement simulé |
+|---|---|
+| `M1M2_TopPositionFree_DI` | **Libre (TRUE) par défaut** — sain, cohérent avec le mou de câble. Ne dépend plus de la position M1. Seul le stimulus manuel `SimTopPositionActive` injecte un fait capteur : capteur actif ⇒ `FALSE`. |
+| `M2_TensionedCable_DI` | `TRUE` (câble tendu) — sain par défaut. |
+
+> 🆕 **Décision (régression `fc8115d9` corrigée)** : le modèle piloté par la position M1
+> (`TopPositionModelActive`/`CfgTopSensorRawPos`) est retiré. Il rendait le capteur TOP dépendant de
+> la position du treuil et bloquait la montée en simulation quand le treuil était en haut. Le
+> stimulus manuel `SimTopPositionActive` reste la seule source d'un fait capteur.
 
 ---
 
@@ -157,6 +180,7 @@ donc aucune régression de mouvement possible en changeant sa valeur à l'arrêt
 | 1 | ✅ résolu (ce lot) | Bit0 `M3_StatusWordSim` forcé à l'arrêt, faux Méca B permanent | REX 2026-08-14, voir §4 |
 | 2 | 🟡 ouvert | `T110` — sémantique réelle de `DriveStatusWord.0` sur AC600, à confirmer terrain/constructeur | `PLAN_TASK.md T110` |
 | 3 | ℹ️ sans conséquence connue | `FB_Sim_Safety.Enable` câblé en dur `TRUE`, contredit son propre commentaire d'en-tête | Voir `FB_Sim_Safety_v1.0.md §1` |
+| 4 | ✅ résolu (ce lot) | Capteur haut TOP piloté par la position M1 (régression `fc8115d9`), bloquait la montée en simu | Corrigé : sain (libre) par défaut, cohérent avec mou de câble — §2.1, TC-P13-014 |
 
 ---
 

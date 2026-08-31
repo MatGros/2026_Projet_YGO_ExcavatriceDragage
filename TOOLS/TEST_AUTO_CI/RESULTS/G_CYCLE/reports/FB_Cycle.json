@@ -7,7 +7,7 @@
       "passed": true
     },
     {
-      "name": "TC-P04-001 : Relachement manche (CycleMotionPermit=FALSE) stoppe les commandes sans perdre l etape",
+      "name": "TC-P04-001 : Relachement manche (JoystickDeflected=FALSE) stoppe les commandes sans perdre l etape",
       "passed": true
     },
     {
@@ -41,11 +41,15 @@
     {
       "name": "TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pas de redemarrage) (T192-A S1)",
       "passed": true
+    },
+    {
+      "name": "TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et compteur",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 10,
-    "passed": 10,
+    "total": 11,
+    "passed": 11,
     "failed": 0
   }
 }

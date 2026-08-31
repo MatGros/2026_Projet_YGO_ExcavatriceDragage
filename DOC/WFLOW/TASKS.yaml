@@ -5088,11 +5088,12 @@ tasks:
   - T202-E
 - id: T202-G
   parent_id: T202
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: G_CYCLE
   agent: Claude Code (orchestrateur)
   date: '2026-08-31T00:00:00'
+  updated_at: '2026-08-31T22:30:00'
   titre: 'T202-G — Réparer le filet CI G_CYCLE (harnais périmés) + couverture AF-04 must_survive'
   contexte: 'Baseline 2026-08-31 : run_tests.py --domain G_CYCLE = 0/4 PASS sur code
     NON modifié → aucun filet de non-régression pour T202. Causes : (1) registry.yaml
@@ -5113,6 +5114,13 @@ tasks:
     et test_fb_extractionassist.st (retirer FORCEMINSPEEDSTEP). 4) Ajouter af_doc:
     DOC/AF/AF_Partie-04...md sur l entrée FB_Cycle du registry pour activer le contrôle
     de cohérence AF↔tests (TC-P04-xxx). 5) Rejouer run_tests.py --domain G_CYCLE = 4/4 PASS.'
+  note: '✅ FAIT (2026-08-31) : registry FB_ExtractionAssist corrigé (E_ExtractionAssistState.st
+    + FB_ExtractionAssist.st) ; test_fb_cycle.st réécrit (CycleMotionPermit → JoystickDeflected)
+    + ajout TC-P04-SCEN-NOM (scène nominale X0→X13→X0, SampleCount 1x/cycle, rebouclage) ;
+    test_fb_divesearch.st et test_fb_extractionassist.st réécrits sur l interface actuelle ;
+    af_doc AF-04 ajouté sur FB_Cycle ; TC-P04-SCEN-NOM ajouté à la table AF-04. run_tests.py
+    --domain G_CYCLE = 4/4 PASS (FB_Cycle 11/11). WARNs non bloquants documentés : TC-P04-010/011
+    (couverts par test_fb_divesearch.st, pas test_fb_cycle.st) et TC-P04-022 (hors catalogue AF).'
   objectifs:
   - 'registry.yaml : entrée FB_ExtractionAssist correcte (nom + sources + test) ; af_doc AF-04 sur FB_Cycle'
   - 'test_fb_cycle.st compile et PASS sur le code actuel, sans membre/inp. disparu'
@@ -5376,4 +5384,26 @@ tasks:
   - 'Mettre à jour AF_Partie-10 §7.6 + fiche FB_WinchSync_v1.1'
   - 'G200 liaison PASS + bundle + gates palier C PASS'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T210.yaml
+  bloque_par: []
+- id: T211
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: TERRAIN
+  agent: HUM
+  date: '2026-09-01T00:00:00+02:00'
+  titre: Test terrain séquence de plongée (Dive) avec le Kobold — suite aux essais réels de la dernière mise en service
+  contexte: 'Suite aux essais réalisés en réel lors de la dernière mise en service :
+    valider sur site la séquence de plongée (Dive) avec le Kobold. Vérifier le comportement
+    réel de la recherche de fond (FB_DiveSearch), la qualification de fond Kobold, le
+    bridage Palier <= 4 en plongée et la transition vers l''extraction.'
+  description: 'Test terrain de la séquence de plongée avec le Kobold, suite aux essais
+    réels de la dernière mise en service. Couvre : descente en plongée, détection fond
+    Kobold (immersion + timeout), interdiction palier 5 en plongée, transition Dive →
+    Extraction. À exécuter sur machine réelle, à documenter dans une fiche de test terrain.'
+  contrat: ''
+  objectifs:
+  - 'Valider la séquence de plongée (Dive) avec le Kobold sur machine réelle'
+  - 'Vérifier la détection de fond Kobold (immersion + timeout) et le bridage Palier <= 4'
+  - 'Documenter les résultats dans une fiche de test terrain'
   bloque_par: []

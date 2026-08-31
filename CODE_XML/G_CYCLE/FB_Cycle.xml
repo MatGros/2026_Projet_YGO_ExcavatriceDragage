@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T12:06:44.659408" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T12:06:44.659408">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T20:06:42.872378" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T20:06:42.872378">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -575,6 +575,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine de securite OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFaultPresent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Defaut codeur agrege (cycle non autorise, T207)</xhtml>
               </documentation>
             </variable>
             <variable name="Mode">
@@ -1424,7 +1432,10 @@ ErrorEdge(CLK := Fault.Error);
 
 {region "§2 Gate securite &amp; Bascule Mode"}
 // 🛑 2. GATES DE SÉCURITÉ ET NEUTRALISATION
-IF NOT Enable OR NOT PowerContactorEngaged THEN
+// T207 : le mode SEMI_AUTO peut être sélectionné sous AU/défaut (FB_Modes), mais le cycle
+// ne tourne JAMAIS sans puissance (PowerContactorEngaged) ni avec un codeur défaillant
+// (EncoderFaultPresent) — les données de position invalides rendraient le Grafcet erroné.
+IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     WinchM1Cmd.ReqStartStop   := FALSE;
     WinchM1Cmd.ReqDirection   := 0;
     WinchM1Cmd.StepTgt        := 0;
@@ -1447,7 +1458,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     END_IF;
 
     CycleStep            := State;
-    CycleStateStr        := 'Cycle desactive : securite absente ou mode hors semi-auto';
+    CycleStateStr        := 'Cycle desactive : securite absente, defaut codeur ou mode hors semi-auto';
     Ready                := FALSE;
     Lifecycle.Busy       := FALSE;
     Lifecycle.Done       := FALSE;
@@ -1456,7 +1467,11 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     SpeedMismatchActive := FALSE;
     SpeedMismatchConfirmed := FALSE;
     OperatorActionId := 0;
-    OperatorAction := 'Passer en mode Semi-Auto et engager la securite pour activer le cycle.';
+    IF EncoderFaultPresent THEN
+        OperatorAction := 'Cycle non autorise : defaut codeur present. Reinitialiser le defaut codeur.';
+    ELSE
+        OperatorAction := 'Passer en mode Semi-Auto et engager la securite pour activer le cycle.';
+    END_IF;
     ExpectedAxis := E_OperatorAxis.NONE;
     ExpectedDirection := 0;
     WaitingForOperator := FALSE;
