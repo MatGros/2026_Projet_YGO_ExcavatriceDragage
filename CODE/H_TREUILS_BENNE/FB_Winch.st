@@ -275,10 +275,14 @@ ELSE
     RelayRev := FALSE;
 END_IF;
 
-Contactor1 := (StepNumber = 1);
-Contactor2 := (StepNumber = 2);
-Contactor3 := (StepNumber = 3);
-Contactor4 := (StepNumber = 4);
+// 🛡️ FIX contacteurs (audit CONTACTEURS_2026-08-31) : décodage THERMOMÈTRE CUMULATIF
+// (palier N = contacteurs 1..N tous pilotés), au lieu de l'ancien décodage one-hot
+// exclusif (ContactorN := StepNumber=N) qui éteignait les paliers inférieurs à
+// chaque montée de palier et ne couvrait pas le palier 5 (aucun contacteur).
+Contactor1 := (StepNumber >= 1);
+Contactor2 := (StepNumber >= 2);
+Contactor3 := (StepNumber >= 3);
+Contactor4 := (StepNumber >= 4);
 
 AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);

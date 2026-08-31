@@ -16,7 +16,7 @@ FUNCTION_BLOCK FB_TranslationCmdArbitrationM3
 VAR_INPUT
     Enable         : BOOL;  // --> [CMD] Autorisation FB (TRUE=arbitre actif)
     Joystick       : ST_AcquisitionJoystickQualified;   // --> [HW] Données joystick qualifiées (AxisX, DeadmanArmed)
-    Auth           : ST_fbModes_Autorisations;           // --> [CMD] Autorisations mode (Mode, MaintenanceM3TargetEnable)
+    Auth           : ST_Modes_Autorisations;           // --> [CMD] Autorisations mode (Mode, MaintenanceM3TargetEnable)
     ReqTranslation : ST_ProgramTranslationRequest;        // --> [REQ] Demande cycle translation (SEMI_AUTO)
     IHM            : ST_fbTranslationCmdArbitration_IHM;  // --> [CMD] Boutons IHM, sélecteur, fréquence
     TglJoystickMaster : BOOL;  // --> [CMD] Toggle joystick maître global (Modes.Cmd, source unique)

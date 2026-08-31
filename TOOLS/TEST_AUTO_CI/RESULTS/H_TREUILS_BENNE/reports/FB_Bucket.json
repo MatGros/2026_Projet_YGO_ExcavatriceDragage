@@ -15,6 +15,14 @@
       "passed": true
     },
     {
+      "name": "T196-001 Etat ferme publie apres atteinte de l offset",
+      "passed": true
+    },
+    {
+      "name": "T196-002 Etat ouvert publie apres atteinte de l offset",
+      "passed": true
+    },
+    {
       "name": "TC-P10-025 Demande benne refusee si M1_Busy OR M2_Busy a l entree (READY)",
       "passed": true
     },
@@ -79,15 +87,8 @@
       "passed": true
     },
     {
-      "name": "TC-P10-047.2 Boot incoherent IsOpen=TRUE ET IsClosed=TRUE -> StateIncoherent (attendu ROUGE)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE",
-        "file": "test_fb_bucket.st",
-        "line": 665,
-        "message": "Boot IsOpen ET IsClosed -> StateIncoherent=TRUE (code ne le traite pas)"
-      }
+      "name": "TC-P10-047.2 Boot incoherent IsOpen=TRUE ET IsClosed=TRUE -> StateIncoherent",
+      "passed": true
     },
     {
       "name": "TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle",
@@ -99,8 +100,8 @@
     }
   ],
   "summary": {
-    "total": 22,
-    "passed": 21,
-    "failed": 1
+    "total": 24,
+    "passed": 24,
+    "failed": 0
   }
 }

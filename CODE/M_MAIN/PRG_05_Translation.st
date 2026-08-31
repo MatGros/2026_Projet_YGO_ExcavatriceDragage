@@ -29,6 +29,9 @@ VAR
     ArbM3_Context               : ST_fbTranslationCmdArbitration_Context; // . [LOC] Contexte gating FB d'arbitrage M3
     ArbM3_Cfg                   : ST_fbTranslationCmdArbitration_Cfg;     // . [LOC] Config FB d'arbitrage M3 (fréquence max)
 
+    // 🔧 Config regroupée de FB_Translation (C3 — pattern NC-110/G380, source unique GVL_PERSISTENT)
+    TranslationCfg              : ST_fbTranslation_Cfg;                     // . [LOC] Cfg FB_Translation, assemblée depuis GVL_PERSISTENT
+
     // === 📊 STRUCTS INTERNES (publiés via Data) ===
     TranslationFinalInterlockRequest : ST_TranslationFinalInterlockRequest; // . [LOC] Demande finale et interlocks translation M3
     TranslationState                 : ST_TranslationState;                 // . [LOC] Etat public translation M3
@@ -64,6 +67,10 @@ VAR
     // indépendant du mouvement réel (rebond capteur mal filtré).
     TonM3ConfirmedMoving : TON;
     M3_ConfirmedMoving   : BOOL;
+
+    // 🕵️ Trace de blocage terrain (publiée via Data.TranslationTrace, consommée FB_TroubleshootingView)
+    TraceTranslation           : ST_TraceTranslation;        // . [LOC] Trace blocage translation M3
+    TraceTranslation_PrevReason : E_TranslationTraceBlockReason; // . [LOC] Cause précédente M3 (détection de changement)
 END_VAR
 
 {region "§0 Decodage position M3"}
@@ -285,6 +292,21 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 {region "§2 Pilotage translation M3"}
 // === ⚙️ §2 EXÉCUTION PILOTAGE TRANSLATION M3 ===
 
+// 🔧 Assemblage de la config FB_Translation (C3) — SOURCE UNIQUE : GVL_PERSISTENT.
+// Fini le double sourcing (rampes flat + vitesses d'approche via GVL_IHM.TranslationM3.Cfg).
+// Les 3 vitesses d'approche sont lues dans _TranslationCfgPersist (miroir persistant de
+// ST_TranslationCfg, synchronisé par FB_CfgPersistBridge_TranslationCfg dans PRG_07) — la
+// valeur reflète toute modification IHM persistée. Les délais (DirectionInterlockDelay,
+// CaptorDebounce, BrakeDelay*, BrakeFeedbackTimeout) restent aux valeurs défaut du struct
+// (non réglés IHM) — même comportement qu'avant (non câblés, défauts FB).
+TranslationCfg.CfgRampAccelRate           := _TranslationRampAccelRate_Pct;
+TranslationCfg.CfgRampDecelNormalRate     := _TranslationRampDecelNormal_Pct;
+TranslationCfg.CfgRampDecelFastRate       := _TranslationRampDecelFast_Pct;
+TranslationCfg.DriveFreqScaleMaxHz        := _TranslationMaxFreq_Hz;
+TranslationCfg.ApproachSpeedTremieHz      := _TranslationCfgPersist.CfgApproachSpeedTremie_Hz;
+TranslationCfg.ApproachSpeedMaintenanceHz := _TranslationCfgPersist.CfgApproachSpeedMaintenance_Hz;
+TranslationCfg.ApproachSpeedP1Hz          := _TranslationCfgPersist.CfgApproachSpeedP1_Hz;
+
 instTranslationM3(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE),
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -312,13 +334,7 @@ instTranslationM3(
     LimitSwitchRev          := M3_LimitSwitchRevStable,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
-    CfgRampAccelRate        := _TranslationRampAccelRate_Pct,
-    CfgRampDecelNormalRate  := _TranslationRampDecelNormal_Pct,
-    CfgRampDecelFastRate    := _TranslationRampDecelFast_Pct,
-    ApproachSpeedTremieHz       := GVL_IHM.TranslationM3.Cfg.CfgApproachSpeedTremie_Hz,
-    ApproachSpeedMaintenanceHz  := GVL_IHM.TranslationM3.Cfg.CfgApproachSpeedMaintenance_Hz,
-    ApproachSpeedP1Hz           := GVL_IHM.TranslationM3.Cfg.CfgApproachSpeedP1_Hz,
-    DriveFreqScaleMaxHz     := _TranslationMaxFreq_Hz,
+    Cfg                     := TranslationCfg,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.ContactorFeedback,
     BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
@@ -368,7 +384,13 @@ TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.Reque
 
 {region "§4 Publication etat IHM"}
 // === 📤 PUBLICATION ÉTAT TRANSLATION IHM (lecture seule) ===
-TranslationState.FBState := E_State.READY;
+IF instTranslationM3.Fault.Error THEN
+    TranslationState.FBState := E_State.ERROR;
+ELSIF ABS(instTranslationM3.RequestedDriveFreqHz) > 0.1 THEN
+    TranslationState.FBState := E_State.BUSY;
+ELSE
+    TranslationState.FBState := E_State.READY;
+END_IF;
 TranslationState.Ready := instTranslationM3.Ready;
 TranslationState.Busy := (ABS(instTranslationM3.RequestedDriveFreqHz) > 0.1);
 TranslationState.Done := instTranslationM3.TargetReached;
@@ -405,7 +427,13 @@ TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
 TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
-TranslationState.FinalInterlockState := E_State.READY;
+// 🛡️ Pas de sortie State sur FB_TranslationOutputInterlock : le "vrai état" de la
+// barrière finale M3 est dérivé de son défaut (READY normal / ERROR sur défaut barrière).
+IF PRG_06_Outputs.instTranslationOutputInterlockM3.Fault.Error THEN
+    TranslationState.FinalInterlockState := E_State.ERROR;
+ELSE
+    TranslationState.FinalInterlockState := E_State.READY;
+END_IF;
 TranslationState.FinalInterlockReason := PRG_06_Outputs.instTranslationOutputInterlockM3.Reason;
 TranslationState.FinalInterlockError := PRG_06_Outputs.instTranslationOutputInterlockM3.Fault.Error;
 TranslationState.FinalInterlockErrorId := PRG_06_Outputs.instTranslationOutputInterlockM3.Fault.ErrorId;
@@ -435,6 +463,54 @@ TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
 
+{region "§4bis Trace de blocage terrain M3 (ST_TraceTranslation)"}
+// === ↔️ §4bis TRACE DE BLOCAGE TERRAIN M3 (cause priorisée + horodatage) ===
+// Diagnostic lecture seule, publié via Data.TranslationTrace et consommé par FB_TroubleshootingView.
+// L'ordre IF/ELSIF EST l'ordre de priorité (cf. E_TranslationTraceBlockReason) : la cause la plus
+// grave gagne. BlockReasonTimestamp est latched au premier scan du changement (1 scan, mémoire).
+// Aucune action de conduite ne dépend de ces champs.
+TranslationTrace.SafeStopActive           := M3_SafeStop_Aggregate;
+TranslationTrace.SafeStopSourceInput      := M3_SafeStop_Active;
+TranslationTrace.SafeStopSourceSafety     := instSafetyTranslationM3.SafeStop;
+TranslationTrace.PowerCutOffActive        := instSafetyTranslationM3.PowerCutOff;
+TranslationTrace.HeightInterlockBlocking  := NOT M3_HeightInterlockOk;
+TranslationTrace.DriveOperational         := PRG_02_Acquisition.Data.Network.DriveM3.Operational;
+TranslationTrace.FinalInterlockError      := TranslationState.FinalInterlockError;
+
+// Permis de mouvement effectif = toutes les barrières levées (agrégat diagnostic)
+TranslationTrace.MotionPermitEffective := NOT M3_SafeStop_Aggregate
+    AND NOT instSafetyTranslationM3.PowerCutOff
+    AND M3_HeightInterlockOk
+    AND PRG_02_Acquisition.Data.Network.DriveM3.Operational
+    AND NOT TranslationState.FinalInterlockError
+    AND NOT instTranslationM3.Fault.Error;
+
+IF instSafetyTranslationM3.PowerCutOff THEN
+    TranslationTrace.BlockReason := E_TranslationTraceBlockReason.POWER_CUTOFF;
+ELSIF M3_SafeStop_Aggregate THEN
+    TranslationTrace.BlockReason := E_TranslationTraceBlockReason.SAFESTOP;
+ELSIF instSafetyTranslationM3.Fault.Error THEN
+    TranslationTrace.BlockReason := E_TranslationTraceBlockReason.SAFETY_FAULT;
+ELSIF NOT M3_HeightInterlockOk THEN
+    TranslationTrace.BlockReason := E_TranslationTraceBlockReason.HEIGHT_INTERLOCK;
+ELSIF NOT PRG_02_Acquisition.Data.Network.DriveM3.Operational THEN
+    TranslationTrace.BlockReason := E_TranslationTraceBlockReason.DRIVE_UNAVAILABLE;
+ELSIF TranslationState.FinalInterlockError THEN
+    TranslationTrace.BlockReason := E_TranslationTraceBlockReason.FINAL_INTERLOCK;
+ELSIF instTranslationM3.Fault.Error THEN
+    TranslationTrace.BlockReason := E_TranslationTraceBlockReason.FAULT;
+ELSE
+    TranslationTrace.BlockReason := E_TranslationTraceBlockReason.NONE;
+END_IF;
+IF TranslationTrace.BlockReason <> TraceTranslation_PrevReason THEN
+    TranslationTrace.BlockReasonTimestamp := TIME_TO_UDINT(TIME());
+END_IF;
+TraceTranslation_PrevReason := TranslationTrace.BlockReason;
+{endregion}
+
+// 🧩 Cause de blocage priorisée sur l'état public IHM (miroir de la trace terrain §4bis)
+TranslationState.AxisBlockReason := TranslationTrace.BlockReason;
+
 // === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_TranslationInterPrg) ===
 // Copie des structs internes vers le bus de sortie (producteur unique).
 Data.TranslationFinalInterlockRequest := TranslationFinalInterlockRequest;
@@ -445,6 +521,8 @@ Data.TranslationDone                  := instTranslationM3.TargetReached;
 Data.M3_AtTremieStable                := M3_AtTremieStable;
 Data.M3_AtP1Stable                    := M3_AtP1Stable;
 Data.M3_AtMaintenanceStable           := M3_AtMaintenanceStable;
+// 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView)
+Data.TranslationTrace                 := TranslationTrace;
 
 {endregion}
 END_PROGRAM

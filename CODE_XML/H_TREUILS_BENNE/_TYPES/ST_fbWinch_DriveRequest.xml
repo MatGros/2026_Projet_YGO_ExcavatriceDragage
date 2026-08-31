@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:17:44.781435" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:17:44.781435">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:31:29.908493" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:31:29.908493">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -32,7 +32,7 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRE DE MOUVEMENT ===
-TRUE = mouvement demandÃ©</xhtml>
+TRUE = mouvement demandé</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -56,8 +56,8 @@ TRUE = mouvement demandÃ©</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DE CLAMP (agrÃ©gÃ©es PRG_04) ===
-[cible] Plancher palier montÃ©e (usage aval)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DE CLAMP (agrégées PRG_04) ===
+[cible] Plancher palier montée (usage aval)</xhtml>
               </documentation>
             </variable>
             <variable name="MaxStepUp">
@@ -68,7 +68,7 @@ TRUE = mouvement demandÃ©</xhtml>
                 <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier montÃ©e (1..5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier montée (1..5)</xhtml>
               </documentation>
             </variable>
             <variable name="MinStepDown">
@@ -130,8 +130,8 @@ Position limite haute active (m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAMPS CONSERVÃ‰S (clamp interne FB_Winch) ===
-[08a] Vitesse limitÃ©e au palier 1 (approche homing)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAMPS CONSERVÉS (clamp interne FB_Winch) ===
+[08a] Vitesse limitée au palier 1 (approche homing)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -143,13 +143,13 @@ Position limite haute active (m)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ðŸª ST_fbWinch_DriveRequest â€” RequÃªte d'axe treuil (producteur PRG_04)
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ðŸŽ¯ RÃ´le : Demande de mouvement, palier et bornes de clamp d'un treuil
-   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   ðŸ“¤ Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
-   ðŸ“¥ Consommateur : FB_Winch
-   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+   🪝 ST_fbWinch_DriveRequest — Requête d'axe treuil (producteur PRG_04)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Demande de mouvement, palier et bornes de clamp d'un treuil
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
+   📥 Consommateur : FB_Winch
+   🔒 Structs cibles + champs conservés pour garder le décodage %→palier
       et le clamp DANS FB_Winch (comportement bit-identique).
       SpeedStepReq est consommé par FB_Winch (§5) ; MinStepUp est déclaré
       mais non consommé (usage aval).

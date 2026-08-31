@@ -63,7 +63,7 @@ VAR_OUTPUT
     Fault                   : ST_Fault;
 
     // === BUS D'AUTORISATIONS ARBITREES ===
-    Auth                    : ST_fbModes_Autorisations; // <-- [STAT] Bus d'autorisations typees machine
+    Auth                    : ST_Modes_Autorisations; // <-- [STAT] Bus public d'autorisations machine (NC-110)
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===

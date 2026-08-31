@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:20:46.311902" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:20:46.311902">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:40:03.992710" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:40:03.992710">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,6 +23,99 @@
   </contentHeader>
   <types>
     <dataTypes>
+      <dataType name="E_WinchTraceBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="POWER_CUTOFF" value="1" />
+              <value name="AXIS_DISABLED" value="2" />
+              <value name="SAFESTOP" value="3" />
+              <value name="SAFETY_FAULT" value="4" />
+              <value name="SAFETY_PERMIT_MISSING" value="5" />
+              <value name="PROCESS_PERMIT_MISSING" value="6" />
+              <value name="COUPLING_BLOCKED" value="7" />
+              <value name="WINCH_FAULT" value="8" />
+              <value name="FINAL_INTERLOCK_BLOCKED" value="9" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage - au moins un sens effectivement permis</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont (instSafetyWinch.PowerCutOff) - priorite max</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AXIS_DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Axe neutralise (Mode=DISABLE ou InhibitMx -&gt; Enable FALSE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFESTOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop effectif (rampe rapide demandee)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut safety latched (FB_Safety_Winch.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_PERMIT_MISSING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun sens ne delivre de permit safety (limite / mou de cable / homing)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>PROCESS_PERMIT_MISSING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Permit process absent (benne / fond Kobold / limite legale / extraction)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>COUPLING_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Couplage synchro anti-telescopage (l'autre axe bloque)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WINCH_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut treuil latched (FB_Winch.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FINAL_INTERLOCK_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Barriere finale en defaut (frein / redemarrage)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>96d04ade-707d-5249-90f0-8daa4cdfac0f</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="ST_BucketHMIState">
         <baseType>
           <struct>
@@ -586,6 +679,141 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_TraceWinch">
+        <baseType>
+          <struct>
+            <variable name="DescendPermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis effectifs par sens (reflet exact des permis appliques au mouvement)
+Descente effectivement permise (EffectivePermit*_Descend)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee effectivement permise (EffectivePermit*_Ascent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Source de SafeStop / coupure - pour distinguer l'origine du blocage
+SafeStop effectif applique (SafeStop*_Active)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSourceSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop issu de FB_Safety_Winch (defaut safety)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSourceInput">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop issu du module d'entree / homing / slip benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSourceSync">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop issu de la synchro M1/M2 (couplage anti-telescopage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont active (instSafetyWinch.PowerCutOff)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Inhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Axe neutralise (Mode=DISABLE ou InhibitMx)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalInterlockError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Barriere finale (fin de course mecanique / frein / redemarrage)
+Defaut barriere finale (frein / redemarrage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalInterlockReason">
+              <type>
+                <derived name="E_WinchFinalInterlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause barriere finale memorisee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockReason">
+              <type>
+                <derived name="E_WinchTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause de blocage priorisee + horodatage
+Cause de blocage prioritaire</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockReasonTimestamp">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ms depuis demarrage PLC (TIME()) - dernier changement de BlockReason</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepNumber">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier de vitesse actif (WinchState.StepNumber)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>433bbcb3-dea9-55c2-b301-a41628e1f283</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_TraceWinch - Trace de blocage terrain d'un treuil M1/M2
+   -----------------------------------------------------------------------
+   Role : Publier au technicien une vue consolidee "pourquoi l'axe ne bouge
+   pas" : permis effectifs par sens, source du SafeStop/coupure, cause de
+   blocage priorisee et horodatee.
+   Producteur unique : PRG_04_Treuils_Benne (#8bis) - 1 instance par axe
+       (TraceM1 / TraceM2 au sein de ST_WinchInterPrg).
+   Consommateur : FB_TroubleshootingView (pure recopie -&gt; GVL_Troubleshooting).
+   Lecture seule - aucun calcul de commande n'en depend.
+   BlockReasonTimestamp : ms depuis demarrage PLC (TIME()), latched au dernier
+       changement de BlockReason (1 scan, memoire).
+   Doc metier : DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_WinchFinalInterlockRequest">
         <baseType>
           <struct>
@@ -865,6 +1093,23 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Treuil M2 — limite de position levée</xhtml>
               </documentation>
             </variable>
+            <variable name="TraceM1">
+              <type>
+                <derived name="ST_TraceWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView) ===
+🕵️ Trace blocage treuil M1 (cause priorisée + horodatage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TraceM2">
+              <type>
+                <derived name="ST_TraceWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕵️ Trace blocage treuil M2 (cause priorisée + horodatage)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -1000,6 +1245,14 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_Winch)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisBlockReason">
+              <type>
+                <derived name="E_WinchTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Cause prioritaire de blocage (miroir de TraceMx.BlockReason)</xhtml>
               </documentation>
             </variable>
             <variable name="Ready">
@@ -1653,7 +1906,7 @@ Delai interlock changement de sens montee</xhtml>
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOMBÃ‰E CONTACTEURS ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOMBÉE CONTACTEURS ===
 Delai d'attente retombee des contacteurs</xhtml>
               </documentation>
             </variable>
@@ -1688,7 +1941,7 @@ Distance d'approche avant limite pour ralentir (m)</xhtml>
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DÃ‰CODAGE %â†’PALIER (conservÃ©) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DÉCODAGE %→PALIER (conservé) ===
 [08a] Marge d'hysteresis palier (%)</xhtml>
               </documentation>
             </variable>
@@ -1701,16 +1954,16 @@ Distance d'approche avant limite pour ralentir (m)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ðŸª ST_fbWinch_Cfg â€” Configuration statique d'un treuil
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ðŸŽ¯ RÃ´le : RÃ©glages persistants propres Ã  l'instance treuil (statique)
-   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   ðŸ“¤ Producteur : configuration persistante
-   ðŸ“¥ Consommateur : FB_Winch (statique uniquement)
-   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+   🪝 ST_fbWinch_Cfg — Configuration statique d'un treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Réglages persistants propres à l'instance treuil (statique)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : configuration persistante
+   📥 Consommateur : FB_Winch (statique uniquement)
+   🔒 Structs cibles + champs conservés pour garder le décodage %→palier
       et les deux cadences de rampe DANS FB_Winch (comportement
-      bit-identique). Le champ StepRampDelay est dÃ©clarÃ© mais non
-      consommÃ© (usage aval).
+      bit-identique). Le champ StepRampDelay est déclaré mais non
+      consommé (usage aval).
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1723,7 +1976,7 @@ Distance d'approche avant limite pour ralentir (m)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRE DE MOUVEMENT ===
-TRUE = mouvement demandÃ©</xhtml>
+TRUE = mouvement demandé</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -1747,8 +2000,8 @@ TRUE = mouvement demandÃ©</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DE CLAMP (agrÃ©gÃ©es PRG_04) ===
-[cible] Plancher palier montÃ©e (usage aval)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DE CLAMP (agrégées PRG_04) ===
+[cible] Plancher palier montée (usage aval)</xhtml>
               </documentation>
             </variable>
             <variable name="MaxStepUp">
@@ -1759,7 +2012,7 @@ TRUE = mouvement demandÃ©</xhtml>
                 <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier montÃ©e (1..5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier montée (1..5)</xhtml>
               </documentation>
             </variable>
             <variable name="MinStepDown">
@@ -1821,8 +2074,8 @@ Position limite haute active (m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAMPS CONSERVÃ‰S (clamp interne FB_Winch) ===
-[08a] Vitesse limitÃ©e au palier 1 (approche homing)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAMPS CONSERVÉS (clamp interne FB_Winch) ===
+[08a] Vitesse limitée au palier 1 (approche homing)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1834,13 +2087,13 @@ Position limite haute active (m)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ðŸª ST_fbWinch_DriveRequest â€” RequÃªte d'axe treuil (producteur PRG_04)
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ðŸŽ¯ RÃ´le : Demande de mouvement, palier et bornes de clamp d'un treuil
-   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   ðŸ“¤ Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
-   ðŸ“¥ Consommateur : FB_Winch
-   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+   🪝 ST_fbWinch_DriveRequest — Requête d'axe treuil (producteur PRG_04)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Demande de mouvement, palier et bornes de clamp d'un treuil
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
+   📥 Consommateur : FB_Winch
+   🔒 Structs cibles + champs conservés pour garder le décodage %→palier
       et le clamp DANS FB_Winch (comportement bit-identique).
       SpeedStepReq est consommé par FB_Winch (§5) ; MinStepUp est déclaré
       mais non consommé (usage aval).
@@ -1855,7 +2108,7 @@ Position limite haute active (m)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== POSITION ET RÃ‰FÃ‰RENCEMENT ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== POSITION ET RÉFÉRENCEMENT ===
 Position actuelle du cable (m)</xhtml>
               </documentation>
             </variable>
@@ -1881,7 +2134,7 @@ Position actuelle du cable (m)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS CONTACTEURS ===
-TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
+TRUE = relais sens + C1..C4 tous retombés (ex-FwdRevSpeedFeedbackOff)</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedMps">
@@ -1890,7 +2143,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE VITESSE ===
-[cible] Mesure vitesse rÃ©elle (m/s) â€” usage aval</xhtml>
+[cible] Mesure vitesse réelle (m/s) — usage aval</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedValid">
@@ -1898,7 +2151,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Mesure exploitable â€” usage aval</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Mesure exploitable — usage aval</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedBand">
@@ -1909,7 +2162,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Bande vitesse rÃ©elle validÃ©e (garde-fou conservÃ© dans FB_Winch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Bande vitesse réelle validée (garde-fou conservé dans FB_Winch)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedGuardEnable">
@@ -1920,7 +2173,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GARDE-FOU VITESSE (conservÃ©) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GARDE-FOU VITESSE (conservé) ===
 [08a] Activation garde-fou changement de palier</xhtml>
               </documentation>
             </variable>
@@ -1932,7 +2185,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Conditions de stabilitÃ© validÃ©es</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Conditions de stabilité validées</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1944,16 +2197,16 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ðŸª ST_fbWinch_Sensors â€” Mesures et feedbacks d'un treuil
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ðŸŽ¯ RÃ´le : Retours physiques et mesures propres Ã  l'instance treuil
-   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   ðŸ“¤ Producteur : PRG_04_Treuils_Benne / acquisition
-   ðŸ“¥ Consommateur : FB_Winch
-   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le garde-fou vitesse
+   🪝 ST_fbWinch_Sensors — Mesures et feedbacks d'un treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Retours physiques et mesures propres à l'instance treuil
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : PRG_04_Treuils_Benne / acquisition
+   📥 Consommateur : FB_Winch
+   🔒 Structs cibles + champs conservés pour garder le garde-fou vitesse
       DANS FB_Winch (comportement bit-identique). Les champs
-      MeasuredSpeedMps / MeasuredSpeedValid sont dÃ©clarÃ©s mais non
-      consommÃ©s (usage aval).
+      MeasuredSpeedMps / MeasuredSpeedValid sont déclarés mais non
+      consommés (usage aval).
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -2312,6 +2565,117 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_Modes_Autorisations">
+        <baseType>
+          <struct>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitre (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickWinchSelectArbitrated">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couples nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingApproachEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement butee haut (N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceM3TargetEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 #4bis - matrice de maintenance
+Ces trois champs sont des FAITS/DIAGS publies, pas des autorisations : ils
+restent vrais meme quand le FB est neutralise par Enable=FALSE (etat persistant).
+Demande de changement de mode REFUSEE : les treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas a l'arret mecanique confirme (contacteurs
+retombes ET frein serre ET |v| &lt; seuil). Mode courant maintenu.
+M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : idem</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fd63c0a6-3caa-5a6f-9077-b79ee39469f5</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_Modes_Autorisations - Bus public d'autorisations du mode machine
+   -----------------------------------------------------------------------
+   Doc metier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md #2
+   NC-110 : le prefixe ST_fb* est reserve aux DUT propriete d'un seul FB.
+      Ce DUT est un BUS multi-consommateurs (&gt;=6 domaines : Cycle, Safety,
+      Treuils, Translation, Supervision, Acquisition) -&gt; renomme
+      ST_Modes_Autorisations (bus de domaine public, sans le prefixe FB).
+   Produit par FB_Modes (via PRG_03_Modes_Cycle)
+      Consomme par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
+   Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_ProgramBucketRequest">
         <baseType>
           <struct>
@@ -2385,116 +2749,6 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
    🎯 Rôle : Regroupe les demandes logiques de manœuvre benne et mesure Kobold
    📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_fbModes_Autorisations">
-        <baseType>
-          <struct>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SyncEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InhibitM1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InhibitM2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickWinchSelectArbitrated">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingApproachEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dépassement butée haut (N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintenanceM3TargetEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ModeChangePendingBlocked">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 §4bis — matrice de maintenance
-⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
-vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l'IHM).
-🚦 Demande de changement de mode REFUSÉE : les treuils</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingRequiredM1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas à l'arrêt mécanique confirmé
-(contacteurs retombés ET frein serré ET |v| &lt; seuil).
-Le mode courant est maintenu. IHM : « arrêter les
-treuils avant de changer de mode ».
-🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingRequiredM2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(usage effectif d'un override/bypass position en maintenance)
-🧭 M2 : idem</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>98f7d0df-d5cd-5d76-b6a8-e5e391c63538</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
-                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
-   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
-      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
-   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_ContactorCheck">
@@ -2685,204 +2939,6 @@ treuils avant de changer de mode ».
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_SpeedStepTable">
-        <baseType>
-          <struct>
-            <variable name="P1R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 1 (VITESSE MINIMALE) ===
-Contacteur 1 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P1R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P1R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P1R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 2 ===
-Contacteur 1 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 3 ===
-Contacteur 1 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 4 ===
-Contacteur 1 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 5 (VITESSE MAXIMALE) ===
-Contacteur 1 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepThreshold_Pct">
-              <type>
-                <array>
-                  <dimension lower="1" upper="5" />
-                  <baseType>
-                    <REAL />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SEUILS DE TRANSITION (%) ===
-Seuils de changement de palier (0..100%)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>fbfd953e-d8b9-5242-babe-f7521771609a</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_WinchBothIntent">
         <baseType>
           <struct>
@@ -3023,6 +3079,7 @@ Seuils de changement de palier (0..100%)</xhtml>
               <value name="BUSY" value="3" />
               <value name="DONE" value="4" />
               <value name="STOPPING" value="5" />
+              <value name="ERROR" value="6" />
             </values>
           </enum>
         </baseType>
@@ -3063,6 +3120,12 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <Name>STOPPING</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut actif non acquitté (FB en erreur — HMI non aveugle)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -3354,6 +3417,204 @@ Seuils de changement de palier (0..100%)</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des informations et diagnostics des codeurs.
    ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SpeedStepTable">
+        <baseType>
+          <struct>
+            <variable name="P1R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 1 (VITESSE MINIMALE) ===
+Contacteur 1 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 2 ===
+Contacteur 1 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 3 ===
+Contacteur 1 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 4 ===
+Contacteur 1 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 5 (VITESSE MAXIMALE) ===
+Contacteur 1 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepThreshold_Pct">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SEUILS DE TRANSITION (%) ===
+Seuils de changement de palier (0..100%)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fbfd953e-d8b9-5242-babe-f7521771609a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_fbJoystick_AxisCmd">
@@ -4305,6 +4566,39 @@ l'armement du re-homing obligatoire publié vers PRG_03 (PositionLimitOverridden
                 <BOOL />
               </type>
             </variable>
+            <variable name="TraceM1">
+              <type>
+                <derived name="ST_TraceWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕵️ Trace de blocage terrain (§8bis) — publiée via Data.TraceM1/M2, consommée FB_TroubleshootingView
+. [LOC] Trace blocage treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TraceM2">
+              <type>
+                <derived name="ST_TraceWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Trace blocage treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TraceM1_PrevReason">
+              <type>
+                <derived name="E_WinchTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cause précédente M1 (détection de changement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TraceM2_PrevReason">
+              <type>
+                <derived name="E_WinchTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cause précédente M2 (détection de changement)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -4476,8 +4770,7 @@ instArbM1(
     IHM        := ArbIHM,
     TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext,
-    Cfg        := ArbM1Cfg,
-    SpeedStepTable := _WinchSpeedStepTable
+    Cfg        := ArbM1Cfg
 );
 M1LogicRequestStartStop := instArbM1.StartStop;
 M1LogicRequestDirection := instArbM1.Direction;
@@ -4499,8 +4792,7 @@ instArbM2(
     IHM        := ArbIHM,
     TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext,
-    Cfg        := ArbM2Cfg,
-    SpeedStepTable := _WinchSpeedStepTable
+    Cfg        := ArbM2Cfg
 );
 M2LogicRequestStartStop := instArbM2.StartStop;
 M2LogicRequestDirection := instArbM2.Direction;
@@ -5129,7 +5421,13 @@ M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps;
 WinchM1State.Position_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
 WinchM1State.SpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct;
 WinchM1State.StepNumber := instWinchM1.StepNumber;
-WinchM1State.FBState := E_State.READY;
+IF instWinchM1.Fault.Error THEN
+    WinchM1State.FBState := E_State.ERROR;
+ELSIF instWinchM1.StepNumber &gt; 0 THEN
+    WinchM1State.FBState := E_State.BUSY;
+ELSE
+    WinchM1State.FBState := E_State.READY;
+END_IF;
 WinchM1State.Ready := instWinchM1.Ready;
 WinchM1State.Busy := (instWinchM1.StepNumber &gt; 0);
 WinchM1State.Done := FALSE;
@@ -5147,8 +5445,8 @@ WinchM1State.FinalAuthorizedStep := instWinchM1.RequestedStep;
 WinchM1State.ContactorsCheck := instWinchM1.ContactorsCheck;
 WinchM1State.FinalInterlockState := PRG_06_Outputs.instWinchOutputInterlockM1.State;
 WinchM1State.FinalInterlockReason := PRG_06_Outputs.instWinchOutputInterlockM1.Reason;
-WinchM1State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM1.Error;
-WinchM1State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM1.ErrorId;
+WinchM1State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM1.Fault.Error;
+WinchM1State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM1.Fault.ErrorId;
 WinchM1State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM1.RestartInhibit;
 WinchM1State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeoutElapsed;
 WinchM1State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.RestartDelayElapsed;
@@ -5186,7 +5484,13 @@ M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps;
 WinchM2State.Position_M := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 WinchM2State.SpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct;
 WinchM2State.StepNumber := instWinchM2.StepNumber;
-WinchM2State.FBState := E_State.READY;
+IF instWinchM2.Fault.Error THEN
+    WinchM2State.FBState := E_State.ERROR;
+ELSIF instWinchM2.StepNumber &gt; 0 THEN
+    WinchM2State.FBState := E_State.BUSY;
+ELSE
+    WinchM2State.FBState := E_State.READY;
+END_IF;
 WinchM2State.Ready := instWinchM2.Ready;
 WinchM2State.Busy := (instWinchM2.StepNumber &gt; 0);
 WinchM2State.Done := FALSE;
@@ -5204,8 +5508,8 @@ WinchM2State.FinalAuthorizedStep := instWinchM2.RequestedStep;
 WinchM2State.ContactorsCheck := instWinchM2.ContactorsCheck;
 WinchM2State.FinalInterlockState := PRG_06_Outputs.instWinchOutputInterlockM2.State;
 WinchM2State.FinalInterlockReason := PRG_06_Outputs.instWinchOutputInterlockM2.Reason;
-WinchM2State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM2.Error;
-WinchM2State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM2.ErrorId;
+WinchM2State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM2.Fault.Error;
+WinchM2State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM2.Fault.ErrorId;
 WinchM2State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM2.RestartInhibit;
 WinchM2State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.BrakeTimeoutElapsed;
 WinchM2State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.RestartDelayElapsed;
@@ -5302,11 +5606,23 @@ SyncState.SyncDeviationWarn := instWinchSync.SyncDeviationWarn;
 SyncState.Ready := instWinchSync.Ready;
 SyncState.Error := instWinchSync.Fault.Error;
 SyncState.ErrorId := instWinchSync.Fault.ErrorId;
-SyncState.FBState := E_State.READY;
+IF instWinchSync.Fault.Error THEN
+    SyncState.FBState := E_State.ERROR;
+ELSIF instWinchSync.SyncActive THEN
+    SyncState.FBState := E_State.BUSY;
+ELSE
+    SyncState.FBState := E_State.READY;
+END_IF;
 
 BucketState.MechState := _BucketState;
 BucketState.MechState.ActiveOffsetValid := instBucket.ActiveOffsetValid;
-BucketState.FBState := E_State.READY;
+IF instBucket.Fault.Error THEN
+    BucketState.FBState := E_State.ERROR;
+ELSIF instBucket.Lifecycle.Busy THEN
+    BucketState.FBState := E_State.BUSY;
+ELSE
+    BucketState.FBState := E_State.READY;
+END_IF;
 BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
 BucketState.M2StartStop := instBucket.M2_StartStop;
 BucketState.M2Direction := instBucket.M2_Direction;
@@ -5344,6 +5660,104 @@ Benne_IsRoughlyClosed := _BucketState.IsClosed
     OR (_BucketState.IsIntermediate
         AND (instBucket.DeltaPosition_M &gt;= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)));
 
+{region "§8bis Trace de blocage terrain M1/M2 (ST_TraceWinch)"}
+// === 🕵️ §8bis TRACE DE BLOCAGE TERRAIN (cause priorisée + horodatage) ===
+// Diagnostic lecture seule, publié via Data.TraceM1/M2 et consommé par FB_TroubleshootingView.
+// L'ordre IF/ELSIF EST l'ordre de priorité (cf. E_WinchTraceBlockReason) : la cause la plus
+// grave gagne. BlockReasonTimestamp est latched au premier scan du changement (1 scan, mémoire).
+// Aucune action de conduite ne dépend de ces champs.
+
+// --- M1 ---
+TraceM1.DescendPermitEffective := EffectivePermitM1_Descend;
+TraceM1.AscentPermitEffective  := EffectivePermitM1_Ascent;
+TraceM1.SafeStopActive         := SafeStopM1_Active;
+TraceM1.SafeStopSourceSafety   := instSafetyWinchM1.SafeStop;
+TraceM1.SafeStopSourceInput    := PRG_02_Acquisition.Data.InputModules.Fault
+                                  OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss
+                                  OR instBucket.M1SlipDetected;
+TraceM1.SafeStopSourceSync     := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000)
+                                  OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
+TraceM1.PowerCutOffActive      := instSafetyWinchM1.PowerCutOff;
+TraceM1.Inhibited              := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE)
+                                  OR PRG_03_Modes_Cycle.Data.Auth.InhibitM1;
+TraceM1.FinalInterlockError    := WinchM1State.FinalInterlockError;
+TraceM1.FinalInterlockReason   := WinchM1State.FinalInterlockReason;
+TraceM1.StepNumber             := WinchM1State.StepNumber;
+
+IF instSafetyWinchM1.PowerCutOff THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.POWER_CUTOFF;
+ELSIF TraceM1.Inhibited THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.AXIS_DISABLED;
+ELSIF SafeStopM1_Active THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.SAFESTOP;
+ELSIF instSafetyWinchM1.Fault.Error THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.SAFETY_FAULT;
+ELSIF NOT (SafetyPermitM1_Ascent OR SafetyPermitM1_Descend) THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.SAFETY_PERMIT_MISSING;
+ELSIF NOT (ProcessPermitM1_Ascent OR ProcessPermitM1_Descend) THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.PROCESS_PERMIT_MISSING;
+ELSIF NOT (EffectivePermitM1_Ascent OR EffectivePermitM1_Descend) THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.COUPLING_BLOCKED;
+ELSIF instWinchM1.Fault.Error THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.WINCH_FAULT;
+ELSIF WinchM1State.FinalInterlockError THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.FINAL_INTERLOCK_BLOCKED;
+ELSE
+    TraceM1.BlockReason := E_WinchTraceBlockReason.NONE;
+END_IF;
+IF TraceM1.BlockReason &lt;&gt; TraceM1_PrevReason THEN
+    TraceM1.BlockReasonTimestamp := TIME_TO_UDINT(TIME());
+END_IF;
+TraceM1_PrevReason := TraceM1.BlockReason;
+
+// --- M2 ---
+TraceM2.DescendPermitEffective := EffectivePermitM2_Descend;
+TraceM2.AscentPermitEffective  := EffectivePermitM2_Ascent;
+TraceM2.SafeStopActive         := SafeStopM2_Active;
+TraceM2.SafeStopSourceSafety   := instSafetyWinchM2.SafeStop;
+TraceM2.SafeStopSourceInput    := PRG_02_Acquisition.Data.InputModules.Fault
+                                  OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
+TraceM2.SafeStopSourceSync     := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000)
+                                  OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
+TraceM2.PowerCutOffActive      := instSafetyWinchM2.PowerCutOff;
+TraceM2.Inhibited              := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE)
+                                  OR PRG_03_Modes_Cycle.Data.Auth.InhibitM2;
+TraceM2.FinalInterlockError    := WinchM2State.FinalInterlockError;
+TraceM2.FinalInterlockReason   := WinchM2State.FinalInterlockReason;
+TraceM2.StepNumber             := WinchM2State.StepNumber;
+
+IF instSafetyWinchM2.PowerCutOff THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.POWER_CUTOFF;
+ELSIF TraceM2.Inhibited THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.AXIS_DISABLED;
+ELSIF SafeStopM2_Active THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.SAFESTOP;
+ELSIF instSafetyWinchM2.Fault.Error THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.SAFETY_FAULT;
+ELSIF NOT (SafetyPermitM2_Ascent OR SafetyPermitM2_Descend) THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.SAFETY_PERMIT_MISSING;
+ELSIF NOT (ProcessPermitM2_Ascent OR ProcessPermitM2_Descend) THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.PROCESS_PERMIT_MISSING;
+ELSIF NOT (EffectivePermitM2_Ascent OR EffectivePermitM2_Descend) THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.COUPLING_BLOCKED;
+ELSIF instWinchM2.Fault.Error THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.WINCH_FAULT;
+ELSIF WinchM2State.FinalInterlockError THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.FINAL_INTERLOCK_BLOCKED;
+ELSE
+    TraceM2.BlockReason := E_WinchTraceBlockReason.NONE;
+END_IF;
+IF TraceM2.BlockReason &lt;&gt; TraceM2_PrevReason THEN
+    TraceM2.BlockReasonTimestamp := TIME_TO_UDINT(TIME());
+END_IF;
+TraceM2_PrevReason := TraceM2.BlockReason;
+
+{endregion}
+
+// 🧩 Cause de blocage priorisée sur l'état public IHM (miroir de la trace terrain §8bis)
+WinchM1State.AxisBlockReason := TraceM1.BlockReason;
+WinchM2State.AxisBlockReason := TraceM2.BlockReason;
+
 // === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_WinchInterPrg) ===
 // Copie des structs internes vers le bus de sortie (producteur unique).
 Data.WinchM1FinalInterlockRequest := WinchM1FinalInterlockRequest;
@@ -5367,6 +5781,9 @@ Data.ArmingPermit                 := ArmingPermit;
 // Usage effectif d'un override/bypass de position (consommé PRG_03 → FB_Modes)
 Data.PositionLimitOverriddenM1    := PositionLimitOverriddenM1;
 Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
+// 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView)
+Data.TraceM1                      := TraceM1;
+Data.TraceM2                      := TraceM2;
 
 {endregion}
 </xhtml>
@@ -5988,7 +6405,10 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Premier cycle &amp; recalage boutons IHM"}
 IF FirstCycle THEN
     FirstCycle := FALSE;
-    IF NOT BucketState.IsOpen AND NOT BucketState.IsClosed THEN
+    // Une seule position doit être qualifiée au démarrage : ni l'une ni l'autre
+    // ou les deux simultanément signifient que la mémorisation n'est pas fiable.
+    IF (BucketState.IsOpen AND BucketState.IsClosed)
+       OR (NOT BucketState.IsOpen AND NOT BucketState.IsClosed) THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
 END_IF;
@@ -6181,7 +6601,7 @@ BucketState.ActiveOffsetValid := ActiveOffsetValid;
             </variable>
             <variable name="Auth">
               <type>
-                <derived name="ST_fbModes_Autorisations" />
+                <derived name="ST_Modes_Autorisations" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisations mode (Mode, gating séquencement couplé)</xhtml>
@@ -8056,10 +8476,14 @@ ELSE
     RelayRev := FALSE;
 END_IF;
 
-Contactor1 := (StepNumber = 1);
-Contactor2 := (StepNumber = 2);
-Contactor3 := (StepNumber = 3);
-Contactor4 := (StepNumber = 4);
+// 🛡️ FIX contacteurs (audit CONTACTEURS_2026-08-31) : décodage THERMOMÈTRE CUMULATIF
+// (palier N = contacteurs 1..N tous pilotés), au lieu de l'ancien décodage one-hot
+// exclusif (ContactorN := StepNumber=N) qui éteignait les paliers inférieurs à
+// chaque montée de palier et ne couvrait pas le palier 5 (aucun contacteur).
+Contactor1 := (StepNumber &gt;= 1);
+Contactor2 := (StepNumber &gt;= 2);
+Contactor3 := (StepNumber &gt;= 3);
+Contactor4 := (StepNumber &gt;= 4);
 
 AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);
@@ -8132,7 +8556,7 @@ PrevStepNumber := StepNumber;
             </variable>
             <variable name="Auth">
               <type>
-                <derived name="ST_fbModes_Autorisations" />
+                <derived name="ST_Modes_Autorisations" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisations mode (Mode, JoystickWinchSelectArbitrated)</xhtml>
@@ -8184,14 +8608,6 @@ PrevStepNumber := StepNumber;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier boutons/both (BtnStepTgt)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepTable">
-              <type>
-                <derived name="ST_SpeedStepTable" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table paliers (conservée pour compat interface ; plus de conversion %→palier ici)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -8359,7 +8775,7 @@ END_IF;
             </variable>
             <variable name="Auth">
               <type>
-                <derived name="ST_fbModes_Autorisations" />
+                <derived name="ST_Modes_Autorisations" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisations mode (Mode, JoystickWinchSelectArbitrated)</xhtml>
@@ -8411,14 +8827,6 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse override benne</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepTable">
-              <type>
-                <derived name="ST_SpeedStepTable" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table paliers (conservée pour compat interface ; plus de conversion %→palier ici)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -10637,6 +11045,32 @@ END_IF;
         <Folder Name="M_MAIN">
           <Object Name="PRG_04_Treuils_Benne" ObjectId="8dae74a3-6bd7-5bdb-8b05-9ae37b0ffd4d" />
         </Folder>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="E_WinchTraceBlockReason" ObjectId="96d04ade-707d-5249-90f0-8daa4cdfac0f" />
+              <Object Name="ST_BucketHMIState" ObjectId="ea0b3689-7d29-5817-9b66-52896d468768" />
+              <Object Name="ST_SafetyWinch" ObjectId="3a43f912-4348-5c66-b0c2-9405e5e3ae59" />
+              <Object Name="ST_TraceWinch" ObjectId="433bbcb3-dea9-55c2-b301-a41628e1f283" />
+              <Object Name="ST_WinchFinalInterlockRequest" ObjectId="1a0be5b9-7748-52ea-86e2-35102e49b3f8" />
+              <Object Name="ST_WinchInterPrg" ObjectId="3ec62512-5b23-55ca-ae68-cc9ed0fefa58" />
+              <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
+            </Folder>
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
+            </Folder>
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
+              <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
+              <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
+              <Object Name="ST_WinchBothIntent" ObjectId="27a8fd28-e07a-5ea0-8328-eea98b482fb9" />
+            </Folder>
+            <Folder Name="4_JOYSTICK_ACQUISITION">
+              <Object Name="ST_AcquisitionJoystickQualified" ObjectId="e915927d-33f8-504a-9060-48dca13140d7" />
+              <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
+            </Folder>
+          </Folder>
+        </Folder>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="BENNE">
             <Object Name="FB_Bucket" ObjectId="82efa9a6-05fa-5372-9d4c-1316f7f70a0b" />
@@ -10667,35 +11101,11 @@ END_IF;
             <Object Name="ST_fbWinch_Cfg" ObjectId="6e031a4e-ea7c-5444-b4f1-495452dd1ae8" />
             <Object Name="ST_fbWinch_DriveRequest" ObjectId="45e51157-f25e-5b78-83e7-e1b47077800c" />
             <Object Name="ST_fbWinch_Sensors" ObjectId="ba625d91-b679-557f-bae8-bd35a0a8e716" />
-            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
             <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
             <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />
             <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
             <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
-          </Folder>
-        </Folder>
-        <Folder Name="J_SUPERVISION">
-          <Folder Name="_TYPES">
-            <Folder Name="1_TREUILS_BENNE">
-              <Object Name="ST_BucketHMIState" ObjectId="ea0b3689-7d29-5817-9b66-52896d468768" />
-              <Object Name="ST_SafetyWinch" ObjectId="3a43f912-4348-5c66-b0c2-9405e5e3ae59" />
-              <Object Name="ST_WinchFinalInterlockRequest" ObjectId="1a0be5b9-7748-52ea-86e2-35102e49b3f8" />
-              <Object Name="ST_WinchInterPrg" ObjectId="3ec62512-5b23-55ca-ae68-cc9ed0fefa58" />
-              <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
-            </Folder>
-            <Folder Name="7_COMMUN_CONFIG">
-              <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
-            </Folder>
-            <Folder Name="3_CYCLE_ET_MODES">
-              <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
-              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
-              <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
-              <Object Name="ST_WinchBothIntent" ObjectId="27a8fd28-e07a-5ea0-8328-eea98b482fb9" />
-            </Folder>
-            <Folder Name="4_JOYSTICK_ACQUISITION">
-              <Object Name="ST_AcquisitionJoystickQualified" ObjectId="e915927d-33f8-504a-9060-48dca13140d7" />
-              <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
-            </Folder>
+            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
           </Folder>
         </Folder>
         <Folder Name="F_MODES">

@@ -1,0 +1,98 @@
+contract:
+  task_id: T196_BUCKET_STATE
+  criticality: C2
+  strategy: patch
+  objective: >
+    Rétablir une chaîne déterministe de commande benne vers état mécanique
+    IsOpen/IsClosed et sa publication IHM, sans jamais déclarer une position
+    atteinte sur la seule présence d'une commande.
+  acceptance:
+    - id: AC1
+      statement: >
+        Une demande de fermeture acceptée avec mouvement actif maintient la
+        demande jusqu'à l'atteinte de l'offset fermé puis publie IsClosed=TRUE,
+        IsOpen=FALSE et Done=TRUE.
+      verified_by: >
+        Test STruCpp FB_Bucket avec positions M1/M2 progressant jusqu'à
+        OffsetCloseM et assertion directe sur la VAR_IN_OUT BucketState.
+    - id: AC2
+      statement: >
+        Une demande d'ouverture acceptée avec mouvement actif maintient la
+        demande jusqu'à l'atteinte de l'offset ouvert puis publie IsOpen=TRUE,
+        IsClosed=FALSE et Done=TRUE.
+      verified_by: >
+        Test STruCpp FB_Bucket avec positions M1/M2 progressant jusqu'à
+        OffsetOpenM et assertion directe sur la VAR_IN_OUT BucketState.
+    - id: AC3
+      statement: >
+        La demande benne est refusée si M1_Busy ou M2_Busy est déjà actif à
+        l'entrée READY, sans changement de l'état mémorisé.
+      verified_by: >
+        Tests TC-P10-025 et TC-P10-025.1 du banc FB_Bucket.
+    - id: AC4
+      statement: >
+        L'état mécanique publié par PRG_04 est recopié sans perte dans
+        Data.BucketState.MechState puis dans GVL_IHM.M2TreuilBenne.Bucket.State.
+      verified_by: >
+        Audit statique producteur/consommateurs et contrôle de liaison G200;
+        validation CODESYS finale par l'humain.
+    - id: AC5
+      statement: >
+        Une configuration ou un homing non qualifié ne permet pas de produire
+        un état ouvert/fermé qualifié ni de contourner les interlocks de sécurité.
+      verified_by: >
+        Tests de défaut FB_Bucket (configuration invalide, codeur non référencé)
+        et revue des branches Gate/ActiveOffsetValid.
+    - id: AC6
+      statement: >
+        Le nom de fichier est égal au nom de POU CODESYS (`PRG_04_Treuils_Benne.st`,
+        `PRG_07_Supervision.st`) et le suffixe est égal au langage du bundle
+        Structured Text IEC.
+      verified_by: >
+        Contrôle structurel du contrat et inspection du bundle PLCopenXML
+        généré; aucun renommage implicite de POU n'est accepté.
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/H_TREUILS_BENNE/FB_BucketCmdArbitration.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - DOC/WFLOW/AUDITS/T196_BUCKET_STATE_20260831.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T196_BUCKET_STATE.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_DiveSearch.st
+      - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st
+  conservation:
+    must_survive:
+      - "L'état IsOpen/IsClosed n'est confirmé qu'après position physique atteinte ou commit de homing atomique."
+      - "Le refus anti-traversée M1_Busy/M2_Busy."
+      - "Le latch de défaut et l'absence de redémarrage automatique."
+      - "Les modifications concurrentes des autres agents dans les fichiers hors périmètre."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - strucpp_fb_bucket_tests
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "deepseek-v4-flash:cloud"
+  alert_duty: >
+    Toute incohérence entre la spécification AF, le câblage PRG_04/PRG_07 et le
+    comportement simulé doit être signalée immédiatement; ne pas transformer
+    une absence de mouvement physique en état ouvert/fermé.
+
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex / root"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Contrat créé avant correction; diagnostic et tests en cours."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation humaine CODESYS requise avant clôture."

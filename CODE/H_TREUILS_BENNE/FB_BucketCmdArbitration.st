@@ -15,7 +15,7 @@
 FUNCTION_BLOCK FB_BucketCmdArbitration
 VAR_INPUT
     Enable    : BOOL;  // --> [CMD] Autorisation FB (TRUE=arbitre actif)
-    Auth      : ST_fbModes_Autorisations;          // --> [CMD] Autorisations mode (Mode, gating séquencement couplé)
+    Auth      : ST_Modes_Autorisations;          // --> [CMD] Autorisations mode (Mode, gating séquencement couplé)
     ReqBucket : ST_ProgramBucketRequest;            // --> [REQ] Demande cycle benne (SEMI_AUTO)
     IHM       : ST_fbBucketCmdArbitration_IHM;      // --> [CMD] Boutons IHM benne (BtnOpen/BtnClose)
     Context   : ST_fbBucketCmdArbitration_Context;   // --> [STAT] Gating séquencement couplé benne

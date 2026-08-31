@@ -20,6 +20,7 @@ STRUCT
     SpeedCmd_Pct            : REAL;             (* 📈 Commande de vitesse finale après rampe (%) *)
     StepNumber              : INT;              (* 🔢 Palier de vitesse actif (0..5) *)
     FBState                 : E_State;          (* 🤖 État de l'automate interne (FB_Winch) *)
+    AxisBlockReason         : E_WinchTraceBlockReason; (* 🧩 Cause prioritaire de blocage (miroir de TraceMx.BlockReason) *)
     Ready                   : BOOL;             (* 🟢 Treuil prêt à fonctionner *)
     Busy                    : BOOL;             (* ⚙️ Mouvement en cours *)
     Done                    : BOOL;             (* ✅ Action terminée *)

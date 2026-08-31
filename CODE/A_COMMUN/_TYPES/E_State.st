@@ -13,6 +13,7 @@ ENUM
     READY    := 2,   (* Prêt, attend ordre *)
     BUSY     := 3,   (* Action en cours *)
     DONE     := 4,   (* Action terminée *)
-    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    STOPPING := 5,   (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    ERROR    := 6    (* Défaut actif non acquitté (FB en erreur — HMI non aveugle) *)
 END_ENUM
 END_TYPE

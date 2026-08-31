@@ -6,7 +6,7 @@
    ======================================================================= *)
 TYPE ST_ModesCycleInterPrg :
 STRUCT
-    Auth          : ST_fbModes_Autorisations; // Bus d'autorisations machine
+    Auth          : ST_Modes_Autorisations; // Bus public d'autorisations machine (NC-110)
     WinchBothIntent : ST_WinchBothIntent;     // 🎮 Intention both continue opérateur (source unique PRG_03, TOUS modes)
     ReqProgram    : ST_ProgramRequest;        // Demandes programme vers PRG_04 / PRG_05
     SequenceState : ST_SequencePublicState;   // État public de la séquence

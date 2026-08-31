@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:16:09.681441" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:16:09.681441">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:51:45.433060" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:51:45.433060">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -990,7 +990,10 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Premier cycle &amp; recalage boutons IHM"}
 IF FirstCycle THEN
     FirstCycle := FALSE;
-    IF NOT BucketState.IsOpen AND NOT BucketState.IsClosed THEN
+    // Une seule position doit être qualifiée au démarrage : ni l'une ni l'autre
+    // ou les deux simultanément signifient que la mémorisation n'est pas fiable.
+    IF (BucketState.IsOpen AND BucketState.IsClosed)
+       OR (NOT BucketState.IsOpen AND NOT BucketState.IsClosed) THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
 END_IF;

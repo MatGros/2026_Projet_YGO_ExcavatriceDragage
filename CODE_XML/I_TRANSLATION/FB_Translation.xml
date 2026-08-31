@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:27:08.224072" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:27:08.224072">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:35:35.914843" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:35:35.914843">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -236,6 +236,178 @@
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbTranslation_Cfg">
+        <baseType>
+          <struct>
+            <variable name="CfgRampAccelRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RAMPES VITESSE (%/s) ===
+--&gt; [CFG] Accélération</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampDecelNormalRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="40" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Décélération normale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgRampDecelFastRate">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="100" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Décélération RAPIDE (SafeStop)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionInterlockDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Délai avant changement de sens à l'arrêt</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ApproachSpeedTremieHz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VITESSES RÉDUITES D'APPROCHE (Hz) ===
+--&gt; [CFG] Approche Trémie (Direction=1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ApproachSpeedMaintenanceHz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Approche Maintenance (Direction=-1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ApproachSpeedP1Hz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Approche P1 (Direction=-1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveFreqScaleMaxHz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="60" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ÉCHELLE VARIATEUR ===
+--&gt; [CFG] Échelle 0..100 % → MaxHz</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CaptorDebounce">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMUN / FREIN ===
+--&gt; [CFG] Filtrage capteur position cible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeDelayContactClose">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeDelayMagnetise">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#300ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeDelayMotorDecel">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeFeedbackTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#300ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Strictement sous watchdog final 500 ms</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>80895eea-2391-5128-a7c7-f38056563b20</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_fbTranslation_Cfg — Configuration regroupée de FB_Translation
+   ───────────────────────────────────────────────────────────────
+   📐 NC-110 / G380 : pattern « Cfg : ST_fb&lt;Fb&gt;_Cfg » (comme FB_Winch
+      avec Config : ST_fbWinch_Cfg). Regroupe en UN point d'interface les
+      ~13 scalaires `[CFG]` qui étaient des VAR_INPUT plates de FB_Translation.
+   🎯 Un seul sourcing : PRG_05_Translation assemble ce struct depuis la
+      source unique GVL_PERSISTENT (§ source propre documentée ci-dessous).
+   📤 Producteur : PRG_05_Translation (câblage).
+   📥 Consommateur : FB_Translation (Cfg, lecture seule).
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
     </dataTypes>
     <pous>
       <pou name="FB_Translation" pouType="functionBlock">
@@ -399,150 +571,13 @@
                 <BOOL />
               </type>
             </variable>
-            <variable name="CfgRampAccelRate">
+            <variable name="Cfg">
               <type>
-                <REAL />
+                <derived name="ST_fbTranslation_Cfg" />
               </type>
-              <initialValue>
-                <simpleValue value="20" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages rampe
---&gt; [CFG] %/s — accélération</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgRampDecelNormalRate">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="40" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] %/s — décélération normale</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgRampDecelFastRate">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="100" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] %/s — décélération RAPIDE</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DirectionInterlockDelay">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#200ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Délai avant d'autoriser un changement de sens à l'arrêt</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ApproachSpeedTremieHz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="10" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages ETHERCAT
---&gt; [CFG] Vitesse réduite d'approche Trémie en Hz</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ApproachSpeedMaintenanceHz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="10" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse réduite d'approche Maintenance en Hz</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ApproachSpeedP1Hz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="10" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse réduite d'approche P1 en Hz</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DriveFreqScaleMaxHz">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="60" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Échelle 0..100 % → MaxHz</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CaptorDebounce">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#100ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Réglages communs
---&gt; [CFG] Filtrage capteur de position cible</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BrakeDelayContactClose">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#100ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BrakeDelayMagnetise">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#300ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BrakeDelayMotorDecel">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#500ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BrakeFeedbackTimeout">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#300ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Strictement sous watchdog final 500 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Configuration regroupée (pattern NC-110/G380 — un seul point d'interface)
+--&gt; [CFG] Rampe, vitesses d'approche, échelle, frein (source GVL_PERSISTENT)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -777,6 +812,9 @@
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
+   🔧 Interface plate → structs : configuration regroupée en `Cfg : ST_fbTranslation_Cfg`
+      (pattern NC-110/G380, comme FB_Winch `Config : ST_fbWinch_Cfg`). Source unique
+      GVL_PERSISTENT (câblée par PRG_05_Translation).
    🧩 Compose FB_Brake (réutilisé TEL QUEL depuis COMMUN).
    🎯 Invariant : toute inversion de sens force la cible de rampe à 0.0 tant que le
       changement de sens est en attente, pour garantir le croisement du seuil d'arrêt
@@ -858,7 +896,7 @@ CycleTimeCalc();
 {endregion}
 
 {region "§4 Arrivée sur cible et interlock direction"}
-CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
+CaptorDebounceTon(IN := PositionSensorTarget, PT := Cfg.CaptorDebounce);
 TargetReached := CaptorDebounceTon.Q;
 ArrivalEdge(CLK := TargetReached);
 
@@ -873,7 +911,7 @@ END_IF;
 
 DirectionChangeDelay(
     IN := (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) AND (ABS(SpeedRamp.Current) &lt;= 0.1) AND (ABS(DriveActualFreqHz) &lt;= 0.5),
-    PT := DirectionInterlockDelay
+    PT := Cfg.DirectionInterlockDelay
 );
 
 IF (CommandedDirection = 0) AND (Direction &lt;&gt; 0) THEN
@@ -903,8 +941,8 @@ END_IF;
 
 SpeedRamp(
     Target := RampTargetPct,
-    AccelRate := CfgRampAccelRate,
-    DecelRate := SEL(SafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
+    AccelRate := Cfg.CfgRampAccelRate,
+    DecelRate := SEL(SafeStop, Cfg.CfgRampDecelNormalRate, Cfg.CfgRampDecelFastRate),
     CycleTimeS := CycleTimeCalc.CycleTimeS
 );
 {endregion}
@@ -924,10 +962,10 @@ Brake(
     MovementRequested := MovementRequested,
     ContactorFeedback := BrakeFeedback,
     BypassContactorCheck := BypassContactorCheck,
-    DelayContactClose := BrakeDelayContactClose,
-    DelayMagnetise := BrakeDelayMagnetise,
-    DelayMotorDecel := BrakeDelayMotorDecel,
-    FeedbackTimeout := BrakeFeedbackTimeout
+    DelayContactClose := Cfg.BrakeDelayContactClose,
+    DelayMagnetise := Cfg.BrakeDelayMagnetise,
+    DelayMotorDecel := Cfg.BrakeDelayMotorDecel,
+    FeedbackTimeout := Cfg.BrakeFeedbackTimeout
 );
 
 BrakeReleaseRequest := Brake.BrakeCmd;
@@ -948,15 +986,15 @@ ELSE
     RequestedDriveControlWord := 0;
 END_IF;
 
-RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * DriveFreqScaleMaxHz;
+RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * Cfg.DriveFreqScaleMaxHz;
 
 // Ralentissements d'approche
 IF (CommandedDirection = 1) AND SlowdownSensorTremie THEN
-    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedTremieHz);
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedTremieHz);
 ELSIF (CommandedDirection = -1) AND SlowdownSensorMaintenance THEN
-    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedMaintenanceHz);
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedMaintenanceHz);
 ELSIF (CommandedDirection = -1) AND SlowdownSensorP1 THEN
-    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedP1Hz);
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedP1Hz);
 END_IF;
 
 IF Fault.Error THEN
@@ -1739,6 +1777,9 @@ Current := LIMIT(-100.0, Current, 100.0);
       <ProjectStructure>
         <Folder Name="I_TRANSLATION">
           <Object Name="FB_Translation" ObjectId="de336a4c-425c-5d56-a65e-a979a390c79c" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbTranslation_Cfg" ObjectId="80895eea-2391-5128-a7c7-f38056563b20" />
+          </Folder>
         </Folder>
         <Folder Name="F_MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />

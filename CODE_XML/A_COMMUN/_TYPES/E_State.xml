@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T18:53:19.300696" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T18:53:19.300696">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:37:37.165063" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:37:37.165063">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -33,6 +33,7 @@
               <value name="BUSY" value="3" />
               <value name="DONE" value="4" />
               <value name="STOPPING" value="5" />
+              <value name="ERROR" value="6" />
             </values>
           </enum>
         </baseType>
@@ -73,6 +74,12 @@
                 <Name>STOPPING</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut actif non acquitté (FB en erreur — HMI non aveugle)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

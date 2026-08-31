@@ -23,4 +23,9 @@ VAR_GLOBAL
     MotionM2              : ST_MotionChecklist;   // ⚙️ Diagnostic chronologique Mouvement M2 (Treuil Benne)
     MotionM3              : ST_MotionChecklist;   // ⚙️ Diagnostic chronologique Mouvement M3 (Translation)
     Inputs                : ST_HardwareImage;     // 📥 Image complète des entrées réelles / qualifiées / simulées
+
+    // 🕵️ Trace de blocage terrain (cause priorisée + horodatage) — produite par PRG_04/05
+    TraceWinchM1          : ST_TraceWinch;        // 🕵️ Trace blocage treuil M1 (cause priorisée + horodatage)
+    TraceWinchM2          : ST_TraceWinch;        // 🕵️ Trace blocage treuil M2 (cause priorisée + horodatage)
+    TraceTranslation      : ST_TraceTranslation;  // ↔️ Trace blocage translation M3 (cause priorisée + horodatage)
 END_VAR
