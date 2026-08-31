@@ -42,7 +42,7 @@ Les champs déplacés sont référencés par l'IHM sous les anciens chemins. Les
 > ⚠️ **Champs retirés** (plus d'équivalent dans `State` — à supprimer des écrans) :
 > - `PowerContactorEngaged` → entrée brute `PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI`
 >   (déjà exposée ailleurs, ex. `GVL_Troubleshooting`).
-> - `PowerCutOffActive` → non repris dans `State` (coupure métier, voir `PRG_06_Outputs.PowerCutOffActive`).
+> - `PowerCutOffActive` → `PRG_06_Outputs.PowerCutOffActive` (coupure métier finale active).
 
 ---
 
@@ -62,7 +62,11 @@ Les champs déplacés sont référencés par l'IHM sous les anciens chemins. Les
 | `Emergency.HmiCmd.BtnEmergencyCutOff` | `Emergency.Cmd.BtnEmergencyCutOff` | Bouton « Coupure d'urgence » |
 | `Emergency.HmiState.EmergencyArmable` | `Emergency.State.Armable` | Voyant réarmement possible |
 | `Emergency.HmiState.EmergencyArmingFailed` | `Emergency.State.Diag.ArmFailed` | Alarme échec réarmement |
-| `Emergency.HmiState.PowerCutOffActive` | ⚠️ **champ retiré** → `PRG_06_Outputs.PowerCutOffActive` | Voyant coupure métier |
+| `Emergency.HmiState.PowerCutOffActive` | `PRG_06_Outputs.PowerCutOffActive` | Voyant coupure métier |
+
+> ⚠️ **Clarification utilisateur** : `Emergency.HmiState.PowerCutOffActive` est **conservé** et
+> relié à **`PRG_06_Outputs.PowerCutOffActive`** (coupure métier finale active). **Pas** de
+> `Emergency.PowerCutOffRequest` (n'existe pas dans `ST_EmergencyHMI`).
 | `Emergency.Status.State.ChainOk` | `Emergency.State.ChainOk` | Voyant boucle AU saine |
 | `Emergency.Status.State.ContactorOk` | `Emergency.State.ContactorOk` | Voyant contacteur confirmé |
 | `Emergency.Cmd.MaintainA_Cmd` | `Emergency.State.MaintainA_Cmd` | État maintien canal A |
@@ -80,23 +84,31 @@ Les champs déplacés sont référencés par l'IHM sous les anciens chemins. Les
 
 ## 🧩 C0218 — CASE `FB_Safety_EmergencyManagement` (message opérateur §11)
 
-> 📌 **Verdict** : le CASE avec **constantes symboliques `CST_STEP_*` est VALIDE en CODESYS**.
-> La déclaration est correcte — **ne pas remplacer les labels par des littéraux entiers**.
+> 📌 **Verdict (confirmé utilisateur)** : CODESYS **refuse** les constantes locales
+> `VAR CONSTANT` déclarées dans un `FUNCTION_BLOCK` comme **étiquettes de CASE** (conformité IEC).
+> Le C0218 persiste malgré une déclaration correcte. **Correctif appliqué** : les constantes
+> `CST_STEP_*` (0..6) et `CST_ABORT_*` (bitfield) sont déplacées dans une **GVL de constantes**
+> `GVL_Safety_Emergency_Constants` en `VAR_GLOBAL CONSTANT` — les constantes globales sont des
+> labels de CASE valides en CODESYS. Le CASE **garde ses labels symboliques** (lisible).
+
+**Correctif repo** :
+- ➕ `CODE/B_AU_SECURITE/GVL_Safety_Emergency_Constants.st` : `VAR_GLOBAL CONSTANT` avec
+  `CST_STEP_IDLE..CST_STEP_CONFIRM` (`INT := 0..6`) et `CST_ABORT_NONE..CST_ABORT_TIMEOUT_CONTACTOR`
+  (`INT := 0,1,2,4,8,16,32,64,128`). GVL **non** `qualified_only` → les références symboliques
+  non qualifiées (`ArmingSeqStep = CST_STEP_IDLE`, labels du CASE) restent valides sans modification.
+- ✏️ `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st` : bloc `VAR CONSTANT` local réduit aux
+  **5 temporisations** (`CST_TestDuration`…`CST_FaultDisplayDebounce`). `CST_STEP_*`/`CST_ABORT_*`
+  retirées (commentaire de renvoi vers la GVL). CASE §11 et toutes les comparaisons **inchangés**.
 
 **Vérification de la déclaration** (`CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st`) :
-- Bloc `VAR CONSTANT` : lignes **94-121** (déclaré **avant** le CASE).
-- `CST_STEP_IDLE..CST_STEP_CONFIRM` : lignes **103-109**, tous de type **`INT := 0..6`** (entier).
-- CASE : ligne **452** (après le bloc `VAR CONSTANT`).
+- Bloc `VAR CONSTANT` local : lignes **94-107** (temporisations uniquement).
+- CASE : ligne **438** (après le bloc `VAR CONSTANT`), labels `CST_STEP_*` → résolus depuis la GVL.
 - Variable scrutée `ArmingSeqStep` : `INT` (ligne 56) — type cohérent avec les labels.
 
-**Cause racine du C0218** : le projet CODESYS de l'utilisateur **n'est pas aligné** avec le `CODE/`
-à jour (le CASE est à des lignes différentes dans son log → il a une **version antérieure** du FB,
-où les constantes n'étaient pas déclarées correctement ou le bloc `VAR CONSTANT` était absent/après
-le CASE). **Action** : ré-importer le FB courant `FB_Safety_EmergencyManagement.st` (ou le bundle
-`CODE_XML/CODE_Bundle.xml`) dans CODESYS, puis recompiler. Le C0218 disparaît sans toucher au CASE.
-
-> ⚠️ **Ne pas** remplacer les labels `CST_STEP_*` par des littéraux : les constantes symboliques
-> sont plus lisibles et restent utilisées dans les comparaisons (`ArmingSeqStep = CST_STEP_IDLE`…).
+**Action CODESYS (manuelle)** : ré-importer la GVL `GVL_Safety_Emergency_Constants` **et** le FB
+`FB_Safety_EmergencyManagement` (ou le bundle `CODE_XML/CODE_Bundle.xml`) dans CODESYS, puis
+recompiler. Le C0218 disparaît. ⚠️ **Ne pas** remplacer les labels `CST_STEP_*` par des littéraux :
+les constantes symboliques restent plus lisibles et sont utilisées dans les comparaisons.
 
 ---
 

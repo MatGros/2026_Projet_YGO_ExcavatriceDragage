@@ -99,27 +99,11 @@ VAR CONSTANT
     CST_ArmingLockout        : TIME := T#5s;    // Duree verrouillage anti-reessai apres echec
     CST_FaultDisplayDebounce : TIME := T#200ms; // Anti-clignotement affichage IHM uniquement
 
-    // === ETAPES SEQUENCE REARMEMENT (ArmingSeqStep reste INT) ===
-    CST_STEP_IDLE      : INT := 0; // Repos
-    CST_STEP_TEST_A    : INT := 1; // Autotest canal A
-    CST_STEP_RESTORE_A : INT := 2; // Restauration canal A
-    CST_STEP_TEST_B    : INT := 3; // Autotest canal B
-    CST_STEP_RESTORE_B : INT := 4; // Restauration canal B
-    CST_STEP_PULSE     : INT := 5; // Impulsion rearmement contacteur
-    CST_STEP_CONFIRM   : INT := 6; // Attente confirmation contacteur
-
-    // === CAUSES D'ABANDON (LastAbortCause, valeurs load-bearing IHM) ===
-    // ⚠️ Type INT (décimal) : valeurs identiques aux anciens masques hex (1,2,4,8,16,32,64,128).
-    //    LastAbortCause reste WORD (bitfield) : conversion implicite INT→WORD en CODESYS.
-    CST_ABORT_NONE               : INT := 0;   // Aucun abandon
-    CST_ABORT_CUT_IHM            : INT := 1;   // Coupure manuelle IHM
-    CST_ABORT_CHAIN_DROP         : INT := 2;   // Chute boucle AU pendant impulsion/confirmation
-    CST_ABORT_TIMEOUT_RESTORE_A  : INT := 4;   // Timeout restauration canal A
-    CST_ABORT_TIMEOUT_RESTORE_B  : INT := 8;   // Timeout restauration canal B
-    CST_ABORT_POWER_CUTOFF       : INT := 16;  // Coupure securite metier (PowerCutOff)
-    CST_ABORT_REDUNDANCY_A       : INT := 32;  // Defaut redondance canal A
-    CST_ABORT_REDUNDANCY_B       : INT := 64;  // Defaut redondance canal B
-    CST_ABORT_TIMEOUT_CONTACTOR  : INT := 128; // Timeout confirmation contacteur
+    // === ETAPES SEQUENCE & CAUSES D'ABANDON ===
+    // ⚠️ CST_STEP_* (0..6) et CST_ABORT_* (bitfield) sont déclarées en
+    //    VAR_GLOBAL CONSTANT dans GVL_Safety_Emergency_Constants (conformité IEC :
+    //    CODESYS refuse les constantes locales d'un FUNCTION_BLOCK comme étiquettes
+    //    de CASE — erreur C0218). Références symboliques inchangées ci-dessous.
 END_VAR
 
 // === IMPLEMENTATION ===

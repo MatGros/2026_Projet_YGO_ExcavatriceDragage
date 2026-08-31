@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T12:32:39.163825" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T12:32:39.163825">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_Safety_Emergency_Constants" constant="true">
+        <variable name="CST_STEP_IDLE">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAPES SEQUENCE REARMEMENT (ArmingSeqStep reste INT) ===
+Repos</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_TEST_A">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Autotest canal A</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_RESTORE_A">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="2" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Restauration canal A</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_TEST_B">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="3" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Autotest canal B</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_RESTORE_B">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="4" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Restauration canal B</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_PULSE">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="5" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion rearmement contacteur</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_CONFIRM">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="6" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente confirmation contacteur</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_NONE">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES D'ABANDON (LastAbortCause, valeurs load-bearing IHM) ===
+⚠️ Type INT (décimal) : valeurs identiques aux anciens masques hex (1,2,4,8,16,32,64,128).
+LastAbortCause reste WORD (bitfield) : conversion implicite INT→WORD en CODESYS.
+Aucun abandon</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_CUT_IHM">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure manuelle IHM</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_CHAIN_DROP">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="2" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Chute boucle AU pendant impulsion/confirmation</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_TIMEOUT_RESTORE_A">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="4" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout restauration canal A</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_TIMEOUT_RESTORE_B">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="8" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout restauration canal B</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_POWER_CUTOFF">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="16" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure securite metier (PowerCutOff)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_REDUNDANCY_A">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="32" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut redondance canal A</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_REDUNDANCY_B">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="64" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut redondance canal B</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_TIMEOUT_CONTACTOR">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="128" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout confirmation contacteur</xhtml>
+          </documentation>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>4a06a006-d4b4-5486-9390-2bd7d17e0c27</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ GVL_Safety_Emergency_Constants — Constantes globales chaîne AU
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Constantes symboliques de la séquence de réarmement AU —
+      étapes CST_STEP_* et causes d'abandon CST_ABORT_* — partagées
+      entre POU. Sorties du bloc `VAR CONSTANT` local du FB
+      FB_Safety_EmergencyManagement (conformité IEC : CODESYS refuse
+      les constantes locales d'un FUNCTION_BLOCK comme étiquettes de
+      CASE — erreur C0218). En `VAR_GLOBAL CONSTANT`, elles sont des
+      labels de CASE valides.
+   🔒 Sécurité : valeurs figées par conception (étapes 0..6, causes
+      bitfield 1,2,4,8,16,32,64,128) — jamais modifiables à l'exécution.
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </globalVars>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="B_AU_SECURITE">
+          <Object Name="GVL_Safety_Emergency_Constants" ObjectId="4a06a006-d4b4-5486-9390-2bd7d17e0c27" />
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
