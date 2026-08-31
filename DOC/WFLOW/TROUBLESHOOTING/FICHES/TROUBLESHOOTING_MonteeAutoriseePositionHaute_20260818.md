@@ -16,7 +16,7 @@
 ### Variables & valeurs
 | <nobr>Élément</nobr> | <nobr>Variable complète</nobr> | Valeur | <nobr>Horodatage</nobr> |
 |---|---|---|---|
-| Capteur haut simulé | `HwIn.Winch.M1M2_TopPositionFree_DI` | TRUE (toujours, FB_SimBench L211) | statique |
+| Capteur haut simulé | `HwIn.Winch.M1M2_TopPositionFree_DI` | TRUE (toujours, FB_SimBench L218) | statique |
 | Bypass top limit | `PRG_02_Acquisition.SimulationBypassActive` | à confirmer | |
 | Position M1 | `CablePosM1` | à confirmer | |
 | Position M2 | `CablePosM2` | à confirmer | |
@@ -38,7 +38,7 @@ En simulation dragage : appui « remonter » → le treuil **monte** (alors que 
 | # | Hypothèse | Variable de décision | Valeur attendue (source) | Valeur lue | Verdict |
 |---|---|---|---|---|---|
 | 1 | **Montée autorisée car top limit bypassé en simu** | `SimulationBypassActive` → `BypassTopLimitSwitch/Software` | TRUE (PRG_04 L732-735, L790-793) | à confirmer | ⏳ |
-| 2 | Capteur haut jamais atteint en simu | `HwIn.Winch.M1M2_TopPositionFree_DI` | TRUE constant (FB_SimBench L211) | TRUE | ✅ statique |
+| 2 | Capteur haut jamais atteint en simu | `HwIn.Winch.M1M2_TopPositionFree_DI` | TRUE constant (FB_SimBench L218) | TRUE | ✅ statique |
 | 3 | **Défaut = Méca B (pilotage actif sans commande opérateur)** | `instSafetyWinchMx.ErrorId bit8` | TRUE si boutons + joystick neutre >3s (FB_Safety_Winch L302-310) | à confirmer | ⏳ |
 | 4 | Descente bloquée par interlock Dive | `DescendPermitDiveBucketOpen` | FALSE si benne non ouverte (PRG_04 L660-661) | à confirmer | ⏳ |
 | 5 | Descente bloquée par limite basse / mou câble | `instSafetyWinchMx.DescendPermit` | à confirmer | à confirmer | ⏳ |
@@ -86,6 +86,6 @@ DESCENTE (Direction=-1)
 
 ## 10. 📝 Journal (chronologique)
 
-- 2026-08-18 : ouverture session. Analyse statique : montée autorisée en position haute = bypass top limit en simulation (FB_SimBench L211 + PRG_04 L732-735) ; défaut suspecté = Méca B (boutons + joystick neutre) ; descente bloquée = interlock Dive (benne non ouverte). En attente de confirmation utilisateur.
+- 2026-08-18 : ouverture session. Analyse statique : montée autorisée en position haute = bypass top limit en simulation (FB_SimBench L218 + PRG_04 L732-735) ; défaut suspecté = Méca B (boutons + joystick neutre) ; descente bloquée = interlock Dive (benne non ouverte). En attente de confirmation utilisateur.
 - 2026-08-18 : snapshots 160206/160229 lus. **Hypothèse bypass top limit éliminée** (`Idx203_BypassSensorsGlobal=FALSE`). **Descente bloquée prouvée** = `DumpAtTremieDescentLocked` (M3 pas à P1/Maintenance). Défaut montée = SafeStop+PowerCutOff, bit exact non capturé.
 - 2026-08-18 : bascule en **revue conception** des modes dragage (DiveSearch/ExtractionSequence/DumpAtTremie). Écarts DumpAtTremie identifiés (verrou translation trémie absent, latch « une fois descendu » absent, logique inline dans PRG_04). Loggé → **T125** (revue), **T126** (IHM cause+contexte), **T127** (cycle semi-auto). ErrorId treuil toujours en suspens.

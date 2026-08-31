@@ -41,7 +41,7 @@ contract:
     allowed:
       - CODE/L_SIMULATION/FB_SimBench.st
       - CODE/M_MAIN/PRG_02_Acquisition.st   # si retrait de CfgTopSensorRawPos
-      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
       - DOC/AF/AF_Partie-13_Fonction_Simulation/*.md   # sous-fiches si existantes
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export

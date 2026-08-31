@@ -1,6 +1,6 @@
 # FB_Sim_Joystick — Spec composant (v1.0)
 
-> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.4.md`](../AF_Partie-13_Fonction_Simulation_v2.4.md) §4.
+> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.5.md`](../AF_Partie-13_Fonction_Simulation_v2.5.md) §4.
 > Rôle de **ce** document : entrées brutes joystick simulées (bus CAN hors ligne) — et
 > **catalogue unique** des `TC-P13-050...`.
 > Source code : `CODE/L_SIMULATION/FB_Sim_Joystick.st` · instance `FB_SimBench.instSimJoystick`.

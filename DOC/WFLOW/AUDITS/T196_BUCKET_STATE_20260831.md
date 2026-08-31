@@ -104,6 +104,13 @@ L'essai fonctionnel reste à consigner.
 
 ## Correctif simulation capteur haut — 2026-08-31 08:49
 
+> ⚠️ **SUPERSEDE — SIM-TOPSENSOR-COHERENCE (2026-08-31)** : le « correctif » décrit ci-dessous
+> (capteur haut piloté par la position M1) a été **retiré** par le fix `SIM-TOPSENSOR-COHERENCE`.
+> Le capteur TOP simulé est désormais **sain (libre) par défaut**, cohérent avec le mou de câble
+> (`M1M2_TopPositionFree_DI := NOT SimTopPositionActive`, `FB_SimBench.st:218`). Le stimulus manuel
+> `SimTopPositionActive` est requis pour le homing en simulation. Ce contenu historique est conservé
+> à titre d'audit — il ne reflète plus l'état actuel du code.
+
 Le blocage observé en `MachineHomingStep = NEED_TOP_POSITION (30)` venait du
 modèle de simulation : le capteur haut ne pouvait devenir actif qu'en forçant
 manuellement `GVL_Simulation.SimTopPositionActive`.

@@ -1,6 +1,6 @@
 # FB_SimBench — Spec composant (v1.1)
 
-> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.4.md`](../AF_Partie-13_Fonction_Simulation_v2.4.md) §2/§4.
+> Rôle machine (vague) : [`AF_Partie-13_Fonction_Simulation_v2.5.md`](../AF_Partie-13_Fonction_Simulation_v2.5.md) §2/§4.
 > Rôle de **ce** document : enveloppe unique de simulation banc — composition, câblage des
 > décalages 1-scan, table des sous-modèles — et **catalogue unique** des `TC-P13-010...`.
 > Source code : `CODE/L_SIMULATION/FB_SimBench.st` · instance `PRG_02_Acquisition.instSimBench`.
@@ -118,6 +118,11 @@ directement dans `FB_SimBench` (sous-image `Winch`).
 > la position du treuil et bloquait la montée en simulation quand le treuil était en haut. Le
 > stimulus manuel `SimTopPositionActive` reste la seule source d'un fait capteur.
 
+> 🎯 **Procédure homing en simulation** : le homing auto (T173 / `FB_MachineHomingCycle`) dépend du
+> capteur TOP (`TopPositionActive = SimTopPositionActive`, `PRG_02:436`). Le capteur TOP simulé étant
+> **libre par défaut**, l'opérateur **doit poser `SimTopPositionActive=TRUE`** pour déclencher le
+> homing nominal/conjoint en simulation. Sans ce stimulus, le cycle reste en `NEED_TOP_POSITION`.
+
 ---
 
 ## 3. Interface — entrées bouclées avec décalage 1 scan
@@ -180,7 +185,7 @@ donc aucune régression de mouvement possible en changeant sa valeur à l'arrêt
 | 1 | ✅ résolu (ce lot) | Bit0 `M3_StatusWordSim` forcé à l'arrêt, faux Méca B permanent | REX 2026-08-14, voir §4 |
 | 2 | 🟡 ouvert | `T110` — sémantique réelle de `DriveStatusWord.0` sur AC600, à confirmer terrain/constructeur | `PLAN_TASK.md T110` |
 | 3 | ℹ️ sans conséquence connue | `FB_Sim_Safety.Enable` câblé en dur `TRUE`, contredit son propre commentaire d'en-tête | Voir `FB_Sim_Safety_v1.0.md §1` |
-| 4 | ✅ résolu (ce lot) | Capteur haut TOP piloté par la position M1 (régression `fc8115d9`), bloquait la montée en simu | Corrigé : sain (libre) par défaut, cohérent avec mou de câble — §2.1, TC-P13-014 |
+| 4 | ✅ résolu (ce lot) | Capteur haut TOP piloté par la position M1 (régression `fc8115d9`), bloquait la montée en simu | Corrigé : sain (libre) par défaut, cohérent avec mou de câble — §2.1, <nobr><code>TC-P13-014</code></nobr> |
 
 ---
 

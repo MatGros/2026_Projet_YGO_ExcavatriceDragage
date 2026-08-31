@@ -33,20 +33,20 @@ END_SETUP
 
 (* ---------- TC-P03-001 : dynamique Enable ---------- *)
 TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
-    (* Scan 0 : Enable=FALSE -> Neutralisation standard *)
+    (* ⛔ Scan 0 : Enable=FALSE → neutralisé *)
     FB(Enable := FALSE, Reset := FALSE, Inputs := Inp);
     ASSERT_FALSE(FB.Ready, 'Enable=FALSE -> Ready=FALSE (neutralise)');
     ASSERT_FALSE(FB.Lifecycle.Busy, 'Enable=FALSE -> Lifecycle.Busy=FALSE');
 
     ADVANCE_TIME(10000000);
 
-    (* Scan 1 : Enable=TRUE -> Prete en service *)
+    (* ✅ Scan 1 : Enable=TRUE → prêt *)
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_TRUE(FB.Ready, 'Enable=TRUE -> Ready=TRUE (nominal)');
 
     ADVANCE_TIME(10000000);
 
-    (* Scan 2 : Enable=FALSE -> Re-neutralisation *)
+    (* ⛔ Scan 2 : Enable=FALSE → re-neutralisé *)
     FB(Enable := FALSE, Reset := FALSE, Inputs := Inp);
     ASSERT_FALSE(FB.Ready, 'Coupure -> Ready retombe a FALSE');
 END_TEST
@@ -59,14 +59,14 @@ TEST 'TC-P04-010 DiveSearch : mise en service recherche de couche'
     ASSERT_TRUE(FB.Ready, 'Module DiveSearch pret');
     ASSERT_EQ(FB.Outputs.StepState, E_DiveSearchState.READY_TO_DESCEND, 'Pret a descendre');
 
-    (* Demarrage de la descente : passe a SEARCHING_IMMERSION *)
+    (* 🚀 Descente → SEARCHING_IMMERSION *)
     ADVANCE_TIME(10000000);
     Inp.MotionRequestActive := TRUE;
     Inp.MotionDirection := -1;
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_EQ(FB.Outputs.StepState, E_DiveSearchState.SEARCHING_IMMERSION, 'Passe en recherche immersion');
 
-    (* Scan suivant dans SEARCHING_IMMERSION : activation du permis et de Busy *)
+    (* 👀 SEARCHING_IMMERSION : permis + Busy *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_TRUE(FB.Outputs.DescendPermit, 'Permis descente actif en recherche immersion');
@@ -77,11 +77,11 @@ END_TEST
 
 (* ---------- TC-P04-011 : sequence complete Kobold 4 temps ---------- *)
 TEST 'TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur contact fond'
-    (* 1. Initialisation avec seuils realistes -> READY_TO_DESCEND *)
+    (* 🏁 Init → READY_TO_DESCEND *)
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_TRUE(FB.Ready, 'Pret a descendre');
 
-    (* 2. Demarrage descente (Scan 1: transition -> SEARCHING_IMMERSION, Scan 2: execution) *)
+    (* 🚀 Descente → SEARCHING_IMMERSION *)
     Inp.M1Position_M := 12.0;
     Inp.M2Position_M := 12.0;
     Inp.MotionRequestActive := TRUE;
@@ -90,14 +90,14 @@ TEST 'TC-P04-011 : Sequence complete Kobold 4 temps avec coupure contacteur sur 
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_TRUE(FB.Outputs.KoboldContactorCmd, 'Contacteur Kobold alimente');
 
-    (* 3. Entree dans la fenetre eau -> Front montant KoboldImmersed (0 -> 1) *)
+    (* 🌊 Immersion (front 0→1) → SEARCHING_BOTTOM *)
     Inp.KoboldImmersed := TRUE;
     Inp.M1Position_M := 8.0;
     Inp.M2Position_M := 8.0;
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_EQ(FB.Outputs.StepState, E_DiveSearchState.SEARCHING_BOTTOM, 'Passe en recherche du fond');
 
-    (* 4. Contact fond -> Front descendant KoboldImmersed (1 -> 0) *)
+    (* 🎯 Contact fond (front 1→0) → BOTTOM_CONFIRMED *)
     Inp.KoboldImmersed := FALSE;
     Inp.M1Position_M := -5.0;
     Inp.M2Position_M := -5.0;
@@ -114,16 +114,16 @@ TEST 'TC-P04-012 : Tentative descente en Palier 5 sous Kobold declenche defaut b
     Inp.MotionRequestActive := FALSE;
     Inp.MotionDirection := 0;
     Inp.CurrentSpeedStep := 4;
-    (* Scan 1 : Passage a READY_TO_DESCEND *)
+    (* 🏁 Scan 1 → READY_TO_DESCEND *)
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
-    (* Scan 2 : Demarrage descente vers SEARCHING_IMMERSION *)
+    (* 🚀 Scan 2 → SEARCHING_IMMERSION *)
     Inp.MotionRequestActive := TRUE;
     Inp.MotionDirection := -1;
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
-    (* Scan 3 : Passage interdit en Palier 5 -> Declenchement defaut *)
+    (* ⛔ Scan 3 : Palier 5 interdit → défaut *)
     Inp.CurrentSpeedStep := 5;
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
-    (* Scan 4 : Evaluation socle de defaut *)
+    (* 🔍 Scan 4 : évaluation défaut *)
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_TRUE(FB.Fault.Error, 'Defaut Palier 5 interdit');
     ASSERT_EQ(FB.Outputs.StepState, E_DiveSearchState.ERROR_HOLD, 'Verrouille en ERROR_HOLD');
@@ -144,12 +144,12 @@ TEST 'TC-P04-013 : Depassement tempo recherche immersion Kobold -> ERROR_HOLD et
     Inp.ImmersionLower_M := 0.0;
     Inp.CableLimitAscent_M := 0.15;
     Inp.CycleTime := T#4s;
-    (* Scan 1 : WAIT -> READY ; Scan 2 : READY -> SEARCHING_IMMERSION *)
+    (* 🚀 WAIT→READY→SEARCHING_IMMERSION *)
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_EQ(FB.Outputs.StepState, E_DiveSearchState.SEARCHING_IMMERSION, 'En recherche immersion');
 
-    (* 5 scans de 4s = 20s (> 10s timeout) *)
+    (* ⏱️ 5 scans × 4s = 20s > timeout 10s *)
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
@@ -180,22 +180,22 @@ TEST 'TC-P04-014 : Depassement tempo recherche fond Kobold -> ERROR_HOLD et capt
     Inp.ImmersionLower_M := 5.0;
     Inp.LimitLegalDepthMin_M := 4.996;
     Inp.CycleTime := T#4s;
-    (* Scan 1 : WAIT -> READY *)
+    (* 🏁 Scan 1 → READY *)
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
-    (* Scan 2 : READY -> SEARCHING_IMMERSION *)
+    (* 🚀 Scan 2 → SEARCHING_IMMERSION *)
     Inp.MotionRequestActive := TRUE;
     Inp.MotionDirection := -1;
     Inp.M1Position_M := 12.0;
     Inp.M2Position_M := 12.0;
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
-    (* Scan 3 : immersion validee -> SEARCHING_BOTTOM *)
+    (* 🌊 Scan 3 : immersion → SEARCHING_BOTTOM *)
     Inp.KoboldImmersed := TRUE;
     Inp.M1Position_M := 8.0;
     Inp.M2Position_M := 8.0;
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_EQ(FB.Outputs.StepState, E_DiveSearchState.SEARCHING_BOTTOM, 'Passe en recherche fond');
 
-    (* 5 scans de 4s = 20s (> 10s timeout) *)
+    (* ⏱️ 5 scans × 4s = 20s > timeout 10s *)
     Inp.M1Position_M := 7.0; Inp.M2Position_M := 7.0;
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     Inp.M1Position_M := 6.5; Inp.M2Position_M := 6.5;
@@ -217,7 +217,7 @@ END_TEST
 
 (* ---------- TC-P04-015 : latch timeout survit au cycle Enable OFF/ON ---------- *)
 TEST 'TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seulement sur front Reset'
-    (* 1. Declenche un timeout immersion -> latch arme *)
+    (* ⏱️ Timeout immersion → latch armé *)
     Inp.BypassPreconditions := TRUE;
     Inp.MotionRequestActive := TRUE;
     Inp.MotionDirection := -1;
@@ -233,11 +233,11 @@ TEST 'TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seuleme
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_TRUE(FB.Fault.Latched, 'Latch timeout immersion arme');
 
-    (* 2. Enable OFF : neutralisation, mais latch conserve *)
+    (* ⛔ Enable OFF : latch conservé *)
     FB(Enable := FALSE, Reset := FALSE, Inputs := Inp);
     ASSERT_TRUE(FB.Fault.Latched, 'Latch conserve sous Enable=FALSE (pas de redemarrage auto)');
 
-    (* 3. Enable ON sans Reset : defaut toujours latche ET automate verrouille en ERROR_HOLD *)
+    (* ⛔ Enable ON sans Reset : ERROR_HOLD *)
     Inp.BypassPreconditions := FALSE;
     Inp.MotionRequestActive := FALSE;
     Inp.MotionDirection := 0;
@@ -256,7 +256,7 @@ TEST 'TC-P04-015 : Latch timeout survit au cycle Enable OFF/ON, acquitte seuleme
     ASSERT_EQ(FB.Outputs.StepState, E_DiveSearchState.ERROR_HOLD, 'Verrouille ERROR_HOLD, aucun redemarrage vers READY_TO_DESCEND');
     ASSERT_FALSE(FB.Outputs.DescendPermit, 'Aucun permis descente au retour Enable sans reset');
 
-    (* 4. Front Reset (conditions de garde reunies) : acquittement effectif *)
+    (* 🔄 Front Reset → acquittement *)
     FB(Enable := TRUE, Reset := TRUE, Inputs := Inp);
     ASSERT_FALSE(FB.Fault.Latched, 'Front Reset acquitte le latch timeout');
 END_TEST
@@ -268,14 +268,14 @@ TEST 'TC-P04-016 : Contacteur Kobold coupe des le relachement de la descente (an
     Inp.MotionRequestActive := TRUE;
     Inp.MotionDirection := -1;
     Inp.CurrentSpeedStep := 4;
-    (* Entree en SEARCHING_IMMERSION sous descente active (WAIT->READY->SEARCHING puis execution) *)
+    (* 🚀 → SEARCHING_IMMERSION *)
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
     ASSERT_EQ(FB.Outputs.StepState, E_DiveSearchState.SEARCHING_IMMERSION, 'En recherche immersion');
     ASSERT_TRUE(FB.Outputs.KoboldContactorCmd, 'Contacteur alimente sous descente active');
 
-    (* Relachement de la demande de descente : contacteur et permis coupes le meme scan, sans defaut *)
+    (* 🛑 Relâchement : contacteur + permis coupés *)
     Inp.MotionRequestActive := FALSE;
     Inp.MotionDirection := 0;
     FB(Enable := TRUE, Reset := FALSE, Inputs := Inp);
