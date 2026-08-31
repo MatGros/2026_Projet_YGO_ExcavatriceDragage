@@ -60,8 +60,8 @@ VAR CONSTANT
     CST_SensCount                   : INT := 2;   // Nombre de sens (ascending, descending)
     CST_ChargeCount                 : INT := 2;   // Nombre d'etats de charge (vide, charge)
     CST_PalierCount                 : INT := 5;   // Nombre de paliers (1..5)
-    CST_IdxAscending                : INT := 1;   // Index sens ascending
-    CST_IdxDescending               : INT := 2;   // Index sens descending
+    CST_IdxAscent                : INT := 1;   // Index sens ascending
+    CST_IdxDescent               : INT := 2;   // Index sens descending
     CST_IdxVide                     : INT := 1;   // Index charge vide
     CST_IdxCharge                   : INT := 2;   // Index charge presente
 END_VAR
@@ -84,7 +84,7 @@ CollectAllowed := LearnRequested AND MeasureUsable AND ContextValid;
 {region "§2 Collecte passive"}
 IF CollectAllowed THEN
     // Index sens et charge
-    IF Direction > 0 THEN SensIdx := CST_IdxAscending; ELSE SensIdx := CST_IdxDescending; END_IF;
+    IF Direction > 0 THEN SensIdx := CST_IdxAscent; ELSE SensIdx := CST_IdxDescent; END_IF;
     IF LoadPresent THEN ChargeIdx := CST_IdxCharge; ELSE ChargeIdx := CST_IdxVide; END_IF;
 
     // Plausibilite : vitesse dans l'enveloppe du palier (borne min/max)

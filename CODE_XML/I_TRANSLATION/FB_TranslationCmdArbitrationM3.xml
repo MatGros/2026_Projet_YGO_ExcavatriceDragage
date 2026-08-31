@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:32:56.545902" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:32:56.545902">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:36.148160" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:36.148160">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -327,20 +327,20 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
       <dataType name="ST_fbTranslationCmdArbitration_IHM">
         <baseType>
           <struct>
-            <variable name="BtnFwd">
+            <variable name="BtnTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation avant (TranslationM3.Cmd.BtnFwd)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation vers Trémie (TranslationM3.Cmd.BtnTremie, ex-BtnFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnRev">
+            <variable name="BtnMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation arrière (TranslationM3.Cmd.BtnRev)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation vers Maintenance (TranslationM3.Cmd.BtnMaintenance, ex-BtnRev)</xhtml>
               </documentation>
             </variable>
             <variable name="SelPositioning">
@@ -685,7 +685,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Rev, 0: Stop, 1: Fwd)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: vers Maintenance, 0: Stop, 1: vers Trémie)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedPct">
@@ -775,9 +775,9 @@ ELSE
         PositioningActive := IHM.SelPositioning;
         SelTarget := 0;
 
-        IF NOT TglJoystickMaster AND IHM.BtnFwd THEN
+        IF NOT TglJoystickMaster AND IHM.BtnTremie THEN
             Direction := 1;
-        ELSIF NOT TglJoystickMaster AND IHM.BtnRev THEN
+        ELSIF NOT TglJoystickMaster AND IHM.BtnMaintenance THEN
             Direction := -1;
         ELSIF TglJoystickMaster THEN
             Direction := Joystick.AxisX.Direction;

@@ -49,9 +49,9 @@ VAR
     M3_SafeStop_Aggregate   : BOOL; // 🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)
 
     M3_HeightInterlockOk    : BOOL; // TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)
-    M3_LimitSwitchRevEffective : BOOL; // Coupure dure §5bis — bascule sur P1 si Maintenance interdite
-    M3_LimitSwitchFwdStable : BOOL; // Verrou bistable Fdc Trémie (mémorisé stable contre les rebonds)
-    M3_LimitSwitchRevStable : BOOL; // Verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds)
+    M3_LimitSwitchMaintenanceEffective : BOOL; // Coupure dure §5bis — bascule sur P1 si Maintenance interdite (ex-M3_LimitSwitchRevEffective)
+    M3_LimitSwitchTremieStable : BOOL; // Verrou bistable Fdc Trémie (mémorisé stable contre les rebonds) (ex-M3_LimitSwitchFwdStable)
+    M3_LimitSwitchMaintenanceStable : BOOL; // Verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds) (ex-M3_LimitSwitchRevStable)
 
     // Verrous bistables des positions cibles (§0quater) — PositionDecoder n'émet
     // plus qu'un front transitoire par capteur, mémorisé ici jusqu'à dégagement.
@@ -96,8 +96,8 @@ Data.TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
 Data.TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
 Data.TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
 Data.TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
-Data.M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
-Data.M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
+Data.M3_LimitSwitchTremie       := instPosDecoderM3.LimitSwitchTremie;
+Data.M3_LimitSwitchMaintenance  := instPosDecoderM3.LimitSwitchMaintenance;
 Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 Data.M3_SensorsWord            := instPosDecoderM3.SensorsWord;
 {endregion}
@@ -122,31 +122,31 @@ TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 {endregion}
 
 {region "§0bis Coupure dure limite translation"}
-// === 🚧 §0bis COUPURE DURE (LimitSwitchRev) — bascule sur P1 si Maintenance interdite ===
-// LimitSwitchFwd/Rev protègent nativement Trémie/Maintenance
+// === 🚧 §0bis COUPURE DURE (LimitSwitchMaintenance) — bascule sur P1 si Maintenance interdite ===
+// LimitSwitchTremie/Maintenance protègent nativement Trémie/Maintenance
 // (§5bis FB_Translation : coupure immédiate, sans rampe, dès que CommandedDirection insiste
 // dans l'extrémité). P1/P2 n'ont aucune protection dure équivalente — seul le verrou souple
 // (arrival-lock) les couvre. Quand Maintenance est interdite, la coupure dure doit protéger
 // P1 comme si c'était l'extrémité réelle : mot 00001 (P1=0 ET Maintenance=1), UN CRAN AVANT
 // la vraie extrémité Maintenance (00000) — backup si le verrou souple a déjà échoué à arrêter
 // avant P1, garde la machine hors de la zone interdite plutôt que d'attendre le vrai fond.
-M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
+M3_LimitSwitchMaintenanceEffective := SEL(PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
                                    NOT instPosDecoderM3.TranslationPosP1 AND instPosDecoderM3.TranslationPosMaintenance,
-                                   instPosDecoderM3.LimitSwitchRev);
+                                   instPosDecoderM3.LimitSwitchMaintenance);
 
 // 🔒 §0ter STABILISATION BISTABLE FINS DE COURSE EXTRÊMES (Trémie & Maintenance/P1)
 // Maintient la détection stable à 1 même si le capteur physique vibre ou saute brièvement.
 // Se libère uniquement sur un mouvement effectif dans le SENS INVERSE (dégagement).
-IF instPosDecoderM3.LimitSwitchFwd THEN
-    M3_LimitSwitchFwdStable := TRUE;
+IF instPosDecoderM3.LimitSwitchTremie THEN
+    M3_LimitSwitchTremieStable := TRUE;
 ELSIF M3_Direction_Active = -1 THEN
-    M3_LimitSwitchFwdStable := FALSE;
+    M3_LimitSwitchTremieStable := FALSE;
 END_IF;
 
-IF M3_LimitSwitchRevEffective THEN
-    M3_LimitSwitchRevStable := TRUE;
-ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchRev) THEN
-    M3_LimitSwitchRevStable := FALSE;
+IF M3_LimitSwitchMaintenanceEffective THEN
+    M3_LimitSwitchMaintenanceStable := TRUE;
+ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchMaintenance) THEN
+    M3_LimitSwitchMaintenanceStable := FALSE;
 END_IF;
 
 // 🔒 §0quater MÉMORISATION DU DERNIER POINT ATTEINT (front → jeton unique)
@@ -182,8 +182,8 @@ END_IF;
 
 // ── Arbitrage M3 (FB_TranslationCmdArbitrationM3) ──
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
-ArbM3_IHM.BtnFwd            := GVL_IHM.TranslationM3.Cmd.BtnFwd;
-ArbM3_IHM.BtnRev            := GVL_IHM.TranslationM3.Cmd.BtnRev;
+ArbM3_IHM.BtnTremie         := GVL_IHM.TranslationM3.Cmd.BtnTremie;
+ArbM3_IHM.BtnMaintenance    := GVL_IHM.TranslationM3.Cmd.BtnMaintenance;
 ArbM3_IHM.SelPositioning    := GVL_IHM.TranslationM3.Cmd.SelPositioning;
 ArbM3_IHM.SetFreq_Hz        := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
 ArbM3_IHM.BypassGlobal      := GVL_IHM.TranslationM3.Bypass.Global;
@@ -267,8 +267,9 @@ instSafetyTranslationM3(
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BrakeCmd                := instTranslationM3.BrakeReleaseRequest,
     Direction               := M3_Direction_Active,
-    LimitSwitchFwd          := M3_LimitSwitchFwdStable,
-    LimitSwitchRev          := M3_LimitSwitchRevStable,
+    LimitSwitchTremie       := M3_LimitSwitchTremieStable,
+    LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
+    MaintenanceM3TargetEnable := PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
     SensorWordIncoherent    := instPosDecoderM3.Incoherent,
     BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
@@ -330,8 +331,8 @@ instTranslationM3(
     // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
     SlowdownSensorP1           := (NOT instPosDecoderM3.TranslationPosP2) AND instPosDecoderM3.TranslationPosP1
                                    AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
-    LimitSwitchFwd          := M3_LimitSwitchFwdStable,
-    LimitSwitchRev          := M3_LimitSwitchRevStable,
+    LimitSwitchTremie       := M3_LimitSwitchTremieStable,
+    LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     Cfg                     := TranslationCfg,
@@ -423,8 +424,8 @@ TranslationState.AtMaintenance := M3_AtMaintenanceStable;
 TranslationState.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationState.SensorsWord := instPosDecoderM3.SensorsWord;
 TranslationState.SensorWordIncoherent := instPosDecoderM3.Incoherent;
-TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
-TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
+TranslationState.LimitSwitchTremie := M3_LimitSwitchTremieStable;
+TranslationState.LimitSwitchMaintenance := M3_LimitSwitchMaintenanceStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 // 🛡️ Pas de sortie State sur FB_TranslationOutputInterlock : le "vrai état" de la
@@ -459,6 +460,11 @@ TranslationSafety.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
 TranslationSafety.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
 TranslationSafety.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
+// 🟢 Permis directionnels M3 (source unique : FB_Safety_Translation) — projetés vers l'IHM
+TranslationSafety.TremiePermit := instSafetyTranslationM3.TremiePermit;
+TranslationSafety.MaintenancePermit := instSafetyTranslationM3.MaintenancePermit;
+GVL_IHM.TranslationM3.Safety.TremiePermit := instSafetyTranslationM3.TremiePermit;
+GVL_IHM.TranslationM3.Safety.MaintenancePermit := instSafetyTranslationM3.MaintenancePermit;
 TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;

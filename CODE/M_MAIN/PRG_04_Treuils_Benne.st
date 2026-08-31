@@ -83,7 +83,7 @@ VAR
     // fermée. Distinct de DumpAtTremie/DiveSearch/ExtractionAssist (fonctionnement normal,
     // pas une assistance MAINT_N1/N2 dédiée). Réutilise WinchBothMotionActive/
     // WinchBothMotionDirection (§1 ci-dessus) : déjà exactement "mouvement both
-    // demandé" dans les 2 modes (joystick Select=0, ou BtnWinchBothUp/Down) — mêmes variables
+    // demandé" dans les 2 modes (joystick Select=0, ou BtnWinchBothAscent/Descent) — mêmes variables
     // déjà utilisées par instBucket/instDiveSearch/instExtractionAssist.
     WinchBothDiveBucketOpenArmed     : BOOL;  // CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)
     WinchBothMotionBlockedByBucket   : BOOL;  // Garde-fou direct -- voir §3
@@ -173,11 +173,11 @@ VAR
     M2_LimitShift                : REAL;
 
     EffectiveMaxStepAscent    : INT;
-    EffectiveMaxStepDescending  : INT;
+    EffectiveMaxStepDescent  : INT;
 
     // Agrégateur de clamp de palier — bornes communes M1=M2 puis M2-propre
-    CommonMaxStepUp   : INT;
-    CommonMaxStepDown : INT;
+    CommonMaxStepAscent   : INT;
+    CommonMaxStepDescent : INT;
     CommonMinStepUp   : INT;
     CommonMinStepDown : INT;
     M2MaxStepUp       : INT;
@@ -342,10 +342,10 @@ ELSE
     EffectiveMaxStepAscent := _CommunCfgPersist.WinchMaxStepAscent;
 END_IF;
 
-IF _CommunCfgPersist.WinchMaxStepDescending <= 0 THEN
-    EffectiveMaxStepDescending := 3;
+IF _CommunCfgPersist.WinchMaxStepDescent <= 0 THEN
+    EffectiveMaxStepDescent := 3;
 ELSE
-    EffectiveMaxStepDescending := _CommunCfgPersist.WinchMaxStepDescending;
+    EffectiveMaxStepDescent := _CommunCfgPersist.WinchMaxStepDescent;
 END_IF;
 
 
@@ -360,20 +360,20 @@ BucketM2Open  := (instBucket.M2_Direction = 1);
 BucketM2Close := (instBucket.M2_Direction = -1);
 
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
-ArbIHM.BtnUpM1           := GVL_IHM.M1TreuilRetenue.Cmd.BtnUp;
-ArbIHM.BtnDownM1         := GVL_IHM.M1TreuilRetenue.Cmd.BtnDown;
-ArbIHM.BtnUpM2           := GVL_IHM.M2TreuilBenne.Cmd.BtnUp;
-ArbIHM.BtnDownM2         := GVL_IHM.M2TreuilBenne.Cmd.BtnDown;
-ArbIHM.BtnWinchBothUp    := GVL_IHM.Commun.BtnWinchBothUp;
-ArbIHM.BtnWinchBothDown  := GVL_IHM.Commun.BtnWinchBothDown;
+ArbIHM.BtnAscentM1           := GVL_IHM.M1TreuilRetenue.Cmd.BtnAscent;
+ArbIHM.BtnDescentM1         := GVL_IHM.M1TreuilRetenue.Cmd.BtnDescent;
+ArbIHM.BtnAscentM2           := GVL_IHM.M2TreuilBenne.Cmd.BtnAscent;
+ArbIHM.BtnDescentM2         := GVL_IHM.M2TreuilBenne.Cmd.BtnDescent;
+ArbIHM.BtnWinchBothAscent    := GVL_IHM.Commun.BtnWinchBothAscent;
+ArbIHM.BtnWinchBothDescent  := GVL_IHM.Commun.BtnWinchBothDescent;
 
 ArbContext.BucketBusy                     := instBucket.Lifecycle.Busy;
 ArbContext.BucketM2StartStop              := instBucket.M2_StartStop;
 ArbContext.BucketM2Open                   := BucketM2Open;
 ArbContext.BucketM2Close                  := BucketM2Close;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
-ArbContext.SyncBlocksUp                   := SyncMinorDeviationBlocksUp;
-ArbContext.SyncBlocksDown                 := SyncMinorDeviationBlocksDown;
+ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
+ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
 
 ArbM1Cfg.BtnStepTgt := 5;
 ArbM2Cfg.BtnStepTgt := 5;
@@ -841,26 +841,26 @@ ArmingPermit := (EffectivePermitM1_Ascent OR EffectivePermitM1_Descend
 // Synchro (instWinchSync) calculée en §4, en amont : SyncDeviationWarn réduit les DEUX treuils.
 
 // --- Sources communes (M1 = M2) ---
-CommonMaxStepUp   := EffectiveMaxStepAscent;
-CommonMaxStepDown := EffectiveMaxStepDescending;
+CommonMaxStepAscent   := EffectiveMaxStepAscent;
+CommonMaxStepDescent := EffectiveMaxStepDescent;
 IF instWinchSync.SyncDeviationWarn THEN
-    CommonMaxStepUp   := 1;
-    CommonMaxStepDown := 1;
+    CommonMaxStepAscent   := 1;
+    CommonMaxStepDescent := 1;
 END_IF;
 IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ExtractionControlActive OR ExtractionControlActive THEN
-    CommonMaxStepUp := 1;
+    CommonMaxStepAscent := 1;
 END_IF;
 
 // Planchers communs : 1 (neutre) en montée ; en descente, MAX(1, plancher plongée FB_DiveSearch).
 // Règle de l'agrégateur : plancher = MAX des sources plancher ; si plancher > plafond,
 // LE PLAFOND GAGNE — le clamp final (consommation FB_Winch, lot aval) borne au plafond,
-// on ne force donc jamais ici un palier au-delà de CommonMaxStepDown.
+// on ne force donc jamais ici un palier au-delà de CommonMaxStepDescent.
 CommonMinStepUp   := 1;
 CommonMinStepDown := MAX(1, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStepDown);
 
 // --- M2-propre (jamais vu par M1) ---
-M2MaxStepUp   := CommonMaxStepUp;
-M2MaxStepDown := CommonMaxStepDown;
+M2MaxStepUp   := CommonMaxStepAscent;
+M2MaxStepDown := CommonMaxStepDescent;
 IF instBucket.M2_BucketJogLimit OR ManualBucketLimitsActive THEN
     M2MaxStepUp   := 1;
     M2MaxStepDown := 1;
@@ -906,8 +906,8 @@ instWinchLoadEstimatorM2(
 M1DriveRequest.StartStop            := M1LogicRequestStartStop;
 M1DriveRequest.Direction            := M1LogicRequestDirection;
 M1DriveRequest.SpeedStepReq         := M1LogicRequestStepTgt;
-M1DriveRequest.MaxStepUp            := CommonMaxStepUp;
-M1DriveRequest.MaxStepDown          := CommonMaxStepDown;
+M1DriveRequest.MaxStepUp            := CommonMaxStepAscent;
+M1DriveRequest.MaxStepDown          := CommonMaxStepDescent;
 // Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
 // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
 M1DriveRequest.MinStepDown          := CommonMinStepDown;

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:36:12.028121" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:36:12.028121">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:50.793180" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:50.793180">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -134,20 +134,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Maintenance (1=Atteint)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_LimitSwitchFwd">
+            <variable name="M3_LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course avant M3 (1=Actionne)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course Trémie M3 (1=Actionne) (ex-M3_LimitSwitchFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_LimitSwitchRev">
+            <variable name="M3_LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course arriere M3 (1=Actionne)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course Maintenance M3 (1=Actionne) (ex-M3_LimitSwitchRev)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_SensorWordIncoherent">
@@ -333,6 +333,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
               </documentation>
             </variable>
             <variable name="BlockedBySafety">
@@ -837,15 +853,21 @@
                 <BOOL />
               </type>
             </variable>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Fin de course extrême Trémie (ex-LimitSwitchFwd)</xhtml>
+              </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
+              </documentation>
             </variable>
             <variable name="DriveThermalOk">
               <type>

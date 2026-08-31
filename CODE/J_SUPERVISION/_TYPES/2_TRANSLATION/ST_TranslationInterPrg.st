@@ -31,8 +31,8 @@ STRUCT
     TranslationAtP2           : BOOL; // 🎯 Position exacte P2 (1=Atteint)
     TranslationAtP1           : BOOL; // 🎯 Position exacte P1 (1=Atteint)
     TranslationAtMaintenance  : BOOL; // 🎯 Position exacte Maintenance (1=Atteint)
-    M3_LimitSwitchFwd         : BOOL; // 🛡️ Fin de course avant M3 (1=Actionne)
-    M3_LimitSwitchRev         : BOOL; // 🛡️ Fin de course arriere M3 (1=Actionne)
+    M3_LimitSwitchTremie    : BOOL; // 🛡️ Fin de course Trémie M3 (1=Actionne) (ex-M3_LimitSwitchFwd)
+    M3_LimitSwitchMaintenance : BOOL; // 🛡️ Fin de course Maintenance M3 (1=Actionne) (ex-M3_LimitSwitchRev)
     M3_SensorWordIncoherent   : BOOL; // ❌ Incoherence detectee mot capteurs M3
     M3_SensorsWord             : BYTE; // 📊 Mot d'etat capteurs M3
 

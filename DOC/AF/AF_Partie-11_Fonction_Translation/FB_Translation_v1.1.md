@@ -128,7 +128,7 @@ contrairement aux treuils à contacteurs discrets).
 | `SlowdownSensorTremie` | BOOL | Capteur PV — ralentissement avant Trémie (`Direction=1`) |
 | `SlowdownSensorMaintenance` | BOOL | 🆕 Zone P1→Maintenance — ralentissement avant Maintenance (`Direction=-1`) |
 | `SlowdownSensorP1` | BOOL | 🆕 Zone P2→P1 — ralentissement avant P1 (`Direction=-1`), **gaté par le mode côté PRG_05** (désactivé si zone Maintenance autorisée — P1 n'est alors plus un point d'arrêt, 100% vitesse) |
-| `LimitSwitchFwd`/`LimitSwitchRev` | BOOL | Butées extrêmes (depuis PositionDecoder, verrou bistable anti-rebond §0ter PRG_05) |
+| `LimitSwitchTremie`/`LimitSwitchMaintenance` | BOOL | Butées extrêmes (depuis PositionDecoder, verrou bistable anti-rebond §0ter PRG_05) — ex-`LimitSwitchFwd`/`LimitSwitchRev` |
 | `DriveStatusWord` | WORD | Mot état AC600 (EtherCAT) |
 | `DriveActualFreqHz` | REAL | Fréquence réelle mesurée (Hz) |
 | `InvertDriveDirection` | BOOL | 🆕 2026-08-06 : compense le câblage moteur réel (U/V inversés) — appliqué **uniquement** au mot de commande variateur en sortie (§7bis), jamais à `Direction`/`CommandedDirection` qui reste partout ailleurs le sens sémantique réel apparié aux capteurs physiques |

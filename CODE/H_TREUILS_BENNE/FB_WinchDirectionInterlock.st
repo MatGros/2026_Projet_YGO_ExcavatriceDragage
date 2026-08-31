@@ -14,8 +14,8 @@ VAR_INPUT
     EnableRising    : BOOL;   // --> [CMD] Front montant Enable du FB parent (D18)
     Reset           : BOOL;   // --> [CMD] Acquittement defaut (front) : purge la memoire de direction
     ReqDirection    : INT;    // --> [CMD] Sens demande (-1: Descending, 0: Stop, 1: Ascending)
-    ChangeDelayUp   : TIME;   // --> [CFG] Delai interlock changement de sens montee
-    ChangeDelayDown : TIME;   // --> [CFG] Delai interlock changement de sens descente
+    ChangeDelayAscent   : TIME;   // --> [CFG] Delai interlock changement de sens montee
+    ChangeDelayDescent : TIME;   // --> [CFG] Delai interlock changement de sens descente
 END_VAR
 VAR_OUTPUT
     CommandedDirection      : INT;   // <-- [DIAG] Sens interne memorise
@@ -44,9 +44,9 @@ END_IF;
 
 // Delai effectif selon le sens demande
 IF ReqDirection > 0 THEN
-    EffectiveDelay := ChangeDelayUp;
+    EffectiveDelay := ChangeDelayAscent;
 ELSE
-    EffectiveDelay := ChangeDelayDown;
+    EffectiveDelay := ChangeDelayDescent;
 END_IF;
 
 // D18 : au front montant Enable avec sens maintenu, armer le temps mort

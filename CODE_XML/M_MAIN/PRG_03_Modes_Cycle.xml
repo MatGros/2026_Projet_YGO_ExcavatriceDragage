@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:33:41.349774" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:33:41.349774">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.633512" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.633512">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1855,9 +1855,9 @@ IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     WinchBothMotionActive := PRG_02_Acquisition.Data.Joystick.DeadmanArmed
                                      AND (instModes.Auth.JoystickWinchSelectArbitrated = 0);
 ELSE
-    IF GVL_IHM.Commun.BtnWinchBothUp THEN
+    IF GVL_IHM.Commun.BtnWinchBothAscent THEN
         WinchBothMotionDirection := 1;
-    ELSIF GVL_IHM.Commun.BtnWinchBothDown THEN
+    ELSIF GVL_IHM.Commun.BtnWinchBothDescent THEN
         WinchBothMotionDirection := -1;
     ELSE
         WinchBothMotionDirection := 0;
@@ -2797,7 +2797,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
               </documentation>
             </variable>
-            <variable name="ProcessPermitM1_Ascending">
+            <variable name="ProcessPermitM1_Ascent">
               <type>
                 <BOOL />
               </type>
@@ -2806,7 +2806,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
 . [LOC] Permis ascending treuil M1 = CycleMotionPermit AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
-            <variable name="ProcessPermitM1_Descending">
+            <variable name="ProcessPermitM1_Descend">
               <type>
                 <BOOL />
               </type>
@@ -2814,7 +2814,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis descending treuil M1 = CycleMotionPermit AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
-            <variable name="ProcessPermitM2_Ascending">
+            <variable name="ProcessPermitM2_Ascent">
               <type>
                 <BOOL />
               </type>
@@ -2822,7 +2822,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis ascending treuil M2 = CycleMotionPermit AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
-            <variable name="ProcessPermitM2_Descending">
+            <variable name="ProcessPermitM2_Descend">
               <type>
                 <BOOL />
               </type>
@@ -3171,10 +3171,10 @@ Ready := Enable AND NOT Fault.Latched;
 // défléchi (CycleMotionPermit) ET l'homme-mort est armé (DeadmanArmed). Chaque
 // commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par CycleMotionPermit.
-ProcessPermitM1_Ascending        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM1_Descending      := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM2_Ascending        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM2_Descending      := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM1_Ascent        := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM1_Descend      := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM2_Ascent        := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM2_Descend      := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitBucket_Open := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitBucket_Close := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitM3_Tremie        := CycleMotionPermit AND DeadmanArmed;
@@ -3281,10 +3281,10 @@ CASE State OF
 
         // Vitesses lentes pour chercher capteur top + référencement
         IF NOT HomedM1 OR NOT HomedM2 THEN
-            WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+            WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
             WinchM1Cmd.ReqDirection := 1;   // montée lente vers capteur top
             WinchM1Cmd.StepTgt := 1;
-            WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+            WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
             WinchM2Cmd.ReqDirection := 1;
             WinchM2Cmd.StepTgt := 1;
             IF HomingRequest THEN
@@ -3356,13 +3356,13 @@ CASE State OF
         OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
         // M1 et M2 descendent ensemble (synchro gérée en aval)
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descend;
         WinchM1Cmd.ReqDirection := -1;
         WinchM1Cmd.StepTgt  := 3;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descend;
         WinchM2Cmd.ReqDirection := -1;
         WinchM2Cmd.StepTgt  := 3;
-        BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descending;
+        BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descend;
 
         // Transition uniquement sur le retour dédié Kobold.
         IF CycleMotionPermit AND KoboldContactFond THEN
@@ -3390,10 +3390,10 @@ CASE State OF
         OperatorActionId := 16#0405;
         OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
 
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
         WinchM1Cmd.ReqDirection := 1;
         WinchM1Cmd.StepTgt := 1;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt := 1;
 
@@ -3437,10 +3437,10 @@ CASE State OF
         OperatorActionId := 16#0407;
         OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
 
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
         WinchM1Cmd.ReqDirection := 1;
         WinchM1Cmd.StepTgt  := 1;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt  := 1;
 
@@ -3463,10 +3463,10 @@ CASE State OF
         OperatorActionId := 16#0408;
         OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
         WinchM1Cmd.ReqDirection := 1;
         WinchM1Cmd.StepTgt  := 4;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt  := 4;
 
@@ -3532,10 +3532,10 @@ CASE State OF
         // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
         // précédent). Les deux treuils restent synchrones et sous homme-mort.
         WinchM1Cmd.ReqDirection := -1;
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descend;
         WinchM1Cmd.StepTgt  := 1;
         WinchM2Cmd.ReqDirection := -1;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descend;
         WinchM2Cmd.StepTgt  := 1;
 
         BucketCmd.ReqOpen := ProcessPermitBucket_Open AND (WinchM1Cmd.ReqDirection = -1);
@@ -3594,7 +3594,7 @@ END_IF;
 // 🛑 Relâchement du manche (retour au centre) OU de l'homme-mort : neutralisation
 // des demandes actives. Gate continu : aucune commande d'actionneur ne survit à la
 // perte du permis opérateur (manche défléchi ET homme-mort armé).
-IF Lifecycle.Busy AND NOT ProcessPermitM1_Ascending THEN
+IF Lifecycle.Busy AND NOT ProcessPermitM1_Ascent THEN
     WinchM1Cmd.ReqStartStop := FALSE;
     WinchM2Cmd.ReqStartStop := FALSE;
     TranslationCmd.ReqStart := FALSE;

@@ -58,7 +58,7 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2)</xhtml>
               </documentation>
             </variable>
-            <variable name="WinchMaxStepDescending">
+            <variable name="WinchMaxStepDescent">
               <type>
                 <INT />
               </type>

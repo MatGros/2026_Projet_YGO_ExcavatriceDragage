@@ -21,7 +21,7 @@ VAR_INPUT
     Auth       : ST_Modes_Autorisations;          // --> [CMD] Autorisations mode (Mode, JoystickWinchSelectArbitrated)
     ReqWinch   : ST_ProgramWinchRequest;            // --> [REQ] Demande cycle treuil M1 (SEMI_AUTO)
     BothIntent : ST_WinchBothIntent;           // --> [CMD] Intention both opérateur (source unique PRG_03)
-    IHM        : ST_fbWinchCmdArbitration_IHM;  // --> [CMD] Boutons IHM (BtnUpM1/BtnDownM1, both)
+    IHM        : ST_fbWinchCmdArbitration_IHM;  // --> [CMD] Boutons IHM (BtnAscentM1/BtnDescentM1, both)
     TglJoystickMaster : BOOL;  // --> [CMD] Toggle joystick maître global (Modes.Cmd, source unique)
     Context    : ST_fbWinchCmdArbitration_Context; // --> [STAT] Gating benne/synchro (partagé M1/M2)
     Cfg        : ST_fbWinchCmdArbitration_Cfg;     // --> [CFG] Palier boutons/both (BtnStepTgt)
@@ -62,13 +62,13 @@ ELSE
         IF NOT TglJoystickMaster THEN
             // Mode Boutons IHM
             IF BothIntent.Active THEN
-                // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
+                // Both (BtnWinchBothAscent/Descent) — source unique PRG_03, plus de re-dérivation
                 Direction := BothIntent.Direction;
                 StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
-            ELSIF IHM.BtnUpM1 THEN
+            ELSIF IHM.BtnAscentM1 THEN
                 Direction := 1;
                 StepTgt   := Cfg.BtnStepTgt;
-            ELSIF IHM.BtnDownM1 THEN
+            ELSIF IHM.BtnDescentM1 THEN
                 Direction := -1;
                 StepTgt   := Cfg.BtnStepTgt;
             ELSE
@@ -94,8 +94,8 @@ ELSE
         StartStop := (Direction <> 0)
                   AND NOT Context.BucketBusy
                   AND NOT Context.WinchBothMotionBlockedByBucket
-                  AND NOT ((Context.SyncBlocksUp   AND (Direction = 1))
-                        OR (Context.SyncBlocksDown AND (Direction = -1)))
+                  AND NOT ((Context.SyncBlocksAscent   AND (Direction = 1))
+                        OR (Context.SyncBlocksDescent AND (Direction = -1)))
                   AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed);
     END_IF;
 

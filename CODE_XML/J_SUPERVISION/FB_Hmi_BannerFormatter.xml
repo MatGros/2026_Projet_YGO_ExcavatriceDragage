@@ -598,6 +598,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
               </documentation>
             </variable>
+            <variable name="TremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BlockedBySafety">
               <type>
                 <BOOL />

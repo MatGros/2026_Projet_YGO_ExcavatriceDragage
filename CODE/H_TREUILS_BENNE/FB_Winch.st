@@ -132,8 +132,8 @@ Fault := instFault.Fault;
 IF NOT Enable THEN
     SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := Config.SpeedStepTable);
     DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqDirection := 0,
-                       ChangeDelayUp := Config.DirectionInterlockDelayUp,
-                       ChangeDelayDown := Config.DirectionInterlockDelayDown);
+                       ChangeDelayAscent := Config.DirectionInterlockDelayAscent,
+                       ChangeDelayDescent := Config.DirectionInterlockDelayDescent);
     StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := Config.StepRampDelayAscent);
     RelayFwd := FALSE;
     RelayRev := FALSE;
@@ -191,8 +191,8 @@ DirectionInterlock(
     EnableRising := EnableRisingEdge.Q,
     Reset := Reset,
     ReqDirection := DriveRequest.Direction,
-    ChangeDelayUp := Config.DirectionInterlockDelayUp,
-    ChangeDelayDown := Config.DirectionInterlockDelayDown
+    ChangeDelayAscent := Config.DirectionInterlockDelayAscent,
+    ChangeDelayDescent := Config.DirectionInterlockDelayDescent
 );
 CommandedDirection := DirectionInterlock.CommandedDirection;
 DirectionChangePending := DirectionInterlock.DirectionChangePending;
@@ -252,7 +252,7 @@ END_IF;
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
 IF CommandedDirection = -1 THEN
-    EffectiveStepRampDelay := Config.StepRampDelayDescending;
+    EffectiveStepRampDelay := Config.StepRampDelayDescent;
 ELSE
     EffectiveStepRampDelay := Config.StepRampDelayAscent;
 END_IF;

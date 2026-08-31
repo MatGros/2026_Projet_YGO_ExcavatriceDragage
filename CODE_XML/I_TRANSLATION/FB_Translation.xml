@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:35:35.914843" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:35:35.914843">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:26.595016" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:26.595016">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -466,7 +466,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = vers Maintenance, 0 = Neutre, +1 = vers Trémie (source d'autorité du sens)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedTgt_Pct">
@@ -509,20 +509,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur P2 — ralentissement avant P1 (Direction=-1)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême avant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême arrière</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveStatusWord">
@@ -848,7 +848,7 @@ instCauses[3].Active   := DriveFaultLatching;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Defaut variateur translation AC600';
 
-IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev)) THEN
+IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchTremie) OR (CommandedDirection = -1 AND LimitSwitchMaintenance)) THEN
     instCauses[6].Active := TRUE;
 ELSE
     instCauses[6].Active := FALSE;

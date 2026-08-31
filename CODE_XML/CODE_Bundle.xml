@@ -1950,7 +1950,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Distinct des bypass individuels M1/M2 (ST_BypassWinch)
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
-      GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
+      GVL_IHM.Commun.BtnWinchBothAscent/Descent), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
       pilotage groupé — SANS retirer les bypass individuels pour le pilotage à l'unité.
       ⚠️ Ne remplace PAS les bypass individuels : les deux se combinent en OR, jamais l'un
@@ -3634,20 +3634,20 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick Axe X (-100% à +100%)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx203_HmiCmd_BtnFwd">
+            <variable name="Idx203_HmiCmd_BtnTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Avance IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton vers Trémie IHM | 0 = Relâché (ex-Idx203_HmiCmd_BtnFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx204_HmiCmd_BtnRev">
+            <variable name="Idx204_HmiCmd_BtnMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Recul IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton vers Maintenance IHM | 0 = Relâché (ex-Idx204_HmiCmd_BtnRev)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx205_HmiTargetPosition">
@@ -3843,20 +3843,20 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx304_LimitSwitchFwdActive">
+            <variable name="Idx304_LimitSwitchTremieActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Avance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Trémie (ex-Idx304_LimitSwitchFwdActive)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx305_LimitSwitchRevActive">
+            <variable name="Idx305_LimitSwitchMaintenanceActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Recul</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Maintenance (ex-Idx305_LimitSwitchRevActive)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx306_BypassLimitSwitch">
@@ -4106,7 +4106,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick (-100% à +100%)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx203_HmiManualCmd_BtnUp">
+            <variable name="Idx203_HmiManualCmd_BtnAscent">
               <type>
                 <BOOL />
               </type>
@@ -4114,7 +4114,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Ascending IHM | 0 = Relâché</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx204_HmiManualCmd_BtnDown">
+            <variable name="Idx204_HmiManualCmd_BtnDescent">
               <type>
                 <BOOL />
               </type>
@@ -4240,7 +4240,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
       <dataType name="ST_Chain_Winch_Outputs">
         <baseType>
           <struct>
-            <variable name="Idx501_CmdRelayFwd_Up_DQ">
+            <variable name="Idx501_CmdRelayAscent_DQ">
               <type>
                 <BOOL />
               </type>
@@ -4248,7 +4248,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Ascending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx502_CmdRelayRev_Down_DQ">
+            <variable name="Idx502_CmdRelayDescent_DQ">
               <type>
                 <BOOL />
               </type>
@@ -4577,7 +4577,7 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2)</xhtml>
               </documentation>
             </variable>
-            <variable name="WinchMaxStepDescending">
+            <variable name="WinchMaxStepDescent">
               <type>
                 <INT />
               </type>
@@ -4791,7 +4791,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : temps depuis dernier front IHM</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothUp">
+            <variable name="BtnWinchBothAscent">
               <type>
                 <BOOL />
               </type>
@@ -4800,7 +4800,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
 ⬆️ Monte les 2 treuils simultanément</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothDown">
+            <variable name="BtnWinchBothDescent">
               <type>
                 <BOOL />
               </type>
@@ -8984,6 +8984,22 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
               </documentation>
             </variable>
+            <variable name="TremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BlockedBySafety">
               <type>
                 <BOOL />
@@ -10623,20 +10639,20 @@ Cause de blocage prioritaire</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Numéro de la cible de position sélectionnée</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnFwd">
+            <variable name="BtnTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche avant (→ Trémie), pilotage IHM exclusif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche vers Trémie (ex-BtnFwd), pilotage IHM exclusif</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnRev">
+            <variable name="BtnMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche arrière (→ Maintenance), pilotage IHM exclusif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche vers Maintenance (ex-BtnRev), pilotage IHM exclusif</xhtml>
               </documentation>
             </variable>
             <variable name="SetFreq_Hz">
@@ -10688,7 +10704,7 @@ Cause de blocage prioritaire</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au pilotage de la translation M3 depuis l'IHM.
    📄 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
-      sans pont générique pour ne jamais persister BtnFwd/BtnRev.
+      sans pont générique pour ne jamais persister BtnTremie/BtnMaintenance.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -10942,20 +10958,20 @@ Cause de blocage prioritaire</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Maintenance (1=Atteint)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_LimitSwitchFwd">
+            <variable name="M3_LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course avant M3 (1=Actionne)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course Trémie M3 (1=Actionne) (ex-M3_LimitSwitchFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_LimitSwitchRev">
+            <variable name="M3_LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course arriere M3 (1=Actionne)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course Maintenance M3 (1=Actionne) (ex-M3_LimitSwitchRev)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_SensorWordIncoherent">
@@ -11318,15 +11334,21 @@ Cause de blocage prioritaire</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Fin de course extrême Trémie (ex-LimitSwitchFwd)</xhtml>
+              </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
+              </documentation>
             </variable>
             <variable name="DriveThermalOk">
               <type>
@@ -11578,7 +11600,7 @@ Cause de blocage prioritaire</xhtml>
       <dataType name="ST_WinchCmd">
         <baseType>
           <struct>
-            <variable name="BtnUp">
+            <variable name="BtnAscent">
               <type>
                 <BOOL />
               </type>
@@ -11586,7 +11608,7 @@ Cause de blocage prioritaire</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⬆️ Mouvement montee maintenu (mode boutons IHM, MAINT_N1 accessible)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnDown">
+            <variable name="BtnDescent">
               <type>
                 <BOOL />
               </type>
@@ -13828,20 +13850,20 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
       <dataType name="ST_fbTranslationCmdArbitration_IHM">
         <baseType>
           <struct>
-            <variable name="BtnFwd">
+            <variable name="BtnTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation avant (TranslationM3.Cmd.BtnFwd)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation vers Trémie (TranslationM3.Cmd.BtnTremie, ex-BtnFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnRev">
+            <variable name="BtnMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation arrière (TranslationM3.Cmd.BtnRev)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton translation vers Maintenance (TranslationM3.Cmd.BtnMaintenance, ex-BtnRev)</xhtml>
               </documentation>
             </variable>
             <variable name="SelPositioning">
@@ -14148,7 +14170,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncBlocksUp">
+            <variable name="SyncBlocksAscent">
               <type>
                 <BOOL />
               </type>
@@ -14156,7 +14178,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncBlocksDown">
+            <variable name="SyncBlocksDescent">
               <type>
                 <BOOL />
               </type>
@@ -14187,7 +14209,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
       <dataType name="ST_fbWinchCmdArbitration_IHM">
         <baseType>
           <struct>
-            <variable name="BtnUpM1">
+            <variable name="BtnAscentM1">
               <type>
                 <BOOL />
               </type>
@@ -14195,7 +14217,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée treuil M1 (nommage hardware)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnDownM1">
+            <variable name="BtnDescentM1">
               <type>
                 <BOOL />
               </type>
@@ -14203,7 +14225,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton descente treuil M1</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnUpM2">
+            <variable name="BtnAscentM2">
               <type>
                 <BOOL />
               </type>
@@ -14211,7 +14233,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnDownM2">
+            <variable name="BtnDescentM2">
               <type>
                 <BOOL />
               </type>
@@ -14219,7 +14241,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton descente treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothUp">
+            <variable name="BtnWinchBothAscent">
               <type>
                 <BOOL />
               </type>
@@ -14227,7 +14249,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée couplée both (Commun)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothDown">
+            <variable name="BtnWinchBothDescent">
               <type>
                 <BOOL />
               </type>
@@ -14252,7 +14274,7 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
        paramètre séparé des FB (I4 — factorisation, source unique GVL_IHM.Modes.Cmd).
    📤 Producteur : PRG_04_Treuils_Benne (câblage GVL_IHM).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Nommage : BtnUpM1/BtnUpM2 = nommage hardware propagé (convention projet).
+   🔌 Nommage : BtnAscentM1/BtnAscentM2 = nommage hardware propagé (convention projet).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -14496,7 +14518,7 @@ palier : 1..5</xhtml>
 Table de seuils des paliers de vitesse</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionInterlockDelayUp">
+            <variable name="DirectionInterlockDelayAscent">
               <type>
                 <TIME />
               </type>
@@ -14508,7 +14530,7 @@ Table de seuils des paliers de vitesse</xhtml>
 Delai interlock changement de sens montee</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionInterlockDelayDown">
+            <variable name="DirectionInterlockDelayDescent">
               <type>
                 <TIME />
               </type>
@@ -14542,7 +14564,7 @@ Delai interlock changement de sens montee</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier montee (D10, dedie)</xhtml>
               </documentation>
             </variable>
-            <variable name="StepRampDelayDescending">
+            <variable name="StepRampDelayDescent">
               <type>
                 <TIME />
               </type>
@@ -17945,7 +17967,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
               </documentation>
             </variable>
-            <variable name="ProcessPermitM1_Ascending">
+            <variable name="ProcessPermitM1_Ascent">
               <type>
                 <BOOL />
               </type>
@@ -17954,7 +17976,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
 . [LOC] Permis ascending treuil M1 = CycleMotionPermit AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
-            <variable name="ProcessPermitM1_Descending">
+            <variable name="ProcessPermitM1_Descend">
               <type>
                 <BOOL />
               </type>
@@ -17962,7 +17984,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis descending treuil M1 = CycleMotionPermit AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
-            <variable name="ProcessPermitM2_Ascending">
+            <variable name="ProcessPermitM2_Ascent">
               <type>
                 <BOOL />
               </type>
@@ -17970,7 +17992,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis ascending treuil M2 = CycleMotionPermit AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
-            <variable name="ProcessPermitM2_Descending">
+            <variable name="ProcessPermitM2_Descend">
               <type>
                 <BOOL />
               </type>
@@ -18319,10 +18341,10 @@ Ready := Enable AND NOT Fault.Latched;
 // défléchi (CycleMotionPermit) ET l'homme-mort est armé (DeadmanArmed). Chaque
 // commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par CycleMotionPermit.
-ProcessPermitM1_Ascending        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM1_Descending      := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM2_Ascending        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM2_Descending      := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM1_Ascent        := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM1_Descend      := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM2_Ascent        := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM2_Descend      := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitBucket_Open := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitBucket_Close := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitM3_Tremie        := CycleMotionPermit AND DeadmanArmed;
@@ -18429,10 +18451,10 @@ CASE State OF
 
         // Vitesses lentes pour chercher capteur top + référencement
         IF NOT HomedM1 OR NOT HomedM2 THEN
-            WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+            WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
             WinchM1Cmd.ReqDirection := 1;   // montée lente vers capteur top
             WinchM1Cmd.StepTgt := 1;
-            WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+            WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
             WinchM2Cmd.ReqDirection := 1;
             WinchM2Cmd.StepTgt := 1;
             IF HomingRequest THEN
@@ -18504,13 +18526,13 @@ CASE State OF
         OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
         // M1 et M2 descendent ensemble (synchro gérée en aval)
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descend;
         WinchM1Cmd.ReqDirection := -1;
         WinchM1Cmd.StepTgt  := 3;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descend;
         WinchM2Cmd.ReqDirection := -1;
         WinchM2Cmd.StepTgt  := 3;
-        BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descending;
+        BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descend;
 
         // Transition uniquement sur le retour dédié Kobold.
         IF CycleMotionPermit AND KoboldContactFond THEN
@@ -18538,10 +18560,10 @@ CASE State OF
         OperatorActionId := 16#0405;
         OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
 
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
         WinchM1Cmd.ReqDirection := 1;
         WinchM1Cmd.StepTgt := 1;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt := 1;
 
@@ -18585,10 +18607,10 @@ CASE State OF
         OperatorActionId := 16#0407;
         OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
 
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
         WinchM1Cmd.ReqDirection := 1;
         WinchM1Cmd.StepTgt  := 1;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt  := 1;
 
@@ -18611,10 +18633,10 @@ CASE State OF
         OperatorActionId := 16#0408;
         OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
         WinchM1Cmd.ReqDirection := 1;
         WinchM1Cmd.StepTgt  := 4;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt  := 4;
 
@@ -18680,10 +18702,10 @@ CASE State OF
         // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
         // précédent). Les deux treuils restent synchrones et sous homme-mort.
         WinchM1Cmd.ReqDirection := -1;
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descend;
         WinchM1Cmd.StepTgt  := 1;
         WinchM2Cmd.ReqDirection := -1;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descend;
         WinchM2Cmd.StepTgt  := 1;
 
         BucketCmd.ReqOpen := ProcessPermitBucket_Open AND (WinchM1Cmd.ReqDirection = -1);
@@ -18742,7 +18764,7 @@ END_IF;
 // 🛑 Relâchement du manche (retour au centre) OU de l'homme-mort : neutralisation
 // des demandes actives. Gate continu : aucune commande d'actionneur ne survit à la
 // perte du permis opérateur (manche défléchi ET homme-mort armé).
-IF Lifecycle.Busy AND NOT ProcessPermitM1_Ascending THEN
+IF Lifecycle.Busy AND NOT ProcessPermitM1_Ascent THEN
     WinchM1Cmd.ReqStartStop := FALSE;
     WinchM2Cmd.ReqStartStop := FALSE;
     TranslationCmd.ReqStart := FALSE;
@@ -28764,23 +28786,31 @@ Diag.LastAbortCause       := LastAbortCause;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction commandée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction commandée (-1: vers Maintenance, 0: Stop, 1: vers Trémie)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême avant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême arrière</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceM3TargetEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation cible Maintenance (Auth.MaintenanceM3TargetEnable)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorWordIncoherent">
@@ -29009,6 +29039,22 @@ Diag.LastAbortCause       := LastAbortCause;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incohérence mot capteurs position (bit7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -29274,8 +29320,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 6 : Limite extrême escalade (live)
     IF NOT (BypassSafety OR BypassLimitSwitch) THEN
-        OverrunCondition := (LimitSwitchFwd AND (Direction = 1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
-                         OR (LimitSwitchRev AND (Direction = -1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
+        OverrunCondition := (LimitSwitchTremie AND (Direction = 1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchMaintenance AND (Direction = -1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
         instCauses[6].Active := TonLimitSwitchOverrun.Q;
     ELSE
@@ -29317,6 +29363,8 @@ IF NOT Enable THEN
     ErrorMecaA := FALSE;
     ErrorLimitSwitch := FALSE;
     ErrorSensorIncoherent := FALSE;
+    TremiePermit := FALSE;
+    MaintenancePermit := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
@@ -29343,6 +29391,13 @@ ErrorMecaB            := instCauses[4].Active;
 ErrorMecaA            := instCauses[5].Active;
 ErrorLimitSwitch      := instCauses[6].Active;
 ErrorSensorIncoherent := instCauses[7].Active;
+
+// 🛡️ Permis directionnels M3 (polarité fail-safe : TRUE = autorisé)
+// TremiePermit : autorisé vers Trémie tant que la fin de course Trémie n'est pas atteinte.
+TremiePermit := NOT LimitSwitchTremie;
+// MaintenancePermit : autorisé vers Maintenance uniquement si la cible Maintenance est
+// autorisée (Auth.MaintenanceM3TargetEnable) ET la fin de course Maintenance non atteinte.
+MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
 {endregion}
 </xhtml>
           </ST>
@@ -33488,7 +33543,7 @@ END_IF;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = vers Maintenance, 0 = Neutre, +1 = vers Trémie (source d'autorité du sens)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedTgt_Pct">
@@ -33531,20 +33586,20 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur P2 — ralentissement avant P1 (Direction=-1)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême avant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême arrière</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
               </documentation>
             </variable>
             <variable name="DriveStatusWord">
@@ -33870,7 +33925,7 @@ instCauses[3].Active   := DriveFaultLatching;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Defaut variateur translation AC600';
 
-IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev)) THEN
+IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchTremie) OR (CommandedDirection = -1 AND LimitSwitchMaintenance)) THEN
     instCauses[6].Active := TRUE;
 ELSE
     instCauses[6].Active := FALSE;
@@ -34124,7 +34179,7 @@ END_IF;
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Rev, 0: Stop, 1: Fwd)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: vers Maintenance, 0: Stop, 1: vers Trémie)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedPct">
@@ -34214,9 +34269,9 @@ ELSE
         PositioningActive := IHM.SelPositioning;
         SelTarget := 0;
 
-        IF NOT TglJoystickMaster AND IHM.BtnFwd THEN
+        IF NOT TglJoystickMaster AND IHM.BtnTremie THEN
             Direction := 1;
-        ELSIF NOT TglJoystickMaster AND IHM.BtnRev THEN
+        ELSIF NOT TglJoystickMaster AND IHM.BtnMaintenance THEN
             Direction := -1;
         ELSIF TglJoystickMaster THEN
             Direction := Joystick.AxisX.Direction;
@@ -34681,20 +34736,20 @@ DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz)
             </variable>
           </inputVars>
           <outputVars>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extrême Trémie confirmé (mot = 11111)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extrême Trémie confirmé (mot = 11111) (ex-LimitSwitchFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extrême Maintenance confirmé (mot = 00000)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extrême Maintenance confirmé (mot = 00000) (ex-LimitSwitchRev)</xhtml>
               </documentation>
             </variable>
             <variable name="Incoherent">
@@ -34928,8 +34983,8 @@ CASE SensorsWord OF
 END_CASE;
 
 // 🚧 Limites extrêmes — uniquement sur mot valide (évite un Fdc fantôme déclenché par une incohérence)
-LimitSwitchFwd := (NOT Incoherent) AND (SensorsWord = 2#11111);
-LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
+LimitSwitchTremie := (NOT Incoherent) AND (SensorsWord = 2#11111);
+LimitSwitchMaintenance := (NOT Incoherent) AND (SensorsWord = 2#00000);
 {endregion}
 
 {region "§2 Reprise capteurs"}
@@ -35985,8 +36040,8 @@ GVL_Troubleshooting.LevageUnitaireM1.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winc
 
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx201_JoyRawPhysical_ANA := HwIn.Operator.JoyYRaw_ANA2;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.Deflection;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM1.Cmd.BtnUp;
-GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM1.Cmd.BtnDown;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx203_HmiManualCmd_BtnAscent := WinchM1.Cmd.BtnAscent;
+GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx204_HmiManualCmd_BtnDescent := WinchM1.Cmd.BtnDescent;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM1SpeedTgt_Pct;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx206_ModeActive := Auth.Mode;
 GVL_Troubleshooting.LevageUnitaireM1.Demandes_200.Idx207_BypassOperatorComm := WinchM1.Bypass.OperatorComm;
@@ -36042,8 +36097,8 @@ GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx412_InTopSlowdownZone := Win
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx413_InBottomSlowdownZone := WinchM1.State.InBottomSlowdownZone;
 GVL_Troubleshooting.LevageUnitaireM1.Control_400.Idx414_BottomLimitActiveM := WinchM1.State.BottomLimitActiveM;
 
-GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx501_CmdRelayFwd_Up_DQ := WinchM1.State.RelayFwd;
-GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx502_CmdRelayRev_Down_DQ := WinchM1.State.RelayRev;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_DQ := WinchM1.State.RelayFwd;
+GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_DQ := WinchM1.State.RelayRev;
 GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM1.State.Contactor1;
 GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM1.State.Contactor4;
 GVL_Troubleshooting.LevageUnitaireM1.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM1.State.BrakeCmd;
@@ -36057,8 +36112,8 @@ GVL_Troubleshooting.LevageUnitaireM2.Inputs_100.Idx105_ThermalOk_DI := HwIn.Winc
 
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx201_JoyRawPhysical_ANA := HwIn.Operator.JoyYRaw_ANA2;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx202_JoyScaledPhysical_Pct := JoystickHMI.State.AxisCmdY.Deflection;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnUp := WinchM2.Cmd.BtnUp;
-GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDown := WinchM2.Cmd.BtnDown;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx203_HmiManualCmd_BtnAscent := WinchM2.Cmd.BtnAscent;
+GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx204_HmiManualCmd_BtnDescent := WinchM2.Cmd.BtnDescent;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx205_CycleAutoCmd_Pct := CycleM2SpeedTgt_Pct;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx206_ModeActive := Auth.Mode;
 GVL_Troubleshooting.LevageUnitaireM2.Demandes_200.Idx207_BypassOperatorComm := WinchM2.Bypass.OperatorComm;
@@ -36114,8 +36169,8 @@ GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx412_InTopSlowdownZone := Win
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx413_InBottomSlowdownZone := WinchM2.State.InBottomSlowdownZone;
 GVL_Troubleshooting.LevageUnitaireM2.Control_400.Idx414_BottomLimitActiveM := WinchM2.State.BottomLimitActiveM;
 
-GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx501_CmdRelayFwd_Up_DQ := WinchM2.State.RelayFwd;
-GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx502_CmdRelayRev_Down_DQ := WinchM2.State.RelayRev;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_DQ := WinchM2.State.RelayFwd;
+GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_DQ := WinchM2.State.RelayRev;
 GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx503_CmdSpeedContactor1_DQ := WinchM2.State.Contactor1;
 GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx504_CmdSpeedContactor4_DQ := WinchM2.State.Contactor4;
 GVL_Troubleshooting.LevageUnitaireM2.Outputs_500.Idx505_CmdBrakeRelease_RQ := WinchM2.State.BrakeCmd;
@@ -36216,8 +36271,8 @@ GVL_Troubleshooting.TranslationPontM3.Inputs_100.Idx109_DriveThermalOk := Transl
 
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx201_JoyXRaw_ANA := HwIn.Operator.JoyXRaw_ANA1;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx202_JoyXScaled_Pct := GVL_IHM.JOY1Joystick.State.AxisCmdX.Deflection;
-GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnFwd := Translation.Cmd.BtnFwd;
-GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnRev := Translation.Cmd.BtnRev;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx203_HmiCmd_BtnTremie := Translation.Cmd.BtnTremie;
+GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx204_HmiCmd_BtnMaintenance := Translation.Cmd.BtnMaintenance;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx205_HmiTargetPosition := Translation.Cmd.SelTarget;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx206_CycleTargetPosition := CycleTargetPosition;
 GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx207_ModeActive := Auth.Mode;
@@ -36227,8 +36282,8 @@ GVL_Troubleshooting.TranslationPontM3.Demandes_200.Idx209_ArbitratedSpeed_Pct :=
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx301_EmergencyChainClosed := HwIn.Machine.EmergencyChainClosed_DI;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx302_SafeStopActive := Translation.Safety.SafeStop;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx303_PowerCutOffActive := Translation.Safety.PowerCutOff;
-GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx304_LimitSwitchFwdActive := Translation.State.LimitSwitchFwd;
-GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx305_LimitSwitchRevActive := Translation.State.LimitSwitchRev;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx304_LimitSwitchTremieActive := Translation.State.LimitSwitchTremie;
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx305_LimitSwitchMaintenanceActive := Translation.State.LimitSwitchMaintenance;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx306_BypassLimitSwitch := Translation.Bypass.LimitSwitch;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx307_PositionDecoderIncoherent := Translation.State.SensorWordIncoherent;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx308_HeightInterlockBlocking := Translation.State.HeightInterlockBlocking;
@@ -37017,8 +37072,8 @@ Fault := instFault.Fault;
 IF NOT Enable THEN
     SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := Config.SpeedStepTable);
     DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqDirection := 0,
-                       ChangeDelayUp := Config.DirectionInterlockDelayUp,
-                       ChangeDelayDown := Config.DirectionInterlockDelayDown);
+                       ChangeDelayAscent := Config.DirectionInterlockDelayAscent,
+                       ChangeDelayDescent := Config.DirectionInterlockDelayDescent);
     StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := Config.StepRampDelayAscent);
     RelayFwd := FALSE;
     RelayRev := FALSE;
@@ -37076,8 +37131,8 @@ DirectionInterlock(
     EnableRising := EnableRisingEdge.Q,
     Reset := Reset,
     ReqDirection := DriveRequest.Direction,
-    ChangeDelayUp := Config.DirectionInterlockDelayUp,
-    ChangeDelayDown := Config.DirectionInterlockDelayDown
+    ChangeDelayAscent := Config.DirectionInterlockDelayAscent,
+    ChangeDelayDescent := Config.DirectionInterlockDelayDescent
 );
 CommandedDirection := DirectionInterlock.CommandedDirection;
 DirectionChangePending := DirectionInterlock.DirectionChangePending;
@@ -37137,7 +37192,7 @@ END_IF;
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
 IF CommandedDirection = -1 THEN
-    EffectiveStepRampDelay := Config.StepRampDelayDescending;
+    EffectiveStepRampDelay := Config.StepRampDelayDescent;
 ELSE
     EffectiveStepRampDelay := Config.StepRampDelayAscent;
 END_IF;
@@ -37274,7 +37329,7 @@ PrevStepNumber := StepNumber;
                 <derived name="ST_fbWinchCmdArbitration_IHM" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnUpM1/BtnDownM1, both)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnAscentM1/BtnDescentM1, both)</xhtml>
               </documentation>
             </variable>
             <variable name="TglJoystickMaster">
@@ -37394,13 +37449,13 @@ ELSE
         IF NOT TglJoystickMaster THEN
             // Mode Boutons IHM
             IF BothIntent.Active THEN
-                // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
+                // Both (BtnWinchBothAscent/Descent) — source unique PRG_03, plus de re-dérivation
                 Direction := BothIntent.Direction;
                 StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
-            ELSIF IHM.BtnUpM1 THEN
+            ELSIF IHM.BtnAscentM1 THEN
                 Direction := 1;
                 StepTgt   := Cfg.BtnStepTgt;
-            ELSIF IHM.BtnDownM1 THEN
+            ELSIF IHM.BtnDescentM1 THEN
                 Direction := -1;
                 StepTgt   := Cfg.BtnStepTgt;
             ELSE
@@ -37426,8 +37481,8 @@ ELSE
         StartStop := (Direction &lt;&gt; 0)
                   AND NOT Context.BucketBusy
                   AND NOT Context.WinchBothMotionBlockedByBucket
-                  AND NOT ((Context.SyncBlocksUp   AND (Direction = 1))
-                        OR (Context.SyncBlocksDown AND (Direction = -1)))
+                  AND NOT ((Context.SyncBlocksAscent   AND (Direction = 1))
+                        OR (Context.SyncBlocksDescent AND (Direction = -1)))
                   AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed);
     END_IF;
 
@@ -37493,7 +37548,7 @@ END_IF;
                 <derived name="ST_fbWinchCmdArbitration_IHM" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnUpM2/BtnDownM2, both)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnAscentM2/BtnDescentM2, both)</xhtml>
               </documentation>
             </variable>
             <variable name="TglJoystickMaster">
@@ -37620,13 +37675,13 @@ ELSE
             IF NOT TglJoystickMaster THEN
                 // Mode Boutons IHM
                 IF BothIntent.Active THEN
-                    // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
+                    // Both (BtnWinchBothAscent/Descent) — source unique PRG_03, plus de re-dérivation
                     Direction := BothIntent.Direction;
                     StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
-                ELSIF IHM.BtnUpM2 THEN
+                ELSIF IHM.BtnAscentM2 THEN
                     Direction := 1;
                     StepTgt   := Cfg.BtnStepTgt;
-                ELSIF IHM.BtnDownM2 THEN
+                ELSIF IHM.BtnDescentM2 THEN
                     Direction := -1;
                     StepTgt   := Cfg.BtnStepTgt;
                 ELSE
@@ -37652,8 +37707,8 @@ ELSE
             // homme-mort qualifié en joystick
             StartStop := (Direction &lt;&gt; 0)
                       AND NOT Context.WinchBothMotionBlockedByBucket
-                      AND NOT ((Context.SyncBlocksUp   AND (Direction = -1))
-                            OR (Context.SyncBlocksDown AND (Direction = 1)))
+                      AND NOT ((Context.SyncBlocksAscent   AND (Direction = -1))
+                            OR (Context.SyncBlocksDescent AND (Direction = 1)))
                       AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed);
         END_IF;
     END_IF;
@@ -37707,7 +37762,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens demande (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
-            <variable name="ChangeDelayUp">
+            <variable name="ChangeDelayAscent">
               <type>
                 <TIME />
               </type>
@@ -37715,7 +37770,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai interlock changement de sens montee</xhtml>
               </documentation>
             </variable>
-            <variable name="ChangeDelayDown">
+            <variable name="ChangeDelayDescent">
               <type>
                 <TIME />
               </type>
@@ -37822,9 +37877,9 @@ END_IF;
 
 // Delai effectif selon le sens demande
 IF ReqDirection &gt; 0 THEN
-    EffectiveDelay := ChangeDelayUp;
+    EffectiveDelay := ChangeDelayAscent;
 ELSE
-    EffectiveDelay := ChangeDelayDown;
+    EffectiveDelay := ChangeDelayDescent;
 END_IF;
 
 // D18 : au front montant Enable avec sens maintenu, armer le temps mort
@@ -39466,7 +39521,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de paliers (1..5)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_IdxAscending">
+            <variable name="CST_IdxAscent">
               <type>
                 <INT />
               </type>
@@ -39477,7 +39532,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Index sens ascending</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_IdxDescending">
+            <variable name="CST_IdxDescent">
               <type>
                 <INT />
               </type>
@@ -39543,7 +39598,7 @@ CollectAllowed := LearnRequested AND MeasureUsable AND ContextValid;
 {region "§2 Collecte passive"}
 IF CollectAllowed THEN
     // Index sens et charge
-    IF Direction &gt; 0 THEN SensIdx := CST_IdxAscending; ELSE SensIdx := CST_IdxDescending; END_IF;
+    IF Direction &gt; 0 THEN SensIdx := CST_IdxAscent; ELSE SensIdx := CST_IdxDescent; END_IF;
     IF LoadPresent THEN ChargeIdx := CST_IdxCharge; ELSE ChargeIdx := CST_IdxVide; END_IF;
 
     // Plausibilite : vitesse dans l'enveloppe du palier (borne min/max)
@@ -42181,9 +42236,9 @@ IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     WinchBothMotionActive := PRG_02_Acquisition.Data.Joystick.DeadmanArmed
                                      AND (instModes.Auth.JoystickWinchSelectArbitrated = 0);
 ELSE
-    IF GVL_IHM.Commun.BtnWinchBothUp THEN
+    IF GVL_IHM.Commun.BtnWinchBothAscent THEN
         WinchBothMotionDirection := 1;
-    ELSIF GVL_IHM.Commun.BtnWinchBothDown THEN
+    ELSIF GVL_IHM.Commun.BtnWinchBothDescent THEN
         WinchBothMotionDirection := -1;
     ELSE
         WinchBothMotionDirection := 0;
@@ -42897,7 +42952,7 @@ descente uniquement benne ouverte, montée uniquement benne
 fermée. Distinct de DumpAtTremie/DiveSearch/ExtractionAssist (fonctionnement normal,
 pas une assistance MAINT_N1/N2 dédiée). Réutilise WinchBothMotionActive/
 WinchBothMotionDirection (§1 ci-dessus) : déjà exactement "mouvement both
-demandé" dans les 2 modes (joystick Select=0, ou BtnWinchBothUp/Down) — mêmes variables
+demandé" dans les 2 modes (joystick Select=0, ou BtnWinchBothAscent/Descent) — mêmes variables
 déjà utilisées par instBucket/instDiveSearch/instExtractionAssist.
 CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
               </documentation>
@@ -43305,12 +43360,12 @@ front descendant Kobold</xhtml>
                 <INT />
               </type>
             </variable>
-            <variable name="EffectiveMaxStepDescending">
+            <variable name="EffectiveMaxStepDescent">
               <type>
                 <INT />
               </type>
             </variable>
-            <variable name="CommonMaxStepUp">
+            <variable name="CommonMaxStepAscent">
               <type>
                 <INT />
               </type>
@@ -43318,7 +43373,7 @@ front descendant Kobold</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Agrégateur de clamp de palier — bornes communes M1=M2 puis M2-propre</xhtml>
               </documentation>
             </variable>
-            <variable name="CommonMaxStepDown">
+            <variable name="CommonMaxStepDescent">
               <type>
                 <INT />
               </type>
@@ -43648,10 +43703,10 @@ ELSE
     EffectiveMaxStepAscent := _CommunCfgPersist.WinchMaxStepAscent;
 END_IF;
 
-IF _CommunCfgPersist.WinchMaxStepDescending &lt;= 0 THEN
-    EffectiveMaxStepDescending := 3;
+IF _CommunCfgPersist.WinchMaxStepDescent &lt;= 0 THEN
+    EffectiveMaxStepDescent := 3;
 ELSE
-    EffectiveMaxStepDescending := _CommunCfgPersist.WinchMaxStepDescending;
+    EffectiveMaxStepDescent := _CommunCfgPersist.WinchMaxStepDescent;
 END_IF;
 
 
@@ -43666,20 +43721,20 @@ BucketM2Open  := (instBucket.M2_Direction = 1);
 BucketM2Close := (instBucket.M2_Direction = -1);
 
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
-ArbIHM.BtnUpM1           := GVL_IHM.M1TreuilRetenue.Cmd.BtnUp;
-ArbIHM.BtnDownM1         := GVL_IHM.M1TreuilRetenue.Cmd.BtnDown;
-ArbIHM.BtnUpM2           := GVL_IHM.M2TreuilBenne.Cmd.BtnUp;
-ArbIHM.BtnDownM2         := GVL_IHM.M2TreuilBenne.Cmd.BtnDown;
-ArbIHM.BtnWinchBothUp    := GVL_IHM.Commun.BtnWinchBothUp;
-ArbIHM.BtnWinchBothDown  := GVL_IHM.Commun.BtnWinchBothDown;
+ArbIHM.BtnAscentM1           := GVL_IHM.M1TreuilRetenue.Cmd.BtnAscent;
+ArbIHM.BtnDescentM1         := GVL_IHM.M1TreuilRetenue.Cmd.BtnDescent;
+ArbIHM.BtnAscentM2           := GVL_IHM.M2TreuilBenne.Cmd.BtnAscent;
+ArbIHM.BtnDescentM2         := GVL_IHM.M2TreuilBenne.Cmd.BtnDescent;
+ArbIHM.BtnWinchBothAscent    := GVL_IHM.Commun.BtnWinchBothAscent;
+ArbIHM.BtnWinchBothDescent  := GVL_IHM.Commun.BtnWinchBothDescent;
 
 ArbContext.BucketBusy                     := instBucket.Lifecycle.Busy;
 ArbContext.BucketM2StartStop              := instBucket.M2_StartStop;
 ArbContext.BucketM2Open                   := BucketM2Open;
 ArbContext.BucketM2Close                  := BucketM2Close;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
-ArbContext.SyncBlocksUp                   := SyncMinorDeviationBlocksUp;
-ArbContext.SyncBlocksDown                 := SyncMinorDeviationBlocksDown;
+ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
+ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
 
 ArbM1Cfg.BtnStepTgt := 5;
 ArbM2Cfg.BtnStepTgt := 5;
@@ -44147,26 +44202,26 @@ ArmingPermit := (EffectivePermitM1_Ascent OR EffectivePermitM1_Descend
 // Synchro (instWinchSync) calculée en §4, en amont : SyncDeviationWarn réduit les DEUX treuils.
 
 // --- Sources communes (M1 = M2) ---
-CommonMaxStepUp   := EffectiveMaxStepAscent;
-CommonMaxStepDown := EffectiveMaxStepDescending;
+CommonMaxStepAscent   := EffectiveMaxStepAscent;
+CommonMaxStepDescent := EffectiveMaxStepDescent;
 IF instWinchSync.SyncDeviationWarn THEN
-    CommonMaxStepUp   := 1;
-    CommonMaxStepDown := 1;
+    CommonMaxStepAscent   := 1;
+    CommonMaxStepDescent := 1;
 END_IF;
 IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ExtractionControlActive OR ExtractionControlActive THEN
-    CommonMaxStepUp := 1;
+    CommonMaxStepAscent := 1;
 END_IF;
 
 // Planchers communs : 1 (neutre) en montée ; en descente, MAX(1, plancher plongée FB_DiveSearch).
 // Règle de l'agrégateur : plancher = MAX des sources plancher ; si plancher &gt; plafond,
 // LE PLAFOND GAGNE — le clamp final (consommation FB_Winch, lot aval) borne au plafond,
-// on ne force donc jamais ici un palier au-delà de CommonMaxStepDown.
+// on ne force donc jamais ici un palier au-delà de CommonMaxStepDescent.
 CommonMinStepUp   := 1;
 CommonMinStepDown := MAX(1, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStepDown);
 
 // --- M2-propre (jamais vu par M1) ---
-M2MaxStepUp   := CommonMaxStepUp;
-M2MaxStepDown := CommonMaxStepDown;
+M2MaxStepUp   := CommonMaxStepAscent;
+M2MaxStepDown := CommonMaxStepDescent;
 IF instBucket.M2_BucketJogLimit OR ManualBucketLimitsActive THEN
     M2MaxStepUp   := 1;
     M2MaxStepDown := 1;
@@ -44212,8 +44267,8 @@ instWinchLoadEstimatorM2(
 M1DriveRequest.StartStop            := M1LogicRequestStartStop;
 M1DriveRequest.Direction            := M1LogicRequestDirection;
 M1DriveRequest.SpeedStepReq         := M1LogicRequestStepTgt;
-M1DriveRequest.MaxStepUp            := CommonMaxStepUp;
-M1DriveRequest.MaxStepDown          := CommonMaxStepDown;
+M1DriveRequest.MaxStepUp            := CommonMaxStepAscent;
+M1DriveRequest.MaxStepDown          := CommonMaxStepDescent;
 // Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
 // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
 M1DriveRequest.MinStepDown          := CommonMinStepDown;
@@ -44800,28 +44855,28 @@ Data.TraceM2                      := TraceM2;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = M1 ET M2 au-dessus de la hauteur mini (ou bypass actif)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_LimitSwitchRevEffective">
+            <variable name="M3_LimitSwitchMaintenanceEffective">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure dure §5bis — bascule sur P1 si Maintenance interdite</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure dure §5bis — bascule sur P1 si Maintenance interdite (ex-M3_LimitSwitchRevEffective)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_LimitSwitchFwdStable">
+            <variable name="M3_LimitSwitchTremieStable">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrou bistable Fdc Trémie (mémorisé stable contre les rebonds)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrou bistable Fdc Trémie (mémorisé stable contre les rebonds) (ex-M3_LimitSwitchFwdStable)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_LimitSwitchRevStable">
+            <variable name="M3_LimitSwitchMaintenanceStable">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrou bistable Fdc Maintenance/P1 (mémorisé stable contre les rebonds) (ex-M3_LimitSwitchRevStable)</xhtml>
               </documentation>
             </variable>
             <variable name="M3_AtTremieStable">
@@ -44926,8 +44981,8 @@ Data.TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
 Data.TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
 Data.TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
 Data.TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
-Data.M3_LimitSwitchFwd       := instPosDecoderM3.LimitSwitchFwd;
-Data.M3_LimitSwitchRev       := instPosDecoderM3.LimitSwitchRev;
+Data.M3_LimitSwitchTremie       := instPosDecoderM3.LimitSwitchTremie;
+Data.M3_LimitSwitchMaintenance  := instPosDecoderM3.LimitSwitchMaintenance;
 Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 Data.M3_SensorsWord            := instPosDecoderM3.SensorsWord;
 {endregion}
@@ -44952,31 +45007,31 @@ TranslationState.HeightInterlockBlocking := NOT M3_HeightInterlockOk;
 {endregion}
 
 {region "§0bis Coupure dure limite translation"}
-// === 🚧 §0bis COUPURE DURE (LimitSwitchRev) — bascule sur P1 si Maintenance interdite ===
-// LimitSwitchFwd/Rev protègent nativement Trémie/Maintenance
+// === 🚧 §0bis COUPURE DURE (LimitSwitchMaintenance) — bascule sur P1 si Maintenance interdite ===
+// LimitSwitchTremie/Maintenance protègent nativement Trémie/Maintenance
 // (§5bis FB_Translation : coupure immédiate, sans rampe, dès que CommandedDirection insiste
 // dans l'extrémité). P1/P2 n'ont aucune protection dure équivalente — seul le verrou souple
 // (arrival-lock) les couvre. Quand Maintenance est interdite, la coupure dure doit protéger
 // P1 comme si c'était l'extrémité réelle : mot 00001 (P1=0 ET Maintenance=1), UN CRAN AVANT
 // la vraie extrémité Maintenance (00000) — backup si le verrou souple a déjà échoué à arrêter
 // avant P1, garde la machine hors de la zone interdite plutôt que d'attendre le vrai fond.
-M3_LimitSwitchRevEffective := SEL(PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
+M3_LimitSwitchMaintenanceEffective := SEL(PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
                                    NOT instPosDecoderM3.TranslationPosP1 AND instPosDecoderM3.TranslationPosMaintenance,
-                                   instPosDecoderM3.LimitSwitchRev);
+                                   instPosDecoderM3.LimitSwitchMaintenance);
 
 // 🔒 §0ter STABILISATION BISTABLE FINS DE COURSE EXTRÊMES (Trémie &amp; Maintenance/P1)
 // Maintient la détection stable à 1 même si le capteur physique vibre ou saute brièvement.
 // Se libère uniquement sur un mouvement effectif dans le SENS INVERSE (dégagement).
-IF instPosDecoderM3.LimitSwitchFwd THEN
-    M3_LimitSwitchFwdStable := TRUE;
+IF instPosDecoderM3.LimitSwitchTremie THEN
+    M3_LimitSwitchTremieStable := TRUE;
 ELSIF M3_Direction_Active = -1 THEN
-    M3_LimitSwitchFwdStable := FALSE;
+    M3_LimitSwitchTremieStable := FALSE;
 END_IF;
 
-IF M3_LimitSwitchRevEffective THEN
-    M3_LimitSwitchRevStable := TRUE;
-ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchRev) THEN
-    M3_LimitSwitchRevStable := FALSE;
+IF M3_LimitSwitchMaintenanceEffective THEN
+    M3_LimitSwitchMaintenanceStable := TRUE;
+ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchMaintenance) THEN
+    M3_LimitSwitchMaintenanceStable := FALSE;
 END_IF;
 
 // 🔒 §0quater MÉMORISATION DU DERNIER POINT ATTEINT (front → jeton unique)
@@ -45012,8 +45067,8 @@ END_IF;
 
 // ── Arbitrage M3 (FB_TranslationCmdArbitrationM3) ──
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
-ArbM3_IHM.BtnFwd            := GVL_IHM.TranslationM3.Cmd.BtnFwd;
-ArbM3_IHM.BtnRev            := GVL_IHM.TranslationM3.Cmd.BtnRev;
+ArbM3_IHM.BtnTremie         := GVL_IHM.TranslationM3.Cmd.BtnTremie;
+ArbM3_IHM.BtnMaintenance    := GVL_IHM.TranslationM3.Cmd.BtnMaintenance;
 ArbM3_IHM.SelPositioning    := GVL_IHM.TranslationM3.Cmd.SelPositioning;
 ArbM3_IHM.SetFreq_Hz        := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
 ArbM3_IHM.BypassGlobal      := GVL_IHM.TranslationM3.Bypass.Global;
@@ -45097,8 +45152,9 @@ instSafetyTranslationM3(
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BrakeCmd                := instTranslationM3.BrakeReleaseRequest,
     Direction               := M3_Direction_Active,
-    LimitSwitchFwd          := M3_LimitSwitchFwdStable,
-    LimitSwitchRev          := M3_LimitSwitchRevStable,
+    LimitSwitchTremie       := M3_LimitSwitchTremieStable,
+    LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
+    MaintenanceM3TargetEnable := PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
     SensorWordIncoherent    := instPosDecoderM3.Incoherent,
     BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
@@ -45160,8 +45216,8 @@ instTranslationM3(
     // P1, ralentissement seulement après (zone P1→Maintenance, SlowdownSensorMaintenance ci-dessus).
     SlowdownSensorP1           := (NOT instPosDecoderM3.TranslationPosP2) AND instPosDecoderM3.TranslationPosP1
                                    AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
-    LimitSwitchFwd          := M3_LimitSwitchFwdStable,
-    LimitSwitchRev          := M3_LimitSwitchRevStable,
+    LimitSwitchTremie       := M3_LimitSwitchTremieStable,
+    LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     Cfg                     := TranslationCfg,
@@ -45253,8 +45309,8 @@ TranslationState.AtMaintenance := M3_AtMaintenanceStable;
 TranslationState.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationState.SensorsWord := instPosDecoderM3.SensorsWord;
 TranslationState.SensorWordIncoherent := instPosDecoderM3.Incoherent;
-TranslationState.LimitSwitchFwd := M3_LimitSwitchFwdStable;
-TranslationState.LimitSwitchRev := M3_LimitSwitchRevStable;
+TranslationState.LimitSwitchTremie := M3_LimitSwitchTremieStable;
+TranslationState.LimitSwitchMaintenance := M3_LimitSwitchMaintenanceStable;
 TranslationState.DriveActualFreq_Hz := TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0;
 TranslationState.DriveThermalOk := PRG_02_Acquisition.HwIn.Translation.M3_ThermalOK_DI;
 // 🛡️ Pas de sortie State sur FB_TranslationOutputInterlock : le "vrai état" de la
@@ -45289,6 +45345,11 @@ TranslationSafety.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
 TranslationSafety.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
 TranslationSafety.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
+// 🟢 Permis directionnels M3 (source unique : FB_Safety_Translation) — projetés vers l'IHM
+TranslationSafety.TremiePermit := instSafetyTranslationM3.TremiePermit;
+TranslationSafety.MaintenancePermit := instSafetyTranslationM3.MaintenancePermit;
+GVL_IHM.TranslationM3.Safety.TremiePermit := instSafetyTranslationM3.TremiePermit;
+GVL_IHM.TranslationM3.Safety.MaintenancePermit := instSafetyTranslationM3.MaintenancePermit;
 TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
@@ -45829,8 +45890,8 @@ M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
 
 // ── Sorties physiques M1 ──
-M1_RelayFwd_Up_DQ            := M1RelayFwd;
-M1_RelayRev_Down_DQ          := M1RelayRev;
+M1_RelayAscent_DQ            := M1RelayFwd;
+M1_RelayDescent_DQ           := M1RelayRev;
 M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
 M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
 M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
@@ -45902,8 +45963,8 @@ M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
 M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
 // ── Sorties physiques M2 ──
-M2_RelayFwd_Up_Close_DQ      := M2RelayFwd;
-M2_RelayRev_Down_Open_DQ     := M2RelayRev;
+M2_RelayAscent_Close_DQ      := M2RelayFwd;
+M2_RelayDescent_Open_DQ      := M2RelayRev;
 M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
 M2_SpeedContactor_2_DQ       := M2SpeedContactor2;
 M2_SpeedContactor_3_DQ       := M2SpeedContactor3;

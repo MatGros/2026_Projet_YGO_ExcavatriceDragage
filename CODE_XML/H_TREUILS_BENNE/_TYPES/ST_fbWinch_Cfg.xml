@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:29:39.824821" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:29:39.824821">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.643618" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.643618">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -35,7 +35,7 @@
 Table de seuils des paliers de vitesse</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionInterlockDelayUp">
+            <variable name="DirectionInterlockDelayAscent">
               <type>
                 <TIME />
               </type>
@@ -47,7 +47,7 @@ Table de seuils des paliers de vitesse</xhtml>
 Delai interlock changement de sens montee</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionInterlockDelayDown">
+            <variable name="DirectionInterlockDelayDescent">
               <type>
                 <TIME />
               </type>
@@ -81,7 +81,7 @@ Delai interlock changement de sens montee</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier montee (D10, dedie)</xhtml>
               </documentation>
             </variable>
-            <variable name="StepRampDelayDescending">
+            <variable name="StepRampDelayDescent">
               <type>
                 <TIME />
               </type>

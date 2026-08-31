@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎨 Distinct des bypass individuels M1/M2 (ST_BypassWinch)
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
-      GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
+      GVL_IHM.Commun.BtnWinchBothAscent/Descent), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
       pilotage groupé — SANS retirer les bypass individuels pour le pilotage à l'unité.
       ⚠️ Ne remplace PAS les bypass individuels : les deux se combinent en OR, jamais l'un

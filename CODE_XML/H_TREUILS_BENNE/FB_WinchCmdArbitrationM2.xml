@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T03:23:07.824525" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T03:23:07.824525">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:15:03.050979" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:15:03.050979">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -395,7 +395,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncBlocksUp">
+            <variable name="SyncBlocksAscent">
               <type>
                 <BOOL />
               </type>
@@ -403,7 +403,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncBlocksDown">
+            <variable name="SyncBlocksDescent">
               <type>
                 <BOOL />
               </type>
@@ -434,7 +434,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
       <dataType name="ST_fbWinchCmdArbitration_IHM">
         <baseType>
           <struct>
-            <variable name="BtnUpM1">
+            <variable name="BtnAscentM1">
               <type>
                 <BOOL />
               </type>
@@ -442,7 +442,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée treuil M1 (nommage hardware)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnDownM1">
+            <variable name="BtnDescentM1">
               <type>
                 <BOOL />
               </type>
@@ -450,7 +450,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton descente treuil M1</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnUpM2">
+            <variable name="BtnAscentM2">
               <type>
                 <BOOL />
               </type>
@@ -458,7 +458,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnDownM2">
+            <variable name="BtnDescentM2">
               <type>
                 <BOOL />
               </type>
@@ -466,7 +466,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton descente treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothUp">
+            <variable name="BtnWinchBothAscent">
               <type>
                 <BOOL />
               </type>
@@ -474,7 +474,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée couplée both (Commun)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothDown">
+            <variable name="BtnWinchBothDescent">
               <type>
                 <BOOL />
               </type>
@@ -499,7 +499,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
        paramètre séparé des FB (I4 — factorisation, source unique GVL_IHM.Modes.Cmd).
    📤 Producteur : PRG_04_Treuils_Benne (câblage GVL_IHM).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Nommage : BtnUpM1/BtnUpM2 = nommage hardware propagé (convention projet).
+   🔌 Nommage : BtnAscentM1/BtnAscentM2 = nommage hardware propagé (convention projet).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -759,7 +759,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <derived name="ST_fbWinchCmdArbitration_IHM" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnUpM2/BtnDownM2, both)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Boutons IHM (BtnAscentM2/BtnDescentM2, both)</xhtml>
               </documentation>
             </variable>
             <variable name="TglJoystickMaster">
@@ -886,13 +886,13 @@ ELSE
             IF NOT TglJoystickMaster THEN
                 // Mode Boutons IHM
                 IF BothIntent.Active THEN
-                    // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
+                    // Both (BtnWinchBothAscent/Descent) — source unique PRG_03, plus de re-dérivation
                     Direction := BothIntent.Direction;
                     StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
-                ELSIF IHM.BtnUpM2 THEN
+                ELSIF IHM.BtnAscentM2 THEN
                     Direction := 1;
                     StepTgt   := Cfg.BtnStepTgt;
-                ELSIF IHM.BtnDownM2 THEN
+                ELSIF IHM.BtnDescentM2 THEN
                     Direction := -1;
                     StepTgt   := Cfg.BtnStepTgt;
                 ELSE
@@ -918,8 +918,8 @@ ELSE
             // homme-mort qualifié en joystick
             StartStop := (Direction &lt;&gt; 0)
                       AND NOT Context.WinchBothMotionBlockedByBucket
-                      AND NOT ((Context.SyncBlocksUp   AND (Direction = -1))
-                            OR (Context.SyncBlocksDown AND (Direction = 1)))
+                      AND NOT ((Context.SyncBlocksAscent   AND (Direction = -1))
+                            OR (Context.SyncBlocksDescent AND (Direction = 1)))
                       AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed);
         END_IF;
     END_IF;

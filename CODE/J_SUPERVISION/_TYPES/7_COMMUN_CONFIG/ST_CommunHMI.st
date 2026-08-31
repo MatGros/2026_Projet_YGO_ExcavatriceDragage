@@ -34,8 +34,8 @@ STRUCT
     HeartbeatIhmElapsed       : TIME; (* PLC→IHM : temps depuis dernier front IHM *)
 
     // Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
-    BtnWinchBothUp     : BOOL; (* ⬆️ Monte les 2 treuils simultanément *)
-    BtnWinchBothDown   : BOOL; (* ⬇️ Descend les 2 treuils simultanément *)
+    BtnWinchBothAscent     : BOOL; (* ⬆️ Monte les 2 treuils simultanément *)
+    BtnWinchBothDescent   : BOOL; (* ⬇️ Descend les 2 treuils simultanément *)
 
     // Alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
     // struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse

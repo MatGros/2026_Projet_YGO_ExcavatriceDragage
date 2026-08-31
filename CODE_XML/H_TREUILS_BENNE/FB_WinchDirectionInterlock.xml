@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:44.463436" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:44.463436">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.629984" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.629984">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -59,7 +59,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens demande (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
-            <variable name="ChangeDelayUp">
+            <variable name="ChangeDelayAscent">
               <type>
                 <TIME />
               </type>
@@ -67,7 +67,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai interlock changement de sens montee</xhtml>
               </documentation>
             </variable>
-            <variable name="ChangeDelayDown">
+            <variable name="ChangeDelayDescent">
               <type>
                 <TIME />
               </type>
@@ -174,9 +174,9 @@ END_IF;
 
 // Delai effectif selon le sens demande
 IF ReqDirection &gt; 0 THEN
-    EffectiveDelay := ChangeDelayUp;
+    EffectiveDelay := ChangeDelayAscent;
 ELSE
-    EffectiveDelay := ChangeDelayDown;
+    EffectiveDelay := ChangeDelayDescent;
 END_IF;
 
 // D18 : au front montant Enable avec sens maintenu, armer le temps mort

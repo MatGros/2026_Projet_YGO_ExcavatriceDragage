@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.183789" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.183789">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:15:29.463322" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:15:29.463322">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -42,20 +42,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Numéro de la cible de position sélectionnée</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnFwd">
+            <variable name="BtnTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche avant (→ Trémie), pilotage IHM exclusif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche vers Trémie (ex-BtnFwd), pilotage IHM exclusif</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnRev">
+            <variable name="BtnMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche arrière (→ Maintenance), pilotage IHM exclusif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche vers Maintenance (ex-BtnRev), pilotage IHM exclusif</xhtml>
               </documentation>
             </variable>
             <variable name="SetFreq_Hz">
@@ -107,7 +107,7 @@
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au pilotage de la translation M3 depuis l'IHM.
    📄 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
-      sans pont générique pour ne jamais persister BtnFwd/BtnRev.
+      sans pont générique pour ne jamais persister BtnTremie/BtnMaintenance.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>

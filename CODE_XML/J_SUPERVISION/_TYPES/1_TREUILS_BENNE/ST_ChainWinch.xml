@@ -201,7 +201,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick (-100% à +100%)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx203_HmiManualCmd_BtnUp">
+            <variable name="Idx203_HmiManualCmd_BtnAscent">
               <type>
                 <BOOL />
               </type>
@@ -209,7 +209,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Ascending IHM | 0 = Relâché</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx204_HmiManualCmd_BtnDown">
+            <variable name="Idx204_HmiManualCmd_BtnDescent">
               <type>
                 <BOOL />
               </type>
@@ -335,7 +335,7 @@
       <dataType name="ST_Chain_Winch_Outputs">
         <baseType>
           <struct>
-            <variable name="Idx501_CmdRelayFwd_Up_DQ">
+            <variable name="Idx501_CmdRelayAscent_DQ">
               <type>
                 <BOOL />
               </type>
@@ -343,7 +343,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Ascending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx502_CmdRelayRev_Down_DQ">
+            <variable name="Idx502_CmdRelayDescent_DQ">
               <type>
                 <BOOL />
               </type>

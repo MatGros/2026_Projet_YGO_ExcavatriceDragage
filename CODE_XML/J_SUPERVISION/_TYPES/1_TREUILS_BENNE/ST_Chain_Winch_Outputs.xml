@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:44.607536" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:44.607536">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:18:19.202826" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:18:19.202826">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -26,7 +26,7 @@
       <dataType name="ST_Chain_Winch_Outputs">
         <baseType>
           <struct>
-            <variable name="Idx501_CmdRelayFwd_Up_DQ">
+            <variable name="Idx501_CmdRelayAscent_DQ">
               <type>
                 <BOOL />
               </type>
@@ -34,7 +34,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Ascending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx502_CmdRelayRev_Down_DQ">
+            <variable name="Idx502_CmdRelayDescent_DQ">
               <type>
                 <BOOL />
               </type>

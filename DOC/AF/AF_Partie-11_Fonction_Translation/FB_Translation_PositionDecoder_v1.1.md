@@ -97,8 +97,8 @@ et l'incohérence sont consommées par `FB_Safety_Translation`.
 
 | Sortie | Type | Sens |
 |---|---|---|
-| `LimitSwitchFwd` | BOOL | Extrême Trémie confirmé (mot=11111) |
-| `LimitSwitchRev` | BOOL | Extrême Maintenance confirmé (mot=00000) |
+| `LimitSwitchTremie` | BOOL | Extrême Trémie confirmé (mot=11111) — ex-`LimitSwitchFwd` |
+| `LimitSwitchMaintenance` | BOOL | Extrême Maintenance confirmé (mot=00000) — ex-`LimitSwitchRev` |
 | `Incoherent` | BOOL | Mot hors 6 combinaisons valides |
 | `SensorsWord` | BYTE | Diagnostic (bit4=Trémie…bit0=Maintenance) |
 | `TranslationPosTremie/PV/P2/P1/Maintenance` | BOOL | 🆕 Passthrough brut des 5 capteurs (CUMULATIF — voir §3bis). Pilote le ralentissement d'approche (zone large) |
@@ -173,6 +173,6 @@ a été validé en direct le 2026-08-06) — à vérifier avant d'activer un `Se
 | Doc | Lien |
 |---|---|
 | AF11 (chapô) | Rôle machine, intégration programme |
-| AF11 / FB_Safety_Translation | Consommateur `Incoherent`, `LimitSwitchFwd/Rev` |
+| AF11 / FB_Safety_Translation | Consommateur `Incoherent`, `LimitSwitchTremie/Maintenance` |
 | AF06 | 5 capteurs TOR M3 (E/S physiques) |
 | Code | `CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st` |

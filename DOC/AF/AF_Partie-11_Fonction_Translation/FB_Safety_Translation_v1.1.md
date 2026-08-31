@@ -147,10 +147,32 @@ Produit `SafeStop` et `PowerCutOff`. 1 instance (`instSafetyTranslationM3`), Ena
 | `DriveStatusWord`/`DriveActualFreqHz` | Mot état + fréquence réelle AC600 |
 | `BrakeFeedback`/`BrakeCmd` | Retour + commande frein |
 | `Direction` | Sens commandé (depuis Translation, 1 scan retard) |
-| `LimitSwitchFwd`/`LimitSwitchRev` | Butées extrêmes (depuis PositionDecoder) |
+| `LimitSwitchTremie`/`LimitSwitchMaintenance` | Butées extrêmes (depuis PositionDecoder) — ex-`LimitSwitchFwd`/`LimitSwitchRev` |
+| `MaintenanceM3TargetEnable` | 🆕 Autorisation cible Maintenance (`Auth.MaintenanceM3TargetEnable`, depuis `PRG_03_Modes_Cycle`) |
 | `SensorWordIncoherent` | Mot capteurs incohérent (depuis PositionDecoder) |
 
-**Sorties** : `SafeStop`, `PowerCutOff`, `ErrorId` (WORD, 8 bits), `Error` + 8 flags décapsulés.
+**Sorties** : `SafeStop`, `PowerCutOff`, `ErrorId` (WORD, 8 bits), `Error` + 8 flags décapsulés,
+`TremiePermit`/`MaintenancePermit` (permis directionnels M3, voir §2bis).
+
+### 2bis. Permis directionnels M3 (`TremiePermit`/`MaintenancePermit`) — 🆕 Lot 1 T184
+
+Permis directionnels **safety** (polarité fail-safe : `TRUE` = autorisé, `FALSE` = bloqué) —
+sorties `VAR_OUTPUT`, **gatées par `Enable`** (si `Enable=FALSE`, les deux permits sont forcés à
+`FALSE` au §2 Gate) :
+
+| Permis | Formule (code) | Sens |
+|---|---|---|
+| `TremiePermit` | `NOT LimitSwitchTremie` | Autorise le mouvement **vers Trémie** tant que la fin de course Trémie n'est pas atteinte |
+| `MaintenancePermit` | `MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance` | Autorise le mouvement **vers Maintenance** uniquement si la cible Maintenance est autorisée (`Auth.MaintenanceM3TargetEnable`) **ET** la fin de course Maintenance non atteinte |
+
+- **Polarité fail-safe** : `TRUE` = autorisé (logique positive). Un défaut, une perte de
+  `Enable`, ou une fin de course atteinte force le permit à `FALSE` → mouvement bloqué.
+- **Asymétrie volontaire** : `MaintenancePermit` exige en plus `MaintenanceM3TargetEnable`
+  (autorisation consciente de la zone Maintenance — le mode seul ne suffit jamais, cf.
+  `AF_Partie-05_Modes_Maintenance_v2.1.md` §5). `TremiePermit` n'a pas de gate de mode : la
+  Trémie est toujours une cible légale.
+- **Consommation** : projection `GVL_IHM.TranslationM3.Safety` (display). Si un gate mouvement
+  les consomme plus tard, gater par `Ready` (`Enable AND NOT Fault.Latched`) pour fail-safe.
 
 ---
 
@@ -229,5 +251,5 @@ le **capteur amont** pour un test banc.
 | AF11 (chapô) | Rôle machine, intégration programme |
 | AF01 | AU/PowerCutOff — chaîne électrique |
 | AF03 | Profil FB safety domaine |
-| AF11 / FB_Translation_PositionDecoder | Fournit `Incoherent`, `LimitSwitchFwd/Rev` |
+| AF11 / FB_Translation_PositionDecoder | Fournit `Incoherent`, `LimitSwitchTremie/Maintenance` |
 | Code | `CODE/I_TRANSLATION/FB_Safety_Translation.st` |

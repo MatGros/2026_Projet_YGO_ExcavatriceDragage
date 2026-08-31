@@ -4474,19 +4474,26 @@ tasks:
   bloque_par: []
 - id: T192
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C1
   domaine: SÉCURITÉ
-  agent: —
-  date: '2026-08-31T00:00:00'
+  agent: DSH (DeepSeek)
+  date: '2026-08-31T02:40:00+02:00'
   titre: Corrections safety cycles — défaut latché et reprise consciente (audit cycles)
   contexte: 'Constats S1+S2 des audits CYCLES_AUDIT_A/B_20260831 : contournement du
-    redémarrage après défaut latché + reprise sans geste conscient.'
+    redémarrage après défaut latché + reprise sans geste conscient. 🔁 **2026-08-31
+    : verrouillée** — implémentation avec agents en parallèle (si possible) + revue
+    indépendante.'
   description: '🔴 S1 : FB_Cycle:324 teste NOT Fault.Error au lieu de NOT Fault.Latched
     → Abort+Start contourne le redémarrage après défaut latché non acquitté. Correctif
     : gater la transition X0→X1 sur NOT Fault.Latched. 🔴 S2 : WaitingResume code mort
     (FB_Cycle:269-272) → reprise sans geste conscient après bascule de mode ; AF-04
-    §4.1 non tenue. Correctif : reprise consciente BtnStart.'
+    §4.1 non tenue. Correctif : reprise consciente BtnStart. 🔁 **2026-08-31 : DÉJÀ
+    IMPLÉMENTÉ** (commit 877f48ac) — S1 (FB_Cycle:348 gate NOT Fault.Latched) + S2
+    (FB_Cycle:267-292 reprise consciente WaitingResume+StartEdge.Q). Reste : revue
+    indépendante R1-R7 + update AF-04 §4.1 (décision utilisateur : garder code BtnStart
+    seul, plus sûr) + TC S1 manquant (sous-tâche T192-A) + valider renommage non commité
+    (Ascending→Ascent).'
   objectifs:
   - FB_Cycle gate X0→X1 sur NOT Fault.Latched (plus de redémarrage après défaut non
     acquitté)
@@ -4494,6 +4501,29 @@ tasks:
   - G200 liaison PASS + tests
   contrat: ''
   bloque_par: []
+- id: T192-A
+  parent_id: T192
+  statut: ⬜
+  criticite: C1
+  domaine: TEST_AUTO_CI
+  agent: —
+  date: '2026-08-31T02:45:00+02:00'
+  titre: TC S1 manquant — Abort+Start avec Fault.Latched actif → reste en X0
+  contexte: 'Trou de couverture TC détecté par le challenge T192 (651f7bca) : aucun
+    test ne couvre le scénario S1 exact « Abort+Start avec défaut latché actif → le
+    cycle reste en X0 (pas de redémarrage) ». TC-P04-004 teste reprise après STABILIZING,
+    TC-P04-102 teste reprise consciente (S2), mais PAS le contournement Abort+Start.'
+  description: 'Ajouter un TC (test_fb_cycle.st) qui vérifie : avec Fault.Latched actif
+    (défaut non acquitté), un Abort+Start ne redémarre PAS le cycle (reste en X0).
+    Le gate X0→X1 sur NOT Fault.Latched (FB_Cycle:348) doit être prouvé. Non-régression
+    des 9 TC existants (test_fb_cycle.st) + 6 TC (test_fb_cycle_full.st).'
+  objectifs:
+  - TC S1 ajouté: Abort+Start avec Fault.Latched actif → cycle reste en X0
+  - Gate X0→X1 sur NOT Fault.Latched prouvé par le TC
+  - Zéro régression des TC FB_Cycle existants (9 + 6)
+  contrat: ''
+  bloque_par:
+  - T192
 - id: T193
   parent_id: ''
   statut: ⬜

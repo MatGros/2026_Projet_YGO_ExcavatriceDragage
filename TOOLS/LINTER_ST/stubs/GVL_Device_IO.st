@@ -67,8 +67,8 @@ VAR_GLOBAL
     // === 📤 SORTIES MATÉRIELLES (PRG_06_Outputs) ===
 
     // Treuil M1 (Retenue)
-    M1_RelayFwd_Up_DQ            : BOOL;
-    M1_RelayRev_Down_DQ          : BOOL;
+    M1_RelayAscent_DQ            : BOOL;
+    M1_RelayDescent_DQ           : BOOL;
     M1_SpeedContactor_1_DQ       : BOOL;
     M1_SpeedContactor_2_DQ       : BOOL;
     M1_SpeedContactor_3_DQ       : BOOL;
@@ -76,8 +76,8 @@ VAR_GLOBAL
     M1_BrakeRelease_RQ           : BOOL;
 
     // Treuil M2 (Benne)
-    M2_RelayFwd_Up_Close_DQ      : BOOL;
-    M2_RelayRev_Down_Open_DQ     : BOOL;
+    M2_RelayAscent_Close_DQ      : BOOL;
+    M2_RelayDescent_Open_DQ      : BOOL;
     M2_SpeedContactor_1_DQ       : BOOL;
     M2_SpeedContactor_2_DQ       : BOOL;
     M2_SpeedContactor_3_DQ       : BOOL;

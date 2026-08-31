@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.169344" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.169344">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:39.841532" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:39.841532">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -69,20 +69,20 @@
             </variable>
           </inputVars>
           <outputVars>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extrême Trémie confirmé (mot = 11111)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extrême Trémie confirmé (mot = 11111) (ex-LimitSwitchFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extrême Maintenance confirmé (mot = 00000)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Extrême Maintenance confirmé (mot = 00000) (ex-LimitSwitchRev)</xhtml>
               </documentation>
             </variable>
             <variable name="Incoherent">
@@ -316,8 +316,8 @@ CASE SensorsWord OF
 END_CASE;
 
 // 🚧 Limites extrêmes — uniquement sur mot valide (évite un Fdc fantôme déclenché par une incohérence)
-LimitSwitchFwd := (NOT Incoherent) AND (SensorsWord = 2#11111);
-LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
+LimitSwitchTremie := (NOT Incoherent) AND (SensorsWord = 2#11111);
+LimitSwitchMaintenance := (NOT Incoherent) AND (SensorsWord = 2#00000);
 {endregion}
 
 {region "§2 Reprise capteurs"}

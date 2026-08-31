@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T03:20:40.539434" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T03:20:40.539434">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.640616" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.640616">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -26,7 +26,7 @@
       <dataType name="ST_WinchCmd">
         <baseType>
           <struct>
-            <variable name="BtnUp">
+            <variable name="BtnAscent">
               <type>
                 <BOOL />
               </type>
@@ -34,7 +34,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⬆️ Mouvement montee maintenu (mode boutons IHM, MAINT_N1 accessible)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnDown">
+            <variable name="BtnDescent">
               <type>
                 <BOOL />
               </type>

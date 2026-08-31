@@ -321,6 +321,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
               </documentation>
             </variable>
+            <variable name="TremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BlockedBySafety">
               <type>
                 <BOOL />
@@ -443,20 +459,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Numéro de la cible de position sélectionnée</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnFwd">
+            <variable name="BtnTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche avant (→ Trémie), pilotage IHM exclusif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche vers Trémie (ex-BtnFwd), pilotage IHM exclusif</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnRev">
+            <variable name="BtnMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche arrière (→ Maintenance), pilotage IHM exclusif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche vers Maintenance (ex-BtnRev), pilotage IHM exclusif</xhtml>
               </documentation>
             </variable>
             <variable name="SetFreq_Hz">
@@ -508,7 +524,7 @@
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au pilotage de la translation M3 depuis l'IHM.
    📄 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
-      sans pont générique pour ne jamais persister BtnFwd/BtnRev.
+      sans pont générique pour ne jamais persister BtnTremie/BtnMaintenance.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -786,15 +802,21 @@
                 <BOOL />
               </type>
             </variable>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Fin de course extrême Trémie (ex-LimitSwitchFwd)</xhtml>
+              </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
+              </documentation>
             </variable>
             <variable name="DriveThermalOk">
               <type>
