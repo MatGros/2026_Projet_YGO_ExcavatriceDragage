@@ -1028,6 +1028,48 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <initialValue>
+                <structValue>
+                  <value member="StepThreshold_Pct">
+                    <arrayValue>
+                      <value>
+                        <simpleValue value="20" />
+                      </value>
+                      <value>
+                        <simpleValue value="40" />
+                      </value>
+                      <value>
+                        <simpleValue value="60" />
+                      </value>
+                      <value>
+                        <simpleValue value="80" />
+                      </value>
+                      <value>
+                        <simpleValue value="100" />
+                      </value>
+                    </arrayValue>
+                  </value>
+                </structValue>
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepHystMargin">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge d'hystérésis palier (%) autour des seuils (anti-oscillation)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />

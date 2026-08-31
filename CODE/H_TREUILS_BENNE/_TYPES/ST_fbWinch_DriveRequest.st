@@ -6,16 +6,16 @@
    ðŸ“¤ Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
    ðŸ“¥ Consommateur : FB_Winch
    ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
-      et le clamp DANS FB_Winch (comportement bit-identique). Les champs
-      SpeedStepReq / MinStepUp sont dÃ©clarÃ©s mais non consommÃ©s (usage aval).
+      et le clamp DANS FB_Winch (comportement bit-identique).
+      SpeedStepReq est consommé par FB_Winch (§5) ; MinStepUp est déclaré
+      mais non consommé (usage aval).
    ======================================================================= *)
 TYPE ST_fbWinch_DriveRequest :
 STRUCT
     // === ORDRE DE MOUVEMENT ===
     StartStop                       : BOOL;   // TRUE = mouvement demandÃ©
     Direction                       : INT;    // -1: Descending, 0: Stop, 1: Ascending
-    SpeedStepReq                    : INT;    // [cible] Palier demandÃ© dÃ©codÃ© en amont (usage aval)
-    SpeedTgt_Pct                    : REAL;   // [08a] Consigne vitesse % (0.0..100.0) â€” dÃ©codage conservÃ© dans FB_Winch
+    SpeedStepReq                    : INT;    // [cible] Palier demandé (1..5, 0 = arrêt) — consommé par FB_Winch
 
     // === BORNES DE CLAMP (agrÃ©gÃ©es PRG_04) ===
     MinStepUp                       : INT;    // [cible] Plancher palier montÃ©e (usage aval)

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:44.445513" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:44.445513">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:16:51.557335" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:16:51.557335">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -135,12 +135,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedTgtPct">
+            <variable name="StepTgt">
               <type>
-                <REAL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne de vitesse cible demandée (0.0 à 100.0 %)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier de vitesse cible demandé (1 à 5, 0 = arrêt)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -156,6 +156,204 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
    📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SpeedStepTable">
+        <baseType>
+          <struct>
+            <variable name="P1R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 1 (VITESSE MINIMALE) ===
+Contacteur 1 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 2 ===
+Contacteur 1 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 3 ===
+Contacteur 1 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 4 ===
+Contacteur 1 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 5 (VITESSE MAXIMALE) ===
+Contacteur 1 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepThreshold_Pct">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SEUILS DE TRANSITION (%) ===
+Seuils de changement de palier (0..100%)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fbfd953e-d8b9-5242-babe-f7521771609a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -542,7 +740,15 @@ treuils avant de changer de mode ».
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction) - IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTgt">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier de vitesse (1..5, 0=arret) - logique/limitations (derive de SpeedTgt)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionNegative">
@@ -598,7 +804,8 @@ treuils avant de changer de mode ».
    🕹️ ST_fbJoystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📤 Champs : Enable, StartStop, SpeedTgt (%) + StepTgt (palier 1..5) + direction en bits
+               (DirectionPositive/Negative, AtNeutral). SpeedTgt reste pour l'IHM, StepTgt pour la logique.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    =======================================================================</xhtml>
         </documentation>
@@ -723,6 +930,14 @@ treuils avant de changer de mode ».
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gating benne/synchro (partagé M1/M2)</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table paliers (conservée pour compat interface ; plus de conversion %→palier ici)</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -749,12 +964,12 @@ treuils avant de changer de mode ».
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedPct">
+            <variable name="StepTgt">
               <type>
-                <REAL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Consigne vitesse arbitrée (0..100 %)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Palier de vitesse arbitré (1..5, 0 = arrêt)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -779,6 +994,10 @@ treuils avant de changer de mode ».
        FB_Safety_Winch / FB_Winch.
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Bit-identique à l'ancien PRG_04 §3 (refactor POO).
+   🪜 T190-B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
+       pourcentage. En SEMI_AUTO, passthrough de ReqWinch.StepTgt ; en manuel,
+       le joystick est le producteur UNIQUE du palier (passthrough de
+       Joystick.AxisY.StepTgt), boutons/both = palier 5 (pleine vitesse).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -796,44 +1015,47 @@ BenneBusyFallEdge(CLK := Context.BucketBusy);
 IF NOT Enable THEN
     StartStop := FALSE;
     Direction := 0;
-    SpeedPct  := 0.0;
+    StepTgt   := 0;
 ELSE
     // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         StartStop := ReqWinch.ReqStartStop;
         Direction := ReqWinch.ReqDirection;
-        SpeedPct  := ReqWinch.SpeedTgtPct;
+        StepTgt   := ReqWinch.StepTgt;
     ELSE
         // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
         //    commande unitaire M1 dérivée des boutons/joystick (Select=1). ──
+        // 🪜 StepTgt : le joystick est le producteur UNIQUE du palier (FB_Joystick §6).
+        //    Boutons/both = pleine vitesse (100 % → palier 5) ; joystick = passthrough
+        //    de Joystick.AxisY.StepTgt. Plus de re-dérivation %→palier ici.
         IF NOT TglJoystickMaster THEN
             // Mode Boutons IHM
             IF BothIntent.Active THEN
                 // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
                 Direction := BothIntent.Direction;
-                SpeedPct  := 100.0;
+                StepTgt   := 5;   // 100 % → palier max
             ELSIF IHM.BtnUpM1 THEN
                 Direction := 1;
-                SpeedPct  := 100.0;
+                StepTgt   := 5;
             ELSIF IHM.BtnDownM1 THEN
                 Direction := -1;
-                SpeedPct  := 100.0;
+                StepTgt   := 5;
             ELSE
                 Direction := 0;
-                SpeedPct  := 0.0;
+                StepTgt   := 0;
             END_IF;
         ELSE
             // Mode Joystick Maître — M1 unitaire si Select = 1, both si Select = 0
             IF Auth.JoystickWinchSelectArbitrated = 1 THEN
                 Direction := Joystick.AxisY.Direction;
-                SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+                StepTgt   := Joystick.AxisY.StepTgt;
             ELSIF BothIntent.Active THEN
                 // Both (Select=0) — source unique PRG_03, plus de re-dérivation
                 Direction := BothIntent.Direction;
-                SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+                StepTgt   := Joystick.AxisY.StepTgt;
             ELSE
                 Direction := 0;
-                SpeedPct  := 0.0;
+                StepTgt   := 0;
             END_IF;
         END_IF;
 
@@ -871,6 +1093,7 @@ END_IF;
         <Folder Name="H_TREUILS_BENNE">
           <Object Name="FB_WinchCmdArbitrationM1" ObjectId="ed58a992-e090-5b40-8cf2-91ea992d9d52" />
           <Folder Name="_TYPES">
+            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
             <Object Name="ST_fbWinchCmdArbitration_Context" ObjectId="58dd8b92-25cb-5b24-b149-4d148f2014bb" />
             <Object Name="ST_fbWinchCmdArbitration_IHM" ObjectId="b2c6293b-40b7-50ed-85f4-51c0c572dd06" />
           </Folder>

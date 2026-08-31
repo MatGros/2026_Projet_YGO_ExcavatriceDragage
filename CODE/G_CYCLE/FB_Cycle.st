@@ -212,11 +212,11 @@ ErrorEdge(CLK := Fault.Error);
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     WinchM1Cmd.ReqStartStop   := FALSE;
     WinchM1Cmd.ReqDirection   := 0;
-    WinchM1Cmd.SpeedTgtPct    := 0.0;
+    WinchM1Cmd.StepTgt        := 0;
 
     WinchM2Cmd.ReqStartStop   := FALSE;
     WinchM2Cmd.ReqDirection   := 0;
-    WinchM2Cmd.SpeedTgtPct    := 0.0;
+    WinchM2Cmd.StepTgt        := 0;
 
     TranslationCmd.ReqStart   := FALSE;
     TranslationCmd.PositionTgt  := 0;
@@ -306,8 +306,8 @@ CASE State OF
     E_CycleStep.X0_PREPARATION:
         CycleStep := E_CycleStep.X0_PREPARATION;
         CycleStateStr := 'X0 - Verification coherence systeme';
-        WinchM1Cmd.ReqStartStop := FALSE; WinchM1Cmd.ReqDirection := 0; WinchM1Cmd.SpeedTgtPct := 0.0;
-        WinchM2Cmd.ReqStartStop := FALSE; WinchM2Cmd.ReqDirection := 0; WinchM2Cmd.SpeedTgtPct := 0.0;
+        WinchM1Cmd.ReqStartStop := FALSE; WinchM1Cmd.ReqDirection := 0; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.ReqStartStop := FALSE; WinchM2Cmd.ReqDirection := 0; WinchM2Cmd.StepTgt := 0;
         TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
         BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
         Lifecycle.Busy := FALSE;
@@ -342,10 +342,10 @@ CASE State OF
         IF NOT HomedM1 OR NOT HomedM2 THEN
             WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
             WinchM1Cmd.ReqDirection := 1;   // montée lente vers capteur top
-            WinchM1Cmd.SpeedTgtPct := 10.0;
+            WinchM1Cmd.StepTgt := 1;
             WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
             WinchM2Cmd.ReqDirection := 1;
-            WinchM2Cmd.SpeedTgtPct := 10.0;
+            WinchM2Cmd.StepTgt := 1;
             IF HomingRequest THEN
                 State := E_CycleStep.X2_WORK_POS_SELECT;
             END_IF;
@@ -417,10 +417,10 @@ CASE State OF
         // M1 et M2 descendent ensemble (synchro gérée en aval)
         WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
         WinchM1Cmd.ReqDirection := -1;
-        WinchM1Cmd.SpeedTgtPct  := 50.0;
+        WinchM1Cmd.StepTgt  := 3;
         WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
         WinchM2Cmd.ReqDirection := -1;
-        WinchM2Cmd.SpeedTgtPct  := 50.0;
+        WinchM2Cmd.StepTgt  := 3;
         BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descending;
 
         // Transition uniquement sur le retour dédié Kobold.
@@ -451,10 +451,10 @@ CASE State OF
 
         WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
         WinchM1Cmd.ReqDirection := 1;
-        WinchM1Cmd.SpeedTgtPct := 20.0;
+        WinchM1Cmd.StepTgt := 1;
         WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
         WinchM2Cmd.ReqDirection := 1;
-        WinchM2Cmd.SpeedTgtPct := 20.0;
+        WinchM2Cmd.StepTgt := 1;
 
         IF CycleMotionPermit AND (M1_CablePosM >= RaiseTargetM) AND (M2_CablePosM >= RaiseTargetM) THEN
             WinchM1Cmd.ReqStartStop := FALSE;
@@ -498,10 +498,10 @@ CASE State OF
 
         WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
         WinchM1Cmd.ReqDirection := 1;
-        WinchM1Cmd.SpeedTgtPct  := 20.0;
+        WinchM1Cmd.StepTgt  := 1;
         WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
         WinchM2Cmd.ReqDirection := 1;
-        WinchM2Cmd.SpeedTgtPct  := 20.0;
+        WinchM2Cmd.StepTgt  := 1;
 
         IF CycleMotionPermit
            AND (M1_CablePosM >= (TouchPositionM + CtrlAscentDistM))
@@ -524,10 +524,10 @@ CASE State OF
 
         WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
         WinchM1Cmd.ReqDirection := 1;
-        WinchM1Cmd.SpeedTgtPct  := 70.0;
+        WinchM1Cmd.StepTgt  := 4;
         WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
         WinchM2Cmd.ReqDirection := 1;
-        WinchM2Cmd.SpeedTgtPct  := 70.0;
+        WinchM2Cmd.StepTgt  := 4;
 
         IF CycleMotionPermit AND M1_CablePosM >= CableLimitM1AscentM THEN
             WinchM1Cmd.ReqStartStop := FALSE;
@@ -592,10 +592,10 @@ CASE State OF
         // précédent). Les deux treuils restent synchrones et sous homme-mort.
         WinchM1Cmd.ReqDirection := -1;
         WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
-        WinchM1Cmd.SpeedTgtPct  := 20.0;
+        WinchM1Cmd.StepTgt  := 1;
         WinchM2Cmd.ReqDirection := -1;
         WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
-        WinchM2Cmd.SpeedTgtPct  := 20.0;
+        WinchM2Cmd.StepTgt  := 1;
 
         BucketCmd.ReqOpen := ProcessPermitBucket_Open AND (WinchM1Cmd.ReqDirection = -1);
 

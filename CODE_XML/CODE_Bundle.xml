@@ -8337,12 +8337,12 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedTgtPct">
+            <variable name="StepTgt">
               <type>
-                <REAL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne de vitesse cible demandée (0.0 à 100.0 %)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier de vitesse cible demandé (1 à 5, 0 = arrêt)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -12794,7 +12794,15 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction) - IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTgt">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier de vitesse (1..5, 0=arret) - logique/limitations (derive de SpeedTgt)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionNegative">
@@ -12850,7 +12858,8 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
    🕹️ ST_fbJoystick_AxisCmd — Consigne d'axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d'axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📤 Champs : Enable, StartStop, SpeedTgt (%) + StepTgt (palier 1..5) + direction en bits
+               (DirectionPositive/Negative, AtNeutral). SpeedTgt reste pour l'IHM, StepTgt pour la logique.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    =======================================================================</xhtml>
         </documentation>
@@ -12911,6 +12920,48 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <initialValue>
+                <structValue>
+                  <value member="StepThreshold_Pct">
+                    <arrayValue>
+                      <value>
+                        <simpleValue value="20" />
+                      </value>
+                      <value>
+                        <simpleValue value="40" />
+                      </value>
+                      <value>
+                        <simpleValue value="60" />
+                      </value>
+                      <value>
+                        <simpleValue value="80" />
+                      </value>
+                      <value>
+                        <simpleValue value="100" />
+                      </value>
+                    </arrayValue>
+                  </value>
+                </structValue>
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepHystMargin">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge d'hystérésis palier (%) autour des seuils (anti-oscillation)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -13892,15 +13943,7 @@ TRUE = mouvement demandÃ©</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Palier demandÃ© dÃ©codÃ© en amont (usage aval)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedTgt_Pct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Consigne vitesse % (0.0..100.0) â€” dÃ©codage conservÃ© dans FB_Winch</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Palier demandé (1..5, 0 = arrêt) — consommé par FB_Winch</xhtml>
               </documentation>
             </variable>
             <variable name="MinStepUp">
@@ -14002,8 +14045,9 @@ Position limite haute active (m)</xhtml>
    ðŸ“¤ Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
    ðŸ“¥ Consommateur : FB_Winch
    ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
-      et le clamp DANS FB_Winch (comportement bit-identique). Les champs
-      SpeedStepReq / MinStepUp sont dÃ©clarÃ©s mais non consommÃ©s (usage aval).
+      et le clamp DANS FB_Winch (comportement bit-identique).
+      SpeedStepReq est consommé par FB_Winch (§5) ; MinStepUp est déclaré
+      mais non consommé (usage aval).
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -17494,11 +17538,11 @@ ErrorEdge(CLK := Fault.Error);
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     WinchM1Cmd.ReqStartStop   := FALSE;
     WinchM1Cmd.ReqDirection   := 0;
-    WinchM1Cmd.SpeedTgtPct    := 0.0;
+    WinchM1Cmd.StepTgt        := 0;
 
     WinchM2Cmd.ReqStartStop   := FALSE;
     WinchM2Cmd.ReqDirection   := 0;
-    WinchM2Cmd.SpeedTgtPct    := 0.0;
+    WinchM2Cmd.StepTgt        := 0;
 
     TranslationCmd.ReqStart   := FALSE;
     TranslationCmd.PositionTgt  := 0;
@@ -17588,8 +17632,8 @@ CASE State OF
     E_CycleStep.X0_PREPARATION:
         CycleStep := E_CycleStep.X0_PREPARATION;
         CycleStateStr := 'X0 - Verification coherence systeme';
-        WinchM1Cmd.ReqStartStop := FALSE; WinchM1Cmd.ReqDirection := 0; WinchM1Cmd.SpeedTgtPct := 0.0;
-        WinchM2Cmd.ReqStartStop := FALSE; WinchM2Cmd.ReqDirection := 0; WinchM2Cmd.SpeedTgtPct := 0.0;
+        WinchM1Cmd.ReqStartStop := FALSE; WinchM1Cmd.ReqDirection := 0; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.ReqStartStop := FALSE; WinchM2Cmd.ReqDirection := 0; WinchM2Cmd.StepTgt := 0;
         TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
         BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
         Lifecycle.Busy := FALSE;
@@ -17624,10 +17668,10 @@ CASE State OF
         IF NOT HomedM1 OR NOT HomedM2 THEN
             WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
             WinchM1Cmd.ReqDirection := 1;   // montée lente vers capteur top
-            WinchM1Cmd.SpeedTgtPct := 10.0;
+            WinchM1Cmd.StepTgt := 1;
             WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
             WinchM2Cmd.ReqDirection := 1;
-            WinchM2Cmd.SpeedTgtPct := 10.0;
+            WinchM2Cmd.StepTgt := 1;
             IF HomingRequest THEN
                 State := E_CycleStep.X2_WORK_POS_SELECT;
             END_IF;
@@ -17699,10 +17743,10 @@ CASE State OF
         // M1 et M2 descendent ensemble (synchro gérée en aval)
         WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
         WinchM1Cmd.ReqDirection := -1;
-        WinchM1Cmd.SpeedTgtPct  := 50.0;
+        WinchM1Cmd.StepTgt  := 3;
         WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
         WinchM2Cmd.ReqDirection := -1;
-        WinchM2Cmd.SpeedTgtPct  := 50.0;
+        WinchM2Cmd.StepTgt  := 3;
         BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descending;
 
         // Transition uniquement sur le retour dédié Kobold.
@@ -17733,10 +17777,10 @@ CASE State OF
 
         WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
         WinchM1Cmd.ReqDirection := 1;
-        WinchM1Cmd.SpeedTgtPct := 20.0;
+        WinchM1Cmd.StepTgt := 1;
         WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
         WinchM2Cmd.ReqDirection := 1;
-        WinchM2Cmd.SpeedTgtPct := 20.0;
+        WinchM2Cmd.StepTgt := 1;
 
         IF CycleMotionPermit AND (M1_CablePosM &gt;= RaiseTargetM) AND (M2_CablePosM &gt;= RaiseTargetM) THEN
             WinchM1Cmd.ReqStartStop := FALSE;
@@ -17780,10 +17824,10 @@ CASE State OF
 
         WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
         WinchM1Cmd.ReqDirection := 1;
-        WinchM1Cmd.SpeedTgtPct  := 20.0;
+        WinchM1Cmd.StepTgt  := 1;
         WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
         WinchM2Cmd.ReqDirection := 1;
-        WinchM2Cmd.SpeedTgtPct  := 20.0;
+        WinchM2Cmd.StepTgt  := 1;
 
         IF CycleMotionPermit
            AND (M1_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
@@ -17806,10 +17850,10 @@ CASE State OF
 
         WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
         WinchM1Cmd.ReqDirection := 1;
-        WinchM1Cmd.SpeedTgtPct  := 70.0;
+        WinchM1Cmd.StepTgt  := 4;
         WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
         WinchM2Cmd.ReqDirection := 1;
-        WinchM2Cmd.SpeedTgtPct  := 70.0;
+        WinchM2Cmd.StepTgt  := 4;
 
         IF CycleMotionPermit AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
             WinchM1Cmd.ReqStartStop := FALSE;
@@ -17874,10 +17918,10 @@ CASE State OF
         // précédent). Les deux treuils restent synchrones et sous homme-mort.
         WinchM1Cmd.ReqDirection := -1;
         WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
-        WinchM1Cmd.SpeedTgtPct  := 20.0;
+        WinchM1Cmd.StepTgt  := 1;
         WinchM2Cmd.ReqDirection := -1;
         WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
-        WinchM2Cmd.SpeedTgtPct  := 20.0;
+        WinchM2Cmd.StepTgt  := 1;
 
         BucketCmd.ReqOpen := ProcessPermitBucket_Open AND (WinchM1Cmd.ReqDirection = -1);
 
@@ -24584,6 +24628,38 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle de defaut (liste de causes -&gt; ST_Fault)</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedStepHyst1">
+              <type>
+                <derived name="HYSTERESIS" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Decodage % -&gt; palier, seuil 1 (logique FB_Winch §5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepHyst2">
+              <type>
+                <derived name="HYSTERESIS" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Decodage % -&gt; palier, seuil 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepHyst3">
+              <type>
+                <derived name="HYSTERESIS" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Decodage % -&gt; palier, seuil 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepHyst4">
+              <type>
+                <derived name="HYSTERESIS" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Decodage % -&gt; palier, seuil 4</xhtml>
+              </documentation>
+            </variable>
             <variable name="CmdXVal">
               <type>
                 <REAL />
@@ -24666,7 +24742,7 @@ END_IF;
                   externe, vue joystick) ; FALSE = armement bloqué + warning.
                   Désarmement sur neutre prolongé ; le changement de mode / fin de
                   cycle benne est géré par l'externe via ArmingPermit (vue joystick).
-   📤 Sorties : AxisCmdX/Y (struct = source unique : SpeedTgt NON signee + bits sens
+   📤 Sorties : AxisCmdX/Y (struct = source unique : SpeedTgt NON signee % pour IHM + StepTgt palier 1..5 pour logique + bits sens
                 + Direction -1/0/+1 et Deflection -100..+100 % pour anim IHM), Fault : ST_Fault
                 (socle FB_FaultCore), AtNeutralXY (permis logique), NeutralXAct/YAct (miroirs IHM).
    🧬 Contrat : `standard` — pas de struct métier propre → `Fault : ST_Fault` à plat.
@@ -24731,9 +24807,9 @@ Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT 
 {region "§2 Gate securite (neutralisation pipeline, n efface pas le statut)"}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
-    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0;
+    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0; AxisCmdX.StepTgt := 0;
     AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
-    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0;
+    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0; AxisCmdY.StepTgt := 0;
     AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
     AxisCmdX.Direction := 0; AxisCmdX.Deflection := 0;
     AxisCmdY.Direction := 0; AxisCmdY.Deflection := 0;
@@ -24816,6 +24892,25 @@ AxisCmdY.DirectionPositive := (CmdYVal &gt; 0.1);
 AxisCmdY.DirectionNegative := (CmdYVal &lt; -0.1);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
 IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
+
+// 🪜 Decodage consigne % -&gt; palier (logique FB_Winch §5, deplacee au joystick).
+//    AxisCmdY.SpeedTgt (%) reste pour l'IHM ; AxisCmdY.StepTgt (1..5, 0=arret) pour la logique/limitations.
+SpeedStepHyst1(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[1] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[1] - Cfg.SpeedStepHystMargin));
+SpeedStepHyst2(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[2] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[2] - Cfg.SpeedStepHystMargin));
+SpeedStepHyst3(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[3] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[3] - Cfg.SpeedStepHystMargin));
+SpeedStepHyst4(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[4] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[4] - Cfg.SpeedStepHystMargin));
+
+// Algorithme ASCENDANT : OUT=TRUE quand IN&gt;HIGH (au-dessus du seuil) → palier supérieur.
+// Petite déflexion → palier bas ; grande déflexion → palier haut (borne haute du palier).
+IF AxisCmdY.SpeedTgt &lt;= 0.1 THEN
+    AxisCmdY.StepTgt := 0;
+ELSE
+    AxisCmdY.StepTgt := 1;
+    IF SpeedStepHyst1.OUT THEN AxisCmdY.StepTgt := 2; END_IF;
+    IF SpeedStepHyst2.OUT THEN AxisCmdY.StepTgt := 3; END_IF;
+    IF SpeedStepHyst3.OUT THEN AxisCmdY.StepTgt := 4; END_IF;
+    IF SpeedStepHyst4.OUT THEN AxisCmdY.StepTgt := 5; END_IF;
+END_IF;
 
 // Projections monitoring dans le struct (les bits restent la source logique)
 IF AxisCmdY.DirectionPositive THEN AxisCmdY.Direction := 1;
@@ -35868,38 +35963,6 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Cadencement de palier (D10)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedStepHyst1">
-              <type>
-                <derived name="HYSTERESIS" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Décodage consigne -&gt; palier, seuil 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepHyst2">
-              <type>
-                <derived name="HYSTERESIS" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Décodage consigne -&gt; palier, seuil 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepHyst3">
-              <type>
-                <derived name="HYSTERESIS" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Décodage consigne -&gt; palier, seuil 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepHyst4">
-              <type>
-                <derived name="HYSTERESIS" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Décodage consigne -&gt; palier, seuil 4</xhtml>
-              </documentation>
-            </variable>
             <variable name="ResetEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -35934,20 +35997,12 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
 . [LOC] Tous contacteurs commandes a FALSE</xhtml>
               </documentation>
             </variable>
-            <variable name="RampTargetPct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne cible envoyee au SpeedStep</xhtml>
-              </documentation>
-            </variable>
             <variable name="RampTargetStep">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier demandé par le décodeur amont</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier demandé par l'arbitrage amont</xhtml>
               </documentation>
             </variable>
             <variable name="EffectiveSafeStop">
@@ -36160,31 +36215,16 @@ DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
 {region "§5 Paliers vitesse et contacteurs"}
+// T190-B : la consigne est désormais un PALIER discret (DriveRequest.SpeedStepReq,
+// 1..5, 0 = arrêt) produit par l'arbitrage. Plus de décodage %→palier ici.
 IF DirectionChangePending OR (DriveRequest.Direction = 0) OR EffectiveSafeStop OR NOT DriveRequest.StartStop THEN
-    RampTargetPct := 0.0;
-ELSE
-    RampTargetPct := LIMIT(0.0, DriveRequest.SpeedTgt_Pct, 100.0);
-END_IF;
-
-// Décodage consigne % -&gt; palier conservé ici, immédiatement en amont du
-// décodeur contacteurs. FB_SpeedStep ne reçoit plus que le palier discret.
-SpeedStepHyst1(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[1] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[1] - Config.SpeedStepHystMargin));
-SpeedStepHyst2(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[2] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[2] - Config.SpeedStepHystMargin));
-SpeedStepHyst3(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[3] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[3] - Config.SpeedStepHystMargin));
-SpeedStepHyst4(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[4] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[4] - Config.SpeedStepHystMargin));
-
-IF RampTargetPct &lt;= 0.1 THEN
     RampTargetStep := 0;
 ELSE
-    RampTargetStep := 1;
-    IF NOT SpeedStepHyst1.OUT THEN RampTargetStep := 2; END_IF;
-    IF NOT SpeedStepHyst2.OUT THEN RampTargetStep := 3; END_IF;
-    IF NOT SpeedStepHyst3.OUT THEN RampTargetStep := 4; END_IF;
-    IF NOT SpeedStepHyst4.OUT THEN RampTargetStep := 5; END_IF;
+    RampTargetStep := DriveRequest.SpeedStepReq;
 END_IF;
 
 SpeedStep(
-    Enable := (RampTargetPct &gt; 0.1),
+    Enable := (RampTargetStep &gt; 0),
     SpeedStepReq := RampTargetStep,
     Table := Config.SpeedStepTable,
     MaxStepNumber := ActiveMaxStep
@@ -36211,7 +36251,7 @@ END_IF;
 // Injecte MinStepDown sur la CIBLE (RequestedStep, consommee par le shaper ci-dessous),
 // JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
 // (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -&gt; aucun plancher,
-// l'arret franc RequestedStep=0 / RampTargetPct=0 est preserve.
+// l'arret franc RequestedStep=0 / RampTargetStep=0 est preserve.
 // Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
 // ActiveMaxStep (ex. SlowdownMaxStep -&gt; palier 1 en bordure basse), on borne au plafond.
 IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown &gt; 0) THEN
@@ -36372,6 +36412,14 @@ PrevStepNumber := StepNumber;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gating benne/synchro (partagé M1/M2)</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table paliers (conservée pour compat interface ; plus de conversion %→palier ici)</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -36398,12 +36446,12 @@ PrevStepNumber := StepNumber;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedPct">
+            <variable name="StepTgt">
               <type>
-                <REAL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Consigne vitesse arbitrée (0..100 %)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Palier de vitesse arbitré (1..5, 0 = arrêt)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -36428,6 +36476,10 @@ PrevStepNumber := StepNumber;
        FB_Safety_Winch / FB_Winch.
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Bit-identique à l'ancien PRG_04 §3 (refactor POO).
+   🪜 T190-B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
+       pourcentage. En SEMI_AUTO, passthrough de ReqWinch.StepTgt ; en manuel,
+       le joystick est le producteur UNIQUE du palier (passthrough de
+       Joystick.AxisY.StepTgt), boutons/both = palier 5 (pleine vitesse).
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -36445,44 +36497,47 @@ BenneBusyFallEdge(CLK := Context.BucketBusy);
 IF NOT Enable THEN
     StartStop := FALSE;
     Direction := 0;
-    SpeedPct  := 0.0;
+    StepTgt   := 0;
 ELSE
     // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         StartStop := ReqWinch.ReqStartStop;
         Direction := ReqWinch.ReqDirection;
-        SpeedPct  := ReqWinch.SpeedTgtPct;
+        StepTgt   := ReqWinch.StepTgt;
     ELSE
         // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
         //    commande unitaire M1 dérivée des boutons/joystick (Select=1). ──
+        // 🪜 StepTgt : le joystick est le producteur UNIQUE du palier (FB_Joystick §6).
+        //    Boutons/both = pleine vitesse (100 % → palier 5) ; joystick = passthrough
+        //    de Joystick.AxisY.StepTgt. Plus de re-dérivation %→palier ici.
         IF NOT TglJoystickMaster THEN
             // Mode Boutons IHM
             IF BothIntent.Active THEN
                 // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
                 Direction := BothIntent.Direction;
-                SpeedPct  := 100.0;
+                StepTgt   := 5;   // 100 % → palier max
             ELSIF IHM.BtnUpM1 THEN
                 Direction := 1;
-                SpeedPct  := 100.0;
+                StepTgt   := 5;
             ELSIF IHM.BtnDownM1 THEN
                 Direction := -1;
-                SpeedPct  := 100.0;
+                StepTgt   := 5;
             ELSE
                 Direction := 0;
-                SpeedPct  := 0.0;
+                StepTgt   := 0;
             END_IF;
         ELSE
             // Mode Joystick Maître — M1 unitaire si Select = 1, both si Select = 0
             IF Auth.JoystickWinchSelectArbitrated = 1 THEN
                 Direction := Joystick.AxisY.Direction;
-                SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+                StepTgt   := Joystick.AxisY.StepTgt;
             ELSIF BothIntent.Active THEN
                 // Both (Select=0) — source unique PRG_03, plus de re-dérivation
                 Direction := BothIntent.Direction;
-                SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+                StepTgt   := Joystick.AxisY.StepTgt;
             ELSE
                 Direction := 0;
-                SpeedPct  := 0.0;
+                StepTgt   := 0;
             END_IF;
         END_IF;
 
@@ -36584,6 +36639,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse override benne</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table paliers (conservée pour compat interface ; plus de conversion %→palier ici)</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -36610,12 +36673,12 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedPct">
+            <variable name="StepTgt">
               <type>
-                <REAL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Consigne vitesse arbitrée (0..100 %)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Palier de vitesse arbitré (1..5, 0 = arrêt)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -36641,6 +36704,10 @@ END_IF;
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Bit-identique à l'ancien PRG_04 §3 (refactor POO).
    ⚠️ Asymétries M2 vs M1 : chemin benne (override), Select=0/2, synchro inversée.
+   🪜 T190-B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
+       pourcentage. En SEMI_AUTO, passthrough de ReqWinch.StepTgt ; en manuel,
+       le joystick est le producteur UNIQUE du palier (passthrough de
+       Joystick.AxisY.StepTgt), boutons/both = palier 5, override benne = palier 1.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -36658,50 +36725,53 @@ BenneBusyFallEdge(CLK := Context.BucketBusy);
 IF NOT Enable THEN
     StartStop := FALSE;
     Direction := 0;
-    SpeedPct  := 0.0;
+    StepTgt   := 0;
 ELSE
     // ── Chemin benne : M2 piloté par l'action benne (override) ──
     IF Context.BucketBusy AND Context.BucketM2StartStop THEN
         StartStop := Context.BucketM2StartStop;
         Direction := SEL(Context.BucketM2Open, -1, 1);  // Open → +1, Close → -1
-        SpeedPct  := Cfg.BucketOverrideSpeedPct;
+        StepTgt   := 1;   // override benne = vitesse lente (palier 1)
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN
             StartStop := ReqWinch.ReqStartStop;
             Direction := ReqWinch.ReqDirection;
-            SpeedPct  := ReqWinch.SpeedTgtPct;
+            StepTgt   := ReqWinch.StepTgt;
         ELSE
             // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
             //    commande unitaire M2 dérivée des boutons/joystick (Select=2). ──
+            // 🪜 StepTgt : le joystick est le producteur UNIQUE du palier (FB_Joystick §6).
+            //    Boutons/both = pleine vitesse (100 % → palier 5) ; joystick = passthrough
+            //    de Joystick.AxisY.StepTgt. Plus de re-dérivation %→palier ici.
             IF NOT TglJoystickMaster THEN
                 // Mode Boutons IHM
                 IF BothIntent.Active THEN
                     // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
                     Direction := BothIntent.Direction;
-                    SpeedPct  := 100.0;
+                    StepTgt   := 5;   // 100 % → palier max
                 ELSIF IHM.BtnUpM2 THEN
                     Direction := 1;
-                    SpeedPct  := 100.0;
+                    StepTgt   := 5;
                 ELSIF IHM.BtnDownM2 THEN
                     Direction := -1;
-                    SpeedPct  := 100.0;
+                    StepTgt   := 5;
                 ELSE
                     Direction := 0;
-                    SpeedPct  := 0.0;
+                    StepTgt   := 0;
                 END_IF;
             ELSE
                 // Mode Joystick Maître — M2 unitaire si Select = 2, both si Select = 0
                 IF Auth.JoystickWinchSelectArbitrated = 2 THEN
                     Direction := Joystick.AxisY.Direction;
-                    SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+                    StepTgt   := Joystick.AxisY.StepTgt;
                 ELSIF BothIntent.Active THEN
                     // Both (Select=0) — source unique PRG_03, plus de re-dérivation
                     Direction := BothIntent.Direction;
-                    SpeedPct  := ABS(Joystick.AxisY.SpeedTgt);
+                    StepTgt   := Joystick.AxisY.StepTgt;
                 ELSE
                     Direction := 0;
-                    SpeedPct  := 0.0;
+                    StepTgt   := 0;
                 END_IF;
             END_IF;
 
@@ -40793,11 +40863,11 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
     Data.ReqProgram.ReqWinchM1.ReqStartStop := FALSE;
     Data.ReqProgram.ReqWinchM1.ReqDirection := 0;
-    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := 0.0;
+    Data.ReqProgram.ReqWinchM1.StepTgt  := 0;
 
     Data.ReqProgram.ReqWinchM2.ReqStartStop := FALSE;
     Data.ReqProgram.ReqWinchM2.ReqDirection := 0;
-    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := 0.0;
+    Data.ReqProgram.ReqWinchM2.StepTgt  := 0;
 
     Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;
@@ -40890,11 +40960,11 @@ ELSE
     // Neutralisation déterministe (DISABLE)
     Data.ReqProgram.ReqWinchM1.ReqStartStop := FALSE;
     Data.ReqProgram.ReqWinchM1.ReqDirection := 0;
-    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := 0.0;
+    Data.ReqProgram.ReqWinchM1.StepTgt  := 0;
 
     Data.ReqProgram.ReqWinchM2.ReqStartStop := FALSE;
     Data.ReqProgram.ReqWinchM2.ReqDirection := 0;
-    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := 0.0;
+    Data.ReqProgram.ReqWinchM2.StepTgt  := 0;
 
     Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;
@@ -41355,10 +41425,21 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <INT />
               </type>
             </variable>
+            <variable name="M1LogicRequestStepTgt">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier arbitré M1 (1..5, 0 = arrêt) — consommé par FB_Winch</xhtml>
+              </documentation>
+            </variable>
             <variable name="M1LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic % M1 (palier→%, IHM / simu)</xhtml>
+              </documentation>
             </variable>
             <variable name="M2LogicRequestStartStop">
               <type>
@@ -41370,10 +41451,21 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <INT />
               </type>
             </variable>
+            <variable name="M2LogicRequestStepTgt">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier arbitré M2 (1..5, 0 = arrêt) — consommé par FB_Winch</xhtml>
+              </documentation>
+            </variable>
             <variable name="M2LogicRequestSpeedCmd_Pct">
               <type>
                 <REAL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic % M2 (palier→%, IHM / simu)</xhtml>
+              </documentation>
             </variable>
             <variable name="BottomLimitM1_Active">
               <type>
@@ -41952,11 +42044,18 @@ instArbM1(
     BothIntent := PRG_03_Modes_Cycle.Data.WinchBothIntent,
     IHM        := ArbIHM,
     TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
-    Context    := ArbContext
+    Context    := ArbContext,
+    SpeedStepTable := _WinchSpeedStepTable
 );
 M1LogicRequestStartStop := instArbM1.StartStop;
 M1LogicRequestDirection := instArbM1.Direction;
-M1LogicRequestSpeedCmd_Pct := instArbM1.SpeedPct;
+M1LogicRequestStepTgt := instArbM1.StepTgt;
+// Diagnostic % (palier→%) pour IHM / simu — borne haute du palier arbitré.
+IF (M1LogicRequestStepTgt &gt;= 1) AND (M1LogicRequestStepTgt &lt;= 5) THEN
+    M1LogicRequestSpeedCmd_Pct := _WinchSpeedStepTable.StepThreshold_Pct[M1LogicRequestStepTgt];
+ELSE
+    M1LogicRequestSpeedCmd_Pct := 0.0;
+END_IF;
 
 // ── Arbitrage M2 (FB_WinchCmdArbitrationM2) ──
 instArbM2(
@@ -41968,11 +42067,18 @@ instArbM2(
     IHM        := ArbIHM,
     TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext,
-    Cfg        := ArbM2Cfg
+    Cfg        := ArbM2Cfg,
+    SpeedStepTable := _WinchSpeedStepTable
 );
 M2LogicRequestStartStop := instArbM2.StartStop;
 M2LogicRequestDirection := instArbM2.Direction;
-M2LogicRequestSpeedCmd_Pct := instArbM2.SpeedPct;
+M2LogicRequestStepTgt := instArbM2.StepTgt;
+// Diagnostic % (palier→%) pour IHM / simu — borne haute du palier arbitré.
+IF (M2LogicRequestStepTgt &gt;= 1) AND (M2LogicRequestStepTgt &lt;= 5) THEN
+    M2LogicRequestSpeedCmd_Pct := _WinchSpeedStepTable.StepThreshold_Pct[M2LogicRequestStepTgt];
+ELSE
+    M2LogicRequestSpeedCmd_Pct := 0.0;
+END_IF;
 
 // Front de fin d'action benne (F_TRIG conservé pour §3bis ArmingPermit et extraction control).
 // L'arrêt forcé de fin d'action benne est désormais géré en interne par les FB d'arbitrage.
@@ -42445,7 +42551,7 @@ instWinchLoadEstimatorM2(
 // --- M1 : assemblage des structs (CODESYS refuse l'initialiseur inline en appel) ---
 M1DriveRequest.StartStop            := M1LogicRequestStartStop;
 M1DriveRequest.Direction            := M1LogicRequestDirection;
-M1DriveRequest.SpeedTgt_Pct         := M1LogicRequestSpeedCmd_Pct;
+M1DriveRequest.SpeedStepReq         := M1LogicRequestStepTgt;
 M1DriveRequest.MaxStepUp            := CommonMaxStepUp;
 M1DriveRequest.MaxStepDown          := CommonMaxStepDown;
 // Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
@@ -42492,7 +42598,7 @@ instWinchM1(
 // --- M2 : assemblage des structs ---
 M2DriveRequest.StartStop            := M2LogicRequestStartStop;
 M2DriveRequest.Direction            := M2LogicRequestDirection;
-M2DriveRequest.SpeedTgt_Pct         := M2LogicRequestSpeedCmd_Pct;
+M2DriveRequest.SpeedStepReq         := M2LogicRequestStepTgt;
 // Clamp de palier agrégé en §5ter : bornes communes M1=M2 (CommonMaxStep*) puis
 // M2-propre (M2MaxStep*) — M2_BucketJogLimit, ManualBucketLimitsActive,
 // BucketNotClosedAscentStep1, SlackCableAscentStep1 ne réduisent jamais M1.
@@ -44470,6 +44576,23 @@ PowerCutOffActive := PowerCutOffReq;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant SimulationBypassActive</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleM1SpeedTgt_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🪜 DIAGNOSTIC % CYCLE (palier→%, borne haute du palier) ===
+. [LOC] Consigne % cycle M1 (StepThreshold_Pct[StepTgt])</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleM2SpeedTgt_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne % cycle M2 (StepThreshold_Pct[StepTgt])</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -44981,6 +45104,19 @@ GVL_IHM.Banner := instHmiBannerFormatter.Banner;
 {region "§4 Vue depannage lecture seule"}
 // === 🕵️♂️ §4 VUE DÉPANNAGE (lecture seule stricte) ===
 
+// 🪜 Diagnostic % cycle (palier→%, borne haute du palier) — même patron que PRG_04
+// (M1LogicRequestSpeedCmd_Pct). StepTgt=0 (arrêt) → 0.0 (hors bornes du tableau 1..5).
+IF (PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.StepTgt &gt;= 1) AND (PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.StepTgt &lt;= 5) THEN
+    CycleM1SpeedTgt_Pct := _WinchSpeedStepTable.StepThreshold_Pct[PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.StepTgt];
+ELSE
+    CycleM1SpeedTgt_Pct := 0.0;
+END_IF;
+IF (PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.StepTgt &gt;= 1) AND (PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.StepTgt &lt;= 5) THEN
+    CycleM2SpeedTgt_Pct := _WinchSpeedStepTable.StepThreshold_Pct[PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.StepTgt];
+ELSE
+    CycleM2SpeedTgt_Pct := 0.0;
+END_IF;
+
 instTroubleshootingView(
     Enable               := TRUE,
     HwIn                 := PRG_02_Acquisition.HwIn,
@@ -44997,8 +45133,8 @@ instTroubleshootingView(
     WinchBothMotionDirection := PRG_04_Treuils_Benne.WinchBothMotionDirection,
     WinchBothMotionActive := PRG_04_Treuils_Benne.WinchBothMotionActive,
     CycleAutoBusy := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
-    CycleM1SpeedTgt_Pct := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.SpeedTgtPct,
-    CycleM2SpeedTgt_Pct := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.SpeedTgtPct,
+    CycleM1SpeedTgt_Pct := CycleM1SpeedTgt_Pct,
+    CycleM2SpeedTgt_Pct := CycleM2SpeedTgt_Pct,
     CycleBucketOpen := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen,
     CycleTargetPosition := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt,
     SimulationModeActive := GVL_Simulation.SimulationModeActive,

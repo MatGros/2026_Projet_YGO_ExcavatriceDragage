@@ -68,10 +68,6 @@ VAR
     SpeedStep                       : FB_SpeedStep;                   // * [INST] Decodage paliers vitesse
     DirectionInterlock              : FB_WinchDirectionInterlock;     // * [INST] Interlock changement de sens (D18)
     StepShaper                      : FB_WinchStepShaper;             // * [INST] Cadencement de palier (D10)
-    SpeedStepHyst1                  : HYSTERESIS;                     // * [INST] Décodage consigne -> palier, seuil 1
-    SpeedStepHyst2                  : HYSTERESIS;                     // * [INST] Décodage consigne -> palier, seuil 2
-    SpeedStepHyst3                  : HYSTERESIS;                     // * [INST] Décodage consigne -> palier, seuil 3
-    SpeedStepHyst4                  : HYSTERESIS;                     // * [INST] Décodage consigne -> palier, seuil 4
 
     // === DETECTEURS ET TIMERS INTERNES ===
     ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
@@ -80,8 +76,7 @@ VAR
 
     // === VARIABLES LOCALES CALCULÉES ===
     AllContactorsCommandedOff       : BOOL;                           // . [LOC] Tous contacteurs commandes a FALSE
-    RampTargetPct                   : REAL;                           // . [LOC] Consigne cible envoyee au SpeedStep
-    RampTargetStep                  : INT;                            // . [LOC] Palier demandé par le décodeur amont
+    RampTargetStep                  : INT;                            // . [LOC] Palier demandé par l'arbitrage amont
     EffectiveSafeStop               : BOOL;                           // . [LOC] SafeStop effectif incluant permis
     ActiveMaxStep                   : INT;                            // . [LOC] Plafond palier actif dynamique
     EffectiveStepRampDelay          : TIME;                           // . [LOC] Cadence palier selon sens, distincte interlock
@@ -205,31 +200,16 @@ DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
 {region "§5 Paliers vitesse et contacteurs"}
+// T190-B : la consigne est désormais un PALIER discret (DriveRequest.SpeedStepReq,
+// 1..5, 0 = arrêt) produit par l'arbitrage. Plus de décodage %→palier ici.
 IF DirectionChangePending OR (DriveRequest.Direction = 0) OR EffectiveSafeStop OR NOT DriveRequest.StartStop THEN
-    RampTargetPct := 0.0;
-ELSE
-    RampTargetPct := LIMIT(0.0, DriveRequest.SpeedTgt_Pct, 100.0);
-END_IF;
-
-// Décodage consigne % -> palier conservé ici, immédiatement en amont du
-// décodeur contacteurs. FB_SpeedStep ne reçoit plus que le palier discret.
-SpeedStepHyst1(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[1] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[1] - Config.SpeedStepHystMargin));
-SpeedStepHyst2(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[2] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[2] - Config.SpeedStepHystMargin));
-SpeedStepHyst3(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[3] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[3] - Config.SpeedStepHystMargin));
-SpeedStepHyst4(IN := REAL_TO_INT(RampTargetPct), HIGH := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[4] + Config.SpeedStepHystMargin), LOW := REAL_TO_INT(Config.SpeedStepTable.StepThreshold_Pct[4] - Config.SpeedStepHystMargin));
-
-IF RampTargetPct <= 0.1 THEN
     RampTargetStep := 0;
 ELSE
-    RampTargetStep := 1;
-    IF NOT SpeedStepHyst1.OUT THEN RampTargetStep := 2; END_IF;
-    IF NOT SpeedStepHyst2.OUT THEN RampTargetStep := 3; END_IF;
-    IF NOT SpeedStepHyst3.OUT THEN RampTargetStep := 4; END_IF;
-    IF NOT SpeedStepHyst4.OUT THEN RampTargetStep := 5; END_IF;
+    RampTargetStep := DriveRequest.SpeedStepReq;
 END_IF;
 
 SpeedStep(
-    Enable := (RampTargetPct > 0.1),
+    Enable := (RampTargetStep > 0),
     SpeedStepReq := RampTargetStep,
     Table := Config.SpeedStepTable,
     MaxStepNumber := ActiveMaxStep
@@ -256,7 +236,7 @@ END_IF;
 // Injecte MinStepDown sur la CIBLE (RequestedStep, consommee par le shaper ci-dessous),
 // JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
 // (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -> aucun plancher,
-// l'arret franc RequestedStep=0 / RampTargetPct=0 est preserve.
+// l'arret franc RequestedStep=0 / RampTargetStep=0 est preserve.
 // Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
 // ActiveMaxStep (ex. SlowdownMaxStep -> palier 1 en bordure basse), on borne au plafond.
 IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown > 0) THEN

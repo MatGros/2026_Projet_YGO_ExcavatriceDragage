@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:54.004330" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:54.004330">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:17:44.781435" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:17:44.781435">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -48,15 +48,7 @@ TRUE = mouvement demandÃ©</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Palier demandÃ© dÃ©codÃ© en amont (usage aval)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedTgt_Pct">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Consigne vitesse % (0.0..100.0) â€” dÃ©codage conservÃ© dans FB_Winch</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Palier demandé (1..5, 0 = arrêt) — consommé par FB_Winch</xhtml>
               </documentation>
             </variable>
             <variable name="MinStepUp">
@@ -158,8 +150,9 @@ Position limite haute active (m)</xhtml>
    ðŸ“¤ Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
    ðŸ“¥ Consommateur : FB_Winch
    ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
-      et le clamp DANS FB_Winch (comportement bit-identique). Les champs
-      SpeedStepReq / MinStepUp sont dÃ©clarÃ©s mais non consommÃ©s (usage aval).
+      et le clamp DANS FB_Winch (comportement bit-identique).
+      SpeedStepReq est consommé par FB_Winch (§5) ; MinStepUp est déclaré
+      mais non consommé (usage aval).
    =======================================================================</xhtml>
         </documentation>
       </dataType>
