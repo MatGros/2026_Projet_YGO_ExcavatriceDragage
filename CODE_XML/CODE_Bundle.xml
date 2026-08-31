@@ -9164,7 +9164,7 @@ TRUE = Défaut sécurité actif</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie EFFECTIF (Safety AND Process, TRUE = autorisé, fail-safe) — fusion D1 §1ter PRG_05</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenancePermit">
@@ -9172,7 +9172,7 @@ TRUE = Défaut sécurité actif</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance EFFECTIF (Safety AND Process, TRUE = autorisé, fail-safe) — fusion D1 §1ter PRG_05</xhtml>
               </documentation>
             </variable>
             <variable name="BlockedBySafety">
@@ -10595,7 +10595,7 @@ Seuils de changement de palier (0..100%)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
-🟢 Sens Trémie effectivement permis (instSafetyTranslationM3.TremiePermit)</xhtml>
+🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety AND Process, D1 §1ter PRG_05)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenancePermitEffective">
@@ -10603,7 +10603,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (instSafetyTranslationM3.MaintenancePermit)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety AND Process, D1 §1ter PRG_05)</xhtml>
               </documentation>
             </variable>
             <variable name="HeightInterlockBlocking">
@@ -45007,6 +45007,27 @@ Data.TraceM2                      := TraceM2;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ SafeStop réellement appliqué au mouvement = InputModuleFault OR safety M3 (8 mécanismes)</xhtml>
               </documentation>
             </variable>
+            <variable name="EffectivePermitM3_Tremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnels M3 EFFECTIFS (D1 — Phase 3) : information de POSSIBILITÉ de
+mouvement dans une direction, donnée AVANT l'ordre. Reflète les conditions physiques/
+logiques (fins de course, défauts, autorisation cible) — PAS la commande (homme-mort).
+Pour M3, les conditions physiques sont déjà dans FB_Safety_Translation (TremiePermit/
+MaintenancePermit) ; pas de Process supplémentaire (pas de benne/Kobold comme les treuils).
+🟢 Permis effectif M3 vers Trémie (Safety)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitM3_Maintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis effectif M3 vers Maintenance (Safety)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M3_HeightInterlockOk">
               <type>
                 <BOOL />
@@ -45322,6 +45343,34 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 
 {endregion}
 
+{region "§1ter Permis effectifs M3 (D1)"}
+// === 🟢 §1ter PERMIS EFFECTIFS M3 (D1 — Phase 3) ===
+// Niveau exposé à l'IHM = EFFECTIF, aligné sur les treuils M1/M2 (PRG_04 §5).
+// ⚠️ Le permit est une INFORMATION DE POSSIBILITÉ de mouvement dans une direction,
+// donnée AVANT l'ordre. Il reflète que l'axe est PRÊT À FONCTIONNER (pas de défaut,
+// puissance, thermique) ET que la direction est physiquement possible (fins de course,
+// autorisation cible). Il ne reflète PAS la commande (homme-mort) : l'homme-mort est une
+// condition de COMMANDE (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle), pas de
+// possibilité — il n'entre donc PAS dans le permit exposé.
+// Pour M3, le Safety (FB_Safety_Translation) fournit :
+//   - TremiePermit = NOT LimitSwitchTremie (direction possible vers Trémie)
+//   - MaintenancePermit = MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance
+//   - SafeStop / PowerCutOff = défauts (thermique, Méca A/B, incohérence, comm, phases...)
+// Le permit effectif = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff
+// (prêt à fonctionner), aligné sur le modèle treuils où le Safety produit déjà des
+// permits gatés par les défauts. Pas de Process supplémentaire (pas de benne/Kobold).
+// ⚠️ Ces permis effectifs sont des valeurs de DIAGNOSTIC/IHM (lecture seule) : la commande
+// réelle reste gatée par SafeStop/PowerCutOff (instSafetyTranslationM3) et l'homme-mort
+// (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle). Aucun impact sur la chaîne de sécurité.
+EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremiePermit
+                               AND NOT instSafetyTranslationM3.SafeStop
+                               AND NOT instSafetyTranslationM3.PowerCutOff;
+EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenancePermit
+                                 AND NOT instSafetyTranslationM3.SafeStop
+                                 AND NOT instSafetyTranslationM3.PowerCutOff;
+
+{endregion}
+
 {region "§2 Pilotage translation M3"}
 // === ⚙️ §2 EXÉCUTION PILOTAGE TRANSLATION M3 ===
 
@@ -45494,9 +45543,10 @@ TranslationSafety.ErrorMecaB := instSafetyTranslationM3.ErrorMecaB;
 TranslationSafety.ErrorMecaA := instSafetyTranslationM3.ErrorMecaA;
 TranslationSafety.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
-// 🟢 Permis directionnels M3 (source unique : FB_Safety_Translation) — projetés vers l'IHM
-TranslationSafety.TremiePermit := instSafetyTranslationM3.TremiePermit;
-TranslationSafety.MaintenancePermit := instSafetyTranslationM3.MaintenancePermit;
+// 🟢 Permis directionnels M3 EFFECTIFS (D1 — Safety AND Process, §1ter) — projetés vers l'IHM
+// (source safety : FB_Safety_Translation ; fusion Process en local, modèle treuils PRG_04 §5)
+TranslationSafety.TremiePermit := EffectivePermitM3_Tremie;
+TranslationSafety.MaintenancePermit := EffectivePermitM3_Maintenance;
 TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
@@ -45514,9 +45564,9 @@ TranslationTrace.PowerCutOffActive        := instSafetyTranslationM3.PowerCutOff
 TranslationTrace.HeightInterlockBlocking  := NOT M3_HeightInterlockOk;
 TranslationTrace.DriveOperational         := PRG_02_Acquisition.Data.Network.DriveM3.Operational;
 TranslationTrace.FinalInterlockError      := TranslationState.FinalInterlockError;
-// 🟢 Permis directionnels par sens (source unique : FB_Safety_Translation) — reflet exact des permis appliqués
-TranslationTrace.TremiePermitEffective    := instSafetyTranslationM3.TremiePermit;
-TranslationTrace.MaintenancePermitEffective := instSafetyTranslationM3.MaintenancePermit;
+// 🟢 Permis directionnels par sens EFFECTIFS (D1 — Safety AND Process, §1ter) — reflet exact des permis appliqués
+TranslationTrace.TremiePermitEffective    := EffectivePermitM3_Tremie;
+TranslationTrace.MaintenancePermitEffective := EffectivePermitM3_Maintenance;
 
 // Permis de mouvement effectif = toutes les barrières levées (agrégat diagnostic)
 TranslationTrace.MotionPermitEffective := NOT M3_SafeStop_Aggregate
