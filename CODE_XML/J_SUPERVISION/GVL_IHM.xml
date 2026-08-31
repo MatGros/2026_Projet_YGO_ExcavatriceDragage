@@ -1901,7 +1901,7 @@ Boucle AU fermee (EmergencyChainClosed = TRUE)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant (= ArmRequestAllowed) : chain OK, step=0, pas de lockout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">

@@ -1,0 +1,105 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T202 : Audit incohérences CODE/G_CYCLE
+# ═══════════════════════════════════════════════════════════════════════════
+# Note de décision d'architecture associée (A1/A2/A6/A7) :
+#   DOC/WFLOW/CONTRACTS/T202_NOTE_DECISION_ARCHI.md
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T202_AUDIT_G_CYCLE
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Résorber la dette du dossier CODE/G_CYCLE sans changer le comportement machine,
+    sauf pour un seul écart de sécurité identifié (X4_DESCEND_OPEN détecte le fond
+    sur DI Kobold brut, sans validation de fenêtre d'immersion ni timeout dédié),
+    qui est corrigé via une brique de qualification de fond partagée SEMI_AUTO/MAINT.
+
+  acceptance:
+    - id: AC1
+      statement: "FB_Cycle ne déclare plus aucune VAR_INPUT non lue (SetDepthM, SetOffsetM, WinchSyncDeltaM, Translation_Busy, Translation_Done, Benne_Busy, TopPositionSensor, Mode) ni VAR interne write-only (SavedState, SelectedWorkTarget) ; le câblage correspondant dans PRG_03_Modes_Cycle est retiré."
+      verified_by: "grep de chaque identifiant dans FB_Cycle.st (0 hit hors éventuelle réintroduction justifiée) + lecture git diff PRG_03"
+    - id: AC2
+      statement: "Les 8 permis ProcessPermitM1_Ascent..ProcessPermitM3_Maintenance sont remplacés par un permis homme-mort unique ; la neutralisation des commandes actionneurs est factorisée en un seul site (méthode/bloc) au lieu de ~5 copies."
+      verified_by: "lecture FB_Cycle.st + run_all_gates (comportement inchangé)"
+    - id: AC3
+      statement: "WaitingResume et PausedState sont exposés en VAR_OUTPUT de FB_Cycle et consommés tels quels par FB_TroubleshootingView (Idx215/Idx216) ; plus aucun recalcul de ces champs à partir de Auth.Mode/CycleStep."
+      verified_by: "grep 'Idx215\\|Idx216' FB_TroubleshootingView.st → affectation directe depuis le bus séquenceur ; lecture git diff"
+    - id: AC4
+      statement: "FB_Cycle X4_DESCEND_OPEN → X5_BOTTOM_CONFIRMED transite sur une qualification de fond validée (fenêtre immersion + timeout), produite par une brique partagée, et non plus sur KoboldContactFond brut ; AF-04 §4.2 redevient exact."
+      verified_by: "test STruCpp cycle SEMI_AUTO (immersion aberrante → pas de passage X5 ; blocage descente → faute) + relecture AF-04"
+    - id: AC5
+      statement: "La branche morte 'IF NOT HomedM1 OR NOT HomedM2' de X1_HOMING est supprimée (ou X1 retiré du grafcet si AF-04 le permet) ; FB_MachineHomingCycle reste producteur unique de la qualification machine."
+      verified_by: "lecture FB_Cycle.st + AF-04"
+    - id: AC6
+      statement: "Le commentaire d'interface de SelTarget dans FB_Cycle n'annonce plus de valeur non gérée par X2 (P2 retiré ou X2 étendu selon décision T202-A)."
+      verified_by: "lecture FB_Cycle.st ligne SelTarget"
+    - id: AC7
+      statement: "Bundle PLCopenXML régénéré, G200 liaison PASS (0 erreur), 21 gates PASS, revue humaine du git diff réel effectuée."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py --report + run_all_gates.py"
+    - id: AC8
+      statement: "Le nom de fichier est égal au nom de POU CODESYS PRG_03_Modes_Cycle et le suffixe est égal au langage Structured Text généré dans le bundle."
+      verified_by: "Contrôle structurel du contrat (check_task_contract.py) et compilation CODESYS humaine."
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/G_CYCLE/FB_DiveSearch.st            # extraction brique fond (T202-E only)
+      - CODE/G_CYCLE/_TYPES/                     # nouveau DUT/enum brique fond si besoin
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st        # nettoyage câblage + wiring brique fond
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st  # A3 conso WaitingResume/PausedState
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/   # champs bus séquenceur si besoin
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+    forbidden:
+      - PRJ_CODESYS/**/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - CODE/H_TREUILS_BENNE/**                  # interfaces treuils = périmètre T194
+      - CODE/G_CYCLE/FB_ExtractionAssist.st      # pas de fusion extraction (voir note A1)
+      - CODE/G_CYCLE/FB_MachineHomingCycle.st    # producteur unique, hors scope
+
+  conservation:
+    must_survive:
+      - "Grafcet SEMI_AUTO X0→X13 + STABILIZING : mêmes transitions, mêmes conditions de passage (hors X4→X5 qui gagne la validation immersion, et X1 dont la branche morte disparaît)."
+      - "Repli STABILIZING sur défaut latché, reprise consciente par StartCycle, pas de redémarrage automatique."
+      - "Gate continu homme-mort : aucune commande actionneur ne survit à la perte de (JoystickDeflected AND DeadmanArmed)."
+      - "Compteur SampleCount : 1 incrément par cycle, RETAIN, cadré par front."
+      - "Sorties ST_ProgramWinchRequest / ST_ProgramTranslationRequest / ST_ProgramBucketRequest : mêmes valeurs à état de cycle égal."
+      - "Neutralisation contacteur Kobold (ReqKoboldMeasureEnable=FALSE) en STABILIZING et à la perte du permis."
+    dropped_on_purpose:
+      - "VAR_INPUT mortes de FB_Cycle (aucun effet fonctionnel — jamais lues)."
+      - "Granularité fictive des 8 permis homme-mort (tous strictement identiques)."
+      - "Branche X1_HOMING 'NOT HomedM1 OR NOT HomedM2' (inatteignable : SEMI_AUTO refusé si NOT MachineHomed)."
+      - "Détection de fond X4 sur DI brut (remplacée par qualification validée)."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    T202-A (note de décision) DOIT être validée par l'humain avant T202-E. Les lots
+    T202-B/C/D (nettoyages bit-identiques) peuvent démarrer en parallèle mais tout
+    changement de comportement observé en cours de route est remonté immédiatement.
+    Si AF-04 impose la présence de X1_HOMING ou de P2 comme cible auto → STOP, remonter.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    (à remplir par l'agent en fin de lot)
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    (visa orchestrateur / recette humaine)

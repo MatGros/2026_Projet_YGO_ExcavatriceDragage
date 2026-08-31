@@ -26,7 +26,7 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     // === SORTIES STRUCTUREES (2 DUT) ===
-    Status                  : ST_Safety_Emergency_Status; // <-- [STAT] État/diagnostic (Ready/Busy/Done + State + Diag + Fault + message) — PRG_07/IHM/Troubleshooting
+    Status                  : ST_Safety_Emergency_Status; // <-- [STAT] État/diagnostic (Ready/Done + State + Diag + Fault + message) — PRG_07/IHM/Troubleshooting
     Cmd                     : ST_Safety_Emergency_Cmd;    // <-- [ACT]  Commandes de pilotage (MaintainA/B_Cmd + ArmPulse_Cmd) — PRG_06
 END_VAR
 VAR
@@ -57,18 +57,15 @@ VAR
     EmergencyArmingLockoutActive : BOOL; // . [LOC] Verrouillage temporel 5s entre essais
     RedundancyTestFailed      : BOOL; // . [LOC] Defaut auto-test affiche (Cause lissee OR NOT Ack)
     EmergencyArmingFailed     : BOOL; // . [LOC] Defaut rearmement affiche (Cause lissee OR NOT Ack)
-    Armable                   : BOOL; // . [LOC] Rearmement possible actuellement (= ArmRequestAllowed, aligne IHM/armement)
+    Armable                   : BOOL; // . [LOC] Rearmement possible actuellement (source unique, aligne IHM/armement)
     ArmingBusy                : BOOL; // . [LOC] Sequence ou lockout en cours
     LastAbortStep             : INT;  // . [LOC] Etape sequence lors du dernier abandon (0 a 6)
     LastAbortCause            : WORD; // . [LOC] Bitfield cause abandon (voir constantes CST_ABORT_*)
 
     // === CONDITIONS DECOMPOSEES (lisibilite §2quater) ===
-    ArmRequest_ChainOk        : BOOL; // . [LOC] Preconditions chaine + repos + pas de coupure IHM
-    ArmRequest_NoBlock        : BOOL; // . [LOC] Pas de coupure metier, pas de lockout, contacteur au repos
-    ArmRequestAllowed         : BOOL; // . [LOC] Rearmement autorise (front ArmRequest + preconditions)
     Armable_ChainOk           : BOOL; // . [LOC] Boucle fermee + pas de coupure IHM/metier
     Armable_Idle              : BOOL; // . [LOC] Sequence au repos
-    Armable_NoBlock           : BOOL; // . [LOC] Pas de lockout, contacteur au repos (aligne sur ArmRequestAllowed)
+    Armable_NoBlock           : BOOL; // . [LOC] Pas de lockout, contacteur au repos
     Maintain_ChainOk          : BOOL; // . [LOC] Boucle fermee OU sequence en cours (maintien A/B)
     Maintain_NoCutOff         : BOOL; // . [LOC] Pas de coupure metier ni IHM (maintien A/B)
     MaintainA_NoFault         : BOOL; // . [LOC] Pas de forcage A ni cause redondance
@@ -214,10 +211,17 @@ IF Enable THEN
     // 🚦 DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
     // Une nouvelle tentative repart d'une Cause propre : si le problème persiste, il sera
     // re-latché dès le prochain échec (RedundancyCauseEdge/ArmingFailedCauseEdge -> Ack remis à FALSE).
-    ArmRequest_ChainOk := (ArmingSeqStep = CST_STEP_IDLE) AND EmergencyChainClosed AND NOT BtnEmergencyCutOff;
-    ArmRequest_NoBlock := NOT PowerCutOffRequest AND NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
-    ArmRequestAllowed := ArmRequest_ChainOk AND ArmRequest_NoBlock;
-    IF ArmReqEdge.Q AND ArmRequestAllowed THEN
+    // 🚦 PRÉCONDITIONS D'ARMEMENT — source unique (Armable = State.Armable).
+    // ⚠️ Armable_NoBlock SANS `NOT RedundancyTestFailedCause` : la cause de redondance est
+    //    latée mais la séquence d'armement la re-teste (§5 étape 1/3) : l'armement reste donc
+    //    réellement possible (et sûr) tant que les autres préconditions sont réunies. Afficher
+    //    le bouton « Armable » sur cette cause seule bloquait le réarmement après acquittement
+    //    (Reset ne purge pas la Cause, cf. §4) alors que l'armement était permis.
+    Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+    Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
+    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
+    Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
+    IF ArmReqEdge.Q AND Armable THEN
         ArmingSeqStep := CST_STEP_TEST_A;
         RedundancyTestFailedCause := FALSE;
         EmergencyArmingFailedCause := FALSE;
@@ -334,16 +338,6 @@ END_IF;
 {region "§7 Etats publics (interlock sur Cause brute)"}
 // 🚦 ÉTATS PUBLICS — interlock sur Cause brute (jamais sur l'Ack)
 IF Enable THEN
-    Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
-    Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
-    // ⚠️ Armable_NoBlock SANS `NOT RedundancyTestFailedCause` : aligné sur ArmRequestAllowed (§5).
-    //    La cause de redondance est latée mais la séquence d'armement la re-teste (§5 étape 1/3) :
-    //    l'armement reste donc réellement possible (et sûr) tant que les autres préconditions
-    //    sont réunies. Afficher le bouton « Armable » sur cette cause seule bloquait le réarmement
-    //    après acquittement (Reset ne purge pas la Cause, cf. §4) alors que l'armement était permis.
-    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
-    Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
-
     ArmingBusy := (ArmingSeqStep <> CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
 END_IF;
 {endregion}
@@ -417,7 +411,6 @@ Status.Diag.LastAbortCause       := LastAbortCause;
 {region "§11 Etats publics IEC + message operateur"}
 // 📤 ÉTATS PUBLICS IEC
 Status.Ready := Enable AND NOT StartupFail;
-Status.Busy  := (ArmingSeqStep <> CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
 Status.Done  := PowerContactorEngaged;
 
 // 💬 MESSAGE OPÉRATEUR — un message explicite par état et par problème de la chaîne AU.

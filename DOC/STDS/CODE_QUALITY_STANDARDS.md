@@ -476,6 +476,34 @@ Intégré à `run_all_gates.py` (GATE 2quinquies). Toute nouvelle collision est 
 
 ---
 
+## 3ter. 🧭 Traçabilité d'impact — tracer le câblage de bout en bout AVANT de coder (REX 2026-08 `FB_Sim_Safety`)
+
+> 🚨 **Cas vécu** : le correctif `FB_Sim_Safety` (chaîne fermée par défaut) a été écrit **sans
+> vérifier** que la valeur simulée atteignait bien l'entrée `EmergencyChainClosed` du FB AU. Le
+> routage simulation exigeait `SimSafetyActive` — le correctif ne « passait » pas. La fonction
+> avait été modifiée isolément, sans tracer l'impact de l'autre côté.
+
+**Règle** : avant de modifier une fonction, **tracer l'impact complet** de la donnée touchée —
+qui la **produit**, qui la **route**, qui la **consomme** — et vérifier que la modification
+atteint bien le **consommateur final**. Ne **jamais** coder une fonction isolément sans vérifier
+le câblage de bout en bout.
+
+| Maillon | Question | Réf. |
+|---|---|---|
+| **Producteur** | Quel POU/FB écrit la donnée ? | §5 (producteur unique) |
+| **Routeur(s)** | Quels POU/FB la transportent ou la conditionnent (routage simulation, aiguillage mode, GVL de liaison) ? | §3, §10 |
+| **Consommateur final** | Quel POU/FB l'utilise réellement (ex. entrée `EmergencyChainClosed` du FB AU) ? | §3, §8 |
+
+**Preuve** : la chaîne producteur → routeur → consommateur est tracée (grep des références
+croisées, `G200_check_linkage.py --report`) **avant** d'écrire, et le **consommateur final** est
+nommé dans la restitution du lot.
+
+> 🔗 **Complète §8 (non-régression), ne le remplace pas** : §8 vérifie que les consommateurs
+> identifiés tiennent **après** la modification ; §3ter exige de tracer la chaîne complète
+> **avant** de coder. Les deux s'appliquent.
+
+---
+
 ## 4. Code et variables mortes (base MISRA)
 
 - Toute variable déclarée est **lue au moins une fois** hors de son initialisation.

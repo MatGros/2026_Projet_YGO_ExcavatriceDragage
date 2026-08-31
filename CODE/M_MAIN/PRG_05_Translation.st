@@ -86,20 +86,7 @@ instPosDecoderM3(
 );
 
 // 📤 Publication des faits M3 dans le bus PRG_05 (consommés par PRG_07)
-Data.TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
-Data.TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
-Data.TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
-Data.TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
-Data.TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
-Data.TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
-Data.TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
-Data.TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
-Data.TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
-Data.TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
-Data.M3_LimitSwitchTremie       := instPosDecoderM3.LimitSwitchTremie;
-Data.M3_LimitSwitchMaintenance  := instPosDecoderM3.LimitSwitchMaintenance;
 Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
-Data.M3_SensorsWord            := instPosDecoderM3.SensorsWord;
 {endregion}
 
 {region "§0 Interlock hauteur M1/M2"}
@@ -399,6 +386,8 @@ TranslationState.Error := instTranslationM3.Fault.Error;
 TranslationState.ErrorId := instTranslationM3.Fault.ErrorId;
 TranslationState.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
 TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
+// 🔌 Retour physique direct frein M3 (même source que le SEL §1bis/§2) — consommé FB_TroubleshootingView Idx108
+TranslationState.BrakeFeedback := PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI;
 TranslationState.PositionReached := instTranslationM3.TargetReached;
 TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationState.DriveFreqCmd_Hz := instTranslationM3.RequestedDriveFreqHz;
@@ -463,8 +452,6 @@ TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIn
 // 🟢 Permis directionnels M3 (source unique : FB_Safety_Translation) — projetés vers l'IHM
 TranslationSafety.TremiePermit := instSafetyTranslationM3.TremiePermit;
 TranslationSafety.MaintenancePermit := instSafetyTranslationM3.MaintenancePermit;
-GVL_IHM.TranslationM3.Safety.TremiePermit := instSafetyTranslationM3.TremiePermit;
-GVL_IHM.TranslationM3.Safety.MaintenancePermit := instSafetyTranslationM3.MaintenancePermit;
 TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;

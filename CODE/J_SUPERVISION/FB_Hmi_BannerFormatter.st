@@ -379,46 +379,52 @@ IF AbortMsgActive AND NOT AbortMsgLatched THEN
     END_IF;
 END_IF;
 IF AbortMsgActive THEN
-    CASE LastAbortCause OF
-        INT_TO_WORD(CST_ABORT_CUT_IHM): AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
-        INT_TO_WORD(CST_ABORT_CHAIN_DROP): AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
-        INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A): AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
-        INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B): AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
-        INT_TO_WORD(CST_ABORT_POWER_CUTOFF):
-            // 🩹 Décodage de la cause CST_ABORT_POWER_CUTOFF (PowerCutOff métier) en cause explicite
-            // M1/M2/M3 + bit MecaA/MecaB/thermique, à partir des DUT Safety déjà en entrée.
-            // Priorité : M3 (translation) puis M1 puis M2 ; MecaA > MecaB > thermique.
-            IF TranslationSafety.ErrorMecaA THEN
-                AbortMsgText := '[M3] MecaA (mouvement non commandé) - Reset puis réarmer';
-            ELSIF TranslationSafety.ErrorMecaB THEN
-                AbortMsgText := '[M3] MecaB (arrêt non confirmé) - Reset puis réarmer';
-            ELSIF TranslationSafety.ErrorBrakeThermal THEN
-                AbortMsgText := '[M3] Surchauffe frein - Reset puis réarmer';
-            ELSIF WinchM1Safety.ErrorMecaA THEN
-                AbortMsgText := '[M1] MecaA (mouvement non commandé) - Reset puis réarmer';
-            ELSIF WinchM1Safety.ErrorMecaB THEN
-                AbortMsgText := '[M1] MecaB (arrêt non confirmé) - Reset puis réarmer';
-            ELSIF WinchM1Safety.ThermalFault THEN
-                AbortMsgText := '[M1] Surchauffe moteur - Reset puis réarmer';
-            ELSIF WinchM1Safety.ErrorBrakeThermal THEN
-                AbortMsgText := '[M1] Surchauffe frein - Reset puis réarmer';
-            ELSIF WinchM2Safety.ErrorMecaA THEN
-                AbortMsgText := '[M2] MecaA (mouvement non commandé) - Reset puis réarmer';
-            ELSIF WinchM2Safety.ErrorMecaB THEN
-                AbortMsgText := '[M2] MecaB (arrêt non confirmé) - Reset puis réarmer';
-            ELSIF WinchM2Safety.ThermalFault THEN
-                AbortMsgText := '[M2] Surchauffe moteur - Reset puis réarmer';
-            ELSIF WinchM2Safety.ErrorBrakeThermal THEN
-                AbortMsgText := '[M2] Surchauffe frein - Reset puis réarmer';
-            ELSE
-                AbortMsgText := '[AU] Coupure securite metier active - lever la cause puis rearmer';
-            END_IF;
-        INT_TO_WORD(CST_ABORT_REDUNDANCY_A): AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
-        INT_TO_WORD(CST_ABORT_REDUNDANCY_B): AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
-        INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR): AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
+    IF LastAbortCause = INT_TO_WORD(CST_ABORT_CUT_IHM) THEN
+        AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_CHAIN_DROP) THEN
+        AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A) THEN
+        AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B) THEN
+        AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_POWER_CUTOFF) THEN
+        // 🩹 Décodage de la cause CST_ABORT_POWER_CUTOFF (PowerCutOff métier) en cause explicite
+        // M1/M2/M3 + bit MecaA/MecaB/thermique, à partir des DUT Safety déjà en entrée.
+        // Priorité : M3 (translation) puis M1 puis M2 ; MecaA > MecaB > thermique.
+        IF TranslationSafety.ErrorMecaA THEN
+            AbortMsgText := '[M3] MecaA (mouvement non commandé) - Reset puis réarmer';
+        ELSIF TranslationSafety.ErrorMecaB THEN
+            AbortMsgText := '[M3] MecaB (arrêt non confirmé) - Reset puis réarmer';
+        ELSIF TranslationSafety.ErrorBrakeThermal THEN
+            AbortMsgText := '[M3] Surchauffe frein - Reset puis réarmer';
+        ELSIF WinchM1Safety.ErrorMecaA THEN
+            AbortMsgText := '[M1] MecaA (mouvement non commandé) - Reset puis réarmer';
+        ELSIF WinchM1Safety.ErrorMecaB THEN
+            AbortMsgText := '[M1] MecaB (arrêt non confirmé) - Reset puis réarmer';
+        ELSIF WinchM1Safety.ThermalFault THEN
+            AbortMsgText := '[M1] Surchauffe moteur - Reset puis réarmer';
+        ELSIF WinchM1Safety.ErrorBrakeThermal THEN
+            AbortMsgText := '[M1] Surchauffe frein - Reset puis réarmer';
+        ELSIF WinchM2Safety.ErrorMecaA THEN
+            AbortMsgText := '[M2] MecaA (mouvement non commandé) - Reset puis réarmer';
+        ELSIF WinchM2Safety.ErrorMecaB THEN
+            AbortMsgText := '[M2] MecaB (arrêt non confirmé) - Reset puis réarmer';
+        ELSIF WinchM2Safety.ThermalFault THEN
+            AbortMsgText := '[M2] Surchauffe moteur - Reset puis réarmer';
+        ELSIF WinchM2Safety.ErrorBrakeThermal THEN
+            AbortMsgText := '[M2] Surchauffe frein - Reset puis réarmer';
+        ELSE
+            AbortMsgText := '[AU] Coupure securite metier active - lever la cause puis rearmer';
+        END_IF;
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_REDUNDANCY_A) THEN
+        AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_REDUNDANCY_B) THEN
+        AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR) THEN
+        AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
     ELSE
         AbortMsgText := '[AU] Rearmement interrompu - verifier et rearmer';
-    END_CASE;
+    END_IF;
 END_IF;
 
 IF NOT EmergencyChainClosed THEN
