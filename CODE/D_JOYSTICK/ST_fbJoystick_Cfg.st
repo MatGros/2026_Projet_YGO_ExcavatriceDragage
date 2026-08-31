@@ -16,6 +16,8 @@ STRUCT
     DeadmanArmHoldTime   : TIME := T#100MS;  // Appui continu bouton requis pour armer le geste
     DeadmanArmGraceTime  : TIME := T#3S;     // Délai de grâce post-armement avant désarmement neutre
     RawOutOfRangeMargin  : INT  := 500;      // Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)
+    SpeedStepTable       : ST_SpeedStepTable := (StepThreshold_Pct := [20.0, 40.0, 60.0, 80.0, 100.0]); // 🪜 Table seuils % -> palier (conversion au joystick, logique FB_Winch §5)
+    SpeedStepHystMargin  : REAL := 2.0;      // Marge d'hystérésis palier (%) autour des seuils (anti-oscillation)
     Initialized          : BOOL := FALSE;    // 🚦 Flag restauration boot (interne pont FB_CfgPersistBridge_fbJoystick_Cfg)
 END_STRUCT
 END_TYPE

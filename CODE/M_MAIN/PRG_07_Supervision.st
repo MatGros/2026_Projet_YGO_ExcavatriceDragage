@@ -63,6 +63,10 @@ VAR
     // === 🧪 DÉTECTEURS FRONT SIMULATION BYPASS (pilotage bypass IHM) ===
     SimBypassRise           : R_TRIG; // . [LOC] Front montant SimulationBypassActive
     SimBypassFall           : F_TRIG; // . [LOC] Front descendant SimulationBypassActive
+
+    // === 🪜 DIAGNOSTIC % CYCLE (palier→%, borne haute du palier) ===
+    CycleM1SpeedTgt_Pct     : REAL;   // . [LOC] Consigne % cycle M1 (StepThreshold_Pct[StepTgt])
+    CycleM2SpeedTgt_Pct     : REAL;   // . [LOC] Consigne % cycle M2 (StepThreshold_Pct[StepTgt])
 END_VAR
 
 {region "§1 Horloge, heartbeat et reset machine"}
@@ -560,6 +564,19 @@ GVL_IHM.Banner := instHmiBannerFormatter.Banner;
 {region "§4 Vue depannage lecture seule"}
 // === 🕵️♂️ §4 VUE DÉPANNAGE (lecture seule stricte) ===
 
+// 🪜 Diagnostic % cycle (palier→%, borne haute du palier) — même patron que PRG_04
+// (M1LogicRequestSpeedCmd_Pct). StepTgt=0 (arrêt) → 0.0 (hors bornes du tableau 1..5).
+IF (PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.StepTgt >= 1) AND (PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.StepTgt <= 5) THEN
+    CycleM1SpeedTgt_Pct := _WinchSpeedStepTable.StepThreshold_Pct[PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.StepTgt];
+ELSE
+    CycleM1SpeedTgt_Pct := 0.0;
+END_IF;
+IF (PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.StepTgt >= 1) AND (PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.StepTgt <= 5) THEN
+    CycleM2SpeedTgt_Pct := _WinchSpeedStepTable.StepThreshold_Pct[PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.StepTgt];
+ELSE
+    CycleM2SpeedTgt_Pct := 0.0;
+END_IF;
+
 instTroubleshootingView(
     Enable               := TRUE,
     HwIn                 := PRG_02_Acquisition.HwIn,
@@ -576,8 +593,8 @@ instTroubleshootingView(
     WinchBothMotionDirection := PRG_04_Treuils_Benne.WinchBothMotionDirection,
     WinchBothMotionActive := PRG_04_Treuils_Benne.WinchBothMotionActive,
     CycleAutoBusy := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
-    CycleM1SpeedTgt_Pct := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.SpeedTgtPct,
-    CycleM2SpeedTgt_Pct := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM2.SpeedTgtPct,
+    CycleM1SpeedTgt_Pct := CycleM1SpeedTgt_Pct,
+    CycleM2SpeedTgt_Pct := CycleM2SpeedTgt_Pct,
     CycleBucketOpen := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen,
     CycleTargetPosition := PRG_03_Modes_Cycle.Data.ReqProgram.ReqTranslation.PositionTgt,
     SimulationModeActive := GVL_Simulation.SimulationModeActive,

@@ -333,11 +333,11 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
     Data.ReqProgram.ReqWinchM1.ReqStartStop := FALSE;
     Data.ReqProgram.ReqWinchM1.ReqDirection := 0;
-    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := 0.0;
+    Data.ReqProgram.ReqWinchM1.StepTgt  := 0;
 
     Data.ReqProgram.ReqWinchM2.ReqStartStop := FALSE;
     Data.ReqProgram.ReqWinchM2.ReqDirection := 0;
-    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := 0.0;
+    Data.ReqProgram.ReqWinchM2.StepTgt  := 0;
 
     Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;
@@ -430,11 +430,11 @@ ELSE
     // Neutralisation déterministe (DISABLE)
     Data.ReqProgram.ReqWinchM1.ReqStartStop := FALSE;
     Data.ReqProgram.ReqWinchM1.ReqDirection := 0;
-    Data.ReqProgram.ReqWinchM1.SpeedTgtPct  := 0.0;
+    Data.ReqProgram.ReqWinchM1.StepTgt  := 0;
 
     Data.ReqProgram.ReqWinchM2.ReqStartStop := FALSE;
     Data.ReqProgram.ReqWinchM2.ReqDirection := 0;
-    Data.ReqProgram.ReqWinchM2.SpeedTgtPct  := 0.0;
+    Data.ReqProgram.ReqWinchM2.StepTgt  := 0;
 
     Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;

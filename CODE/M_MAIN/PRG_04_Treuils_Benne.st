@@ -93,11 +93,13 @@ VAR
 
     M1LogicRequestStartStop     : BOOL;
     M1LogicRequestDirection     : INT;
-    M1LogicRequestSpeedCmd_Pct      : REAL;
+    M1LogicRequestStepTgt       : INT;   // Palier arbitré M1 (1..5, 0 = arrêt) — consommé par FB_Winch
+    M1LogicRequestSpeedCmd_Pct  : REAL;  // Diagnostic % M1 (palier→%, IHM / simu)
 
     M2LogicRequestStartStop     : BOOL;
     M2LogicRequestDirection     : INT;
-    M2LogicRequestSpeedCmd_Pct      : REAL;
+    M2LogicRequestStepTgt       : INT;   // Palier arbitré M2 (1..5, 0 = arrêt) — consommé par FB_Winch
+    M2LogicRequestSpeedCmd_Pct  : REAL;  // Diagnostic % M2 (palier→%, IHM / simu)
 
     BottomLimitM1_Active    : REAL;
     BottomLimitM2_Active    : REAL;
@@ -358,11 +360,18 @@ instArbM1(
     BothIntent := PRG_03_Modes_Cycle.Data.WinchBothIntent,
     IHM        := ArbIHM,
     TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
-    Context    := ArbContext
+    Context    := ArbContext,
+    SpeedStepTable := _WinchSpeedStepTable
 );
 M1LogicRequestStartStop := instArbM1.StartStop;
 M1LogicRequestDirection := instArbM1.Direction;
-M1LogicRequestSpeedCmd_Pct := instArbM1.SpeedPct;
+M1LogicRequestStepTgt := instArbM1.StepTgt;
+// Diagnostic % (palier→%) pour IHM / simu — borne haute du palier arbitré.
+IF (M1LogicRequestStepTgt >= 1) AND (M1LogicRequestStepTgt <= 5) THEN
+    M1LogicRequestSpeedCmd_Pct := _WinchSpeedStepTable.StepThreshold_Pct[M1LogicRequestStepTgt];
+ELSE
+    M1LogicRequestSpeedCmd_Pct := 0.0;
+END_IF;
 
 // ── Arbitrage M2 (FB_WinchCmdArbitrationM2) ──
 instArbM2(
@@ -374,11 +383,18 @@ instArbM2(
     IHM        := ArbIHM,
     TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext,
-    Cfg        := ArbM2Cfg
+    Cfg        := ArbM2Cfg,
+    SpeedStepTable := _WinchSpeedStepTable
 );
 M2LogicRequestStartStop := instArbM2.StartStop;
 M2LogicRequestDirection := instArbM2.Direction;
-M2LogicRequestSpeedCmd_Pct := instArbM2.SpeedPct;
+M2LogicRequestStepTgt := instArbM2.StepTgt;
+// Diagnostic % (palier→%) pour IHM / simu — borne haute du palier arbitré.
+IF (M2LogicRequestStepTgt >= 1) AND (M2LogicRequestStepTgt <= 5) THEN
+    M2LogicRequestSpeedCmd_Pct := _WinchSpeedStepTable.StepThreshold_Pct[M2LogicRequestStepTgt];
+ELSE
+    M2LogicRequestSpeedCmd_Pct := 0.0;
+END_IF;
 
 // Front de fin d'action benne (F_TRIG conservé pour §3bis ArmingPermit et extraction control).
 // L'arrêt forcé de fin d'action benne est désormais géré en interne par les FB d'arbitrage.
@@ -851,7 +867,7 @@ instWinchLoadEstimatorM2(
 // --- M1 : assemblage des structs (CODESYS refuse l'initialiseur inline en appel) ---
 M1DriveRequest.StartStop            := M1LogicRequestStartStop;
 M1DriveRequest.Direction            := M1LogicRequestDirection;
-M1DriveRequest.SpeedTgt_Pct         := M1LogicRequestSpeedCmd_Pct;
+M1DriveRequest.SpeedStepReq         := M1LogicRequestStepTgt;
 M1DriveRequest.MaxStepUp            := CommonMaxStepUp;
 M1DriveRequest.MaxStepDown          := CommonMaxStepDown;
 // Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
@@ -898,7 +914,7 @@ instWinchM1(
 // --- M2 : assemblage des structs ---
 M2DriveRequest.StartStop            := M2LogicRequestStartStop;
 M2DriveRequest.Direction            := M2LogicRequestDirection;
-M2DriveRequest.SpeedTgt_Pct         := M2LogicRequestSpeedCmd_Pct;
+M2DriveRequest.SpeedStepReq         := M2LogicRequestStepTgt;
 // Clamp de palier agrégé en §5ter : bornes communes M1=M2 (CommonMaxStep*) puis
 // M2-propre (M2MaxStep*) — M2_BucketJogLimit, ManualBucketLimitsActive,
 // BucketNotClosedAscentStep1, SlackCableAscentStep1 ne réduisent jamais M1.

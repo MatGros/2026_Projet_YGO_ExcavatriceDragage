@@ -8,7 +8,7 @@
                   externe, vue joystick) ; FALSE = armement bloqué + warning.
                   Désarmement sur neutre prolongé ; le changement de mode / fin de
                   cycle benne est géré par l'externe via ArmingPermit (vue joystick).
-   📤 Sorties : AxisCmdX/Y (struct = source unique : SpeedTgt NON signee + bits sens
+   📤 Sorties : AxisCmdX/Y (struct = source unique : SpeedTgt NON signee % pour IHM + StepTgt palier 1..5 pour logique + bits sens
                 + Direction -1/0/+1 et Deflection -100..+100 % pour anim IHM), Fault : ST_Fault
                 (socle FB_FaultCore), AtNeutralXY (permis logique), NeutralXAct/YAct (miroirs IHM).
    🧬 Contrat : `standard` — pas de struct métier propre → `Fault : ST_Fault` à plat.
@@ -73,6 +73,10 @@ VAR
     DeadmanArmTimer           : TON;                 // * [INST] Temporisation maintien bouton armement
     DeadmanArmGraceTimer      : TON;                 // * [INST] Temporisation delai de grace post-armement
     instFault                 : FB_FaultCore;        // * [INST] Socle de defaut (liste de causes -> ST_Fault)
+    SpeedStepHyst1            : HYSTERESIS;          // * [INST] Decodage % -> palier, seuil 1 (logique FB_Winch §5)
+    SpeedStepHyst2            : HYSTERESIS;          // * [INST] Decodage % -> palier, seuil 2
+    SpeedStepHyst3            : HYSTERESIS;          // * [INST] Decodage % -> palier, seuil 3
+    SpeedStepHyst4            : HYSTERESIS;          // * [INST] Decodage % -> palier, seuil 4
 
     // === VARIABLES LOCALES INTERNES ===
     CmdXVal                   : REAL;                // . [LOC]  Consigne axe X calculee apres filtrage/homme-mort
@@ -136,9 +140,9 @@ Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT 
 {region "§2 Gate securite (neutralisation pipeline, n efface pas le statut)"}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
-    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0;
+    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0; AxisCmdX.StepTgt := 0;
     AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
-    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0;
+    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0; AxisCmdY.StepTgt := 0;
     AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
     AxisCmdX.Direction := 0; AxisCmdX.Deflection := 0;
     AxisCmdY.Direction := 0; AxisCmdY.Deflection := 0;
@@ -221,6 +225,25 @@ AxisCmdY.DirectionPositive := (CmdYVal > 0.1);
 AxisCmdY.DirectionNegative := (CmdYVal < -0.1);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
 IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
+
+// 🪜 Decodage consigne % -> palier (logique FB_Winch §5, deplacee au joystick).
+//    AxisCmdY.SpeedTgt (%) reste pour l'IHM ; AxisCmdY.StepTgt (1..5, 0=arret) pour la logique/limitations.
+SpeedStepHyst1(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[1] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[1] - Cfg.SpeedStepHystMargin));
+SpeedStepHyst2(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[2] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[2] - Cfg.SpeedStepHystMargin));
+SpeedStepHyst3(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[3] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[3] - Cfg.SpeedStepHystMargin));
+SpeedStepHyst4(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[4] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[4] - Cfg.SpeedStepHystMargin));
+
+// Algorithme ASCENDANT : OUT=TRUE quand IN>HIGH (au-dessus du seuil) → palier supérieur.
+// Petite déflexion → palier bas ; grande déflexion → palier haut (borne haute du palier).
+IF AxisCmdY.SpeedTgt <= 0.1 THEN
+    AxisCmdY.StepTgt := 0;
+ELSE
+    AxisCmdY.StepTgt := 1;
+    IF SpeedStepHyst1.OUT THEN AxisCmdY.StepTgt := 2; END_IF;
+    IF SpeedStepHyst2.OUT THEN AxisCmdY.StepTgt := 3; END_IF;
+    IF SpeedStepHyst3.OUT THEN AxisCmdY.StepTgt := 4; END_IF;
+    IF SpeedStepHyst4.OUT THEN AxisCmdY.StepTgt := 5; END_IF;
+END_IF;
 
 // Projections monitoring dans le struct (les bits restent la source logique)
 IF AxisCmdY.DirectionPositive THEN AxisCmdY.Direction := 1;

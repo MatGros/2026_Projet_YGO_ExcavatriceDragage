@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:54.019567" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:54.019567">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:09:09.719214" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:09:09.719214">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -42,12 +42,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
-            <variable name="SpeedTgtPct">
+            <variable name="StepTgt">
               <type>
-                <REAL />
+                <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne de vitesse cible demandée (0.0 à 100.0 %)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier de vitesse cible demandé (1 à 5, 0 = arrêt)</xhtml>
               </documentation>
             </variable>
           </struct>
