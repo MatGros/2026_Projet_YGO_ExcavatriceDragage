@@ -482,8 +482,10 @@ GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceSt
 GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
 GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
+// 🕹️ JoystickMotionActive = déflexion joystick seule (SANS homme-mort) — même signal que
+// CycleMotionPermit (FB_Cycle, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
+// « joystick défléchi » est projeté à l'IHM.
 GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
-GVL_IHM.Cycle.State.MotionPermit           := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
 // Projection Assistance Dragage (DredgingAssist.State)
 GVL_IHM.DredgingAssist.State.DiveReady                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveReady;

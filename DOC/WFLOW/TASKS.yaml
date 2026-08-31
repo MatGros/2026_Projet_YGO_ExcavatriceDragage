@@ -4106,11 +4106,11 @@ tasks:
   bloque_par: []
 - id: T184
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C2
   domaine: TRANSLATION / SECURITE / IHM
   agent: DSH (DeepSeek)
-  date: '2026-08-30T18:30:00+02:00'
+  date: '2026-08-31T02:30:00+02:00'
   titre: Homogénéisation cohérence « sens par axe » M1/M2/M3 — permit directionnel
     M3 (Fwd/Rev) + nettoyage redondance MotionPermit
   contexte: 'Audit cohérence WT5_SIMBENCH (verdict MAJOR) : M1/M2 exposent un permit
@@ -4123,19 +4123,25 @@ tasks:
     (FB_TroubleshootingView.st:632). Redondance : MotionPermit (PRG_07:476) == JoystickMotionActive
     (PRG_07:475) == CycleMotionPermit (PRG_03:202) == NOT AtNeutralXY (3 noms pour
     le même « manche défléchi », dont un nom trompeur qui prétend inclure l''homme-mort
-    via commentaire ST_CycleState:27).'
+    via commentaire ST_CycleState:27). 🔁 **2026-08-31 (troubleshooting M1/M2/M3)** :
+    confirme les trous d''acquisition A1 (publier M3_Direction_Active/M3_StartStop_Active
+    dans PRG_05) et A2 (calculer FwdPermit/RevPermit M3) — prérequis pour déboguer
+    M3 directionnel. Intégrer à cette tâche.'
   description: Homogénéiser la cohérence « peut-on aller dans un sens ou l'autre »
     sur les 3 axes (M1 treuil, M2 treuil, M3 translation), à l'unisson des treuils
-    (modèle FB_Safety_Winch). 1) Ajouter FwdPermit/RevPermit à FB_Safety_Translation
-    (+ champs ST_SafetyTranslation + câblage PRG_05 + projection GVL_IHM.TranslationM3.Safety)
-    — producteur unique, 1 source safety / 1 projection IHM par axe. 2) Corriger MotionM3.Step6_DirectionAllowed
+    (modèle FB_Safety_Winch). 1) Ajouter TremiePermit/MaintenancePermit à FB_Safety_Translation
+    (modèle M3 = vers Trémie/Maintenance, pas Fwd/Rev générique) + champs ST_SafetyTranslation
+    + câblage PRG_05 + projection GVL_IHM.TranslationM3.Safety — producteur unique,
+    1 source safety / 1 projection IHM par axe. 2) Corriger MotionM3.Step6_DirectionAllowed
     pour n'utiliser que les nouveaux permits (≠ interlock hauteur, qui reste un blocage
     non directionnel séparé). 3) Renommer MotionPermit → JoystickDeflected (ou éliminer
     le doublon avec JoystickMotionActive/CycleMotionPermit) et corriger les commentaires
     trompeurs. 4) Correction doc ST_SafetyWinch.st:11 (DescendPermit = effectif, pas
-    safety simple). 5) MàJ spec AF_Partie-11 (fiches FB_Translation / FB_Safety_Translation)
-    + registre/TC si besoin. Analyse livrée par le worktree WT5_SIMBENCH (gates 491/492/493,
-    rewire HwIn, TC-P13-014) ; à EXÉCUTER sur main (hors worktree).
+    safety simple). 5) **Nettoyage exhaustif nommage directionnel** (audit grep Forward/Up/Fwd/Rev/Ascent/Descent/Tremie/Maintenance
+    — agent a078ccce) — corriger les incohérences, doublons, noms trompeurs. 6) **Phase
+    update AF** — MàJ spec AF_Partie-11 (fiches FB_Translation / FB_Safety_Translation)
+    + AF_Partie-10/12 si impact + registre/TC. Analyse livrée par le worktree WT5_SIMBENCH
+    (gates 491/492/493, rewire HwIn, TC-P13-014) ; à EXÉCUTER sur main (hors worktree).
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T184_PERMITS_DIRECTIONNELS_M3.yaml
   objectifs:
   - FB_Safety_Translation expose FwdPermit et RevPermit (permit directionnel effectif,
@@ -4288,19 +4294,29 @@ tasks:
   bloque_par: []
 - id: T188
   parent_id: ''
-  statut: ✅
+  statut: ⏳
   criticite: C2
   domaine: H_TREUILS_BENNE
-  agent: —
-  date: '2026-08-31T00:00:00'
+  agent: DSH (DeepSeek)
+  date: '2026-08-31T02:10:00+02:00'
   titre: Refactor POO — arbitrage de commande PRG_04/05 vers FB (bit-identique)
   contexte: 'Intitulé complet : Déplacer l''arbitrage de commande (source joystick/boutons/cycle
     selon mode) de PRG_04 §3 et PRG_05 §1 vers FB_WinchCommandArbitration et FB_TranslationCommandArbitration,
     conformément à CODE_QUALITY_STANDARDS.md §5.'
-  description: '⚠️ **BLOQUÉ** sur la fin de T181 (implémentation actuelle). Refactor
-    **bit-identique** (aucun changement de comportement machine). Violation POO :
-    la décision combinant plusieurs causes est calculée dans le PRG, pas par son propriétaire
-    fonctionnel. Contrat: TASK_CONTRACT_T188.yaml.'
+  description: '🔁 **RÉOUVERTE 2026-08-31 (vérification)** : marquée ✅ mais réouverte
+    à la demande utilisateur pour vérification indépendante de l''implémentation.
+    **VERDICT vérification (agent 5e4146cc) : ÉCARTS — pas bit-identique strict**.
+    5 écarts : A (interlock hauteur M3 SEMI_AUTO ajouté — amélioration sécurité), B
+    (Direction joystick Select=0 + deadman non armé → 0), C (priorité boutons both
+    vs individuel inversée), D (source BothIntent JoyBtnRaw→DeadmanArmed — amélioration
+    sécurité), E (interface SpeedPct→StepTgt + nommage FB≠contrat). Raccordement PRG_04/05
+    OK, SimBench OK, aucun mouvement non commandé. **DÉCISION utilisateur 2026-08-31
+    : Option A** — documenter les écarts A/D/E comme décisions assumées (améliorations
+    sécurité + refactor palier T190) + mettre à jour le contrat T188 (nommage FB,
+    interface StepTgt, critères bit-identique assouplis). Écarts B/C = edge cases sans
+    valeur machine, non corrigés. Refactor **bit-identique** (aucun changement de comportement
+    machine). Violation POO : la décision combinant plusieurs causes est calculée dans
+    le PRG, pas par son propriétaire fonctionnel. Contrat: TASK_CONTRACT_T188.yaml.'
   objectifs:
   - Créer FB_WinchCommandArbitration (2 instances M1/M2) bit-identique à PRG_04 §3
   - Créer FB_TranslationCommandArbitration (1 instance M3) bit-identique à PRG_05

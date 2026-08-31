@@ -1403,15 +1403,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Mouvement joystick actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MotionPermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Homme-mort + axe Y actif (CycleMotionPermit)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Joystick défléchi (non centré) — même signal que CycleMotionPermit (FB_Cycle) ; SANS homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStepAtError">
