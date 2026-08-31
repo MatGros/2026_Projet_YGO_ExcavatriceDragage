@@ -58,7 +58,7 @@ VAR_INPUT
 
     // === BYPASSES ET SIMULATION ===
     EncoderFaultBypass              : BOOL;                           // --> [TST] Bypass defaut codeur
-    BypassGlobal                    : BOOL := FALSE;                  // --> [TST] Force ErrorId=0 global
+    BypassGlobal                    : BOOL := FALSE;                  // --> [TST] Inhibe l'evaluation des causes + RAZ latches ; ne force pas ErrorId=0 (causes live deja posees restent visibles)
     BypassSafety                    : BOOL := FALSE;                  // --> [TST] Bypass groupe PowerCutOff
     BypassProcess                   : BOOL := FALSE;                  // --> [TST] Bypass groupe SafeStop/Permit
     BypassTopLimitSwitch            : BOOL := FALSE;                  // --> [TST] Bypass individuel fin de course haut capteur
@@ -113,6 +113,27 @@ VAR
     UncommandedActiveD              : BOOL;                           // . [LOC] Condition active Meca D
     OppositeDirectionActive         : BOOL;                           // . [LOC] Condition active sens oppose
     FirstScanDone                   : BOOL;                           // . [LOC] Initialisation premier scan
+
+    // === MIROIRS LISIBLES DES CAUSES (bits ErrorId, source instCauses[i].Active) ===
+    // Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §4).
+    CauseOperatorCommActive         : BOOL;                           // . [LOC] bit0  Perte com operateur (live)
+    CauseEncoderActive              : BOOL;                           // . [LOC] bit1  Perte codeur (latched)
+    CauseMotorThermalActive         : BOOL;                           // . [LOC] bit2  Surchauffe moteur (latched)
+    CauseSlackCableActive           : BOOL;                           // . [LOC] bit3  Mou de cable (live)
+    CausePhaseRotationActive        : BOOL;                           // . [LOC] bit4  Rotation phases (latched)
+    CauseTopLimitSwitchActive       : BOOL;                           // . [LOC] bit5  Fin de course haut capteur (live)
+    CauseCableLimitActive           : BOOL;                           // . [LOC] bit6  Limite basse cable descente (live)
+    CauseMecaAActive                : BOOL;                           // . [LOC] bit7  Derive non commandee (latched)
+    CauseMecaBActive                : BOOL;                           // . [LOC] bit8  Absence confirmation arret (latched)
+    CauseMecaCActive                : BOOL;                           // . [LOC] bit9  Glissement pendant benne (latched)
+    CauseBrakeThermalActive         : BOOL;                           // . [LOC] bit10 Surchauffe frein (latched)
+    CauseMecaDActive                : BOOL;                           // . [LOC] bit11 Escalade fin de course haut (latched)
+    CauseMecaEActive                : BOOL;                           // . [LOC] bit12 Ecart critique synchro (latched)
+    CauseMecaEEscaladeActive        : BOOL;                           // . [LOC] bit13 Escalade ecart synchro (latched)
+    CauseOppositeDirActive          : BOOL;                           // . [LOC] bit14 Sens reel oppose (latched)
+    CauseNoMovementActive           : BOOL;                           // . [LOC] bit15 Absence mouvement (latched)
+    CausesSafeStopActive            : BOOL;                           // . [LOC] Causes non directionnelles -> SafeStop
+    CausesPowerCutOffActive         : BOOL;                           // . [LOC] Causes critiques -> PowerCutOff
 
     // Latches défauts
     EncoderFaultLatched             : BOOL;
@@ -358,6 +379,42 @@ OverspeedFault := OverspeedFaultLatched;
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
+
+// Miroirs des causes : exactement les bits de la vue LIVE ErrorId (le socle pose
+// ErrorId bit i = Causes[i].Active quand Enable). §2 fait RETURN si Enable=FALSE,
+// ces miroirs ne servent qu'en aval, sous Enable.
+CauseOperatorCommActive   := instCauses[0].Active;
+CauseEncoderActive        := instCauses[1].Active;
+CauseMotorThermalActive   := instCauses[2].Active;
+CauseSlackCableActive     := instCauses[3].Active;
+CausePhaseRotationActive  := instCauses[4].Active;
+CauseTopLimitSwitchActive := instCauses[5].Active;
+CauseCableLimitActive     := instCauses[6].Active;
+CauseMecaAActive          := instCauses[7].Active;
+CauseMecaBActive          := instCauses[8].Active;
+CauseMecaCActive          := instCauses[9].Active;
+CauseBrakeThermalActive   := instCauses[10].Active;
+CauseMecaDActive          := instCauses[11].Active;
+CauseMecaEActive          := instCauses[12].Active;
+CauseMecaEEscaladeActive  := instCauses[13].Active;
+CauseOppositeDirActive    := instCauses[14].Active;
+CauseNoMovementActive     := instCauses[15].Active;
+
+// Agregats safety (causes homogenes, AF03 §4 — jamais de masque hexa) :
+// CausesSafeStop : toutes les causes sauf les 3 purement directionnelles
+// (SlackCable bit3, TopLimitSwitch bit5, CableLimitDescent bit6), traitees
+// par les permis de sens. CausesPowerCutOff : defauts a coupure immediate,
+// SANS MecaE-ecart (bit12, laisse au SafeStop tant que non confirme).
+CausesSafeStopActive := CauseOperatorCommActive OR CauseEncoderActive
+    OR CauseMotorThermalActive OR CausePhaseRotationActive
+    OR CauseMecaAActive OR CauseMecaBActive OR CauseMecaCActive
+    OR CauseBrakeThermalActive OR CauseMecaDActive
+    OR CauseMecaEActive OR CauseMecaEEscaladeActive
+    OR CauseOppositeDirActive OR CauseNoMovementActive;
+
+CausesPowerCutOffActive := CauseMotorThermalActive OR CauseMecaAActive
+    OR CauseMecaBActive OR CauseMecaCActive OR CauseBrakeThermalActive
+    OR CauseMecaDActive OR CauseMecaEEscaladeActive;
 {endregion}
 
 {region "§2 Gate neutralisation"}
@@ -383,27 +440,31 @@ Ready := Enable AND NOT Fault.Latched;
 
 {region "§3 Arbitrage sorties securite"}
 // 📤 3. ARBITRAGE SÉCURITÉ
+// Interlocks sur les miroirs de causes (bits ErrorId) — jamais de masque hexa.
 IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
-ELSIF NOT SyncEnable THEN
-    SafeStop := ((Fault.ErrorId AND 16#FF97) <> 16#0000) OR OverspeedFaultLatched;
 ELSE
-    SafeStop := ((Fault.ErrorId AND 16#FF9F) <> 16#0000) OR OverspeedFaultLatched;
+    // Causes non directionnelles + survitesse. Hors synchro (SyncEnable=FALSE),
+    // le mou de cable (bit3) n'entraine pas SafeStop : il bloque la descente
+    // seule via DescendPermit (retendre en montant reste possible).
+    SafeStop := CausesSafeStopActive
+                OR (SyncEnable AND CauseSlackCableActive)
+                OR OverspeedFaultLatched;
 END_IF;
 
 DescendPermit := NOT (
-    (((Fault.ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
+    ((CauseCableLimitActive OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
     // La limite légale est une interdiction d'exploitation distincte du groupe
     // SafeStop/Permit. Le bypass banc BypassProcess ne doit jamais la lever :
     // seul le bypass dédié BypassLimitLegal, déjà filtré par la matrice MAINT_N2
     // dans PRG_04, peut l'autoriser explicitement.
     OR (LimitLegalReached AND NOT BypassLimitLegal)
-    OR (((Fault.ErrorId AND 16#0008) <> 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
+    OR ((CauseSlackCableActive AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
 );
 
 AscentPermit := NOT (
-    (((Fault.ErrorId AND 16#0020) <> 16#0000
+    ((CauseTopLimitSwitchActive
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
     // TopLimitM porte deja la relaxation 7,5->8,5 m (override N1 / bypass N2, bornee par la
@@ -412,7 +473,7 @@ AscentPermit := NOT (
     OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM >= TopLimitM))
 );
 
-PowerCutOff := (Fault.ErrorId AND 16#2F84) <> 16#0000;
+PowerCutOff := CausesPowerCutOffActive;
 {endregion}
 
 END_FUNCTION_BLOCK

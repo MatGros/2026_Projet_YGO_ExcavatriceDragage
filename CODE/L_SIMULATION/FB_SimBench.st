@@ -63,7 +63,6 @@ VAR_INPUT
 
     // ── Stimuli & Paramètres de banc ─────────────────────────────────────────
     SimEncoderSpeedFactor      : REAL := 1.0;   (* --> [CFG] Facteur vitesse codeur *)
-    CfgTopSensorRawPos         : UDINT := 0;    (* --> [CFG] Seuil brut M1 du capteur haut commun; 0 désactive le modèle automatique *)
     SimTopPositionActive       : BOOL := FALSE; (* --> [TST] Injection manuelle capteur haut actif (essai ciblé) *)
     SimSyncDeviationInjectM1   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M1 *)
     SimSyncDeviationInjectM2   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M2 *)
@@ -125,7 +124,6 @@ VAR
     M2_PresetCmd               : BOOL;   (* . [LOC] Trigger preset M2 *)
     M1_OffsetPts               : DINT;   (* . [LOC] Offset synchro M1 *)
     M2_OffsetPts               : DINT;   (* . [LOC] Offset synchro M2 *)
-    TopPositionModelActive     : BOOL;   (* . [LOC] Capteur haut simulé depuis la position M1 *)
 
     M3_RelayFwd                : BOOL;   (* . [LOC] Sens avant M3 *)
     M3_RelayRev                : BOOL;   (* . [LOC] Sens arrière M3 *)
@@ -215,12 +213,9 @@ Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
                                     OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
 Winch.M2_ThermalOk_DI          := TRUE;
 
-// Polarité matériel : le nom *_Free_DI vaut TRUE hors butée. Le capteur commun
-// suit normalement la référence M1 (seuil brut configuré par PRG_02); le
-// stimulus manuel reste disponible pour injecter un fait capteur au banc.
-// Le modèle ne s'arme jamais avec le seuil par défaut 0.
-TopPositionModelActive := (CfgTopSensorRawPos > 0) AND (RawPosM1 >= CfgTopSensorRawPos);
-Winch.M1M2_TopPositionFree_DI  := NOT (TopPositionModelActive OR SimTopPositionActive);
+// Cohérent avec M2_TensionedCable_DI (sain par défaut) : capteur TOP libre en simu,
+// sauf stimulus manuel SimTopPositionActive (injection de fait capteur au banc).
+Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
 Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;

@@ -463,6 +463,15 @@ ELSIF SafeStopActive THEN
 ELSIF DirectionBlocked THEN
     IF CurrentDirection < 0 THEN
         OperatorActionCandidate := '[TREUIL] Descente interdite';
+    ELSIF TopLimitReached THEN
+        // 🛡️ Montée bloquée par butée logicielle haute (agrégat M1/M2) — cause exposée par le safety.
+        OperatorActionCandidate := '[TREUIL] Montée interdite - limite haute';
+    ELSIF WinchM1Safety.ErrorMecaD OR WinchM2Safety.ErrorMecaD THEN
+        // 🛡️ Montée bloquée par capteur haut (non-arrêt au capteur haut, MecaD) — cause exposée par le safety.
+        OperatorActionCandidate := '[TREUIL] Montée interdite - capteur haut';
+    ELSIF WinchM1Safety.AscentPermit AND NOT WinchM2Safety.AscentPermit THEN
+        // 🛡️ Montée bloquée par treuil M2 (M1 autorise, M2 non) — cause exposée par le safety.
+        OperatorActionCandidate := '[TREUIL] Montée interdite - treuil M2';
     ELSE
         OperatorActionCandidate := '[TREUIL] Montée interdite';
     END_IF;

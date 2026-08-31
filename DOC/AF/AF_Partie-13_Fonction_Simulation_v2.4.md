@@ -5,7 +5,9 @@
 > **Sources** : `CODE/L_SIMULATION/*.st`, `CODE/M_MAIN/PRG_02_Acquisition.st` (ST propriétaire),
 > `AUDITS/PreLivraison/PLAN_Rationalisation_Simulation_v1.0.md`,
 > `CHECKLISTS/CHECKLIST_MiseEnRoute_Simulation_v1.0.md`.
-> 🆕 v2.4 (2026-08-26) : mise en conformité `GUIDE_EDITION_AF_v1.0` — Sommaire lié, Table des
+> 🆕 v2.5 (2026-08-31) : capteur haut TOP simulé **sain (libre) par défaut**, cohérent avec le mou
+> de câble ; retrait du modèle piloté par la position M1 (régression `fc8115d9` corrigée) — §5, §7.
+> v2.4 (2026-08-26) : mise en conformité `GUIDE_EDITION_AF_v1.0` — Sommaire lié, Table des
 > fonctions (F13.01-05), macro-table Points de validation (catalogue TC-P13-* réel, non dupliqué),
 > §3 Frontière unique converti en Mermaid, correction chemin source (`CODE/L_SIMULATION`, pas
 > `CODE/SIMULATION`), Suivi historique + TBD + Documents liés.
@@ -74,7 +76,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Enveloppe unique de simulation — composition des 4 sous-modèles, décalage 1 scan</b></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_SimBench</code></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;"><a href="AF_Partie-13_Fonction_Simulation/FB_SimBench_v1.0.md"><code>FB_SimBench_v1.0.md</code></a></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-010..013</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-010..014</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
@@ -143,7 +145,7 @@ Elle n'est ni un bypass, ni un forçage d'état sain, ni une autorisation de sé
   </thead>
   <tbody>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-010..013</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P13-010..014</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Enveloppe</b><br>simulation</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : <code>SimulationModeActive=FALSE</code>, banc inactif<br>
@@ -220,7 +222,7 @@ fiche `FB_Sim_Safety` avant tout diagnostic de blocage AU en simulation** (§4 d
 
 | Fiche | FB | Contenu |
 |---|---|---|
-| [`FB_SimBench_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_SimBench_v1.0.md) | `FB_SimBench` | Enveloppe unique, composition des 4 sous-modèles, décalages 1 scan, REX StatusWord AC600 |
+| [`FB_SimBench_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_SimBench_v1.0.md) | `FB_SimBench` | Enveloppe unique, composition des 4 sous-modèles, décalages 1 scan, REX StatusWord AC600, capteur haut TOP sain par défaut |
 | [`FB_Sim_Safety_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Safety_v1.0.md) | `FB_Sim_Safety` | Chaîne AU/contacteur simulée — ⚠️ piège latches AU non liés à la simulation |
 | [`FB_Sim_Encoder_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Encoder_v1.0.md) | `FB_Sim_Encoder` | Position codeur COD1/COD2, persistance reset froid |
 | [`FB_Sim_Translation_v1.0.md`](AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md) | `FB_Sim_Translation` | 5 capteurs M3 par progression continue |
@@ -298,6 +300,13 @@ Le sélecteur est atomique par domaine : `HwIn.<Domaine> := HwSim.<Domaine>` ou
 | 🕹️ Joystick | `SimJoystickLeft_Rev_TREMIE_Active`, `SimJoystickRight_Fwd_MAINT_Active`, `SimJoystickFwd_Up_Close_Active`, `SimJoystickRev_Down_Open_Active` | Un seul bouton impose `0`/`5000`/`10000` (plusieurs ⇒ neutre). L'activation d'un bouton directionnel simule l'appui homme-mort `JoyBtnRaw` (aucun auto-arm permanent) : le homme-mort `FB_Joystick` est testé fidèlement — armement au commandement, grâce 3 s, retombée au neutre. |
 | 🕹️ Homme-mort | `SimJoystickRawButton` | TRUE simule le bouton brut indépendant (pour essais spécifiques neutre/homme-mort) ; le contrôle homme-mort de `FB_Joystick` reste actif. |
 | 🪝 Synchronisation | `SimSyncDeviationInjectM1/M2`, `SimSyncDeviationOffset_M` | Front montant : saut persistant de position simulée afin de tester l'écart M1/M2. |
+| 🪝 Capteur haut TOP | `SimTopPositionActive` | Injection manuelle d'un fait capteur haut (essai ciblé). Par défaut le capteur TOP simulé est **libre (TRUE)** — cohérent avec le mou de câble (`M2_TensionedCable_DI := TRUE`). |
+
+> 🆕 **Capteur haut TOP simulé — sain (libre) par défaut** : `M1M2_TopPositionFree_DI` est **libre
+> (TRUE)** par défaut en simulation, cohérent avec le mou de câble (`M2_TensionedCable_DI := TRUE`).
+> Il ne dépend plus de la position M1. Seul le stimulus manuel `SimTopPositionActive` injecte un fait
+> capteur (capteur actif ⇒ `M1M2_TopPositionFree_DI := FALSE`). Le modèle piloté par la position M1
+> (`TopPositionModelActive`/`CfgTopSensorRawPos`) a été retiré — **régression `fc8115d9` corrigée**.
 
 Au front descendant du bit maître, tous les flags de domaine et stimuli ci-dessus reprennent leurs
 valeurs nominales. Les positions codeurs persistantes ne sont pas des stimuli et ne sont pas effacées.
@@ -347,6 +356,13 @@ Les gates Python interdisent désormais :
   `Supervision` et `Troubleshooting` ;
 - toute forme `OR (GVL_Simulation.<flag> AND ...)`, sans exception.
 
+🆕 **Régression `fc8115d9` corrigée (capteur haut TOP)** : le modèle piloté par la position M1
+(`TopPositionModelActive`/`CfgTopSensorRawPos`) rendait le capteur TOP simulé dépendant de la
+position du treuil, bloquant la montée en simulation quand le treuil était en haut. **Décision** :
+le capteur TOP simulé est désormais **sain (libre) par défaut**, cohérent avec le mou de câble
+(`M2_TensionedCable_DI := TRUE`), sauf stimulus manuel `SimTopPositionActive` (§5). Le modèle
+piloté par position est retiré — le stimulus manuel reste la seule source d'un fait capteur.
+
 ## 8. 📥 Application CODESYS 3.5
 
 1. Importer le bundle unique `CODE_XML/CODE_Bundle.xml` dans `Application` via
@@ -364,6 +380,7 @@ Les gates Python interdisent désormais :
 
 | Version | Date | Contenu |
 |---|---|---|
+| v2.5 | 2026-08-31 | Capteur haut TOP simulé sain (libre) par défaut, cohérent avec le mou de câble ; retrait du modèle piloté par la position M1 (régression `fc8115d9` corrigée) — §5, §7 |
 | v2.4 | 2026-08-26 | Mise en conformité `GUIDE_EDITION_AF_v1.0` : Sommaire lié, Table des fonctions F13.01-05, macro-table Points de validation, Mermaid §4, correction chemin source `CODE/L_SIMULATION`, Suivi historique/TBD/Documents liés |
 | v2.3 | 2026-08-14 | Composition éclatée en fiches FB dédiées (pattern Partie 11/01), REX StatusWord AC600 |
 | v2.2 et antérieures | — | Voir `ARCHIVES/Doc/` |

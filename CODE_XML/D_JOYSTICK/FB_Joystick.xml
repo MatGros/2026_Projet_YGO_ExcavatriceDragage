@@ -357,31 +357,11 @@
               <type>
                 <derived name="ST_SpeedStepTable" />
               </type>
-              <initialValue>
-                <structValue>
-                  <value member="StepThreshold_Pct">
-                    <arrayValue>
-                      <value>
-                        <simpleValue value="20" />
-                      </value>
-                      <value>
-                        <simpleValue value="40" />
-                      </value>
-                      <value>
-                        <simpleValue value="60" />
-                      </value>
-                      <value>
-                        <simpleValue value="80" />
-                      </value>
-                      <value>
-                        <simpleValue value="100" />
-                      </value>
-                    </arrayValue>
-                  </value>
-                </structValue>
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les initialiseurs imbriqués de STRUCT (notamment les ARRAY) ne sont pas
+acceptés par STruCpp/CODESYS dans une déclaration de type. La table est
+fournie par la configuration persistante de l'appelant.
+🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedStepHystMargin">

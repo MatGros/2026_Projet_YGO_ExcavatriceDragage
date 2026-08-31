@@ -1,26 +1,34 @@
 Error compiling source files:
 
-ST_AcquisitionNetworkDiagnostics.st:12:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
-  12 |     CanOpenMaster   : ST_Diag_Device; // 🔌 Diagnostic maître CANopen
-     |                       ^
+FB_Translation.st:48:35: error: Undefined type 'ST_FBTRANSLATION_CFG' in FUNCTION_BLOCK 'FB_TRANSLATION'
+  48 |     Cfg                         : ST_fbTranslation_Cfg; // --> [CFG] Rampe, vitesses d'approche, échelle, frein (source GVL_PERSISTENT)
+     |                                   ^
 
-ST_AcquisitionNetworkDiagnostics.st:13:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
-  13 |     Joystick        : ST_Diag_Device; // 🕹️ Diagnostic esclave Joystick MCB560
-     |                       ^
+FB_TestHarness_PRG_05.st:15:31: error: Undefined type 'ST_FBMODES_AUTORISATIONS' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_05'
+  15 |     ModesAuth               : ST_fbModes_Autorisations;
+     |                               ^
 
-ST_AcquisitionNetworkDiagnostics.st:14:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
-  14 |     EthercatMaster  : ST_Diag_Device; // 🔌 Diagnostic maître EtherCAT
-     |                       ^
+ST_TranslationState.st:10:31: error: Undefined type 'E_TRANSLATIONTRACEBLOCKREASON' in STRUCT 'ST_TRANSLATIONSTATE'
+  10 |     AxisBlockReason         : E_TranslationTraceBlockReason; (* 🧩 Cause prioritaire de blocage (miroir de TranslationTrace.BlockReason) *)
+     |                               ^
 
-ST_AcquisitionNetworkDiagnostics.st:15:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
-  15 |     EncoderM1       : ST_Diag_Device; // 🧲 Diagnostic esclave Codeur M1 (COD1)
-     |                       ^
+ST_TranslationInterPrg.st:34:36: error: Undefined type 'ST_TRACETRANSLATION' in STRUCT 'ST_TRANSLATIONINTERPRG'
+  34 |     TranslationTrace             : ST_TraceTranslation; // 🕵️ Trace blocage translation M3 (cause priorisée + horodatage)
+     |                                    ^
 
-ST_AcquisitionNetworkDiagnostics.st:16:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
-  16 |     EncoderM2       : ST_Diag_Device; // 🧲 Diagnostic esclave Codeur M2 (COD2)
-     |                       ^
+ST_AcquisitionInterPrg.st:22:36: error: Undefined type 'ST_MACHINEHOMING' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  22 |     MachineHoming                : ST_MachineHoming;                   // 🎯 État homing conjoint machine (M1/M2/benne)
+     |                                    ^
 
-ST_AcquisitionNetworkDiagnostics.st:17:23: error: Undefined type 'ST_DIAG_DEVICE' in STRUCT 'ST_ACQUISITIONNETWORKDIAGNOSTICS'
-  17 |     DriveM3         : ST_Diag_Device; // ⚙️ Diagnostic esclave Variateur M3 (AC600)
-     |                       ^
+ST_AcquisitionInterPrg.st:25:36: error: Undefined type 'ST_IOMODULEDIAG' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  25 |     InputModules                 : ST_IOModuleDiag; // 🩺 Diagnostic carte des 5 modules E/S (AF06 §3bis)
+     |                                    ^
+
+ST_AcquisitionInterPrg.st:28:36: error: Undefined type 'ST_INPUTSOURCE' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  28 |     InputSource                  : ST_InputSource; // 🔀 Flags de bascule de source (réel/simu) par domaine
+     |                                    ^
+
+ST_AcquisitionInterPrg.st:29:36: error: Undefined type 'ST_M3DRIVEFEEDBACK' in STRUCT 'ST_ACQUISITIONINTERPRG'
+  29 |     M3                           : ST_M3DriveFeedback; // ↔️ Retours variateur M3 filtrés (consommé PRG_05)
+     |                                    ^
 
