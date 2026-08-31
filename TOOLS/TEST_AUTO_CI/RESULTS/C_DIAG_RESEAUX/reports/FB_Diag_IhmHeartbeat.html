@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 23:22:16</div>
+    <div class="exec-time">2026-08-31 21:42:15</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (3 tests)</summary>
@@ -406,38 +406,39 @@
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 8 écarts</span></summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 2 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 8 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>HEARTBEATIHMOK</code> jamais câblé en production</li><li>Pin <code>HEARTBEATIHMTIMEOUT</code> jamais câblé en production</li><li>Pin <code>IHMTIMEOUT</code> jamais câblé en production</li><li>Pin <code>PLCTOGGLEPERIOD</code> jamais câblé en production</li><li>Pin <code>TGLHEARTBEATIHM</code> jamais câblé en production</li><li>Pin <code>TGLHEARTBEATPLC</code> jamais câblé en production</li><li>Pin <code>TIMESINCEIHMEDGE</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 2 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>IHMTIMEOUT</code> jamais câblé en production</li><li>Pin <code>PLCTOGGLEPERIOD</code> jamais câblé en production</li></ul>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><span style="color:var(--muted);font-size:10px;margin-right:4px;">Constante :</span><code title="TRUE" onclick="copyPinExpr(this)">TRUE</code> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN ENABLE <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-wired">
+            <div class="pin-expr"><span style="color:var(--muted);font-size:10px;margin-right:4px;">Source production :</span><code title="SEL(GVL_IHM.Network.Bypass.IhmHeartbeat, GVL_IHM.Commun.TglHeartbeatIhm, GVL_Global.BlinkClock)" onclick="copyPinExpr(this)">SEL(GVL_IHM.Network.Bypass.IhmHeartbeat, GVL_IHM.Commun.TglHeartbeatIhm, GVL_Global.BlinkClock)</code> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN TGLHEARTBEATIHM <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">TGLHEARTBEATIHM <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN IHMTIMEOUT <span class="pin-type">IEC_TIME</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">IHMTIMEOUT <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">PLCTOGGLEPERIOD <span class="pin-type">IEC_TIME</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN PLCTOGGLEPERIOD <span class="pin-type">IEC_TIME</span></div>
         </div></div>
             <div class="pin-block">FB_Diag_IhmHeartbeat</div>
-            <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">HEARTBEATIHMOK <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">HEARTBEATIHMTIMEOUT <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">TGLHEARTBEATPLC <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
-        </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">TIMESINCEIHMEDGE <span class="pin-type">IEC_TIME</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-col pin-col-out"><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">OUT HEARTBEATIHMOK <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.Commun.HeartbeatIhmOk            := instDiagIhmHeartbeat.HeartbeatIhmOk;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.Commun.HeartbeatIhmOk            := instDiagIhmHeartbeat.HeartbeatIhmOk;</code></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">OUT HEARTBEATIHMTIMEOUT <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.Commun.HeartbeatIhmTimeout       := instDiagIhmHeartbeat.HeartbeatIhmTimeout;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.Commun.HeartbeatIhmTimeout       := instDiagIhmHeartbeat.HeartbeatIhmTimeout;</code></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">OUT TGLHEARTBEATPLC <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.Commun.TglHeartbeatPlc           := instDiagIhmHeartbeat.TglHeartbeatPlc;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.Commun.TglHeartbeatPlc           := instDiagIhmHeartbeat.TglHeartbeatPlc;</code></div>
+        </div><div class="pin-row pin-row-wired pin-row-out">
+            <div class="pin-name">OUT TIMESINCEIHMEDGE <span class="pin-type">IEC_TIME</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <code title="M_MAIN/PRG_07_Supervision.st: GVL_IHM.Commun.HeartbeatIhmElapsed       := instDiagIhmHeartbeat.TimeSinceIhmEdge;" onclick="copyPinExpr(this)">M_MAIN/PRG_07_Supervision.st: GVL_IHM.Commun.HeartbeatIhmElapsed       := instDiagIhmHeartbeat.TimeSinceIhmEdge;</code></div>
         </div></div>
         </div>
     </details>

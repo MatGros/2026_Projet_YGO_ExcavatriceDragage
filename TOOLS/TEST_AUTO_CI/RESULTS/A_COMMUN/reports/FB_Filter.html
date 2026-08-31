@@ -87,6 +87,9 @@
     .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    /* Bouton discret "retour à l'index" (les rapports vivent dans RESULTS/<domaine>/reports/) */
+    .btn-index { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--btn-border); color: var(--muted); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.15s ease; user-select: none; white-space: nowrap; }
+    .btn-index:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
     .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
     .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
         border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
@@ -239,6 +242,10 @@
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
     .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .wiring-pastille { display: inline-block; margin-left: 8px; padding: 1px 9px; border-radius: 999px;
+        font-size: 11px; font-weight: 700; letter-spacing: 0.3px; vertical-align: 1px; }
+    .wiring-pastille-ok { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+    .wiring-pastille-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
     .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
@@ -303,11 +310,12 @@
             <h1>FB_Filter</h1>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
+            <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 17:20:42</div>
+    <div class="exec-time">2026-08-31 21:42:15</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (3 tests)</summary>
@@ -399,26 +407,27 @@
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 4 écarts</span></summary>
         <div class="af-warning-banner">
             <div class="af-warning-title">⚠️ 4 écart(s) interface ↔ câblage production</div>
             <ul><li>Pin <code>CYCLETIMES</code> jamais câblé en production</li><li>Pin <code>TIMECONST</code> jamais câblé en production</li><li>Pin <code>VALUEIN</code> jamais câblé en production</li><li>Pin <code>VALUEOUT</code> jamais câblé en production</li></ul>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">VALUEIN <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN VALUEIN <span class="pin-type">IEC_REAL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">TIMECONST <span class="pin-type">IEC_TIME</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN TIMECONST <span class="pin-type">IEC_TIME</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CYCLETIMES <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN CYCLETIMES <span class="pin-type">IEC_REAL</span></div>
         </div></div>
             <div class="pin-block">FB_Filter</div>
             <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">VALUEOUT <span class="pin-type">IEC_REAL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT VALUEOUT <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div></div>
         </div>
     </details>
@@ -580,7 +589,10 @@
                 
     <div class="chronogram-group">
         
-        <details >
+        <!-- Décision (2026-08-29) : les 2 chronogrammes (graphique + tableau) sont OUVERTS par
+             défaut quand la carte du test est dépliée, quel que soit le PASS/FAIL. Avant, ils
+             ne s'ouvraient qu'en cas d'échec. L'échec reste signalé par `fail_note` ci-dessus. -->
+        <details open>
             <summary class="chrono-table-summary">
                 <div class="chrono-summary-inner">
                     <span>📊 Chronogramme graphique (3 scans, 1 variables actives)</span>
@@ -591,7 +603,7 @@
             </summary>
             <div class="wf-scroll"><svg width="388" height="132" viewBox="0 0 388 132" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;VALUEIN&quot;: &quot;10&quot;, &quot;TIMECONST&quot;: &quot;100000000&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;VALUEOUT&quot;: &quot;5&quot;, &quot;T&quot;: &quot;0.1&quot;, &quot;ALPHA&quot;: &quot;0.5&quot;}, &quot;note&quot;: &quot;TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;VALUEIN&quot;: &quot;10&quot;, &quot;TIMECONST&quot;: &quot;100000000&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;VALUEOUT&quot;: &quot;7.5&quot;, &quot;T&quot;: &quot;0.1&quot;, &quot;ALPHA&quot;: &quot;0.5&quot;}, &quot;note&quot;: &quot;TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;VALUEIN&quot;: &quot;10&quot;, &quot;TIMECONST&quot;: &quot;100000000&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;VALUEOUT&quot;: &quot;8.75&quot;, &quot;T&quot;: &quot;0.1&quot;, &quot;ALPHA&quot;: &quot;0.5&quot;}, &quot;note&quot;: &quot;TimeConst=100ms, CycleTimeS=100ms -&gt; Alpha = 0.1/(0.1+0.1) = 0.5&quot;}]" data-fields="[&quot;VALUEOUT&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="114" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#64748b"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#ef4444"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#f97316"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#0284c7"/><text x="418" y="17" class="wf-legend">Voies actives</text><line x1="200" y1="56" x2="200" y2="114" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="126" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="114" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="126" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="114" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="126" class="wf-scan">#2</text><circle cx="192" cy="82.0" r="4" fill="#0284c7"/><text x="182" y="86.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 0)" title="Cliquer pour basculer Courbe / Chiffres">VALUEOUT</text><g class="wf-numeric-group" data-row="0"><g class="wf-analog-view"><text x="194" y="72" class="wf-scale">8.75</text><text x="194" y="98" class="wf-scale">5.00</text><path d="M200,96.0L256,96.0L256,77.3L312,77.3L312,68.0L368,68.0" class="wf-line" stroke="#0284c7" stroke-width="2.2"/><circle cx="256" cy="77.3" r="2.5" fill="#0284c7"/><circle cx="312" cy="68.0" r="2.5" fill="#0284c7"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="219.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><rect x="273.5" y="68.0" width="21" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="284.0" y="77.0" class="wf-num-changed">7.5</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><rect x="326.0" y="68.0" width="28" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="340.0" y="77.0" class="wf-num-changed">8.75</text></g></g></svg></div>
         </details>
-        <details >
+        <details open>
             <summary class="chrono-table-summary">
                 <div class="chrono-summary-inner">
                     <span>📋 Chronogramme tableau (3 scans)</span>

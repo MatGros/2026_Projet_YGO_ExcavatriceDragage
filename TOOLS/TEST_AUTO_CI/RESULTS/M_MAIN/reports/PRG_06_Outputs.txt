@@ -1,10 +1,22 @@
 Error compiling source files:
 
-FB_TranslationOutputInterlock.st:28:36: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_TRANSLATIONOUTPUTINTERLOCK'
-  28 |     Fault                        : ST_Fault;
+ST_WinchState.st:23:31: error: Undefined type 'E_WINCHTRACEBLOCKREASON' in STRUCT 'ST_WINCHSTATE'
+  23 |     AxisBlockReason         : E_WinchTraceBlockReason; (* 🧩 Cause prioritaire de blocage (miroir de TraceMx.BlockReason) *)
+     |                               ^
+
+ST_WinchInterPrg.st:56:36: error: Undefined type 'ST_TRACEWINCH' in STRUCT 'ST_WINCHINTERPRG'
+  56 |     TraceM1                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M1 (cause priorisée + horodatage)
      |                                    ^
 
-FB_TranslationOutputInterlock.st:57:36: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_TRANSLATIONOUTPUTINTERLOCK'
-  57 |     instFault                    : FB_FaultCore;                  // * [INST] Socle défaut transverse
+ST_WinchInterPrg.st:57:36: error: Undefined type 'ST_TRACEWINCH' in STRUCT 'ST_WINCHINTERPRG'
+  57 |     TraceM2                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M2 (cause priorisée + horodatage)
+     |                                    ^
+
+ST_TranslationState.st:10:31: error: Undefined type 'E_TRANSLATIONTRACEBLOCKREASON' in STRUCT 'ST_TRANSLATIONSTATE'
+  10 |     AxisBlockReason         : E_TranslationTraceBlockReason; (* 🧩 Cause prioritaire de blocage (miroir de TranslationTrace.BlockReason) *)
+     |                               ^
+
+ST_TranslationInterPrg.st:34:36: error: Undefined type 'ST_TRACETRANSLATION' in STRUCT 'ST_TRANSLATIONINTERPRG'
+  34 |     TranslationTrace             : ST_TraceTranslation; // 🕵️ Trace blocage translation M3 (cause priorisée + horodatage)
      |                                    ^
 

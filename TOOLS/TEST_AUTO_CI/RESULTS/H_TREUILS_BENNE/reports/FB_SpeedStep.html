@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-30 18:15:29</div>
+    <div class="exec-time">2026-08-31 21:42:35</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (4 tests)</summary>
@@ -431,45 +431,46 @@
             <div class="af-warning-title">⚠️ 12 écart(s) interface ↔ câblage production</div>
             <ul><li>Pin <code>CONFIGERROR</code> jamais câblé en production</li><li>Pin <code>CONFIGERRORID</code> jamais câblé en production</li><li>Pin <code>CONTACTOR1</code> jamais câblé en production</li><li>Pin <code>CONTACTOR2</code> jamais câblé en production</li><li>Pin <code>CONTACTOR3</code> jamais câblé en production</li><li>Pin <code>CONTACTOR4</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>MAXSTEPNUMBER</code> jamais câblé en production</li><li>Pin <code>MINSTEPNUMBER</code> jamais câblé en production</li><li>Pin <code>SPEEDSTEPREQ</code> jamais câblé en production</li><li>Pin <code>STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>TABLE</code> jamais câblé en production</li></ul>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN ENABLE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDSTEPREQ <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SPEEDSTEPREQ <span class="pin-type">IEC_INT</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">TABLE <span class="pin-type">ST_SPEEDSTEPTABLE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN TABLE <span class="pin-type">ST_SPEEDSTEPTABLE</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MINSTEPNUMBER <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN MINSTEPNUMBER <span class="pin-type">IEC_INT</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MAXSTEPNUMBER <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN MAXSTEPNUMBER <span class="pin-type">IEC_INT</span></div>
         </div></div>
             <div class="pin-block">FB_SpeedStep</div>
             <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">STEPNUMBER <span class="pin-type">IEC_INT</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT STEPNUMBER <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONTACTOR1 <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT CONTACTOR1 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONTACTOR2 <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT CONTACTOR2 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONTACTOR3 <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT CONTACTOR3 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONTACTOR4 <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT CONTACTOR4 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONFIGERROR <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT CONFIGERROR <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CONFIGERRORID <span class="pin-type">IEC_WORD</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT CONFIGERRORID <span class="pin-type">IEC_WORD</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div></div>
         </div>
     </details>

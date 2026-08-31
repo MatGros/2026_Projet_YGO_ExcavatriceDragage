@@ -61,7 +61,7 @@ TEST 'PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux 
     ASSERT_FALSE(harness.Auth.InhibitM1 AND harness.Auth.InhibitM2, 'Exclusion mutuelle : les 2 inhibitions jamais simultanees');
 END_TEST
 
-TEST 'PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -> MAINT_N1'
+TEST 'PRG_03_Modes_Cycle : Defaut codeur - SEMI_AUTO selectionne mais cycle non autorise (T207)'
     harness(
         SelMode := E_Mode.SEMI_AUTO,
         PowerContactorEngaged := TRUE,
@@ -69,8 +69,10 @@ TEST 'PRG_03_Modes_Cycle : Garde-fou defaut codeur - Semi-Auto refuse -> MAINT_N
         HomedM1 := TRUE,
         HomedM2 := TRUE
     );
-    // Semi-Auto refuse par defaut codeur : mode degrade MAINT_N1 (jamais SEMI_AUTO)
-    ASSERT_EQ(harness.Auth.Mode, E_Mode.MAINT_N1, 'Auth.Mode degrade MAINT_N1 (refus Semi-Auto sur defaut codeur)');
+    // T207 : le defaut codeur ne force plus le repli MAINT_N1 ; le mode reste SEMI_AUTO.
+    ASSERT_EQ(harness.Auth.Mode, E_Mode.SEMI_AUTO, 'Auth.Mode reste SEMI_AUTO (T207, pas de repli)');
+    // Le cycle ne tourne pas : gate codeur FB_Cycle -> sequenceur non Busy.
+    ASSERT_FALSE(harness.CycleBusy, 'Cycle non Busy (gate defaut codeur FB_Cycle)');
 END_TEST
 
 TEST 'PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)'

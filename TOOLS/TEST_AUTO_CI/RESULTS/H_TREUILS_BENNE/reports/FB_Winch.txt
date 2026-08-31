@@ -1,18 +1,88 @@
-Error compiling source files:
-
-FB_Safety_Winch.st:343:18: error: Expected `Assign`, found `.`.
- 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
-     |                  ^
-
-FB_Safety_Winch.st:343:30: error: Expected `Semicolon`, found `TO`.
- 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
-     |                              ^
-
-FB_Safety_Winch.st:343:44: error: Expected `END_IF`, found `END_FOR`.
- 343 |     FOR ResetEdge.Q := FALSE TO FALSE DO ; END_FOR;
-     |                                            ^
-
-FB_Safety_Winch.st:344:1: error: Expected `END_FUNCTION_BLOCK`, found `END_IF`.
- 344 | END_IF;
-     | ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:41:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+   41 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:106:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  106 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:128:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  128 |         s.DRIVEREQ.SPEEDTGT_PCT = 20.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:143:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  143 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:157:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  157 |         s.DRIVEREQ.SPEEDTGT_PCT = 20.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:205:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  205 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:227:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  227 |         s.DRIVEREQ.SPEEDTGT_PCT = 90.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:241:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  241 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:257:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  257 |         s.DRIVEREQ.SPEEDTGT_PCT = 20.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:307:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  307 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:329:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  329 |         s.DRIVEREQ.SPEEDTGT_PCT = 20.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:343:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  343 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:356:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  356 |         s.DRIVEREQ.SPEEDTGT_PCT = 20.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:390:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  390 |         s.DRIVEREQ.SPEEDTGT_PCT = 50.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:439:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  439 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:451:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  451 |         s.DRIVEREQ.SPEEDTGT_PCT = 20.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:491:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  491 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:512:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  512 |         s.DRIVEREQ.SPEEDTGT_PCT = 90.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:525:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  525 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:537:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  537 |         s.DRIVEREQ.SPEEDTGT_PCT = 90.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:550:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  550 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:562:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  562 |         s.DRIVEREQ.SPEEDTGT_PCT = 90.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:576:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  576 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:589:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  589 |         s.DRIVEREQ.SPEEDTGT_PCT = 90.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:632:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  632 |         s.DRIVEREQ.SPEEDTGT_PCT = 0.0;
+      |                    ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_FB_Winch_odv6u09j\strucpp_tmp\strucpp-test-79iZcN\test_main.cpp:653:20: error: 'struct strucpp::ST_FBWINCH_DRIVEREQUEST' has no member named 'SPEEDTGT_PCT'
+  653 |         s.DRIVEREQ.SPEEDTGT_PCT = 90.0;
+      |                    ^~~~~~~~~~~~
 

@@ -1,46 +1,14 @@
-Error parsing test_fb_winchoutputinterlock.st:
+Error compiling source files:
 
-test_fb_winchoutputinterlock.st:46:51: error: unexpected character: ->#<- at offset: 2702, skipped 1 characters.
-  46 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_BRAKE_COMMAND_CONFIRMATION, 'Etat WAIT_BRAKE_COMMAND_CONFIRMATION (2)');
-     |                                                   ^
+FB_WinchOutputInterlock.st:48:39: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_WINCHOUTPUTINTERLOCK'
+  48 |     Fault                           : ST_Fault;                       // <-- [DIAG] Defaut transverse standard (socle FB_FaultCore, bit0: timeout frein)
+     |                                       ^
 
-test_fb_winchoutputinterlock.st:59:53: error: unexpected character: ->#<- at offset: 3510, skipped 1 characters.
-  59 |     ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason#BRAKE_COMMAND_NOT_CONFIRMED, 'Reason=BRAKE_COMMAND_NOT_CONFIRMED (1)');
-     |                                                     ^
+FB_WinchOutputInterlock.st:112:39: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_WINCHOUTPUTINTERLOCK'
+ 112 |     instFault                       : FB_FaultCore;                  // * [INST] Socle defaut (vue live + latchee)
+     |                                       ^
 
-test_fb_winchoutputinterlock.st:60:51: error: unexpected character: ->#<- at offset: 3634, skipped 1 characters.
-  60 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#FAULT, 'Etat FAULT (5)');
-     |                                                   ^
-
-test_fb_winchoutputinterlock.st:108:51: error: unexpected character: ->#<- at offset: 6388, skipped 1 characters.
- 108 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
-     |                                                   ^
-
-test_fb_winchoutputinterlock.st:233:53: error: unexpected character: ->#<- at offset: 13786, skipped 1 characters.
- 233 |     ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason#BRAKE_COMMAND_NOT_CONFIRMED, 'Reason=BRAKE_COMMAND_NOT_CONFIRMED');
-     |                                                     ^
-
-test_fb_winchoutputinterlock.st:282:51: error: unexpected character: ->#<- at offset: 16907, skipped 1 characters.
- 282 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
-     |                                                   ^
-
-test_fb_winchoutputinterlock.st:340:51: error: unexpected character: ->#<- at offset: 20597, skipped 1 characters.
- 340 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
-     |                                                   ^
-
-test_fb_winchoutputinterlock.st:434:51: error: unexpected character: ->#<- at offset: 26494, skipped 1 characters.
- 434 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#WAIT_SENSE_DROP_CONFIRM, 'Etat WAIT_SENSE_DROP_CONFIRM (6)');
-     |                                                   ^
-
-test_fb_winchoutputinterlock.st:457:51: error: unexpected character: ->#<- at offset: 28032, skipped 1 characters.
- 457 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#READY, 'Retour READY');
-     |                                                   ^
-
-test_fb_winchoutputinterlock.st:519:51: error: unexpected character: ->#<- at offset: 32039, skipped 1 characters.
- 519 |     ASSERT_EQ(fb.State, E_WinchFinalInterlockState#FAULT, 'Etat FAULT');
-     |                                                   ^
-
-test_fb_winchoutputinterlock.st:520:53: error: unexpected character: ->#<- at offset: 32115, skipped 1 characters.
- 520 |     ASSERT_EQ(fb.Reason, E_WinchFinalInterlockReason#SENSE_DROP_TIMEOUT, 'Reason=SENSE_DROP_TIMEOUT');
-     |                                                     ^
+FB_WinchOutputInterlock.st:113:5: error: Undefined type 'ST_FAULTCAUSE' in FUNCTION_BLOCK 'FB_WINCHOUTPUTINTERLOCK'
+ 113 |     instCauses                      : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Causes en clair pour le socle defaut
+     |     ^
 

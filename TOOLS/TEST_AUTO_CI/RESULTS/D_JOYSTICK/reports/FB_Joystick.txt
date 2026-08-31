@@ -1,11 +1,22 @@
-Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Joystick_qmv_0ig6\strucpp-test-CxK0EH\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Joystick_qmv_0ig6\strucpp-test-CxK0EH\test_main.cpp:429:53: error: 'class strucpp::FB_JOYSTICK' has no member named 'ATNEUTRAL'; did you mean 'ATNEUTRALXY'?
-  429 |         if (!ctx.assert_true(static_cast<bool>(s.FB.ATNEUTRAL), "FB.ATNEUTRAL", 249, "Signal dans deadband : considere au neutre")) return false;
-      |                                                     ^~~~~~~~~
-      |                                                     ATNEUTRALXY
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Joystick_qmv_0ig6\strucpp-test-CxK0EH\test_main.cpp:449:53: error: 'class strucpp::FB_JOYSTICK' has no member named 'ATNEUTRAL'; did you mean 'ATNEUTRALXY'?
-  449 |         if (!ctx.assert_true(static_cast<bool>(s.FB.ATNEUTRAL), "FB.ATNEUTRAL", 261, "Signal dans deadband : considere au neutre")) return false;
-      |                                                     ^~~~~~~~~
-      |                                                     ATNEUTRALXY
+Error compiling source files:
+
+FB_Joystick.st:76:33: error: Undefined type 'FB_HYSTERESIS_UTIL' in FUNCTION_BLOCK 'FB_JOYSTICK'
+  76 |     SpeedStepHyst1            : FB_Hysteresis_Util;          // * [INST] Decodage % -> palier, seuil 1 (logique FB_Winch §5)
+     |                                 ^
+
+FB_Joystick.st:77:33: error: Undefined type 'FB_HYSTERESIS_UTIL' in FUNCTION_BLOCK 'FB_JOYSTICK'
+  77 |     SpeedStepHyst2            : FB_Hysteresis_Util;          // * [INST] Decodage % -> palier, seuil 2
+     |                                 ^
+
+FB_Joystick.st:78:33: error: Undefined type 'FB_HYSTERESIS_UTIL' in FUNCTION_BLOCK 'FB_JOYSTICK'
+  78 |     SpeedStepHyst3            : FB_Hysteresis_Util;          // * [INST] Decodage % -> palier, seuil 3
+     |                                 ^
+
+FB_Joystick.st:79:33: error: Undefined type 'FB_HYSTERESIS_UTIL' in FUNCTION_BLOCK 'FB_JOYSTICK'
+  79 |     SpeedStepHyst4            : FB_Hysteresis_Util;          // * [INST] Decodage % -> palier, seuil 4
+     |                                 ^
+
+ST_fbJoystick_Cfg.st:22:28: error: Undefined type 'ST_SPEEDSTEPTABLE' in STRUCT 'ST_FBJOYSTICK_CFG'
+  22 |     SpeedStepTable       : ST_SpeedStepTable; // 🪜 Table seuils % -> palier (conversion au joystick, logique FB_Winch §5)
+     |                            ^
 

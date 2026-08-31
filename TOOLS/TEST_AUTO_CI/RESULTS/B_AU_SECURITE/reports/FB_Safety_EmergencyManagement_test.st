@@ -7,6 +7,9 @@ END_SETUP
 
 (* Profil actif : 12 preuves fonctionnelles AF. Les essais de causes et diagnostics sont conserves dans contract_deferred. *)
 
+
+(* Ordre de rapport stable : contrat IEC, scenarios operationnels, puis TC-P01 par numero croissant. *)
+
 TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure'
     (* Scan 0 : Enable=FALSE -> Neutralisation standard *)
     fb(ENABLE := FALSE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
@@ -40,6 +43,7 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
        BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
     ASSERT_FALSE(fb.STATUS.READY, 'Coupure -> Ready retombe a FALSE');
 END_TEST
+
 
 
 TEST 'TC-P01-SCEN-NOM Scenario Nominal : Sequence complete de rearmement sans blocage'
@@ -128,6 +132,7 @@ TEST 'TC-P01-SCEN-NOM Scenario Nominal : Sequence complete de rearmement sans bl
     ASSERT_TRUE(fb.STATUS.DONE, 'Puissance engagee -> Done=TRUE');
     ASSERT_FALSE(fb.STATUS.DIAG.ERROR, 'Cycle nominal termine sans defaut');
 END_TEST
+
 
 
 TEST 'TC-P01-SCEN-DYN Scenario Dynamique : Enchainement nominal puis perturbations reelles en service'
@@ -252,6 +257,25 @@ TEST 'TC-P01-SCEN-DYN Scenario Dynamique : Enchainement nominal puis perturbatio
 END_TEST
 
 
+
+TEST 'TC-P01-001 Coupure AU physique (essai site, non automatise)'
+    (* 🟢 SITE — essai terrain, non automatisable en logiciel.
+       Enfoncement du coup de poing AU physique sur site -> ouverture materielle
+       immediate de la boucle 24V de securite -> retombee instantanee du contacteur
+       de puissance ligne (API reste sous tension). Stub logique : le FB ne peut pas
+       prouver la coupure physique ; il ne fait qu observer EmergencyChainClosed=FALSE
+       et reflete l'ouverture dans Armable. La verification reelle reste un essai SITE. *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_FALSE(fb.STATUS.STATE.ARMABLE, 'chaine AU ouverte -> Armable=FALSE (reflet logiciel de la coupure physique)');
+    ASSERT_FALSE(fb.CMD.MAINTAINA_CMD, 'chaine AU ouverte -> maintien canal A retombe');
+    ASSERT_FALSE(fb.CMD.MAINTAINB_CMD, 'chaine AU ouverte -> maintien canal B retombe');
+END_TEST
+
+
+
 TEST 'TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu'
     (* demarrage + regime etabli, sain *)
     fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
@@ -306,6 +330,7 @@ TEST 'TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre
     ASSERT_FALSE(fb.STATUS.DIAG.ERROR, 'pas de defaut si le canal B reagit correctement au test');
     ASSERT_TRUE(fb.CMD.MAINTAINB_CMD, 'canal B restaure immediatement apres son test');
 END_TEST
+
 
 
 TEST 'TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -> pulse 1s puis confirmation'
@@ -381,6 +406,7 @@ TEST 'TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -> pulse 1s puis 
 END_TEST
 
 
+
 TEST 'TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste'
     (* reproduit l etat "canal colle" de TC-P01-006 -- setup independant, propre a ce test *)
     fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
@@ -436,6 +462,92 @@ TEST 'TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persi
 END_TEST
 
 
+
+TEST 'TC-P01-005 Sequence 2 temps : ArmRequest sans Reset bloque ; Reset puis ArmRequest arme'
+    (* ⚡ MIXTE — partie AUTO : sequencement logique Reset puis ArmRequest.
+       Temps 1 : ArmRequest SEUL (sans Reset) est bloque tant qu un defaut/lockout est actif.
+       Temps 2 : Reset acquitte et purge, puis un ArmRequest distinct et conscient arme.
+       La partie SITE (double action physique acquittement IHM puis rearmement pupitre)
+       reste une verification terrain ; ici on prouve le sequencement logiciel. *)
+    (* Setup : montee en sequence jusqu au pulse (steps 1-5), puis timeout confirmation 2s
+       -> EmergencyArmingFailed + lockout 5s (meme montee que TC-P01-007) *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(1000000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    (* timeout 2s confirmation -> EmergencyArmingFailed + lockout *)
+    ADVANCE_TIME(2000000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_TRUE(fb.STATUS.DIAG.LOCKOUTACTIVE, 'precondition : lockout 5s actif apres echec');
+    ASSERT_FALSE(fb.STATUS.STATE.ARMABLE, 'precondition : Armable=FALSE sous lockout');
+
+    (* Temps 1 : ArmRequest SANS Reset -> bloque (lockout actif), reste Step 0 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'Temps 1 : ArmRequest sans Reset bloque -> reste Step 0');
+
+    (* Temps 2a : Reset acquitte et purge le defaut + lockout *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := TRUE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := TRUE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_FALSE(fb.STATUS.DIAG.LOCKOUTACTIVE, 'Reset purge le lockout');
+    ASSERT_FALSE(fb.STATUS.DIAG.ERROR, 'Reset acquitte l affichage du defaut');
+
+    (* Temps 2b : ArmRequest distinct et conscient -> arme (Step 1) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_EQ(fb.STATUS.STATE.STEP, 1, 'Temps 2 : Reset puis ArmRequest -> sequence armee (Step 1)');
+END_TEST
+
+
+
+
 TEST 'TC-P01-006 canal colle bloque le reamement (echec auto-test)'
     (* scans 1-2 : demarrage + regime etabli, sain *)
     fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
@@ -472,6 +584,7 @@ TEST 'TC-P01-006 canal colle bloque le reamement (echec auto-test)'
     ASSERT_TRUE(fb.STATUS.DIAG.REDUNDANCYTESTFAILED, 'defaut redondance leve (Diag.RedundancyTestFailed)');
     ASSERT_FALSE(fb.CMD.MAINTAINB_CMD, 'canal colle bloque aussi le maintien B (interlock Cause brute sur les 2 canaux)');
 END_TEST
+
 
 
 TEST 'TC-P01-007 timeout confirmation contacteur -> lockout 5s'
@@ -564,6 +677,37 @@ TEST 'TC-P01-007 timeout confirmation contacteur -> lockout 5s'
 END_TEST
 
 
+
+TEST 'TC-P01-008 PowerCutOffRequest coupe A et B sans armer'
+    (* scan 1 : autotest demarrage (1 cycle, boucle saine, contacteur repos) *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+
+    (* scan 2 : regime etabli, maintien sain attendu -- +1 cycle automate (10ms) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_TRUE(fb.CMD.MAINTAINA_CMD, 'hors defaut, canal A doit etre maintenu');
+    ASSERT_TRUE(fb.CMD.MAINTAINB_CMD, 'hors defaut, canal B doit etre maintenu');
+    ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'pas de sequence en cours');
+
+    (* scan 3 : coupure demandee par un metier (Winch/Translation) -- +1 cycle automate *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := TRUE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := TRUE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_FALSE(fb.CMD.MAINTAINA_CMD, 'PowerCutOffRequest doit couper le canal A');
+    ASSERT_FALSE(fb.CMD.MAINTAINB_CMD, 'PowerCutOffRequest doit couper le canal B');
+    ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'PowerCutOffRequest ne doit jamais declencher une sequence armement');
+END_TEST
+
+
+
 TEST 'TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien'
     (* Meme montee en sequence que TC-P01-003 jusqu au pulse (step 5) *)
     fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
@@ -619,133 +763,5 @@ TEST 'TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit 
     ASSERT_FALSE(fb.CMD.ARMPULSE_CMD, 'BtnEmergencyCutOff doit aussi couper le pulse de reamement en cours (coherence avec la coupure du maintien)');
 END_TEST
 
-
-TEST 'TC-P01-008 PowerCutOffRequest coupe A et B sans armer'
-    (* scan 1 : autotest demarrage (1 cycle, boucle saine, contacteur repos) *)
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-
-    (* scan 2 : regime etabli, maintien sain attendu -- +1 cycle automate (10ms) *)
-    ADVANCE_TIME(10000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ASSERT_TRUE(fb.CMD.MAINTAINA_CMD, 'hors defaut, canal A doit etre maintenu');
-    ASSERT_TRUE(fb.CMD.MAINTAINB_CMD, 'hors defaut, canal B doit etre maintenu');
-    ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'pas de sequence en cours');
-
-    (* scan 3 : coupure demandee par un metier (Winch/Translation) -- +1 cycle automate *)
-    ADVANCE_TIME(10000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := TRUE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := TRUE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ASSERT_FALSE(fb.CMD.MAINTAINA_CMD, 'PowerCutOffRequest doit couper le canal A');
-    ASSERT_FALSE(fb.CMD.MAINTAINB_CMD, 'PowerCutOffRequest doit couper le canal B');
-    ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'PowerCutOffRequest ne doit jamais declencher une sequence armement');
-END_TEST
-
-
-TEST 'TC-P01-001 Coupure AU physique (essai site, non automatise)'
-    (* 🟢 SITE — essai terrain, non automatisable en logiciel.
-       Enfoncement du coup de poing AU physique sur site -> ouverture materielle
-       immediate de la boucle 24V de securite -> retombee instantanee du contacteur
-       de puissance ligne (API reste sous tension). Stub logique : le FB ne peut pas
-       prouver la coupure physique ; il ne fait qu observer EmergencyChainClosed=FALSE
-       et reflete l'ouverture dans Armable. La verification reelle reste un essai SITE. *)
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
-    ASSERT_FALSE(fb.STATUS.STATE.ARMABLE, 'chaine AU ouverte -> Armable=FALSE (reflet logiciel de la coupure physique)');
-    ASSERT_FALSE(fb.CMD.MAINTAINA_CMD, 'chaine AU ouverte -> maintien canal A retombe');
-    ASSERT_FALSE(fb.CMD.MAINTAINB_CMD, 'chaine AU ouverte -> maintien canal B retombe');
-END_TEST
-
-
-TEST 'TC-P01-005 Sequence 2 temps : ArmRequest sans Reset bloque ; Reset puis ArmRequest arme'
-    (* ⚡ MIXTE — partie AUTO : sequencement logique Reset puis ArmRequest.
-       Temps 1 : ArmRequest SEUL (sans Reset) est bloque tant qu un defaut/lockout est actif.
-       Temps 2 : Reset acquitte et purge, puis un ArmRequest distinct et conscient arme.
-       La partie SITE (double action physique acquittement IHM puis rearmement pupitre)
-       reste une verification terrain ; ici on prouve le sequencement logiciel. *)
-    (* Setup : montee en sequence jusqu au pulse (steps 1-5), puis timeout confirmation 2s
-       -> EmergencyArmingFailed + lockout 5s (meme montee que TC-P01-007) *)
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ADVANCE_TIME(10000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ADVANCE_TIME(10000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ADVANCE_TIME(200000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
-    ADVANCE_TIME(200000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ADVANCE_TIME(200000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
-    ADVANCE_TIME(200000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ADVANCE_TIME(1000000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    (* timeout 2s confirmation -> EmergencyArmingFailed + lockout *)
-    ADVANCE_TIME(2000000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ASSERT_TRUE(fb.STATUS.DIAG.LOCKOUTACTIVE, 'precondition : lockout 5s actif apres echec');
-    ASSERT_FALSE(fb.STATUS.STATE.ARMABLE, 'precondition : Armable=FALSE sous lockout');
-
-    (* Temps 1 : ArmRequest SANS Reset -> bloque (lockout actif), reste Step 0 *)
-    ADVANCE_TIME(10000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'Temps 1 : ArmRequest sans Reset bloque -> reste Step 0');
-
-    (* Temps 2a : Reset acquitte et purge le defaut + lockout *)
-    ADVANCE_TIME(10000000);
-    fb(ENABLE := TRUE, RESET := TRUE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := TRUE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ASSERT_FALSE(fb.STATUS.DIAG.LOCKOUTACTIVE, 'Reset purge le lockout');
-    ASSERT_FALSE(fb.STATUS.DIAG.ERROR, 'Reset acquitte l affichage du defaut');
-
-    (* Temps 2b : ArmRequest distinct et conscient -> arme (Step 1) *)
-    ADVANCE_TIME(10000000);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
-       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
-    ASSERT_EQ(fb.STATUS.STATE.STEP, 1, 'Temps 2 : Reset puis ArmRequest -> sequence armee (Step 1)');
-END_TEST
 
 

@@ -5271,3 +5271,71 @@ tasks:
   - 'Interlocks physiques et permits M3 inchangés'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T207_MODE_SELECTION_AU_FAULT.yaml
   bloque_par: []
+- id: T208
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: TREUILS / SÉCURITÉ
+  agent: DSH-02
+  date: '2026-08-31T00:00:00'
+  titre: 'Cohérence ActiveOffsetM / état benne — cause racine du faux défaut MecaE'
+  contexte: 'Intitulé complet : Analyser la mise à jour de ActiveOffsetM et de l''état benne
+    (IsOpen/IsClosed) — cause racine du faux défaut MecaE (offset 15m incohérent avec
+    la position physique).'
+  description: 'Diagnostic 2026-08-31 : le faux défaut MecaE (meca synchron) vient d''un
+    ActiveOffsetM incohérent. Valeurs observées : CablePosM(M1)=1.31m, ExpectedOtherWinchPosM=-13.7m
+    (donc ActiveOffsetM=15m = OffsetCloseM benne fermée), alors que les 2 treuils sont
+    référencés à 1.31m (benne ouverte, offset devrait être 0m). ActiveOffsetM dépend de
+    l''état benne mémorisé (IsOpen/IsClosed), pas de la position physique mesurée. Si
+    l''état benne est incohérent (cycle interrompu, jog manuel, état non mis à jour),
+    ActiveOffsetM est faux → ABS(M1-M2+ActiveOffsetM) > 2.5m → faux MecaE. Objectif :
+    comprendre pourquoi ActiveOffsetM reste à 15m alors que la benne est ouverte, et
+    proposer une correction (mise à jour d''état benne, garde-fou StateIncoherent).'
+  contrat: ''
+  objectifs:
+  - 'Comprendre pourquoi ActiveOffsetM reste à 15m (OffsetCloseM) alors que la benne est
+    physiquement ouverte (2 treuils à la même position)'
+  - 'Identifier le mécanisme de mise à jour de l''état benne (IsOpen/IsClosed) et les cas
+    où il devient incohérent (cycle interrompu, jog manuel, état non mis à jour)'
+  - 'Proposer une correction : mise à jour d''état benne fiable, ou garde-fou StateIncoherent
+    (forcer ActiveOffsetM sûr / inhiber MecaE si état incohérent)'
+  - 'Vérifier que la correction ne casse pas la synchro ni le cycle benne'
+  - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS'
+  bloque_par: []
+- id: T209
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: TREUILS / SÉCURITÉ
+  agent: DSH-02
+  date: '2026-08-31T00:00:00'
+  titre: 'Refactorisation FB_Safety_Winch : masques hexadécimaux → bits explicites'
+  contexte: 'Intitulé complet : Remplacer les 6 masques hexadécimaux de FB_Safety_Winch
+    (16#FF97, 16#FF9F, 16#0040, 16#0020, 16#0008, 16#2F84) par des bits explicites,
+    pour rendre le code lisible et auditable (safety).'
+  description: 'Le code FB_Safety_Winch (CODE/H_TREUILS_BENNE/FB_Safety_Winch.st:250-282)
+    utilise des masques hexadécimaux illisibles pour tester des combinaisons de bits de
+    ErrorId. Refactoriser en bits explicites dérivés de instCauses[i].Active (source
+    exacte de ErrorId), SANS changer la logique. ⚠️ TABLE DE BITS CORRECTE (vérifiée
+    code réel, PAS le préambule) : bit0=OperatorComm, bit1=Encoder, bit2=MotorThermal,
+    bit3=SlackCable, bit4=PhaseRotation, bit5=TopLimitSwitch, bit6=CableLimitDescent,
+    bit7=MecaA, bit8=MecaB, bit9=MecaC, bit10=BrakeThermal, bit11=MecaD, bit12=MecaE
+    écart, bit13=MecaE escalade, bit14=OppositeDir, bit15=NoMovement. Décodage : FF97 =
+    tout sauf SlackCable/TopLimitSwitch/CableLimitDescent ; FF9F = tout sauf
+    TopLimitSwitch/CableLimitDescent ; 0040=CableLimitDescent ; 0020=TopLimitSwitch ;
+    0008=SlackCable ; 2F84={MotorThermal,MecaA/B/C,BrakeThermal,MecaD,MecaE-escalade}.
+    Corriger aussi la doc TROUBLESHOOTING_RearmementAU_PowerCutOff_20260901.md:56
+    (liste 2F84 fausse) et le commentaire FB_Safety_Winch.st:61 (BypassGlobal ne force
+    pas ErrorId=0).'
+  contrat: ''
+  objectifs:
+  - 'Remplacer les 6 masques hexadécimaux de FB_Safety_Winch par des bits explicites
+    dérivés de instCauses[i].Active (booléens locaux)'
+  - 'Logique IDENTIQUE (mêmes causes testées) — vérifié masque par masque (non-régression)'
+  - 'Utiliser la table de bits CORRECTE (bit10=BrakeThermal, bit11=MecaD, bit12=MecaE
+    écart, bit13=MecaE escalade) — PAS celle du préambule erroné'
+  - 'Corriger la doc TROUBLESHOOTING_RearmementAU_PowerCutOff_20260901.md:56 (liste 2F84)'
+  - 'Clarifier le commentaire FB_Safety_Winch.st:61 (BypassGlobal ne force pas ErrorId=0)'
+  - 'test_fb_safety_winch.st reste 100% vert (couvre tous les masques)'
+  - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS'
+  bloque_par: []

@@ -1739,6 +1739,23 @@ def _render_st_io_block_diagram(analysis: dict) -> str:
             <div style="margin-top:2px;">{"".join(sub_rows)}</div>
         </details>""")
 
+    constant_reads = reads.get("GLOBAL_CONSTANTS", [])
+    if constant_reads:
+        sub_rows = "".join(
+            f'<span style="display:inline-block;margin:2px 4px 2px 0;padding:3px 6px;border:1px solid #d97706;border-radius:4px;color:#fde68a;font-family:monospace;font-size:11px;">{_html.escape(p)}</span>'
+            for p in constant_reads
+        )
+        left_items.append(f"""
+        <details style="margin:4px 0;">
+            <summary style="list-style:none;cursor:pointer;">
+                <div class="pin-row pin-row-wired" style="background:rgba(245,158,11,0.12);border:1px solid #d97706;cursor:pointer;">
+                    <div class="pin-expr"><span style="color:#fde68a;font-weight:700;font-size:12px;">📐 Constantes globales CST_* ({len(constant_reads)} constantes ▾)</span></div>
+                    <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.25);color:#fde68a;">VAR_GLOBAL CONSTANT</span></div>
+                </div>
+            </summary>
+            <div style="padding:4px 8px;">{sub_rows}</div>
+        </details>""")
+
     # 6. Variables rémanentes / Calibrations persistantes RETAIN (ex: _CalibM1, _WinchM1CfgPersist)
     retain_reads = reads.get("RETAIN_PERSIST", [])
     if retain_reads:
@@ -1973,13 +1990,16 @@ def _render_pin_diagram(fb_name: str, wiring: dict | None, label: str | None = N
         key = name.upper()
         wired = call_args.get(key)
         cls = "pin-row-unwired" if key in unwired_inputs else "pin-row-wired"
-        expr_html = (f'<code title="{_html.escape(wired)}" onclick="copyPinExpr(this)">{_html.escape(wired)}</code>'
+        is_constant = wired and wired.upper() in ("TRUE", "FALSE")
+        source_label = "Constante" if is_constant else "Source production"
+        expr_html = (f'<span style="color:var(--muted);font-size:10px;margin-right:4px;">{source_label} :</span>'
+                     f'<code title="{_html.escape(wired)}" onclick="copyPinExpr(this)">{_html.escape(wired)}</code>'
                      if wired else "<span class='pin-missing'>⚠ non câblé en production</span>")
         tag_html = f"<span class='pin-tag'>{tag}</span>" if tag else ""
         # Nom du pin en dernier -> reste colle au bloc (colonne IN justifiee a droite)
         return f"""<div class="pin-row {cls}">
-            <div class="pin-expr">{expr_html}</div>
-            <div class="pin-name">{_html.escape(name)}{tag_html} <span class="pin-type">{_html.escape(ftype)}</span></div>
+            <div class="pin-expr">{expr_html} <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN {_html.escape(name)}{tag_html} <span class="pin-type">{_html.escape(ftype)}</span></div>
         </div>"""
 
     def _out_row(name: str, ftype: str) -> str:
@@ -1995,8 +2015,8 @@ def _render_pin_diagram(fb_name: str, wiring: dict | None, label: str | None = N
             expr_html = "<span class='pin-missing'>⚠ jamais lu en production</span>"
         # Nom du pin en premier -> reste colle au bloc (colonne OUT justifiee a gauche)
         return f"""<div class="pin-row {cls} pin-row-out">
-            <div class="pin-name">{_html.escape(name)} <span class="pin-type">{_html.escape(ftype)}</span></div>
-            <div class="pin-expr">{expr_html}</div>
+            <div class="pin-name">OUT {_html.escape(name)} <span class="pin-type">{_html.escape(ftype)}</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> {expr_html}</div>
         </div>"""
 
     left_html = "".join(_in_row(n, t) for n, t in pins["inputs"])
@@ -2024,6 +2044,7 @@ def _render_pin_diagram(fb_name: str, wiring: dict | None, label: str | None = N
     <details class="pin-diagram-details">
         <summary>{summary_txt}</summary>
         {warnings_html}
+        <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in">{left_html}</div>
             <div class="pin-block">{block_label}</div>

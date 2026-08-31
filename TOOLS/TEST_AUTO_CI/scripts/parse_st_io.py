@@ -55,7 +55,7 @@ ST_KEYWORDS = {
     "LIMIT", "MAX", "MIN", "TRUNC", "ROUND", "FLOOR", "CEIL",
     "LEN", "LEFT", "RIGHT", "MID", "CONCAT", "FIND", "INSERT", "DELETE", "REPLACE",
     "TO_INT", "TO_REAL", "TO_LREAL", "TO_BOOL", "TO_BYTE", "TO_WORD", "TO_DWORD", "TO_UDINT", "TO_DINT", "TO_STRING",
-    "INT_TO_REAL", "REAL_TO_INT", "REAL_TO_DINT", "UDINT_TO_REAL", "WORD_TO_UINT", "UINT_TO_WORD",
+    "INT_TO_REAL", "INT_TO_WORD", "REAL_TO_INT", "REAL_TO_DINT", "UDINT_TO_REAL", "WORD_TO_UINT", "UINT_TO_WORD",
     "SHL", "SHR", "ROL", "ROR",
     
     # Blocs standard
@@ -349,6 +349,7 @@ class STParser:
         clean_expr = re.sub(r"\b2#[0-1]+\b", " ", clean_expr)
         clean_expr = re.sub(r"\bT#[0-9a-zA-Z_.]+\b", " ", clean_expr)
         clean_expr = re.sub(r"\b\d+(?:\.\d+)?\b", " ", clean_expr)
+        clean_expr = re.sub(r"\b[A-Za-z_][A-Za-z0-9_]*\s*:=\s*", "", clean_expr)
         
         matches = re.findall(r"\b([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\b", clean_expr)
         res = []
@@ -440,6 +441,7 @@ class STParser:
             "HW_IO": {},          # Entrées/Sorties physiques mappées (Device_IO)
             "DEVICES": [],        # Nœuds/Équipements de l'arbre CODESYS (ex: CANbus, COD1_CODEUR)
             "ENUMS": [],          # Énumérations globales du projet (ex: E_Mode, DEVICE_STATE)
+            "GLOBAL_CONSTANTS": [],
             "RETAIN_PERSIST": [], # Variables rémanentes / calibrations persistantes (ex: _CalibM1, _WinchM1CfgPersist)
             "EXTERNAL": []        # Variables réellement inconnues / non déclarées
         }
@@ -465,6 +467,8 @@ class STParser:
                 categories["HW_IO"][p] = hw_map[base]
             elif base in devices or base.upper() in ("CANBUS", "ETHERCAT_MASTER", "LOCAL_DIGITAL_IO", "VH_0800END", "VH_0808ETP", "VH_0008ER", "VH_0008ER_1", "COD1_CODEUR", "COD2_CODEUR", "AC600_ECAT_DRIVE", "JOY1_JOYSTICK_MCB560_CO4201A"):
                 categories["DEVICES"].append(p)
+            elif base.startswith("CST_"):
+                categories["GLOBAL_CONSTANTS"].append(p)
             elif base.startswith("E_") or base.upper() in ("DEVICE_STATE", "E_STATE", "E_MODE", "E_DIAG_STATE"):
                 categories["ENUMS"].append(p)
             elif base.startswith("_") or "PERSIST" in base.upper() or "CALIB" in base.upper():
@@ -472,7 +476,7 @@ class STParser:
             else:
                 categories["EXTERNAL"].append(p)
                 
-        for k in ("GVL", "PRG_Inter", "VAR_OUTPUT", "VAR_INPUT", "VAR_LOCAL", "SUB_INSTANCES", "DEVICES", "ENUMS", "RETAIN_PERSIST", "EXTERNAL"):
+        for k in ("GVL", "PRG_Inter", "VAR_OUTPUT", "VAR_INPUT", "VAR_LOCAL", "SUB_INSTANCES", "DEVICES", "ENUMS", "GLOBAL_CONSTANTS", "RETAIN_PERSIST", "EXTERNAL"):
             categories[k].sort()
         return categories
 
