@@ -644,7 +644,7 @@ GVL_Troubleshooting.MotionM3.Step4_MotionRequested    := Translation.State.Busy 
 GVL_Troubleshooting.MotionM3.RequestedDirection       := Translation.State.ActiveDirection;
 GVL_Troubleshooting.MotionM3.RequestedSpeedPct        := Translation.State.SpeedCmd_Pct;
 GVL_Troubleshooting.MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
-GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := NOT Translation.State.HeightInterlockBlocking; // Interlock hauteur M1/M2 (risque collision)
+GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.MotionM3.RequestedDirection = 1, Translation.Safety.MaintenancePermit, Translation.Safety.TremiePermit); // Permis directionnels M3 (Direction=+1 → Trémie, -1 → Maintenance) — HeightInterlockBlocking reste un blocage séparé (non directionnel)
 GVL_Troubleshooting.MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
 

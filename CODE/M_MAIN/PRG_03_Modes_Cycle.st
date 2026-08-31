@@ -204,7 +204,7 @@ END_IF;
 
 // === 🔄 §3 SÉQUENCEUR DE CYCLE SEMI-AUTOMATIQUE ===
 {region "§3 Séquenceur de cycle"}
-// 🕹️ CycleMotionPermit = manche défléchi (non centré) — D2
+// 🕹️ JoystickDeflected = manche défléchi (non centré) — D2
 // ⚠️ Entrées consommées sur les bus publics Data (retard N-1 admis AF-02) :
 
 instCycleSemiAuto(
@@ -212,7 +212,7 @@ instCycleSemiAuto(
     Reset                   := GVL_IHM.Cycle.Cmd.BtnReset,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := instModes.Auth.Mode,
-    CycleMotionPermit       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
+    JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,
