@@ -1,7 +1,8 @@
-# FB_Winch — fiche composant cible (v2.0, T181)
+# FB_Winch — fiche composant (v2.0, T181)
 
-> Statut : **cadrage cible, non implémenté — visa humain requis**.  
+> Statut : **implémenté (T181-08) — interface struct réelle, vérifiée code** (`CODE/H_TREUILS_BENNE/FB_Winch.st`).  
 > Source normative de cette fiche : `DOC/WFLOW/AUDITS/DESIGN/CADRAGE_T181-06_DRIVEREQUEST.md` et `AF10_INTERFACE_TREUIL_CIBLE_T181.md`.
+> La v1.0 (interface plate périmée) est archivée (G340) : `ARCHIVES/Doc/AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md`.
 
 ## 🧭 Sommaire
 
@@ -27,13 +28,15 @@ Il ne choisit jamais le producteur, le mode ou la synchronisation. Ces responsab
 <tr><td>IN</td><td><code>DriveRequest : ST_fbWinch_DriveRequest</code></td><td>ordre, palier, bornes et limites effectives</td></tr>
 <tr><td>IN</td><td><code>Sensors : ST_fbWinch_Sensors</code></td><td>position, référencement, contacteurs, vitesse m/s</td></tr>
 <tr><td>IN</td><td><code>Config : ST_fbWinch_Cfg</code></td><td>configuration statique seulement</td></tr>
-<tr><td>IN</td><td><code>SafeStop, PermitUp, PermitDown</code></td><td>sorties déjà arbitrées de <code>FB_Safety_Winch</code></td></tr>
-<tr><td>OUT</td><td><code>RelayFwd_Up, RelayRev_Down, Contactor1..4</code></td><td>commandes envoyées à la barrière finale</td></tr>
-<tr><td>OUT</td><td><code>SpeedStepReq_Decoded, StepNumber, StepRampElapsed</code></td><td>cible clampée et palier temporisé</td></tr>
-<tr><td>OUT</td><td><code>ContactorsCheck, Fault, Ready</code></td><td>diagnostic ; <code>ContactorStuck</code> publié mais produit par Safety</td></tr>
+<tr><td>IN</td><td><code>SafeStop, DescendPermit, AscentPermit</code></td><td>sorties déjà arbitrées de <code>FB_Safety_Winch</code></td></tr>
+<tr><td>IN</td><td><code>BypassContactorCheck, BypassGlobal</code></td><td>bypasses de test / simulation</td></tr>
+<tr><td>OUT</td><td><code>RelayFwd, RelayRev, Contactor1..4</code></td><td>commandes envoyées à la barrière finale</td></tr>
+<tr><td>OUT</td><td><code>RequestedStep, StepNumber, BusinessStepDelayElapsed</code></td><td>cible clampée et palier temporisé</td></tr>
+<tr><td>OUT</td><td><code>Fault : ST_Fault, Ready</code></td><td>état transverse et disponibilité</td></tr>
+<tr><td>OUT</td><td><code>ContactorsCheck, SpeedGuardLimited, InTopSlowdownZone, InBottomSlowdownZone, CommandedDirection, DirectionChangePending, DirectionChangeDelayElapsed, SenseHoldRequest</code></td><td>diagnostic et intention de maintien de sens</td></tr>
 </tbody></table>
 
-Les DUT et chaque champ sont définis dans le cadrage T181-06 §2. `SyncCoupled` est diag-only : une revue/garde interdit sa lecture logique dans ce FB.
+Les DUT et chaque champ sont définis dans le cadrage T181-06 §2. `SyncCoupled` est un champ diag-only de `DriveRequest` : une revue/garde interdit sa lecture logique dans ce FB.
 
 ## 3. Composition et limites de responsabilité
 
@@ -57,7 +60,7 @@ Les DUT et chaque champ sont définis dans le cadrage T181-06 §2. `SyncCoupled`
 - **D13 (tranché T181-06)** : la reconstruction de table `M2_SpeedStepTableActive` (`PRG_04:405-429`) est **supprimée** — le clamp unifié (`M2_BucketJogLimit` → `MaxStepUp/Down := 1`) suffit, appliqué aux deux sens.
 - `PRG_04` produit `ST_WinchFinalInterlockReq`; `PRG_06` reste la barrière finale.
 
-## 5. Validation attendue
+## 5. Validation
 
 | Preuve | Objet |
 |---|---|
@@ -67,12 +70,13 @@ Les DUT et chaque champ sont définis dans le cadrage T181-06 §2. `SyncCoupled`
 | garde revue | `FB_Winch` ne lit jamais `SyncCoupled` |
 | G200 + bundle + gates | liaison et non-régression après phase d'implémentation |
 
-Ces preuves ne valent pas qualification terrain : l'import CODESYS et les seuils de cadence nécessitent un essai site signé.
+L'interface struct (DriveRequest/Sensors/Config) est **réelle et vérifiée code** (T181-08). Ces preuves ne valent pas qualification terrain : l'import CODESYS et les seuils de cadence nécessitent un essai site signé.
 
 ## 6. Historique
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.0 (implémenté) | 2026-08-31 | T181-18 : statué **implémenté** (T181-08) — interface struct réelle vérifiée code ; fiche alignée sur l'interface réelle ; v1.0 archivée (G340). |
 | v2.0 | 2026-08-29 | Fiche cible T181-06 : interface struct, palier discret, clamp par instance et arrêt visa humain. |
 | v2.0 (additif) | 2026-08-29 | Décisions T181-06 intégrées : D13 (suppression `M2_SpeedStepTableActive`), jog benne = palier `BucketJogStep` (retrait du `15.0` %), clamp M2-only. |
-| v1.0 | antérieure | Interface actuelle, conservée comme référence historique jusqu'à implémentation validée. |
+| v1.0 | antérieure | Interface plate périmée — **archivée** (G340) : `ARCHIVES/Doc/AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md`. |
