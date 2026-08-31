@@ -9,7 +9,7 @@
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Bit-identique à l'ancien PRG_04 §3 (refactor POO).
    ⚠️ Asymétries M2 vs M1 : chemin benne (override), Select=0/2, synchro inversée.
-   🪜 T190-B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
+   🪜 -B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
        pourcentage. En SEMI_AUTO, passthrough de ReqWinch.StepTgt ; en manuel,
        le joystick est le producteur UNIQUE du palier (passthrough de
        Joystick.AxisY.StepTgt), boutons/both = palier 5, override benne = palier 1.

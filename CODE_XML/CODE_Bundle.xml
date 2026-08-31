@@ -13238,7 +13238,7 @@ Identifiant numerique de l'action</xhtml>
       EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
    🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
       vers le device.
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -26231,7 +26231,7 @@ Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
                  uniquement (aucun redemarrage automatique).
    🔌 Interface : contrat standard (Enable/Reset, Ready/Fault/Lifecycle).
                   Producteur UNIQUE de la qualification machine — ne relit
-                  jamais un ActiveOffsetValid aval (T185 C-3).
+                  jamais un ActiveOffsetValid aval (C).
    📄 Doc metier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
                    + DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
    🧩 Dependances : FB_FaultCore, FB_Encoder (M1/M2), FB_Bucket, FB_Modes
@@ -26306,7 +26306,7 @@ IF HomingLossLatched AND WinchesMechanicallyStopped THEN
     HomingLossLatched := FALSE;
 END_IF;
 
-(* T185 C-1 : pas de redemarrage automatique. Une perte de datum en mouvement exige un
+(* C : pas de redemarrage automatique. Une perte de datum en mouvement exige un
    acquittement conscient (front Reset) avant que MachineHomed puisse revenir. *)
 IF HomingLossLatched AND NOT ReHomingAckRequired THEN
     ReHomingAckRequired := TRUE;
@@ -26333,12 +26333,12 @@ instCauses[CAUSE_HOMING_ERROR_M2].Active   := HomingStarted AND M2Status.HomingE
 instCauses[CAUSE_HOMING_ERROR_M2].Latching := TRUE;
 instCauses[CAUSE_HOMING_ERROR_M2].Texte    := 'Erreur de homing codeur M2 pendant le referencement conjoint';
 
-(* T185 C-2 : confirmation Ouverte ET Fermee au meme scan = rejet total, cause a acquitter. *)
+(* C : confirmation Ouverte ET Fermee au meme scan = rejet total, cause a acquitter. *)
 instCauses[CAUSE_DOUBLE_CONFIRM].Active   := DoubleConfirmRequested;
 instCauses[CAUSE_DOUBLE_CONFIRM].Latching := TRUE;
 instCauses[CAUSE_DOUBLE_CONFIRM].Texte    := 'Confirmation benne Ouverte et Fermee simultanee : refusee';
 
-(* T185 C-4.3 : confirmation recue pendant un homing d'axe deja en cours = ignoree. *)
+(* C : confirmation recue pendant un homing d'axe deja en cours = ignoree. *)
 instCauses[CAUSE_CONFIRM_WHILE_HOMING].Active   := ConfirmWhileHoming;
 instCauses[CAUSE_CONFIRM_WHILE_HOMING].Latching := TRUE;
 instCauses[CAUSE_CONFIRM_WHILE_HOMING].Texte    := 'Confirmation benne pendant un homing codeur en cours : ignoree';
@@ -26378,7 +26378,7 @@ END_IF;
 
 // === 🔑 §4 OUVERTURE DE LA TRANSACTION DE REFERENCEMENT CONJOINT ===
 {region "§4 Ouverture transaction"}
-(* T185 C-4.1 : jamais "au vol" par-dessus un homing d'axe deja en cours.
+(* C : jamais "au vol" par-dessus un homing d'axe deja en cours.
    Demande acceptee uniquement dans la fenetre mecanique sure, front unique, hors double. *)
 IF SingleConfirm AND NOT HomingStarted AND NOT DoubleConfirmRequested AND NOT ConfirmWhileHoming
    AND WindowSafe
@@ -29580,7 +29580,7 @@ ErrorSensorIncoherent := instCauses[7].Active;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil survitesse (max bande apprise T181-15, m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil survitesse (max bande apprise , m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="OppositeDirectionTimeout">
@@ -30060,7 +30060,7 @@ ErrorSensorIncoherent := instCauses[7].Active;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch survitesse (hors bitfield, T181-16)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch survitesse (hors bitfield)</xhtml>
               </documentation>
             </variable>
             <variable name="instFault">
@@ -30298,8 +30298,8 @@ IF NOT BypassGlobal THEN
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
 
-    // Survitesse (latch dédié hors bitfield — T181-16, alternative validée).
-    // Seuil = max bande apprise T181-15 (SpeedBandMaxMps). Latché jusqu'au Reset.
+    // Survitesse (latch dédié hors bitfield —, alternative validée).
+    // Seuil = max bande apprise  (SpeedBandMaxMps). Latché jusqu'au Reset.
     // ⚠️ N'alimente PAS PowerCutOff : couper la puissance en survitesse peut
     // provoquer une chute libre de la charge — décision à trancher (ISO 13849).
     IF NOT BypassProcess AND MeasuredSpeedValid AND (ABS(MeasuredSpeedMps) &gt; SpeedBandMaxMps) THEN
@@ -36666,7 +36666,7 @@ GVL_Troubleshooting.TraceTranslation := TranslationTrace;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTENTION DE MAINTIEN DU CONTACTEUR DE SENS (§3bis / T181-01) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTENTION DE MAINTIEN DU CONTACTEUR DE SENS (§3bis) ===
 &lt;-- [ACT] Demande a la barriere finale de TENIR le contacteur de sens apres chute de palier a 0 (inertie moteur), bornee par T_hold_internal</xhtml>
               </documentation>
             </variable>
@@ -36768,7 +36768,7 @@ GVL_Troubleshooting.TraceTranslation := TranslationTrace;
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MAINTIEN DU CONTACTEUR DE SENS (§3bis / T181-01) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MAINTIEN DU CONTACTEUR DE SENS (§3bis) ===
 . [LOC] Garde interne T_hold_internal (&lt; MaxSenseHoldTime barriere)</xhtml>
               </documentation>
             </variable>
@@ -36865,7 +36865,7 @@ END_IF;
 // mais ne produit plus ce defaut.
 instCauses[1].Active   := FALSE;
 instCauses[1].Latching := TRUE;
-instCauses[1].Texte    := 'Contacteur colle gere par FB_Safety_Winch (T181-08)';
+instCauses[1].Texte    := 'Contacteur colle gere par FB_Safety_Winch ';
 
 instCauses[2].Active   := SpeedStepConfigFaultLatched;
 instCauses[2].Latching := TRUE;
@@ -36949,7 +36949,7 @@ DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
 {region "§5 Paliers vitesse et contacteurs"}
-// T190-B : la consigne est désormais un PALIER discret (DriveRequest.SpeedStepReq,
+// -B : la consigne est désormais un PALIER discret (DriveRequest.SpeedStepReq,
 // 1..5, 0 = arrêt) produit par l'arbitrage. Plus de décodage %→palier ici.
 IF DirectionChangePending OR (DriveRequest.Direction = 0) OR EffectiveSafeStop OR NOT DriveRequest.StartStop THEN
     RampTargetStep := 0;
@@ -37056,7 +37056,7 @@ IF Fault.Error THEN
 END_IF;
 {endregion}
 
-{region "§5bis Intention de maintien du contacteur de sens (§3bis / T181-01)"}
+{region "§5bis Intention de maintien du contacteur de sens (§3bis)"}
 // Quand le palier temporise StepNumber vient de retomber a 0 alors qu'un sens etait
 // commande, FB_Winch DEMANDE a la barriere finale (FB_WinchOutputInterlock) de TENIR
 // le contacteur de sens le temps que le moteur ralentisse (inertie). Borne par
@@ -37221,7 +37221,7 @@ PrevStepNumber := StepNumber;
        FB_Safety_Winch / FB_Winch.
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Bit-identique à l'ancien PRG_04 §3 (refactor POO).
-   🪜 T190-B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
+   🪜 -B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
        pourcentage. En SEMI_AUTO, passthrough de ReqWinch.StepTgt ; en manuel,
        le joystick est le producteur UNIQUE du palier (passthrough de
        Joystick.AxisY.StepTgt), boutons/both = palier 5 (pleine vitesse).
@@ -37441,7 +37441,7 @@ END_IF;
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Bit-identique à l'ancien PRG_04 §3 (refactor POO).
    ⚠️ Asymétries M2 vs M1 : chemin benne (override), Select=0/2, synchro inversée.
-   🪜 T190-B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
+   🪜 -B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
        pourcentage. En SEMI_AUTO, passthrough de ReqWinch.StepTgt ; en manuel,
        le joystick est le producteur UNIQUE du palier (passthrough de
        Joystick.AxisY.StepTgt), boutons/both = palier 5, override benne = palier 1.
@@ -39716,7 +39716,7 @@ TableComplete := (CellsFilled &gt;= CellsTotal);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Façade codeur M2 (PRG_02_Acquisition.Data.EncoderM2)</xhtml>
               </documentation>
             </variable>
-            <variable name="WinchM1">
+            <variable name="WinchM1Ref">
               <type>
                 <derived name="FB_Winch" />
               </type>
@@ -39724,7 +39724,7 @@ TableComplete := (CellsFilled &gt;= CellsTotal);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 FB_Winch M1 (instWinchM1)</xhtml>
               </documentation>
             </variable>
-            <variable name="WinchM2">
+            <variable name="WinchM2Ref">
               <type>
                 <derived name="FB_Winch" />
               </type>
@@ -39817,7 +39817,7 @@ TableComplete := (CellsFilled &gt;= CellsTotal);
         (via ce FB), consommés par PRG_07/IHM.
    🔒 Non-régression : chaque assignation de la §8 de PRG_04 est déplacée
       telle quelle (bit-identique, aucune logique modifiée).
-   📄 Doc : DOC/WFLOW/AUDITS/FB_WinchStateProjection_DESIGN.md (T195)
+   📄 Doc : DOC/WFLOW/AUDITS/FB_WinchStateProjection_DESIGN.md 
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -39839,29 +39839,29 @@ M1_PrevSpeed_Mps := EncoderM1.Measurement.Speed_Mps;
 
 WinchM1State.Position_M := EncoderM1.Measurement.CablePosM;
 WinchM1State.SpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct;
-WinchM1State.StepNumber := WinchM1.StepNumber;
-IF WinchM1.Fault.Error THEN
+WinchM1State.StepNumber := WinchM1Ref.StepNumber;
+IF WinchM1Ref.Fault.Error THEN
     WinchM1State.FBState := E_State.ERROR;
-ELSIF WinchM1.StepNumber &gt; 0 THEN
+ELSIF WinchM1Ref.StepNumber &gt; 0 THEN
     WinchM1State.FBState := E_State.BUSY;
 ELSE
     WinchM1State.FBState := E_State.READY;
 END_IF;
-WinchM1State.Ready := WinchM1.Ready;
-WinchM1State.Busy := (WinchM1.StepNumber &gt; 0);
+WinchM1State.Ready := WinchM1Ref.Ready;
+WinchM1State.Busy := (WinchM1Ref.StepNumber &gt; 0);
 WinchM1State.Done := FALSE;
-WinchM1State.Error := WinchM1.Fault.Error;
-WinchM1State.ErrorId := WinchM1.Fault.ErrorId;
-WinchM1State.RelayFwd := WinchM1.RelayFwd;
-WinchM1State.RelayRev := WinchM1.RelayRev;
-WinchM1State.Contactor1 := WinchM1.Contactor1;
-WinchM1State.Contactor2 := WinchM1.Contactor2;
-WinchM1State.Contactor3 := WinchM1.Contactor3;
-WinchM1State.Contactor4 := WinchM1.Contactor4;
+WinchM1State.Error := WinchM1Ref.Fault.Error;
+WinchM1State.ErrorId := WinchM1Ref.Fault.ErrorId;
+WinchM1State.RelayFwd := WinchM1Ref.RelayFwd;
+WinchM1State.RelayRev := WinchM1Ref.RelayRev;
+WinchM1State.Contactor1 := WinchM1Ref.Contactor1;
+WinchM1State.Contactor2 := WinchM1Ref.Contactor2;
+WinchM1State.Contactor3 := WinchM1Ref.Contactor3;
+WinchM1State.Contactor4 := WinchM1Ref.Contactor4;
 WinchM1State.BrakeCmd := InterlockM1.BrakeCmd;
 WinchM1State.BrakeCommandOpenConfirmed := HwInWinch.M1_BrakeIsOpen_DI;
-WinchM1State.FinalAuthorizedStep := WinchM1.RequestedStep;
-WinchM1State.ContactorsCheck := WinchM1.ContactorsCheck;
+WinchM1State.FinalAuthorizedStep := WinchM1Ref.RequestedStep;
+WinchM1State.ContactorsCheck := WinchM1Ref.ContactorsCheck;
 WinchM1State.FinalInterlockState := InterlockM1.State;
 WinchM1State.FinalInterlockReason := InterlockM1.Reason;
 WinchM1State.FinalInterlockError := InterlockM1.Fault.Error;
@@ -39889,11 +39889,11 @@ WinchM1State.Encoder.HomingSuspect := EncoderM1.HomingSuspect;
 WinchM1State.Encoder.HomingRefRaw := EncoderM1.Measurement.HomingRefRaw;
 WinchM1State.InhibitActive := Auth.InhibitM1;
 WinchM1State.BottomLimitActiveM := BottomLimitM1_Active;
-WinchM1State.InTopSlowdownZone := WinchM1.InTopSlowdownZone;
-WinchM1State.InBottomSlowdownZone := WinchM1.InBottomSlowdownZone;
-WinchM1State.CommandedDirection := WinchM1.CommandedDirection;
-WinchM1State.DirectionChangeDelayElapsed := WinchM1.DirectionChangeDelayElapsed;
-WinchM1State.DirectionChangePending := WinchM1.DirectionChangePending;
+WinchM1State.InTopSlowdownZone := WinchM1Ref.InTopSlowdownZone;
+WinchM1State.InBottomSlowdownZone := WinchM1Ref.InBottomSlowdownZone;
+WinchM1State.CommandedDirection := WinchM1Ref.CommandedDirection;
+WinchM1State.DirectionChangeDelayElapsed := WinchM1Ref.DirectionChangeDelayElapsed;
+WinchM1State.DirectionChangePending := WinchM1Ref.DirectionChangePending;
 
 // ── M2 : état public (voir bandeau M1 ci-dessus) ────────────────────────────
 WinchM2State.MeasuredSpeed_Mps := EncoderM2.Measurement.Speed_Mps;
@@ -39902,29 +39902,29 @@ M2_PrevSpeed_Mps := EncoderM2.Measurement.Speed_Mps;
 
 WinchM2State.Position_M := EncoderM2.Measurement.CablePosM;
 WinchM2State.SpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct;
-WinchM2State.StepNumber := WinchM2.StepNumber;
-IF WinchM2.Fault.Error THEN
+WinchM2State.StepNumber := WinchM2Ref.StepNumber;
+IF WinchM2Ref.Fault.Error THEN
     WinchM2State.FBState := E_State.ERROR;
-ELSIF WinchM2.StepNumber &gt; 0 THEN
+ELSIF WinchM2Ref.StepNumber &gt; 0 THEN
     WinchM2State.FBState := E_State.BUSY;
 ELSE
     WinchM2State.FBState := E_State.READY;
 END_IF;
-WinchM2State.Ready := WinchM2.Ready;
-WinchM2State.Busy := (WinchM2.StepNumber &gt; 0);
+WinchM2State.Ready := WinchM2Ref.Ready;
+WinchM2State.Busy := (WinchM2Ref.StepNumber &gt; 0);
 WinchM2State.Done := FALSE;
-WinchM2State.Error := WinchM2.Fault.Error;
-WinchM2State.ErrorId := WinchM2.Fault.ErrorId;
-WinchM2State.RelayFwd := WinchM2.RelayFwd;
-WinchM2State.RelayRev := WinchM2.RelayRev;
-WinchM2State.Contactor1 := WinchM2.Contactor1;
-WinchM2State.Contactor2 := WinchM2.Contactor2;
-WinchM2State.Contactor3 := WinchM2.Contactor3;
-WinchM2State.Contactor4 := WinchM2.Contactor4;
+WinchM2State.Error := WinchM2Ref.Fault.Error;
+WinchM2State.ErrorId := WinchM2Ref.Fault.ErrorId;
+WinchM2State.RelayFwd := WinchM2Ref.RelayFwd;
+WinchM2State.RelayRev := WinchM2Ref.RelayRev;
+WinchM2State.Contactor1 := WinchM2Ref.Contactor1;
+WinchM2State.Contactor2 := WinchM2Ref.Contactor2;
+WinchM2State.Contactor3 := WinchM2Ref.Contactor3;
+WinchM2State.Contactor4 := WinchM2Ref.Contactor4;
 WinchM2State.BrakeCmd := InterlockM2.BrakeCmd;
 WinchM2State.BrakeCommandOpenConfirmed := HwInWinch.M2_BrakeIsOpen_DI;
-WinchM2State.FinalAuthorizedStep := WinchM2.RequestedStep;
-WinchM2State.ContactorsCheck := WinchM2.ContactorsCheck;
+WinchM2State.FinalAuthorizedStep := WinchM2Ref.RequestedStep;
+WinchM2State.ContactorsCheck := WinchM2Ref.ContactorsCheck;
 WinchM2State.FinalInterlockState := InterlockM2.State;
 WinchM2State.FinalInterlockReason := InterlockM2.Reason;
 WinchM2State.FinalInterlockError := InterlockM2.Fault.Error;
@@ -39952,11 +39952,11 @@ WinchM2State.Encoder.HomingSuspect := EncoderM2.HomingSuspect;
 WinchM2State.Encoder.HomingRefRaw := EncoderM2.Measurement.HomingRefRaw;
 WinchM2State.InhibitActive := Auth.InhibitM2;
 WinchM2State.BottomLimitActiveM := BottomLimitM2_Active;
-WinchM2State.InTopSlowdownZone := WinchM2.InTopSlowdownZone;
-WinchM2State.InBottomSlowdownZone := WinchM2.InBottomSlowdownZone;
-WinchM2State.CommandedDirection := WinchM2.CommandedDirection;
-WinchM2State.DirectionChangeDelayElapsed := WinchM2.DirectionChangeDelayElapsed;
-WinchM2State.DirectionChangePending := WinchM2.DirectionChangePending;
+WinchM2State.InTopSlowdownZone := WinchM2Ref.InTopSlowdownZone;
+WinchM2State.InBottomSlowdownZone := WinchM2Ref.InBottomSlowdownZone;
+WinchM2State.CommandedDirection := WinchM2Ref.CommandedDirection;
+WinchM2State.DirectionChangeDelayElapsed := WinchM2Ref.DirectionChangeDelayElapsed;
+WinchM2State.DirectionChangePending := WinchM2Ref.DirectionChangePending;
 
 // ── Limite haute atteinte (fait public) ──────────────────────────────────────
 // ⛔️ Miroir de la butée logicielle de AscentPermit (Homed, hors homing, non
@@ -39978,7 +39978,7 @@ WinchM1Safety.AscentPermit := EffectivePermitM1_Ascent;
 WinchM1Safety.DescendPermit := EffectivePermitM1_Descend;
 WinchM1Safety.ThermalFault := NOT HwInWinch.M1_ThermalOk_DI;
 WinchM1Safety.PowerCutOff := SafetyM1.PowerCutOff;
-WinchM1Safety.Error := WinchM1.Fault.Error OR SafetyM1.Fault.Error;
+WinchM1Safety.Error := WinchM1Ref.Fault.Error OR SafetyM1.Fault.Error;
 WinchM1Safety.ErrorId := SafetyM1.Fault.ErrorId;
 WinchM1Safety.ErrorOperatorComm  := (SafetyM1.Fault.ErrorId AND 16#0001) &lt;&gt; 0;
 WinchM1Safety.ErrorEncoder       := (SafetyM1.Fault.ErrorId AND 16#0002) &lt;&gt; 0;
@@ -40004,7 +40004,7 @@ WinchM2Safety.DescendPermit := EffectivePermitM2_Descend;
 WinchM2Safety.SlackCable := NOT HwInWinch.M2_TensionedCable_DI;
 WinchM2Safety.ThermalFault := NOT HwInWinch.M2_ThermalOk_DI;
 WinchM2Safety.PowerCutOff := SafetyM2.PowerCutOff;
-WinchM2Safety.Error := WinchM2.Fault.Error OR SafetyM2.Fault.Error;
+WinchM2Safety.Error := WinchM2Ref.Fault.Error OR SafetyM2.Fault.Error;
 WinchM2Safety.ErrorId := SafetyM2.Fault.ErrorId;
 WinchM2Safety.ErrorOperatorComm  := (SafetyM2.Fault.ErrorId AND 16#0001) &lt;&gt; 0;
 WinchM2Safety.ErrorEncoder       := (SafetyM2.Fault.ErrorId AND 16#0002) &lt;&gt; 0;
@@ -42437,7 +42437,7 @@ END_IF;
                 <derived name="FB_WinchStateProjection" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Projection lecture seule des états IHM treuils (T195) : décharge la §8
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Projection lecture seule des états IHM treuils () : décharge la §8
 (~250 lignes d'assignations pures) en un FB. Recopie bit-identique des
 sources → WinchM1State/WinchM2State/WinchM1Safety/WinchM2Safety/CableLimitAscent.</xhtml>
               </documentation>
@@ -42461,9 +42461,9 @@ via MeasuredSpeedBand, 1 instance par treuil, mêmes sources que FB_Safety_Winch
                 <derived name="FB_WinchSpeedLearning" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Collecteurs passifs d'apprentissage vitesse par palier (T181-15) : 1 par treuil,
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Collecteurs passifs d'apprentissage vitesse par palier : 1 par treuil,
 écrivent la table RETAIN _WinchSpeedLearnTable {axe x sens x charge/vide x palier}.
-STRICTEMENT PASSIFS : aucune commande moteur, aucune surveillance survitesse (T181-16).</xhtml>
+STRICTEMENT PASSIFS : aucune commande moteur, aucune surveillance survitesse.</xhtml>
               </documentation>
             </variable>
             <variable name="instWinchSpeedLearningM2">
@@ -44016,14 +44016,14 @@ M1WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM1.SpeedBand;
 // FB_SpeedStep_v1.0 SpeedGuardEnable := FALSE). Le TRUE code en dur etait un reste de
 // mise en service : il rendait la capacite de palier otage de instWinchSync (tout ecart
 // sync -&gt; SpeedGuardReady=FALSE -&gt; clamp palier 1, y compris en montee).
-// ⚠️ DETTE SAFETY T193-S5 : le garde-fou vitesse mesuree est HORS SERVICE. Le FB de
-// gouvernance nominale annonce (FB_WinchRateInterlock, T181-01) n'existe PAS dans CODE/.
+// ⚠️ DETTE SAFETY -S5 : le garde-fou vitesse mesuree est HORS SERVICE. Le FB de
+// gouvernance nominale annonce (FB_WinchRateInterlock) n'existe PAS dans CODE/.
 // Decision : risque ACTE et documente — la surveillance survitesse reelle est portee par
-// FB_Safety_Winch (T181-16, gelee : harnais VAR_IN_OUT indisponible). Ne PAS armer une
-// survitesse sur une table non prouvee. A re-trancher a la livraison T181-01/T181-16.
-// ⚠️ T181-01 est BLOQUE (contrat C4 TASK_CONTRACT_T181-01_AUTORITE_2_INTERLOCKS.yaml,
+// FB_Safety_Winch (gelee : harnais VAR_IN_OUT indisponible). Ne PAS armer une
+// survitesse sur une table non prouvee. A re-trancher a la livraison .
+// ⚠️ tache est BLOQUE (contrat C4 TASK_CONTRACT_AUTORITE_2_INTERLOCKS.yaml,
 // ARRET VALIDATION HUMAINE requis : autorite, T_max/DropConfirmDelay, classification
-// Fault.Error, argument PLr ; prerequis T181-00/T175/T181-05 non livres). Ne PAS creer
+// Fault.Error, argument PLr ; prerequis// non livres). Ne PAS creer
 // FB_WinchRateInterlock hors de ce contrat — la logique de garde-fou existe deja dans
 // FB_Winch §5 et reste volontairement desactivee (SpeedGuardEnable := FALSE) tant que la
 // table SpeedBandMaxMps n'est pas validee en charge reelle (AF-10 §7.3 TBD).
@@ -44097,14 +44097,14 @@ instWinchM2(
     BypassGlobal            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
-// ── Collecteurs passifs d'apprentissage vitesse par palier (T181-15) ──
+// ── Collecteurs passifs d'apprentissage vitesse par palier ──
 // Appelés APRÈS instWinchM1/M2 : StepNumber lu = palier courant du scan (pas de lag).
 // Dérivations des entrées de collecte :
 //   • LoadPresent : charge présente si l'estimateur de charge (même source vitesse) estime
 //     une charge &gt;= 50 % (seuil de mise en service, à confirmer sur site).
 //   • StableForLearn : treuil commandé (palier &gt; 0) et sans défaut — conditions stables.
 // Collecteur STRICTEMENT PASSIF : aucune commande moteur, aucune surveillance survitesse
-// (la survitesse reste T181-16, gelée — voir bandeau §6 M1/M2 SpeedGuardEnable).
+// (la survitesse reste, gelée — voir bandeau §6 M1/M2 SpeedGuardEnable).
 LoadPresentM1 := (instWinchLoadEstimatorM1.EstimatedLoadPct &gt;= 50.0);
 LoadPresentM2 := (instWinchLoadEstimatorM2.EstimatedLoadPct &gt;= 50.0);
 StableForLearnM1 := (instWinchM1.StepNumber &gt; 0) AND NOT instWinchM1.Fault.Error;
@@ -44182,15 +44182,15 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
 {region "📊 §8 Publication états IHM"}
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
-// Projection déléguée à FB_WinchStateProjection (T195) : recopie bit-identique
+// Projection déléguée à FB_WinchStateProjection () : recopie bit-identique
 // des sources → WinchM1State/WinchM2State/WinchM1Safety/WinchM2Safety/CableLimitAscent.
 // Aucune logique de commande modifiée (non-régression). SyncState/BucketState/
 // Benne_IsRoughlyClosed/GLV_IHM restent ici (hors scope du FB).
 instWinchStateProjection(
     EncoderM1 := PRG_02_Acquisition.Data.EncoderM1,
     EncoderM2 := PRG_02_Acquisition.Data.EncoderM2,
-    WinchM1 := instWinchM1,
-    WinchM2 := instWinchM2,
+    WinchM1Ref := instWinchM1,
+    WinchM2Ref := instWinchM2,
     SafetyM1 := instSafetyWinchM1,
     SafetyM2 := instSafetyWinchM2,
     InterlockM1 := PRG_06_Outputs.instWinchOutputInterlockM1,

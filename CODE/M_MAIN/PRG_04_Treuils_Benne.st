@@ -24,7 +24,7 @@ VAR
     instSafetyWinchM2 : FB_Safety_Winch;
     instWinchM1   : FB_Winch;
     instWinchM2   : FB_Winch;
-    // Projection lecture seule des états IHM treuils (T195) : décharge la §8
+    // Projection lecture seule des états IHM treuils () : décharge la §8
     // (~250 lignes d'assignations pures) en un FB. Recopie bit-identique des
     // sources → WinchM1State/WinchM2State/WinchM1Safety/WinchM2Safety/CableLimitAscent.
     instWinchStateProjection : FB_WinchStateProjection;
@@ -33,9 +33,9 @@ VAR
     instWinchLoadEstimatorM1 : FB_WinchLoadEstimator;
     instWinchLoadEstimatorM2 : FB_WinchLoadEstimator;
 
-    // Collecteurs passifs d'apprentissage vitesse par palier (T181-15) : 1 par treuil,
+    // Collecteurs passifs d'apprentissage vitesse par palier : 1 par treuil,
     // écrivent la table RETAIN _WinchSpeedLearnTable {axe x sens x charge/vide x palier}.
-    // STRICTEMENT PASSIFS : aucune commande moteur, aucune surveillance survitesse (T181-16).
+    // STRICTEMENT PASSIFS : aucune commande moteur, aucune surveillance survitesse.
     instWinchSpeedLearningM1 : FB_WinchSpeedLearning;
     instWinchSpeedLearningM2 : FB_WinchSpeedLearning;
     // Dérivations des entrées de collecte (charge présente / conditions stables) — voir §6.
@@ -913,14 +913,14 @@ M1WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM1.SpeedBand;
 // FB_SpeedStep_v1.0 SpeedGuardEnable := FALSE). Le TRUE code en dur etait un reste de
 // mise en service : il rendait la capacite de palier otage de instWinchSync (tout ecart
 // sync -> SpeedGuardReady=FALSE -> clamp palier 1, y compris en montee).
-// ⚠️ DETTE SAFETY T193-S5 : le garde-fou vitesse mesuree est HORS SERVICE. Le FB de
-// gouvernance nominale annonce (FB_WinchRateInterlock, T181-01) n'existe PAS dans CODE/.
+// ⚠️ DETTE SAFETY -S5 : le garde-fou vitesse mesuree est HORS SERVICE. Le FB de
+// gouvernance nominale annonce (FB_WinchRateInterlock) n'existe PAS dans CODE/.
 // Decision : risque ACTE et documente — la surveillance survitesse reelle est portee par
-// FB_Safety_Winch (T181-16, gelee : harnais VAR_IN_OUT indisponible). Ne PAS armer une
-// survitesse sur une table non prouvee. A re-trancher a la livraison T181-01/T181-16.
-// ⚠️ T181-01 est BLOQUE (contrat C4 TASK_CONTRACT_T181-01_AUTORITE_2_INTERLOCKS.yaml,
+// FB_Safety_Winch (gelee : harnais VAR_IN_OUT indisponible). Ne PAS armer une
+// survitesse sur une table non prouvee. A re-trancher a la livraison .
+// ⚠️ tache est BLOQUE (contrat C4 TASK_CONTRACT_AUTORITE_2_INTERLOCKS.yaml,
 // ARRET VALIDATION HUMAINE requis : autorite, T_max/DropConfirmDelay, classification
-// Fault.Error, argument PLr ; prerequis T181-00/T175/T181-05 non livres). Ne PAS creer
+// Fault.Error, argument PLr ; prerequis// non livres). Ne PAS creer
 // FB_WinchRateInterlock hors de ce contrat — la logique de garde-fou existe deja dans
 // FB_Winch §5 et reste volontairement desactivee (SpeedGuardEnable := FALSE) tant que la
 // table SpeedBandMaxMps n'est pas validee en charge reelle (AF-10 §7.3 TBD).
@@ -994,14 +994,14 @@ instWinchM2(
     BypassGlobal            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
-// ── Collecteurs passifs d'apprentissage vitesse par palier (T181-15) ──
+// ── Collecteurs passifs d'apprentissage vitesse par palier ──
 // Appelés APRÈS instWinchM1/M2 : StepNumber lu = palier courant du scan (pas de lag).
 // Dérivations des entrées de collecte :
 //   • LoadPresent : charge présente si l'estimateur de charge (même source vitesse) estime
 //     une charge >= 50 % (seuil de mise en service, à confirmer sur site).
 //   • StableForLearn : treuil commandé (palier > 0) et sans défaut — conditions stables.
 // Collecteur STRICTEMENT PASSIF : aucune commande moteur, aucune surveillance survitesse
-// (la survitesse reste T181-16, gelée — voir bandeau §6 M1/M2 SpeedGuardEnable).
+// (la survitesse reste, gelée — voir bandeau §6 M1/M2 SpeedGuardEnable).
 LoadPresentM1 := (instWinchLoadEstimatorM1.EstimatedLoadPct >= 50.0);
 LoadPresentM2 := (instWinchLoadEstimatorM2.EstimatedLoadPct >= 50.0);
 StableForLearnM1 := (instWinchM1.StepNumber > 0) AND NOT instWinchM1.Fault.Error;
@@ -1079,15 +1079,15 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
 {region "📊 §8 Publication états IHM"}
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
-// Projection déléguée à FB_WinchStateProjection (T195) : recopie bit-identique
+// Projection déléguée à FB_WinchStateProjection () : recopie bit-identique
 // des sources → WinchM1State/WinchM2State/WinchM1Safety/WinchM2Safety/CableLimitAscent.
 // Aucune logique de commande modifiée (non-régression). SyncState/BucketState/
 // Benne_IsRoughlyClosed/GLV_IHM restent ici (hors scope du FB).
 instWinchStateProjection(
     EncoderM1 := PRG_02_Acquisition.Data.EncoderM1,
     EncoderM2 := PRG_02_Acquisition.Data.EncoderM2,
-    WinchM1 := instWinchM1,
-    WinchM2 := instWinchM2,
+    WinchM1Ref := instWinchM1,
+    WinchM2Ref := instWinchM2,
     SafetyM1 := instSafetyWinchM1,
     SafetyM2 := instSafetyWinchM2,
     InterlockM1 := PRG_06_Outputs.instWinchOutputInterlockM1,

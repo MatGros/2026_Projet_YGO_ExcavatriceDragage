@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:49:13.991330" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:49:13.991330">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T03:22:19.743136" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T03:22:19.743136">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -527,7 +527,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil survitesse (max bande apprise T181-15, m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil survitesse (max bande apprise , m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="OppositeDirectionTimeout">
@@ -1007,7 +1007,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch survitesse (hors bitfield, T181-16)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch survitesse (hors bitfield)</xhtml>
               </documentation>
             </variable>
             <variable name="instFault">
@@ -1245,8 +1245,8 @@ IF NOT BypassGlobal THEN
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
 
-    // Survitesse (latch dédié hors bitfield — T181-16, alternative validée).
-    // Seuil = max bande apprise T181-15 (SpeedBandMaxMps). Latché jusqu'au Reset.
+    // Survitesse (latch dédié hors bitfield —, alternative validée).
+    // Seuil = max bande apprise  (SpeedBandMaxMps). Latché jusqu'au Reset.
     // ⚠️ N'alimente PAS PowerCutOff : couper la puissance en survitesse peut
     // provoquer une chute libre de la charge — décision à trancher (ISO 13849).
     IF NOT BypassProcess AND MeasuredSpeedValid AND (ABS(MeasuredSpeedMps) &gt; SpeedBandMaxMps) THEN

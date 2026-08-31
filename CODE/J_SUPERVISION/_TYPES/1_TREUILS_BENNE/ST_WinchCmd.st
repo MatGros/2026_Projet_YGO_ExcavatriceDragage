@@ -22,7 +22,7 @@ STRUCT
                                                     Bypass.TopLimitSoftware). N'ouvre JAMAIS le FDC
                                                     capteur physique. *)
     BtnLearnSpeed : BOOL;                   (* 💾 Bit IHM lancer l'apprentissage passif des vitesses
-                                                    réelles par palier (FB_WinchSpeedLearning, T181-15).
+                                                    réelles par palier (FB_WinchSpeedLearning).
                                                     Collecteur STRICTEMENT PASSIF : aucune commande moteur.
                                                     Maintenu pendant la collecte ; la table RETAIN
                                                     _WinchSpeedLearnTable est remplie par palier/sens/
