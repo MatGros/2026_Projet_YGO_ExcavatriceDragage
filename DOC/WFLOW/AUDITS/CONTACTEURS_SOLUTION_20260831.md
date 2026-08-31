@@ -239,7 +239,7 @@ Deux régimes de palier **divergents** ⇒ un treuil tourne plus vite que l'autr
 | # | Étape | Fichiers | Livrable / Gate |
 |---|---|---|---|
 | **1** | **Corriger le décodage** : FB_Winch ré-émet les sorties table de FB_SpeedStep (`4.A`). | `CODE/.../FB_Winch.st` | Test unitaire : P1→0, P2→{K1}, P3→{K1,K2}… |
-| **2** | **Créer `FB_WinchContactorCoupler`** (génération simultanée + `StepMismatch`) (`4.B`). | `CODE/H_TREUILS_BENNE/FB_WinchContactorCoupler.st` (+ `_TYPES` si DUT dédié) | Gate structure G310, contrat FB (AF-03 §3). |
+| **2** | **Créer `FB_WinchContactorCoupler`** (génération simultanée + `StepMismatch`) (`4.B`). | `CODE/H_TREUILS_BENNE/FB_SyncContactor.st` (+ `_TYPES` si DUT dédié) | Gate structure G310, contrat FB (AF-03 §3). |
 | **3** | **Câbler le coupler dans PRG_04** (couplage supplante les contacteurs M1/M2, fusion clamps couplés) (`4.B`/`4.C`). | `CODE/M_MAIN/PRG_04_Treuils_Benne.st` | Gate liaison **G200 (bloquant)**. |
 | **4** | **Renforcer `FB_SyncContactor`** : debounce 100 ms couplé + comparaison `StepNumber` + feedback `ContactorAllOff`. | `CODE/H_TREUILS_BENNE/FB_SyncContactor.st` | Test unitaire mismatch. |
 | **5** | **Valider feedback physique** (`4.C.4`) au coupler / `FB_Safety_Winch`. | `CODE/.../FB_Winch.st` (Sensors) · `PRG_04` (câblage) | Gate liaison. |

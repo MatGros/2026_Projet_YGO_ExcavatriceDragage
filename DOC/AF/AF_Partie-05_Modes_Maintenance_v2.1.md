@@ -5,7 +5,7 @@
 ## 🎯 Rôle et périmètre
 
 - **Rôle** : définir les modes machine, les droits et les arbitrages de source.
-- **Périmètre** : `E_Mode`, bus `Auth : ST_fbModes_Autorisations`, sélection de commande,
+- **Périmètre** : `E_Mode`, bus `Auth : ST_Modes_Autorisations`, sélection de commande,
   limite légale. Les sorties physiques et la chaîne AU restent hors de ce document (Parties 01/06).
 - **Type de composant** : `FB_Modes` (contrat AF03 `standard`) — Transverse.
 
@@ -115,10 +115,10 @@
 | 🛠️ MAINT_N2 | Manuel niveau 2 : pilotage dégradé, droits étendus et bypasses conscients autorisés. |
 | 🔄 SEMI_AUTO | Cycle séquencé ; mouvements toujours conditionnés par l'opérateur. |
 
-`FB_Modes` / `PRG_MODES_CFC` (POU ST actuel ; cible `PRG_03_Modes_Cycle_CFC`, rang 03) arbitre :
+`FB_Modes` / `PRG_03_Modes_Cycle` (POU ST, rang 03) arbitre :
 
 - le mode actif ;
-- le bus d'autorisations `Auth : ST_fbModes_Autorisations` (mode arbitré, SyncEnable, InhibitM1/2, sélection joystick, homing approach, cible maintenance).
+- le bus d'autorisations `Auth : ST_Modes_Autorisations` (mode arbitré, SyncEnable, InhibitM1/2, sélection joystick, homing approach, cible maintenance).
 
 Il ne produit aucune sortie physique.
 
@@ -161,7 +161,7 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 
 - L'inhibition d'un treuil est une action de maintenance distincte.
 - Elle neutralise le mouvement de l'axe concerne et impose les consequences de synchro.
-- Elle est pilotée via `Auth.InhibitM1/2` (bus `Auth : ST_fbModes_Autorisations`).
+- Elle est pilotée via `Auth.InhibitM1/2` (bus `Auth : ST_Modes_Autorisations`).
 - Matrice complete des bypass : **§4bis** (treuils M1/M2, T181-11).
 
 > 📌 **Authentification** : gérée côté IHM (visibilité des actions selon niveau utilisateur).
@@ -255,7 +255,7 @@ T175 AC4 : *« FB_Bucket confirme/ouvre sous MAINT_N1 ET N2 comme décrit (TC-P1
 
 ## 📐 5 · Bus d'autorisations
 
-`FB_Modes` (via `PRG_MODES_CFC` actuel, `PRG_03_Modes_Cycle_CFC` en cible) produit le bus typé `Auth : ST_fbModes_Autorisations` :
+`FB_Modes` (via `PRG_03_Modes_Cycle`) produit le bus typé `Auth : ST_Modes_Autorisations` :
 
 | Champ | Rôle |
 |---|---|
@@ -303,7 +303,7 @@ La chaine AU, `PowerKeepAlive` et le rearmement sont proprietaires de la Partie 
 | Version | Date | Changement |
 |---|---|---|
 | v2.2 | 2026-08-29 | T181-11 : ajout §4bis « Matrice de bypass maintenance — treuils M1/M2 » (25 bascules mode-gated N2, override FDC N1 momentané 7,5/8,5 m, règle de bascule contacteurs retombés + frein serré, re-homing obligatoire, alignement T175 AC4 = N1 ET N2). Sommaire et TBD mis à jour. |
-| v2.1 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié, section `🎯 Rôle et périmètre` explicite, section « Bus d'autorisations » intégrée à la numérotation (§5, était orpheline), Suivi historique ajouté, renumérotation complète + réfs `§N` cascadées. Correctif de fond (review sous-agent expert automatisme, vérifié contre `FB_Modes.st`) : §5 citait `TglMaintenanceZoneAccess`, nom inexistant dans le code — corrigé en `SelMaintenanceZoneAccess` (variable réelle, ligne 165). Struct `ST_fbModes_Autorisations`, `E_Mode`, logique booléenne `MaintenanceM3TargetEnable`, absence de garde mot de passe PLC (§4) et propriété `FB_Safety_Winch` de la limite légale (§6) tous vérifiés conformes au code |
+| v2.1 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié, section `🎯 Rôle et périmètre` explicite, section « Bus d'autorisations » intégrée à la numérotation (§5, était orpheline), Suivi historique ajouté, renumérotation complète + réfs `§N` cascadées. Correctif de fond (review sous-agent expert automatisme, vérifié contre `FB_Modes.st`) : §5 citait `TglMaintenanceZoneAccess`, nom inexistant dans le code — corrigé en `SelMaintenanceZoneAccess` (variable réelle, ligne 165). Struct `ST_Modes_Autorisations`, `E_Mode`, logique booléenne `MaintenanceM3TargetEnable`, absence de garde mot de passe PLC (§4) et propriété `FB_Safety_Winch` de la limite légale (§6) tous vérifiés conformes au code |
 | v2.0 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 
 ## ❓ 9 · TBD
@@ -315,7 +315,7 @@ La chaine AU, `PowerKeepAlive` et le rearmement sont proprietaires de la Partie 
 ## 📚 10 · Documents liés
 
 - Partie 01 : AU et rearmement.
-- Partie 02 : architecture cible — page `PRG_03_Modes_Cycle_CFC` (modes, autorisations et sequenceur `FB_Cycle` reunis).
+- Partie 02 : architecture cible — page `PRG_03_Modes_Cycle` (modes, autorisations et sequenceur `FB_Cycle` reunis).
 - Partie 03 : contrats et precedence.
 - Partie 04 : cycle et assistants.
 - Partie 07 : interface IHM modes.

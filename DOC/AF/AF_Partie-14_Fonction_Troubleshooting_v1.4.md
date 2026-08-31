@@ -18,6 +18,7 @@
 6. [🩺 Table de visu — dépannage de l'acquisition DI](#6-table-de-visu-dépannage-de-lacquisition-di)
 7. [🔒 Diagnostic réarmement AU — checklist chronologique](#7-diagnostic-réarmement-au-checklist-chronologique)
 8. [🔄 Diagnostic Séquenceur Semi-Auto — arbre chronologique](#8-diagnostic-séquenceur-semi-auto-arbre-chronologique)
+8bis. [🕵️ Trace de blocage terrain (ST_TraceWinch / ST_TraceTranslation)](#8bis-trace-de-blocage-terrain-st_tracewinch--st_tracetranslation)
 9. [📜 Suivi historique](#9-suivi-historique)
 10. [❓ TBD](#10-tbd)
 11. [📚 Documents liés](#11-documents-liés)
@@ -201,6 +202,61 @@ GVL_Troubleshooting.CycleSemiAuto
  │   └─ Idx216_PausedState        : Étape mémorisée pour reprise sécurisée
  └─ Idx301..306 : Consignes & feedbacks (Cible, Profondeur, Kobold, Écart vitesse, Limite légale, Synchro)
 ```
+
+---
+
+## 8bis. 🕵️ Trace de blocage terrain (ST_TraceWinch / ST_TraceTranslation)
+
+> 🆕 v1.4 (2026-08-28) : intégration de la **trace de blocage terrain** — vue consolidée
+> « pourquoi l'axe ne bouge pas », publiée par `PRG_04_Treuils_Benne` (§8bis) et
+> `PRG_05_Translation` (§4bis), consommée en lecture seule par `FB_TroubleshootingView`.
+
+La trace publie au technicien une cause de blocage **priorisée et horodatée** par axe, en
+distinguant l'origine du `SafeStop`/coupure. Elle est **lecture seule** : aucun calcul de
+commande n'en dépend.
+
+### 8bis.1 Treuils M1/M2 — `ST_TraceWinch` / `E_WinchTraceBlockReason`
+
+- **Producteur unique** : `PRG_04_Treuils_Benne` (§8bis), 1 instance par axe (`TraceM1`/`TraceM2`
+  au sein de `ST_WinchInterPrg`), publié via `Data.TraceM1/M2`.
+- **Consommateur** : `FB_TroubleshootingView` (pure recopie → `GVL_Troubleshooting.TraceM1/2`).
+- **Champs** : `DescendPermitEffective`/`AscentPermitEffective` (permis effectifs par sens),
+  `SafeStopActive` + sources (`SafeStopSourceSafety`/`Input`/`Sync`), `PowerCutOffActive`,
+  `Inhibited`, `FinalInterlockError`/`FinalInterlockReason`, `BlockReason`
+  (`E_WinchTraceBlockReason`), `BlockReasonTimestamp` (ms depuis démarrage PLC, latched au
+  dernier changement), `StepNumber` (palier actif).
+
+**Ordre de priorité `E_WinchTraceBlockReason`** (valeur croissante = priorité décroissante ;
+la cause la plus grave gagne) :
+
+| Valeur | Cause | Origine |
+|---|---|---|
+| 0 | `NONE` | Aucun blocage — au moins un sens effectivement permis |
+| 1 | `POWER_CUTOFF` | Coupure puissance amont (`instSafetyWinch.PowerCutOff`) — priorité max |
+| 2 | `AXIS_DISABLED` | Axe neutralisé (`Mode=DISABLE` ou `InhibitMx` → `Enable FALSE`) |
+| 3 | `SAFESTOP` | SafeStop effectif (rampe rapide demandée) |
+| 4 | `SAFETY_FAULT` | Défaut safety latched (`FB_Safety_Winch.Fault.Error`) |
+| 5 | `SAFETY_PERMIT_MISSING` | Aucun sens ne délivre de permit safety (limite / mou de câble / homing) |
+| 6 | `PROCESS_PERMIT_MISSING` | Permit process absent (benne / fond Kobold / limite légale / extraction) |
+| 7 | `COUPLING_BLOCKED` | Couplage synchro anti-télescopage (l'autre axe bloque) |
+| 8 | `WINCH_FAULT` | Défaut treuil latched (`FB_Winch.Fault.Error`) |
+| 9 | `FINAL_INTERLOCK_BLOCKED` | Barrière finale en défaut (frein / redémarrage) |
+
+### 8bis.2 Translation M3 — `ST_TraceTranslation` / `E_TranslationTraceBlockReason`
+
+- **Producteur unique** : `PRG_05_Translation` (§4bis), publié via `Data.TranslationTrace`.
+- **Consommateur** : `FB_TroubleshootingView` (pure recopie → `GVL_Troubleshooting`).
+- **Champs** : `SafeStopActive` + sources (`SafeStopSourceInput`/`Safety`), `PowerCutOffActive`,
+  `HeightInterlockBlocking`, `DriveOperational`, `FinalInterlockError`, `MotionPermitEffective`,
+  `BlockReason` (`E_TranslationTraceBlockReason`), `BlockReasonTimestamp`.
+
+**Ordre de priorité `E_TranslationTraceBlockReason`** (même convention : la cause la plus grave
+gagne) : `NONE` → `POWER_CUTOFF` → `SAFESTOP` → `SAFETY_FAULT` → `HEIGHT_INTERLOCK` →
+`DRIVE_UNAVAILABLE` → `FINAL_INTERLOCK` → `FAULT`.
+
+> 📌 **Miroir IHM** : la cause priorisée est aussi recopiée sur l'état public IHM
+> (`WinchM1State.AxisBlockReason` / `WinchM2State.AxisBlockReason` /
+> `TranslationState.AxisBlockReason`), miroir de la trace terrain.
 
 ---
 
