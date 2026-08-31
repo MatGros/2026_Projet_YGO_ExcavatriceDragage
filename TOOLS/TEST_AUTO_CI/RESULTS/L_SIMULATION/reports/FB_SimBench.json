@@ -27,7 +27,11 @@
       "passed": true
     },
     {
-      "name": "T196-003 Stimulus capteur haut actif expose la polarite Free_DI correcte",
+      "name": "T196-003 Capteur haut manuel et polarite Free_DI correcte",
+      "passed": true
+    },
+    {
+      "name": "T196-004 Capteur haut auto : seuil M1 atteint sans for\u00e7age manuel",
       "passed": true
     },
     {
@@ -92,8 +96,8 @@
     }
   ],
   "summary": {
-    "total": 22,
-    "passed": 22,
+    "total": 23,
+    "passed": 23,
     "failed": 0
   }
 }

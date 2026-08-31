@@ -449,15 +449,15 @@ END_IF;
 {endregion}
 
 {region "🛡️ §3bis ArmingPermit"}
-// === 🛡️ §3bis ARMINGPERMIT (Option B — combiné interlock benne) ===
+// === 🛡️ §3bis ARMINGPERMIT (général — permis de mouvement) ===
 // ArmingPermit = permission d'armement homme-mort (entrée FB_Joystick, consommée PRG_02).
-// Combiné interlock benne : interdit l'armement pendant une action benne
-// (ouverture/fermeture, instBucket.Lifecycle.Busy) et pendant 1 scan après la fin
-// de l'action (BenneBusyFallEdge.Q, déjà câblé §3) — l'opérateur doit re-presser
-// consciemment le bouton homme-mort (pas de ré-armement "surprise" à la ré-acquisition).
-// Délai fin de cycle benne → ré-armement autorisé : 1 scan MainTask = 10 ms
-// (dans la fenêtre 10-20 ms exigée). Polarité positive (NC-100) : TRUE = armement autorisé.
-ArmingPermit := NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
+// Règle générale : on ne peut armer QUE si au moins un axe (treuil M1/M2 ou translation M3)
+// a un permis de mouvement effectif. Sinon, aucun mouvement n'est possible → armement inutile
+// et trompeur (l'opérateur croit pouvoir bouger alors que tout est bloqué).
+// Calcul déplacé après §5bis (où EffectivePermitM1/M2_Ascent/Descend sont disponibles).
+// Combiné interlock benne conservé : interdit l'armement pendant une action benne
+// (instBucket.Lifecycle.Busy) et 1 scan après (BenneBusyFallEdge.Q).
+// Polarité positive (NC-100) : TRUE = armement autorisé.
 {endregion}
 
 {region "🔄 §4 Synchro M1/M2"}
@@ -817,6 +817,15 @@ EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND (NOT instWinch
 EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Descend);
 EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Ascent);
 EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Ascent);
+
+// 🛡️ ArmingPermit (général — permis de mouvement) : on ne peut armer QUE si au moins
+// un axe (treuil M1/M2 ou translation M3) a un permis de mouvement effectif.
+// M3 : NOT TranslationSafety.SafeStop = permis de mouvement translation.
+// Combiné interlock benne conservé (pas d'armement pendant action benne + 1 scan).
+ArmingPermit := (EffectivePermitM1_Ascent OR EffectivePermitM1_Descend
+              OR EffectivePermitM2_Ascent OR EffectivePermitM2_Descend
+              OR NOT PRG_05_Translation.Data.TranslationSafety.SafeStop)
+              AND NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
 
 
 {endregion}

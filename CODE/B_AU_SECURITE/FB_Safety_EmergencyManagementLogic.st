@@ -173,8 +173,10 @@ IF ArmingSeqStep <> 0 THEN
         LastAbortCause := 16#0001; // Bit0: Demande coupure manuelle IHM
         ArmingSeqStep := 0;
     ELSIF PowerCutOffRequest THEN
-        // Avortement sécurité d'urgence : alarme d'échec + verrouillage 5s
-        EmergencyArmingFailedCause := TRUE;
+        // Avortement sécurité d'urgence : coupure métier (PAS un défaut d'armement).
+        // Sécurité conservée : lockout 5s + interlock (Armable/Cmd.Maintain* bloqués par
+        // PowerCutOffRequest). Ne pose PAS EmergencyArmingFailedCause -> pas de fausse
+        // alarme "échec armement" pour une coupure métier voulue (D2 option c).
         EmergencyArmingLockoutActive := TRUE;
         LastAbortStep := ArmingSeqStep;
         LastAbortCause := 16#0010; // Bit4: Coupure sécurité métier active (PowerCutOff)

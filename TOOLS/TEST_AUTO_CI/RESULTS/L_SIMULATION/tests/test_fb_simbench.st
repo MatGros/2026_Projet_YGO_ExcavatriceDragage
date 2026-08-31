@@ -68,7 +68,7 @@ TEST 'TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret'
     ASSERT_EQ(FB_Bench.Translation.M3_StatusWord, 16#0080, 'M3 a l arret -> StatusWord 0x0080 (bit0 retombe)');
 END_TEST
 
-TEST 'T196-003 Stimulus capteur haut actif expose la polarite Free_DI correcte'
+TEST 'T196-003 Capteur haut manuel et polarite Free_DI correcte'
     FB_Bench(Enable := TRUE, SimTopPositionActive := TRUE,
              RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_FALSE(FB_Bench.Winch.M1M2_TopPositionFree_DI,
@@ -78,6 +78,21 @@ TEST 'T196-003 Stimulus capteur haut actif expose la polarite Free_DI correcte'
              RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_TRUE(FB_Bench.Winch.M1M2_TopPositionFree_DI,
                 'TopPositionActive=FALSE -> Free_DI=TRUE (butée libre)');
+END_TEST
+
+TEST 'T196-004 Capteur haut auto : seuil M1 atteint sans forçage manuel'
+    RawPosM1 := 99;
+    RawPosM2 := 0;
+    FB_Bench(Enable := TRUE, CfgTopSensorRawPos := 100, SimTopPositionActive := FALSE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_TRUE(FB_Bench.Winch.M1M2_TopPositionFree_DI,
+                'M1 sous seuil -> capteur haut libre');
+    ADVANCE_TIME(10000000);
+    RawPosM1 := 100;
+    FB_Bench(Enable := TRUE, CfgTopSensorRawPos := 100, SimTopPositionActive := FALSE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_FALSE(FB_Bench.Winch.M1M2_TopPositionFree_DI,
+                 'M1 au seuil -> capteur haut actif sans forçage');
 END_TEST
 
 (* =========================================================================

@@ -19,8 +19,17 @@ contract:
     DÉCISION UTILISATEUR (2026-08-31) : le signalement se fait en AVAL (IHM), SANS modifier le
     comportement de la séquence AU (step, consignes, ErrorId). Le message IHM est produit par
     FB_Hmi_BannerFormatter à partir de LastAbortCause (déjà tracé par T173-A), via un front
-    descendant ArmingSeqStep (abandon) maintenu 5s. ErrorId peut rester 0 pour les timeouts
+    descendant ArmingSeqStep (abandon). ErrorId peut rester 0 pour les timeouts
     restauration A/B : le signal est le MESSAGE, pas ErrorId.
+    D2 (option c, 2026-08-31) : PowerCutOffRequest est une COUPURE MÉTIER, PAS un défaut
+    d'armement. Le code ne pose PAS EmergencyArmingFailedCause sur PowerCutOffRequest
+    (sécurité conservée : lockout 5s + interlock sur PowerCutOffRequest). Supprime la fausse
+    alarme "échec armement" pour une coupure métier voulue.
+    VERROUILLAGE (2026-08-31) : les causes SANS latch (16#0010 PowerCutOff, 16#0004/0008
+    timeout restauration) sont verrouillées jusqu'à Reset (ou nouvelle séquence) pour que
+    l'opérateur voie l'échec (le message transitoire 5s était raté). Les causes déjà latched
+    (16#0002/0020/0040/0080) et la coupe volontaire (16#0001) ne sont pas verrouillées.
+    Le message verrouillé ne masque jamais SafeStop/DirectionBlocked (gating §4).
 
   # ── 2. Criteres testables ─────────────────────────────────────────────────
   acceptance:

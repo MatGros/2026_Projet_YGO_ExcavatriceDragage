@@ -68,6 +68,7 @@ VAR_INPUT
     EmergencyArmingFailed: BOOL;   // --> [DIAG] Echec rearmement contacteur AU (lisee -> message explicite)
     ArmingSeqStep        : INT;    // --> [DIAG] Etape sequence rearmement AU (0=IDLE..6=Confirm) — front descendant = abandon
     LastAbortCause       : WORD;   // --> [DIAG] Cause du dernier abandon de sequence AU (message explicite cause+action)
+    Reset                : BOOL;   // --> [CMD] Front acquittement defauts (FaultMachineReset_IHM) — efface le message d'abandon verrouillé
     AlarmHoldTime        : TIME := T#1s; // --> [CFG] Durée d'affichage par message du carrousel
     Network              : ST_NetworkDiagHMI; // --> [DIAG] Diagnostic réseau, bus et modules E/S
 END_VAR
@@ -91,8 +92,11 @@ VAR
     AntiFlickOperator    : FB_AntiFlickerText; // * [INST] §4 Action opérateur (critique → direct, warning → maintenu)
     LastAbortEdge        : F_TRIG; // . [LOC] Front descendant ArmingSeqStep (abandon de sequence AU)
     ArmingInProgress     : BOOL; // . [LOC] Sequence AU en cours (ArmingSeqStep <> 0)
-    TonAbortHold         : TON; // . [LOC] Maintien du message d'abandon AU
+    ResetEdge            : R_TRIG; // . [LOC] Front montant Reset (acquittement defauts)
+    ArmStartEdge         : R_TRIG; // . [LOC] Front montant ArmingInProgress (nouvelle sequence AU)
+    TonAbortHold         : TON; // . [LOC] Maintien du message d'abandon AU (causes non latched)
     AbortMsgActive       : BOOL; // . [LOC] Message d'abandon AU affiché (fenêtre de maintien)
+    AbortMsgLatched      : BOOL; // . [LOC] Message d'abandon verrouillé jusqu'à Reset (causes sans latch)
     AbortMsgText         : STRING(120); // . [LOC] Texte cause+action du dernier abandon AU
     TonAlarmBanner       : TON; // . [LOC] §5 Tempo de maintien par message du carrousel
     AlarmArray           : ARRAY[0..49] OF STRING(120); // . [LOC] §5 Messages actifs collectés ce scan
@@ -326,14 +330,31 @@ DirectionBlocked := (CurrentDirection < 0 AND NOT DescendPermit)
 // sans modifier le comportement de l'AU. Front descendant ArmingSeqStep (sequence en
 // cours -> 0) = fin de sequence. Gating sur NOT PowerContactorEngaged : un SUCCES
 // (step 6 -> 0 avec contacteur engage) ne produit AUCUN message (AC4) ; seul un
-// ABANDON (step -> 0 sans contacteur engage) affiche la cause. Robuste aux abandons repetes.
+// ABANDON (step -> 0 sans contacteur engage) affiche la cause.
+// Verrouillage : les causes SANS latch (16#0010 PowerCutOff, 16#0004/0008 timeout
+// restauration) restent affichées jusqu'à Reset (ou nouvelle séquence) pour que
+// l'opérateur voie l'échec. Les causes déjà latched (16#0002/0020/0040/0080) et la
+// coupe volontaire (16#0001) ne sont pas verrouillées.
 ArmingInProgress := (ArmingSeqStep <> 0);
 LastAbortEdge(CLK := ArmingInProgress);
+ResetEdge(CLK := Reset);
+ArmStartEdge(CLK := ArmingInProgress);
+
 IF LastAbortEdge.Q AND NOT PowerContactorEngaged THEN
     AbortMsgActive := TRUE;
+    AbortMsgLatched := (LastAbortCause = 16#0010) OR (LastAbortCause = 16#0004) OR (LastAbortCause = 16#0008);
     TonAbortHold(IN := FALSE);
 END_IF;
-IF AbortMsgActive THEN
+
+// Effacement : Reset OU nouvelle séquence (évite le message périmé après réarmement réussi)
+IF ResetEdge.Q OR ArmStartEdge.Q THEN
+    AbortMsgActive := FALSE;
+    AbortMsgLatched := FALSE;
+    TonAbortHold(IN := FALSE);
+END_IF;
+
+// Maintien transitoire 5s UNIQUEMENT pour les causes non latched
+IF AbortMsgActive AND NOT AbortMsgLatched THEN
     TonAbortHold(IN := TRUE, PT := CST_AbortHoldTime);
     IF TonAbortHold.Q THEN
         AbortMsgActive := FALSE;
@@ -371,10 +392,12 @@ ELSIF NOT VarM3Valid THEN
     OperatorActionCandidate := '[ECAT] Variateur non détecté - vérifier liaison';
 ELSIF PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[SÉCURITÉ] Coupure puissance active - acquitter défaut treuil/pont';
-ELSIF AbortMsgActive THEN
+ELSIF AbortMsgActive AND NOT SafeStopActive AND NOT DirectionBlocked THEN
     // 🩹 Cause du dernier abandon de séquence AU (message explicite cause+action)
     // Placé avant RedundancyTestFailed/EmergencyArmingFailed pour que chaque cause
     // (dont chute chaîne, PowerCutOff, timeout contacteur, redondance) montre son message spécifique.
+    // Gating NOT SafeStopActive AND NOT DirectionBlocked : le message verrouillé ne masque
+    // jamais une condition de sécurité courante (SafeStop/DirectionBlocked).
     OperatorActionCandidate := AbortMsgText;
 ELSIF RedundancyTestFailed THEN
     OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer (Reset)';

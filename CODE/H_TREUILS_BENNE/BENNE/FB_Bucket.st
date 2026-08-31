@@ -21,8 +21,8 @@ VAR_INPUT
     MachineHomingCommitClose            : BOOL;                           // --> [CMD] Commit atomique reference benne fermee
     MachineHomed           : BOOL;                           // --> [STAT] Qualification conjointe M1/M2/benne
     MachineHomingActive      : BOOL;                           // --> [STAT] Homing conjoint en cours
-    ConfirmOpenPosition             : BOOL;                           // --> [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle
-    ConfirmClosePosition            : BOOL;                           // --> [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle
+    ConfirmOpenPosition             : BOOL;                           // --> [CMD] Confirmation visuelle IHM : benne ouverte
+    ConfirmClosePosition            : BOOL;                           // --> [CMD] Confirmation visuelle IHM : benne fermee
 
     // === SECOURS ET HARDWARE ===
     PowerContactorEngaged           : BOOL;                           // --> [SAFE] Condition d'arret d'urgence / puissance
@@ -72,6 +72,8 @@ VAR
     // === DETECTEURS ET TIMERS INTERNES ===
     ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
     BusyEdge                        : R_TRIG;                         // . [LOC] Detecteur entree en etat Busy
+    ConfirmOpenEdge                 : R_TRIG;                         // . [LOC] Detecteur front confirmation ouverture IHM
+    ConfirmCloseEdge                : R_TRIG;                         // . [LOC] Detecteur front confirmation fermeture IHM
     TonTimeout                      : TON;                            // . [LOC] Temporisateur timeout de mouvement
 
     // === VARIABLES LOCALES CALCULÉES ===
@@ -203,6 +205,29 @@ IF FirstCycle THEN
        OR (NOT BucketState.IsOpen AND NOT BucketState.IsClosed) THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
+END_IF;
+
+// Les confirmations IHM restent les commandes fonctionnelles de référence
+// benne, indépendantes du cycle global. Elles ne sont acceptées qu'à l'arrêt
+// en maintenance : un front qualifie l'observation visuelle opérateur.
+ConfirmOpenEdge(CLK := ConfirmOpenPosition);
+IF ConfirmOpenEdge.Q
+   AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
+   AND NOT Lifecycle.Busy THEN
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := FALSE;
+    BucketState.LastPosM2Open := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
+END_IF;
+
+ConfirmCloseEdge(CLK := ConfirmClosePosition);
+IF ConfirmCloseEdge.Q
+   AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
+   AND NOT Lifecycle.Busy THEN
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := TRUE;
+    BucketState.LastPosM2Close := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
 END_IF;
 
 IF MachineHomingCommitOpen AND NOT Lifecycle.Busy THEN

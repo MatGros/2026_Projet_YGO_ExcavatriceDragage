@@ -2705,7 +2705,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: bitfield brut FB_Bucket (bit0 timeout, bit1 incohérence, bit2 limites, bit3 codeur non référencé, bit4 glissement M1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: bitfield brut FB_Bucket (bit0 configuration, bit1 écart M2/M1, bit2 timeout, bit3 glissement M1, bit4 codeurs non référencés)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_BucketBusy">
@@ -15898,7 +15898,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Confirmation visuelle IHM : benne ouverte</xhtml>
               </documentation>
             </variable>
             <variable name="ConfirmClosePosition">
@@ -15906,7 +15906,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Confirmation visuelle IHM : benne fermee</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -16159,6 +16159,22 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur entree en etat Busy</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmOpenEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front confirmation ouverture IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmCloseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front confirmation fermeture IHM</xhtml>
               </documentation>
             </variable>
             <variable name="TonTimeout">
@@ -16417,6 +16433,29 @@ IF FirstCycle THEN
        OR (NOT BucketState.IsOpen AND NOT BucketState.IsClosed) THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
+END_IF;
+
+// Les confirmations IHM restent les commandes fonctionnelles de référence
+// benne, indépendantes du cycle global. Elles ne sont acceptées qu'à l'arrêt
+// en maintenance : un front qualifie l'observation visuelle opérateur.
+ConfirmOpenEdge(CLK := ConfirmOpenPosition);
+IF ConfirmOpenEdge.Q
+   AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
+   AND NOT Lifecycle.Busy THEN
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := FALSE;
+    BucketState.LastPosM2Open := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
+END_IF;
+
+ConfirmCloseEdge(CLK := ConfirmClosePosition);
+IF ConfirmCloseEdge.Q
+   AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
+   AND NOT Lifecycle.Busy THEN
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := TRUE;
+    BucketState.LastPosM2Close := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
 END_IF;
 
 IF MachineHomingCommitOpen AND NOT Lifecycle.Busy THEN
@@ -24062,6 +24101,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Cause du dernier abandon de sequence AU (message explicite cause+action)</xhtml>
               </documentation>
             </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front acquittement defauts (FaultMachineReset_IHM) — efface le message d'abandon verrouillé</xhtml>
+              </documentation>
+            </variable>
             <variable name="AlarmHoldTime">
               <type>
                 <TIME />
@@ -24221,12 +24268,28 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sequence AU en cours (ArmingSeqStep &lt;&gt; 0)</xhtml>
               </documentation>
             </variable>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset (acquittement defauts)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmStartEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant ArmingInProgress (nouvelle sequence AU)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonAbortHold">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message d'abandon AU</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message d'abandon AU (causes non latched)</xhtml>
               </documentation>
             </variable>
             <variable name="AbortMsgActive">
@@ -24235,6 +24298,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Message d'abandon AU affiché (fenêtre de maintien)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbortMsgLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Message d'abandon verrouillé jusqu'à Reset (causes sans latch)</xhtml>
               </documentation>
             </variable>
             <variable name="AbortMsgText">
@@ -24722,14 +24793,31 @@ DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
 // sans modifier le comportement de l'AU. Front descendant ArmingSeqStep (sequence en
 // cours -&gt; 0) = fin de sequence. Gating sur NOT PowerContactorEngaged : un SUCCES
 // (step 6 -&gt; 0 avec contacteur engage) ne produit AUCUN message (AC4) ; seul un
-// ABANDON (step -&gt; 0 sans contacteur engage) affiche la cause. Robuste aux abandons repetes.
+// ABANDON (step -&gt; 0 sans contacteur engage) affiche la cause.
+// Verrouillage : les causes SANS latch (16#0010 PowerCutOff, 16#0004/0008 timeout
+// restauration) restent affichées jusqu'à Reset (ou nouvelle séquence) pour que
+// l'opérateur voie l'échec. Les causes déjà latched (16#0002/0020/0040/0080) et la
+// coupe volontaire (16#0001) ne sont pas verrouillées.
 ArmingInProgress := (ArmingSeqStep &lt;&gt; 0);
 LastAbortEdge(CLK := ArmingInProgress);
+ResetEdge(CLK := Reset);
+ArmStartEdge(CLK := ArmingInProgress);
+
 IF LastAbortEdge.Q AND NOT PowerContactorEngaged THEN
     AbortMsgActive := TRUE;
+    AbortMsgLatched := (LastAbortCause = 16#0010) OR (LastAbortCause = 16#0004) OR (LastAbortCause = 16#0008);
     TonAbortHold(IN := FALSE);
 END_IF;
-IF AbortMsgActive THEN
+
+// Effacement : Reset OU nouvelle séquence (évite le message périmé après réarmement réussi)
+IF ResetEdge.Q OR ArmStartEdge.Q THEN
+    AbortMsgActive := FALSE;
+    AbortMsgLatched := FALSE;
+    TonAbortHold(IN := FALSE);
+END_IF;
+
+// Maintien transitoire 5s UNIQUEMENT pour les causes non latched
+IF AbortMsgActive AND NOT AbortMsgLatched THEN
     TonAbortHold(IN := TRUE, PT := CST_AbortHoldTime);
     IF TonAbortHold.Q THEN
         AbortMsgActive := FALSE;
@@ -24767,10 +24855,12 @@ ELSIF NOT VarM3Valid THEN
     OperatorActionCandidate := '[ECAT] Variateur non détecté - vérifier liaison';
 ELSIF PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[SÉCURITÉ] Coupure puissance active - acquitter défaut treuil/pont';
-ELSIF AbortMsgActive THEN
+ELSIF AbortMsgActive AND NOT SafeStopActive AND NOT DirectionBlocked THEN
     // 🩹 Cause du dernier abandon de séquence AU (message explicite cause+action)
     // Placé avant RedundancyTestFailed/EmergencyArmingFailed pour que chaque cause
     // (dont chute chaîne, PowerCutOff, timeout contacteur, redondance) montre son message spécifique.
+    // Gating NOT SafeStopActive AND NOT DirectionBlocked : le message verrouillé ne masque
+    // jamais une condition de sécurité courante (SafeStop/DirectionBlocked).
     OperatorActionCandidate := AbortMsgText;
 ELSIF RedundancyTestFailed THEN
     OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer (Reset)';
@@ -28092,8 +28182,10 @@ IF ArmingSeqStep &lt;&gt; 0 THEN
         LastAbortCause := 16#0001; // Bit0: Demande coupure manuelle IHM
         ArmingSeqStep := 0;
     ELSIF PowerCutOffRequest THEN
-        // Avortement sécurité d'urgence : alarme d'échec + verrouillage 5s
-        EmergencyArmingFailedCause := TRUE;
+        // Avortement sécurité d'urgence : coupure métier (PAS un défaut d'armement).
+        // Sécurité conservée : lockout 5s + interlock (Armable/Cmd.Maintain* bloqués par
+        // PowerCutOffRequest). Ne pose PAS EmergencyArmingFailedCause -&gt; pas de fausse
+        // alarme "échec armement" pour une coupure métier voulue (D2 option c).
         EmergencyArmingLockoutActive := TRUE;
         LastAbortStep := ArmingSeqStep;
         LastAbortCause := 16#0010; // Bit4: Coupure sécurité métier active (PowerCutOff)
@@ -30640,6 +30732,17 @@ palier est encore engagé (fausse condition d'armement Méca A).
 --&gt; [CFG] Facteur vitesse codeur</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgTopSensorRawPos">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil brut M1 du capteur haut commun; 0 désactive le modèle automatique</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimTopPositionActive">
               <type>
                 <BOOL />
@@ -30648,7 +30751,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Capteur haut commun actif (référencement benne)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Injection manuelle capteur haut actif (essai ciblé)</xhtml>
               </documentation>
             </variable>
             <variable name="SimSyncDeviationInjectM1">
@@ -31002,6 +31105,14 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Offset synchro M2</xhtml>
               </documentation>
             </variable>
+            <variable name="TopPositionModelActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Capteur haut simulé depuis la position M1</xhtml>
+              </documentation>
+            </variable>
             <variable name="M3_RelayFwd">
               <type>
                 <BOOL />
@@ -31148,9 +31259,12 @@ Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
                                     OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
 Winch.M2_ThermalOk_DI          := TRUE;
 
-// Polarité matériel : le nom *_Free_DI vaut TRUE hors butée. Le stimulus de
-// banc est exprimé positivement (TopPositionActive) puis inversé ici.
-Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
+// Polarité matériel : le nom *_Free_DI vaut TRUE hors butée. Le capteur commun
+// suit normalement la référence M1 (seuil brut configuré par PRG_02); le
+// stimulus manuel reste disponible pour injecter un fait capteur au banc.
+// Le modèle ne s'arme jamais avec le seuil par défaut 0.
+TopPositionModelActive := (CfgTopSensorRawPos &gt; 0) AND (RawPosM1 &gt;= CfgTopSensorRawPos);
+Winch.M1M2_TopPositionFree_DI  := NOT (TopPositionModelActive OR SimTopPositionActive);
 Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
@@ -41506,6 +41620,8 @@ instSimBench(
     EmergencyArming_RQ       := PRG_06_Outputs.Data.EmergencyArmingCmd
                                  OR (PRG_06_Outputs.ArmingSeqStep = 5),
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
+    CfgTopSensorRawPos       := REAL_TO_UDINT(_WinchM1CfgPersist.CfgTopSensorPos_M
+                                 * (UDINT_TO_REAL(ENCODER_POINTS_PER_REV) / WINCH_CABLE_M_PER_REV)),
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
@@ -43552,15 +43668,15 @@ END_IF;
 {endregion}
 
 {region "🛡️ §3bis ArmingPermit"}
-// === 🛡️ §3bis ARMINGPERMIT (Option B — combiné interlock benne) ===
+// === 🛡️ §3bis ARMINGPERMIT (général — permis de mouvement) ===
 // ArmingPermit = permission d'armement homme-mort (entrée FB_Joystick, consommée PRG_02).
-// Combiné interlock benne : interdit l'armement pendant une action benne
-// (ouverture/fermeture, instBucket.Lifecycle.Busy) et pendant 1 scan après la fin
-// de l'action (BenneBusyFallEdge.Q, déjà câblé §3) — l'opérateur doit re-presser
-// consciemment le bouton homme-mort (pas de ré-armement "surprise" à la ré-acquisition).
-// Délai fin de cycle benne → ré-armement autorisé : 1 scan MainTask = 10 ms
-// (dans la fenêtre 10-20 ms exigée). Polarité positive (NC-100) : TRUE = armement autorisé.
-ArmingPermit := NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
+// Règle générale : on ne peut armer QUE si au moins un axe (treuil M1/M2 ou translation M3)
+// a un permis de mouvement effectif. Sinon, aucun mouvement n'est possible → armement inutile
+// et trompeur (l'opérateur croit pouvoir bouger alors que tout est bloqué).
+// Calcul déplacé après §5bis (où EffectivePermitM1/M2_Ascent/Descend sont disponibles).
+// Combiné interlock benne conservé : interdit l'armement pendant une action benne
+// (instBucket.Lifecycle.Busy) et 1 scan après (BenneBusyFallEdge.Q).
+// Polarité positive (NC-100) : TRUE = armement autorisé.
 {endregion}
 
 {region "🔄 §4 Synchro M1/M2"}
@@ -43920,6 +44036,15 @@ EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND (NOT instWinch
 EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Descend);
 EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Ascent);
 EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Ascent);
+
+// 🛡️ ArmingPermit (général — permis de mouvement) : on ne peut armer QUE si au moins
+// un axe (treuil M1/M2 ou translation M3) a un permis de mouvement effectif.
+// M3 : NOT TranslationSafety.SafeStop = permis de mouvement translation.
+// Combiné interlock benne conservé (pas d'armement pendant action benne + 1 scan).
+ArmingPermit := (EffectivePermitM1_Ascent OR EffectivePermitM1_Descend
+              OR EffectivePermitM2_Ascent OR EffectivePermitM2_Descend
+              OR NOT PRG_05_Translation.Data.TranslationSafety.SafeStop)
+              AND NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
 
 
 {endregion}
@@ -46676,6 +46801,7 @@ instHmiBannerFormatter(
     EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
     ArmingSeqStep                := PRG_06_Outputs.ArmingSeqStep,
     LastAbortCause               := PRG_06_Outputs.EmergencyDiag.LastAbortCause,
+    Reset                        := FaultMachineReset_IHM,
     AlarmHoldTime               := T#1s,
     Network                     := GVL_IHM.Network
 );

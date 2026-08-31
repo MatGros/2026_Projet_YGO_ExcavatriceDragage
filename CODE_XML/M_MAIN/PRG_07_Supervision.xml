@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:26:40.616079" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:26:40.616079">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T07:20:51.919332" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T07:20:51.919332">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -7919,6 +7919,7 @@ instHmiBannerFormatter(
     EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
     ArmingSeqStep                := PRG_06_Outputs.ArmingSeqStep,
     LastAbortCause               := PRG_06_Outputs.EmergencyDiag.LastAbortCause,
+    Reset                        := FaultMachineReset_IHM,
     AlarmHoldTime               := T#1s,
     Network                     := GVL_IHM.Network
 );
@@ -9483,6 +9484,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Cause du dernier abandon de sequence AU (message explicite cause+action)</xhtml>
               </documentation>
             </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front acquittement defauts (FaultMachineReset_IHM) — efface le message d'abandon verrouillé</xhtml>
+              </documentation>
+            </variable>
             <variable name="AlarmHoldTime">
               <type>
                 <TIME />
@@ -9642,12 +9651,28 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sequence AU en cours (ArmingSeqStep &lt;&gt; 0)</xhtml>
               </documentation>
             </variable>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset (acquittement defauts)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmStartEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant ArmingInProgress (nouvelle sequence AU)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonAbortHold">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message d'abandon AU</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message d'abandon AU (causes non latched)</xhtml>
               </documentation>
             </variable>
             <variable name="AbortMsgActive">
@@ -9656,6 +9681,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Message d'abandon AU affiché (fenêtre de maintien)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbortMsgLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Message d'abandon verrouillé jusqu'à Reset (causes sans latch)</xhtml>
               </documentation>
             </variable>
             <variable name="AbortMsgText">
@@ -10143,14 +10176,31 @@ DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
 // sans modifier le comportement de l'AU. Front descendant ArmingSeqStep (sequence en
 // cours -&gt; 0) = fin de sequence. Gating sur NOT PowerContactorEngaged : un SUCCES
 // (step 6 -&gt; 0 avec contacteur engage) ne produit AUCUN message (AC4) ; seul un
-// ABANDON (step -&gt; 0 sans contacteur engage) affiche la cause. Robuste aux abandons repetes.
+// ABANDON (step -&gt; 0 sans contacteur engage) affiche la cause.
+// Verrouillage : les causes SANS latch (16#0010 PowerCutOff, 16#0004/0008 timeout
+// restauration) restent affichées jusqu'à Reset (ou nouvelle séquence) pour que
+// l'opérateur voie l'échec. Les causes déjà latched (16#0002/0020/0040/0080) et la
+// coupe volontaire (16#0001) ne sont pas verrouillées.
 ArmingInProgress := (ArmingSeqStep &lt;&gt; 0);
 LastAbortEdge(CLK := ArmingInProgress);
+ResetEdge(CLK := Reset);
+ArmStartEdge(CLK := ArmingInProgress);
+
 IF LastAbortEdge.Q AND NOT PowerContactorEngaged THEN
     AbortMsgActive := TRUE;
+    AbortMsgLatched := (LastAbortCause = 16#0010) OR (LastAbortCause = 16#0004) OR (LastAbortCause = 16#0008);
     TonAbortHold(IN := FALSE);
 END_IF;
-IF AbortMsgActive THEN
+
+// Effacement : Reset OU nouvelle séquence (évite le message périmé après réarmement réussi)
+IF ResetEdge.Q OR ArmStartEdge.Q THEN
+    AbortMsgActive := FALSE;
+    AbortMsgLatched := FALSE;
+    TonAbortHold(IN := FALSE);
+END_IF;
+
+// Maintien transitoire 5s UNIQUEMENT pour les causes non latched
+IF AbortMsgActive AND NOT AbortMsgLatched THEN
     TonAbortHold(IN := TRUE, PT := CST_AbortHoldTime);
     IF TonAbortHold.Q THEN
         AbortMsgActive := FALSE;
@@ -10188,10 +10238,12 @@ ELSIF NOT VarM3Valid THEN
     OperatorActionCandidate := '[ECAT] Variateur non détecté - vérifier liaison';
 ELSIF PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[SÉCURITÉ] Coupure puissance active - acquitter défaut treuil/pont';
-ELSIF AbortMsgActive THEN
+ELSIF AbortMsgActive AND NOT SafeStopActive AND NOT DirectionBlocked THEN
     // 🩹 Cause du dernier abandon de séquence AU (message explicite cause+action)
     // Placé avant RedundancyTestFailed/EmergencyArmingFailed pour que chaque cause
     // (dont chute chaîne, PowerCutOff, timeout contacteur, redondance) montre son message spécifique.
+    // Gating NOT SafeStopActive AND NOT DirectionBlocked : le message verrouillé ne masque
+    // jamais une condition de sécurité courante (SafeStop/DirectionBlocked).
     OperatorActionCandidate := AbortMsgText;
 ELSIF RedundancyTestFailed THEN
     OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer (Reset)';

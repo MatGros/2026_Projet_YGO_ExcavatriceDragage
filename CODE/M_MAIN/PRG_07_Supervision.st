@@ -562,6 +562,7 @@ instHmiBannerFormatter(
     EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
     ArmingSeqStep                := PRG_06_Outputs.ArmingSeqStep,
     LastAbortCause               := PRG_06_Outputs.EmergencyDiag.LastAbortCause,
+    Reset                        := FaultMachineReset_IHM,
     AlarmHoldTime               := T#1s,
     Network                     := GVL_IHM.Network
 );

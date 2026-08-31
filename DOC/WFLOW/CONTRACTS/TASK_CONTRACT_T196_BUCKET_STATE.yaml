@@ -103,15 +103,17 @@ execution:
   evidence_submitted:
     - "FB_Bucket : STruCpp 24/24 PASS ; T196-001, T196-002 et T181-21 PASS."
     - "FB_MachineHomingCycle : STruCpp 18/18 PASS (transactions de référence)."
-    - "FB_SimBench : STruCpp 22/22 PASS ; T196-003 polarité capteur haut PASS."
-    - "Exécution concurrente FB_Bucket + FB_SimBench : 24/24 et 22/22, sans mélange de runner."
+    - "FB_SimBench : STruCpp 23/23 PASS ; T196-003 polarité et T196-004 capteur haut automatique PASS."
+    - "Exécution concurrente FB_Bucket + FB_SimBench : 24/24 et 23/23, sans mélange de runner."
     - "Lint ST propre : FB_Bucket, FB_MachineHomingCycle, FB_SimBench."
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
   notes: >
-    Clean/Rebuild CODESYS confirmé compilant par l'utilisateur le 2026-08-31.
+    Clean/Rebuild CODESYS confirmé compilant par l'utilisateur le 2026-08-31
+    avant l'ajout du modèle automatique de capteur haut. Une recompilation
+    CODESYS est requise pour ce dernier correctif.
     Validation fonctionnelle humaine encore requise : commande ouverte/fermée
     jusqu'à l'offset, publication GVL_IHM et transaction de référencement N2.
     La liaison globale G200 exige un bundle frais généré depuis le projet CODESYS
