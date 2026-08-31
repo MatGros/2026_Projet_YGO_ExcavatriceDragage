@@ -18,7 +18,7 @@ STRUCT
     ChainOk     : BOOL; // Boucle AU fermee (EmergencyChainClosed = TRUE)
     ContactorOk : BOOL; // Contacteur puissance confirme engage (PowerContactorEngaged = TRUE)
     Step        : INT;  // Etape sequence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm
-    Armable     : BOOL; // Rearmement possible maintenant (= ArmRequestAllowed) : chain OK, step=0, pas de lockout
+    Armable     : BOOL; // Rearmement possible maintenant : chain OK, step=0, pas de lockout
     ArmingBusy  : BOOL; // Sequence armement OU lockout en cours (nouvelle demande ignoree)
 
     // ── États publics FB AU (Ready/Done/Fault/OperatorMessage) ──

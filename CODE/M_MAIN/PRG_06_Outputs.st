@@ -21,11 +21,6 @@ VAR_OUTPUT
     Data : ST_OutputsInterPrg; // <-- [BUS] Ordres actionneurs finaux (rebouclés FB_SimBench)
 
     // === 🚨 ÉTATS CHAÎNE AU & COUPURE ===
-    EmergencyArmingPulseActive   : BOOL; // <-- [STAT] Impulsion rearmement AU active
-    EmergencyArmingLockoutActive : BOOL; // <-- [STAT] Verrouillage rearmement AU actif
-    ArmingSeqStep                : INT;  // <-- [STAT] Etape sequence rearmement AU
-    RedundancyTestFailed         : BOOL; // <-- [DIAG] Test redondance AU echoue
-    EmergencyArmingFailed        : BOOL; // <-- [DIAG] Echec rearmement AU
     EmergencyState               : ST_Safety_Emergency_State; // <-- [STAT] Etat chaine AU
     EmergencyDiag                : ST_Safety_Emergency_Diag;  // <-- [DIAG] Diagnostic chaine AU
     EmergencyReady               : BOOL; // <-- [STAT] FB AU pret a fonctionner (Enable + pas de StartupFail)
@@ -322,14 +317,7 @@ Data.PowerKeepAliveACmd    := PowerKeepAliveACmd;
 Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
 Data.EmergencyArmingCmd    := EmergencyArmingCmd;
 
-// ── Diagnostics chaîne AU (scalaires → State/Diag du DUT structuré) ──
-// ⚡ Impulsion de réarmement AU (miroir de l'ordre physique EmergencyArmingCmd) — l'IHM
-// affiche ainsi la fenêtre 1s du réarmement, pas seulement l'état "lockout"/"failed".
-EmergencyArmingPulseActive := instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd;
-EmergencyArmingLockoutActive := instSafetyEmergencyManagement.Status.Diag.LockoutActive;
-ArmingSeqStep := instSafetyEmergencyManagement.Status.State.Step;
-RedundancyTestFailed := instSafetyEmergencyManagement.Status.Diag.RedundancyTestFailed;
-EmergencyArmingFailed := instSafetyEmergencyManagement.Status.Diag.ArmFailed;
+// ── Diagnostics chaîne AU (DUT structurés State/Diag, source unique) ──
 EmergencyState := instSafetyEmergencyManagement.Status.State;
 EmergencyDiag := instSafetyEmergencyManagement.Status.Diag;
 EmergencyReady := instSafetyEmergencyManagement.Status.Ready;

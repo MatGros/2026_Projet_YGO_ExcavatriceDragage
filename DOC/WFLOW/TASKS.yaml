@@ -4873,3 +4873,198 @@ tasks:
   - T201-B
   - T201-C
   - T201-D
+- id: T202
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: G_CYCLE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Audit incohérences CODE/G_CYCLE — code mort, algos dédoublés SEMI_AUTO/MAINT, publication séquenceur
+  contexte: 'Audit Claude Code 2026-08-31 du dossier CODE/G_CYCLE (FB_Cycle, FB_DiveSearch,
+    FB_ExtractionAssist, FB_MachineHomingCycle). Socle conforme (contrats standard,
+    ST_Fault/ST_Lifecycle/FB_FaultCore, Reset front, repli STABILIZING, enum E_CycleStep
+    == AF-04 §4.2). Reste de la dette réelle à qualifier avant décision patch/refactor.
+    Chevauchement partiel : T194 (params morts génériques), T195/O8 (polarité Kobold
+    FB_Cycle vs FB_DiveSearch), T191 (doc AF vs code). T202 traite le périmètre G_CYCLE
+    non couvert. Décision d''architecture requise (fusion algos) AVANT toute implémentation.'
+  description: '🔴 A1 — Algos dédoublés à trancher (archi) : recherche de fond
+    (FB_Cycle X4/X5 sur KoboldContactFond brut, sans validation immersion ni timeout,
+    vs FB_DiveSearch hardened) ; fermeture+remontée contrôlée (FB_Cycle X6/X7/X8 vs
+    FB_ExtractionAssist CLOSING/CONTROL_ASCENT/NOMINAL) ; référencement (FB_Cycle
+    X1_HOMING vs FB_MachineHomingCycle producteur unique). Les FB assistants sont
+    Enable=MAINT_N1/N2 seulement, FB_Cycle=SEMI_AUTO : implémentations mutuellement
+    exclusives, robustesse divergente, double maintenance. Décider : factoriser en
+    briques communes OU documenter la séparation volontaire.
+    🔴 A2 — Non-conformité spec : AF-04 §4.2 dit X5 = "fond validé (FB_DiveSearch)"
+    mais FB_Cycle transite sur DI brut ; branche FB_Cycle X1_HOMING "IF NOT HomedM1
+    OR NOT HomedM2" quasi inatteignable (SEMI_AUTO refusé si NOT MachineHomed,
+    FB_Modes:138) ; drift nom spec FB_ExtractionSequence vs code FB_ExtractionAssist.
+    🟠 A3 — Publication séquenceur : WaitingResume / PausedState restent VAR internes
+    de FB_Cycle ; FB_TroubleshootingView:698-699 les RECALCULE depuis Auth.Mode +
+    CycleStep (viole producteur unique, AF-04 §6 Idx215/Idx216). Exposer en VAR_OUTPUT
+    et consommer.
+    🟠 A4 — Code mort FB_Cycle (vérifié absent du corps) : VAR_INPUT jamais lues
+    SetDepthM, SetOffsetM, WinchSyncDeltaM, Translation_Busy, Translation_Done,
+    Benne_Busy, TopPositionSensor, Mode ; VAR write-only SavedState (L305),
+    SelectedWorkTarget (L398). Retirer + nettoyer câblage PRG_03.
+    🟠 A5 — Doublons internes FB_Cycle : 8 permis ProcessPermitM1_Ascent..M3_Maintenance
+    tous identiques (JoystickDeflected AND DeadmanArmed) → 1 booléen ; bloc de
+    neutralisation des commandes copié ~5x (L214-227, L279-282, L336-339, L665-670,
+    L688-695) → extraire méthode NeutralizeCommands.
+    🟡 A6 — Robustesse X2_WORK_POS_SELECT : SelTarget=2 (P2, listé au commentaire
+    d''interface) silencieusement ignoré → blocage en X2 (seul StepMaxTimer fault,
+    et uniquement si joystick défléchi). Trancher : gérer P2 ou retirer du commentaire.
+    🟡 A7 — Hétérogénéité interfaces dans G_CYCLE : FB_Cycle (~45 scalaires plats
+    + sorties struct), FB_ExtractionAssist (~20 scalaires plats), FB_DiveSearch /
+    FB_MachineHomingCycle (bus struct Inputs/Outputs). Aligner sur AF-03 §3 profils.'
+  objectifs:
+  - 'A1 : décision d''architecture écrite (fusion briques communes OU séparation
+    documentée), validée par l''utilisateur, AVANT impl'
+  - 'A2 : X5 aligné sur spec (ou spec corrigée) ; branche X1_HOMING statuée ; nom
+    FB_ExtractionSequence/FB_ExtractionAssist tranché spec+code'
+  - 'A3 : WaitingResume + PausedState exposés en VAR_OUTPUT de FB_Cycle et consommés
+    par FB_TroubleshootingView (plus de recalcul externe)'
+  - 'A4 : 0 VAR_INPUT morte et 0 VAR write-only dans FB_Cycle ; câblage PRG_03 nettoyé'
+  - 'A5 : 1 seul permis homme-mort ; neutralisation des commandes factorisée (1 site)'
+  - 'A6 : SelTarget=2 géré ou explicitement retiré (code + commentaire)'
+  - 'A7 : convention d''interface G_CYCLE homogène et conforme AF-03 §3'
+  - 'Bundle PLCopenXML frais + G200 liaison PASS + 21 gates + revue humaine du git diff'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
+  bloque_par: []
+- id: T202-A
+  parent_id: T202
+  statut: ⏳
+  criticite: C3
+  domaine: G_CYCLE
+  agent: Claude Code (orchestrateur)
+  date: '2026-08-31T00:00:00'
+  titre: 'T202-A — Note de décision d''architecture (A1/A2/A6/A7)'
+  contexte: 'Blocante pour T202-E. Trancher : fusion des algos SEMI_AUTO/MAINT ou séparation
+    assumée + fermeture du seul écart critique (X4 fond sur DI brut). Note rédigée :
+    DOC/WFLOW/CONTRACTS/T202_NOTE_DECISION_ARCHI.md — recommandation Option 2.'
+  description: 'Produire + faire valider par l''humain la note de décision : A1 (recommandation
+    = séparation assumée ; extraire une brique de qualification de fond Kobold partagée
+    consommée par FB_Cycle X4 et le chemin MAINT ; ajouter le backstop fermeture benne
+    manquant en X6 ; supprimer la branche morte de X1_HOMING ; documenter la séparation
+    dans AF-04). A2 (X5 aligné via brique fond ; nom FB_ExtractionSequence↔FB_ExtractionAssist
+    tranché → garder le code, corriger AF-04). A6 (SelTarget=2/P2 : retirer du commentaire,
+    P2 n''est pas une cible auto). A7 (hétérogénéité interfaces : hors scope impl T202,
+    rattacher à T194).'
+  objectifs:
+  - Note DOC/WFLOW/CONTRACTS/T202_NOTE_DECISION_ARCHI.md complète
+  - Décision A1 (Option 1/2/3) tranchée et validée explicitement par l''utilisateur
+  - Sort de A6 (P2) et A7 (renvoi T194) actée
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
+  bloque_par: []
+- id: T202-B
+  parent_id: T202
+  statut: ⬜
+  criticite: C2
+  domaine: G_CYCLE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: 'T202-B — Retrait code mort FB_Cycle + nettoyage câblage PRG_03 (bit-identique)'
+  contexte: 'Nettoyage sans changement de comportement. Parallélisable avec T202-C/D.'
+  description: 'Retirer de FB_Cycle.st les VAR_INPUT jamais lues (SetDepthM, SetOffsetM,
+    WinchSyncDeltaM, Translation_Busy, Translation_Done, Benne_Busy, TopPositionSensor,
+    Mode) et les VAR internes write-only (SavedState L305, SelectedWorkTarget L398).
+    Retirer les lignes de câblage correspondantes dans PRG_03_Modes_Cycle.st (appel
+    instCycleSemiAuto). Vérifier qu''aucune n''est réintroduite ailleurs.'
+  objectifs:
+  - 0 VAR_INPUT morte et 0 VAR write-only dans FB_Cycle.st (grep par identifiant)
+  - Câblage PRG_03 nettoyé, appel instCycleSemiAuto cohérent
+  - Bundle + G200 PASS + 21 gates PASS (comportement inchangé)
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
+  bloque_par:
+  - T202-A
+- id: T202-C
+  parent_id: T202
+  statut: ⬜
+  criticite: C2
+  domaine: G_CYCLE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: 'T202-C — Dédoublonnage interne FB_Cycle : permis homme-mort unique + neutralisation factorisée'
+  contexte: 'Nettoyage sans changement de comportement. Parallélisable avec T202-B/D.'
+  description: 'Remplacer les 8 booléens ProcessPermitM1_Ascent..ProcessPermitM3_Maintenance
+    (tous strictement = JoystickDeflected AND DeadmanArmed) par un permis unique.
+    Extraire les ~5 blocs copiés de mise à FALSE/0 des commandes actionneurs (L214-227,
+    L279-282, L336-339, L665-670, L688-695) en une méthode/bloc unique NeutralizeCommands.
+    Aucune valeur de sortie ne change à état de cycle égal.'
+  objectifs:
+  - 1 seul permis homme-mort dans FB_Cycle.st
+  - Neutralisation des commandes en 1 site unique
+  - Bundle + G200 PASS + 21 gates PASS (comportement inchangé, diff de sortie nul)
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
+  bloque_par:
+  - T202-A
+- id: T202-D
+  parent_id: T202
+  statut: ⬜
+  criticite: C2
+  domaine: G_CYCLE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: 'T202-D — Exposer WaitingResume/PausedState en sortie FB_Cycle + conso FB_TroubleshootingView'
+  contexte: 'A3. FB_TroubleshootingView:698-699 recalcule Idx215/Idx216 depuis Auth.Mode+CycleStep
+    au lieu de lire l''état réel du séquenceur (viole producteur unique, AF-04 §6).'
+  description: 'Ajouter WaitingResume:BOOL et PausedState:E_CycleStep en VAR_OUTPUT de
+    FB_Cycle. Les publier sur le bus séquenceur (PRG_03 Data.SequenceState + DUT si
+    besoin). FB_TroubleshootingView consomme ces sorties directement pour Idx215_WaitingResume
+    et Idx216_PausedState ; supprimer le recalcul externe.'
+  objectifs:
+  - WaitingResume + PausedState en VAR_OUTPUT de FB_Cycle, publiés sur le bus
+  - FB_TroubleshootingView Idx215/Idx216 = affectation directe (0 recalcul)
+  - Bundle + G200 PASS + 21 gates PASS
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
+  bloque_par:
+  - T202-A
+- id: T202-E
+  parent_id: T202
+  statut: ⬜
+  criticite: C3
+  domaine: G_CYCLE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: 'T202-E — Implémentation décision A1 (brique fond partagée + backstop X6 + branche X1 morte)'
+  contexte: 'Seul lot à impact machine. Démarre APRÈS validation de T202-A. Contrat +
+    tests STruCpp + revue humaine du diff obligatoires.'
+  description: 'Selon décision T202-A (recommandé Option 2) : extraire la qualification
+    de fond Kobold (fenêtre immersion + timeout + interdiction palier) en brique pure
+    partagée ; FB_Cycle X4_DESCEND_OPEN → X5_BOTTOM_CONFIRMED consomme sa sortie validée
+    au lieu de KoboldContactFond brut. Ajouter le backstop de fermeture benne en X6.
+    Supprimer la branche morte IF NOT HomedM1 OR NOT HomedM2 de X1_HOMING. Mettre AF-04
+    §4.2 en cohérence (X5) et documenter la séparation SEMI_AUTO/MAINT.'
+  objectifs:
+  - X4→X5 sur qualification de fond validée (immersion + timeout), plus sur DI brut
+  - Backstop fermeture benne actif en X6
+  - Branche X1_HOMING morte supprimée ; FB_MachineHomingCycle reste producteur unique
+  - AF-04 §4.2 exact ; séparation SEMI_AUTO/MAINT documentée
+  - Tests STruCpp cycle SEMI_AUTO PASS + Bundle + G200 + 21 gates + revue humaine du diff
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
+  bloque_par:
+  - T202-A
+- id: T202-F
+  parent_id: T202
+  statut: ⬜
+  criticite: C3
+  domaine: G_CYCLE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: 'T202-F — Revue finale indépendante + non-régression G_CYCLE'
+  contexte: 'Agent différent des implémenteurs. Lit le git diff réel.'
+  description: 'Revue finale : conservation (grafcet X0→X13, repli STABILIZING, reprise
+    consciente, gate homme-mort, SampleCount, valeurs ST_Program*Request à état égal),
+    0 identifiant mort résiduel, liaison G200 PASS, bundle frais, 21 gates PASS, cohérence
+    AF-04, liaison inter-lots B/C/D/E.'
+  objectifs:
+  - Conservation vérifiée (must_survive du contrat)
+  - G200 PASS (0 erreur) + bundle frais + 21 gates PASS
+  - Cohérence AF-04 + git diff réel relu par l''orchestrateur
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
+  bloque_par:
+  - T202-B
+  - T202-C
+  - T202-D
+  - T202-E

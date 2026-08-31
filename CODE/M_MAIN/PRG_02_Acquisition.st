@@ -60,7 +60,6 @@ VAR
     PreviousMachineInputSourceSimulated      : BOOL; // . [LOC] Memoire cycle precedent source Machine
     MachineInputSourceInitialized            : BOOL; // . [LOC] Indicateur initialisation source Machine
 
-    SimulationModeRise                : R_TRIG; // . [LOC] Front montant activation simulation
     SimulationModeFall                : F_TRIG; // . [LOC] Front descendant desactivation simulation
 END_VAR
 
@@ -74,21 +73,21 @@ END_VAR
 // === 🧪 §0 SIMULATION & SÉLECTION DE SOURCE ===
 // 🎯 Producteur unique des aiguillages Reel/Simu par domaine (HwReal vs HwSim -> HwIn).
 
-SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
 SimulationModeFall(CLK := GVL_Simulation.SimulationModeActive);
 
-IF SimulationModeRise.Q THEN
-    GVL_Simulation.SimWinchActive := TRUE;
-    GVL_Simulation.SimTranslationActive := TRUE;
-    GVL_Simulation.SimOperatorActive := TRUE;
-    GVL_Simulation.SimSafetyActive := TRUE;
-END_IF;
+// 🧪 Activation par domaine = NIVEAU (pas front) : Sim*Active suivent directement
+// SimulationModeActive. Robustesse : la chaîne d'urgence est fermée (routage HwSim)
+// dès que SimulationModeActive=TRUE, même si le front montant n'est pas observé
+// (ex. SimulationModeActive déjà TRUE au boot ou réglé hors front).
+// Hors simulation (SimulationModeActive=FALSE) → Sim*Active=FALSE → repli HwReal
+// (sécurité réelle intacte). Cohérent pour les 4 domaines (Winch/Translation/Operator/Safety).
+GVL_Simulation.SimWinchActive       := GVL_Simulation.SimulationModeActive;
+GVL_Simulation.SimTranslationActive := GVL_Simulation.SimulationModeActive;
+GVL_Simulation.SimOperatorActive    := GVL_Simulation.SimulationModeActive;
+GVL_Simulation.SimSafetyActive      := GVL_Simulation.SimulationModeActive;
 
 IF SimulationModeFall.Q THEN
-    GVL_Simulation.SimWinchActive := FALSE;
-    GVL_Simulation.SimTranslationActive := FALSE;
-    GVL_Simulation.SimOperatorActive := FALSE;
-    GVL_Simulation.SimSafetyActive := FALSE;
+    // 🧪 Reset des stimuli de simulation sur désactivation (front descendant)
     GVL_Simulation.SimM3SensorsWordOverrideActive := FALSE;
     GVL_Simulation.SimM3SensorsWord := 16#07;
     GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active := FALSE;
@@ -272,7 +271,7 @@ instSimBench(
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
     // inter-POU ArmPulse est observée avec un cycle de retard dans la tâche.
     EmergencyArming_RQ       := PRG_06_Outputs.Data.EmergencyArmingCmd
-                                 OR (PRG_06_Outputs.ArmingSeqStep = 5),
+                                 OR (PRG_06_Outputs.EmergencyState.Step = 5),
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     CfgTopSensorRawPos       := REAL_TO_UDINT(_WinchM1CfgPersist.CfgTopSensorPos_M
                                  * (UDINT_TO_REAL(ENCODER_POINTS_PER_REV) / WINCH_CABLE_M_PER_REV)),

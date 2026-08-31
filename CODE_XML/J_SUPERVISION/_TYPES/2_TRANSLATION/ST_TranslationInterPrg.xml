@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:50.793180" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:50.793180">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T13:19:04.169157" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T13:19:04.169157">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -53,117 +53,13 @@
 🛡️ Diagnostic et securites translation M3</xhtml>
               </documentation>
             </variable>
-            <variable name="TranslationPosTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎯 Faits decodeur position M3 (produits par PRG_05, AF-02 TBD §8 #5) ===
-📍 Zone Tremie (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone pre-ralentissement PV (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P2 (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P1 (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone Maintenance (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Tremie (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte PV (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P2 (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P1 (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Maintenance (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_LimitSwitchTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course Trémie M3 (1=Actionne) (ex-M3_LimitSwitchFwd)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_LimitSwitchMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course Maintenance M3 (1=Actionne) (ex-M3_LimitSwitchRev)</xhtml>
-              </documentation>
-            </variable>
             <variable name="M3_SensorWordIncoherent">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Incoherence detectee mot capteurs M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_SensorsWord">
-              <type>
-                <BYTE />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat capteurs M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎯 Faits decodeur position M3 (produits par PRG_05, AF-02 TBD §8 #5) ===
+❌ Incoherence detectee mot capteurs M3</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationBusy">

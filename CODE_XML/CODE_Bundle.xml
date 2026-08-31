@@ -5857,7 +5857,7 @@ Boucle AU fermee (EmergencyChainClosed = TRUE)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant (= ArmRequestAllowed) : chain OK, step=0, pas de lockout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -9589,7 +9589,7 @@ TRUE = Défaut sécurité actif</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant (= ArmRequestAllowed) : chain OK, step=0, pas de lockout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -9627,14 +9627,6 @@ TRUE = Défaut sécurité actif</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS PUBLICS IEC ===
 &lt;-- [STAT] FB pret a fonctionner (Enable + pas de StartupFail)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Busy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence ou lockout en cours</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -9692,11 +9684,11 @@ TRUE = Défaut sécurité actif</xhtml>
    📊 ST_Safety_Emergency_Status — État &amp; diagnostic de la chaîne AU
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : DUT d'état/diagnostic du FB_Safety_EmergencyManagement fusionné.
-      Regroupe les états publics IEC (Ready/Busy/Done), le bus d'état (State),
+      Regroupe les états publics IEC (Ready/Done), le bus d'état (State),
       le bus de diagnostic (Diag), le défaut laté (Fault : ST_Fault, socle
       FB_FaultCore) et le message opérateur par état / par problème.
    🔒 Sécurité : interlock TOUJOURS sur la cause brute (State/Diag), jamais sur le latch.
-      Fail-safe : Enable=FALSE → Ready/Busy à FALSE.
+      Fail-safe : Enable=FALSE → Ready à FALSE.
    🔌 Interface : Produit par FB_Safety_EmergencyManagement.Status, consommé par
       PRG_07_Supervision / IHM / Troubleshooting.
    📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
@@ -11110,117 +11102,13 @@ Cause de blocage prioritaire</xhtml>
 🛡️ Diagnostic et securites translation M3</xhtml>
               </documentation>
             </variable>
-            <variable name="TranslationPosTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎯 Faits decodeur position M3 (produits par PRG_05, AF-02 TBD §8 #5) ===
-📍 Zone Tremie (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone pre-ralentissement PV (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P2 (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone P1 (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationPosMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📍 Zone Maintenance (1=Present)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Tremie (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtPV">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte PV (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtP2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P2 (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtP1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte P1 (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TranslationAtMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Position exacte Maintenance (1=Atteint)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_LimitSwitchTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course Trémie M3 (1=Actionne) (ex-M3_LimitSwitchFwd)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_LimitSwitchMaintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Fin de course Maintenance M3 (1=Actionne) (ex-M3_LimitSwitchRev)</xhtml>
-              </documentation>
-            </variable>
             <variable name="M3_SensorWordIncoherent">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Incoherence detectee mot capteurs M3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_SensorsWord">
-              <type>
-                <BYTE />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mot d'etat capteurs M3</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🎯 Faits decodeur position M3 (produits par PRG_05, AF-02 TBD §8 #5) ===
+❌ Incoherence detectee mot capteurs M3</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationBusy">
@@ -25159,46 +25047,52 @@ IF AbortMsgActive AND NOT AbortMsgLatched THEN
     END_IF;
 END_IF;
 IF AbortMsgActive THEN
-    CASE LastAbortCause OF
-        INT_TO_WORD(CST_ABORT_CUT_IHM): AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
-        INT_TO_WORD(CST_ABORT_CHAIN_DROP): AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
-        INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A): AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
-        INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B): AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
-        INT_TO_WORD(CST_ABORT_POWER_CUTOFF):
-            // 🩹 Décodage de la cause CST_ABORT_POWER_CUTOFF (PowerCutOff métier) en cause explicite
-            // M1/M2/M3 + bit MecaA/MecaB/thermique, à partir des DUT Safety déjà en entrée.
-            // Priorité : M3 (translation) puis M1 puis M2 ; MecaA &gt; MecaB &gt; thermique.
-            IF TranslationSafety.ErrorMecaA THEN
-                AbortMsgText := '[M3] MecaA (mouvement non commandé) - Reset puis réarmer';
-            ELSIF TranslationSafety.ErrorMecaB THEN
-                AbortMsgText := '[M3] MecaB (arrêt non confirmé) - Reset puis réarmer';
-            ELSIF TranslationSafety.ErrorBrakeThermal THEN
-                AbortMsgText := '[M3] Surchauffe frein - Reset puis réarmer';
-            ELSIF WinchM1Safety.ErrorMecaA THEN
-                AbortMsgText := '[M1] MecaA (mouvement non commandé) - Reset puis réarmer';
-            ELSIF WinchM1Safety.ErrorMecaB THEN
-                AbortMsgText := '[M1] MecaB (arrêt non confirmé) - Reset puis réarmer';
-            ELSIF WinchM1Safety.ThermalFault THEN
-                AbortMsgText := '[M1] Surchauffe moteur - Reset puis réarmer';
-            ELSIF WinchM1Safety.ErrorBrakeThermal THEN
-                AbortMsgText := '[M1] Surchauffe frein - Reset puis réarmer';
-            ELSIF WinchM2Safety.ErrorMecaA THEN
-                AbortMsgText := '[M2] MecaA (mouvement non commandé) - Reset puis réarmer';
-            ELSIF WinchM2Safety.ErrorMecaB THEN
-                AbortMsgText := '[M2] MecaB (arrêt non confirmé) - Reset puis réarmer';
-            ELSIF WinchM2Safety.ThermalFault THEN
-                AbortMsgText := '[M2] Surchauffe moteur - Reset puis réarmer';
-            ELSIF WinchM2Safety.ErrorBrakeThermal THEN
-                AbortMsgText := '[M2] Surchauffe frein - Reset puis réarmer';
-            ELSE
-                AbortMsgText := '[AU] Coupure securite metier active - lever la cause puis rearmer';
-            END_IF;
-        INT_TO_WORD(CST_ABORT_REDUNDANCY_A): AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
-        INT_TO_WORD(CST_ABORT_REDUNDANCY_B): AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
-        INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR): AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
+    IF LastAbortCause = INT_TO_WORD(CST_ABORT_CUT_IHM) THEN
+        AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_CHAIN_DROP) THEN
+        AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A) THEN
+        AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B) THEN
+        AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_POWER_CUTOFF) THEN
+        // 🩹 Décodage de la cause CST_ABORT_POWER_CUTOFF (PowerCutOff métier) en cause explicite
+        // M1/M2/M3 + bit MecaA/MecaB/thermique, à partir des DUT Safety déjà en entrée.
+        // Priorité : M3 (translation) puis M1 puis M2 ; MecaA &gt; MecaB &gt; thermique.
+        IF TranslationSafety.ErrorMecaA THEN
+            AbortMsgText := '[M3] MecaA (mouvement non commandé) - Reset puis réarmer';
+        ELSIF TranslationSafety.ErrorMecaB THEN
+            AbortMsgText := '[M3] MecaB (arrêt non confirmé) - Reset puis réarmer';
+        ELSIF TranslationSafety.ErrorBrakeThermal THEN
+            AbortMsgText := '[M3] Surchauffe frein - Reset puis réarmer';
+        ELSIF WinchM1Safety.ErrorMecaA THEN
+            AbortMsgText := '[M1] MecaA (mouvement non commandé) - Reset puis réarmer';
+        ELSIF WinchM1Safety.ErrorMecaB THEN
+            AbortMsgText := '[M1] MecaB (arrêt non confirmé) - Reset puis réarmer';
+        ELSIF WinchM1Safety.ThermalFault THEN
+            AbortMsgText := '[M1] Surchauffe moteur - Reset puis réarmer';
+        ELSIF WinchM1Safety.ErrorBrakeThermal THEN
+            AbortMsgText := '[M1] Surchauffe frein - Reset puis réarmer';
+        ELSIF WinchM2Safety.ErrorMecaA THEN
+            AbortMsgText := '[M2] MecaA (mouvement non commandé) - Reset puis réarmer';
+        ELSIF WinchM2Safety.ErrorMecaB THEN
+            AbortMsgText := '[M2] MecaB (arrêt non confirmé) - Reset puis réarmer';
+        ELSIF WinchM2Safety.ThermalFault THEN
+            AbortMsgText := '[M2] Surchauffe moteur - Reset puis réarmer';
+        ELSIF WinchM2Safety.ErrorBrakeThermal THEN
+            AbortMsgText := '[M2] Surchauffe frein - Reset puis réarmer';
+        ELSE
+            AbortMsgText := '[AU] Coupure securite metier active - lever la cause puis rearmer';
+        END_IF;
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_REDUNDANCY_A) THEN
+        AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_REDUNDANCY_B) THEN
+        AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR) THEN
+        AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
     ELSE
         AbortMsgText := '[AU] Rearmement interrompu - verifier et rearmer';
-    END_CASE;
+    END_IF;
 END_IF;
 
 IF NOT EmergencyChainClosed THEN
@@ -27802,7 +27696,7 @@ Current := LIMIT(-100.0, Current, 100.0);
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES STRUCTUREES (2 DUT) ===
-&lt;-- [STAT] État/diagnostic (Ready/Busy/Done + State + Diag + Fault + message) — PRG_07/IHM/Troubleshooting</xhtml>
+&lt;-- [STAT] État/diagnostic (Ready/Done + State + Diag + Fault + message) — PRG_07/IHM/Troubleshooting</xhtml>
               </documentation>
             </variable>
             <variable name="Cmd">
@@ -27975,7 +27869,7 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rearmement possible actuellement (= ArmRequestAllowed, aligne IHM/armement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rearmement possible actuellement (source unique, aligne IHM/armement)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -28002,37 +27896,13 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bitfield cause abandon (voir constantes CST_ABORT_*)</xhtml>
               </documentation>
             </variable>
-            <variable name="ArmRequest_ChainOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONDITIONS DECOMPOSEES (lisibilite §2quater) ===
-. [LOC] Preconditions chaine + repos + pas de coupure IHM</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmRequest_NoBlock">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de coupure metier, pas de lockout, contacteur au repos</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmRequestAllowed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rearmement autorise (front ArmRequest + preconditions)</xhtml>
-              </documentation>
-            </variable>
             <variable name="Armable_ChainOk">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Boucle fermee + pas de coupure IHM/metier</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONDITIONS DECOMPOSEES (lisibilite §2quater) ===
+. [LOC] Boucle fermee + pas de coupure IHM/metier</xhtml>
               </documentation>
             </variable>
             <variable name="Armable_Idle">
@@ -28048,7 +27918,7 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de lockout, contacteur au repos (aligne sur ArmRequestAllowed)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de lockout, contacteur au repos</xhtml>
               </documentation>
             </variable>
             <variable name="Maintain_ChainOk">
@@ -28378,10 +28248,17 @@ IF Enable THEN
     // 🚦 DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
     // Une nouvelle tentative repart d'une Cause propre : si le problème persiste, il sera
     // re-latché dès le prochain échec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis à FALSE).
-    ArmRequest_ChainOk := (ArmingSeqStep = CST_STEP_IDLE) AND EmergencyChainClosed AND NOT BtnEmergencyCutOff;
-    ArmRequest_NoBlock := NOT PowerCutOffRequest AND NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
-    ArmRequestAllowed := ArmRequest_ChainOk AND ArmRequest_NoBlock;
-    IF ArmReqEdge.Q AND ArmRequestAllowed THEN
+    // 🚦 PRÉCONDITIONS D'ARMEMENT — source unique (Armable = State.Armable).
+    // ⚠️ Armable_NoBlock SANS `NOT RedundancyTestFailedCause` : la cause de redondance est
+    //    latée mais la séquence d'armement la re-teste (§5 étape 1/3) : l'armement reste donc
+    //    réellement possible (et sûr) tant que les autres préconditions sont réunies. Afficher
+    //    le bouton « Armable » sur cette cause seule bloquait le réarmement après acquittement
+    //    (Reset ne purge pas la Cause, cf. §4) alors que l'armement était permis.
+    Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+    Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
+    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
+    Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
+    IF ArmReqEdge.Q AND Armable THEN
         ArmingSeqStep := CST_STEP_TEST_A;
         RedundancyTestFailedCause := FALSE;
         EmergencyArmingFailedCause := FALSE;
@@ -28498,16 +28375,6 @@ END_IF;
 {region "§7 Etats publics (interlock sur Cause brute)"}
 // 🚦 ÉTATS PUBLICS — interlock sur Cause brute (jamais sur l'Ack)
 IF Enable THEN
-    Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
-    Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
-    // ⚠️ Armable_NoBlock SANS `NOT RedundancyTestFailedCause` : aligné sur ArmRequestAllowed (§5).
-    //    La cause de redondance est latée mais la séquence d'armement la re-teste (§5 étape 1/3) :
-    //    l'armement reste donc réellement possible (et sûr) tant que les autres préconditions
-    //    sont réunies. Afficher le bouton « Armable » sur cette cause seule bloquait le réarmement
-    //    après acquittement (Reset ne purge pas la Cause, cf. §4) alors que l'armement était permis.
-    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
-    Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
-
     ArmingBusy := (ArmingSeqStep &lt;&gt; CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
 END_IF;
 {endregion}
@@ -28581,7 +28448,6 @@ Status.Diag.LastAbortCause       := LastAbortCause;
 {region "§11 Etats publics IEC + message operateur"}
 // 📤 ÉTATS PUBLICS IEC
 Status.Ready := Enable AND NOT StartupFail;
-Status.Busy  := (ArmingSeqStep &lt;&gt; CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
 Status.Done  := PowerContactorEngaged;
 
 // 💬 MESSAGE OPÉRATEUR — un message explicite par état et par problème de la chaîne AU.
@@ -41446,14 +41312,6 @@ PreviousQualified := Qualified;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur initialisation source Machine</xhtml>
               </documentation>
             </variable>
-            <variable name="SimulationModeRise">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant activation simulation</xhtml>
-              </documentation>
-            </variable>
             <variable name="SimulationModeFall">
               <type>
                 <derived name="F_TRIG" />
@@ -41506,21 +41364,21 @@ PreviousQualified := Qualified;
 // === 🧪 §0 SIMULATION &amp; SÉLECTION DE SOURCE ===
 // 🎯 Producteur unique des aiguillages Reel/Simu par domaine (HwReal vs HwSim -&gt; HwIn).
 
-SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
 SimulationModeFall(CLK := GVL_Simulation.SimulationModeActive);
 
-IF SimulationModeRise.Q THEN
-    GVL_Simulation.SimWinchActive := TRUE;
-    GVL_Simulation.SimTranslationActive := TRUE;
-    GVL_Simulation.SimOperatorActive := TRUE;
-    GVL_Simulation.SimSafetyActive := TRUE;
-END_IF;
+// 🧪 Activation par domaine = NIVEAU (pas front) : Sim*Active suivent directement
+// SimulationModeActive. Robustesse : la chaîne d'urgence est fermée (routage HwSim)
+// dès que SimulationModeActive=TRUE, même si le front montant n'est pas observé
+// (ex. SimulationModeActive déjà TRUE au boot ou réglé hors front).
+// Hors simulation (SimulationModeActive=FALSE) → Sim*Active=FALSE → repli HwReal
+// (sécurité réelle intacte). Cohérent pour les 4 domaines (Winch/Translation/Operator/Safety).
+GVL_Simulation.SimWinchActive       := GVL_Simulation.SimulationModeActive;
+GVL_Simulation.SimTranslationActive := GVL_Simulation.SimulationModeActive;
+GVL_Simulation.SimOperatorActive    := GVL_Simulation.SimulationModeActive;
+GVL_Simulation.SimSafetyActive      := GVL_Simulation.SimulationModeActive;
 
 IF SimulationModeFall.Q THEN
-    GVL_Simulation.SimWinchActive := FALSE;
-    GVL_Simulation.SimTranslationActive := FALSE;
-    GVL_Simulation.SimOperatorActive := FALSE;
-    GVL_Simulation.SimSafetyActive := FALSE;
+    // 🧪 Reset des stimuli de simulation sur désactivation (front descendant)
     GVL_Simulation.SimM3SensorsWordOverrideActive := FALSE;
     GVL_Simulation.SimM3SensorsWord := 16#07;
     GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active := FALSE;
@@ -41704,7 +41562,7 @@ instSimBench(
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
     // inter-POU ArmPulse est observée avec un cycle de retard dans la tâche.
     EmergencyArming_RQ       := PRG_06_Outputs.Data.EmergencyArmingCmd
-                                 OR (PRG_06_Outputs.ArmingSeqStep = 5),
+                                 OR (PRG_06_Outputs.EmergencyState.Step = 5),
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     CfgTopSensorRawPos       := REAL_TO_UDINT(_WinchM1CfgPersist.CfgTopSensorPos_M
                                  * (UDINT_TO_REAL(ENCODER_POINTS_PER_REV) / WINCH_CABLE_M_PER_REV)),
@@ -44940,20 +44798,7 @@ instPosDecoderM3(
 );
 
 // 📤 Publication des faits M3 dans le bus PRG_05 (consommés par PRG_07)
-Data.TranslationPosTremie      := instPosDecoderM3.TranslationPosTremie;
-Data.TranslationPosPV          := instPosDecoderM3.TranslationPosPV;
-Data.TranslationPosP2          := instPosDecoderM3.TranslationPosP2;
-Data.TranslationPosP1          := instPosDecoderM3.TranslationPosP1;
-Data.TranslationPosMaintenance := instPosDecoderM3.TranslationPosMaintenance;
-Data.TranslationAtTremie      := instPosDecoderM3.TranslationAtTremie;
-Data.TranslationAtPV          := instPosDecoderM3.TranslationAtPV;
-Data.TranslationAtP2          := instPosDecoderM3.TranslationAtP2;
-Data.TranslationAtP1          := instPosDecoderM3.TranslationAtP1;
-Data.TranslationAtMaintenance := instPosDecoderM3.TranslationAtMaintenance;
-Data.M3_LimitSwitchTremie       := instPosDecoderM3.LimitSwitchTremie;
-Data.M3_LimitSwitchMaintenance  := instPosDecoderM3.LimitSwitchMaintenance;
 Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
-Data.M3_SensorsWord            := instPosDecoderM3.SensorsWord;
 {endregion}
 
 {region "§0 Interlock hauteur M1/M2"}
@@ -45253,6 +45098,8 @@ TranslationState.Error := instTranslationM3.Fault.Error;
 TranslationState.ErrorId := instTranslationM3.Fault.ErrorId;
 TranslationState.BrakeCmd := instTranslationM3.BrakeReleaseRequest;
 TranslationState.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
+// 🔌 Retour physique direct frein M3 (même source que le SEL §1bis/§2) — consommé FB_TroubleshootingView Idx108
+TranslationState.BrakeFeedback := PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI;
 TranslationState.PositionReached := instTranslationM3.TargetReached;
 TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationState.DriveFreqCmd_Hz := instTranslationM3.RequestedDriveFreqHz;
@@ -45317,8 +45164,6 @@ TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIn
 // 🟢 Permis directionnels M3 (source unique : FB_Safety_Translation) — projetés vers l'IHM
 TranslationSafety.TremiePermit := instSafetyTranslationM3.TremiePermit;
 TranslationSafety.MaintenancePermit := instSafetyTranslationM3.MaintenancePermit;
-GVL_IHM.TranslationM3.Safety.TremiePermit := instSafetyTranslationM3.TremiePermit;
-GVL_IHM.TranslationM3.Safety.MaintenancePermit := instSafetyTranslationM3.MaintenancePermit;
 TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
@@ -45407,53 +45252,13 @@ Data.TranslationTrace                 := TranslationTrace;
 &lt;-- [BUS] Ordres actionneurs finaux (rebouclés FB_SimBench)</xhtml>
               </documentation>
             </variable>
-            <variable name="EmergencyArmingPulseActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚨 ÉTATS CHAÎNE AU &amp; COUPURE ===
-&lt;-- [STAT] Impulsion rearmement AU active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingLockoutActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Verrouillage rearmement AU actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmingSeqStep">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etape sequence rearmement AU</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyTestFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Test redondance AU echoue</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Echec rearmement AU</xhtml>
-              </documentation>
-            </variable>
             <variable name="EmergencyState">
               <type>
                 <derived name="ST_Safety_Emergency_State" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat chaine AU</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚨 ÉTATS CHAÎNE AU &amp; COUPURE ===
+&lt;-- [STAT] Etat chaine AU</xhtml>
               </documentation>
             </variable>
             <variable name="EmergencyDiag">
@@ -46071,14 +45876,7 @@ Data.PowerKeepAliveACmd    := PowerKeepAliveACmd;
 Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
 Data.EmergencyArmingCmd    := EmergencyArmingCmd;
 
-// ── Diagnostics chaîne AU (scalaires → State/Diag du DUT structuré) ──
-// ⚡ Impulsion de réarmement AU (miroir de l'ordre physique EmergencyArmingCmd) — l'IHM
-// affiche ainsi la fenêtre 1s du réarmement, pas seulement l'état "lockout"/"failed".
-EmergencyArmingPulseActive := instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd;
-EmergencyArmingLockoutActive := instSafetyEmergencyManagement.Status.Diag.LockoutActive;
-ArmingSeqStep := instSafetyEmergencyManagement.Status.State.Step;
-RedundancyTestFailed := instSafetyEmergencyManagement.Status.Diag.RedundancyTestFailed;
-EmergencyArmingFailed := instSafetyEmergencyManagement.Status.Diag.ArmFailed;
+// ── Diagnostics chaîne AU (DUT structurés State/Diag, source unique) ──
 EmergencyState := instSafetyEmergencyManagement.Status.State;
 EmergencyDiag := instSafetyEmergencyManagement.Status.Diag;
 EmergencyReady := instSafetyEmergencyManagement.Status.Ready;
@@ -46968,7 +46766,7 @@ instHmiBannerFormatter(
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
     RedundancyTestFailed         := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed,
     EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
-    ArmingSeqStep                := PRG_06_Outputs.ArmingSeqStep,
+    ArmingSeqStep                := PRG_06_Outputs.EmergencyState.Step,
     LastAbortCause               := PRG_06_Outputs.EmergencyDiag.LastAbortCause,
     Reset                        := FaultMachineReset_IHM,
     AlarmHoldTime               := T#1s,
@@ -47030,7 +46828,7 @@ instTroubleshootingView(
     EmergencyState       := PRG_06_Outputs.EmergencyState,
     EmergencyDiag        := PRG_06_Outputs.EmergencyDiag,
     PowerCutOffActive    := PRG_06_Outputs.PowerCutOffActive,
-    ArmingPulseActive    := PRG_06_Outputs.EmergencyArmingPulseActive,
+    ArmingPulseActive    := PRG_06_Outputs.Data.EmergencyArmingCmd,
     MaintainAActive      := PRG_06_Outputs.Data.PowerKeepAliveACmd,
     MaintainBActive      := PRG_06_Outputs.Data.PowerKeepAliveBCmd,
     CycleReady           := PRG_03_Modes_Cycle.Data.SequenceState.Ready,

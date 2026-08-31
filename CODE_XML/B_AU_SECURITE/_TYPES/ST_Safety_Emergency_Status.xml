@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T10:46:36.249843" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T10:46:36.249843">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T13:34:40.681809" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T13:34:40.681809">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -33,14 +33,6 @@
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS PUBLICS IEC ===
 &lt;-- [STAT] FB pret a fonctionner (Enable + pas de StartupFail)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Busy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence ou lockout en cours</xhtml>
               </documentation>
             </variable>
             <variable name="Done">
@@ -98,11 +90,11 @@
    📊 ST_Safety_Emergency_Status — État &amp; diagnostic de la chaîne AU
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : DUT d'état/diagnostic du FB_Safety_EmergencyManagement fusionné.
-      Regroupe les états publics IEC (Ready/Busy/Done), le bus d'état (State),
+      Regroupe les états publics IEC (Ready/Done), le bus d'état (State),
       le bus de diagnostic (Diag), le défaut laté (Fault : ST_Fault, socle
       FB_FaultCore) et le message opérateur par état / par problème.
    🔒 Sécurité : interlock TOUJOURS sur la cause brute (State/Diag), jamais sur le latch.
-      Fail-safe : Enable=FALSE → Ready/Busy à FALSE.
+      Fail-safe : Enable=FALSE → Ready à FALSE.
    🔌 Interface : Produit par FB_Safety_EmergencyManagement.Status, consommé par
       PRG_07_Supervision / IHM / Troubleshooting.
    📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
@@ -277,7 +269,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant (= ArmRequestAllowed) : chain OK, step=0, pas de lockout</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">

@@ -77,6 +77,15 @@ silencieusement, jamais enterré dans un paragraphe de conclusion.
 **Signaler n'est pas élargir le périmètre.** On attend le signalement, pas la correction
 spontanée. Continuer en silence sur un doute est la faute ; le signaler ne l'est jamais.
 
+## 🧭 Traçabilité d'impact — avant de coder (non négociable)
+
+Avant de modifier une fonction, **tracer l'impact complet** : qui **produit** la donnée, qui la
+**route**, qui la **consomme**. Vérifier que la modification atteint bien le **consommateur
+final** — ne jamais coder une fonction isolément sans vérifier le câblage de bout en bout.
+Exemple vécu : le correctif `FB_Sim_Safety` (chaîne fermée par défaut) ne « passait » pas car la
+valeur simulée n'atteignait pas l'entrée `EmergencyChainClosed` du FB AU (le routage simulation
+exigeait `SimSafetyActive`). Règle complète : `DOC/STDS/CODE_QUALITY_STANDARDS.md §3ter`.
+
 ## À lire avant d'écrire (dans cet ordre, aucune exception)
 
 1. `AGENTS.md` — point d'entrée, guardrails, persona et cas d'arrêt

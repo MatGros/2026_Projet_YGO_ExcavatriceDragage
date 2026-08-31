@@ -244,7 +244,7 @@ d'autres modèles via l'override `provider`/`model` de l'outil `workflow` :
 À la fin de **chaque sous-tâche**, un agent **différent de l'implémenteur** vérifie le travail.
 L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agent producteur.
 
-### Checklist de revue (R1→R7)
+### Checklist de revue (R1→R8)
 
 | # | Vérification | Commande / moyen |
 |---|---|---|
@@ -255,6 +255,7 @@ L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agen
 | R5 | **Renommage pur** | vérifier qu'un renommage n'a pas altéré la sémantique (aucun changement de comportement) |
 | R6 | **Cohérence AF** | le code respecte la spec `AF_Partie-N` correspondante |
 | R7 | **Liaison inter-lots** | si plusieurs lots parallèles, vérifier le câblage entre eux |
+| R8 | **Traçabilité d'impact** | la chaîne producteur → routeur → consommateur a été tracée **avant** de coder, et le consommateur final est nommé dans la restitution (`CODE_QUALITY_STANDARDS.md §3ter`) |
 
 ### Règles
 

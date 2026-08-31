@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:55:20.252000" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:55:20.252000">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T13:53:10.409801" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T13:53:10.409801">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2768,14 +2768,6 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur initialisation source Machine</xhtml>
               </documentation>
             </variable>
-            <variable name="SimulationModeRise">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant activation simulation</xhtml>
-              </documentation>
-            </variable>
             <variable name="SimulationModeFall">
               <type>
                 <derived name="F_TRIG" />
@@ -2828,21 +2820,21 @@ Seuils de changement de palier (0..100%)</xhtml>
 // === 🧪 §0 SIMULATION &amp; SÉLECTION DE SOURCE ===
 // 🎯 Producteur unique des aiguillages Reel/Simu par domaine (HwReal vs HwSim -&gt; HwIn).
 
-SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
 SimulationModeFall(CLK := GVL_Simulation.SimulationModeActive);
 
-IF SimulationModeRise.Q THEN
-    GVL_Simulation.SimWinchActive := TRUE;
-    GVL_Simulation.SimTranslationActive := TRUE;
-    GVL_Simulation.SimOperatorActive := TRUE;
-    GVL_Simulation.SimSafetyActive := TRUE;
-END_IF;
+// 🧪 Activation par domaine = NIVEAU (pas front) : Sim*Active suivent directement
+// SimulationModeActive. Robustesse : la chaîne d'urgence est fermée (routage HwSim)
+// dès que SimulationModeActive=TRUE, même si le front montant n'est pas observé
+// (ex. SimulationModeActive déjà TRUE au boot ou réglé hors front).
+// Hors simulation (SimulationModeActive=FALSE) → Sim*Active=FALSE → repli HwReal
+// (sécurité réelle intacte). Cohérent pour les 4 domaines (Winch/Translation/Operator/Safety).
+GVL_Simulation.SimWinchActive       := GVL_Simulation.SimulationModeActive;
+GVL_Simulation.SimTranslationActive := GVL_Simulation.SimulationModeActive;
+GVL_Simulation.SimOperatorActive    := GVL_Simulation.SimulationModeActive;
+GVL_Simulation.SimSafetyActive      := GVL_Simulation.SimulationModeActive;
 
 IF SimulationModeFall.Q THEN
-    GVL_Simulation.SimWinchActive := FALSE;
-    GVL_Simulation.SimTranslationActive := FALSE;
-    GVL_Simulation.SimOperatorActive := FALSE;
-    GVL_Simulation.SimSafetyActive := FALSE;
+    // 🧪 Reset des stimuli de simulation sur désactivation (front descendant)
     GVL_Simulation.SimM3SensorsWordOverrideActive := FALSE;
     GVL_Simulation.SimM3SensorsWord := 16#07;
     GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active := FALSE;
@@ -3026,7 +3018,7 @@ instSimBench(
     // 🧪 Simulation uniquement : l'état étape 5 sécurise le transfert même si la sortie
     // inter-POU ArmPulse est observée avec un cycle de retard dans la tâche.
     EmergencyArming_RQ       := PRG_06_Outputs.Data.EmergencyArmingCmd
-                                 OR (PRG_06_Outputs.ArmingSeqStep = 5),
+                                 OR (PRG_06_Outputs.EmergencyState.Step = 5),
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     CfgTopSensorRawPos       := REAL_TO_UDINT(_WinchM1CfgPersist.CfgTopSensorPos_M
                                  * (UDINT_TO_REAL(ENCODER_POINTS_PER_REV) / WINCH_CABLE_M_PER_REV)),
