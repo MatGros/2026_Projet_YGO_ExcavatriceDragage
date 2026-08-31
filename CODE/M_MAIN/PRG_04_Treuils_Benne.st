@@ -87,7 +87,8 @@ VAR
     // === STRUCTS D'ARBITRAGE (remplis champ par champ, CODESYS refuse l'init anonyme en appel) ===
     ArbIHM     : ST_fbWinchCmdArbitration_IHM;      // . [LOC] Entrées IHM FB d'arbitrage (partagé M1/M2)
     ArbContext : ST_fbWinchCmdArbitration_Context;  // . [LOC] Contexte gating FB d'arbitrage (partagé M1/M2)
-    ArbM2Cfg   : ST_fbWinchCmdArbitration_Cfg;      // . [LOC] Config M2 (vitesse override benne)
+    ArbM1Cfg   : ST_fbWinchCmdArbitration_Cfg;      // . [LOC] Config M1 (palier boutons/both)
+    ArbM2Cfg   : ST_fbWinchCmdArbitration_Cfg;      // . [LOC] Config M2 (palier boutons/both + override benne)
     ArbBucketIHM     : ST_fbBucketCmdArbitration_IHM;      // . [LOC] Entrées IHM FB d'arbitrage benne
     ArbBucketContext : ST_fbBucketCmdArbitration_Context;  // . [LOC] Contexte gating FB d'arbitrage benne
 
@@ -349,7 +350,9 @@ ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
 ArbContext.SyncBlocksUp                   := SyncMinorDeviationBlocksUp;
 ArbContext.SyncBlocksDown                 := SyncMinorDeviationBlocksDown;
 
-ArbM2Cfg.BucketOverrideSpeedPct := 15.0;
+ArbM1Cfg.BtnStepTgt := 5;
+ArbM2Cfg.BtnStepTgt := 5;
+ArbM2Cfg.BucketOverrideStepTgt := 1;
 
 // ── Arbitrage M1 (FB_WinchCmdArbitrationM1) ──
 instArbM1(
@@ -361,6 +364,7 @@ instArbM1(
     IHM        := ArbIHM,
     TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext,
+    Cfg        := ArbM1Cfg,
     SpeedStepTable := _WinchSpeedStepTable
 );
 M1LogicRequestStartStop := instArbM1.StartStop;

@@ -24,6 +24,7 @@ VAR_INPUT
     IHM        : ST_fbWinchCmdArbitration_IHM;  // --> [CMD] Boutons IHM (BtnUpM1/BtnDownM1, both)
     TglJoystickMaster : BOOL;  // --> [CMD] Toggle joystick maître global (Modes.Cmd, source unique)
     Context    : ST_fbWinchCmdArbitration_Context; // --> [STAT] Gating benne/synchro (partagé M1/M2)
+    Cfg        : ST_fbWinchCmdArbitration_Cfg;     // --> [CFG] Palier boutons/both (BtnStepTgt)
     SpeedStepTable : ST_SpeedStepTable;          // --> [CFG] Table paliers (conservée pour compat interface ; plus de conversion %→palier ici)
 END_VAR
 VAR_OUTPUT
@@ -64,13 +65,13 @@ ELSE
             IF BothIntent.Active THEN
                 // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
                 Direction := BothIntent.Direction;
-                StepTgt   := 5;   // 100 % → palier max
+                StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
             ELSIF IHM.BtnUpM1 THEN
                 Direction := 1;
-                StepTgt   := 5;
+                StepTgt   := Cfg.BtnStepTgt;
             ELSIF IHM.BtnDownM1 THEN
                 Direction := -1;
-                StepTgt   := 5;
+                StepTgt   := Cfg.BtnStepTgt;
             ELSE
                 Direction := 0;
                 StepTgt   := 0;

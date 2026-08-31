@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:10:59.985477" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:10:59.985477">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:20:46.311902" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:20:46.311902">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1383,15 +1383,26 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
       <dataType name="ST_fbWinchCmdArbitration_Cfg">
         <baseType>
           <struct>
-            <variable name="BucketOverrideSpeedPct">
+            <variable name="BtnStepTgt">
               <type>
-                <REAL />
+                <INT />
               </type>
               <initialValue>
-                <simpleValue value="15" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse M2 pendant action benne (ex littéral 15.0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier boutons/both (100 % → palier max)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketOverrideStepTgt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier override benne (vitesse lente)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1405,12 +1416,12 @@ Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ ST_fbWinchCmdArbitration_Cfg — Config treuil (partagé M1/M2)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Config statique de FB_WinchCommandArbitrationM1/M2.
-       Structure UNIQUE partagée : M2 consomme BucketOverrideSpeedPct (chemin benne),
-       M1 l'ignore (pas de chemin benne).
+   🎯 Rôle : Config statique de FB_WinchCmdArbitrationM1/M2.
+       Structure UNIQUE partagée : M1 consomme BtnStepTgt (boutons/both),
+       M2 consomme BtnStepTgt (boutons/both) + BucketOverrideStepTgt (chemin benne).
    📤 Producteur : PRG_04_Treuils_Benne (câblage).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Remplace le littéral 15.0 (PRG_04 §3) par une constante nommée.
+   🔌 Remplace les paliers codés en dur (StepTgt := 5 / StepTgt := 1) par des constantes nommées.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3801,12 +3812,20 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Contexte gating FB d'arbitrage (partagé M1/M2)</xhtml>
               </documentation>
             </variable>
+            <variable name="ArbM1Cfg">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Config M1 (palier boutons/both)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ArbM2Cfg">
               <type>
                 <derived name="ST_fbWinchCmdArbitration_Cfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Config M2 (vitesse override benne)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Config M2 (palier boutons/both + override benne)</xhtml>
               </documentation>
             </variable>
             <variable name="ArbBucketIHM">
@@ -4443,7 +4462,9 @@ ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
 ArbContext.SyncBlocksUp                   := SyncMinorDeviationBlocksUp;
 ArbContext.SyncBlocksDown                 := SyncMinorDeviationBlocksDown;
 
-ArbM2Cfg.BucketOverrideSpeedPct := 15.0;
+ArbM1Cfg.BtnStepTgt := 5;
+ArbM2Cfg.BtnStepTgt := 5;
+ArbM2Cfg.BucketOverrideStepTgt := 1;
 
 // ── Arbitrage M1 (FB_WinchCmdArbitrationM1) ──
 instArbM1(
@@ -4455,6 +4476,7 @@ instArbM1(
     IHM        := ArbIHM,
     TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext,
+    Cfg        := ArbM1Cfg,
     SpeedStepTable := _WinchSpeedStepTable
 );
 M1LogicRequestStartStop := instArbM1.StartStop;
@@ -8156,6 +8178,14 @@ PrevStepNumber := StepNumber;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gating benne/synchro (partagé M1/M2)</xhtml>
               </documentation>
             </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier boutons/both (BtnStepTgt)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SpeedStepTable">
               <type>
                 <derived name="ST_SpeedStepTable" />
@@ -8259,13 +8289,13 @@ ELSE
             IF BothIntent.Active THEN
                 // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
                 Direction := BothIntent.Direction;
-                StepTgt   := 5;   // 100 % → palier max
+                StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
             ELSIF IHM.BtnUpM1 THEN
                 Direction := 1;
-                StepTgt   := 5;
+                StepTgt   := Cfg.BtnStepTgt;
             ELSIF IHM.BtnDownM1 THEN
                 Direction := -1;
-                StepTgt   := 5;
+                StepTgt   := Cfg.BtnStepTgt;
             ELSE
                 Direction := 0;
                 StepTgt   := 0;
@@ -8475,7 +8505,7 @@ ELSE
     IF Context.BucketBusy AND Context.BucketM2StartStop THEN
         StartStop := Context.BucketM2StartStop;
         Direction := SEL(Context.BucketM2Open, -1, 1);  // Open → +1, Close → -1
-        StepTgt   := 1;   // override benne = vitesse lente (palier 1)
+        StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -8493,13 +8523,13 @@ ELSE
                 IF BothIntent.Active THEN
                     // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
                     Direction := BothIntent.Direction;
-                    StepTgt   := 5;   // 100 % → palier max
+                    StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
                 ELSIF IHM.BtnUpM2 THEN
                     Direction := 1;
-                    StepTgt   := 5;
+                    StepTgt   := Cfg.BtnStepTgt;
                 ELSIF IHM.BtnDownM2 THEN
                     Direction := -1;
-                    StepTgt   := 5;
+                    StepTgt   := Cfg.BtnStepTgt;
                 ELSE
                     Direction := 0;
                     StepTgt   := 0;

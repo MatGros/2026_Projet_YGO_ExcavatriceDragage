@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:31:39.145109" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:31:39.145109">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:20:39.049922" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:20:39.049922">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -26,15 +26,26 @@
       <dataType name="ST_fbWinchCmdArbitration_Cfg">
         <baseType>
           <struct>
-            <variable name="BucketOverrideSpeedPct">
+            <variable name="BtnStepTgt">
               <type>
-                <REAL />
+                <INT />
               </type>
               <initialValue>
-                <simpleValue value="15" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Vitesse M2 pendant action benne (ex littéral 15.0)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier boutons/both (100 % → palier max)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketOverrideStepTgt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier override benne (vitesse lente)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -48,12 +59,12 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ⚙️ ST_fbWinchCmdArbitration_Cfg — Config treuil (partagé M1/M2)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Config statique de FB_WinchCommandArbitrationM1/M2.
-       Structure UNIQUE partagée : M2 consomme BucketOverrideSpeedPct (chemin benne),
-       M1 l'ignore (pas de chemin benne).
+   🎯 Rôle : Config statique de FB_WinchCmdArbitrationM1/M2.
+       Structure UNIQUE partagée : M1 consomme BtnStepTgt (boutons/both),
+       M2 consomme BtnStepTgt (boutons/both) + BucketOverrideStepTgt (chemin benne).
    📤 Producteur : PRG_04_Treuils_Benne (câblage).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Remplace le littéral 15.0 (PRG_04 §3) par une constante nommée.
+   🔌 Remplace les paliers codés en dur (StepTgt := 5 / StepTgt := 1) par des constantes nommées.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
