@@ -1,0 +1,58 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T201 Phase B : Aligner FB_DiveSearch OperatorActionId en hex
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T201-B_DIVESEARCH_HEX
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Aligner la base bit-codée de FB_DiveSearch (décimal) sur l'hex utilisé par
+    FB_Cycle/FB_ExtractionAssist, sans changer aucune valeur ni le type WORD.
+
+  acceptance:
+    - id: AC1
+      statement: "FB_DiveSearch.st ne contient plus de littéral décimal 256..384 pour OperatorActionId."
+      verified_by: "grep 'OperatorActionId :=' CODE/G_CYCLE/FB_DiveSearch.st"
+    - id: AC2
+      statement: "Tous les OperatorActionId sont en hex 16#0100..16#0180 (mapping 1:1)."
+      verified_by: "diff : 256→16#0100, 257→16#0101, 258→16#0102, 259→16#0103, 260→16#0104, 384→16#0180"
+    - id: AC3
+      statement: "Le type WORD est conservé (gate G347 PASS)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G347_check_actionid_type.py"
+    - id: AC4
+      statement: "Aucune valeur numérique modifiée (zéro impact IHM)."
+      verified_by: "diff sémantique : chaque décimal remplacé par l'hex de même valeur"
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_DiveSearch.st
+    forbidden:
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/G_CYCLE/FB_ExtractionAssist.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    Tout problème constaté (gate G347, valeur modifiée) est remonté immédiatement
+    à l'orchestrateur.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: ""

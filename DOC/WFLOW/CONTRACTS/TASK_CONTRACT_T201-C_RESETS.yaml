@@ -1,0 +1,54 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T201 Phase C : Remises à zéro 16#0000 → 0
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T201-C_RESETS
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Remplacer les remises à zéro 16#0000 par 0 (lisibilité, cohérence avec les
+    0 INT voisins), sans changer aucune valeur.
+
+  acceptance:
+    - id: AC1
+      statement: "Aucun 16#0000 résiduel dans FB_Encoder_Abs.st, FB_Encoder.st, FB_Bucket.st."
+      verified_by: "grep '16#0000' CODE/E_CODEURS/FB_Encoder_Abs.st CODE/E_CODEURS/FB_Encoder.st CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st = vide"
+    - id: AC2
+      statement: "Aucune valeur modifiée (16#0000 = 0)."
+      verified_by: "diff sémantique"
+    - id: AC3
+      statement: "Bundle + G200 + gates PASS."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py + run_all_gates.py"
+
+  scope:
+    allowed:
+      - CODE/E_CODEURS/FB_Encoder_Abs.st
+      - CODE/E_CODEURS/FB_Encoder.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    Tout problème constaté est remonté immédiatement à l'orchestrateur.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: ""

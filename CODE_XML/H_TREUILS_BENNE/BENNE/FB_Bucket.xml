@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T07:44:36.894762" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T07:44:36.894762">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T12:27:14.944711" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T12:27:14.944711">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1198,7 +1198,7 @@ END_IF;
 
 ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND NOT BucketState.StateIncoherent
-                     AND (Fault.ErrorId = 16#0000)
+                     AND (Fault.ErrorId = 0)
                      AND (MachineHomed OR (BucketState.IsOpen XOR BucketState.IsClosed))
                      AND NOT MachineHomingActive;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
