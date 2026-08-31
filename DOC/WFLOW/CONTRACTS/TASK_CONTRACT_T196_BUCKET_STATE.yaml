@@ -62,6 +62,9 @@ contract:
       - CODE/L_SIMULATION/GVL_Simulation.st
       - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
       - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_simbench.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/TEST_AUTO_CI/MOCKS/ST_fbJoystick_Cfg.st
+      - TOOLS/TEST_AUTO_CI/scripts/run_tests.py
       - DOC/WFLOW/AUDITS/T196_BUCKET_STATE_20260831.md
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T196_BUCKET_STATE.yaml
     forbidden:

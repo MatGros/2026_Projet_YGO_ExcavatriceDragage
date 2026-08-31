@@ -27,6 +27,10 @@
       "passed": true
     },
     {
+      "name": "T196-003 Stimulus capteur haut actif expose la polarite Free_DI correcte",
+      "passed": true
+    },
+    {
       "name": "TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop",
       "passed": true
     },
@@ -88,8 +92,8 @@
     }
   ],
   "summary": {
-    "total": 21,
-    "passed": 21,
+    "total": 22,
+    "passed": 22,
     "failed": 0
   }
 }

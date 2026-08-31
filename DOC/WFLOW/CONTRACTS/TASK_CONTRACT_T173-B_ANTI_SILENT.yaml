@@ -16,6 +16,11 @@ contract:
     boot) doit produire un message IHM EXPLICITE à l'opérateur (cause + action requise), jamais
     un retour silencieux à "chain OK/contacteur OK". L'interlock de sécurité reste arbitré par la
     Cause brute (jamais par l'Ack, jamais affaibli). Basé sur la provenance prouvée en T173-A.
+    DÉCISION UTILISATEUR (2026-08-31) : le signalement se fait en AVAL (IHM), SANS modifier le
+    comportement de la séquence AU (step, consignes, ErrorId). Le message IHM est produit par
+    FB_Hmi_BannerFormatter à partir de LastAbortCause (déjà tracé par T173-A), via un front
+    descendant ArmingSeqStep (abandon) maintenu 5s. ErrorId peut rester 0 pour les timeouts
+    restauration A/B : le signal est le MESSAGE, pas ErrorId.
 
   # ── 2. Criteres testables ─────────────────────────────────────────────────
   acceptance:

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:21:55.870521" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:21:55.870521">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:26:37.473720" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:26:37.473720">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1661,12 +1661,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Echec rearmement contacteur AU (lisee -&gt; message explicite)</xhtml>
               </documentation>
             </variable>
+            <variable name="ArmingSeqStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Etape sequence rearmement AU (0=IDLE..6=Confirm) — front descendant = abandon</xhtml>
+              </documentation>
+            </variable>
             <variable name="LastAbortCause">
               <type>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Cause du dernier abandon de sequence AU (T173 : message explicite cause+action)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Cause du dernier abandon de sequence AU (message explicite cause+action)</xhtml>
               </documentation>
             </variable>
             <variable name="AlarmHoldTime">
@@ -1814,10 +1822,18 @@
             </variable>
             <variable name="LastAbortEdge">
               <type>
-                <derived name="R_TRIG" />
+                <derived name="F_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant LastAbortCause (T173 : nouvel abandon AU)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant ArmingSeqStep (abandon de sequence AU)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingInProgress">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sequence AU en cours (ArmingSeqStep &lt;&gt; 0)</xhtml>
               </documentation>
             </variable>
             <variable name="TonAbortHold">
@@ -1825,7 +1841,7 @@
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message d'abandon AU (T173)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message d'abandon AU</xhtml>
               </documentation>
             </variable>
             <variable name="AbortMsgActive">
@@ -2092,7 +2108,7 @@
                 <simpleValue value="TIME#5s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien message d'abandon AU (T173)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien message d'abandon AU</xhtml>
               </documentation>
             </variable>
             <variable name="CST_NbMaxAlarmes">
@@ -2317,9 +2333,11 @@ END_IF;
 DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
                 OR (CurrentDirection &gt; 0 AND NOT AscentPermit);
 
-// 🩹 T173 : signaler la cause du dernier abandon de séquence AU (message cause+action),
-// sans modifier le comportement de l'AU. Front sur LastAbortCause -&gt; message maintenu 5s.
-LastAbortEdge(CLK := LastAbortCause);
+// 🩹 Signaler la cause du dernier abandon de séquence AU (message cause+action),
+// sans modifier le comportement de l'AU. Front descendant ArmingSeqStep (sequence en
+// cours -&gt; 0) = abandon -&gt; message maintenu 5s. Robuste aux abandons repetes (meme cause).
+ArmingInProgress := (ArmingSeqStep &lt;&gt; 0);
+LastAbortEdge(CLK := ArmingInProgress);
 IF LastAbortEdge.Q THEN
     AbortMsgActive := TRUE;
     TonAbortHold(IN := FALSE);
@@ -2362,13 +2380,15 @@ ELSIF NOT VarM3Valid THEN
     OperatorActionCandidate := '[ECAT] Variateur non détecté - vérifier liaison';
 ELSIF PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[SÉCURITÉ] Coupure puissance active - acquitter défaut treuil/pont';
+ELSIF AbortMsgActive THEN
+    // 🩹 Cause du dernier abandon de séquence AU (message explicite cause+action)
+    // Placé avant RedundancyTestFailed/EmergencyArmingFailed pour que chaque cause
+    // (dont chute chaîne, PowerCutOff, timeout contacteur, redondance) montre son message spécifique.
+    OperatorActionCandidate := AbortMsgText;
 ELSIF RedundancyTestFailed THEN
     OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer (Reset)';
 ELSIF EmergencyArmingFailed THEN
     OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
-ELSIF AbortMsgActive THEN
-    // 🩹 T173 : cause du dernier abandon de séquence AU (message explicite cause+action)
-    OperatorActionCandidate := AbortMsgText;
 ELSIF NOT PowerContactorEngaged THEN
     OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN
