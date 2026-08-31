@@ -87,6 +87,9 @@
     .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    /* Bouton discret "retour à l'index" (les rapports vivent dans RESULTS/<domaine>/reports/) */
+    .btn-index { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--btn-border); color: var(--muted); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.15s ease; user-select: none; white-space: nowrap; }
+    .btn-index:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
     .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
     .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
         border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
@@ -239,6 +242,10 @@
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
     .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .wiring-pastille { display: inline-block; margin-left: 8px; padding: 1px 9px; border-radius: 999px;
+        font-size: 11px; font-weight: 700; letter-spacing: 0.3px; vertical-align: 1px; }
+    .wiring-pastille-ok { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+    .wiring-pastille-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
     .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
@@ -303,15 +310,16 @@
             <h1>FB_SimBench</h1>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
+            <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 17:21:06</div>
+    <div class="exec-time">2026-08-31 04:24:03</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (21 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-simbench-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-1">TC-P13-001 Sim_Safety : neutralisation sans Enable</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-2">TC-P13-010 SimBench Enable=FALSE neutralise tout le banc</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-3">TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-4">TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-5">TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-6">TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-7">TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-8">TC-P13-022 Sim_Safety Enable=FALSE neutralise tout</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-9">TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-10">TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-11">TC-P13-031 Sim_Encoder PresetCmd charge PresetValue</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-12">TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-13">TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-14">TC-P13-040 Sim_Translation progression publie des mots thermometre valides</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-15">TC-P13-041 Sim_Translation Direction +1/-1/0</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-16">TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance]</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-17">TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-18">TC-P13-050 Sim_Joystick initialise au neutre au premier cycle</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-19">TC-P13-051 Sim_Joystick sorties forçables en instance (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-20">TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)</a></li></ul>
+        <summary>📋 Sommaire (22 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-simbench-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-1">TC-P13-001 Sim_Safety : neutralisation sans Enable</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-2">TC-P13-010 SimBench Enable=FALSE neutralise tout le banc</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-3">TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-4">TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-5">TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-6">T196-003 Stimulus capteur haut actif expose la polarite Free_DI correcte</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-7">TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-8">TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-9">TC-P13-022 Sim_Safety Enable=FALSE neutralise tout</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-10">TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-11">TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-12">TC-P13-031 Sim_Encoder PresetCmd charge PresetValue</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-13">TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-14">TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-15">TC-P13-040 Sim_Translation progression publie des mots thermometre valides</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-16">TC-P13-041 Sim_Translation Direction +1/-1/0</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-17">TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance]</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-18">TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-19">TC-P13-050 Sim_Joystick initialise au neutre au premier cycle</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-20">TC-P13-051 Sim_Joystick sorties forçables en instance (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-21">TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -320,12 +328,12 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            21/21 vérifications validées
+            22/22 vérifications validées
         </div>
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 123 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 130 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -442,12 +450,12 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_fbJoystick_Cfg.st</code></td>
+                <td><code>ST_fbJoystick_Cfg.st</code><span style="background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid #d97706;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;">MOCK</span></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
-                <td>Aucune erreur</td>
+                <td>Simulé pour environnement CI (hors CODESYS)</td>
             </tr>
             <tr class="compil-row-pass">
                 <td><code>E_PresetConfirmMode.st</code></td>
@@ -514,7 +522,7 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>E_ExtractionSequenceState.st</code></td>
+                <td><code>E_ExtractionAssistState.st</code></td>
                 <td>DUT</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -522,8 +530,16 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
+                <td><code>ST_MachineHoming.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
                 <td><code>E_WinchFinalInterlockReason.st</code></td>
-                <td>DUT (Enum)</td>
+                <td>DUT</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -531,7 +547,47 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>E_WinchFinalInterlockState.st</code></td>
+                <td>DUT</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_WinchTraceBlockReason.st</code></td>
+                <td>DUT</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_TraceWinch.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_TranslationFinalInterlockReason.st</code></td>
                 <td>DUT (Enum)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>E_TranslationTraceBlockReason.st</code></td>
+                <td>DUT</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_TraceTranslation.st</code></td>
+                <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -548,14 +604,6 @@
             <tr class="compil-row-pass">
                 <td><code>ST_fbBucket_State.st</code></td>
                 <td>DUT (Struct)</td>
-                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
-                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
-                <td><span class="badge badge-pass">PASS</span></td>
-                <td>Aucune erreur</td>
-            </tr>
-            <tr class="compil-row-pass">
-                <td><code>E_TranslationFinalInterlockReason.st</code></td>
-                <td>DUT (Enum)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -954,14 +1002,6 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_fbModes_Autorisations.st</code></td>
-                <td>DUT (Struct)</td>
-                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
-                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
-                <td><span class="badge badge-pass">PASS</span></td>
-                <td>Aucune erreur</td>
-            </tr>
-            <tr class="compil-row-pass">
                 <td><code>ST_fbJoystick_AxisCmd.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -1011,6 +1051,22 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>ST_AcquisitionEncoderQualified.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_InputSource.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_M3DriveFeedback.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -1139,6 +1195,14 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>ST_HomingChecklist.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_IOModuleDiag.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -1318,7 +1382,7 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_SimBench</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 52 flux entrants · 41 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_SimBench</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 53 flux entrants · 41 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimEncoderM1 <span style="color:var(--muted);font-weight:500;">(FB_Sim_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimEncoderM2 <span style="color:var(--muted);font-weight:500;">(FB_Sim_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimTranslation <span style="color:var(--muted);font-weight:500;">(FB_Sim_Translation)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimJoystick <span style="color:var(--muted);font-weight:500;">(FB_Sim_Joystick)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimSafety <span style="color:var(--muted);font-weight:500;">(FB_Sim_Safety)</span></span></div>
@@ -1329,7 +1393,7 @@
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_M3FullTravelTimeS</b> : REAL := 8.0</span></div>
         </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_Direction <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_A <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_B <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyArming_RQ <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimEncoderSpeedFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationOffset_M <span class="pin-type" style="color:var(--muted);">REAL := 0.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWordOverrideActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWord <span class="pin-type" style="color:var(--muted);">BYTE := 16#07</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickLeft_Rev_TREMIE_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRight_Fwd_MAINT_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickFwd_Up_Close_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRev_Down_Open_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawX <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawY <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawButton <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickOvershoot_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickBagotement_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimKoboldContactValue <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnEmergencyStop <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HwReal <span class="pin-type" style="color:var(--muted);">ST_HardwareImage</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM1 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM2 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_Direction <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_A <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_B <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyArming_RQ <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimEncoderSpeedFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimTopPositionActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationOffset_M <span class="pin-type" style="color:var(--muted);">REAL := 0.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWordOverrideActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWord <span class="pin-type" style="color:var(--muted);">BYTE := 16#07</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickLeft_Rev_TREMIE_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRight_Fwd_MAINT_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickFwd_Up_Close_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRev_Down_Open_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawX <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawY <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawButton <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickOvershoot_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickBagotement_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimKoboldContactValue <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnEmergencyStop <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HwReal <span class="pin-type" style="color:var(--muted);">ST_HardwareImage</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM1 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM2 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
@@ -1368,7 +1432,7 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">49</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">50</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
@@ -1376,7 +1440,7 @@
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">7</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">38</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">52 IN</b> / <b style="color:#ffffff;">41 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">53 IN</b> / <b style="color:#ffffff;">41 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -1592,10 +1656,10 @@
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 57 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 56 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BTNEMERGENCYSTOP</code> jamais câblé en production</li><li>Pin <code>BUSY</code> jamais câblé en production</li><li>Pin <code>DONE</code> jamais câblé en production</li><li>Pin <code>EMERGENCYARMING_RQ</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>HWREAL</code> jamais câblé en production</li><li>Pin <code>M1_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M1_PRESETTRIGGERCMD</code> jamais câblé en production</li><li>Pin <code>M1_PRESETVALUEOUT</code> jamais câblé en production</li><li>Pin <code>M1_RELAYFWD</code> jamais câblé en production</li><li>Pin <code>M1_RELAYREV</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_1</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_2</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_3</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_4</code> jamais câblé en production</li><li>Pin <code>M1_STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>M2_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M2_PRESETTRIGGERCMD</code> jamais câblé en production</li><li>Pin <code>M2_PRESETVALUEOUT</code> jamais câblé en production</li><li>Pin <code>M2_RELAYFWD</code> jamais câblé en production</li><li>Pin <code>M2_RELAYREV</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_1</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_2</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_3</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_4</code> jamais câblé en production</li><li>Pin <code>M2_STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>M3_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M3_DIRECTION</code> jamais câblé en production</li><li>Pin <code>M3_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>MACHINE</code> jamais câblé en production</li><li>Pin <code>OPERATOR</code> jamais câblé en production</li><li>Pin <code>POWERKEEPALIVE_A</code> jamais câblé en production</li><li>Pin <code>POWERKEEPALIVE_B</code> jamais câblé en production</li><li>Pin <code>RAWPOSM1</code> jamais câblé en production</li><li>Pin <code>RAWPOSM2</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>SIMENCODERSPEEDFACTOR</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKBAGOTEMENT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKFWD_UP_CLOSE_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKLEFT_REV_TREMIE_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKOVERSHOOT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWBUTTON</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWX</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWY</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKREV_DOWN_OPEN_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRIGHT_FWD_MAINT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMKOBOLDCONTACTVALUE</code> jamais câblé en production</li><li>Pin <code>SIMM3SENSORSWORD</code> jamais câblé en production</li><li>Pin <code>SIMM3SENSORSWORDOVERRIDEACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONINJECTM1</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONINJECTM2</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONOFFSET_M</code> jamais câblé en production</li><li>Pin <code>TRANSLATION</code> jamais câblé en production</li><li>Pin <code>WINCH</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 57 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>BTNEMERGENCYSTOP</code> jamais câblé en production</li><li>Pin <code>BUSY</code> jamais câblé en production</li><li>Pin <code>DONE</code> jamais câblé en production</li><li>Pin <code>EMERGENCYARMING_RQ</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>HWREAL</code> jamais câblé en production</li><li>Pin <code>M1_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M1_PRESETTRIGGERCMD</code> jamais câblé en production</li><li>Pin <code>M1_PRESETVALUEOUT</code> jamais câblé en production</li><li>Pin <code>M1_RELAYFWD</code> jamais câblé en production</li><li>Pin <code>M1_RELAYREV</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_1</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_2</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_3</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_4</code> jamais câblé en production</li><li>Pin <code>M1_STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>M2_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M2_PRESETTRIGGERCMD</code> jamais câblé en production</li><li>Pin <code>M2_PRESETVALUEOUT</code> jamais câblé en production</li><li>Pin <code>M2_RELAYFWD</code> jamais câblé en production</li><li>Pin <code>M2_RELAYREV</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_1</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_2</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_3</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_4</code> jamais câblé en production</li><li>Pin <code>M2_STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>M3_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M3_DIRECTION</code> jamais câblé en production</li><li>Pin <code>M3_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>MACHINE</code> jamais câblé en production</li><li>Pin <code>OPERATOR</code> jamais câblé en production</li><li>Pin <code>POWERKEEPALIVE_A</code> jamais câblé en production</li><li>Pin <code>POWERKEEPALIVE_B</code> jamais câblé en production</li><li>Pin <code>RAWPOSM1</code> jamais câblé en production</li><li>Pin <code>RAWPOSM2</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>SIMENCODERSPEEDFACTOR</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKBAGOTEMENT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKFWD_UP_CLOSE_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKLEFT_REV_TREMIE_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKOVERSHOOT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWBUTTON</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWX</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWY</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKREV_DOWN_OPEN_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRIGHT_FWD_MAINT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMKOBOLDCONTACTVALUE</code> jamais câblé en production</li><li>Pin <code>SIMM3SENSORSWORD</code> jamais câblé en production</li><li>Pin <code>SIMM3SENSORSWORDOVERRIDEACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONINJECTM1</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONINJECTM2</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONOFFSET_M</code> jamais câblé en production</li><li>Pin <code>SIMTOPPOSITIONACTIVE</code> jamais câblé en production</li><li>Pin <code>TRANSLATION</code> jamais câblé en production</li><li>Pin <code>WINCH</code> jamais câblé en production</li></ul>
         </div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
@@ -1688,6 +1752,9 @@
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
             <div class="pin-name">SIMENCODERSPEEDFACTOR <span class="pin-type">IEC_REAL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
+            <div class="pin-name">SIMTOPPOSITIONACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
             <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
             <div class="pin-name">SIMSYNCDEVIATIONINJECTM1 <span class="pin-type">IEC_BOOL</span></div>
@@ -1889,7 +1956,7 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_SimBench</code></td>
-                <td>47</td><td>7</td>
+                <td>48</td><td>7</td>
                 <td>2</td><td>15</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (15 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
@@ -1925,7 +1992,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 20 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 21 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-simbench-1" class="test-card test-card-pass test-card-collapsed">
@@ -2022,6 +2089,23 @@
         <article id="test-fb-simbench-6" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">T196-003 Stimulus capteur haut actif expose la polarite Free_DI correcte </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>TopPositionActive=TRUE -&gt; Free_DI=FALSE (capteur atteint)</li><li>TopPositionActive=FALSE -&gt; Free_DI=TRUE (butée libre)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-simbench-7" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -2036,7 +2120,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-7" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-8" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming </h3>
@@ -2053,7 +2137,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-8" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-9" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-022 Sim_Safety Enable=FALSE neutralise tout </h3>
@@ -2070,7 +2154,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-9" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-10" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel — stub) </h3>
@@ -2094,7 +2178,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-10" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-11" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos </h3>
@@ -2111,7 +2195,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-11" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-12" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-031 Sim_Encoder PresetCmd charge PresetValue </h3>
@@ -2128,7 +2212,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-12" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-13" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0 </h3>
@@ -2145,7 +2229,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-13" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-14" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel — stub) </h3>
@@ -2168,7 +2252,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-14" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-15" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-040 Sim_Translation progression publie des mots thermometre valides </h3>
@@ -2189,7 +2273,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-15" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-16" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-041 Sim_Translation Direction +1/-1/0 </h3>
@@ -2210,7 +2294,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-16" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-17" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance] </h3>
@@ -2231,7 +2315,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-17" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-18" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie </h3>
@@ -2252,7 +2336,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-18" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-19" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-050 Sim_Joystick initialise au neutre au premier cycle </h3>
@@ -2269,7 +2353,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-19" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-20" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-051 Sim_Joystick sorties forçables en instance (essai manuel — stub) </h3>
@@ -2292,7 +2376,7 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-20" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-21" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
                 <h3 style="flex: 1;">TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO) </h3>
@@ -2316,11 +2400,11 @@
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (123)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinchSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchBenneHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchSymmetryHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_BypassTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_ChainTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_ChainContextGlobal.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_SafetyChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_PreflightHMI.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Encoder.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Joystick.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Safety.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Translation.st</code></li><li><code>CODE/L_SIMULATION/FB_SimBench.st</code></li></ul>
+        <summary>Fichiers source compilés (130)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionAssistState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/ST_MachineHoming.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/E_WinchTraceBlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_TraceWinch.st</code></li><li><code>CODE/I_TRANSLATION/_TYPES/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/E_TranslationTraceBlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TraceTranslation.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinchSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchBenneHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchSymmetryHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_BypassTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_ChainTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_InputSource.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_M3DriveFeedback.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_ChainContextGlobal.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_IOModuleDiag.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_SafetyChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM\ST_PreflightHMI.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Encoder.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Joystick.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Safety.st</code></li><li><code>CODE/L_SIMULATION/FB_Sim_Translation.st</code></li><li><code>CODE/L_SIMULATION/FB_SimBench.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (123)</summary>
+        <summary>Code source ST original (130)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -2361,7 +2445,8 @@ ENUM
     READY    := 2,   (* Prêt, attend ordre *)
     BUSY     := 3,   (* Action en cours *)
     DONE     := 4,   (* Action terminée *)
-    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    STOPPING := 5,   (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    ERROR    := 6    (* Défaut actif non acquitté (FB en erreur — HMI non aveugle) *)
 END_ENUM
 END_TYPE
 </pre>
@@ -2774,7 +2859,8 @@ END_TYPE
    🕹️ ST_fbJoystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d&#x27;axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📤 Champs : Enable, StartStop, SpeedTgt (%) + StepTgt (palier 1..5) + direction en bits
+               (DirectionPositive/Negative, AtNeutral). SpeedTgt reste pour l&#x27;IHM, StepTgt pour la logique.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    ======================================================================= *)
 
@@ -2783,7 +2869,8 @@ STRUCT
     // === CONSIGNES DE PILOTAGE AXE ===
     Enable      : BOOL;   // --&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
     StartStop   : BOOL;   // --&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)
-    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)
+    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction) - IHM
+    StepTgt     : INT;    // --&gt; [CMD] Palier de vitesse (1..5, 0=arret) - logique/limitations (derive de SpeedTgt)
     DirectionNegative   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     DirectionPositive   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     AtNeutral   : BOOL;   // --&gt; [CMD] TRUE si axes en zone morte (position centrale)
@@ -2796,26 +2883,15 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_fbJoystick_Cfg.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\ST_fbJoystick_Cfg.st</code></summary>
                 <pre>(* =======================================================================
-   ⚙️ ST_fbJoystick_Cfg — Réglages regroupés de FB_Joystick
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : porter en un bloc les 5 paramètres de conditionnement du geste
-      (zone morte, temporisations homme-mort, marge défaut capteur).
-      Passé à FB_Joystick via l&#x27;entrée `Cfg` — échange bloc IHM / persistant.
-   🧬 Pattern cfg : aligné sur ST_CycleCfg / ST_WinchCfg (préfixe ST_&lt;Domaine&gt;Cfg,
-      instance persistante dans GVL_PERSISTENT, pont FB_CfgPersistBridge_* à venir).
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (§5bis)
+   🧪 ST_fbJoystick_Cfg — Maquette STruCpp pour FB_SimBench
+   -----------------------------------------------------------------------
+   🎯 Rôle : satisfaire le champ ST_JoystickHMI.Cfg sans exercer FB_Joystick.
+   📄 Portée : harnais STruCpp uniquement; le type production reste inchangé.
    ======================================================================= *)
-
 TYPE ST_fbJoystick_Cfg :
 STRUCT
-    DeadbandRaw          : INT  := 300;      // Zone morte en points ADC bruts (0..10000)
-    NeutralHoldTime      : TIME := T#100MS;  // Maintien continu au neutre avant désarmement homme-mort
-    DeadmanArmHoldTime   : TIME := T#100MS;  // Appui continu bouton requis pour armer le geste
-    DeadmanArmGraceTime  : TIME := T#3S;     // Délai de grâce post-armement avant désarmement neutre
-    RawOutOfRangeMargin  : INT  := 500;      // Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)
-    Initialized          : BOOL := FALSE;    // 🚦 Flag restauration boot (interne pont FB_CfgPersistBridge_fbJoystick_Cfg)
 END_STRUCT
 END_TYPE
 </pre>
@@ -2826,7 +2902,7 @@ END_TYPE
    ⚙️ E_PresetConfirmMode — Mode de confirmation du preset codeur
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : sélectionner le fait public utilisé pour valider un preset.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE E_PresetConfirmMode :
@@ -2845,7 +2921,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
    🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE ST_fbEncoder_Cfg :
@@ -2864,7 +2940,7 @@ END_TYPE
    🎯 Regroupe les entrées/sorties hardware d&#x27;un codeur absolu EtherCAT
       pour exposer l&#x27;interface physique de FB_Encoder de façon testable.
    🔌 Producteur/consommateur : PRG_02_Acquisition câble ce bus vers le device.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_EncoderHw :
 STRUCT
@@ -2923,6 +2999,14 @@ END_TYPE
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\E_CODEURS\_TYPES\ST_EncoderMeasurements.st</code></summary>
                 <pre>(* =======================================================================
    📊 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
+   ───────────────────────────────────────────────────────────────
+   ⚠️ ORPHELIN (Tâche C5 — nettoyage données mortes) : ce type n&#x27;est plus
+   référencé par aucun consommateur dans le CODE actif (après consolidation
+   bus acquisition I8, le bus ST_AcquisitionInterPrg utilise désormais
+   EncoderM1/EncoderM2 : ST_AcquisitionEncoderQualified). CONSERVÉ (non
+   supprimé) car référencé par le harnais de test TOOLS/TEST_AUTO_CI/
+   registry.yaml (10 entrées) et par des artefacts bundle. → Proposé à
+   l&#x27;archivage APRÈS mise à jour du harnais de test.
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure frontière regroupant les sous-DUTs de mesure des treuils M1 et M2
    🔌 Interface : Producteur unique PRG_02_Acquisition
@@ -2998,7 +3082,7 @@ TYPE E_DiveSearchState :
 (
     WAIT_PRECONDITIONS := 0, (* Attente benne ouverte, positions et Kobold au repos *)
     READY_TO_DESCEND   := 1, (* Prêt à assister une demande de descente *)
-    SEARCHING_IMMERSION := 2, (* Descente : attente front 0-&gt;1 dans fenêtre eau *)
+    SEARCHING_IMMERSION := 2, (* Descending : attente front 0-&gt;1 dans fenêtre eau *)
     SEARCHING_BOTTOM    := 3, (* Immersion validée : attente front 1-&gt;0 au fond *)
     BOTTOM_CONFIRMED    := 4, (* Fond validé ; extraction peut être demandée *)
     ERROR_HOLD          := 5  (* Séquence invalide, descente assistée interdite *)
@@ -3007,23 +3091,48 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\E_ExtractionSequenceState.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\E_ExtractionAssistState.st</code></summary>
                 <pre>(* =======================================================================
-   ⚙️ E_ExtractionSequenceState — Phases d&#x27;extraction assistée
+   ⚙️ E_ExtractionAssistState — Phases d&#x27;extraction assistée
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Énumération des phases de la séquence d&#x27;extraction assistée
    📄 Doc métier : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    ======================================================================= *)
 
-TYPE E_ExtractionSequenceState :
+TYPE E_ExtractionAssistState :
 (
     WAIT_BOTTOM_CONFIRMATION := 0, (* Attente fond Kobold ou attestation opérateur *)
     READY_TO_CLOSE            := 1, (* Prêt à fermer la benne *)
     CLOSING_BUCKET            := 2, (* FB_Bucket ferme M2 seul *)
     CONTROL_ASCENT            := 3, (* M1/M2 synchronisés au palier sans contacteur vitesse *)
-    NOMINAL_ASCENT            := 4, (* Montée couplée avec vitesse demandée opérateur *)
+    NOMINAL_ASCENT            := 4, (* Ascending couplée avec vitesse demandée opérateur *)
     ERROR_HOLD                := 5  (* Défaut extraction, reprise interdite avant reset *)
 );
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\ST_MachineHoming.st</code></summary>
+                <pre>(* =======================================================================
+   🧭 ST_MachineHoming — Etat publie du homing conjoint machine (M1/M2/benne)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les 8 sorties homing a plat de PRG_02_Acquisition en
+             un bus struct unique, publie sur le bus inter-PRG.
+   🔒 Sécurité : Homed = qualification conjointe reference machine (gate SEMI_AUTO).
+                 HomingLoss = perte reference en mouvement : arret controle SafeStop.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   ======================================================================= *)
+TYPE ST_MachineHoming :
+STRUCT
+    Homed            : BOOL;          (* Qualification conjointe reference machine *)
+    SetPosBucketOpen : BOOL;          (* Valider position actuelle = reference benne ouverte *)
+    SetPosBucketClose: BOOL;          (* Valider position actuelle = reference benne fermee *)
+    Active           : BOOL;          (* Homing conjoint en cours *)
+    HomingLoss       : BOOL;          (* Perte reference en mouvement : arret controle SafeStop *)
+    Step             : INT;           (* Etape guidee reference *)
+    Instruction      : STRING(120);   (* Consigne IHM reference *)
+    Failed           : BOOL;          (* Transaction reference abandonnee *)
+END_STRUCT
 END_TYPE
 </pre>
             </details>
@@ -3040,7 +3149,8 @@ TYPE E_WinchFinalInterlockReason :
 (
     NONE                        := 0,                                 // Aucun blocage actif
     BRAKE_COMMAND_NOT_CONFIRMED := 1,                                 // Absence confirmation ouverture frein &gt; 500ms
-    RESTART_INHIBITED           := 2                                  // Inhibition redemarrage actif
+    RESTART_INHIBITED           := 2,                                 // Inhibition redemarrage actif
+    SENSE_DROP_TIMEOUT          := 3                                  // T_max §3bis depasse sans confirmation retombee (AC7)
 );
 END_TYPE
 </pre>
@@ -3061,8 +3171,167 @@ TYPE E_WinchFinalInterlockState :
     WAIT_BRAKE_COMMAND_CONFIRMATION := 2,                             // Attente confirmation feedback frein
     WAIT_STEP_DELAY                 := 3,                             // Temporisation changement de palier
     WAIT_RESTART_DELAY              := 4,                             // Temporisation anti-court-cycle redemarrage
-    FAULT                           := 5                              // Etat de defaut
+    FAULT                           := 5,                             // Etat de defaut
+    WAIT_SENSE_DROP_CONFIRM         := 6                              // Maintien §3bis du contacteur de sens (AC6/AC7)
 );
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\E_WinchTraceBlockReason.st</code></summary>
+                <pre>(* =======================================================================
+   E_WinchTraceBlockReason - Cause de blocage priorisee treuil (trace terrain)
+   -----------------------------------------------------------------------
+   Role : Ordre de priorite de la cause de blocage d&#x27;un treuil M1/M2,
+      calcule en PRG_04_Treuils_Benne (#8bis) et publie via Data.TraceM1/M2.
+      L&#x27;ordre de l&#x27;enum EST l&#x27;ordre de priorite (valeur croissante = priorite
+      decroissante) : la cause la plus grave gagne (PowerCutOff &gt; ... &gt; NONE).
+   Producteur unique : PRG_04_Treuils_Benne (#8bis).
+   Consommateur : FB_TroubleshootingView (recopie -&gt; GVL_Troubleshooting.TraceM1/2).
+   Lecture seule - aucune action de conduite n&#x27;en depend.
+   Doc metier : DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md
+   ======================================================================= *)
+{attribute &#x27;qualified_only&#x27;}
+TYPE E_WinchTraceBlockReason :
+(
+    NONE                    := 0,   // Aucun blocage - au moins un sens effectivement permis
+    POWER_CUTOFF            := 1,   // Coupure puissance amont (instSafetyWinch.PowerCutOff) - priorite max
+    AXIS_DISABLED           := 2,   // Axe neutralise (Mode=DISABLE ou InhibitMx -&gt; Enable FALSE)
+    SAFESTOP                := 3,   // SafeStop effectif (rampe rapide demandee)
+    SAFETY_FAULT            := 4,   // Defaut safety latched (FB_Safety_Winch.Fault.Error)
+    SAFETY_PERMIT_MISSING   := 5,   // Aucun sens ne delivre de permit safety (limite / mou de cable / homing)
+    PROCESS_PERMIT_MISSING  := 6,   // Permit process absent (benne / fond Kobold / limite legale / extraction)
+    COUPLING_BLOCKED        := 7,   // Couplage synchro anti-telescopage (l&#x27;autre axe bloque)
+    WINCH_FAULT             := 8,   // Defaut treuil latched (FB_Winch.Fault.Error)
+    FINAL_INTERLOCK_BLOCKED := 9    // Barriere finale en defaut (frein / redemarrage)
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_TraceWinch.st</code></summary>
+                <pre>(* =======================================================================
+   ST_TraceWinch - Trace de blocage terrain d&#x27;un treuil M1/M2
+   -----------------------------------------------------------------------
+   Role : Publier au technicien une vue consolidee &quot;pourquoi l&#x27;axe ne bouge
+   pas&quot; : permis effectifs par sens, source du SafeStop/coupure, cause de
+   blocage priorisee et horodatee.
+   Producteur unique : PRG_04_Treuils_Benne (#8bis) - 1 instance par axe
+       (TraceM1 / TraceM2 au sein de ST_WinchInterPrg).
+   Consommateur : FB_TroubleshootingView (pure recopie -&gt; GVL_Troubleshooting).
+   Lecture seule - aucun calcul de commande n&#x27;en depend.
+   BlockReasonTimestamp : ms depuis demarrage PLC (TIME()), latched au dernier
+       changement de BlockReason (1 scan, memoire).
+   Doc metier : DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md
+   ======================================================================= *)
+TYPE ST_TraceWinch :
+STRUCT
+    // Permis effectifs par sens (reflet exact des permis appliques au mouvement)
+    DescendPermitEffective  : BOOL;   // Descente effectivement permise (EffectivePermit*_Descend)
+    AscentPermitEffective   : BOOL;   // Montee effectivement permise (EffectivePermit*_Ascent)
+
+    // Source de SafeStop / coupure - pour distinguer l&#x27;origine du blocage
+    SafeStopActive          : BOOL;   // SafeStop effectif applique (SafeStop*_Active)
+    SafeStopSourceSafety    : BOOL;   // SafeStop issu de FB_Safety_Winch (defaut safety)
+    SafeStopSourceInput     : BOOL;   // SafeStop issu du module d&#x27;entree / homing / slip benne
+    SafeStopSourceSync      : BOOL;   // SafeStop issu de la synchro M1/M2 (couplage anti-telescopage)
+    PowerCutOffActive       : BOOL;   // Coupure puissance amont active (instSafetyWinch.PowerCutOff)
+    Inhibited               : BOOL;   // Axe neutralise (Mode=DISABLE ou InhibitMx)
+
+    // Barriere finale (fin de course mecanique / frein / redemarrage)
+    FinalInterlockError     : BOOL;   // Defaut barriere finale (frein / redemarrage)
+    FinalInterlockReason    : E_WinchFinalInterlockReason; // Cause barriere finale memorisee
+
+    // Cause de blocage priorisee + horodatage
+    BlockReason             : E_WinchTraceBlockReason; // Cause de blocage prioritaire
+    BlockReasonTimestamp    : UDINT;  // ms depuis demarrage PLC (TIME()) - dernier changement de BlockReason
+    StepNumber              : INT;    // Palier de vitesse actif (WinchState.StepNumber)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\_TYPES\E_TranslationFinalInterlockReason.st</code></summary>
+                <pre>(* =======================================================================
+   🛡️ E_TranslationFinalInterlockReason — Raisons d&#x27;interlock M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Énumération des raisons de blocage de la barrière finale M3
+   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   ======================================================================= *)
+{attribute &#x27;qualified_only&#x27;}
+TYPE E_TranslationFinalInterlockReason :
+(
+    NONE := 0,
+    BRAKE_COMMAND_NOT_CONFIRMED := 1,
+    RESTART_INHIBITED := 2
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\E_TranslationTraceBlockReason.st</code></summary>
+                <pre>(* =======================================================================
+   🎯 E_TranslationTraceBlockReason — Cause de blocage priorisée translation M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Ordre de priorité de la cause de blocage de la translation M3,
+      calculé en PRG_05_Translation et publié via Data.TranslationTrace.
+      L&#x27;ordre de l&#x27;enum EST l&#x27;ordre de priorité (valeur croissante = priorité
+      décroissante) : la cause la plus grave gagne (PowerCutOff &gt; … &gt; NONE).
+   📤 Producteur unique : PRG_05_Translation.
+   📥 Consommateur : FB_TroubleshootingView (recopie → GVL_Troubleshooting.TraceTranslation).
+   🔒 Lecture seule — aucune action de conduite n&#x27;en dépend.
+   📄 Doc métier : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
+   ======================================================================= *)
+{attribute &#x27;qualified_only&#x27;}
+TYPE E_TranslationTraceBlockReason :
+(
+    NONE              := 0,   // ✅ Aucun blocage — permis de mouvement effectif
+    POWER_CUTOFF      := 1,   // 🧨 Coupure puissance amont (instSafetyTranslationM3.PowerCutOff) — priorité max
+    SAFESTOP          := 2,   // 🟧 SafeStop effectif (InputModule OR safety M3)
+    SAFETY_FAULT      := 3,   // 🛡️ Défaut safety M3 latched (FB_Safety_Translation.Fault.Error)
+    HEIGHT_INTERLOCK  := 4,   // 🚧 Interlock hauteur M1/M2 actif (risque collision)
+    DRIVE_UNAVAILABLE := 5,   // 📡 Variateur AC600 injoignable / non opérationnel
+    FINAL_INTERLOCK   := 6,   // 🛑 Barrière finale en défaut (frein / redémarrage)
+    FAULT             := 7    // ❌ Défaut mouvement M3 latched (FB_Translation.Fault.Error)
+);
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\2_TRANSLATION\ST_TraceTranslation.st</code></summary>
+                <pre>(* =======================================================================
+   ↔️ ST_TraceTranslation — Trace de blocage terrain de la translation M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Publier au technicien « pourquoi la translation M3 ne bouge pas » :
+      permis de mouvement effectif, interlock hauteur, source SafeStop/coupure
+      et cause de blocage priorisée.
+   📤 Producteur unique : PRG_05_Translation (Data.TranslationTrace).
+   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.TraceTranslation).
+   🔒 Lecture seule — aucun calcul de commande n&#x27;en dépend.
+   🕒 BlockReasonTimestamp : ms depuis démarrage PLC (TIME()), latched au dernier
+      changement de BlockReason (1 scan, mémoire).
+   📄 Doc métier : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
+   ======================================================================= *)
+TYPE ST_TraceTranslation :
+STRUCT
+    // Permis de mouvement effectif (agrégat diagnostic : toutes les barrières levées)
+    MotionPermitEffective    : BOOL;   // 🟢 Translation réellement autorisée à se déplacer
+    HeightInterlockBlocking  : BOOL;   // 🚧 Interlock hauteur M1/M2 actif (risque collision)
+
+    // Source de blocage — pour distinguer l&#x27;origine
+    SafeStopActive           : BOOL;   // 🟧 SafeStop effectif appliqué (M3_SafeStop_Aggregate)
+    SafeStopSourceInput      : BOOL;   // 📥 SafeStop issu du module d&#x27;entrée (InputModuleFault)
+    SafeStopSourceSafety     : BOOL;   // 🛡️ SafeStop issu de FB_Safety_Translation (défaut safety)
+    PowerCutOffActive        : BOOL;   // 🧨 Coupure puissance amont active
+    DriveOperational         : BOOL;   // 📡 Variateur AC600 opérationnel
+
+    // Barrière finale (frein / redémarrage)
+    FinalInterlockError      : BOOL;   // 🛑 Défaut barrière finale (frein / redémarrage)
+
+    // Cause de blocage priorisée + horodatage
+    BlockReason              : E_TranslationTraceBlockReason; // 🎯 Cause de blocage prioritaire (ordre de priorité croissant)
+    BlockReasonTimestamp     : UDINT;  // 🕒 ms depuis démarrage PLC (TIME()) — dernier changement de BlockReason
+END_STRUCT
 END_TYPE
 </pre>
             </details>
@@ -3105,24 +3374,6 @@ STRUCT
     ActiveOffsetValid : BOOL;                                         // Validite offset actif calcule a jour
     StateIncoherent : BOOL;                                           // Etat non sur (divergence boot/reel)
 END_STRUCT
-END_TYPE
-</pre>
-            </details>
-            <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\E_TranslationFinalInterlockReason.st</code></summary>
-                <pre>(* =======================================================================
-   🛡️ E_TranslationFinalInterlockReason — Raisons d&#x27;interlock M3
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Énumération des raisons de blocage de la barrière finale M3
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
-   ======================================================================= *)
-{attribute &#x27;qualified_only&#x27;}
-TYPE E_TranslationFinalInterlockReason :
-(
-    NONE := 0,
-    BRAKE_COMMAND_NOT_CONFIRMED := 1,
-    RESTART_INHIBITED := 2
-);
 END_TYPE
 </pre>
             </details>
@@ -3191,7 +3442,7 @@ STRUCT
     ActiveOffset_M        : REAL;             (* 📐 Offset actif injecté dans la synchro *)
     M2StartStop         : BOOL;             (* 🛗 Commande Start/Stop forcée vers M2 *)
     M2Direction         : INT;              (* 🛗 Commande direction forcée vers M2 *)
-    M2ForceSlowSpeed    : BOOL;             (* 🐢 Blocage vitesse rapide de M2 *)
+    M2BucketJogLimit    : BOOL;             (* 🐢 Plafond palier du jog benne M2 *)
     Ready               : BOOL;             (* 🟢 Bloc opérationnel *)
     Busy                : BOOL;             (* ⚙️ Mouvement d&#x27;ouverture/fermeture en cours *)
     Done                : BOOL;             (* ✅ Mouvement terminé avec succès *)
@@ -3205,8 +3456,14 @@ STRUCT
     AutoBucketSeqActive : BOOL;             (* ⚙️ Séquencement automatique benne en cours (ouverture/fermeture auto) *)
     CoupledDiveOpenArmed    : BOOL;         (* : Ouverture auto armée (descente couplée demandée, benne pas ouverte) *)
     CoupledAscentCloseArmed : BOOL;         (* : Fermeture auto armée (montée couplée demandée, benne pas fermée) *)
-    ControlAscentActive     : BOOL;         (* : Phase vitesse contrôlée montée en cours (post-fermeture auto) *)
+    ExtractionControlActive : BOOL;         (* : Phase vitesse contrôlée montée en cours *)
     CoupledMotionBlockedByBucket : BOOL;    (* : Mouvement couplé bloqué -- auto-séquencement armé mais benne pas Busy (défaut/précondition) *)
+    MachineHomed : BOOL;           (* Reference M1/M2/benne atomiquement valide *)
+    MachineHomingStep         : INT;            (* Etape guidee de recuperation reference machine *)
+    MachineHomingInstruction  : STRING(120);    (* Instruction IHM unique et actionnable *)
+    MachineHomingFailed       : BOOL;           (* Transaction de homing conjoint abandonnee *)
+    MachineHomingActive : BOOL;      (* Homing conjoint en cours *)
+    MachineHomingLossSafeStop : BOOL;           (* Perte reference en mouvement : arret controle *)
 END_STRUCT
 END_TYPE
 </pre>
@@ -3291,6 +3548,15 @@ STRUCT
     Idx111_BucketIsIntermediate  : BOOL; // ↔️ Position intermédiaire (entrebâillée entre ouvert et fermé)
     Idx112_DeltaPosition_M       : REAL; // 📏 Écart réel signé M2 - M1 (mètres) en direct
 
+    Idx113_MachineHomed : BOOL; // Reference M1/M2/benne qualifiee
+    Idx114_MachineHomingStep         : INT;  // Etape guidee reference machine
+    Idx115_MachineHomingFailed       : BOOL; // Transaction reference abandonnee
+    Idx116_M1ReferenceMissing    : BOOL; // M1 non reference ou mesure douteuse
+    Idx117_M2ReferenceMissing    : BOOL; // M2 non reference ou mesure douteuse
+    Idx118_BucketOffsetUnknown   : BOOL; // Offset benne non confirme
+    Idx119_ReferenceTransaction  : BOOL; // Homing conjoint en cours
+    Idx120_MachineHomingLossSafeStop : BOOL; // Perte reference pendant mouvement
+
     Idx201_HmiCmd_BtnOpen        : BOOL; // 1 = Demande Ouverture IHM | 0 = Relâché
     Idx202_HmiCmd_BtnClose       : BOOL; // 1 = Demande Fermeture IHM | 0 = Relâché
     Idx203_CycleCmd_Open         : BOOL; // 1 = Demande Ouverture par le Cycle Auto
@@ -3309,11 +3575,12 @@ STRUCT
 
     Idx401_BucketBusy            : BOOL; // 1 = Mouvement Mâchoires en cours | 0 = Repos
     Idx402_BucketDone            : BOOL; // 1 = Position Cible Atteinte | 0 = En cours
-    Idx403_ControlAscentActive   : BOOL; // : 1 = Phase vitesse contrôlée montée en cours (post-fermeture auto)
+    Idx403_ExtractionControlActive : BOOL; // : 1 = Phase vitesse contrôlée montée en cours
 
     Idx501_M2_CmdRev_DQ          : BOOL; // 1 = Relais Action Benne M2 ON
 END_STRUCT
-END_TYPE</pre>
+END_TYPE
+</pre>
             </details>
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_ChainWinch.st</code></summary>
@@ -3341,15 +3608,15 @@ STRUCT
 
     Idx301_EmergencyChainClosed  : BOOL; // 1 = Boucle Urgence OK | 0 = Arrêt Urgence
     Idx302_SyncFaultActive       : BOOL; // 0 = Synchro OK | 1 = Écart Synchro Bloquant
-    Idx303_M1_AscentPermit       : BOOL; // 1 = Montée M1 Autorisée | 0 = Bloquée (Fdc/Safety)
-    Idx304_M2_AscentPermit       : BOOL; // 1 = Montée M2 Autorisée | 0 = Bloquée (Fdc/Safety)
+    Idx303_M1_AscentPermit       : BOOL; // 1 = Ascending M1 Autorisée | 0 = Bloquée (Fdc/Safety)
+    Idx304_M2_AscentPermit       : BOOL; // 1 = Ascending M2 Autorisée | 0 = Bloquée (Fdc/Safety)
 
     Idx401_SyncMotionAllowed     : BOOL; // 1 = Mouvement Synchro Autorisé | 0 = Bloqué
     Idx402_M1_SetpointSpeed_Pct  : REAL; // [%] Consigne Vitesse Calculée M1
     Idx403_M2_SetpointSpeed_Pct  : REAL; // [%] Consigne Vitesse Calculée M2
 
-    Idx501_M1_CmdRelayFwd_DQ     : BOOL; // 1 = Montée M1 ON | 0 = OFF
-    Idx502_M2_CmdRelayFwd_DQ     : BOOL; // 1 = Montée M2 ON | 0 = OFF
+    Idx501_M1_CmdRelayFwd_DQ     : BOOL; // 1 = Ascending M1 ON | 0 = OFF
+    Idx502_M2_CmdRelayFwd_DQ     : BOOL; // 1 = Ascending M2 ON | 0 = OFF
 END_STRUCT
 END_TYPE</pre>
             </details>
@@ -3380,14 +3647,14 @@ END_TYPE</pre>
 STRUCT
     Idx201_JoyRawPhysical_ANA    : INT;  // [pts] Bruts convertisseur (-2048 à +2048)
     Idx202_JoyScaledPhysical_Pct : REAL; // [%] Consigne Joystick (-100% à +100%)
-    Idx203_HmiManualCmd_BtnUp    : BOOL; // 1 = Appui Bouton Montée IHM | 0 = Relâché
-    Idx204_HmiManualCmd_BtnDown  : BOOL; // 1 = Appui Bouton Descente IHM | 0 = Relâché
+    Idx203_HmiManualCmd_BtnUp    : BOOL; // 1 = Appui Bouton Ascending IHM | 0 = Relâché
+    Idx204_HmiManualCmd_BtnDown  : BOOL; // 1 = Appui Bouton Descending IHM | 0 = Relâché
     Idx205_CycleAutoCmd_Pct      : REAL; // [%] Consigne auto envoyée par le Cycle
     Idx206_ModeActive            : E_Mode;// Mode courant (MANU_N1, AUTO_N1, MAINT_N2...)
     Idx207_BypassOperatorComm    : BOOL; // 0 = Comm Normale OK | 1 = Bypass Réseau Actif ⚠️
     Idx208_ArbitratedSpeed_Pct   : REAL; // [%] Consigne finale retenue après arbitrage
-    Idx209_ArbitratedDirection   : INT;  // +1 = Montée | 0 = Neutre | -1 = Descente
-    Idx210_CoupledUserRequestDirection : INT; // +1 = Montée | 0 = Neutre | -1 = Descente
+    Idx209_ArbitratedDirection   : INT;  // +1 = Ascending | 0 = Neutre | -1 = Descending
+    Idx210_CoupledUserRequestDirection : INT; // +1 = Ascending | 0 = Neutre | -1 = Descending
     Idx211_CoupledUserRequestActive    : BOOL; // 1 = demande utilisateur couplée active
 END_STRUCT
 END_TYPE</pre>
@@ -3409,8 +3676,8 @@ END_TYPE
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Outputs.st</code></summary>
                 <pre>TYPE ST_Chain_Winch_Outputs :
 STRUCT
-    Idx501_CmdRelayFwd_Up_DQ     : BOOL; // 1 = Relais Montée ON | 0 = OFF
-    Idx502_CmdRelayRev_Down_DQ   : BOOL; // 1 = Relais Descente ON | 0 = OFF
+    Idx501_CmdRelayFwd_Up_DQ     : BOOL; // 1 = Relais Ascending ON | 0 = OFF
+    Idx502_CmdRelayRev_Down_DQ   : BOOL; // 1 = Relais Descending ON | 0 = OFF
     Idx503_CmdSpeedContactor1_DQ : BOOL; // 1 = Contacteur Vitesse 1 ON | 0 = OFF
     Idx504_CmdSpeedContactor4_DQ : BOOL; // 1 = Contacteur Vitesse 4 ON (Plein Gaz) | 0 = OFF
     Idx505_CmdBrakeRelease_RQ    : BOOL; // 1 = Bobine Frein Alimentée (Ouvert) | 0 = Non Alimentée (Serré)
@@ -3426,10 +3693,10 @@ STRUCT
     Idx303_PowerCutOffActive     : BOOL; // 0 = Puissance OK | 1 = Coupure Puissance Sécurité
     Idx304_TopSensorPhysical_DI  : BOOL; // 1 = Capteur Haut Libre (Sain) | 0 = Butée Haute Atteinte
     Idx305_TopSensorBypassActive : BOOL; // 0 = Capteur Actif | 1 = Capteur Haut Shunté IHM ⚠️
-    Idx306_AscentPermitEffective  : BOOL; // 1 = Montée Autorisée | 0 = MONTÉE BLOQUÉE
+    Idx306_AscentPermitEffective  : BOOL; // 1 = Ascending Autorisée | 0 = ASCENDING BLOQUÉE
     Idx307_SlackCablePhysical_DI : BOOL; // 1 = Câble Tendu (Sain) | 0 = Mou de Câble Détecté
     Idx308_SlackCableBypassActive: BOOL; // 0 = Capteur Actif | 1 = Mou de Câble Shunté IHM ⚠️
-    Idx309_DescendPermitEffective: BOOL; // 1 = Descente Autorisée | 0 = DESCENTE BLOQUÉE
+    Idx309_DescendPermitEffective: BOOL; // 1 = Descending Autorisée | 0 = DESCENDING BLOQUÉE
     (* Défauts safety déchiffrés (bits ErrorId) — visibles individuellement à l&#x27;IHM *)
     Idx310_ErrorOperatorComm : BOOL; // bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)
     Idx311_ErrorEncoder      : BOOL; // bit1 Perte codeur de ce treuil
@@ -3546,8 +3813,8 @@ STRUCT
     Error             : BOOL;    (* 🛡️ Bloc sécurité (Safety) en défaut *)
     ErrorId           : WORD;    (* ❌ Code bitfield du défaut de sécurité *)
     SafeStop          : BOOL;    (* 🟧 Arrêt rapide activé par la sécurité *)
-    DescendPermit     : BOOL;    (* 🟢 Descente autorisée (TRUE = OK | FALSE = mou de câble / limite basse) *)
-    AscentPermit      : BOOL;    (* 🟢 Montée autorisée (TRUE = OK | FALSE = fin de course haut) *)
+    DescendPermit     : BOOL;    (* 🟢 Descending autorisée (TRUE = OK | FALSE = mou de câble / limite basse) *)
+    AscentPermit      : BOOL;    (* 🟢 Ascending autorisée (TRUE = OK | FALSE = fin de course haut) *)
     SlackCable        : BOOL;    (* ⚠️ Mou de câble physiquement détecté *)
     ThermalFault      : BOOL;    (* 🔥 Surchauffe thermique moteur *)
     EncoderFault      : BOOL;    (* 🔌 Perte de liaison ou incohérence codeur *)
@@ -3651,6 +3918,19 @@ STRUCT
                                                     UNIQUEMENT actif si MAINT_N2 (voir FB_Modes.InhibitM1/M2) *)
     BtnHomingAtZero     : BOOL;             (* Force le homing à 0 m (points codeur centre),
                                                     sans devoir modifier CfgTopSensorPos_M *)
+    BtnOverrideTopSoftware : BOOL;          (* Autorisation MAINTENUE de dépasser le FDC
+                                                    haut LOGICIEL (7,5 m) jusqu&#x27;au capteur physique
+                                                    (CfgTopSensorPos_M ≈ 8,5 m). Bouton, pas toggle :
+                                                    relâché ➔ retour immédiat à 7,5 m. Sans effet hors
+                                                    MAINT_N1 (N2 utilise le bypass latché
+                                                    Bypass.TopLimitSoftware). N&#x27;ouvre JAMAIS le FDC
+                                                    capteur physique. *)
+    BtnLearnSpeed : BOOL;                   (* 💾 Bit IHM lancer l&#x27;apprentissage passif des vitesses
+                                                    réelles par palier (FB_WinchSpeedLearning, T181-15).
+                                                    Collecteur STRICTEMENT PASSIF : aucune commande moteur.
+                                                    Maintenu pendant la collecte ; la table RETAIN
+                                                    _WinchSpeedLearnTable est remplie par palier/sens/
+                                                    charge/vide. *)
 END_STRUCT
 END_TYPE
 </pre>
@@ -3762,6 +4042,20 @@ STRUCT
 
     // === 🛡️ Permission d&#x27;armement homme-mort (Option B — combiné interlock benne) ===
     ArmingPermit                 : BOOL;               // 🛡️ Permission d&#x27;armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)
+
+    // === Usage effectif d&#x27;un override/bypass de POSITION (consommé PRG_03 → FB_Modes) ===
+    // Producteur unique : PRG_04_Treuils_Benne §5. Lecteur : PRG_03_Modes_Cycle (lag 1 scan assumé,
+    // même doctrine que les autres échanges PRG_03/PRG_04 de ce bus).
+    // TRUE = la limite de position de cet axe est actuellement levée au-delà du nominal :
+    // override FDC logiciel N1 maintenu OU bypass N2 effectif de la famille position
+    // (TopLimitSwitch / TopLimitSoftware / CableLimitSwitch / LimitLegal / MecaD).
+    // Sert à armer le re-homing obligatoire (AF-05 §4bis) — n&#x27;est PAS un permis de mouvement.
+    PositionLimitOverriddenM1    : BOOL;               // 🧭 Treuil M1 — limite de position levée
+    PositionLimitOverriddenM2    : BOOL;               // 🧭 Treuil M2 — limite de position levée
+
+    // === 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView) ===
+    TraceM1                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M1 (cause priorisée + horodatage)
+    TraceM2                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M2 (cause priorisée + horodatage)
 END_STRUCT
 END_TYPE
 </pre>
@@ -3790,6 +4084,7 @@ STRUCT
     SpeedCmd_Pct            : REAL;             (* 📈 Commande de vitesse finale après rampe (%) *)
     StepNumber              : INT;              (* 🔢 Palier de vitesse actif (0..5) *)
     FBState                 : E_State;          (* 🤖 État de l&#x27;automate interne (FB_Winch) *)
+    AxisBlockReason         : E_WinchTraceBlockReason; (* 🧩 Cause prioritaire de blocage (miroir de TraceMx.BlockReason) *)
     Ready                   : BOOL;             (* 🟢 Treuil prêt à fonctionner *)
     Busy                    : BOOL;             (* ⚙️ Mouvement en cours *)
     Done                    : BOOL;             (* ✅ Action terminée *)
@@ -3797,8 +4092,8 @@ STRUCT
     ErrorId                 : WORD;             (* ❌ Code bitfield du défaut treuil *)
 
     (* 🔌 Sorties Physiques / Indicateurs LEDs *)
-    RelayFwd                : BOOL;             (* 🛗 Relais Montée activé *)
-    RelayRev                : BOOL;             (* 🛗 Relais Descente activé *)
+    RelayFwd                : BOOL;             (* 🛗 Relais Ascending activé *)
+    RelayRev                : BOOL;             (* 🛗 Relais Descending activé *)
     Contactor1              : BOOL;             (* 🔌 Contacteur vitesse palier 1 *)
     Contactor2              : BOOL;             (* 🔌 Contacteur vitesse palier 2 *)
     Contactor3              : BOOL;             (* 🔌 Contacteur vitesse palier 3 *)
@@ -3979,6 +4274,7 @@ STRUCT
     Idx314_ErrorMecaA        : BOOL; // bit5 Mouvement non commandé
     Idx315_ErrorLimitSwitch  : BOOL; // bit6 Limite extrême atteinte
     Idx316_ErrorSensorIncoherent: BOOL; // bit7 Mot capteurs position incohérent
+    Idx317_ErrorId           : WORD; // Masque brut complet (latch cause) — source d&#x27;arbitrage PowerCutOff
 END_STRUCT
 END_TYPE</pre>
             </details>
@@ -4182,6 +4478,9 @@ STRUCT
     M3_AtTremieStable         : BOOL; // 🎯 M3 positionne stable a la Tremie
     M3_AtP1Stable             : BOOL; // 🎯 M3 positionne stable au Point 1
     M3_AtMaintenanceStable    : BOOL; // 🎯 M3 positionne stable en zone Maintenance
+
+    // === 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView) ===
+    TranslationTrace             : ST_TraceTranslation; // 🕵️ Trace blocage translation M3 (cause priorisée + horodatage)
 END_STRUCT
 END_TYPE
 </pre>
@@ -4197,6 +4496,7 @@ TYPE ST_TranslationState :
 STRUCT
     (* 🚦 États &amp; diagnostics FB_Translation *)
     FBState                 : E_State; (* 🤖 État de l&#x27;automate interne (FB_Translation) *)
+    AxisBlockReason         : E_TranslationTraceBlockReason; (* 🧩 Cause prioritaire de blocage (miroir de TranslationTrace.BlockReason) *)
     Ready                   : BOOL;    (* 🟢 Translation prêt à fonctionner *)
     Busy                    : BOOL;    (* ⚙️ Mouvement en cours *)
     Done                    : BOOL;    (* ✅ Mouvement terminé avec succès *)
@@ -4467,33 +4767,14 @@ STRUCT
     EmergencyArmingBusy   : BOOL;   (* ⏳ Auto-test A/B, pulse, confirmation OU verrouillage 5s en cours — nouvelle demande ignorée *)
     RedundancyTestFailed  : BOOL;   (* Canal A ou B non fonctionnel détecté à l&#x27;auto-test — bloque tout réarmement (front Reset requis) *)
     EmergencyArmingFailed : BOOL;   (* Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis) *)
+
+    (* Miroir IHM des états de maintenance (AF-05 §4bis) *)
+    ModeChangePendingBlocked : BOOL;   (* 🚦 Changement de mode refusé : treuils non à l&#x27;arrêt confirmé (contacteurs retombés + frein serré + |v| &lt; seuil) *)
+    HomingRequiredM1         : BOOL;   (* 🧭 M1 : re-homing obligatoire avant retour SEMI_AUTO *)
+    HomingRequiredM2         : BOOL;   (* 🧭 M2 : re-homing obligatoire avant retour SEMI_AUTO *)
 END_STRUCT
 END_TYPE
 </pre>
-            </details>
-            <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_fbModes_Autorisations.st</code></summary>
-                <pre>(* ═══════════════════════════════════════════════════════════════
-   🎚️ ST_fbModes_Autorisations — Bus d&#x27;autorisations du mode machine
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
-                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
-   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
-      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
-   ═══════════════════════════════════════════════════════════════ *)
-
-TYPE ST_fbModes_Autorisations :
-STRUCT
-    Mode                        : E_Mode;     // Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)
-    SyncEnable                  : BOOL;       // Synchro M1/M2 (logique positive)
-    InhibitM1                   : BOOL;       // Inhibition M1 (MAINT_N2 only)
-    InhibitM2                   : BOOL;       // Inhibition M2 (MAINT_N2 only)
-    JoystickWinchSelectArbitrated : INT;      // 0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)
-    HomingApproachEnable        : BOOL;       // Dépassement butée haut (N2)
-    MaintenanceM3TargetEnable   : BOOL;       // Cible Translation Maintenance (N2 only)
-END_STRUCT
-END_TYPE</pre>
             </details>
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\D_JOYSTICK\ST_fbJoystick_AxisCmd.st</code></summary>
@@ -4501,7 +4782,8 @@ END_TYPE</pre>
    🕹️ ST_fbJoystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d&#x27;axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📤 Champs : Enable, StartStop, SpeedTgt (%) + StepTgt (palier 1..5) + direction en bits
+               (DirectionPositive/Negative, AtNeutral). SpeedTgt reste pour l&#x27;IHM, StepTgt pour la logique.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    ======================================================================= *)
 
@@ -4510,7 +4792,8 @@ STRUCT
     // === CONSIGNES DE PILOTAGE AXE ===
     Enable      : BOOL;   // --&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
     StartStop   : BOOL;   // --&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)
-    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)
+    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction) - IHM
+    StepTgt     : INT;    // --&gt; [CMD] Palier de vitesse (1..5, 0=arret) - logique/limitations (derive de SpeedTgt)
     DirectionNegative   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     DirectionPositive   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     AtNeutral   : BOOL;   // --&gt; [CMD] TRUE si axes en zone morte (position centrale)
@@ -4660,6 +4943,50 @@ END_TYPE
 </pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_InputSource.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🔀 ST_InputSource — Flags de bascule de source (réel/simu) par domaine
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les 4 impulsions 1 cycle signalant qu&#x27;une source
+      d&#x27;entrée a basculé (réel ↔ simu) pour un domaine donné.
+   📤 Producteur unique : PRG_02_Acquisition (Data.InputSource).
+   📥 Consommateur : PRG_07_Supervision (Data.InputSource.* → GVL_IHM).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_InputSource :
+STRUCT
+    WinchInputSourceChanged       : BOOL; // 🔀 Source Winch a basculé (réel/simu)
+    TranslationInputSourceChanged: BOOL; // 🔀 Source Translation a basculé
+    OperatorInputSourceChanged   : BOOL; // 🔀 Source Opérateur a basculé
+    MachineInputSourceChanged    : BOOL; // 🔀 Source Machine a basculé
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_M3DriveFeedback.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   ↔️ ST_M3DriveFeedback — Retours variateur M3 filtrés
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les retours variateur M3 (mot d&#x27;état + fréquence réelle)
+      conditionnés par PRG_02_Acquisition et consommés par PRG_05_Translation.
+   📤 Producteur unique : PRG_02_Acquisition (Data.M3).
+   📥 Consommateur : PRG_05_Translation (Data.M3.StatusWord / Data.M3.ActualFrequencyHz).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_M3DriveFeedback :
+STRUCT
+    StatusWord        : UINT; // 📊 Mot d&#x27;état variateur M3 filtré
+    ActualFrequencyHz : UINT; // 📊 Fréquence réelle M3 filtrée
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_AcquisitionInterPrg.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧲 ST_AcquisitionInterPrg — Bus d&#x27;échange inter-PRG produit par PRG_02_Acquisition
@@ -4682,35 +5009,14 @@ STRUCT
     Network                      : ST_AcquisitionNetworkDiagnostics;  // 🔌 Diagnostics réseaux CANopen et EtherCAT
     EncoderM1                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M1 (Retenue)
     EncoderM2                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M2 (Benne)
-
-    // === 🧲 Mesures codeurs M1/M2 (compatibilité de transition) ===
-    Encoders                     : ST_EncoderMeasurements;             // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
-
-    // === 🛡️ Gates fiabilité codeurs (compatibilité de transition) ===
-    M1_EncoderFault              : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
-    M2_EncoderFault              : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
-    M1_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
-    M2_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
-
-    // === 🕹️ États joystick qualifiés (compatibilité de transition) ===
-    JoystickDeadmanArmed         : BOOL; // 🔒 Homme-mort joystick arme (1=Arme)
-    JoystickYNeutral             : BOOL; // 🟢 Axe Y joystick au neutre
-    JoystickDirectionX           : INT;  // 🎯 Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
-    JoystickSpeedPctX            : REAL; // 📈 Magnitude deviation axe X en % (0..100)
-    JoystickXNeutral             : BOOL; // 🟢 Axe X joystick au neutre
+    MachineHoming                : ST_MachineHoming;                   // 🎯 État homing conjoint machine (M1/M2/benne)
 
     // === 🩺 Diagnostics modules E/S ===
-    LocalDigitalIoOk             : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
-    Vh0800EndOk                  : BOOL; // 🟢 Module VH_0800END OK (DI8)
-    Vh0808EtpOk                  : BOOL; // 🟢 Module VH_0808ETP OK (DI8/DO8)
-    Vh0008ErOk                   : BOOL; // 🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)
-    Vh0008Er1Ok                  : BOOL; // 🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
-    InputModuleFault             : BOOL; // ❌ Defaut sur au moins un module E/S
+    InputModules                 : ST_IOModuleDiag; // 🩺 Diagnostic carte des 5 modules E/S (AF06 §3bis)
 
     // === 🧪 Simulation &amp; variateur M3 filtré ===
-    WinchInputSourceChanged       : BOOL; // 🔀 Impulsion 1 cycle si source Winch bascule (IHM)
-    M3_StatusWord_Filtered        : UINT; // 📊 Mot d&#x27;etat variateur M3 filtre (consommé PRG_05)
-    M3_ActualFrequencyHz_Filtered : UINT; // 📊 Frequence reelle M3 filtree (consommé PRG_05)
+    InputSource                  : ST_InputSource; // 🔀 Flags de bascule de source (réel/simu) par domaine
+    M3                           : ST_M3DriveFeedback; // ↔️ Retours variateur M3 filtrés (consommé PRG_05)
 END_STRUCT
 END_TYPE
 </pre>
@@ -4820,8 +5126,8 @@ STRUCT
 
     (* 1bis. Entrées physiques directes HwIn *)
     HwIn_JoyBtnRaw_DI            : BOOL; (* Bouton brut homme-mort issu de HwIn.Operator *)
-    NeutralXAct                  : BOOL; (* TRUE = Axe X au neutre (PRG_02_Acquisition.JoystickXNeutral) *)
-    NeutralYAct                  : BOOL; (* TRUE = Axe Y au neutre (PRG_02_Acquisition.JoystickYNeutral) *)
+    NeutralXAct                  : BOOL; (* TRUE = Axe X au neutre (PRG_02_Acquisition.Data.Joystick.AxisX.Direction = 0) *)
+    NeutralYAct                  : BOOL; (* TRUE = Axe Y au neutre (PRG_02_Acquisition.Data.Joystick.AxisY.Direction = 0) *)
 
     (* 2. Prise en main &amp; Sécurité *)
     Step3_DeadmanPressed         : BOOL; (* TRUE = Bouton Homme-Mort appuyé *)
@@ -4919,10 +5225,10 @@ STRUCT
     Idx301_ExtractionReady           : BOOL; // 1 = Assistance Extraction Prête | 0 = Non Prête
     Idx302_ExtractionBusy            : BOOL; // 1 = Séquence Extraction En Cours | 0 = Repos
     Idx303_ExtractionDone            : BOOL; // 1 = Extraction Terminée | 0 = En Cours
-    Idx304_ExtractionState           : E_ExtractionSequenceState; // État interne séquenceur extraction
+    Idx304_ExtractionState           : E_ExtractionAssistState; // État interne séquenceur extraction
     Idx305_ExtractionError           : BOOL; // 0 = Sain | 1 = Défaut Extraction
     Idx306_ExtractionErrorId          : WORD; // bit0: fond absent, bit1: fermeture, bit2: contrôle remontée, bit3: config
-    Idx307_ExtractionStepAtFault     : E_ExtractionSequenceState; // Étape figée à l&#x27;apparition du défaut extraction (ERROR_HOLD masque l&#x27;état vivant)
+    Idx307_ExtractionStepAtFault     : E_ExtractionAssistState; // Étape figée à l&#x27;apparition du défaut extraction (ERROR_HOLD masque l&#x27;état vivant)
 
     Idx401_OperatorActionId          : WORD;       // Identifiant consigne opérateur conduite (0 = aucune)
     Idx402_OperatorAction            : STRING(120); // Texte consigne opérateur (secours affichage)
@@ -4931,7 +5237,7 @@ STRUCT
     Idx502_DumpAtTremieAssistActive  : BOOL; // 1 = Mode réellement actif (armé ET Mode MAINT_N1/N2) | 0 = Inactif
     Idx503_DumpAtTremieAtTremie      : BOOL; // 1 = M3 à la position Trémie | 0 = Ailleurs
     Idx504_DumpAtTremieBucketOpenArmed : BOOL; // 1 = Ouverture benne armée par ce mode | 0 = Non armée
-    Idx505_DumpAtTremieDescentLocked : BOOL; // 1 = Descente M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre
+    Idx505_DumpAtTremieDescentLocked : BOOL; // 1 = Descending M1/M2 verrouillée (M3 hors P1/Maintenance) | 0 = Libre
 
     Idx601_BypassDiveActive          : BOOL; // 1 = Bypass séquence DiveSearch armé (IHM)
     Idx602_BypassKoboldBottomTouched : BOOL; // 1 = Fond confirmé par le bypass (front montant Kobold en descente)
@@ -5020,8 +5326,8 @@ STRUCT
     ExtractionDone             : BOOL;
     ExtractionError            : BOOL;
     ExtractionErrorId          : WORD;
-    ExtractionState            : E_ExtractionSequenceState;
-    ExtractionStepAtFault      : E_ExtractionSequenceState;
+    ExtractionState            : E_ExtractionAssistState;
+    ExtractionStepAtFault      : E_ExtractionAssistState;
     OperatorActionId           : WORD;       (* Une seule consigne conduite, arbitré en PRG_09 *)
     OperatorAction             : STRING(120); (* Texte de secours ; IHM peut mapper l&#x27;identifiant *)
     // : mode vidage à la trémie (pas de FB dédié, logique combinatoire PRG_04)
@@ -5100,6 +5406,31 @@ END_TYPE
 </pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_IOModuleDiag.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🩺 ST_IOModuleDiag — Diagnostic carte des 5 modules E/S physiques
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3bis
+   🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
+      pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
+      TOR ment, seulement qu&#x27;aucune des TOR qu&#x27;il porte n&#x27;est fiable.
+   🔗 Producteur : PRG_02_Acquisition (5 appels GetDeviceState()).
+   🔌 Consommateurs : PRG_04 (SafeStop treuils), PRG_05 (SafeStop M3),
+      PRG_07 (recopie IHM GVL_IHM.Network.InputModules + FB_TroubleshootingView).
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_IOModuleDiag :
+STRUCT
+    LocalDigitalIoOk : BOOL;  // Module Local_Digital_IO OK (DI8/DO8)
+    Vh0800EndOk      : BOOL;  // Module VH_0800END OK (DI8)
+    Vh0808EtpOk      : BOOL;  // Module VH_0808ETP OK (DI8/DO8)
+    Vh0008ErOk       : BOOL;  // Module VH_0008ER OK (DO8 Relais Freins/Kobold)
+    Vh0008Er1Ok      : BOOL;  // Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
+    Fault            : BOOL;  // Défaut sur au moins un module E/S
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_InputModuleDiagHMI.st</code></summary>
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🩺 ST_InputModuleDiagHMI — Diagnostic carte des modules DI TOR réelles
@@ -5143,7 +5474,7 @@ STRUCT
 
     (* 2. Intention &amp; Demande *)
     Step4_MotionRequested        : BOOL; (* TRUE = Demande active (Bouton IHM ou Joystick) ➔ Si IHM : TglJoystickMaster doit être à 0 ! *)
-    RequestedDirection           : INT;  (* +1 = Montée, -1 = Descente, 0 = Repos *)
+    RequestedDirection           : INT;  (* +1 = Ascending, -1 = Descending, 0 = Repos *)
     RequestedSpeedPct            : REAL; (* 0..100 % consigne demandée *)
 
     (* 3. Chaîne de Sécurité &amp; Verrous *)
@@ -5154,8 +5485,8 @@ STRUCT
 
     (* 4. Bilan &amp; Exécution Physiques *)
     AllConditionsMet             : BOOL; (* 🟢 TRUE = TOUTES LES CONDITIONS SONT REMPLIES, LES RELAIS DOIVENT COLLER ! *)
-    RelayFwdActive               : BOOL; (* 🛗 Relais Montée physiquement commandé *)
-    RelayRevActive               : BOOL; (* 🛗 Relais Descente physiquement commandé *)
+    RelayFwdActive               : BOOL; (* 🛗 Relais Ascending physiquement commandé *)
+    RelayRevActive               : BOOL; (* 🛗 Relais Descending physiquement commandé *)
     SpeedContactor1Active        : BOOL; (* 🔌 Contacteur de vitesse Palier 1 commandé *)
 END_STRUCT
 END_TYPE
@@ -5331,7 +5662,7 @@ STRUCT
     LimitLegalDepthMinAllowed_M : REAL := -999.0; (* 📐 Cote min de dragage autorisée (m, négatif) *)
     LimitLegalEnabled           : BOOL; (* 🟢 Activation de la limite légale *)
     SelHomingApproachEnable     : BOOL; (* 🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2) *)
-    WinchMaxStepDescente        : INT := 3;     (* 🛑 Limitation palier vitesse en descente (1..5), commun M1/M2 *)
+    WinchMaxStepDescending      : INT := 3;     (* 🛑 Limitation palier vitesse en descending (1..5), commun M1/M2 *)
     WinchMaxStepAscent          : INT := 5;     (* 🚀 Limitation palier vitesse en montée (1..5), commun M1/M2 *)
     WinchSlowdownDistance_M     : REAL := 1.0;  (* 📏 Distance avant limite pour enclencher le ralentissement (m), commun M1/M2 *)
     // : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
@@ -5341,7 +5672,7 @@ STRUCT
     TglEnableKoboldAutoStopDescent : BOOL := FALSE; (* : Arrêt auto descente sur détection fond Kobold (pilotage normal) *)
     // Coupe-circuit d&#x27;urgence pour le séquencement auto benne.
     // Défaut FALSE = mouvement M1/M2 synchro jamais
-    // gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionSequence).
+    // gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionAssist).
     TglEnableCoupledBucketSequencing : BOOL := FALSE;
     Initialized                 : BOOL := FALSE; (* 🚦 flag restauration boot *)
 END_STRUCT
@@ -5670,7 +6001,7 @@ RawPosOut := RawPos;
       (forcer `RawButton` en instance CODESYS) pour armer — comportement
       métier testé pour de vrai, pas contourné.
    🕹️ Comportement dynamique (conception validée) :
-      - Montée : bouton actif → `RawX`/`RawY` monte de `NeutralRaw` vers la cible
+      - Ascending : bouton actif → `RawX`/`RawY` monte de `NeutralRaw` vers la cible
         (0 ou `MaxRaw`) en `RiseTimeS`, avec un bruit pseudo-aléatoire léger.
       - Dépassement (`OvershootActive`) : la cible de montée DÉPASSE la butée
         (MaxRaw+AMT ou 0−AMT) → déclenche le défaut capteur hors plage.
@@ -5807,7 +6138,7 @@ ELSE
 END_IF;
 {endregion}
 
-{region &quot;§5 Montée (rampe + bruit)&quot;}
+{region &quot;§5 Ascending (rampe + bruit)&quot;}
 IF State = CST_ST_RISE THEN
     // Pas de montée : pleine course (MaxRaw−NeutralRaw) en RiseTimeS.
     RiseStep := INT_TO_REAL(MaxRaw - NeutralRaw) / (RiseTimeS / CycleTimeS);
@@ -6151,6 +6482,7 @@ VAR_INPUT
 
     // ── Stimuli &amp; Paramètres de banc ─────────────────────────────────────────
     SimEncoderSpeedFactor      : REAL := 1.0;   (* --&gt; [CFG] Facteur vitesse codeur *)
+    SimTopPositionActive       : BOOL := FALSE; (* --&gt; [TST] Capteur haut commun actif (référencement benne) *)
     SimSyncDeviationInjectM1   : BOOL := FALSE;   (* --&gt; [TST] Injection écart synchro M1 *)
     SimSyncDeviationInjectM2   : BOOL := FALSE;   (* --&gt; [TST] Injection écart synchro M2 *)
     SimSyncDeviationOffset_M   : REAL := 0.5;   (* --&gt; [TST] Offset écart synchro *)
@@ -6300,7 +6632,9 @@ Winch.M2_ContactorsReleased_DI := NOT (M2_RelayFwd OR M2_RelayRev
                                     OR M2_SpeedContactor_3 OR M2_SpeedContactor_4);
 Winch.M2_ThermalOk_DI          := TRUE;
 
-Winch.M1M2_TopPositionFree_DI  := TRUE; // Butée libre au repos en simu
+// Polarité matériel : le nom *_Free_DI vaut TRUE hors butée. Le stimulus de
+// banc est exprimé positivement (TopPositionActive) puis inversé ici.
+Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
 Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
@@ -6453,6 +6787,7 @@ test_fb_simbench.st
   [PASS] TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub)
   [PASS] TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd
   [PASS] TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret
+  [PASS] T196-003 Stimulus capteur haut actif expose la polarite Free_DI correcte
   [PASS] TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop
   [PASS] TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming
   [PASS] TC-P13-022 Sim_Safety Enable=FALSE neutralise tout
@@ -6470,7 +6805,7 @@ test_fb_simbench.st
   [PASS] TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)
 
 -----------------------------------------
-21 tests, 21 passed, 0 failed
+22 tests, 22 passed, 0 failed
 </pre>
     </details>
 </div>

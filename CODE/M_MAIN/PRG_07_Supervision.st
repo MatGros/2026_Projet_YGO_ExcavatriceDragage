@@ -560,6 +560,7 @@ instHmiBannerFormatter(
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
     RedundancyTestFailed         := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed,
     EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
+    ArmingSeqStep                := PRG_06_Outputs.ArmingSeqStep,
     LastAbortCause               := PRG_06_Outputs.EmergencyDiag.LastAbortCause,
     AlarmHoldTime               := T#1s,
     Network                     := GVL_IHM.Network

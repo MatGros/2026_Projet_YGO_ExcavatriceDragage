@@ -267,6 +267,19 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                     json_data = json.loads(json_result.stdout)
                 except json.JSONDecodeError:
                     json_data = None
+                # Le rapport ne doit jamais afficher comme resultat final les assertions
+                # du runner initial STruCpp : pour VAR_IN_OUT elles sont executees avant
+                # injection du copy-out et sont donc semantiquement fausses. On conserve
+                # les diagnostics de compilation precedant le marqueur et on publie le
+                # verdict du runner recompile qui vient d'alimenter json_data.
+                if copyout_exe is not None:
+                    initial_runner_marker = "STruC++ Test Runner v1.0"
+                    if initial_runner_marker in text_report:
+                        text_report = text_report.split(initial_runner_marker, 1)[0].rstrip()
+                    text_report += (
+                        "\n[VAR_IN_OUT] Assertions executees par le runner copy-out "
+                        "recompile; voir le resultat JSON final.\n"
+                    )
             if enable_chronogram:
                 if debug:
                     print(_progress_line("chronogramme"), flush=True)
@@ -403,7 +416,13 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         counter = f" {n_pass}/{len(tests)}" if n_tests_declared else ""
         print(f"\r{f'-> {fb_name} ({domain})...{counter}'.ljust(70)}")
 
-        ok = result.returncode == 0 and test_runner_rc == 0 and bool(json_data) and all(t["passed"] for t in tests)
+        # STruCpp execute son runner initial pendant la generation de --test.
+        # Pour une FB avec VAR_IN_OUT, ce runner connait le copy-in mais pas le
+        # copy-out CODESYS et peut donc retourner 1 malgre une compilation C++
+        # reussie. Le verdict doit etre porte par le runner final (post-traite
+        # puis recompile) : son existence prouve la compilation et son JSON
+        # porte les assertions executees avec la semantique VAR_IN_OUT correcte.
+        ok = test_runner_rc == 0 and bool(json_data) and all(t["passed"] for t in tests)
         return {"ok": ok, "tests": tests, "report": report_path,
                 "af_warnings": af_warnings, "extra_test_warnings": extra_test_warnings,
                 "encapsulation_report": encapsulation_report,

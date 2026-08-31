@@ -287,6 +287,9 @@ FB_Winch:
 
 FB_Bucket:
   domain: H_TREUILS_BENNE
+  prod_instance:
+    file: CODE/M_MAIN/PRG_04_Treuils_Benne.st
+    name: instBucket
   sources:
     - CODE/A_COMMUN/_TYPES/E_State.st
     - CODE/A_COMMUN/_TYPES/ST_Fault.st
@@ -386,6 +389,9 @@ FB_SimBench:
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
     - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
+    # FB_SimBench ne lit aucun champ de JoystickHMI.Cfg : maquette STruCpp
+    # necessaire car le convertisseur ne gere pas les initialiseurs STRUCT imbriques.
+    - TOOLS/TEST_AUTO_CI/MOCKS/ST_fbJoystick_Cfg.st
     - CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
@@ -394,8 +400,15 @@ FB_SimBench:
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
+    - CODE/G_CYCLE/_TYPES/E_ExtractionAssistState.st
+    - CODE/G_CYCLE/_TYPES/ST_MachineHoming.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
+    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/E_WinchTraceBlockReason.st
+    - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_TraceWinch.st
+    - CODE/I_TRANSLATION/_TYPES/E_TranslationFinalInterlockReason.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/E_TranslationTraceBlockReason.st
+    - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TraceTranslation.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st
@@ -454,6 +467,8 @@ FB_SimBench:
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st
+    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_InputSource.st
+    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_M3DriveFeedback.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st
@@ -470,6 +485,7 @@ FB_SimBench:
     - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistState.st
     - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_ChainContextGlobal.st
     - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st
+    - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_IOModuleDiag.st
     - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st
     - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st
     - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st

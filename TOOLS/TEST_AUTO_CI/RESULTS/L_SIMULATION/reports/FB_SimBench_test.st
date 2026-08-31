@@ -68,6 +68,18 @@ TEST 'TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret'
     ASSERT_EQ(FB_Bench.Translation.M3_StatusWord, 16#0080, 'M3 a l arret -> StatusWord 0x0080 (bit0 retombe)');
 END_TEST
 
+TEST 'T196-003 Stimulus capteur haut actif expose la polarite Free_DI correcte'
+    FB_Bench(Enable := TRUE, SimTopPositionActive := TRUE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_FALSE(FB_Bench.Winch.M1M2_TopPositionFree_DI,
+                 'TopPositionActive=TRUE -> Free_DI=FALSE (capteur atteint)');
+    ADVANCE_TIME(10000000);
+    FB_Bench(Enable := TRUE, SimTopPositionActive := FALSE,
+             RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_TRUE(FB_Bench.Winch.M1M2_TopPositionFree_DI,
+                'TopPositionActive=FALSE -> Free_DI=TRUE (butée libre)');
+END_TEST
+
 (* =========================================================================
    AF-13 — FB_Sim_Safety (TC-P13-020/021/022/023)
    ========================================================================= *)
