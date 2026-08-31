@@ -11650,6 +11650,14 @@ Cause de blocage prioritaire</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation MAINTENUE de dépasser le FDC</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnLearnSpeed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 Bit IHM lancer l'apprentissage passif des vitesses</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -17860,14 +17868,6 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
               </documentation>
             </variable>
-            <variable name="EnableEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Enable (retour en semi-auto)</xhtml>
-              </documentation>
-            </variable>
             <variable name="ProcessPermitM1_Ascending">
               <type>
                 <BOOL />
@@ -18138,7 +18138,6 @@ ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
 DeadmanArmedEdge(CLK := DeadmanArmed);
 AbortEdge(CLK := AbortCycle);
-EnableEdge(CLK := Enable);
 
 // ⏱️ Surveillance indépendante de la remontée lente
 // X7_CTRL_ASCENT -&gt; X8_ASCENT_LOADED : TON de stabilisation palier 1.
@@ -18252,16 +18251,39 @@ ProcessPermitBucket_Close := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitM3_Tremie        := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitM3_Maintenance   := CycleMotionPermit AND DeadmanArmed;
 
-// Au retour en Semi-Auto (front montant Enable), si une étape était en cours, on exige une reprise consciente
-IF EnableEdge.Q AND WaitingResume THEN
-    // Sécurité anti-redémarrage automatique : reste en attente de StartCycle
-    ;
+// Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
+IF WaitingResume THEN
+    // 🔒 Sécurité anti-redémarrage automatique (AF-04 §4.1) : le cycle ne reprend
+    // PAS sur manche + homme-mort seuls. Il reste en attente d'un geste conscient
+    // (StartCycle) avant de restaurer l'étape mémorisée.
+    IF StartEdge.Q THEN
+        State := PausedState;   // reprise consciente : restaure l'étape mémorisée
+        WaitingResume := FALSE;
+    ELSE
+        // Hold : neutralise toute demande de mouvement et affiche l'attente.
+        WinchM1Cmd.ReqStartStop := FALSE; WinchM1Cmd.ReqDirection := 0; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.ReqStartStop := FALSE; WinchM2Cmd.ReqDirection := 0; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
+        BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
+        CycleStep := PausedState;
+        CycleStateStr := 'Cycle en pause : reprise consciente requise (StartCycle)';
+        Lifecycle.Busy := FALSE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.BUTTON;
+        ExpectedDirection := 0;
+        WaitingForOperator := TRUE;
+        WaitingForProcess := FALSE;
+        OperatorActionId := 16#0400;
+        OperatorAction := 'Reprendre le cycle : appuyer sur StartCycle (geste conscient).';
+        RequestActive := FALSE;
+    END_IF;
 END_IF;
 
 // 🧊 R9 — capture l'étape spécifique AVANT la bascule vers STABILIZING
 IF ErrorEdge.Q THEN
     CycleStepAtError := State;
     State := E_CycleStep.STABILIZING;
+    WaitingResume := FALSE;   // un défaut abroge la reprise consciente : repli STABILIZING
 END_IF;
 
 IF ResetEdge.Q THEN
@@ -18288,6 +18310,9 @@ BucketCmd.MinStepDown := 0;
 
 {region "§3 Machine etat cycle automatique"}
 // 🔁 2. LOGIQUE DU SÉQUENCEUR (Machine d'état) — CASE sur enum unique (R1)
+// Pendant une reprise consciente (WaitingResume), le séquenceur est gelé :
+// l'étape mémorisée ne s'exécute pas tant que StartCycle n'a pas été appuyé.
+IF NOT WaitingResume THEN
 CASE State OF
 
     E_CycleStep.X0_PREPARATION:
@@ -18308,7 +18333,7 @@ CASE State OF
 
         // Transition si système sain et réarmé (front reset ou démarrage).
         // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
-        IF (StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Error THEN
+        IF (StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Latched THEN
             WaitingResume := FALSE;
             State := E_CycleStep.X1_HOMING;
         END_IF;
@@ -18633,6 +18658,7 @@ CASE State OF
         OperatorAction := 'Cycle stabilise sur anomalie : acquitter le defaut pour reinitialiser.';
 
 END_CASE;
+END_IF;
 {endregion}
 
 {region "§4 Repli homme mort &amp; Syntheses"}
@@ -30204,7 +30230,11 @@ END_IF;
 DescendPermit := NOT (
     (((Fault.ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
-    OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal))
+    // La limite légale est une interdiction d'exploitation distincte du groupe
+    // SafeStop/Permit. Le bypass banc BypassProcess ne doit jamais la lever :
+    // seul le bypass dédié BypassLimitLegal, déjà filtré par la matrice MAINT_N2
+    // dans PRG_04, peut l'autoriser explicitement.
+    OR (LimitLegalReached AND NOT BypassLimitLegal)
     OR (((Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
 );
 
@@ -36318,7 +36348,7 @@ GVL_Troubleshooting.TraceTranslation := TranslationTrace;
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis de descente (mou de cable)</xhtml>
@@ -36329,7 +36359,7 @@ GVL_Troubleshooting.TraceTranslation := TranslationTrace;
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis de montee (fin de course haut)</xhtml>
@@ -41721,6 +41751,44 @@ via MeasuredSpeedBand, 1 instance par treuil, mêmes sources que FB_Safety_Winch
                 <derived name="FB_WinchLoadEstimator" />
               </type>
             </variable>
+            <variable name="instWinchSpeedLearningM1">
+              <type>
+                <derived name="FB_WinchSpeedLearning" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Collecteurs passifs d'apprentissage vitesse par palier (T181-15) : 1 par treuil,
+écrivent la table RETAIN _WinchSpeedLearnTable {axe x sens x charge/vide x palier}.
+STRICTEMENT PASSIFS : aucune commande moteur, aucune surveillance survitesse (T181-16).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instWinchSpeedLearningM2">
+              <type>
+                <derived name="FB_WinchSpeedLearning" />
+              </type>
+            </variable>
+            <variable name="LoadPresentM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dérivations des entrées de collecte (charge présente / conditions stables) — voir §6.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LoadPresentM2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StableForLearnM1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StableForLearnM2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="instArbM1">
               <type>
                 <derived name="FB_WinchCmdArbitrationM1" />
@@ -43240,8 +43308,18 @@ M1WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM1.SpeedBand;
 // Garde-fou vitesse mesuree : DESACTIVE par defaut (AF_Partie-10 §9bis, FB_Winch_v2.1 /
 // FB_SpeedStep_v1.0 SpeedGuardEnable := FALSE). Le TRUE code en dur etait un reste de
 // mise en service : il rendait la capacite de palier otage de instWinchSync (tout ecart
-// sync -&gt; SpeedGuardReady=FALSE -&gt; clamp palier 1, y compris en montee). La gouvernance
-// nominale du palier passe par FB_WinchRateInterlock (T181-01), pas par cette bande.
+// sync -&gt; SpeedGuardReady=FALSE -&gt; clamp palier 1, y compris en montee).
+// ⚠️ DETTE SAFETY T193-S5 : le garde-fou vitesse mesuree est HORS SERVICE. Le FB de
+// gouvernance nominale annonce (FB_WinchRateInterlock, T181-01) n'existe PAS dans CODE/.
+// Decision : risque ACTE et documente — la surveillance survitesse reelle est portee par
+// FB_Safety_Winch (T181-16, gelee : harnais VAR_IN_OUT indisponible). Ne PAS armer une
+// survitesse sur une table non prouvee. A re-trancher a la livraison T181-01/T181-16.
+// ⚠️ T181-01 est BLOQUE (contrat C4 TASK_CONTRACT_T181-01_AUTORITE_2_INTERLOCKS.yaml,
+// ARRET VALIDATION HUMAINE requis : autorite, T_max/DropConfirmDelay, classification
+// Fault.Error, argument PLr ; prerequis T181-00/T175/T181-05 non livres). Ne PAS creer
+// FB_WinchRateInterlock hors de ce contrat — la logique de garde-fou existe deja dans
+// FB_Winch §5 et reste volontairement desactivee (SpeedGuardEnable := FALSE) tant que la
+// table SpeedBandMaxMps n'est pas validee en charge reelle (AF-10 §7.3 TBD).
 M1WinchSensors.SpeedGuardEnable   := FALSE;
 M1WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
 
@@ -43310,6 +43388,47 @@ instWinchM2(
     // Idem M1 ci-dessus
     BypassContactorCheck    := MaintN2 AND (GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback),
     BypassGlobal            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Global
+);
+
+// ── Collecteurs passifs d'apprentissage vitesse par palier (T181-15) ──
+// Appelés APRÈS instWinchM1/M2 : StepNumber lu = palier courant du scan (pas de lag).
+// Dérivations des entrées de collecte :
+//   • LoadPresent : charge présente si l'estimateur de charge (même source vitesse) estime
+//     une charge &gt;= 50 % (seuil de mise en service, à confirmer sur site).
+//   • StableForLearn : treuil commandé (palier &gt; 0) et sans défaut — conditions stables.
+// Collecteur STRICTEMENT PASSIF : aucune commande moteur, aucune surveillance survitesse
+// (la survitesse reste T181-16, gelée — voir bandeau §6 M1/M2 SpeedGuardEnable).
+LoadPresentM1 := (instWinchLoadEstimatorM1.EstimatedLoadPct &gt;= 50.0);
+LoadPresentM2 := (instWinchLoadEstimatorM2.EstimatedLoadPct &gt;= 50.0);
+StableForLearnM1 := (instWinchM1.StepNumber &gt; 0) AND NOT instWinchM1.Fault.Error;
+StableForLearnM2 := (instWinchM2.StepNumber &gt; 0) AND NOT instWinchM2.Fault.Error;
+
+instWinchSpeedLearningM1(
+    Enable              := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
+    LearnStart          := GVL_IHM.M1TreuilRetenue.Cmd.BtnLearnSpeed,
+    WinchId             := 1,
+    Direction           := M1LogicRequestDirection,
+    StepNumber          := instWinchM1.StepNumber,
+    MeasuredSpeedMps    := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps,
+    MeasuredSpeedValid  := PRG_02_Acquisition.Data.EncoderM1.Measurement.SpeedValid,
+    LoadPresent         := LoadPresentM1,
+    StableForLearn      := StableForLearnM1,
+    Config              := _WinchSpeedLearnCfg,
+    Table               := _WinchSpeedLearnTable
+);
+
+instWinchSpeedLearningM2(
+    Enable              := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
+    LearnStart          := GVL_IHM.M2TreuilBenne.Cmd.BtnLearnSpeed,
+    WinchId             := 2,
+    Direction           := M2LogicRequestDirection,
+    StepNumber          := instWinchM2.StepNumber,
+    MeasuredSpeedMps    := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps,
+    MeasuredSpeedValid  := PRG_02_Acquisition.Data.EncoderM2.Measurement.SpeedValid,
+    LoadPresent         := LoadPresentM2,
+    StableForLearn      := StableForLearnM2,
+    Config              := _WinchSpeedLearnCfg,
+    Table               := _WinchSpeedLearnTable
 );
 
 
@@ -45457,6 +45576,14 @@ PowerCutOffActive := PowerCutOffReq;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant SimulationBypassActive</xhtml>
               </documentation>
             </variable>
+            <variable name="SimulationBypassEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bypass banc effectif (simulation treuil active uniquement)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleM1SpeedTgt_Pct">
               <type>
                 <REAL />
@@ -45686,17 +45813,22 @@ instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, RetainVal :=
 
 // ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)
-// La simulation emprunte le chemin IHM : SimulationBypassActive set/reset les bypass IHM
-// (TopLimitSwitch / TopLimitSoftware / LimitLegal) au lieu d'un OR direct dans le code.
-SimBypassRise(CLK := GVL_Simulation.SimulationBypassActive);
-SimBypassFall(CLK := GVL_Simulation.SimulationBypassActive);
+// La simulation emprunte le chemin IHM : le bypass banc ne devient effectif
+// que lorsque les trois conditions sont réunies. Sans ce gate, la valeur par
+// défaut TRUE de SimulationBypassActive pouvait armer BypassProcess en MAINT_N2
+// sur une machine réelle (ou avant l'activation du domaine treuil simulé).
+SimulationBypassEffective := GVL_Simulation.SimulationModeActive
+                             AND GVL_Simulation.SimWinchActive
+                             AND GVL_Simulation.SimulationBypassActive;
+SimBypassRise(CLK := SimulationBypassEffective);
+SimBypassFall(CLK := SimulationBypassEffective);
 
 IF SimBypassRise.Q THEN
     // 🧪 Bypass sim étendu aux tests Meca (Meca A-E via Safety ; NoMovement/
     // OppositeDir via Process) pour travailler sans faux blocage en banc.
     // ❗ Les limites réelles (TopLimitSwitch / TopLimitSoftware / LimitLegal) NE sont PAS
     //    bypassées par la simulation : la protection de montée/descente reste active au banc.
-    // Reste strictement inerte sur machine réelle (SimulationBypassActive gaté MAINT+sim).
+    // Reste strictement inerte sur machine réelle (SimulationBypassEffective gate simulation+treuil).
     GVL_IHM.M1TreuilRetenue.Bypass.Safety  := TRUE;
     GVL_IHM.M1TreuilRetenue.Bypass.Process := TRUE;
     GVL_IHM.M2TreuilBenne.Bypass.Safety    := TRUE;

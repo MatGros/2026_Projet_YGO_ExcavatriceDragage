@@ -29,6 +29,17 @@ VAR
     instWinchLoadEstimatorM1 : FB_WinchLoadEstimator;
     instWinchLoadEstimatorM2 : FB_WinchLoadEstimator;
 
+    // Collecteurs passifs d'apprentissage vitesse par palier (T181-15) : 1 par treuil,
+    // écrivent la table RETAIN _WinchSpeedLearnTable {axe x sens x charge/vide x palier}.
+    // STRICTEMENT PASSIFS : aucune commande moteur, aucune surveillance survitesse (T181-16).
+    instWinchSpeedLearningM1 : FB_WinchSpeedLearning;
+    instWinchSpeedLearningM2 : FB_WinchSpeedLearning;
+    // Dérivations des entrées de collecte (charge présente / conditions stables) — voir §6.
+    LoadPresentM1 : BOOL;
+    LoadPresentM2 : BOOL;
+    StableForLearnM1 : BOOL;
+    StableForLearnM2 : BOOL;
+
     // === FB D'ARBITRAGE DE COMMANDE (POO) ===
     instArbM1 : FB_WinchCmdArbitrationM1;  // * [INST] Arbitrage commande treuil M1
     instArbM2 : FB_WinchCmdArbitrationM2;  // * [INST] Arbitrage commande treuil M2
@@ -895,8 +906,18 @@ M1WinchSensors.MeasuredSpeedBand  := instWinchLoadEstimatorM1.SpeedBand;
 // Garde-fou vitesse mesuree : DESACTIVE par defaut (AF_Partie-10 §9bis, FB_Winch_v2.1 /
 // FB_SpeedStep_v1.0 SpeedGuardEnable := FALSE). Le TRUE code en dur etait un reste de
 // mise en service : il rendait la capacite de palier otage de instWinchSync (tout ecart
-// sync -> SpeedGuardReady=FALSE -> clamp palier 1, y compris en montee). La gouvernance
-// nominale du palier passe par FB_WinchRateInterlock (T181-01), pas par cette bande.
+// sync -> SpeedGuardReady=FALSE -> clamp palier 1, y compris en montee).
+// ⚠️ DETTE SAFETY T193-S5 : le garde-fou vitesse mesuree est HORS SERVICE. Le FB de
+// gouvernance nominale annonce (FB_WinchRateInterlock, T181-01) n'existe PAS dans CODE/.
+// Decision : risque ACTE et documente — la surveillance survitesse reelle est portee par
+// FB_Safety_Winch (T181-16, gelee : harnais VAR_IN_OUT indisponible). Ne PAS armer une
+// survitesse sur une table non prouvee. A re-trancher a la livraison T181-01/T181-16.
+// ⚠️ T181-01 est BLOQUE (contrat C4 TASK_CONTRACT_T181-01_AUTORITE_2_INTERLOCKS.yaml,
+// ARRET VALIDATION HUMAINE requis : autorite, T_max/DropConfirmDelay, classification
+// Fault.Error, argument PLr ; prerequis T181-00/T175/T181-05 non livres). Ne PAS creer
+// FB_WinchRateInterlock hors de ce contrat — la logique de garde-fou existe deja dans
+// FB_Winch §5 et reste volontairement desactivee (SpeedGuardEnable := FALSE) tant que la
+// table SpeedBandMaxMps n'est pas validee en charge reelle (AF-10 §7.3 TBD).
 M1WinchSensors.SpeedGuardEnable   := FALSE;
 M1WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
 
@@ -965,6 +986,47 @@ instWinchM2(
     // Idem M1 ci-dessus
     BypassContactorCheck    := MaintN2 AND (GVL_IHM.M2TreuilBenne.Bypass.Global OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback),
     BypassGlobal            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Global
+);
+
+// ── Collecteurs passifs d'apprentissage vitesse par palier (T181-15) ──
+// Appelés APRÈS instWinchM1/M2 : StepNumber lu = palier courant du scan (pas de lag).
+// Dérivations des entrées de collecte :
+//   • LoadPresent : charge présente si l'estimateur de charge (même source vitesse) estime
+//     une charge >= 50 % (seuil de mise en service, à confirmer sur site).
+//   • StableForLearn : treuil commandé (palier > 0) et sans défaut — conditions stables.
+// Collecteur STRICTEMENT PASSIF : aucune commande moteur, aucune surveillance survitesse
+// (la survitesse reste T181-16, gelée — voir bandeau §6 M1/M2 SpeedGuardEnable).
+LoadPresentM1 := (instWinchLoadEstimatorM1.EstimatedLoadPct >= 50.0);
+LoadPresentM2 := (instWinchLoadEstimatorM2.EstimatedLoadPct >= 50.0);
+StableForLearnM1 := (instWinchM1.StepNumber > 0) AND NOT instWinchM1.Fault.Error;
+StableForLearnM2 := (instWinchM2.StepNumber > 0) AND NOT instWinchM2.Fault.Error;
+
+instWinchSpeedLearningM1(
+    Enable              := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
+    LearnStart          := GVL_IHM.M1TreuilRetenue.Cmd.BtnLearnSpeed,
+    WinchId             := 1,
+    Direction           := M1LogicRequestDirection,
+    StepNumber          := instWinchM1.StepNumber,
+    MeasuredSpeedMps    := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps,
+    MeasuredSpeedValid  := PRG_02_Acquisition.Data.EncoderM1.Measurement.SpeedValid,
+    LoadPresent         := LoadPresentM1,
+    StableForLearn      := StableForLearnM1,
+    Config              := _WinchSpeedLearnCfg,
+    Table               := _WinchSpeedLearnTable
+);
+
+instWinchSpeedLearningM2(
+    Enable              := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
+    LearnStart          := GVL_IHM.M2TreuilBenne.Cmd.BtnLearnSpeed,
+    WinchId             := 2,
+    Direction           := M2LogicRequestDirection,
+    StepNumber          := instWinchM2.StepNumber,
+    MeasuredSpeedMps    := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps,
+    MeasuredSpeedValid  := PRG_02_Acquisition.Data.EncoderM2.Measurement.SpeedValid,
+    LoadPresent         := LoadPresentM2,
+    StableForLearn      := StableForLearnM2,
+    Config              := _WinchSpeedLearnCfg,
+    Table               := _WinchSpeedLearnTable
 );
 
 

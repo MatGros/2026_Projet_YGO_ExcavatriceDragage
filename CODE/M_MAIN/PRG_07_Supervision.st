@@ -63,6 +63,7 @@ VAR
     // === 🧪 DÉTECTEURS FRONT SIMULATION BYPASS (pilotage bypass IHM) ===
     SimBypassRise           : R_TRIG; // . [LOC] Front montant SimulationBypassActive
     SimBypassFall           : F_TRIG; // . [LOC] Front descendant SimulationBypassActive
+    SimulationBypassEffective : BOOL; // . [LOC] Bypass banc effectif (simulation treuil active uniquement)
 
     // === 🪜 DIAGNOSTIC % CYCLE (palier→%, borne haute du palier) ===
     CycleM1SpeedTgt_Pct     : REAL;   // . [LOC] Consigne % cycle M1 (StepThreshold_Pct[StepTgt])
@@ -265,17 +266,22 @@ instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, RetainVal :=
 
 // ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)
-// La simulation emprunte le chemin IHM : SimulationBypassActive set/reset les bypass IHM
-// (TopLimitSwitch / TopLimitSoftware / LimitLegal) au lieu d'un OR direct dans le code.
-SimBypassRise(CLK := GVL_Simulation.SimulationBypassActive);
-SimBypassFall(CLK := GVL_Simulation.SimulationBypassActive);
+// La simulation emprunte le chemin IHM : le bypass banc ne devient effectif
+// que lorsque les trois conditions sont réunies. Sans ce gate, la valeur par
+// défaut TRUE de SimulationBypassActive pouvait armer BypassProcess en MAINT_N2
+// sur une machine réelle (ou avant l'activation du domaine treuil simulé).
+SimulationBypassEffective := GVL_Simulation.SimulationModeActive
+                             AND GVL_Simulation.SimWinchActive
+                             AND GVL_Simulation.SimulationBypassActive;
+SimBypassRise(CLK := SimulationBypassEffective);
+SimBypassFall(CLK := SimulationBypassEffective);
 
 IF SimBypassRise.Q THEN
     // 🧪 Bypass sim étendu aux tests Meca (Meca A-E via Safety ; NoMovement/
     // OppositeDir via Process) pour travailler sans faux blocage en banc.
     // ❗ Les limites réelles (TopLimitSwitch / TopLimitSoftware / LimitLegal) NE sont PAS
     //    bypassées par la simulation : la protection de montée/descente reste active au banc.
-    // Reste strictement inerte sur machine réelle (SimulationBypassActive gaté MAINT+sim).
+    // Reste strictement inerte sur machine réelle (SimulationBypassEffective gate simulation+treuil).
     GVL_IHM.M1TreuilRetenue.Bypass.Safety  := TRUE;
     GVL_IHM.M1TreuilRetenue.Bypass.Process := TRUE;
     GVL_IHM.M2TreuilBenne.Bypass.Safety    := TRUE;

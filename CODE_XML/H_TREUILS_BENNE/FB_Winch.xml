@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:54:13.596112" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:54:13.596112">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:08:10.782078" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:08:10.782078">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -835,7 +835,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis de descente (mou de cable)</xhtml>
@@ -846,7 +846,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis de montee (fin de course haut)</xhtml>

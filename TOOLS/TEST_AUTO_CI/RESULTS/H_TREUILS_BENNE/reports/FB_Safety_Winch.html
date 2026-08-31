@@ -315,11 +315,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-30 18:15:30</div>
+    <div class="exec-time">2026-08-31 04:09:16</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (15 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-0">TC-P10-001 Meca A : derive &gt;2.0m a l arret (joystick neutre) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-1">TC-P10-002 Meca B : non confirmation arret 3s -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-2">TC-P10-018 ContactorStuck : contacteur colle -&gt; ContactorStuck + SafeStop + PowerCutOff (action, pas seulement diagnostic)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-3">TC-P10-003 Meca C : glissement M1 &gt;2.0m pendant maintien benne -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-4">TC-P10-004 Meca D : capteur haut sans arret 3s -&gt; SafeStop (immediat) puis PowerCutOff (3s)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-5">TC-P10-005 Meca E bit12 : ecart &gt;2.5m -&gt; SafeStop SEUL (pas PowerCutOff)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-6">TC-P10-006 Meca E bit13 : bit12 non confirme 3s -&gt; escalade PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-7">TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -&gt; SafeStop SEUL</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-8">TC-P10-008 Meca G : vitesse nulle malgre commande 3s -&gt; SafeStop SEUL</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-9">TC-P10-009 Masque PowerCutOff : bit2 (surchauffe moteur) coupe, bit14 (sens oppose) ne coupe pas</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-10">TC-P10-010 SafeStop exclut bit3 (mou cable) si SyncEnable=FALSE</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-11">TC-P10-036.1 Warmup 3s : perte com operateur ignoree pendant 3s puis SafeStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-12">TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves, re-Enable exige Reset</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-13">TC-P10-044.1 Mou cable : SyncEnable=FALSE -&gt; DescendPermit=FALSE, AscentPermit autorise, blocage leve au retension</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-14">TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chaine PRG_04-&gt;PRG_06-&gt;AU = essai site</a></li></ul>
+        <summary>📋 Sommaire (17 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-0">TC-P10-001 Meca A : derive &gt;2.0m a l arret (joystick neutre) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-1">TC-P10-002 Meca B : non confirmation arret 3s -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-2">TC-P10-018 ContactorStuck : contacteur colle -&gt; ContactorStuck + SafeStop + PowerCutOff (action, pas seulement diagnostic)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-3">TC-P10-003 Meca C : glissement M1 &gt;2.0m pendant maintien benne -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-4">TC-P10-004 Meca D : capteur haut sans arret 3s -&gt; SafeStop (immediat) puis PowerCutOff (3s)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-5">TC-P10-005 Meca E bit12 : ecart &gt;2.5m -&gt; SafeStop SEUL (pas PowerCutOff)</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-6">TC-P10-006 Meca E bit13 : bit12 non confirme 3s -&gt; escalade PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-7">TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -&gt; SafeStop SEUL</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-8">TC-P10-008 Meca G : vitesse nulle malgre commande 3s -&gt; SafeStop SEUL</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-9">TC-P10-009 Masque PowerCutOff : bit2 (surchauffe moteur) coupe, bit14 (sens oppose) ne coupe pas</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-10">TC-P10-010 SafeStop exclut bit3 (mou cable) si SyncEnable=FALSE</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-11">TC-P10-036.1 Warmup 3s : perte com operateur ignoree pendant 3s puis SafeStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-12">TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves, re-Enable exige Reset</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-13">TC-P10-044.1 Mou cable : SyncEnable=FALSE -&gt; DescendPermit=FALSE, AscentPermit autorise, blocage leve au retension</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-14">TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chaine PRG_04-&gt;PRG_06-&gt;AU = essai site</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-15">TC-P10-052 Limite legale : BypassProcess simu ne leve pas le verrou sous -15m</a></li><li class="toc-item toc-pass"><a href="#test-fb-safety-winch-16">TC-P10-053 Limite legale : bypass dedie explicite autorise uniquement le test MAINT_N2</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -328,7 +328,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            15/15 vérifications validées
+            17/17 vérifications validées
         </div>
     </div>
     
@@ -397,8 +397,8 @@
     </details>
     
     <div class="af-warning-banner">
-        <div class="af-warning-title">⚠️ 1 test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
-        <ul><li><code>TC-P10-018</code></li></ul>
+        <div class="af-warning-title">⚠️ 3 test(s) present(s) dans ce fichier mais absent(s) du catalogue AF (ID inconnu ou retire)</div>
+        <ul><li><code>TC-P10-018</code></li><li><code>TC-P10-052</code></li><li><code>TC-P10-053</code></li></ul>
     </div>
     
     <details class="pin-diagram-details" open>
@@ -812,7 +812,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 15 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 17 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-safety-winch-0" class="test-card test-card-pass test-card-collapsed">
@@ -1707,6 +1707,127 @@
     </div>
             </div>
         </article>
+        <article id="test-fb-safety-winch-15" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-052 Limite legale : BypassProcess simu ne leve pas le verrou sous -15m </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Regression T197 : SimulationBypassActive arme BypassProcess pour eviter les
+       faux defauts mecaniques du banc. Ce bypass de groupe ne doit pas neutraliser
+       la limite legale; seul BypassLimitLegal est habilite a le faire.</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>BypassProcess seul ne doit pas autoriser la descente sous la limite legale</li></ul>
+            </details>
+                
+                
+    <div class="chronogram-group">
+        
+        <!-- Décision (2026-08-29) : les 2 chronogrammes (graphique + tableau) sont OUVERTS par
+             défaut quand la carte du test est dépliée, quel que soit le PASS/FAIL. Avant, ils
+             ne s'ouvraient qu'en cas d'échec. L'échec reste signalé par `fail_note` ci-dessus. -->
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (2 scans, 0 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (2 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P10-052 Limite legale : BypassProcess simu ne leve pas le verrou sous -15m')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (87)</summary>
+        <table class="static-table"><tbody><tr><td><code>CABLEPOSM</code></td><td>-15.100</td></tr><tr><td><code>HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERRORID</code></td><td>0</td></tr><tr><td><code>FAULT.LATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.LATCHEDID</code></td><td>0</td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SAFESTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ASCENTPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNEHOLDSTILLACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNESLIPTOLERANCEM</code></td><td>2</td></tr><tr><td><code>BRAKEFEEDBACK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKETHERMALFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKETHERMALFEEDBACK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSBRAKETHERMAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSCABLELIMITSWITCH</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSLIMITLEGAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMECAA</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMECAB</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMECAC</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMECAD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMECAE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMOTORTHERMAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSOPERATORCOMM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSPHASEROTATION</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSPROCESS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BYPASSSAFETY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSTOPLIMITSOFTWARE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSTOPLIMITSWITCH</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGCABLELIMITDESCENTM</code></td><td>-20</td></tr><tr><td><code>CONTACTORSTUCK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CRITICALSYNCTOLERANCEM</code></td><td>2.500</td></tr><tr><td><code>DESCENDPERMIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIRECTION</code></td><td>0</td></tr><tr><td><code>ENCODERAVAILABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EXPECTEDOTHERWINCHPOSM</code></td><td>0</td></tr><tr><td><code>FIRSTSCANDONE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FWDREVSPEEDFEEDBACKOFF</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INREFERENCINGMODE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>JOYSTICKONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKYNEUTRAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>LIMITLEGALREACHED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>MEASUREDSPEEDSIGNEDMPS</code></td><td>0</td></tr><tr><td><code>MEASUREDSPEEDVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECAADRIFTM</code></td><td>0</td></tr><tr><td><code>MECAAFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECABELAPSEDTIME</code></td><td>0</td></tr><tr><td><code>MECABFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECACDRIFTM</code></td><td>0</td></tr><tr><td><code>MECACFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECADFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECAEESCALADEFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECAEFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>MOTORTHERMALFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOVEMENTCOMMANDED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOVEMENTSPEEDTHRESHOLDMPS</code></td><td>0.020</td></tr><tr><td><code>NOMOVEMENTFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NOMOVEMENTTIMEOUT</code></td><td>3000000000</td></tr><tr><td><code>OPPOSITEDIRECTIONACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>OPPOSITEDIRECTIONFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>OPPOSITEDIRECTIONTIMEOUT</code></td><td>500000000</td></tr><tr><td><code>OTHERWINCHINHIBITED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PHASEROTATIONFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POSTRAMPTIMEOUT</code></td><td>3000000000</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCUTOFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SLACKCABLEDETECTED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>THERMALFEEDBACK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TOPLIMITM</code></td><td>8.500</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>UNCOMMANDEDACTIVEB</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>UNCOMMANDEDACTIVED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>UNCOMMANDEDDRIFTTOLERANCEM</code></td><td>2</td></tr><tr><td><code>UNCOMMANDEDSPEEDTHRESHOLDMPS</code></td><td>0.020</td></tr></tbody></table>
+    </details>
+    </div>
+            </div>
+        </article>
+        <article id="test-fb-safety-winch-16" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P10-053 Limite legale : bypass dedie explicite autorise uniquement le test MAINT_N2 </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Le bypass legal dedie conserve le comportement de mise en service; il est
+       gate par MAINT_N2 dans PRG_04 avant d arriver ici.</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (1)</span></summary>
+                <ul class="checks-list"><li>BypassLimitLegal explicite autorise le test de descente</li></ul>
+            </details>
+                
+                
+    <div class="chronogram-group">
+        
+        <!-- Décision (2026-08-29) : les 2 chronogrammes (graphique + tableau) sont OUVERTS par
+             défaut quand la carte du test est dépliée, quel que soit le PASS/FAIL. Avant, ils
+             ne s'ouvraient qu'en cas d'échec. L'échec reste signalé par `fail_note` ci-dessus. -->
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (2 scans, 0 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (2 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P10-053 Limite legale : bypass dedie explicite autorise uniquement le test MAINT_N2')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (87)</summary>
+        <table class="static-table"><tbody><tr><td><code>CABLEPOSM</code></td><td>-15.100</td></tr><tr><td><code>HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FAULT.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.ERRORID</code></td><td>0</td></tr><tr><td><code>FAULT.LATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>FAULT.LATCHEDID</code></td><td>0</td></tr><tr><td><code>READY</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>RESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SAFESTOP</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ASCENTPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNEHOLDSTILLACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNESLIPTOLERANCEM</code></td><td>2</td></tr><tr><td><code>BRAKEFEEDBACK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKETHERMALFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKETHERMALFEEDBACK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSBRAKETHERMAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSCABLELIMITSWITCH</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSGLOBAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSLIMITLEGAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BYPASSMECAA</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMECAB</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMECAC</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMECAD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMECAE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSMOTORTHERMAL</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSOPERATORCOMM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSPHASEROTATION</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSPROCESS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BYPASSSAFETY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSTOPLIMITSOFTWARE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BYPASSTOPLIMITSWITCH</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CFGCABLELIMITDESCENTM</code></td><td>-20</td></tr><tr><td><code>CONTACTORSTUCK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CRITICALSYNCTOLERANCEM</code></td><td>2.500</td></tr><tr><td><code>DESCENDPERMIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIRECTION</code></td><td>0</td></tr><tr><td><code>ENCODERAVAILABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTBYPASS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>ENCODERFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>EXPECTEDOTHERWINCHPOSM</code></td><td>0</td></tr><tr><td><code>FIRSTSCANDONE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>FWDREVSPEEDFEEDBACKOFF</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INREFERENCINGMODE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>JOYSTICKONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKYNEUTRAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>LIMITLEGALREACHED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MEASUREDSPEEDMPS</code></td><td>0</td></tr><tr><td><code>MEASUREDSPEEDSIGNEDMPS</code></td><td>0</td></tr><tr><td><code>MEASUREDSPEEDVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECAADRIFTM</code></td><td>0</td></tr><tr><td><code>MECAAFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECABELAPSEDTIME</code></td><td>0</td></tr><tr><td><code>MECABFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECACDRIFTM</code></td><td>0</td></tr><tr><td><code>MECACFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECADFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECAEESCALADEFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MECAEFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MODE</code></td><td>0</td></tr><tr><td><code>MOTORTHERMALFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOVEMENTCOMMANDED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MOVEMENTSPEEDTHRESHOLDMPS</code></td><td>0.020</td></tr><tr><td><code>NOMOVEMENTFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NOMOVEMENTTIMEOUT</code></td><td>3000000000</td></tr><tr><td><code>OPPOSITEDIRECTIONACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>OPPOSITEDIRECTIONFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>OPPOSITEDIRECTIONTIMEOUT</code></td><td>500000000</td></tr><tr><td><code>OTHERWINCHINHIBITED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PHASEROTATIONFAULTLATCHED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POSTRAMPTIMEOUT</code></td><td>3000000000</td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCUTOFF</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SLACKCABLEDETECTED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>THERMALFEEDBACK</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>TOPLIMITM</code></td><td>8.500</td></tr><tr><td><code>TOPPOSITIONSENSOR</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>UNCOMMANDEDACTIVEB</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>UNCOMMANDEDACTIVED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>UNCOMMANDEDDRIFTTOLERANCEM</code></td><td>2</td></tr><tr><td><code>UNCOMMANDEDSPEEDTHRESHOLDMPS</code></td><td>0.020</td></tr></tbody></table>
+    </details>
+    </div>
+            </div>
+        </article>
         </div>
     </details>
     <details>
@@ -1733,7 +1854,8 @@ ENUM
     READY    := 2,   (* Prêt, attend ordre *)
     BUSY     := 3,   (* Action en cours *)
     DONE     := 4,   (* Action terminée *)
-    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    STOPPING := 5,   (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    ERROR    := 6    (* Défaut actif non acquitté (FB en erreur — HMI non aveugle) *)
 END_ENUM
 END_TYPE
 </pre>
@@ -2325,7 +2447,11 @@ END_IF;
 DescendPermit := NOT (
     (((Fault.ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
-    OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal))
+    // La limite légale est une interdiction d&#x27;exploitation distincte du groupe
+    // SafeStop/Permit. Le bypass banc BypassProcess ne doit jamais la lever :
+    // seul le bypass dédié BypassLimitLegal, déjà filtré par la matrice MAINT_N2
+    // dans PRG_04, peut l&#x27;autoriser explicitement.
+    OR (LimitLegalReached AND NOT BypassLimitLegal)
     OR (((Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
 );
 
@@ -2366,9 +2492,11 @@ test_fb_safety_winch.st
   [PASS] TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves, re-Enable exige Reset
   [PASS] TC-P10-044.1 Mou cable : SyncEnable=FALSE -&gt; DescendPermit=FALSE, AscentPermit autorise, blocage leve au retension
   [PASS] TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chaine PRG_04-&gt;PRG_06-&gt;AU = essai site
+  [PASS] TC-P10-052 Limite legale : BypassProcess simu ne leve pas le verrou sous -15m
+  [PASS] TC-P10-053 Limite legale : bypass dedie explicite autorise uniquement le test MAINT_N2
 
 -----------------------------------------
-15 tests, 15 passed, 0 failed
+17 tests, 17 passed, 0 failed
 </pre>
     </details>
 </div>

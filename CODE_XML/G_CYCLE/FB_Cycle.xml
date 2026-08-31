@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:09:19.525326" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:09:19.525326">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:12:41.732281" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:12:41.732281">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1085,14 +1085,6 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
               </documentation>
             </variable>
-            <variable name="EnableEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Enable (retour en semi-auto)</xhtml>
-              </documentation>
-            </variable>
             <variable name="ProcessPermitM1_Ascending">
               <type>
                 <BOOL />
@@ -1363,7 +1355,6 @@ ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
 DeadmanArmedEdge(CLK := DeadmanArmed);
 AbortEdge(CLK := AbortCycle);
-EnableEdge(CLK := Enable);
 
 // ⏱️ Surveillance indépendante de la remontée lente
 // X7_CTRL_ASCENT -&gt; X8_ASCENT_LOADED : TON de stabilisation palier 1.
@@ -1477,16 +1468,39 @@ ProcessPermitBucket_Close := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitM3_Tremie        := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitM3_Maintenance   := CycleMotionPermit AND DeadmanArmed;
 
-// Au retour en Semi-Auto (front montant Enable), si une étape était en cours, on exige une reprise consciente
-IF EnableEdge.Q AND WaitingResume THEN
-    // Sécurité anti-redémarrage automatique : reste en attente de StartCycle
-    ;
+// Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
+IF WaitingResume THEN
+    // 🔒 Sécurité anti-redémarrage automatique (AF-04 §4.1) : le cycle ne reprend
+    // PAS sur manche + homme-mort seuls. Il reste en attente d'un geste conscient
+    // (StartCycle) avant de restaurer l'étape mémorisée.
+    IF StartEdge.Q THEN
+        State := PausedState;   // reprise consciente : restaure l'étape mémorisée
+        WaitingResume := FALSE;
+    ELSE
+        // Hold : neutralise toute demande de mouvement et affiche l'attente.
+        WinchM1Cmd.ReqStartStop := FALSE; WinchM1Cmd.ReqDirection := 0; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.ReqStartStop := FALSE; WinchM2Cmd.ReqDirection := 0; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
+        BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
+        CycleStep := PausedState;
+        CycleStateStr := 'Cycle en pause : reprise consciente requise (StartCycle)';
+        Lifecycle.Busy := FALSE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.BUTTON;
+        ExpectedDirection := 0;
+        WaitingForOperator := TRUE;
+        WaitingForProcess := FALSE;
+        OperatorActionId := 16#0400;
+        OperatorAction := 'Reprendre le cycle : appuyer sur StartCycle (geste conscient).';
+        RequestActive := FALSE;
+    END_IF;
 END_IF;
 
 // 🧊 R9 — capture l'étape spécifique AVANT la bascule vers STABILIZING
 IF ErrorEdge.Q THEN
     CycleStepAtError := State;
     State := E_CycleStep.STABILIZING;
+    WaitingResume := FALSE;   // un défaut abroge la reprise consciente : repli STABILIZING
 END_IF;
 
 IF ResetEdge.Q THEN
@@ -1513,6 +1527,9 @@ BucketCmd.MinStepDown := 0;
 
 {region "§3 Machine etat cycle automatique"}
 // 🔁 2. LOGIQUE DU SÉQUENCEUR (Machine d'état) — CASE sur enum unique (R1)
+// Pendant une reprise consciente (WaitingResume), le séquenceur est gelé :
+// l'étape mémorisée ne s'exécute pas tant que StartCycle n'a pas été appuyé.
+IF NOT WaitingResume THEN
 CASE State OF
 
     E_CycleStep.X0_PREPARATION:
@@ -1533,7 +1550,7 @@ CASE State OF
 
         // Transition si système sain et réarmé (front reset ou démarrage).
         // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
-        IF (StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Error THEN
+        IF (StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Latched THEN
             WaitingResume := FALSE;
             State := E_CycleStep.X1_HOMING;
         END_IF;
@@ -1858,6 +1875,7 @@ CASE State OF
         OperatorAction := 'Cycle stabilise sur anomalie : acquitter le defaut pour reinitialiser.';
 
 END_CASE;
+END_IF;
 {endregion}
 
 {region "§4 Repli homme mort &amp; Syntheses"}

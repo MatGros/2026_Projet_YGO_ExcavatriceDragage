@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:10.407336" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:10.407336">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:12:55.936946" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:12:55.936946">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1194,6 +1194,59 @@ Seuils de changement de palier (0..100%)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbWinchSpeedLearning_Cfg">
+        <baseType>
+          <struct>
+            <variable name="MinSpeedMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne min vitesse apprise par palier (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxSpeedMps">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne max vitesse apprise par palier (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinSamples">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nb min d'echantillons pour valider une cellule</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e33b18ad-d4ff-5cd1-939b-74be82c01450</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbWinchSpeedLearning_Cfg — Enveloppes de plausibilite par palier
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Bornes min/max de vitesse apprise par palier + seuil d'echantillons
+   📄 Doc metier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_fbWinchSpeedLearning_Table">
         <baseType>
           <struct>
@@ -1591,6 +1644,7 @@ palier : 1..5</xhtml>
             <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
             <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
             <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />
+            <Object Name="ST_fbWinchSpeedLearning_Cfg" ObjectId="e33b18ad-d4ff-5cd1-939b-74be82c01450" />
             <Object Name="ST_fbWinchSpeedLearning_Table" ObjectId="e53cb50d-fd3d-5709-9494-4694f689ff17" />
             <Object Name="ST_fbWinch_Symmetry_Cfg" ObjectId="b3edf443-a7a8-5125-8877-3148f355844d" />
             <Object Name="ST_fbWinch_Symmetry_Data" ObjectId="30d10f2c-209a-59ac-ab89-aae03e9399fe" />
