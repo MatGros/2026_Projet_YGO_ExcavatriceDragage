@@ -2241,14 +2241,25 @@ ELSIF NOT EmergencyChainClosed THEN
 ELSIF EmergencyArmingLockoutActive THEN
     Status.OperatorMessage := 'AU: verrouillage 5s actif - attendre puis rearmer';
 ELSE
+    // 📌 Étiquettes en LITTÉRAUX numériques (pattern PresetSeqStep / FB_Encoder_Abs) :
+    //    le jumeau CI STruCpp ne génère pas d'étiquettes CASE constexpr depuis des constantes
+    //    GVL (IECVar non-constexpr) ; CODESYS accepte les deux formes. La correspondance
+    //    symbolique vit ici : 0..6 = CST_STEP_* (GVL_Safety_Emergency).
     CASE ArmingSeqStep OF
-        CST_STEP_IDLE:      Status.OperatorMessage := 'AU: repos - pret a rearmer';
-        CST_STEP_TEST_A:    Status.OperatorMessage := 'AU: autotest canal A en cours';
-        CST_STEP_RESTORE_A: Status.OperatorMessage := 'AU: restauration canal A';
-        CST_STEP_TEST_B:    Status.OperatorMessage := 'AU: autotest canal B en cours';
-        CST_STEP_RESTORE_B: Status.OperatorMessage := 'AU: restauration canal B';
-        CST_STEP_PULSE:     Status.OperatorMessage := 'AU: impulsion rearmement contacteur';
-        CST_STEP_CONFIRM:   Status.OperatorMessage := 'AU: attente confirmation contacteur';
+        0: // IDLE (= CST_STEP_IDLE)
+            Status.OperatorMessage := 'AU: repos - pret a rearmer';
+        1: // TEST_A (= CST_STEP_TEST_A)
+            Status.OperatorMessage := 'AU: autotest canal A en cours';
+        2: // RESTORE_A (= CST_STEP_RESTORE_A)
+            Status.OperatorMessage := 'AU: restauration canal A';
+        3: // TEST_B (= CST_STEP_TEST_B)
+            Status.OperatorMessage := 'AU: autotest canal B en cours';
+        4: // RESTORE_B (= CST_STEP_RESTORE_B)
+            Status.OperatorMessage := 'AU: restauration canal B';
+        5: // PULSE (= CST_STEP_PULSE)
+            Status.OperatorMessage := 'AU: impulsion rearmement contacteur';
+        6: // CONFIRM (= CST_STEP_CONFIRM)
+            Status.OperatorMessage := 'AU: attente confirmation contacteur';
     END_CASE;
 END_IF;
 {endregion}

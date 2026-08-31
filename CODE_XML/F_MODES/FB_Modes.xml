@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:32:56.532153" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:32:56.532153">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T15:24:28.149913" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T15:24:28.149913">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -692,10 +692,12 @@ ET frein serré, redondés par la mesure de vitesse.
    ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
     🎯 Rôle : Source unique du mode arbitré et calcul du bus d'autorisations
-    🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur ou de re-homing requis ;
-                  refus de toute bascule N1/N2/SEMI_AUTO tant que les treuils ne sont pas
-                  à l'arrêt mécanique confirmé ; re-homing obligatoire après usage effectif
-                  d'un override/bypass de position (AF-05 §4bis)
+    🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur, de re-homing requis ou
+                  d'AU non armé (repli MAINT_N1) ; refus de toute bascule N1/N2/SEMI_AUTO
+                  tant que les treuils ne sont pas à l'arrêt mécanique confirmé ; re-homing
+                  obligatoire après usage effectif d'un override/bypass de position (AF-05 §4bis).
+                  L'arbitrage de mode reste actif même AU non armé (homing, réarmement défaut) :
+                  aucune autorisation de mouvement n'est accordée sans la chaîne AU physique.
     🔌 Interface : Standard composant d'arbitrage applicatif
     📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
                     DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
@@ -761,7 +763,7 @@ instCauses[0].Texte    := 'Mode Semi-Auto refuse car defaut codeur present';
 
 instCauses[2].Active   := SemiAutoRefusedHoming;
 instCauses[2].Latching := TRUE;
-instCauses[2].Texte    := 'Mode Semi-Auto refuse car re-homing obligatoire (depassement de limite de position)';
+instCauses[2].Texte    := 'Mode Semi-Auto refuse : re-homing obligatoire (depassement limite position)';
 
 instCauses[3].Active   := SemiAutoRefusedMachineHoming;
 instCauses[3].Latching := FALSE;
@@ -781,8 +783,10 @@ Fault := instFault.Fault;
 {endregion}
 
 {region "§2 Gate neutralisation"}
-// 🛑 2. GATE — neutralisation si désactivé ou AU non armé
-IF NOT Enable OR NOT PowerContactorEngaged THEN
+// 🛑 2. GATE — neutralisation si désactivé (l'arbitrage de mode reste actif même AU non armé :
+//    homing, réarmement défaut. Aucune autorisation de mouvement n'est accordée sans la chaîne
+//    AU physique : chaque FB de mouvement garde son propre gate PowerContactorEngaged.)
+IF NOT Enable THEN
     Auth.Mode := E_Mode.DISABLE;
     Auth.SyncEnable := TRUE;
     Auth.InhibitM1 := FALSE;
@@ -819,8 +823,9 @@ ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
 
 // 3.2 ARBITRAGE — priorité du refus de sécurité, puis du refus de bascule
 IF (SelMode = E_Mode.SEMI_AUTO)
-   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2 OR NOT MachineHomed) THEN
-    // Défaut codeur ou re-homing obligatoire : SEMI_AUTO interdit, repli MAINT_N1.
+   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2 OR NOT MachineHomed
+        OR NOT PowerContactorEngaged) THEN
+    // Défaut codeur, re-homing obligatoire ou AU non armé : SEMI_AUTO interdit, repli MAINT_N1.
     Auth.Mode := E_Mode.MAINT_N1;
     Auth.ModeChangePendingBlocked := FALSE;
 ELSIF (SelMode &lt;&gt; PrevArbitratedMode)

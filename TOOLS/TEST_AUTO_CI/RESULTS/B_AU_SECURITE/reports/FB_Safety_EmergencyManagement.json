@@ -49,11 +49,59 @@
     {
       "name": "TC-P01-005 Sequence 2 temps : ArmRequest sans Reset bloque ; Reset puis ArmRequest arme",
       "passed": true
+    },
+    {
+      "name": "TC-P01-011 PowerCutOffRequest pendant l impulsion (step 5) -> abandon 16#0010 + lockout + Error=FALSE",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-012 Armable=1 mais rearmement echoue a l etape 5 (PowerCutOff pendant pulse)",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-013 Recuperation Reset : cause latched -> Reset -> cause levee -> rearmement reussi",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-014 Defaillance redondance B : canal B colle pendant TestB -> abandon 16#0040",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-015 Timeout restauration A : boucle ne revient pas apres TestA -> abandon 16#0004",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-016 Timeout restauration B : boucle ne revient pas apres TestB -> abandon 16#0008",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-017 Chute de boucle pendant PULSE (step 5) -> abandon 16#0002 + lockout",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-018 Chute de boucle pendant CONFIRM (step 6) -> abandon 16#0002 + lockout",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-019 Coupure IHM pendant la sequence -> abandon 16#0001 sans alarme ni lockout",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-020 Autotest demarrage : chaine ouverte au 1er Enable -> StartupFail, Reset recupere",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-021 Enable=FALSE pendant l impulsion (step 5) -> neutralisation fail-safe immediate",
+      "passed": true
+    },
+    {
+      "name": "TC-P01-022 Messages par etape : branches CASE transitoires RESTORE_A/B (refermeture anticipee)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 12,
-    "passed": 12,
+    "total": 24,
+    "passed": 24,
     "failed": 0
   }
 }

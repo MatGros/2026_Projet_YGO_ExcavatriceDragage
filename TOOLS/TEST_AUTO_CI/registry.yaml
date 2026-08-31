@@ -191,10 +191,13 @@ FB_DiveSearch:
     - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
+    - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Config.st
+    - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st
+    - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Outputs.st
     - CODE/G_CYCLE/FB_DiveSearch.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_divesearch.st
 
-FB_ExtractionSequence:
+FB_ExtractionAssist:
   domain: G_CYCLE
   sources:
     - CODE/A_COMMUN/_TYPES/E_State.st
@@ -203,8 +206,8 @@ FB_ExtractionSequence:
     - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
-    - CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st
-    - CODE/G_CYCLE/FB_ExtractionSequence.st
+    - CODE/G_CYCLE/_TYPES/E_ExtractionAssistState.st
+    - CODE/G_CYCLE/FB_ExtractionAssist.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_extractionsequence.st
 
 FB_WinchLoadEstimator:
@@ -373,6 +376,7 @@ FB_MachineHomingCycle:
     - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_AxisHomingStatus.st
     - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_HomingDemand.st
     - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_BucketCommit.st
+    - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_Cfg.st
     - CODE/G_CYCLE/FB_MachineHomingCycle.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_machinehomingcycle.st
 

@@ -105,17 +105,28 @@ exigeait `SimSafetyActive`). Règle complète : `DOC/STDS/CODE_QUALITY_STANDARDS
 - `SafeStop`/`StartStop` sur un FB qui n'est pas un FB de mouvement
 - `CoupeEnable` ou `FB_Watchdog` applicatif réintroduits
 
-## Vérification mécanique avant de rendre le lot
+## Vérification mécanique — standard de test (ni trop, ni rien)
 
+> 🎯 **Standard de test** : un minimum à **chaque** livraison, la suite complète à la livraison
+> d'un **lot**. Ni sur-tester (suite complète à chaque micro-édition) ni sous-tester (livrer sans
+> le minimum).
+
+**① Minimum obligatoire — à CHAQUE livraison de code** (rapide, ~secondes) :
 ```powershell
-python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report
-python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .
-python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .   # bundle frais
+python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report # liaison bloquante (sur le bundle frais)
+```
+⛔ **Jamais livrer sans ce minimum** : un bundle généré ou des tests Python verts **ne prouvent
+pas** qu'une fonction est reliée. Seul `G200_check_linkage.py` le prouve. Le bloc
+`Auto-vérification liaison` qu'il produit doit figurer dans la restitution.
+
+**② Suite complète — à la livraison d'un LOT** (plusieurs fonctions, fin de lot) :
+```powershell
+python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py   # ou --palier C (GUIDE_GATES_ET_TESTS §2)
 ```
 
-⛔ Un bundle généré ou des tests Python verts **ne prouvent pas** qu'une fonction est reliée.
-Seul `G200_check_linkage.py` le prouve. Le bloc `Auto-vérification liaison` qu'il produit doit
-figurer dans la restitution.
+**③ Pendant l'édition (micro-éditions)** : ne **pas** lancer la suite complète. Choisir le palier
+adapté (`--palier A` bloc isolé, `--palier B` dès qu'un lien apparaît) — `GUIDE_GATES_ET_TESTS §2`.
 
 ## Format de restitution attendu
 

@@ -6,6 +6,7 @@
 SETUP
 VAR
     Fb : FB_MachineHomingCycle;
+    Cfg : ST_fbMachineHomingCycle_Cfg;
     StatusHomed : ST_fbMachineHomingCycle_AxisHomingStatus;
     StatusNone  : ST_fbMachineHomingCycle_AxisHomingStatus;
     StatusBusy  : ST_fbMachineHomingCycle_AxisHomingStatus;
@@ -78,26 +79,28 @@ END_TEST
 
 (* ---------- AC2 : confirmation admissible => homing conjoint + cible dynamique ---------- *)
 TEST 'TC-T185-030 : confirmation refusee hors MAINT_N2'
+    Cfg.CfgTopHomingTarget_M := 8.5;
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1,
        TopPositionActive := TRUE, WinchesMechanicallyStopped := TRUE,
        M1Status := StatusHomed, M2Status := StatusHomed,
-       ConfirmOpenPosition := TRUE, CfgTopHomingTargetM := 8.5);
+       ConfirmOpenPosition := TRUE, Cfg := Cfg);
     ASSERT_FALSE(Fb.M1Demand.HomeReq, 'Homing conjoint refuse hors N2');
     ASSERT_FALSE(Fb.MachineHomingActive, 'Aucune transaction hors N2');
 END_TEST
 
 TEST 'TC-T185-031 : confirmation fermee admissible => homing M1+M2, cible M2 = top + offset ferme, commit atomique'
+    Cfg.CfgTopHomingTarget_M := 8.5; Cfg.CfgOffsetClose_M := 3.0;
     (* settle *)
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2,
        TopPositionActive := TRUE, WinchesMechanicallyStopped := TRUE,
        M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmClosePosition := FALSE, CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       ConfirmClosePosition := FALSE, Cfg := Cfg);
     ADVANCE_TIME(10000000);
     (* front confirmation fermee *)
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2,
        TopPositionActive := TRUE, WinchesMechanicallyStopped := TRUE,
        M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmClosePosition := TRUE, CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       ConfirmClosePosition := TRUE, Cfg := Cfg);
     ASSERT_TRUE(Fb.M1Demand.HomeReq, 'M1 recoit le homing conjoint');
     ASSERT_TRUE(Fb.M2Demand.HomeReq, 'M2 recoit le homing conjoint');
     ASSERT_TRUE(Fb.M2Demand.UseDynamicTarget, 'M2 cible geometrique');
@@ -109,7 +112,7 @@ TEST 'TC-T185-031 : confirmation fermee admissible => homing M1+M2, cible M2 = t
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2,
        TopPositionActive := TRUE, WinchesMechanicallyStopped := TRUE,
        M1Status := StatusBusy, M2Status := StatusBusy,
-       CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       Cfg := Cfg);
     ASSERT_TRUE(Fb.MachineHomingActive, 'Transaction conservee pendant les deux homings');
     ASSERT_FALSE(Fb.BucketCommit.CommitClose, 'Pas de commit tant que les deux ne sont pas Done');
     (* les deux Done + fiables *)
@@ -117,7 +120,7 @@ TEST 'TC-T185-031 : confirmation fermee admissible => homing M1+M2, cible M2 = t
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2,
        TopPositionActive := TRUE, WinchesMechanicallyStopped := TRUE,
        M1Status := StatusDone, M2Status := StatusDone,
-       CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       Cfg := Cfg);
     ASSERT_FALSE(Fb.MachineHomingFailed, 'Succes homing ne doit pas abandonner');
     ASSERT_TRUE(Fb.BucketCommit.CommitClose, 'Commit ferme apres les deux succes');
     ASSERT_FALSE(Fb.BucketCommit.CommitOpen, 'Commit ouvert non arme');
@@ -129,65 +132,69 @@ END_TEST
 
 (* ---------- AC4 : quatre vecteurs d'abandon ---------- *)
 TEST 'TC-T185-040 : abandon si capteur haut perdu pendant la transaction'
+    Cfg.CfgTopHomingTarget_M := 8.5; Cfg.CfgOffsetClose_M := 3.0;
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmClosePosition := FALSE, CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       ConfirmClosePosition := FALSE, Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmClosePosition := TRUE, CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       ConfirmClosePosition := TRUE, Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := FALSE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusBusy, M2Status := StatusBusy,
-       CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       Cfg := Cfg);
     ASSERT_TRUE(Fb.MachineHomingFailed, 'Perte capteur haut => abandon');
     ASSERT_FALSE(Fb.MachineHomingActive, 'Transaction close');
     ASSERT_EQ(Fb.MachineHomingStep, E_MachineHomingStep.FAILED, 'Guide : recommencer en N2');
 END_TEST
 
 TEST 'TC-T185-041 : abandon si erreur homing M1 pendant la transaction'
+    Cfg.CfgTopHomingTarget_M := 8.5; Cfg.CfgOffsetClose_M := 3.0;
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmClosePosition := FALSE, CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       ConfirmClosePosition := FALSE, Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmClosePosition := TRUE, CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       ConfirmClosePosition := TRUE, Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusErr, M2Status := StatusBusy,
-       CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       Cfg := Cfg);
     ASSERT_TRUE(Fb.MachineHomingFailed, 'Erreur homing M1 => abandon');
     ASSERT_TRUE(Fb.Fault.Latched, 'Cause erreur homing latchee');
 END_TEST
 
 TEST 'TC-T185-042 : abandon si mouvement pendant la transaction'
+    Cfg.CfgTopHomingTarget_M := 8.5; Cfg.CfgOffsetOpen_M := 1.0;
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmOpenPosition := FALSE, CfgTopHomingTargetM := 8.5, CfgOffsetOpenM := 1.0);
+       ConfirmOpenPosition := FALSE, Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmOpenPosition := TRUE, CfgTopHomingTargetM := 8.5, CfgOffsetOpenM := 1.0);
+       ConfirmOpenPosition := TRUE, Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := FALSE, M1Status := StatusBusy, M2Status := StatusBusy,
-       CfgTopHomingTargetM := 8.5, CfgOffsetOpenM := 1.0);
+       Cfg := Cfg);
     ASSERT_TRUE(Fb.MachineHomingFailed, 'Mouvement pendant transaction => abandon');
 END_TEST
 
 
 (* ---------- C-2 : double confirmation meme scan = rejet total ---------- *)
 TEST 'TC-T185-050 : Confirm ouverte ET fermee au meme scan => aucune transaction + cause latchee'
+    Cfg.CfgTopHomingTarget_M := 8.5; Cfg.CfgOffsetOpen_M := 1.0; Cfg.CfgOffsetClose_M := 3.0;
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusHomed, M2Status := StatusHomed,
        ConfirmOpenPosition := FALSE, ConfirmClosePosition := FALSE,
-       CfgTopHomingTargetM := 8.5, CfgOffsetOpenM := 1.0, CfgOffsetCloseM := 3.0);
+       Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusHomed, M2Status := StatusHomed,
        ConfirmOpenPosition := TRUE, ConfirmClosePosition := TRUE,
-       CfgTopHomingTargetM := 8.5, CfgOffsetOpenM := 1.0, CfgOffsetCloseM := 3.0);
+       Cfg := Cfg);
     ASSERT_FALSE(Fb.M1Demand.HomeReq, 'Double confirmation => aucun homing');
     ASSERT_FALSE(Fb.MachineHomingActive, 'Double confirmation => aucune transaction');
     ASSERT_TRUE(Fb.Fault.Latched, 'Cause double confirmation latchee');
@@ -196,13 +203,14 @@ END_TEST
 
 (* ---------- C-4 : jamais de ref benne au vol par-dessus un homing d'axe ---------- *)
 TEST 'TC-T185-060 : confirmation ignoree si un homing d axe est deja Busy'
+    Cfg.CfgTopHomingTarget_M := 8.5; Cfg.CfgOffsetClose_M := 3.0;
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmClosePosition := FALSE, CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       ConfirmClosePosition := FALSE, Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusBusy, M2Status := StatusNone,
-       ConfirmClosePosition := TRUE, CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       ConfirmClosePosition := TRUE, Cfg := Cfg);
     ASSERT_FALSE(Fb.MachineHomingActive, 'Pas de transaction au vol sur homing d axe en cours');
     ASSERT_EQ(Fb.MachineHomingStep, E_MachineHomingStep.HOMING_IN_PROGRESS, 'Guide : homing d axe en cours');
 END_TEST
@@ -241,18 +249,19 @@ END_TEST
 
 (* ---------- AC9 : ordre d action libre, meme etat final ---------- *)
 TEST 'TC-T185-080 : Enable FALSE en pleine transaction => retour IDLE, sorties sures'
+    Cfg.CfgTopHomingTarget_M := 8.5; Cfg.CfgOffsetClose_M := 3.0;
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmClosePosition := FALSE, CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       ConfirmClosePosition := FALSE, Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmClosePosition := TRUE, CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       ConfirmClosePosition := TRUE, Cfg := Cfg);
     ASSERT_TRUE(Fb.MachineHomingActive, 'Transaction armee');
     ADVANCE_TIME(10000000);
     Fb(Enable := FALSE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
        WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
-       CfgTopHomingTargetM := 8.5, CfgOffsetCloseM := 3.0);
+       Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingStep, E_MachineHomingStep.IDLE, 'Enable FALSE => IDLE');
     ASSERT_FALSE(Fb.M1Demand.HomeReq, 'Enable FALSE => demandes sures');
     ASSERT_FALSE(Fb.MachineHomed, 'Enable FALSE => non qualifie');
@@ -270,29 +279,28 @@ TEST 'TC-T185-090 : aucune confirmation explicite => aucun commit benne'
 END_TEST
 
 TEST 'TC-T185-091 : confirmation ouverte explicite => chemin ouvert exclusif'
+    Cfg.CfgTopHomingTarget_M := 8.5; Cfg.CfgOffsetOpen_M := 1.0;
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2,
        TopPositionActive := TRUE, WinchesMechanicallyStopped := TRUE,
        M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmOpenPosition := FALSE, CfgTopHomingTargetM := 8.5,
-       CfgOffsetOpenM := 1.0);
+       ConfirmOpenPosition := FALSE, Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2,
        TopPositionActive := TRUE, WinchesMechanicallyStopped := TRUE,
        M1Status := StatusNone, M2Status := StatusNone,
-       ConfirmOpenPosition := TRUE, CfgTopHomingTargetM := 8.5,
-       CfgOffsetOpenM := 1.0);
+       ConfirmOpenPosition := TRUE, Cfg := Cfg);
     ASSERT_TRUE(Fb.M1Demand.HomeReq, 'Confirmation ouverte declenche M1');
     ASSERT_TRUE(Fb.M2Demand.HomeReq, 'Confirmation ouverte declenche M2');
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2,
        TopPositionActive := TRUE, WinchesMechanicallyStopped := TRUE,
        M1Status := StatusBusy, M2Status := StatusBusy,
-       CfgTopHomingTargetM := 8.5, CfgOffsetOpenM := 1.0);
+       Cfg := Cfg);
     ADVANCE_TIME(10000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2,
        TopPositionActive := TRUE, WinchesMechanicallyStopped := TRUE,
        M1Status := StatusDone, M2Status := StatusDone,
-       CfgTopHomingTargetM := 8.5, CfgOffsetOpenM := 1.0);
+       Cfg := Cfg);
     ASSERT_TRUE(Fb.BucketCommit.CommitOpen, 'Commit ouvert apres deux succes');
     ASSERT_FALSE(Fb.BucketCommit.CommitClose, 'Commit ferme exclusif');
 END_TEST

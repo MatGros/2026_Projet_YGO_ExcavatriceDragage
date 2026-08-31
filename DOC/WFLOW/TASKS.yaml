@@ -4978,6 +4978,7 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
   bloque_par:
   - T202-A
+  - T202-G
 - id: T202-C
   parent_id: T202
   statut: ⬜
@@ -4999,6 +5000,7 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
   bloque_par:
   - T202-A
+  - T202-G
 - id: T202-D
   parent_id: T202
   statut: ⬜
@@ -5020,6 +5022,7 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
   bloque_par:
   - T202-A
+  - T202-G
 - id: T202-E
   parent_id: T202
   statut: ⬜
@@ -5045,6 +5048,7 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
   bloque_par:
   - T202-A
+  - T202-G
 - id: T202-F
   parent_id: T202
   statut: ⬜
@@ -5068,3 +5072,39 @@ tasks:
   - T202-C
   - T202-D
   - T202-E
+- id: T202-G
+  parent_id: T202
+  statut: ⏳
+  criticite: C2
+  domaine: G_CYCLE
+  agent: Claude Code (orchestrateur)
+  date: '2026-08-31T00:00:00'
+  titre: 'T202-G — Réparer le filet CI G_CYCLE (harnais périmés) + couverture AF-04 must_survive'
+  contexte: 'Baseline 2026-08-31 : run_tests.py --domain G_CYCLE = 0/4 PASS sur code
+    NON modifié → aucun filet de non-régression pour T202. Causes : (1) registry.yaml
+    sources manquantes DiveSearch (3 DUT) + MachineHomingCycle (Cfg) → CORRIGÉ, MachineHomingCycle
+    repasse 16/16 PASS ; (2) test_fb_cycle.st référence CycleMotionPermit (input supprimé,
+    remplacé par JoystickDeflected+DeadmanArmed) ; (3) test_fb_divesearch.st référence
+    s.FB.DIVESTATE (→ Outputs.StepState après refacto bus) ; (4) entrée registry FB_ExtractionSequence
+    pointe des fichiers inexistants (réels : FB_ExtractionAssist.st / E_ExtractionAssistState.st)
+    + test_fb_extractionsequence.st référence FORCEMINSPEEDSTEP (membre supprimé).'
+  description: 'Rendre les 4 FB de G_CYCLE VERTS sur le code actuel (filet de caractérisation
+    AVANT T202-B..E). 1) registry.yaml : renommer l entrée FB_ExtractionSequence →
+    FB_ExtractionAssist, corriger sources (FB_ExtractionAssist.st, E_ExtractionAssistState.st)
+    et test. 2) Réécrire test_fb_cycle.st contre l interface actuelle (CycleMotionPermit
+    → JoystickDeflected ; retirer asserts sur membres disparus) en couvrant le contrat
+    de conservation T202 : chaîne X0→X13, repli STABILIZING sur défaut latché, reprise
+    consciente StartCycle, gate homme-mort coupe TOUTES les commandes, SampleCount 1x/cycle,
+    X4→X5 sur KoboldContactFond. 3) Idem test_fb_divesearch.st (DIVESTATE → Outputs.StepState)
+    et test_fb_extractionassist.st (retirer FORCEMINSPEEDSTEP). 4) Ajouter af_doc:
+    DOC/AF/AF_Partie-04...md sur l entrée FB_Cycle du registry pour activer le contrôle
+    de cohérence AF↔tests (TC-P04-xxx). 5) Rejouer run_tests.py --domain G_CYCLE = 4/4 PASS.'
+  objectifs:
+  - 'registry.yaml : entrée FB_ExtractionAssist correcte (nom + sources + test) ; af_doc AF-04 sur FB_Cycle'
+  - 'test_fb_cycle.st compile et PASS sur le code actuel, sans membre/inp. disparu'
+  - 'test_fb_divesearch.st et test_fb_extractionassist.st compilent et PASS sur le code actuel'
+  - 'Couverture explicite des 6 comportements must_survive du contrat T202 (1 TEST minimum chacun)'
+  - 'run_tests.py --domain G_CYCLE = 4/4 PASS (baseline verte figée avant T202-B..E)'
+  - 'WARN de cohérence AF↔tests documenté (TC-P04 manquants listés, non bloquant)'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
+  bloque_par: []
