@@ -2375,8 +2375,21 @@ END_IF;
 
 {region "§2 Chaîne AU"}
 // 1. La chaîne AU est saine si le PLC maintient les deux relais de coupure de puissance
-// AND if no emergency stop button is pressed (BtnEmergencyStop is FALSE)
-SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop;
+// AND if no emergency stop button is pressed (BtnEmergencyStop is FALSE).
+// 🔧 DEADLOCK SIMULATION (corrigé) : sur machine réelle, la boucle AU se ferme
+// physiquement au relâchement du coup-de-poing (indépendant du PLC). En simulation,
+// l'ancien modèle exigeait le maintien actif du PLC (PowerCutOff_A/B) pour fermer la
+// chaîne, or ce maintien dépend lui-même de la chaîne fermée à l'IDLE
+// (Maintain_ChainOk = EmergencyChainClosed, FB_Safety_EmergencyManagement.st:385)
+// → dépendance circulaire : SimChainOk reste FALSE, l'AU ne peut jamais s'armer.
+// Correction : chaîne « fermée par défaut » en simulation (défaut = TRUE, coup-de-poing
+// relâché), qui retombe dès qu'un canal est coupé (test redondance A/B) ou que le
+// coup-de-poing est appuyé. Hors simulation (Enable=FALSE), la chaîne reste pilotée par
+// le matériel via le repli HwReal (PRG_02 §1/§2) — aucune régression sécurité réelle.
+SimChainOk := TRUE; // 🔧 Chaîne fermée par défaut en simulation (coup-de-poing relâché)
+IF NOT PowerCutOff_A OR NOT PowerCutOff_B OR BtnEmergencyStop THEN
+    SimChainOk := FALSE; // Coupure canal (test redondance) ou appui coup-de-poing → boucle ouverte
+END_IF;
 {endregion}
 
 {region "§3 Auto-maintien contacteur"}

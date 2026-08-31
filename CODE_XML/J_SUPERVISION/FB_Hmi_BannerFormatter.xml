@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T10:13:58.497992" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T10:13:58.497992">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T12:45:34.975496" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T12:45:34.975496">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2397,10 +2397,10 @@ DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
 // (PowerContactorEngaged=TRUE). On déclenche désormais sur la CAUSE (LastAbortCause &lt;&gt; 0),
 // en excluant uniquement le SUCCÈS réel (séquence ayant atteint l'étape 6 de confirmation
 // ET contacteur engagé au retour à IDLE) — un succès ne produit AUCUN message (AC4).
-// Verrouillage : les causes SANS latch (16#0010 PowerCutOff, 16#0004/0008 timeout
+// Verrouillage : les causes SANS latch (CST_ABORT_POWER_CUTOFF, CST_ABORT_TIMEOUT_RESTORE_A/B)
 // restauration) restent affichées jusqu'à Reset (ou nouvelle séquence) pour que
-// l'opérateur voie l'échec. Les causes déjà latched (16#0002/0020/0040/0080) et la
-// coupe volontaire (16#0001) ne sont pas verrouillées.
+// l'opérateur voie l'échec. Les causes déjà latched (CST_ABORT_CHAIN_DROP/REDUNDANCY_A/B/
+// TIMEOUT_CONTACTOR) et la coupe volontaire (CST_ABORT_CUT_IHM) ne sont pas verrouillées.
 ArmingInProgress := (ArmingSeqStep &lt;&gt; 0);
 LastAbortEdge(CLK := ArmingInProgress);
 ResetEdge(CLK := Reset);
@@ -2415,7 +2415,7 @@ END_IF;
 
 IF LastAbortEdge.Q AND (LastAbortCause &lt;&gt; 0) AND NOT (SeqReachedConfirm AND PowerContactorEngaged) THEN
     AbortMsgActive := TRUE;
-    AbortMsgLatched := (LastAbortCause = 16#0010) OR (LastAbortCause = 16#0004) OR (LastAbortCause = 16#0008);
+    AbortMsgLatched := (LastAbortCause = INT_TO_WORD(CST_ABORT_POWER_CUTOFF)) OR (LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A)) OR (LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B));
     TonAbortHold(IN := FALSE);
 END_IF;
 
@@ -2442,12 +2442,12 @@ IF AbortMsgActive AND NOT AbortMsgLatched THEN
 END_IF;
 IF AbortMsgActive THEN
     CASE LastAbortCause OF
-        16#0001: AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
-        16#0002: AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
-        16#0004: AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
-        16#0008: AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
-        16#0010:
-            // 🩹 Décodage de la cause 16#0010 (PowerCutOff métier) en cause explicite
+        INT_TO_WORD(CST_ABORT_CUT_IHM): AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
+        INT_TO_WORD(CST_ABORT_CHAIN_DROP): AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
+        INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A): AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
+        INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B): AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
+        INT_TO_WORD(CST_ABORT_POWER_CUTOFF):
+            // 🩹 Décodage de la cause CST_ABORT_POWER_CUTOFF (PowerCutOff métier) en cause explicite
             // M1/M2/M3 + bit MecaA/MecaB/thermique, à partir des DUT Safety déjà en entrée.
             // Priorité : M3 (translation) puis M1 puis M2 ; MecaA &gt; MecaB &gt; thermique.
             IF TranslationSafety.ErrorMecaA THEN
@@ -2475,9 +2475,9 @@ IF AbortMsgActive THEN
             ELSE
                 AbortMsgText := '[AU] Coupure securite metier active - lever la cause puis rearmer';
             END_IF;
-        16#0020: AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
-        16#0040: AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
-        16#0080: AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
+        INT_TO_WORD(CST_ABORT_REDUNDANCY_A): AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
+        INT_TO_WORD(CST_ABORT_REDUNDANCY_B): AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
+        INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR): AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
     ELSE
         AbortMsgText := '[AU] Rearmement interrompu - verifier et rearmer';
     END_CASE;
@@ -2500,7 +2500,7 @@ ELSIF NOT VarM3Valid THEN
 ELSIF AbortMsgActive THEN
     // 🩹 Cause du dernier abandon de séquence AU (message explicite cause+action).
     // 🐛 BUG B corrigé : placé AVANT PowerCutOffActiveAny pour que la cause racine
-    // (dont 16#0010 PowerCutOff décodée en M1/M2/M3 + MecaA/MecaB/thermique) prime sur
+    // (dont CST_ABORT_POWER_CUTOFF décodée en M1/M2/M3 + MecaA/MecaB/thermique) prime sur
     // le message générique de coupure puissance. Placé aussi avant
     // RedundancyTestFailed/EmergencyArmingFailed/SafeStop pour que chaque cause montre
     // son message spécifique — le message d'abandon est la CAUSE RACINE (plus pertinente

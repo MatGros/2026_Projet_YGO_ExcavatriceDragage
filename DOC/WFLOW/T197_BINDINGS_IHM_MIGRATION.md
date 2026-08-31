@@ -88,11 +88,11 @@ Les champs déplacés sont référencés par l'IHM sous les anciens chemins. Les
 > `VAR CONSTANT` déclarées dans un `FUNCTION_BLOCK` comme **étiquettes de CASE** (conformité IEC).
 > Le C0218 persiste malgré une déclaration correcte. **Correctif appliqué** : les constantes
 > `CST_STEP_*` (0..6) et `CST_ABORT_*` (bitfield) sont déplacées dans une **GVL de constantes**
-> `GVL_Safety_Emergency_Constants` en `VAR_GLOBAL CONSTANT` — les constantes globales sont des
+> `GVL_Safety_Emergency` en `VAR_GLOBAL CONSTANT` — les constantes globales sont des
 > labels de CASE valides en CODESYS. Le CASE **garde ses labels symboliques** (lisible).
 
 **Correctif repo** :
-- ➕ `CODE/B_AU_SECURITE/GVL_Safety_Emergency_Constants.st` : `VAR_GLOBAL CONSTANT` avec
+- ➕ `CODE/B_AU_SECURITE/GVL_Safety_Emergency.st` : `VAR_GLOBAL CONSTANT` avec
   `CST_STEP_IDLE..CST_STEP_CONFIRM` (`INT := 0..6`) et `CST_ABORT_NONE..CST_ABORT_TIMEOUT_CONTACTOR`
   (`INT := 0,1,2,4,8,16,32,64,128`). GVL **non** `qualified_only` → les références symboliques
   non qualifiées (`ArmingSeqStep = CST_STEP_IDLE`, labels du CASE) restent valides sans modification.
@@ -105,7 +105,7 @@ Les champs déplacés sont référencés par l'IHM sous les anciens chemins. Les
 - CASE : ligne **438** (après le bloc `VAR CONSTANT`), labels `CST_STEP_*` → résolus depuis la GVL.
 - Variable scrutée `ArmingSeqStep` : `INT` (ligne 56) — type cohérent avec les labels.
 
-**Action CODESYS (manuelle)** : ré-importer la GVL `GVL_Safety_Emergency_Constants` **et** le FB
+**Action CODESYS (manuelle)** : ré-importer la GVL `GVL_Safety_Emergency` **et** le FB
 `FB_Safety_EmergencyManagement` (ou le bundle `CODE_XML/CODE_Bundle.xml`) dans CODESYS, puis
 recompiler. Le C0218 disparaît. ⚠️ **Ne pas** remplacer les labels `CST_STEP_*` par des littéraux :
 les constantes symboliques restent plus lisibles et sont utilisées dans les comparaisons.

@@ -5857,7 +5857,7 @@ Boucle AU fermee (EmergencyChainClosed = TRUE)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant (= ArmRequestAllowed) : chain OK, step=0, pas de lockout</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -9589,7 +9589,7 @@ TRUE = Défaut sécurité actif</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant (= ArmRequestAllowed) : chain OK, step=0, pas de lockout</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -25115,10 +25115,10 @@ DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
 // (PowerContactorEngaged=TRUE). On déclenche désormais sur la CAUSE (LastAbortCause &lt;&gt; 0),
 // en excluant uniquement le SUCCÈS réel (séquence ayant atteint l'étape 6 de confirmation
 // ET contacteur engagé au retour à IDLE) — un succès ne produit AUCUN message (AC4).
-// Verrouillage : les causes SANS latch (16#0010 PowerCutOff, 16#0004/0008 timeout
+// Verrouillage : les causes SANS latch (CST_ABORT_POWER_CUTOFF, CST_ABORT_TIMEOUT_RESTORE_A/B)
 // restauration) restent affichées jusqu'à Reset (ou nouvelle séquence) pour que
-// l'opérateur voie l'échec. Les causes déjà latched (16#0002/0020/0040/0080) et la
-// coupe volontaire (16#0001) ne sont pas verrouillées.
+// l'opérateur voie l'échec. Les causes déjà latched (CST_ABORT_CHAIN_DROP/REDUNDANCY_A/B/
+// TIMEOUT_CONTACTOR) et la coupe volontaire (CST_ABORT_CUT_IHM) ne sont pas verrouillées.
 ArmingInProgress := (ArmingSeqStep &lt;&gt; 0);
 LastAbortEdge(CLK := ArmingInProgress);
 ResetEdge(CLK := Reset);
@@ -25133,7 +25133,7 @@ END_IF;
 
 IF LastAbortEdge.Q AND (LastAbortCause &lt;&gt; 0) AND NOT (SeqReachedConfirm AND PowerContactorEngaged) THEN
     AbortMsgActive := TRUE;
-    AbortMsgLatched := (LastAbortCause = 16#0010) OR (LastAbortCause = 16#0004) OR (LastAbortCause = 16#0008);
+    AbortMsgLatched := (LastAbortCause = INT_TO_WORD(CST_ABORT_POWER_CUTOFF)) OR (LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A)) OR (LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B));
     TonAbortHold(IN := FALSE);
 END_IF;
 
@@ -25160,12 +25160,12 @@ IF AbortMsgActive AND NOT AbortMsgLatched THEN
 END_IF;
 IF AbortMsgActive THEN
     CASE LastAbortCause OF
-        16#0001: AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
-        16#0002: AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
-        16#0004: AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
-        16#0008: AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
-        16#0010:
-            // 🩹 Décodage de la cause 16#0010 (PowerCutOff métier) en cause explicite
+        INT_TO_WORD(CST_ABORT_CUT_IHM): AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
+        INT_TO_WORD(CST_ABORT_CHAIN_DROP): AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
+        INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A): AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
+        INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B): AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
+        INT_TO_WORD(CST_ABORT_POWER_CUTOFF):
+            // 🩹 Décodage de la cause CST_ABORT_POWER_CUTOFF (PowerCutOff métier) en cause explicite
             // M1/M2/M3 + bit MecaA/MecaB/thermique, à partir des DUT Safety déjà en entrée.
             // Priorité : M3 (translation) puis M1 puis M2 ; MecaA &gt; MecaB &gt; thermique.
             IF TranslationSafety.ErrorMecaA THEN
@@ -25193,9 +25193,9 @@ IF AbortMsgActive THEN
             ELSE
                 AbortMsgText := '[AU] Coupure securite metier active - lever la cause puis rearmer';
             END_IF;
-        16#0020: AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
-        16#0040: AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
-        16#0080: AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
+        INT_TO_WORD(CST_ABORT_REDUNDANCY_A): AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
+        INT_TO_WORD(CST_ABORT_REDUNDANCY_B): AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
+        INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR): AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
     ELSE
         AbortMsgText := '[AU] Rearmement interrompu - verifier et rearmer';
     END_CASE;
@@ -25218,7 +25218,7 @@ ELSIF NOT VarM3Valid THEN
 ELSIF AbortMsgActive THEN
     // 🩹 Cause du dernier abandon de séquence AU (message explicite cause+action).
     // 🐛 BUG B corrigé : placé AVANT PowerCutOffActiveAny pour que la cause racine
-    // (dont 16#0010 PowerCutOff décodée en M1/M2/M3 + MecaA/MecaB/thermique) prime sur
+    // (dont CST_ABORT_POWER_CUTOFF décodée en M1/M2/M3 + MecaA/MecaB/thermique) prime sur
     // le message générique de coupure puissance. Placé aussi avant
     // RedundancyTestFailed/EmergencyArmingFailed/SafeStop pour que chaque cause montre
     // son message spécifique — le message d'abandon est la CAUSE RACINE (plus pertinente
@@ -27975,7 +27975,7 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rearmement possible actuellement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rearmement possible actuellement (= ArmRequestAllowed, aligne IHM/armement)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -28048,7 +28048,7 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de lockout, pas de cause redondance, contacteur au repos</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de lockout, contacteur au repos (aligne sur ArmRequestAllowed)</xhtml>
               </documentation>
             </variable>
             <variable name="Maintain_ChainOk">
@@ -28500,7 +28500,12 @@ END_IF;
 IF Enable THEN
     Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
-    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT RedundancyTestFailedCause AND NOT PowerContactorEngaged;
+    // ⚠️ Armable_NoBlock SANS `NOT RedundancyTestFailedCause` : aligné sur ArmRequestAllowed (§5).
+    //    La cause de redondance est latée mais la séquence d'armement la re-teste (§5 étape 1/3) :
+    //    l'armement reste donc réellement possible (et sûr) tant que les autres préconditions
+    //    sont réunies. Afficher le bouton « Armable » sur cette cause seule bloquait le réarmement
+    //    après acquittement (Reset ne purge pas la Cause, cf. §4) alors que l'armement était permis.
+    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
     Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
 
     ArmingBusy := (ArmingSeqStep &lt;&gt; CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
@@ -32436,8 +32441,21 @@ END_IF;
 
 {region "§2 Chaîne AU"}
 // 1. La chaîne AU est saine si le PLC maintient les deux relais de coupure de puissance
-// AND if no emergency stop button is pressed (BtnEmergencyStop is FALSE)
-SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop;
+// AND if no emergency stop button is pressed (BtnEmergencyStop is FALSE).
+// 🔧 DEADLOCK SIMULATION (corrigé) : sur machine réelle, la boucle AU se ferme
+// physiquement au relâchement du coup-de-poing (indépendant du PLC). En simulation,
+// l'ancien modèle exigeait le maintien actif du PLC (PowerCutOff_A/B) pour fermer la
+// chaîne, or ce maintien dépend lui-même de la chaîne fermée à l'IDLE
+// (Maintain_ChainOk = EmergencyChainClosed, FB_Safety_EmergencyManagement.st:385)
+// → dépendance circulaire : SimChainOk reste FALSE, l'AU ne peut jamais s'armer.
+// Correction : chaîne « fermée par défaut » en simulation (défaut = TRUE, coup-de-poing
+// relâché), qui retombe dès qu'un canal est coupé (test redondance A/B) ou que le
+// coup-de-poing est appuyé. Hors simulation (Enable=FALSE), la chaîne reste pilotée par
+// le matériel via le repli HwReal (PRG_02 §1/§2) — aucune régression sécurité réelle.
+SimChainOk := TRUE; // 🔧 Chaîne fermée par défaut en simulation (coup-de-poing relâché)
+IF NOT PowerCutOff_A OR NOT PowerCutOff_B OR BtnEmergencyStop THEN
+    SimChainOk := FALSE; // Coupure canal (test redondance) ou appui coup-de-poing → boucle ouverte
+END_IF;
 {endregion}
 
 {region "§3 Auto-maintien contacteur"}
@@ -47363,7 +47381,7 @@ instTroubleshootingView(
       </globalVars>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_Safety_Emergency_Constants" constant="true">
+      <globalVars name="GVL_Safety_Emergency" constant="true">
         <variable name="CST_STEP_IDLE">
           <type>
             <INT />
@@ -47546,12 +47564,12 @@ Aucun abandon</xhtml>
         </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>4a06a006-d4b4-5486-9390-2bd7d17e0c27</ObjectId>
+            <ObjectId>4c1d6ed9-e9d0-5144-9983-81c9c43bae47</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛡️ GVL_Safety_Emergency_Constants — Constantes globales chaîne AU
+   🛡️ GVL_Safety_Emergency — Constantes globales chaîne AU
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Constantes symboliques de la séquence de réarmement AU —
       étapes CST_STEP_* et causes d'abandon CST_ABORT_* — partagées
@@ -48309,7 +48327,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
         </Folder>
         <Folder Name="B_AU_SECURITE">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
-          <Object Name="GVL_Safety_Emergency_Constants" ObjectId="4a06a006-d4b4-5486-9390-2bd7d17e0c27" />
+          <Object Name="GVL_Safety_Emergency" ObjectId="4c1d6ed9-e9d0-5144-9983-81c9c43bae47" />
           <Folder Name="_TYPES">
             <Object Name="ST_Safety_Emergency_Cmd" ObjectId="c95cff59-9ed1-568b-a37b-15a3870e9e72" />
             <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />
