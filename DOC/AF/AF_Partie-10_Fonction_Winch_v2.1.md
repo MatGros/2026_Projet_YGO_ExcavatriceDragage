@@ -189,10 +189,10 @@ dupliqué ici) :
         💤 <b>Étape 0</b> : Treuil au repos, contacteurs coupés, frein serré<br>
         🚀 <b>Étape 1</b> : Consigne opérateur (joystick/boutons) → arbitrage palier/sens<br>
         ⚡ <b>Étape 2</b> : Activation contacteurs selon palier, décodage <code>FB_SpeedStep</code><br>
-        ✅ <b>Étape 3</b> : Mouvement treuil piloté — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md">FB_Winch_v1.0.md</a>
+        ✅ <b>Étape 3</b> : Mouvement treuil piloté — détail dans <a href="AF_Partie-10_Fonction_Winch/FB_Winch_v2.0.md">FB_Winch_v2.0.md</a>
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>—</code></small></td>
-      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md">FB_Winch_v1.0.md</a></small></td>
+      <td style="padding: 4px 1px; text-align: center;"><small><a href="AF_Partie-10_Fonction_Winch/FB_Winch_v2.0.md">FB_Winch_v2.0.md</a></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>NV-I</code></small></td>
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
@@ -308,7 +308,7 @@ dupliqué ici) :
 
 | Fiche | FB détaillé | Contenu |
 |---|---|---|
-| [`FB_Winch_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_Winch_v1.0.md) | `FB_Winch` | Mouvement, palier, sens (🔧 2026-08-06 : frein retiré, voir §2bis) |
+| [`FB_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch/FB_Winch_v2.0.md) | `FB_Winch` | Mouvement, palier, sens (🔧 2026-08-06 : frein retiré, voir §2bis) |
 | [`FB_Safety_Winch_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md) | `FB_Safety_Winch` | 7 mécanismes A-G, masques, bypass |
 | [`FB_WinchSync_v1.1.md`](AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md) | `FB_WinchSync` | Synchro niveau 1, couplage croisé |
 | [`FB_WinchOutputInterlock_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md) | `FB_WinchOutputInterlock` | Barrière finale, watchdog frein, anti-redémarrage |
