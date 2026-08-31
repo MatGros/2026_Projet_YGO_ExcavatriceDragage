@@ -316,9 +316,9 @@ plus produire de faux écart.
 
 | # | Gravité | Point | Action |
 |---|---|---|---|
-| 1 | 🔴 | **Divergence spec/code ouverte (v1.2)** : le code actuel écrit `PresetValue := RawPos` (neutre, commit `73fa758d`) — l'exigence centre-plage n'est **pas** implémentée | Correction à charger en tâche dédiée + garde-fou TC-P09-070 (diagnostic `TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md`) |
+| 1 | 🔴 | **Divergence spec/code ouverte (v1.2)** : le code actuel écrit `PresetValue := RawPos` (neutre, commit `73fa758d`) — l'exigence centre-plage n'est **pas** implémentée | Correction à charger en tâche dédiée + garde-fou <nobr><code>TC-P09-070</code></nobr> (diagnostic `TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md`) |
 | 2 | 🔴 | **Validation matérielle requise** : le codeur réel doit accepter le preset centre (PDO Rx `PresetTriggerCmd=2`) — sinon `PresetNak` systématique, plus aucun homing possible | À qualifier sur le matériel avant tout mouvement réel (chapô §11 TBD) |
-| 3 | 🟠 | `FB_Sim_Encoder` (AF13) clampe le compteur à 0 en descente au lieu d'enrouler — TC-P09-070.2 (wrap impossible) intestable sur banc tant que non corrigé | À corriger côté AF13 avant la campagne TC |
+| 3 | 🟠 | `FB_Sim_Encoder` (AF13) clampe le compteur à 0 en descente au lieu d'enrouler — <nobr><code>TC-P09-070.2</code></nobr> (wrap impossible) intestable sur banc tant que non corrigé | À corriger côté AF13 avant la campagne TC |
 | 4 | mineur | `FwdRevSpeedFeedbackOff`/`BrakeFeedback` déclarés en entrée, jamais lus ni câblés par la façade | Ports morts, à retirer lors d'un lot dédié (pas fait ici, hors périmètre doc) |
 
 ## 8 · 📚 Documents liés

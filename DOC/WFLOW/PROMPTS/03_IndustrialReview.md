@@ -1,3 +1,4 @@
+# Prompt — Revue industrielle critique
 
 Fais auditer et challenger ton travail et la solution proposée par un **agent expert indépendant en machine industrielle**, avec une vision globale **projet + automatisme + safety/sécurité machine + IHM + ergonomie opérateur + exploitation/maintenance + tests**. La revue doit porter sur **la machine réellement livrée et utilisée**, pas uniquement sur le code ou la documentation.
 

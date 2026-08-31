@@ -309,6 +309,8 @@ dupliqué ici) :
 | Fiche | FB détaillé | Contenu |
 |---|---|---|
 | [`FB_Winch_v2.0.md`](AF_Partie-10_Fonction_Winch/FB_Winch_v2.0.md) | `FB_Winch` | Mouvement, palier, sens (🔧 2026-08-06 : frein retiré, voir §2bis) |
+| `FB_WinchCmdArbitrationM1/M2` | `FB_WinchCmdArbitrationM1/M2` | Arbitrage de commande treuil M1/M2 (joystick / boutons / cycle, POO) — code `CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st` / `FB_WinchCmdArbitrationM2.st` |
+| `FB_BucketCmdArbitration` | `FB_BucketCmdArbitration` | Arbitrage de commande benne (ouverture/fermeture, POO) — code `CODE/H_TREUILS_BENNE/FB_BucketCmdArbitration.st` |
 | [`FB_Safety_Winch_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md) | `FB_Safety_Winch` | 7 mécanismes A-G, masques, bypass |
 | [`FB_WinchSync_v1.1.md`](AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md) | `FB_WinchSync` | Synchro niveau 1, couplage croisé |
 | [`FB_WinchOutputInterlock_v1.0.md`](AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md) | `FB_WinchOutputInterlock` | Barrière finale, watchdog frein, anti-redémarrage |
@@ -431,12 +433,17 @@ défense en profondeur (7 mécanismes détaillés dans la fiche `FB_Safety_Winch
 PRG_04_Treuils_Benne (ST) — régions réelles (corrigé 2026-08-26, vérifié contre le code)
   §1  Intention maintenance et assistants (DiveSearch/ExtractionSequence)
   §2  Commande benne (instBucket)
-  §3  Arbitrage consignes M1/M2 (SEMI_AUTO / MAINT / joystick / boutons, combiné)
+  §3  Arbitrage consignes M1/M2 (FB_WinchCmdArbitrationM1/M2, POO)
+  §3bis ArmingPermit (combiné interlock benne)
   §4  Synchronisation M1/M2 (instWinchSync)
   §5  Couplage croisé et sécurités (instSafetyWinchM1/M2)
+  §5-0 Matrice de maintenance N1/N2 (AF-05 §4bis)
+  §5bis Sécurité M1/M2 (instSafetyWinchM1/M2)
+  §5ter Agrégateur de clamp de palier
   §6  Exécution treuils M1/M2 (instWinchM1/M2)
   §7  Publication demandes brutes
-  §8  Publication états IHM
+  §8  Publication états IHM (instWinchStateProjection, T195)
+  §8bis Trace de blocage terrain (ST_TraceWinch / E_WinchTraceBlockReason)
 PRG_06_Outputs (LD généré)  instWinchOutputInterlockM1/M2 (Q finales)
 ```
 
