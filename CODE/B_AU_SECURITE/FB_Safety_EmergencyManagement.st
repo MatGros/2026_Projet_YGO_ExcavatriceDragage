@@ -208,9 +208,6 @@ IF Enable THEN
         END_IF;
     END_IF;
 
-    // 🚦 DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
-    // Une nouvelle tentative repart d'une Cause propre : si le problème persiste, il sera
-    // re-latché dès le prochain échec (RedundancyCauseEdge/ArmingFailedCauseEdge -> Ack remis à FALSE).
     // 🚦 PRÉCONDITIONS D'ARMEMENT — source unique (Armable = State.Armable).
     // ⚠️ Armable_NoBlock SANS `NOT RedundancyTestFailedCause` : la cause de redondance est
     //    latée mais la séquence d'armement la re-teste (§5 étape 1/3) : l'armement reste donc
@@ -221,94 +218,123 @@ IF Enable THEN
     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
     Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
     Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
-    IF ArmReqEdge.Q AND Armable THEN
-        ArmingSeqStep := CST_STEP_TEST_A;
-        RedundancyTestFailedCause := FALSE;
-        EmergencyArmingFailedCause := FALSE;
-    END_IF;
-
-    // ⏱️ Étape 1 : Coupe canal A seul, vérifie que la boucle tombe
-    TonTestA(IN := (ArmingSeqStep = CST_STEP_TEST_A), PT := CST_TestDuration);
-    IF ArmingSeqStep = CST_STEP_TEST_A THEN
-        ForceTestA := TRUE;
-        IF TonTestA.Q THEN
+    // CASE à étiquettes littérales : 0..6 = CST_STEP_* (GVL_Safety_Emergency).
+    // La CI STruCpp exige ces littéraux pour les étiquettes CASE.
+    CASE ArmingSeqStep OF
+        0: // CST_STEP_IDLE
             ForceTestA := FALSE;
-            IF EmergencyChainClosed THEN
-                RedundancyTestFailedCause := TRUE;
-                LastAbortStep := CST_STEP_TEST_A;
-                LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_A);
-                ArmingSeqStep := CST_STEP_IDLE;
-            ELSE
-                ArmingSeqStep := CST_STEP_RESTORE_A;
-            END_IF;
-        END_IF;
-    ELSE
-        ForceTestA := FALSE;
-    END_IF;
-
-    // ⏱️ Étape 2 : Restaure A, attend le retour sain de la boucle amont
-    TonRestoreA(IN := (ArmingSeqStep = CST_STEP_RESTORE_A), PT := CST_TestDuration);
-    IF (ArmingSeqStep = CST_STEP_RESTORE_A) AND TonRestoreA.Q THEN
-        IF EmergencyChainClosed THEN
-            ArmingSeqStep := CST_STEP_TEST_B;
-        ELSE
-            LastAbortStep := CST_STEP_RESTORE_A;
-            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A);
-            ArmingSeqStep := CST_STEP_IDLE;
-        END_IF;
-    END_IF;
-
-    // ⏱️ Étape 3 : Coupe canal B seul, vérifie que la boucle tombe
-    TonTestB(IN := (ArmingSeqStep = CST_STEP_TEST_B), PT := CST_TestDuration);
-    IF ArmingSeqStep = CST_STEP_TEST_B THEN
-        ForceTestB := TRUE;
-        IF TonTestB.Q THEN
             ForceTestB := FALSE;
-            IF EmergencyChainClosed THEN
-                RedundancyTestFailedCause := TRUE;
-                LastAbortStep := CST_STEP_TEST_B;
-                LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_B);
-                ArmingSeqStep := CST_STEP_IDLE;
-            ELSE
-                ArmingSeqStep := CST_STEP_RESTORE_B;
+            TonTestA(IN := FALSE, PT := CST_TestDuration);
+            TonRestoreA(IN := FALSE, PT := CST_TestDuration);
+            TonTestB(IN := FALSE, PT := CST_TestDuration);
+            TonRestoreB(IN := FALSE, PT := CST_TestDuration);
+            TonArmingPulse(IN := FALSE, PT := CST_ArmingPulseDuration);
+            TonArmingConfirm(IN := FALSE, PT := CST_ArmingConfirmTimeout);
+
+            IF ArmReqEdge.Q AND Armable THEN
+                RedundancyTestFailedCause := FALSE;
+                EmergencyArmingFailedCause := FALSE;
+                ArmingSeqStep := CST_STEP_TEST_A;
             END_IF;
-        END_IF;
-    ELSE
-        ForceTestB := FALSE;
-    END_IF;
 
-    // ⏱️ Étape 4 : Restaure B, attend le retour sain de la boucle amont
-    TonRestoreB(IN := (ArmingSeqStep = CST_STEP_RESTORE_B), PT := CST_TestDuration);
-    IF (ArmingSeqStep = CST_STEP_RESTORE_B) AND TonRestoreB.Q THEN
-        IF EmergencyChainClosed THEN
-            ArmingSeqStep := CST_STEP_PULSE;
+        1: // CST_STEP_TEST_A
+            ForceTestA := TRUE;
+            ForceTestB := FALSE;
+            TonTestA(IN := TRUE, PT := CST_TestDuration);
+
+            IF TonTestA.Q THEN
+                ForceTestA := FALSE;
+                IF EmergencyChainClosed THEN
+                    RedundancyTestFailedCause := TRUE;
+                    LastAbortStep := CST_STEP_TEST_A;
+                    LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_A);
+                    ArmingSeqStep := CST_STEP_IDLE;
+                ELSE
+                    ArmingSeqStep := CST_STEP_RESTORE_A;
+                END_IF;
+            END_IF;
+
+        2: // CST_STEP_RESTORE_A
+            ForceTestA := FALSE;
+            ForceTestB := FALSE;
+            TonRestoreA(IN := TRUE, PT := CST_TestDuration);
+
+            IF TonRestoreA.Q THEN
+                IF EmergencyChainClosed THEN
+                    ArmingSeqStep := CST_STEP_TEST_B;
+                ELSE
+                    LastAbortStep := CST_STEP_RESTORE_A;
+                    LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A);
+                    ArmingSeqStep := CST_STEP_IDLE;
+                END_IF;
+            END_IF;
+
+        3: // CST_STEP_TEST_B
+            ForceTestA := FALSE;
+            ForceTestB := TRUE;
+            TonTestB(IN := TRUE, PT := CST_TestDuration);
+
+            IF TonTestB.Q THEN
+                ForceTestB := FALSE;
+                IF EmergencyChainClosed THEN
+                    RedundancyTestFailedCause := TRUE;
+                    LastAbortStep := CST_STEP_TEST_B;
+                    LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_B);
+                    ArmingSeqStep := CST_STEP_IDLE;
+                ELSE
+                    ArmingSeqStep := CST_STEP_RESTORE_B;
+                END_IF;
+            END_IF;
+
+        4: // CST_STEP_RESTORE_B
+            ForceTestA := FALSE;
+            ForceTestB := FALSE;
+            TonRestoreB(IN := TRUE, PT := CST_TestDuration);
+
+            IF TonRestoreB.Q THEN
+                IF EmergencyChainClosed THEN
+                    ArmingSeqStep := CST_STEP_PULSE;
+                ELSE
+                    LastAbortStep := CST_STEP_RESTORE_B;
+                    LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B);
+                    ArmingSeqStep := CST_STEP_IDLE;
+                END_IF;
+            END_IF;
+
+        5: // CST_STEP_PULSE
+            ForceTestA := FALSE;
+            ForceTestB := FALSE;
+            TonArmingPulse(IN := TRUE, PT := CST_ArmingPulseDuration);
+
+            IF TonArmingPulse.Q THEN
+                ArmingSeqStep := CST_STEP_CONFIRM;
+            END_IF;
+
+        6: // CST_STEP_CONFIRM
+            ForceTestA := FALSE;
+            ForceTestB := FALSE;
+            TonArmingConfirm(IN := TRUE, PT := CST_ArmingConfirmTimeout);
+
+            IF PowerContactorEngaged THEN
+                EmergencyArmingLockoutActive := FALSE;
+                ArmingSeqStep := CST_STEP_IDLE;
+            ELSIF TonArmingConfirm.Q THEN
+                EmergencyArmingFailedCause := TRUE;
+                EmergencyArmingLockoutActive := TRUE;
+                LastAbortStep := CST_STEP_CONFIRM;
+                LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR);
+                ArmingSeqStep := CST_STEP_IDLE;
+            END_IF;
+
         ELSE
-            LastAbortStep := CST_STEP_RESTORE_B;
-            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B);
-            ArmingSeqStep := CST_STEP_IDLE;
-        END_IF;
-    END_IF;
-
-    // ⏱️ Étape 5 : Les 2 canaux validés -> impulsion réarmement physique (1s)
-    TonArmingPulse(IN := (ArmingSeqStep = CST_STEP_PULSE), PT := CST_ArmingPulseDuration);
-    IF (ArmingSeqStep = CST_STEP_PULSE) AND TonArmingPulse.Q THEN
-        ArmingSeqStep := CST_STEP_CONFIRM;
-    END_IF;
-
-    // ⏱️ Étape 6 : Attente confirmation contacteur principal (2s max)
-    TonArmingConfirm(IN := (ArmingSeqStep = CST_STEP_CONFIRM), PT := CST_ArmingConfirmTimeout);
-    IF ArmingSeqStep = CST_STEP_CONFIRM THEN
-        IF PowerContactorEngaged THEN
-            ArmingSeqStep := CST_STEP_IDLE;
-            EmergencyArmingLockoutActive := FALSE;
-        ELSIF TonArmingConfirm.Q THEN
+            ForceTestA := FALSE;
+            ForceTestB := FALSE;
             EmergencyArmingFailedCause := TRUE;
             EmergencyArmingLockoutActive := TRUE;
-            LastAbortStep := CST_STEP_CONFIRM;
-            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR);
+            LastAbortStep := ArmingSeqStep;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_INVALID_STEP);
             ArmingSeqStep := CST_STEP_IDLE;
-        END_IF;
-    END_IF;
+    END_CASE;
 
     // ⏱️ Séquence de verrouillage temporel (5s)
     TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := CST_ArmingLockout);
@@ -427,7 +453,11 @@ ELSIF StartupFail THEN
 ELSIF RedundancyTestFailed THEN
     Status.OperatorMessage := 'AU: defaut redondance contacteurs - verifier puis Reset';
 ELSIF EmergencyArmingFailed THEN
-    Status.OperatorMessage := 'AU: echec rearmement contacteur (timeout) - verifier puis rearmer';
+    IF LastAbortCause = INT_TO_WORD(CST_ABORT_INVALID_STEP) THEN
+        Status.OperatorMessage := 'AU: etape sequence invalide - verifier puis Reset';
+    ELSE
+        Status.OperatorMessage := 'AU: echec rearmement contacteur (timeout) - verifier puis rearmer';
+    END_IF;
 ELSIF PowerCutOffRequest THEN
     Status.OperatorMessage := 'AU: coupure securite metier active - lever la cause puis rearmer';
 ELSIF BtnEmergencyCutOff THEN

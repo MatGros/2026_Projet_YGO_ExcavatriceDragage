@@ -1,0 +1,78 @@
+# Contrat de tache — T199 C4 : refactor CASE sequence rearmement AU
+contract:
+  task_id: T199_CASE_AU
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Rendre la sequence de rearmement AU du FB_Safety_EmergencyManagement
+    lisible et verifiable par etape CASE, sans affaiblir la securite ni
+    supprimer une cause, un interlock, une sortie ou un diagnostic existant.
+
+  acceptance:
+    - id: AC1
+      statement: "La region 5 contient un unique CASE ArmingSeqStep avec les etapes 0 a 6 documentees contre CST_STEP_*."
+      verified_by: "revue du ST + test de structure cible"
+    - id: AC2
+      statement: "Chaque etape 1 a 6 affecte explicitement ses forcages et n'appelle que son TON de sequence; l'etape 0 remet tous les TON de sequence et forcages a l'etat sur."
+      verified_by: "revue ligne a ligne + test unitaire des etapes"
+    - id: AC3
+      statement: "Les chemins nominal, redondance A/B, restore A/B, timeout contacteur, PowerCutOff, coupure IHM, chute de chaine et Enable=FALSE conservent leurs causes, lockouts et sorties suretes."
+      verified_by: "test_fb_safety_emergency.st : TC-P01-002,003,006-008,010-021"
+    - id: AC4
+      statement: "Une etape invalide est tracee, affichee puis ramenee a IDLE; elle ne reste jamais silencieuse ni ne maintient ArmPulse_Cmd."
+      verified_by: "nouveau test TC-P01-023 : forcer Step=7, verifier LastAbortStep/Cause, lockout, ArmPulse_Cmd=FALSE et OperatorMessage"
+    - id: AC5
+      statement: "La sequence reste un rearmement conscient sur front ArmRequest; aucun redemarrage automatique n'est introduit."
+      verified_by: "TC-P01-003 et TC-P01-005"
+    - id: AC6
+      statement: "Bundle frais, G200 sans erreur, test AU vert et gates palier C verts."
+      verified_by: "generate_codesys_bundle.py ; G200_check_linkage.py --report ; run_tests.py --fb FB_Safety_EmergencyManagement ; run_all_gates.py --palier C"
+
+  scope:
+    allowed:
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
+      - CODE/B_AU_SECURITE/GVL_Safety_Emergency.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/test_fb_safety_emergency.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T199_CASE_AU.yaml
+      - DOC/WFLOW/CONTRACTS/REGISTRE_ACTIONS_T199_CASE_AU.md
+      - DOC/WFLOW/CONTRACTS/TEST_DESIGN_T199_CASE_AU.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - interfaces publiques, DUT, PRG et cablage hors preuve d'une anomalie
+
+  conservation:
+    must_survive:
+      - "Coupures et priorites : BtnEmergencyCutOff, PowerCutOffRequest et chute chaine en etape 5/6."
+      - "Durees configurees : test/restauration 200 ms, pulse 1 s, confirmation 2 s, lockout 5 s."
+      - "Sorties Cmd.MaintainA_Cmd, Cmd.MaintainB_Cmd, Cmd.ArmPulse_Cmd et Cmd.TestCutActive."
+      - "Diagnostics Status.State.Step, Armable, ArmingBusy, LastAbortStep et LastAbortCause."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - bundle
+    - run_all_gates
+    - unit_test_au
+
+  alert_duty: >
+    Toute divergence de sortie, cause, lockout, duree minimale ou liaison est une
+    alerte C4 immediate. Elle n'est ni corrigee hors scope ni masquee par le refactor.
+
+status: PENDING
+execution:
+  executed_by: "Codex orchestrateur"
+  completed_at: "2026-08-31T18:12:25+02:00"
+  status: COMPLETED
+  summary: "§5 refactorée en CASE, étape invalide tracée/lockout/message explicite et testée."
+  evidence_submitted:
+    - "run_tests.py --fb FB_Safety_EmergencyManagement: PASS 25/25"
+    - "generate_codesys_bundle.py: PASS"
+    - "G200_check_linkage.py --report: PASS (0 erreur)"
+    - "run_all_gates.py --palier C: PASS 26/26"
+    - "run_all_gates.py: PASS 32/32"
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation humaine safety requise avant modification ST."

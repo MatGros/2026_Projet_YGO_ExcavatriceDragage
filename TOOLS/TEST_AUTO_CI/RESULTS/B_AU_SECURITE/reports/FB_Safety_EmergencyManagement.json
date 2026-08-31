@@ -7,6 +7,10 @@
       "passed": true
     },
     {
+      "name": "TC-P01-023 Etape invalide -> abandon trace et lockout",
+      "passed": true
+    },
+    {
       "name": "TC-P01-SCEN-NOM Scenario Nominal : Sequence complete de rearmement sans blocage",
       "passed": true
     },
@@ -100,8 +104,8 @@
     }
   ],
   "summary": {
-    "total": 24,
-    "passed": 24,
+    "total": 25,
+    "passed": 25,
     "failed": 0
   }
 }

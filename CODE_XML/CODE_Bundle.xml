@@ -28273,9 +28273,6 @@ IF Enable THEN
         END_IF;
     END_IF;
 
-    // 🚦 DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
-    // Une nouvelle tentative repart d'une Cause propre : si le problème persiste, il sera
-    // re-latché dès le prochain échec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis à FALSE).
     // 🚦 PRÉCONDITIONS D'ARMEMENT — source unique (Armable = State.Armable).
     // ⚠️ Armable_NoBlock SANS `NOT RedundancyTestFailedCause` : la cause de redondance est
     //    latée mais la séquence d'armement la re-teste (§5 étape 1/3) : l'armement reste donc
@@ -28286,94 +28283,123 @@ IF Enable THEN
     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
     Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
     Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
-    IF ArmReqEdge.Q AND Armable THEN
-        ArmingSeqStep := CST_STEP_TEST_A;
-        RedundancyTestFailedCause := FALSE;
-        EmergencyArmingFailedCause := FALSE;
-    END_IF;
-
-    // ⏱️ Étape 1 : Coupe canal A seul, vérifie que la boucle tombe
-    TonTestA(IN := (ArmingSeqStep = CST_STEP_TEST_A), PT := CST_TestDuration);
-    IF ArmingSeqStep = CST_STEP_TEST_A THEN
-        ForceTestA := TRUE;
-        IF TonTestA.Q THEN
+    // CASE à étiquettes littérales : 0..6 = CST_STEP_* (GVL_Safety_Emergency).
+    // La CI STruCpp exige ces littéraux pour les étiquettes CASE.
+    CASE ArmingSeqStep OF
+        0: // CST_STEP_IDLE
             ForceTestA := FALSE;
-            IF EmergencyChainClosed THEN
-                RedundancyTestFailedCause := TRUE;
-                LastAbortStep := CST_STEP_TEST_A;
-                LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_A);
-                ArmingSeqStep := CST_STEP_IDLE;
-            ELSE
-                ArmingSeqStep := CST_STEP_RESTORE_A;
-            END_IF;
-        END_IF;
-    ELSE
-        ForceTestA := FALSE;
-    END_IF;
-
-    // ⏱️ Étape 2 : Restaure A, attend le retour sain de la boucle amont
-    TonRestoreA(IN := (ArmingSeqStep = CST_STEP_RESTORE_A), PT := CST_TestDuration);
-    IF (ArmingSeqStep = CST_STEP_RESTORE_A) AND TonRestoreA.Q THEN
-        IF EmergencyChainClosed THEN
-            ArmingSeqStep := CST_STEP_TEST_B;
-        ELSE
-            LastAbortStep := CST_STEP_RESTORE_A;
-            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A);
-            ArmingSeqStep := CST_STEP_IDLE;
-        END_IF;
-    END_IF;
-
-    // ⏱️ Étape 3 : Coupe canal B seul, vérifie que la boucle tombe
-    TonTestB(IN := (ArmingSeqStep = CST_STEP_TEST_B), PT := CST_TestDuration);
-    IF ArmingSeqStep = CST_STEP_TEST_B THEN
-        ForceTestB := TRUE;
-        IF TonTestB.Q THEN
             ForceTestB := FALSE;
-            IF EmergencyChainClosed THEN
-                RedundancyTestFailedCause := TRUE;
-                LastAbortStep := CST_STEP_TEST_B;
-                LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_B);
-                ArmingSeqStep := CST_STEP_IDLE;
-            ELSE
-                ArmingSeqStep := CST_STEP_RESTORE_B;
+            TonTestA(IN := FALSE, PT := CST_TestDuration);
+            TonRestoreA(IN := FALSE, PT := CST_TestDuration);
+            TonTestB(IN := FALSE, PT := CST_TestDuration);
+            TonRestoreB(IN := FALSE, PT := CST_TestDuration);
+            TonArmingPulse(IN := FALSE, PT := CST_ArmingPulseDuration);
+            TonArmingConfirm(IN := FALSE, PT := CST_ArmingConfirmTimeout);
+
+            IF ArmReqEdge.Q AND Armable THEN
+                RedundancyTestFailedCause := FALSE;
+                EmergencyArmingFailedCause := FALSE;
+                ArmingSeqStep := CST_STEP_TEST_A;
             END_IF;
-        END_IF;
-    ELSE
-        ForceTestB := FALSE;
-    END_IF;
 
-    // ⏱️ Étape 4 : Restaure B, attend le retour sain de la boucle amont
-    TonRestoreB(IN := (ArmingSeqStep = CST_STEP_RESTORE_B), PT := CST_TestDuration);
-    IF (ArmingSeqStep = CST_STEP_RESTORE_B) AND TonRestoreB.Q THEN
-        IF EmergencyChainClosed THEN
-            ArmingSeqStep := CST_STEP_PULSE;
+        1: // CST_STEP_TEST_A
+            ForceTestA := TRUE;
+            ForceTestB := FALSE;
+            TonTestA(IN := TRUE, PT := CST_TestDuration);
+
+            IF TonTestA.Q THEN
+                ForceTestA := FALSE;
+                IF EmergencyChainClosed THEN
+                    RedundancyTestFailedCause := TRUE;
+                    LastAbortStep := CST_STEP_TEST_A;
+                    LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_A);
+                    ArmingSeqStep := CST_STEP_IDLE;
+                ELSE
+                    ArmingSeqStep := CST_STEP_RESTORE_A;
+                END_IF;
+            END_IF;
+
+        2: // CST_STEP_RESTORE_A
+            ForceTestA := FALSE;
+            ForceTestB := FALSE;
+            TonRestoreA(IN := TRUE, PT := CST_TestDuration);
+
+            IF TonRestoreA.Q THEN
+                IF EmergencyChainClosed THEN
+                    ArmingSeqStep := CST_STEP_TEST_B;
+                ELSE
+                    LastAbortStep := CST_STEP_RESTORE_A;
+                    LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A);
+                    ArmingSeqStep := CST_STEP_IDLE;
+                END_IF;
+            END_IF;
+
+        3: // CST_STEP_TEST_B
+            ForceTestA := FALSE;
+            ForceTestB := TRUE;
+            TonTestB(IN := TRUE, PT := CST_TestDuration);
+
+            IF TonTestB.Q THEN
+                ForceTestB := FALSE;
+                IF EmergencyChainClosed THEN
+                    RedundancyTestFailedCause := TRUE;
+                    LastAbortStep := CST_STEP_TEST_B;
+                    LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_B);
+                    ArmingSeqStep := CST_STEP_IDLE;
+                ELSE
+                    ArmingSeqStep := CST_STEP_RESTORE_B;
+                END_IF;
+            END_IF;
+
+        4: // CST_STEP_RESTORE_B
+            ForceTestA := FALSE;
+            ForceTestB := FALSE;
+            TonRestoreB(IN := TRUE, PT := CST_TestDuration);
+
+            IF TonRestoreB.Q THEN
+                IF EmergencyChainClosed THEN
+                    ArmingSeqStep := CST_STEP_PULSE;
+                ELSE
+                    LastAbortStep := CST_STEP_RESTORE_B;
+                    LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B);
+                    ArmingSeqStep := CST_STEP_IDLE;
+                END_IF;
+            END_IF;
+
+        5: // CST_STEP_PULSE
+            ForceTestA := FALSE;
+            ForceTestB := FALSE;
+            TonArmingPulse(IN := TRUE, PT := CST_ArmingPulseDuration);
+
+            IF TonArmingPulse.Q THEN
+                ArmingSeqStep := CST_STEP_CONFIRM;
+            END_IF;
+
+        6: // CST_STEP_CONFIRM
+            ForceTestA := FALSE;
+            ForceTestB := FALSE;
+            TonArmingConfirm(IN := TRUE, PT := CST_ArmingConfirmTimeout);
+
+            IF PowerContactorEngaged THEN
+                EmergencyArmingLockoutActive := FALSE;
+                ArmingSeqStep := CST_STEP_IDLE;
+            ELSIF TonArmingConfirm.Q THEN
+                EmergencyArmingFailedCause := TRUE;
+                EmergencyArmingLockoutActive := TRUE;
+                LastAbortStep := CST_STEP_CONFIRM;
+                LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR);
+                ArmingSeqStep := CST_STEP_IDLE;
+            END_IF;
+
         ELSE
-            LastAbortStep := CST_STEP_RESTORE_B;
-            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B);
-            ArmingSeqStep := CST_STEP_IDLE;
-        END_IF;
-    END_IF;
-
-    // ⏱️ Étape 5 : Les 2 canaux validés -&gt; impulsion réarmement physique (1s)
-    TonArmingPulse(IN := (ArmingSeqStep = CST_STEP_PULSE), PT := CST_ArmingPulseDuration);
-    IF (ArmingSeqStep = CST_STEP_PULSE) AND TonArmingPulse.Q THEN
-        ArmingSeqStep := CST_STEP_CONFIRM;
-    END_IF;
-
-    // ⏱️ Étape 6 : Attente confirmation contacteur principal (2s max)
-    TonArmingConfirm(IN := (ArmingSeqStep = CST_STEP_CONFIRM), PT := CST_ArmingConfirmTimeout);
-    IF ArmingSeqStep = CST_STEP_CONFIRM THEN
-        IF PowerContactorEngaged THEN
-            ArmingSeqStep := CST_STEP_IDLE;
-            EmergencyArmingLockoutActive := FALSE;
-        ELSIF TonArmingConfirm.Q THEN
+            ForceTestA := FALSE;
+            ForceTestB := FALSE;
             EmergencyArmingFailedCause := TRUE;
             EmergencyArmingLockoutActive := TRUE;
-            LastAbortStep := CST_STEP_CONFIRM;
-            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR);
+            LastAbortStep := ArmingSeqStep;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_INVALID_STEP);
             ArmingSeqStep := CST_STEP_IDLE;
-        END_IF;
-    END_IF;
+    END_CASE;
 
     // ⏱️ Séquence de verrouillage temporel (5s)
     TonArmingLockout(IN := EmergencyArmingLockoutActive, PT := CST_ArmingLockout);
@@ -28492,7 +28518,11 @@ ELSIF StartupFail THEN
 ELSIF RedundancyTestFailed THEN
     Status.OperatorMessage := 'AU: defaut redondance contacteurs - verifier puis Reset';
 ELSIF EmergencyArmingFailed THEN
-    Status.OperatorMessage := 'AU: echec rearmement contacteur (timeout) - verifier puis rearmer';
+    IF LastAbortCause = INT_TO_WORD(CST_ABORT_INVALID_STEP) THEN
+        Status.OperatorMessage := 'AU: etape sequence invalide - verifier puis Reset';
+    ELSE
+        Status.OperatorMessage := 'AU: echec rearmement contacteur (timeout) - verifier puis rearmer';
+    END_IF;
 ELSIF PowerCutOffRequest THEN
     Status.OperatorMessage := 'AU: coupure securite metier active - lever la cause puis rearmer';
 ELSIF BtnEmergencyCutOff THEN
@@ -47629,6 +47659,17 @@ Aucun abandon</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout confirmation contacteur</xhtml>
           </documentation>
         </variable>
+        <variable name="CST_ABORT_INVALID_STEP">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="256" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence inconnue</xhtml>
+          </documentation>
+        </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>4c1d6ed9-e9d0-5144-9983-81c9c43bae47</ObjectId>
@@ -47964,52 +48005,44 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 0. Contexte Global Machine (Mode, Simu, Commande, Bypass)</xhtml>
           </documentation>
         </variable>
-        <variable name="LevageSynchroniseM1M2">
+        <variable name="Inputs">
           <type>
-            <derived name="ST_ChainWinchSync" />
+            <derived name="ST_HardwareImage" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 1. Levage Synchronisé M1+M2 (Mode Couplé Nominal)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📥 1. Image complète des entrées réelles / qualifiées / simulées</xhtml>
           </documentation>
         </variable>
-        <variable name="LevageUnitaireM1">
+        <variable name="Safety">
           <type>
-            <derived name="ST_ChainWinch" />
+            <derived name="ST_SafetyChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 2. Levage Unitaire M1 (Treuil Retenue)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ 2. Diagnostic chronologique Chaîne de Sécurité &amp; Réarmement AU</xhtml>
           </documentation>
         </variable>
-        <variable name="LevageUnitaireM2">
+        <variable name="Joystick">
           <type>
-            <derived name="ST_ChainWinch" />
+            <derived name="ST_JoystickChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 3. Levage Unitaire M2 (Treuil Benne)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ 3. Diagnostic chronologique Bus CANopen &amp; Homme-Mort Joystick</xhtml>
           </documentation>
         </variable>
-        <variable name="BenneOuvertureFermeture">
+        <variable name="HomingM1">
           <type>
-            <derived name="ST_ChainBucket" />
+            <derived name="ST_HomingChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 4. Ouverture / Fermeture Benne</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 4. Diagnostic chronologique Homing M1 (Treuil Retenue)</xhtml>
           </documentation>
         </variable>
-        <variable name="TranslationPontM3">
+        <variable name="HomingM2">
           <type>
-            <derived name="ST_ChainTranslation" />
+            <derived name="ST_HomingChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ 5. Translation Pont M3 (Variateur AC600)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="AssistanceDragage">
-          <type>
-            <derived name="ST_ChainDredgingAssist" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌊 5bis. Assistance Plongée/Extraction/Vidage Trémie</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 5. Diagnostic chronologique Homing M2 (Treuil Benne)</xhtml>
           </documentation>
         </variable>
         <variable name="CycleSemiAuto">
@@ -48020,36 +48053,52 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 6. Séquenceur de Cycle Semi-Automatique (X0 à X13)</xhtml>
           </documentation>
         </variable>
-        <variable name="HomingM1">
+        <variable name="LevageSynchroniseM1M2">
           <type>
-            <derived name="ST_HomingChecklist" />
+            <derived name="ST_ChainWinchSync" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Diagnostic chronologique Homing M1 (Treuil Retenue)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 7. Levage Synchronisé M1+M2 (Mode Couplé Nominal)</xhtml>
           </documentation>
         </variable>
-        <variable name="HomingM2">
+        <variable name="LevageUnitaireM1">
           <type>
-            <derived name="ST_HomingChecklist" />
+            <derived name="ST_ChainWinch" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Diagnostic chronologique Homing M2 (Treuil Benne)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 8. Levage Unitaire M1 (Treuil Retenue)</xhtml>
           </documentation>
         </variable>
-        <variable name="Safety">
+        <variable name="LevageUnitaireM2">
           <type>
-            <derived name="ST_SafetyChecklist" />
+            <derived name="ST_ChainWinch" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Diagnostic chronologique Chaîne de Sécurité &amp; Réarmement AU</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 9. Levage Unitaire M2 (Treuil Benne)</xhtml>
           </documentation>
         </variable>
-        <variable name="Joystick">
+        <variable name="BenneOuvertureFermeture">
           <type>
-            <derived name="ST_JoystickChecklist" />
+            <derived name="ST_ChainBucket" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Diagnostic chronologique Bus CANopen &amp; Homme-Mort Joystick</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 10. Ouverture / Fermeture Benne</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TranslationPontM3">
+          <type>
+            <derived name="ST_ChainTranslation" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ 11. Translation Pont M3 (Variateur AC600)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="AssistanceDragage">
+          <type>
+            <derived name="ST_ChainDredgingAssist" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌊 12. Assistance Plongée/Extraction/Vidage Trémie</xhtml>
           </documentation>
         </variable>
         <variable name="MotionM1">
@@ -48057,7 +48106,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <derived name="ST_MotionChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic chronologique Mouvement M1 (Treuil Retenue)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ 13. Diagnostic chronologique Mouvement M1 (Treuil Retenue)</xhtml>
           </documentation>
         </variable>
         <variable name="MotionM2">
@@ -48065,7 +48114,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <derived name="ST_MotionChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic chronologique Mouvement M2 (Treuil Benne)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ 14. Diagnostic chronologique Mouvement M2 (Treuil Benne)</xhtml>
           </documentation>
         </variable>
         <variable name="MotionM3">
@@ -48073,15 +48122,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <derived name="ST_MotionChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic chronologique Mouvement M3 (Translation)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="Inputs">
-          <type>
-            <derived name="ST_HardwareImage" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">📥 Image complète des entrées réelles / qualifiées / simulées</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ 15. Diagnostic chronologique Mouvement M3 (Translation)</xhtml>
           </documentation>
         </variable>
         <variable name="TraceWinchM1">
@@ -48090,7 +48131,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🕵️ Trace de blocage terrain (cause priorisée + horodatage) — produite par PRG_04/05
-🕵️ Trace blocage treuil M1 (cause priorisée + horodatage)</xhtml>
+🕵️ 16. Trace blocage treuil M1 (cause priorisée + horodatage)</xhtml>
           </documentation>
         </variable>
         <variable name="TraceWinchM2">
@@ -48098,7 +48139,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <derived name="ST_TraceWinch" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕵️ Trace blocage treuil M2 (cause priorisée + horodatage)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕵️ 17. Trace blocage treuil M2 (cause priorisée + horodatage)</xhtml>
           </documentation>
         </variable>
         <variable name="TraceTranslation">
@@ -48106,7 +48147,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <derived name="ST_TraceTranslation" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Trace blocage translation M3 (cause priorisée + horodatage)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ 18. Trace blocage translation M3 (cause priorisée + horodatage)</xhtml>
           </documentation>
         </variable>
         <addData>
