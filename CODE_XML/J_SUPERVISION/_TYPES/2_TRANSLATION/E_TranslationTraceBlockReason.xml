@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:50:15.341554" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:50:15.341554">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="E_TranslationTraceBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="POWER_CUTOFF" value="1" />
+              <value name="SAFESTOP" value="2" />
+              <value name="SAFETY_FAULT" value="3" />
+              <value name="HEIGHT_INTERLOCK" value="4" />
+              <value name="DRIVE_UNAVAILABLE" value="5" />
+              <value name="FINAL_INTERLOCK" value="6" />
+              <value name="FAULT" value="7" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Aucun blocage — permis de mouvement effectif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont (instSafetyTranslationM3.PowerCutOff) — priorité max</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFESTOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 SafeStop effectif (InputModule OR safety M3)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Défaut safety M3 latched (FB_Safety_Translation.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HEIGHT_INTERLOCK</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Interlock hauteur M1/M2 actif (risque collision)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DRIVE_UNAVAILABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Variateur AC600 injoignable / non opérationnel</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FINAL_INTERLOCK</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Barrière finale en défaut (frein / redémarrage)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Défaut mouvement M3 latched (FB_Translation.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7bd7bd96-6f5f-5a55-98d4-99bd61298849</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="2_TRANSLATION">
+              <Object Name="E_TranslationTraceBlockReason" ObjectId="7bd7bd96-6f5f-5a55-98d4-99bd61298849" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

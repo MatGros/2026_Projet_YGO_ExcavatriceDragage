@@ -319,6 +319,9 @@ Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
 Data.EmergencyArmingCmd    := EmergencyArmingCmd;
 
 // ── Diagnostics chaîne AU ──
+// ⚡ Impulsion de réarmement AU (miroir de l'ordre physique EmergencyArmingCmd) — l'IHM
+// affiche ainsi la fenêtre 1s du réarmement, pas seulement l'état "lockout"/"failed".
+EmergencyArmingPulseActive := instSafetyEmergencyManagement.ArmPulse_RQ;
 EmergencyArmingLockoutActive := instSafetyEmergencyManagement.EmergencyArmingLockoutActive;
 ArmingSeqStep := instSafetyEmergencyManagement.ArmingSeqStep;
 RedundancyTestFailed := instSafetyEmergencyManagement.RedundancyTestFailed;

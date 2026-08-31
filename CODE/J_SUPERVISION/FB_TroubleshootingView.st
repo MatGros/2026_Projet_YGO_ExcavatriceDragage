@@ -30,7 +30,7 @@ VAR_INPUT
     Vh0808EtpOk              : BOOL; (* --> [HW] idem *)
 
     (* 🎚️ PRG_03_Modes_Cycle *)
-    Auth                     : ST_fbModes_Autorisations;   (* --> [SAFE] Autorisations machine *)
+    Auth                     : ST_Modes_Autorisations;   (* --> [SAFE] Autorisations machine *)
 
     (* 🛗 PRG_04_Treuils_Benne — demandes publiques déjà arbitrées *)
     M1LogicRequestSpeedCmd_Pct : REAL;   (* --> [CMD] Consigne vitesse M1 *)
@@ -98,6 +98,12 @@ VAR_INPUT
 
     (* 📐 Config effective limite haute — source _CommunCfgPersist (≠ copie IHM) *)
     CfgTopLimitM             : REAL;   (* --> [CFG] Limite haute active (m) = CfgCableLimitAscent_M *)
+
+    (* 🕵️ PRG_04/05 — Trace de blocage terrain (cause priorisée + horodatage, produite
+       par PRG_04 §8bis / PRG_05 §4bis, publiée via Data ; pure recopie ici) *)
+    WinchM1Trace             : ST_TraceWinch;       (* --> [DIAG] Trace blocage treuil M1 *)
+    WinchM2Trace             : ST_TraceWinch;       (* --> [DIAG] Trace blocage treuil M2 *)
+    TranslationTrace         : ST_TraceTranslation; (* --> [DIAG] Trace blocage translation M3 *)
 END_VAR
 VAR_OUTPUT
     Ready                    : BOOL; (* <-- [STAT] Diagnostic interne minimal — fiche §3 *)
@@ -698,5 +704,13 @@ GVL_Troubleshooting.CycleSemiAuto.Idx303_KoboldBottomTouch         := CycleKobol
 GVL_Troubleshooting.CycleSemiAuto.Idx304_SpeedMismatchActive       := CycleSpeedMismatchActive;
 GVL_Troubleshooting.CycleSemiAuto.Idx305_LimitLegalReached         := CycleLimitLegalReached;
 GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinchSyncError;
+{endregion}
+
+{region "§14 Trace de blocage terrain (winch M1/M2 + translation M3)"}
+// === 🕵️ 13. Trace de blocage terrain (ST_TraceWinch / ST_TraceTranslation) ===
+// Pur recopie des traces publiées par PRG_04 (§8bis) et PRG_05 (§4bis). Aucun calcul métier ici.
+GVL_Troubleshooting.TraceWinchM1     := WinchM1Trace;
+GVL_Troubleshooting.TraceWinchM2     := WinchM2Trace;
+GVL_Troubleshooting.TraceTranslation := TranslationTrace;
 {endregion}
 

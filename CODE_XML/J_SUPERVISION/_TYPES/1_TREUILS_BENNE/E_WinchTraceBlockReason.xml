@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:51:21.135085" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:51:21.135085">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="E_WinchTraceBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="POWER_CUTOFF" value="1" />
+              <value name="AXIS_DISABLED" value="2" />
+              <value name="SAFESTOP" value="3" />
+              <value name="SAFETY_FAULT" value="4" />
+              <value name="SAFETY_PERMIT_MISSING" value="5" />
+              <value name="PROCESS_PERMIT_MISSING" value="6" />
+              <value name="COUPLING_BLOCKED" value="7" />
+              <value name="WINCH_FAULT" value="8" />
+              <value name="FINAL_INTERLOCK_BLOCKED" value="9" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage - au moins un sens effectivement permis</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont (instSafetyWinch.PowerCutOff) - priorite max</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AXIS_DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Axe neutralise (Mode=DISABLE ou InhibitMx -&gt; Enable FALSE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFESTOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop effectif (rampe rapide demandee)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut safety latched (FB_Safety_Winch.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_PERMIT_MISSING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun sens ne delivre de permit safety (limite / mou de cable / homing)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>PROCESS_PERMIT_MISSING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Permit process absent (benne / fond Kobold / limite legale / extraction)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>COUPLING_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Couplage synchro anti-telescopage (l'autre axe bloque)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WINCH_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut treuil latched (FB_Winch.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FINAL_INTERLOCK_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Barriere finale en defaut (frein / redemarrage)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>96d04ade-707d-5249-90f0-8daa4cdfac0f</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="E_WinchTraceBlockReason" ObjectId="96d04ade-707d-5249-90f0-8daa4cdfac0f" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

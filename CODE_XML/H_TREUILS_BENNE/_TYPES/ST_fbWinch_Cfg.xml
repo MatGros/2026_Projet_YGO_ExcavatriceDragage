@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:10.472315" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:10.472315">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:29:39.824821" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:29:39.824821">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -100,7 +100,7 @@ Delai interlock changement de sens montee</xhtml>
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOMBÃ‰E CONTACTEURS ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOMBÉE CONTACTEURS ===
 Delai d'attente retombee des contacteurs</xhtml>
               </documentation>
             </variable>
@@ -135,7 +135,7 @@ Distance d'approche avant limite pour ralentir (m)</xhtml>
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DÃ‰CODAGE %â†’PALIER (conservÃ©) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DÉCODAGE %→PALIER (conservé) ===
 [08a] Marge d'hysteresis palier (%)</xhtml>
               </documentation>
             </variable>
@@ -148,16 +148,16 @@ Distance d'approche avant limite pour ralentir (m)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ðŸª ST_fbWinch_Cfg â€” Configuration statique d'un treuil
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ðŸŽ¯ RÃ´le : RÃ©glages persistants propres Ã  l'instance treuil (statique)
-   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   ðŸ“¤ Producteur : configuration persistante
-   ðŸ“¥ Consommateur : FB_Winch (statique uniquement)
-   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+   🪝 ST_fbWinch_Cfg — Configuration statique d'un treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Réglages persistants propres à l'instance treuil (statique)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : configuration persistante
+   📥 Consommateur : FB_Winch (statique uniquement)
+   🔒 Structs cibles + champs conservés pour garder le décodage %→palier
       et les deux cadences de rampe DANS FB_Winch (comportement
-      bit-identique). Le champ StepRampDelay est dÃ©clarÃ© mais non
-      consommÃ© (usage aval).
+      bit-identique). Le champ StepRampDelay est déclaré mais non
+      consommé (usage aval).
    =======================================================================</xhtml>
         </documentation>
       </dataType>

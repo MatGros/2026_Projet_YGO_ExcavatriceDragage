@@ -4,7 +4,7 @@
    ⚙️ Exécuté par la tâche PLC en position 3 (après PRG_02_Acquisition).
    📄 Docs : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
             DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
-   🎯 Rôle unique : Instancier FB_Modes, distribuer le bus ST_fbModes_Autorisations,
+   🎯 Rôle unique : Instancier FB_Modes, distribuer le bus ST_Modes_Autorisations,
       et instancier les 2 séquenceurs de cycle (maintenance + semi-auto).
    ⚠️ Retard d'un scan : FB_Cycle (rang 03) lit les feedbacks de PRG_04/05
       (rangs 04/05) du scan PRÉCÉDENT — documenté, cohérent avec la pratique

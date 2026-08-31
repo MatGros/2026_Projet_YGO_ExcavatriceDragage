@@ -18,7 +18,7 @@ FUNCTION_BLOCK FB_WinchCmdArbitrationM1
 VAR_INPUT
     Enable     : BOOL;  // --> [CMD] Autorisation FB (TRUE=arbitre actif)
     Joystick   : ST_AcquisitionJoystickQualified;  // --> [HW] Données joystick qualifiées (AxisY, DeadmanArmed)
-    Auth       : ST_fbModes_Autorisations;          // --> [CMD] Autorisations mode (Mode, JoystickWinchSelectArbitrated)
+    Auth       : ST_Modes_Autorisations;          // --> [CMD] Autorisations mode (Mode, JoystickWinchSelectArbitrated)
     ReqWinch   : ST_ProgramWinchRequest;            // --> [REQ] Demande cycle treuil M1 (SEMI_AUTO)
     BothIntent : ST_WinchBothIntent;           // --> [CMD] Intention both opérateur (source unique PRG_03)
     IHM        : ST_fbWinchCmdArbitration_IHM;  // --> [CMD] Boutons IHM (BtnUpM1/BtnDownM1, both)

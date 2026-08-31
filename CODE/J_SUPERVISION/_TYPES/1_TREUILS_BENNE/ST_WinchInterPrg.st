@@ -51,5 +51,9 @@ STRUCT
     // Sert à armer le re-homing obligatoire (AF-05 §4bis) — n'est PAS un permis de mouvement.
     PositionLimitOverriddenM1    : BOOL;               // 🧭 Treuil M1 — limite de position levée
     PositionLimitOverriddenM2    : BOOL;               // 🧭 Treuil M2 — limite de position levée
+
+    // === 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView) ===
+    TraceM1                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M1 (cause priorisée + horodatage)
+    TraceM2                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M2 (cause priorisée + horodatage)
 END_STRUCT
 END_TYPE

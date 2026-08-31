@@ -640,7 +640,10 @@ instTroubleshootingView(
     JoystickAtNeutral    := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     HomedM1              := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomedM2              := PRG_02_Acquisition.Data.EncoderM2.Homed,
-    CfgTopLimitM         := _CommunCfgPersist.CfgCableLimitAscent_M
+    CfgTopLimitM         := _CommunCfgPersist.CfgCableLimitAscent_M,
+    WinchM1Trace         := PRG_04_Treuils_Benne.Data.TraceM1,
+    WinchM2Trace         := PRG_04_Treuils_Benne.Data.TraceM2,
+    TranslationTrace     := PRG_05_Translation.Data.TranslationTrace
 );
 
 {endregion}

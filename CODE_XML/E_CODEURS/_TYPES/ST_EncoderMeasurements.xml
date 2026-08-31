@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:49:13.326835" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:49:13.326835">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:33:22.167665" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:33:22.167665">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -53,6 +53,14 @@ Chaine de mesure treuil M1 (COD1)</xhtml>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    📊 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
+   ───────────────────────────────────────────────────────────────
+   ⚠️ ORPHELIN (Tâche C5 — nettoyage données mortes) : ce type n'est plus
+   référencé par aucun consommateur dans le CODE actif (après consolidation
+   bus acquisition I8, le bus ST_AcquisitionInterPrg utilise désormais
+   EncoderM1/EncoderM2 : ST_AcquisitionEncoderQualified). CONSERVÉ (non
+   supprimé) car référencé par le harnais de test TOOLS/TEST_AUTO_CI/
+   registry.yaml (10 entrées) et par des artefacts bundle. → Proposé à
+   l'archivage APRÈS mise à jour du harnais de test.
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure frontière regroupant les sous-DUTs de mesure des treuils M1 et M2
    🔌 Interface : Producteur unique PRG_02_Acquisition

@@ -811,6 +811,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_Winch)</xhtml>
               </documentation>
             </variable>
+            <variable name="AxisBlockReason">
+              <type>
+                <derived name="E_WinchTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Cause prioritaire de blocage (miroir de TraceMx.BlockReason)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Ready">
               <type>
                 <BOOL />
@@ -1097,6 +1105,7 @@
               <value name="BUSY" value="3" />
               <value name="DONE" value="4" />
               <value name="STOPPING" value="5" />
+              <value name="ERROR" value="6" />
             </values>
           </enum>
         </baseType>
@@ -1137,6 +1146,12 @@
                 <Name>STOPPING</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut actif non acquitté (FB en erreur — HMI non aveugle)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -1272,6 +1287,99 @@
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>f4ffbe06-67c2-52e4-817f-cab830f42ec8</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_WinchTraceBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="POWER_CUTOFF" value="1" />
+              <value name="AXIS_DISABLED" value="2" />
+              <value name="SAFESTOP" value="3" />
+              <value name="SAFETY_FAULT" value="4" />
+              <value name="SAFETY_PERMIT_MISSING" value="5" />
+              <value name="PROCESS_PERMIT_MISSING" value="6" />
+              <value name="COUPLING_BLOCKED" value="7" />
+              <value name="WINCH_FAULT" value="8" />
+              <value name="FINAL_INTERLOCK_BLOCKED" value="9" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage - au moins un sens effectivement permis</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont (instSafetyWinch.PowerCutOff) - priorite max</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AXIS_DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Axe neutralise (Mode=DISABLE ou InhibitMx -&gt; Enable FALSE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFESTOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop effectif (rampe rapide demandee)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut safety latched (FB_Safety_Winch.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_PERMIT_MISSING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun sens ne delivre de permit safety (limite / mou de cable / homing)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>PROCESS_PERMIT_MISSING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Permit process absent (benne / fond Kobold / limite legale / extraction)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>COUPLING_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Couplage synchro anti-telescopage (l'autre axe bloque)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WINCH_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut treuil latched (FB_Winch.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FINAL_INTERLOCK_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Barriere finale en defaut (frein / redemarrage)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>96d04ade-707d-5249-90f0-8daa4cdfac0f</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -1500,6 +1608,7 @@
               <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
               <Object Name="ST_WinchCmd" ObjectId="c71b5360-d47d-51c7-a74c-66d1cdd622f0" />
               <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
+              <Object Name="E_WinchTraceBlockReason" ObjectId="96d04ade-707d-5249-90f0-8daa4cdfac0f" />
             </Folder>
             <Folder Name="4_JOYSTICK_ACQUISITION">
               <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />

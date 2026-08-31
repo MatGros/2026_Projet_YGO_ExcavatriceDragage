@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:22:18.877437" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:22:18.877437">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:38:08.746341" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:38:08.746341">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -539,6 +539,117 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_Modes_Autorisations">
+        <baseType>
+          <struct>
+            <variable name="Mode">
+              <type>
+                <derived name="E_Mode" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitre (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickWinchSelectArbitrated">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couples nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingApproachEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Depassement butee haut (N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceM3TargetEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 #4bis - matrice de maintenance
+Ces trois champs sont des FAITS/DIAGS publies, pas des autorisations : ils
+restent vrais meme quand le FB est neutralise par Enable=FALSE (etat persistant).
+Demande de changement de mode REFUSEE : les treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas a l'arret mecanique confirme (contacteurs
+retombes ET frein serre ET |v| &lt; seuil). Mode courant maintenu.
+M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRequiredM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : idem</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fd63c0a6-3caa-5a6f-9077-b79ee39469f5</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_Modes_Autorisations - Bus public d'autorisations du mode machine
+   -----------------------------------------------------------------------
+   Doc metier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+                DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md #2
+   NC-110 : le prefixe ST_fb* est reserve aux DUT propriete d'un seul FB.
+      Ce DUT est un BUS multi-consommateurs (&gt;=6 domaines : Cycle, Safety,
+      Treuils, Translation, Supervision, Acquisition) -&gt; renomme
+      ST_Modes_Autorisations (bus de domaine public, sans le prefixe FB).
+   Produit par FB_Modes (via PRG_03_Modes_Cycle)
+      Consomme par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
+   Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_NetworkDiagHMI">
         <baseType>
           <struct>
@@ -827,6 +938,251 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_TraceTranslation">
+        <baseType>
+          <struct>
+            <variable name="MotionPermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis de mouvement effectif (agrégat diagnostic : toutes les barrières levées)
+🟢 Translation réellement autorisée à se déplacer</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeightInterlockBlocking">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Interlock hauteur M1/M2 actif (risque collision)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Source de blocage — pour distinguer l'origine
+🟧 SafeStop effectif appliqué (M3_SafeStop_Aggregate)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSourceInput">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📥 SafeStop issu du module d'entrée (InputModuleFault)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSourceSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ SafeStop issu de FB_Safety_Translation (défaut safety)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveOperational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Variateur AC600 opérationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalInterlockError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Barrière finale (frein / redémarrage)
+🛑 Défaut barrière finale (frein / redémarrage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockReason">
+              <type>
+                <derived name="E_TranslationTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause de blocage priorisée + horodatage
+🎯 Cause de blocage prioritaire (ordre de priorité croissant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockReasonTimestamp">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕒 ms depuis démarrage PLC (TIME()) — dernier changement de BlockReason</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c34c2a39-9720-51c0-a152-0a8b1d813856</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ↔️ ST_TraceTranslation — Trace de blocage terrain de la translation M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Publier au technicien « pourquoi la translation M3 ne bouge pas » :
+      permis de mouvement effectif, interlock hauteur, source SafeStop/coupure
+      et cause de blocage priorisée.
+   📤 Producteur unique : PRG_05_Translation (Data.TranslationTrace).
+   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.TraceTranslation).
+   🔒 Lecture seule — aucun calcul de commande n'en dépend.
+   🕒 BlockReasonTimestamp : ms depuis démarrage PLC (TIME()), latched au dernier
+      changement de BlockReason (1 scan, mémoire).
+   📄 Doc métier : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_TraceWinch">
+        <baseType>
+          <struct>
+            <variable name="DescendPermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis effectifs par sens (reflet exact des permis appliques au mouvement)
+Descente effectivement permise (EffectivePermit*_Descend)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee effectivement permise (EffectivePermit*_Ascent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Source de SafeStop / coupure - pour distinguer l'origine du blocage
+SafeStop effectif applique (SafeStop*_Active)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSourceSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop issu de FB_Safety_Winch (defaut safety)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSourceInput">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop issu du module d'entree / homing / slip benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSourceSync">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop issu de la synchro M1/M2 (couplage anti-telescopage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont active (instSafetyWinch.PowerCutOff)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Inhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Axe neutralise (Mode=DISABLE ou InhibitMx)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalInterlockError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Barriere finale (fin de course mecanique / frein / redemarrage)
+Defaut barriere finale (frein / redemarrage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalInterlockReason">
+              <type>
+                <derived name="E_WinchFinalInterlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause barriere finale memorisee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockReason">
+              <type>
+                <derived name="E_WinchTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause de blocage priorisee + horodatage
+Cause de blocage prioritaire</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockReasonTimestamp">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ms depuis demarrage PLC (TIME()) - dernier changement de BlockReason</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepNumber">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier de vitesse actif (WinchState.StepNumber)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>433bbcb3-dea9-55c2-b301-a41628e1f283</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_TraceWinch - Trace de blocage terrain d'un treuil M1/M2
+   -----------------------------------------------------------------------
+   Role : Publier au technicien une vue consolidee "pourquoi l'axe ne bouge
+   pas" : permis effectifs par sens, source du SafeStop/coupure, cause de
+   blocage priorisee et horodatee.
+   Producteur unique : PRG_04_Treuils_Benne (#8bis) - 1 instance par axe
+       (TraceM1 / TraceM2 au sein de ST_WinchInterPrg).
+   Consommateur : FB_TroubleshootingView (pure recopie -&gt; GVL_Troubleshooting).
+   Lecture seule - aucun calcul de commande n'en depend.
+   BlockReasonTimestamp : ms depuis demarrage PLC (TIME()), latched au dernier
+       changement de BlockReason (1 scan, memoire).
+   Doc metier : DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_TranslationHMI">
         <baseType>
           <struct>
@@ -1013,116 +1369,6 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des bargraphes, LEDs, mesures et réglages.
    📄 Structuration en Cmd / State / Cfg / Safety / Bypass
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_fbModes_Autorisations">
-        <baseType>
-          <struct>
-            <variable name="Mode">
-              <type>
-                <derived name="E_Mode" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode arbitré (DISABLE/N1/N2/SEMI_AUTO)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SyncEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synchro M1/M2 (logique positive)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InhibitM1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M1 (MAINT_N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="InhibitM2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition M2 (MAINT_N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="JoystickWinchSelectArbitrated">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingApproachEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Dépassement butée haut (N2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintenanceM3TargetEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible Translation Maintenance (N2 only)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ModeChangePendingBlocked">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">AF-05 §4bis — matrice de maintenance
-⚠️ Ces trois champs sont des FAITS/DIAGS publiés, pas des autorisations : ils restent
-vrais même quand le FB est neutralisé par Enable=FALSE (état persistant à remonter à l'IHM).
-🚦 Demande de changement de mode REFUSÉE : les treuils</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingRequiredM1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas à l'arrêt mécanique confirmé
-(contacteurs retombés ET frein serré ET |v| &lt; seuil).
-Le mode courant est maintenu. IHM : « arrêter les
-treuils avant de changer de mode ».
-🧭 M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingRequiredM2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">(usage effectif d'un override/bypass position en maintenance)
-🧭 M2 : idem</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>98f7d0df-d5cd-5d76-b6a8-e5e391c63538</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎚️ ST_fbModes_Autorisations — Bus d'autorisations du mode machine
-   ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
-                   DOC/AF/AF_Partie-02_Architecture_Programme_v3.2.md §2
-   🎯 Produit par FB_Modes (via PRG_03_Modes_Cycle)
-      Consommé par : Cycle, Safety, Treuils, Translation, Supervision, Acquisition
-   🎯 Producteur unique : FB_Modes (via PRG_03_Modes_Cycle)
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -2487,6 +2733,57 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="E_Mode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLE" value="0" />
+              <value name="MAINT_N1" value="1" />
+              <value name="MAINT_N2" value="2" />
+              <value name="SEMI_AUTO" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N1</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MAINT_N2</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SEMI_AUTO</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="ST_BypassNetwork">
         <baseType>
           <struct>
@@ -2930,6 +3227,229 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="E_TranslationTraceBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="POWER_CUTOFF" value="1" />
+              <value name="SAFESTOP" value="2" />
+              <value name="SAFETY_FAULT" value="3" />
+              <value name="HEIGHT_INTERLOCK" value="4" />
+              <value name="DRIVE_UNAVAILABLE" value="5" />
+              <value name="FINAL_INTERLOCK" value="6" />
+              <value name="FAULT" value="7" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Aucun blocage — permis de mouvement effectif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont (instSafetyTranslationM3.PowerCutOff) — priorité max</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFESTOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 SafeStop effectif (InputModule OR safety M3)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Défaut safety M3 latched (FB_Safety_Translation.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HEIGHT_INTERLOCK</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Interlock hauteur M1/M2 actif (risque collision)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DRIVE_UNAVAILABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Variateur AC600 injoignable / non opérationnel</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FINAL_INTERLOCK</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Barrière finale en défaut (frein / redémarrage)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Défaut mouvement M3 latched (FB_Translation.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7bd7bd96-6f5f-5a55-98d4-99bd61298849</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_WinchFinalInterlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="BRAKE_COMMAND_NOT_CONFIRMED" value="1" />
+              <value name="RESTART_INHIBITED" value="2" />
+              <value name="SENSE_DROP_TIMEOUT" value="3" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BRAKE_COMMAND_NOT_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence confirmation ouverture frein &gt; 500ms</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>RESTART_INHIBITED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SENSE_DROP_TIMEOUT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">T_max §3bis depasse sans confirmation retombee (AC7)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6c58fa53-306e-500d-a9d6-db062ea6d497</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_WinchTraceBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="POWER_CUTOFF" value="1" />
+              <value name="AXIS_DISABLED" value="2" />
+              <value name="SAFESTOP" value="3" />
+              <value name="SAFETY_FAULT" value="4" />
+              <value name="SAFETY_PERMIT_MISSING" value="5" />
+              <value name="PROCESS_PERMIT_MISSING" value="6" />
+              <value name="COUPLING_BLOCKED" value="7" />
+              <value name="WINCH_FAULT" value="8" />
+              <value name="FINAL_INTERLOCK_BLOCKED" value="9" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage - au moins un sens effectivement permis</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont (instSafetyWinch.PowerCutOff) - priorite max</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AXIS_DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Axe neutralise (Mode=DISABLE ou InhibitMx -&gt; Enable FALSE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFESTOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop effectif (rampe rapide demandee)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut safety latched (FB_Safety_Winch.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_PERMIT_MISSING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun sens ne delivre de permit safety (limite / mou de cable / homing)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>PROCESS_PERMIT_MISSING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Permit process absent (benne / fond Kobold / limite legale / extraction)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>COUPLING_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Couplage synchro anti-telescopage (l'autre axe bloque)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WINCH_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut treuil latched (FB_Winch.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FINAL_INTERLOCK_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Barriere finale en defaut (frein / redemarrage)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>96d04ade-707d-5249-90f0-8daa4cdfac0f</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="ST_BypassTranslation">
         <baseType>
           <struct>
@@ -3369,6 +3889,14 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 États &amp; diagnostics FB_Translation
 🤖 État de l'automate interne (FB_Translation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisBlockReason">
+              <type>
+                <derived name="E_TranslationTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Cause prioritaire de blocage (miroir de TranslationTrace.BlockReason)</xhtml>
               </documentation>
             </variable>
             <variable name="Ready">
@@ -4446,6 +4974,14 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🤖 État de l'automate interne (FB_Winch)</xhtml>
               </documentation>
             </variable>
+            <variable name="AxisBlockReason">
+              <type>
+                <derived name="E_WinchTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Cause prioritaire de blocage (miroir de TraceMx.BlockReason)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Ready">
               <type>
                 <BOOL />
@@ -4721,57 +5257,6 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    🎨 Destiné aux retours d'informations et bargraphes HMI.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
-      </dataType>
-      <dataType name="E_Mode">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLE" value="0" />
-              <value name="MAINT_N1" value="1" />
-              <value name="MAINT_N2" value="2" />
-              <value name="SEMI_AUTO" value="3" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Désactivé / Veille de sécurité (sorties bloquées)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N1</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 1 : Pilotage unitaire avec toutes sécurités actives</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MAINT_N2</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Manuel Niveau 2 : Pilotage dégradé (droits étendus + bypasses autorisés)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEMI_AUTO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode Semi-Automatique (séquenceur automatique)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e54280f0-d415-50d8-9acc-a2932bad84c4</ObjectId>
-          </data>
-        </addData>
       </dataType>
       <dataType name="E_PresetConfirmMode">
         <baseType>
@@ -5315,6 +5800,7 @@ Seuils de changement de palier (0..100%)</xhtml>
               <value name="BUSY" value="3" />
               <value name="DONE" value="4" />
               <value name="STOPPING" value="5" />
+              <value name="ERROR" value="6" />
             </values>
           </enum>
         </baseType>
@@ -5355,6 +5841,12 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <Name>STOPPING</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut actif non acquitté (FB en erreur — HMI non aveugle)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -5780,57 +6272,6 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
       les autres défauts du même bloc.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
-      </dataType>
-      <dataType name="E_WinchFinalInterlockReason">
-        <baseType>
-          <enum>
-            <values>
-              <value name="NONE" value="0" />
-              <value name="BRAKE_COMMAND_NOT_CONFIRMED" value="1" />
-              <value name="RESTART_INHIBITED" value="2" />
-              <value name="SENSE_DROP_TIMEOUT" value="3" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>NONE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage actif</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BRAKE_COMMAND_NOT_CONFIRMED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Absence confirmation ouverture frein &gt; 500ms</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>RESTART_INHIBITED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition redemarrage actif</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SENSE_DROP_TIMEOUT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">T_max §3bis depasse sans confirmation retombee (AC7)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6c58fa53-306e-500d-a9d6-db062ea6d497</ObjectId>
-          </data>
-        </addData>
       </dataType>
       <dataType name="E_WinchFinalInterlockState">
         <baseType>
@@ -6331,7 +6772,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
             </variable>
             <variable name="Auth">
               <type>
-                <derived name="ST_fbModes_Autorisations" />
+                <derived name="ST_Modes_Autorisations" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎚️ PRG_03_Modes_Cycle
@@ -6782,6 +7223,32 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Config effective limite haute — source _CommunCfgPersist (≠ copie IHM)
 --&gt; [CFG] Limite haute active (m) = CfgCableLimitAscent_M</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM1Trace">
+              <type>
+                <derived name="ST_TraceWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕵️ PRG_04/05 — Trace de blocage terrain (cause priorisée + horodatage, produite
+       par PRG_04 §8bis / PRG_05 §4bis, publiée via Data ; pure recopie ici)
+--&gt; [DIAG] Trace blocage treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2Trace">
+              <type>
+                <derived name="ST_TraceWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Trace blocage treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationTrace">
+              <type>
+                <derived name="ST_TraceTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Trace blocage translation M3</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -7418,6 +7885,14 @@ GVL_Troubleshooting.CycleSemiAuto.Idx305_LimitLegalReached         := CycleLimit
 GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinchSyncError;
 {endregion}
 
+{region "§14 Trace de blocage terrain (winch M1/M2 + translation M3)"}
+// === 🕵️ 13. Trace de blocage terrain (ST_TraceWinch / ST_TraceTranslation) ===
+// Pur recopie des traces publiées par PRG_04 (§8bis) et PRG_05 (§4bis). Aucun calcul métier ici.
+GVL_Troubleshooting.TraceWinchM1     := WinchM1Trace;
+GVL_Troubleshooting.TraceWinchM2     := WinchM2Trace;
+GVL_Troubleshooting.TraceTranslation := TranslationTrace;
+{endregion}
+
 </xhtml>
           </ST>
         </body>
@@ -7464,13 +7939,18 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
               <Object Name="ST_JoystickState" ObjectId="f7e9804f-8654-5e66-a418-611d9f5fae02" />
               <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
             </Folder>
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
+            </Folder>
             <Folder Name="6_DIAG_ET_CHAINES">
               <Object Name="ST_NetworkDiagHMI" ObjectId="db0961ed-689c-5868-863e-85a1d463708f" />
               <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
             </Folder>
             <Folder Name="2_TRANSLATION">
+              <Object Name="ST_TraceTranslation" ObjectId="c34c2a39-9720-51c0-a152-0a8b1d813856" />
               <Object Name="ST_TranslationHMI" ObjectId="d6558eac-730d-54eb-ad2f-d618dc359506" />
               <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
+              <Object Name="E_TranslationTraceBlockReason" ObjectId="7bd7bd96-6f5f-5a55-98d4-99bd61298849" />
               <Object Name="ST_BypassTranslation" ObjectId="939b065b-c824-5e9f-9d65-f78dc4331b4d" />
               <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
               <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
@@ -7478,10 +7958,12 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
               <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
             </Folder>
             <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_TraceWinch" ObjectId="433bbcb3-dea9-55c2-b301-a41628e1f283" />
               <Object Name="ST_WinchBenneHMI" ObjectId="734a14b6-6b4b-50b8-8bce-737b6c3fa07b" />
               <Object Name="ST_WinchHMI" ObjectId="69c9434c-20aa-55ce-8395-0acc03dd2089" />
               <Object Name="ST_WinchSymmetryHMI" ObjectId="53f9b377-a390-54de-9b7c-d1db8711e403" />
               <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
+              <Object Name="E_WinchTraceBlockReason" ObjectId="96d04ade-707d-5249-90f0-8daa4cdfac0f" />
               <Object Name="ST_BucketHMI" ObjectId="e003b81c-fc6d-5cd1-ad20-f66aa3e150a5" />
               <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
               <Object Name="ST_SafetyWinch" ObjectId="3a43f912-4348-5c66-b0c2-9405e5e3ae59" />
@@ -7492,9 +7974,6 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
               <Object Name="ST_BucketCmd" ObjectId="758915ca-bb53-5f1a-ae3f-b495527bc5f4" />
               <Object Name="ST_BucketHMIState" ObjectId="ea0b3689-7d29-5817-9b66-52896d468768" />
               <Object Name="ST_BypassBucket" ObjectId="77e7b77e-4a14-5220-93aa-7bb27ede6733" />
-            </Folder>
-            <Folder Name="3_CYCLE_ET_MODES">
-              <Object Name="ST_fbModes_Autorisations" ObjectId="98f7d0df-d5cd-5d76-b6a8-e5e391c63538" />
             </Folder>
             <Folder Name="8_BANDEAU_ET_IHM">
               <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
@@ -7525,17 +8004,17 @@ GVL_Troubleshooting.CycleSemiAuto.Idx306_WinchSyncError            := CycleWinch
           <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />
           <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
         </Folder>
+        <Folder Name="F_MODES">
+          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
+        </Folder>
         <Folder Name="C_DIAG_RESEAUX">
           <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
           <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
         </Folder>
-        <Folder Name="F_MODES">
-          <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />
-        </Folder>
         <Folder Name="H_TREUILS_BENNE">
           <Folder Name="_TYPES">
-            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
             <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
+            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
             <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
           </Folder>
           <Folder Name="BENNE">

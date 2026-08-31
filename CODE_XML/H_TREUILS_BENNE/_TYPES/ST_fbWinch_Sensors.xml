@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T13:28:48.800690" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T13:28:48.800690">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:29:39.842927" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:29:39.842927">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -31,7 +31,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== POSITION ET RÃ‰FÃ‰RENCEMENT ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== POSITION ET RÉFÉRENCEMENT ===
 Position actuelle du cable (m)</xhtml>
               </documentation>
             </variable>
@@ -57,7 +57,7 @@ Position actuelle du cable (m)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS CONTACTEURS ===
-TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
+TRUE = relais sens + C1..C4 tous retombés (ex-FwdRevSpeedFeedbackOff)</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedMps">
@@ -66,7 +66,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE VITESSE ===
-[cible] Mesure vitesse rÃ©elle (m/s) â€” usage aval</xhtml>
+[cible] Mesure vitesse réelle (m/s) — usage aval</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedValid">
@@ -74,7 +74,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Mesure exploitable â€” usage aval</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Mesure exploitable — usage aval</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedBand">
@@ -85,7 +85,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Bande vitesse rÃ©elle validÃ©e (garde-fou conservÃ© dans FB_Winch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Bande vitesse réelle validée (garde-fou conservé dans FB_Winch)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedGuardEnable">
@@ -96,7 +96,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GARDE-FOU VITESSE (conservÃ©) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GARDE-FOU VITESSE (conservé) ===
 [08a] Activation garde-fou changement de palier</xhtml>
               </documentation>
             </variable>
@@ -108,7 +108,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Conditions de stabilitÃ© validÃ©es</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Conditions de stabilité validées</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -120,16 +120,16 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ðŸª ST_fbWinch_Sensors â€” Mesures et feedbacks d'un treuil
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ðŸŽ¯ RÃ´le : Retours physiques et mesures propres Ã  l'instance treuil
-   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   ðŸ“¤ Producteur : PRG_04_Treuils_Benne / acquisition
-   ðŸ“¥ Consommateur : FB_Winch
-   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le garde-fou vitesse
+   🪝 ST_fbWinch_Sensors — Mesures et feedbacks d'un treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Retours physiques et mesures propres à l'instance treuil
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : PRG_04_Treuils_Benne / acquisition
+   📥 Consommateur : FB_Winch
+   🔒 Structs cibles + champs conservés pour garder le garde-fou vitesse
       DANS FB_Winch (comportement bit-identique). Les champs
-      MeasuredSpeedMps / MeasuredSpeedValid sont dÃ©clarÃ©s mais non
-      consommÃ©s (usage aval).
+      MeasuredSpeedMps / MeasuredSpeedValid sont déclarés mais non
+      consommés (usage aval).
    =======================================================================</xhtml>
         </documentation>
       </dataType>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-28T14:19:18.368006" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-28T14:19:18.368006">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:36:12.028121" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:36:12.028121">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -207,6 +207,15 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable en zone Maintenance</xhtml>
               </documentation>
             </variable>
+            <variable name="TranslationTrace">
+              <type>
+                <derived name="ST_TraceTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView) ===
+🕵️ Trace blocage translation M3 (cause priorisée + horodatage)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -365,6 +374,116 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_TraceTranslation">
+        <baseType>
+          <struct>
+            <variable name="MotionPermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis de mouvement effectif (agrégat diagnostic : toutes les barrières levées)
+🟢 Translation réellement autorisée à se déplacer</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HeightInterlockBlocking">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Interlock hauteur M1/M2 actif (risque collision)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Source de blocage — pour distinguer l'origine
+🟧 SafeStop effectif appliqué (M3_SafeStop_Aggregate)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSourceInput">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📥 SafeStop issu du module d'entrée (InputModuleFault)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopSourceSafety">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ SafeStop issu de FB_Safety_Translation (défaut safety)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveOperational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Variateur AC600 opérationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalInterlockError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Barrière finale (frein / redémarrage)
+🛑 Défaut barrière finale (frein / redémarrage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockReason">
+              <type>
+                <derived name="E_TranslationTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cause de blocage priorisée + horodatage
+🎯 Cause de blocage prioritaire (ordre de priorité croissant)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockReasonTimestamp">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕒 ms depuis démarrage PLC (TIME()) — dernier changement de BlockReason</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c34c2a39-9720-51c0-a152-0a8b1d813856</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ↔️ ST_TraceTranslation — Trace de blocage terrain de la translation M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Publier au technicien « pourquoi la translation M3 ne bouge pas » :
+      permis de mouvement effectif, interlock hauteur, source SafeStop/coupure
+      et cause de blocage priorisée.
+   📤 Producteur unique : PRG_05_Translation (Data.TranslationTrace).
+   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.TraceTranslation).
+   🔒 Lecture seule — aucun calcul de commande n'en dépend.
+   🕒 BlockReasonTimestamp : ms depuis démarrage PLC (TIME()), latched au dernier
+      changement de BlockReason (1 scan, mémoire).
+   📄 Doc métier : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_TranslationFinalInterlockRequest">
         <baseType>
           <struct>
@@ -454,6 +573,14 @@
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 États &amp; diagnostics FB_Translation
 🤖 État de l'automate interne (FB_Translation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AxisBlockReason">
+              <type>
+                <derived name="E_TranslationTraceBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧩 Cause prioritaire de blocage (miroir de TranslationTrace.BlockReason)</xhtml>
               </documentation>
             </variable>
             <variable name="Ready">
@@ -764,6 +891,85 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="E_TranslationTraceBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="POWER_CUTOFF" value="1" />
+              <value name="SAFESTOP" value="2" />
+              <value name="SAFETY_FAULT" value="3" />
+              <value name="HEIGHT_INTERLOCK" value="4" />
+              <value name="DRIVE_UNAVAILABLE" value="5" />
+              <value name="FINAL_INTERLOCK" value="6" />
+              <value name="FAULT" value="7" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Aucun blocage — permis de mouvement effectif</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance amont (instSafetyTranslationM3.PowerCutOff) — priorité max</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFESTOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 SafeStop effectif (InputModule OR safety M3)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Défaut safety M3 latched (FB_Safety_Translation.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HEIGHT_INTERLOCK</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Interlock hauteur M1/M2 actif (risque collision)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>DRIVE_UNAVAILABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Variateur AC600 injoignable / non opérationnel</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FINAL_INTERLOCK</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Barrière finale en défaut (frein / redémarrage)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Défaut mouvement M3 latched (FB_Translation.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>7bd7bd96-6f5f-5a55-98d4-99bd61298849</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="E_State">
         <baseType>
           <enum>
@@ -774,6 +980,7 @@
               <value name="BUSY" value="3" />
               <value name="DONE" value="4" />
               <value name="STOPPING" value="5" />
+              <value name="ERROR" value="6" />
             </values>
           </enum>
         </baseType>
@@ -814,6 +1021,12 @@
                 <Name>STOPPING</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut actif non acquitté (FB en erreur — HMI non aveugle)</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -865,8 +1078,10 @@
             <Folder Name="2_TRANSLATION">
               <Object Name="ST_TranslationInterPrg" ObjectId="0d838c96-5f80-5add-9102-b8f7b35a3c53" />
               <Object Name="ST_SafetyTranslation" ObjectId="d56fcc6a-fbab-543a-8ea6-51fdbe24ae09" />
+              <Object Name="ST_TraceTranslation" ObjectId="c34c2a39-9720-51c0-a152-0a8b1d813856" />
               <Object Name="ST_TranslationFinalInterlockRequest" ObjectId="3d90836c-bd65-54ca-b2e2-f3d1ef3a1bd3" />
               <Object Name="ST_TranslationState" ObjectId="dfcb900f-6c46-5e67-a7c9-85312e3be036" />
+              <Object Name="E_TranslationTraceBlockReason" ObjectId="7bd7bd96-6f5f-5a55-98d4-99bd61298849" />
             </Folder>
           </Folder>
         </Folder>

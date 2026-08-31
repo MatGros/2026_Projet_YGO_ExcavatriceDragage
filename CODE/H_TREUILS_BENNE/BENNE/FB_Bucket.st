@@ -197,7 +197,10 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Premier cycle & recalage boutons IHM"}
 IF FirstCycle THEN
     FirstCycle := FALSE;
-    IF NOT BucketState.IsOpen AND NOT BucketState.IsClosed THEN
+    // Une seule position doit être qualifiée au démarrage : ni l'une ni l'autre
+    // ou les deux simultanément signifient que la mémorisation n'est pas fiable.
+    IF (BucketState.IsOpen AND BucketState.IsClosed)
+       OR (NOT BucketState.IsOpen AND NOT BucketState.IsClosed) THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
 END_IF;

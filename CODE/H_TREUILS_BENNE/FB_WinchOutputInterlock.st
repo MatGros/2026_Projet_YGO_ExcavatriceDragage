@@ -4,6 +4,7 @@
    🎯 Rôle : Barrière de sécurité finale pour frein et contacteurs M1/M2
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs)
+   🧩 Défaut homogénéisé (AF-03 §3) : Fault:ST_Fault via FB_FaultCore (bit0 = timeout frein).
    🔒 Sécurité : Surveillance feedback frein et temporisation d'inversion
    ======================================================================= *)
 
@@ -99,6 +100,17 @@ VAR
     SenseHoldRequested              : BOOL;                           // . [LOC] Condition §3bis demandee (palier 0 + sens commande)
     SenseHoldDone                   : BOOL;                           // . [LOC] One-shot maintien effectue (anti-bouclage)
     ContactorStuckLatched           : BOOL;                           // . [LOC] Latch interne T_max depasse sans confirmation retombee
+
+    // === ÉTAT DÉFAUT INTERNE (gate machine) ===
+    // Gate interne PRÉSERVÉE à l'identique → sorties Error/ErrorId déplacées du scope
+    // VAR_OUTPUT vers locaux retenus : lecture en §2bis/§5 et écriture en §6bis inchangées,
+    // SEULE la publication est homogénéisée sur Fault:ST_Fault (§6bis2).
+    Error                           : BOOL;                           // . [LOC] Synthese defaut (gate interne, = ErrorId <> 0)
+    ErrorId                         : WORD;                           // . [LOC] Code erreur (bit0: timeout frein) — gate interne
+
+    // === SOCLE DEFAUT (transverse standard AF-03 §3) ===
+    instFault                       : FB_FaultCore;                  // * [INST] Socle defaut (vue live + latchee)
+    instCauses                      : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Causes en clair pour le socle defaut
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
@@ -402,6 +414,19 @@ IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
 ELSE
     ErrorId := ErrorId AND 16#FFFE;
 END_IF;
+
+// ── 6bis2. Publication Fault transverse (socle FB_FaultCore) ──────────────
+// 🧩 Homogénéisation interface (AF-03 §3) : le défaut est exposé sous la forme
+// standard Fault:ST_Fault (comme FB_TranslationOutputInterlock) au lieu du plat
+// Error/ErrorId. La cause unique bit0 = timeout frein, strictement identique à la
+// gate interne (ErrorId) ; Latching reproduit le latch existant restitué au front
+// Reset (jamais de re-armement auto). La gate interne (Error/ErrorId) reste
+// inchangée — la publication n'ajoute ni ne modifie aucune coupure.
+instCauses[0].Active   := ((ErrorId AND 16#0001) <> 16#0000);
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Timeout confirmation ouverture frein treuil';
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
 
 // ── 6ter. Synchronisation defaut frein en fin de scan (TC-P10-012/013/020) ──
 // ErrorId bit0 (defaut frein) est pose en §6bis, APRES la machine d'etat §5.

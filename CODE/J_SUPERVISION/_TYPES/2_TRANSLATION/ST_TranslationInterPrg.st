@@ -42,5 +42,8 @@ STRUCT
     M3_AtTremieStable         : BOOL; // 🎯 M3 positionne stable a la Tremie
     M3_AtP1Stable             : BOOL; // 🎯 M3 positionne stable au Point 1
     M3_AtMaintenanceStable    : BOOL; // 🎯 M3 positionne stable en zone Maintenance
+
+    // === 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView) ===
+    TranslationTrace             : ST_TraceTranslation; // 🕵️ Trace blocage translation M3 (cause priorisée + horodatage)
 END_STRUCT
 END_TYPE

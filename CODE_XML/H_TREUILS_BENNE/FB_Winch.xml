@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:10:39.205101" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:10:39.205101">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:45:12.189862" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:45:12.189862">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -262,7 +262,7 @@ Delai interlock changement de sens montee</xhtml>
                 <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOMBÃ‰E CONTACTEURS ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOMBÉE CONTACTEURS ===
 Delai d'attente retombee des contacteurs</xhtml>
               </documentation>
             </variable>
@@ -297,7 +297,7 @@ Distance d'approche avant limite pour ralentir (m)</xhtml>
                 <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DÃ‰CODAGE %â†’PALIER (conservÃ©) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DÉCODAGE %→PALIER (conservé) ===
 [08a] Marge d'hysteresis palier (%)</xhtml>
               </documentation>
             </variable>
@@ -310,16 +310,16 @@ Distance d'approche avant limite pour ralentir (m)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ðŸª ST_fbWinch_Cfg â€” Configuration statique d'un treuil
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ðŸŽ¯ RÃ´le : RÃ©glages persistants propres Ã  l'instance treuil (statique)
-   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   ðŸ“¤ Producteur : configuration persistante
-   ðŸ“¥ Consommateur : FB_Winch (statique uniquement)
-   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+   🪝 ST_fbWinch_Cfg — Configuration statique d'un treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Réglages persistants propres à l'instance treuil (statique)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : configuration persistante
+   📥 Consommateur : FB_Winch (statique uniquement)
+   🔒 Structs cibles + champs conservés pour garder le décodage %→palier
       et les deux cadences de rampe DANS FB_Winch (comportement
-      bit-identique). Le champ StepRampDelay est dÃ©clarÃ© mais non
-      consommÃ© (usage aval).
+      bit-identique). Le champ StepRampDelay est déclaré mais non
+      consommé (usage aval).
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -332,7 +332,7 @@ Distance d'approche avant limite pour ralentir (m)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRE DE MOUVEMENT ===
-TRUE = mouvement demandÃ©</xhtml>
+TRUE = mouvement demandé</xhtml>
               </documentation>
             </variable>
             <variable name="Direction">
@@ -356,8 +356,8 @@ TRUE = mouvement demandÃ©</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DE CLAMP (agrÃ©gÃ©es PRG_04) ===
-[cible] Plancher palier montÃ©e (usage aval)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DE CLAMP (agrégées PRG_04) ===
+[cible] Plancher palier montée (usage aval)</xhtml>
               </documentation>
             </variable>
             <variable name="MaxStepUp">
@@ -368,7 +368,7 @@ TRUE = mouvement demandÃ©</xhtml>
                 <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier montÃ©e (1..5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier montée (1..5)</xhtml>
               </documentation>
             </variable>
             <variable name="MinStepDown">
@@ -430,8 +430,8 @@ Position limite haute active (m)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAMPS CONSERVÃ‰S (clamp interne FB_Winch) ===
-[08a] Vitesse limitÃ©e au palier 1 (approche homing)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAMPS CONSERVÉS (clamp interne FB_Winch) ===
+[08a] Vitesse limitée au palier 1 (approche homing)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -443,13 +443,13 @@ Position limite haute active (m)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ðŸª ST_fbWinch_DriveRequest â€” RequÃªte d'axe treuil (producteur PRG_04)
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ðŸŽ¯ RÃ´le : Demande de mouvement, palier et bornes de clamp d'un treuil
-   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   ðŸ“¤ Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
-   ðŸ“¥ Consommateur : FB_Winch
-   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+   🪝 ST_fbWinch_DriveRequest — Requête d'axe treuil (producteur PRG_04)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Demande de mouvement, palier et bornes de clamp d'un treuil
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
+   📥 Consommateur : FB_Winch
+   🔒 Structs cibles + champs conservés pour garder le décodage %→palier
       et le clamp DANS FB_Winch (comportement bit-identique).
       SpeedStepReq est consommé par FB_Winch (§5) ; MinStepUp est déclaré
       mais non consommé (usage aval).
@@ -464,7 +464,7 @@ Position limite haute active (m)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== POSITION ET RÃ‰FÃ‰RENCEMENT ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== POSITION ET RÉFÉRENCEMENT ===
 Position actuelle du cable (m)</xhtml>
               </documentation>
             </variable>
@@ -490,7 +490,7 @@ Position actuelle du cable (m)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS CONTACTEURS ===
-TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
+TRUE = relais sens + C1..C4 tous retombés (ex-FwdRevSpeedFeedbackOff)</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedMps">
@@ -499,7 +499,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE VITESSE ===
-[cible] Mesure vitesse rÃ©elle (m/s) â€” usage aval</xhtml>
+[cible] Mesure vitesse réelle (m/s) — usage aval</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedValid">
@@ -507,7 +507,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Mesure exploitable â€” usage aval</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Mesure exploitable — usage aval</xhtml>
               </documentation>
             </variable>
             <variable name="MeasuredSpeedBand">
@@ -518,7 +518,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Bande vitesse rÃ©elle validÃ©e (garde-fou conservÃ© dans FB_Winch)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Bande vitesse réelle validée (garde-fou conservé dans FB_Winch)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedGuardEnable">
@@ -529,7 +529,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GARDE-FOU VITESSE (conservÃ©) ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GARDE-FOU VITESSE (conservé) ===
 [08a] Activation garde-fou changement de palier</xhtml>
               </documentation>
             </variable>
@@ -541,7 +541,7 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Conditions de stabilitÃ© validÃ©es</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Conditions de stabilité validées</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -553,16 +553,16 @@ TRUE = relais sens + C1..C4 tous retombÃ©s (ex-FwdRevSpeedFeedbackOff)</xhtml>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ðŸª ST_fbWinch_Sensors â€” Mesures et feedbacks d'un treuil
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ðŸŽ¯ RÃ´le : Retours physiques et mesures propres Ã  l'instance treuil
-   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   ðŸ“¤ Producteur : PRG_04_Treuils_Benne / acquisition
-   ðŸ“¥ Consommateur : FB_Winch
-   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le garde-fou vitesse
+   🪝 ST_fbWinch_Sensors — Mesures et feedbacks d'un treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Retours physiques et mesures propres à l'instance treuil
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : PRG_04_Treuils_Benne / acquisition
+   📥 Consommateur : FB_Winch
+   🔒 Structs cibles + champs conservés pour garder le garde-fou vitesse
       DANS FB_Winch (comportement bit-identique). Les champs
-      MeasuredSpeedMps / MeasuredSpeedValid sont dÃ©clarÃ©s mais non
-      consommÃ©s (usage aval).
+      MeasuredSpeedMps / MeasuredSpeedValid sont déclarés mais non
+      consommés (usage aval).
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -1381,10 +1381,14 @@ ELSE
     RelayRev := FALSE;
 END_IF;
 
-Contactor1 := (StepNumber = 1);
-Contactor2 := (StepNumber = 2);
-Contactor3 := (StepNumber = 3);
-Contactor4 := (StepNumber = 4);
+// 🛡️ FIX contacteurs (audit CONTACTEURS_2026-08-31) : décodage THERMOMÈTRE CUMULATIF
+// (palier N = contacteurs 1..N tous pilotés), au lieu de l'ancien décodage one-hot
+// exclusif (ContactorN := StepNumber=N) qui éteignait les paliers inférieurs à
+// chaque montée de palier et ne couvrait pas le palier 5 (aucun contacteur).
+Contactor1 := (StepNumber &gt;= 1);
+Contactor2 := (StepNumber &gt;= 2);
+Contactor3 := (StepNumber &gt;= 3);
+Contactor4 := (StepNumber &gt;= 4);
 
 AllContactorsCommandedOff := (NOT RelayFwd) AND (NOT RelayRev)
                              AND (NOT Contactor1) AND (NOT Contactor2) AND (NOT Contactor3) AND (NOT Contactor4);

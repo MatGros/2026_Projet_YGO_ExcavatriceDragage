@@ -206,6 +206,12 @@ VAR
     // Usage effectif d'un override/bypass de position -> arme le re-homing obligatoire (PRG_03).
     PositionLimitOverriddenM1 : BOOL;
     PositionLimitOverriddenM2 : BOOL;
+
+    // 🕵️ Trace de blocage terrain (§8bis) — publiée via Data.TraceM1/M2, consommée FB_TroubleshootingView
+    TraceM1               : ST_TraceWinch;        // . [LOC] Trace blocage treuil M1
+    TraceM2               : ST_TraceWinch;        // . [LOC] Trace blocage treuil M2
+    TraceM1_PrevReason    : E_WinchTraceBlockReason; // . [LOC] Cause précédente M1 (détection de changement)
+    TraceM2_PrevReason    : E_WinchTraceBlockReason; // . [LOC] Cause précédente M2 (détection de changement)
 END_VAR
 
 {region "§1 Intention maintenance et assistants"}
@@ -1015,7 +1021,13 @@ M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps;
 WinchM1State.Position_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
 WinchM1State.SpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct;
 WinchM1State.StepNumber := instWinchM1.StepNumber;
-WinchM1State.FBState := E_State.READY;
+IF instWinchM1.Fault.Error THEN
+    WinchM1State.FBState := E_State.ERROR;
+ELSIF instWinchM1.StepNumber > 0 THEN
+    WinchM1State.FBState := E_State.BUSY;
+ELSE
+    WinchM1State.FBState := E_State.READY;
+END_IF;
 WinchM1State.Ready := instWinchM1.Ready;
 WinchM1State.Busy := (instWinchM1.StepNumber > 0);
 WinchM1State.Done := FALSE;
@@ -1033,8 +1045,8 @@ WinchM1State.FinalAuthorizedStep := instWinchM1.RequestedStep;
 WinchM1State.ContactorsCheck := instWinchM1.ContactorsCheck;
 WinchM1State.FinalInterlockState := PRG_06_Outputs.instWinchOutputInterlockM1.State;
 WinchM1State.FinalInterlockReason := PRG_06_Outputs.instWinchOutputInterlockM1.Reason;
-WinchM1State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM1.Error;
-WinchM1State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM1.ErrorId;
+WinchM1State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM1.Fault.Error;
+WinchM1State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM1.Fault.ErrorId;
 WinchM1State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM1.RestartInhibit;
 WinchM1State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeoutElapsed;
 WinchM1State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.RestartDelayElapsed;
@@ -1072,7 +1084,13 @@ M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps;
 WinchM2State.Position_M := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 WinchM2State.SpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct;
 WinchM2State.StepNumber := instWinchM2.StepNumber;
-WinchM2State.FBState := E_State.READY;
+IF instWinchM2.Fault.Error THEN
+    WinchM2State.FBState := E_State.ERROR;
+ELSIF instWinchM2.StepNumber > 0 THEN
+    WinchM2State.FBState := E_State.BUSY;
+ELSE
+    WinchM2State.FBState := E_State.READY;
+END_IF;
 WinchM2State.Ready := instWinchM2.Ready;
 WinchM2State.Busy := (instWinchM2.StepNumber > 0);
 WinchM2State.Done := FALSE;
@@ -1090,8 +1108,8 @@ WinchM2State.FinalAuthorizedStep := instWinchM2.RequestedStep;
 WinchM2State.ContactorsCheck := instWinchM2.ContactorsCheck;
 WinchM2State.FinalInterlockState := PRG_06_Outputs.instWinchOutputInterlockM2.State;
 WinchM2State.FinalInterlockReason := PRG_06_Outputs.instWinchOutputInterlockM2.Reason;
-WinchM2State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM2.Error;
-WinchM2State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM2.ErrorId;
+WinchM2State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM2.Fault.Error;
+WinchM2State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM2.Fault.ErrorId;
 WinchM2State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM2.RestartInhibit;
 WinchM2State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.BrakeTimeoutElapsed;
 WinchM2State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.RestartDelayElapsed;
@@ -1188,11 +1206,23 @@ SyncState.SyncDeviationWarn := instWinchSync.SyncDeviationWarn;
 SyncState.Ready := instWinchSync.Ready;
 SyncState.Error := instWinchSync.Fault.Error;
 SyncState.ErrorId := instWinchSync.Fault.ErrorId;
-SyncState.FBState := E_State.READY;
+IF instWinchSync.Fault.Error THEN
+    SyncState.FBState := E_State.ERROR;
+ELSIF instWinchSync.SyncActive THEN
+    SyncState.FBState := E_State.BUSY;
+ELSE
+    SyncState.FBState := E_State.READY;
+END_IF;
 
 BucketState.MechState := _BucketState;
 BucketState.MechState.ActiveOffsetValid := instBucket.ActiveOffsetValid;
-BucketState.FBState := E_State.READY;
+IF instBucket.Fault.Error THEN
+    BucketState.FBState := E_State.ERROR;
+ELSIF instBucket.Lifecycle.Busy THEN
+    BucketState.FBState := E_State.BUSY;
+ELSE
+    BucketState.FBState := E_State.READY;
+END_IF;
 BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
 BucketState.M2StartStop := instBucket.M2_StartStop;
 BucketState.M2Direction := instBucket.M2_Direction;
@@ -1230,6 +1260,104 @@ Benne_IsRoughlyClosed := _BucketState.IsClosed
     OR (_BucketState.IsIntermediate
         AND (instBucket.DeltaPosition_M >= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)));
 
+{region "§8bis Trace de blocage terrain M1/M2 (ST_TraceWinch)"}
+// === 🕵️ §8bis TRACE DE BLOCAGE TERRAIN (cause priorisée + horodatage) ===
+// Diagnostic lecture seule, publié via Data.TraceM1/M2 et consommé par FB_TroubleshootingView.
+// L'ordre IF/ELSIF EST l'ordre de priorité (cf. E_WinchTraceBlockReason) : la cause la plus
+// grave gagne. BlockReasonTimestamp est latched au premier scan du changement (1 scan, mémoire).
+// Aucune action de conduite ne dépend de ces champs.
+
+// --- M1 ---
+TraceM1.DescendPermitEffective := EffectivePermitM1_Descend;
+TraceM1.AscentPermitEffective  := EffectivePermitM1_Ascent;
+TraceM1.SafeStopActive         := SafeStopM1_Active;
+TraceM1.SafeStopSourceSafety   := instSafetyWinchM1.SafeStop;
+TraceM1.SafeStopSourceInput    := PRG_02_Acquisition.Data.InputModules.Fault
+                                  OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss
+                                  OR instBucket.M1SlipDetected;
+TraceM1.SafeStopSourceSync     := ((instWinchSync.Fault.ErrorId AND 16#0002) <> 16#0000)
+                                  OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
+TraceM1.PowerCutOffActive      := instSafetyWinchM1.PowerCutOff;
+TraceM1.Inhibited              := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE)
+                                  OR PRG_03_Modes_Cycle.Data.Auth.InhibitM1;
+TraceM1.FinalInterlockError    := WinchM1State.FinalInterlockError;
+TraceM1.FinalInterlockReason   := WinchM1State.FinalInterlockReason;
+TraceM1.StepNumber             := WinchM1State.StepNumber;
+
+IF instSafetyWinchM1.PowerCutOff THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.POWER_CUTOFF;
+ELSIF TraceM1.Inhibited THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.AXIS_DISABLED;
+ELSIF SafeStopM1_Active THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.SAFESTOP;
+ELSIF instSafetyWinchM1.Fault.Error THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.SAFETY_FAULT;
+ELSIF NOT (SafetyPermitM1_Ascent OR SafetyPermitM1_Descend) THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.SAFETY_PERMIT_MISSING;
+ELSIF NOT (ProcessPermitM1_Ascent OR ProcessPermitM1_Descend) THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.PROCESS_PERMIT_MISSING;
+ELSIF NOT (EffectivePermitM1_Ascent OR EffectivePermitM1_Descend) THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.COUPLING_BLOCKED;
+ELSIF instWinchM1.Fault.Error THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.WINCH_FAULT;
+ELSIF WinchM1State.FinalInterlockError THEN
+    TraceM1.BlockReason := E_WinchTraceBlockReason.FINAL_INTERLOCK_BLOCKED;
+ELSE
+    TraceM1.BlockReason := E_WinchTraceBlockReason.NONE;
+END_IF;
+IF TraceM1.BlockReason <> TraceM1_PrevReason THEN
+    TraceM1.BlockReasonTimestamp := TIME_TO_UDINT(TIME());
+END_IF;
+TraceM1_PrevReason := TraceM1.BlockReason;
+
+// --- M2 ---
+TraceM2.DescendPermitEffective := EffectivePermitM2_Descend;
+TraceM2.AscentPermitEffective  := EffectivePermitM2_Ascent;
+TraceM2.SafeStopActive         := SafeStopM2_Active;
+TraceM2.SafeStopSourceSafety   := instSafetyWinchM2.SafeStop;
+TraceM2.SafeStopSourceInput    := PRG_02_Acquisition.Data.InputModules.Fault
+                                  OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
+TraceM2.SafeStopSourceSync     := ((instWinchSync.Fault.ErrorId AND 16#0002) <> 16#0000)
+                                  OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
+TraceM2.PowerCutOffActive      := instSafetyWinchM2.PowerCutOff;
+TraceM2.Inhibited              := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE)
+                                  OR PRG_03_Modes_Cycle.Data.Auth.InhibitM2;
+TraceM2.FinalInterlockError    := WinchM2State.FinalInterlockError;
+TraceM2.FinalInterlockReason   := WinchM2State.FinalInterlockReason;
+TraceM2.StepNumber             := WinchM2State.StepNumber;
+
+IF instSafetyWinchM2.PowerCutOff THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.POWER_CUTOFF;
+ELSIF TraceM2.Inhibited THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.AXIS_DISABLED;
+ELSIF SafeStopM2_Active THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.SAFESTOP;
+ELSIF instSafetyWinchM2.Fault.Error THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.SAFETY_FAULT;
+ELSIF NOT (SafetyPermitM2_Ascent OR SafetyPermitM2_Descend) THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.SAFETY_PERMIT_MISSING;
+ELSIF NOT (ProcessPermitM2_Ascent OR ProcessPermitM2_Descend) THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.PROCESS_PERMIT_MISSING;
+ELSIF NOT (EffectivePermitM2_Ascent OR EffectivePermitM2_Descend) THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.COUPLING_BLOCKED;
+ELSIF instWinchM2.Fault.Error THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.WINCH_FAULT;
+ELSIF WinchM2State.FinalInterlockError THEN
+    TraceM2.BlockReason := E_WinchTraceBlockReason.FINAL_INTERLOCK_BLOCKED;
+ELSE
+    TraceM2.BlockReason := E_WinchTraceBlockReason.NONE;
+END_IF;
+IF TraceM2.BlockReason <> TraceM2_PrevReason THEN
+    TraceM2.BlockReasonTimestamp := TIME_TO_UDINT(TIME());
+END_IF;
+TraceM2_PrevReason := TraceM2.BlockReason;
+
+{endregion}
+
+// 🧩 Cause de blocage priorisée sur l'état public IHM (miroir de la trace terrain §8bis)
+WinchM1State.AxisBlockReason := TraceM1.BlockReason;
+WinchM2State.AxisBlockReason := TraceM2.BlockReason;
+
 // === 🔌 PUBLICATION BUS INTER-PRG (Data : ST_WinchInterPrg) ===
 // Copie des structs internes vers le bus de sortie (producteur unique).
 Data.WinchM1FinalInterlockRequest := WinchM1FinalInterlockRequest;
@@ -1253,6 +1381,9 @@ Data.ArmingPermit                 := ArmingPermit;
 // Usage effectif d'un override/bypass de position (consommé PRG_03 → FB_Modes)
 Data.PositionLimitOverriddenM1    := PositionLimitOverriddenM1;
 Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
+// 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView)
+Data.TraceM1                      := TraceM1;
+Data.TraceM2                      := TraceM2;
 
 {endregion}
 END_PROGRAM

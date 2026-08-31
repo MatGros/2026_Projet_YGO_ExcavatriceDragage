@@ -110,6 +110,66 @@ TEST 'TC-P10-024 Ouverture seulement si MotionDirection=-1 ET MotionRequestActiv
     ASSERT_TRUE(FB.M2_BucketJogLimit, 'Ouverture -> vitesse lente forcee');
 END_TEST
 
+TEST 'T196-001 Etat ferme publie apres atteinte de l offset'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := FALSE;
+
+    (* Initialisation au repos puis armement de la fermeture. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdClose_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := 1,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T196 fermeture armee -> Busy');
+
+    (* Le modèle physique atteint la cible : seul ce fait valide IsClosed. *)
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := 1,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 2.9,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(BucketState.IsClosed, 'T196 cible atteinte -> IsClosed=TRUE');
+    ASSERT_FALSE(BucketState.IsOpen, 'T196 cible atteinte -> IsOpen=FALSE');
+    ASSERT_TRUE(FB.Lifecycle.Done, 'T196 cible atteinte -> Done=TRUE');
+END_TEST
+
+TEST 'T196-002 Etat ouvert publie apres atteinte de l offset'
+    Config.OffsetOpenM := 0.0;
+    Config.OffsetCloseM := 3.0;
+    Config.CoherenceLimitM := 5.0;
+    Config.CloseAnticipationM := 0.2;
+    Config.OpenAnticipationM := 0.2;
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := TRUE;
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 3.0,
+       Config := Config, BucketState := BucketState);
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       CmdOpen_IHM := TRUE, MotionRequestActive := TRUE, MotionDirection := -1,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 3.0,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(FB.Lifecycle.Busy, 'T196 ouverture armee -> Busy');
+
+    ADVANCE_TIME(10000000);
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+       MotionRequestActive := TRUE, MotionDirection := -1,
+       HomedM1 := TRUE, HomedM2 := TRUE, CablePosM1 := 0.0, CablePosM2 := 0.1,
+       Config := Config, BucketState := BucketState);
+    ASSERT_TRUE(BucketState.IsOpen, 'T196 cible atteinte -> IsOpen=TRUE');
+    ASSERT_FALSE(BucketState.IsClosed, 'T196 cible atteinte -> IsClosed=FALSE');
+    ASSERT_TRUE(FB.Lifecycle.Done, 'T196 cible atteinte -> Done=TRUE');
+END_TEST
+
 TEST 'TC-P10-025 Demande benne refusee si M1_Busy OR M2_Busy a l entree (READY)'
     Config.OffsetOpenM := 0.0;
     Config.OffsetCloseM := 3.0;
@@ -644,11 +704,9 @@ TEST 'TC-P10-047.1 Incoherence boot : 1er cycle ni IsOpen ni IsClosed -> StateIn
     ASSERT_FALSE(FB.ActiveOffsetValid, 'Boot incoherent -> ActiveOffsetValid=FALSE');
 END_TEST
 
-TEST 'TC-P10-047.2 Boot incoherent IsOpen=TRUE ET IsClosed=TRUE -> StateIncoherent (attendu ROUGE)'
-    (* ⚠️ TC LEGITIMEMENT ROUGE (T175) : le code de boot (FB_Bucket.st L198) ne detecte que le
-       cas ni IsOpen ni IsClosed (L198). L'etat contradictoire IsOpen=TRUE ET IsClosed=TRUE
-       n'est PAS traite -> StateIncoherent reste FALSE, ActiveOffsetValid reste TRUE. Ce TC
-       documente l'ecart ; il doit rester ROUGE tant que le code ne traite pas ce cas. *)
+TEST 'TC-P10-047.2 Boot incoherent IsOpen=TRUE ET IsClosed=TRUE -> StateIncoherent'
+    (* Une position benne est exclusive : la combinaison ouverte ET fermee est
+       invalide et doit rendre l'offset inutilisable dès le premier scan. *)
     Config.OffsetOpenM := 0.0;
     Config.OffsetCloseM := 3.0;
     Config.CoherenceLimitM := 5.0;
@@ -662,8 +720,8 @@ TEST 'TC-P10-047.2 Boot incoherent IsOpen=TRUE ET IsClosed=TRUE -> StateIncohere
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     BucketState := FB.BucketState;
-    ASSERT_TRUE(BucketState.StateIncoherent, 'Boot IsOpen ET IsClosed -> StateIncoherent=TRUE (code ne le traite pas)');
-    ASSERT_FALSE(FB.ActiveOffsetValid, 'Boot incoherent -> ActiveOffsetValid=FALSE (code ne le traite pas)');
+    ASSERT_TRUE(BucketState.StateIncoherent, 'Boot IsOpen ET IsClosed -> StateIncoherent=TRUE');
+    ASSERT_FALSE(FB.ActiveOffsetValid, 'Boot incoherent -> ActiveOffsetValid=FALSE');
 END_TEST
 
 TEST 'TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle'

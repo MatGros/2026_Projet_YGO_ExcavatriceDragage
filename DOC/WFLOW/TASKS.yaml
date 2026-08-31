@@ -397,22 +397,6 @@ tasks:
   contrat: ''
   objectifs: []
   bloque_par: []
-- id: T096
-  parent_id: ''
-  statut: ❌
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: —
-  titre: Mode apprentissage automatique des bandes de vitesse à vide et...
-  contexte: 'Intitulé complet : Mode apprentissage automatique des bandes de vitesse à vide et en charge'
-  description: 'ABSORBÉE par T181-15 (FB_WinchSpeedLearning : collecteur passif, table RETAIN charge/vide par palier) et T181-13
-    (partie plongée : palier plancher lissé). La surveillance de cette table relève de T181-16. Clôture administrative : aucune
-    implémentation autonome T096 ne doit être engagée.'
-  objectifs: []
-  contrat: ''
-  date: '2026-08-29T23:16:48+02:00'
-  completed_at: '2026-08-29T23:16:48+02:00'
-  bloque_par: []
 - id: T098
   parent_id: ''
   statut: ✅
@@ -790,24 +774,6 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T185_HOMING_BENNE_CONJOINT_N2.yaml
   date: '2026-08-28T21:08:44'
   bloque_par: []
-- id: T135
-  parent_id: ''
-  statut: ⏸️
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: —
-  titre: Refactor intention dans le reste du programme (PRG_04, PRG_05,...
-  contexte: 'Intitulé complet : Refactor intention dans le reste du programme (PRG_04, PRG_05, FB_Winch, FB_Translation) :
-    consommer FB_IntentionDecoder au lieu de re-décoder Direction/SpeedPct en interne'
-  description: '⏸️ SUPERSEDÉE par T165-B2/C2 : les consommateurs migrent vers les bus publics PRG_02.Data et PRG_03.Data,
-    sans FB_IntentionDecoder et sans modification métier opportuniste. Historique : Direction/SpeedPct ne doivent pas être
-    redécodés depuis le brut dans les PRG ; consommer les faits qualifiés AF‑08.'
-  objectifs:
-  - Conserver l'historique ; ne pas déléguer T135
-  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-C2_PRG03_CONSUMERS.yaml
-  date: '2026-08-28T11:51:18+02:00'
-  bloque_par:
-  - T165-A
 - id: T136
   parent_id: ''
   statut: ✅
@@ -933,35 +899,6 @@ tasks:
     Palier C 15/15 PASS**. Validé par l''utilisateur (clôture).'
   contrat: ''
   objectifs: []
-  bloque_par: []
-- id: T144
-  parent_id: ''
-  statut: ⏸️
-  criticite: C2
-  domaine: TRANSLATION
-  agent: —
-  titre: Assainir l'interface de PRG_06_Outputs (conformité esprit bus/...
-  contexte: 'Intitulé complet : Assainir l''interface de PRG_06_Outputs (conformité esprit bus/encapsulation T142 + sorties
-    M3 mortes) | Signalé 2026-08-20 (revue sim M3) : PRG_06 ne respecte pas l''esprit bus (T142). Faits vérifiés : ① M3_DriveControlWord/M3_DriveFreqRefWord
-    (VAR_OUTPUT l.43-44) jamais assignés (morts, toujours 0) ; ② M3_CommandWord/M3_SetpointFrequencyHz (assignés l.215-216)
-    non déclarés dans les .st (globals uniquement dans Device.export) → source non auto-consistant ; ③ la commande drive M3
-    n''est PAS dans le bus Data (ST_OutputsInterPrg ne porte que TranslationBrakeCmd) ; ④ diag plats en VAR_OUTPUT (M3BlockedBySafetyInfo,
-    EmergencyState, EmergencyDiag…) au lieu d''un struct/bus diag propre.'
-  description: '✅ **Faits ①② RÉSOLUS (2026-08-25, T121)** : `M3_DriveControlWord`/`M3_DriveFreqCmdWord` désormais déclarés
-    (L51-52) ET assignés (L270-271) depuis `instTranslationOutputInterlockM3` ; les globals `M3_CommandWord`/`M3_SetpointFrequencyHz`
-    ne sont plus dans le .st (source auto-consistante). ✅ **Design T144B livré** (`DOC/WFLOW/AUDITS/DESIGN/DESIGN_T144B_INTERFACES_PRG6_v0.1.md`,
-    2026-08-30) : challenge inter-PRG → D1 (supprimer la boucle PRG_04→PRG_06, bus diag `ST_OutputsDiag` sur PRG_06, assemblage
-    IHM PRG_07 sur 2 bus), D2 (source unique `PowerCutOff` dans `…FinalInterlockRequest`), D3 (commande drive M3 sur `ST_OutputsInterPrg`).
-    ⏳ **Implémentation en attente** : arbitrages Q1-Q4 (variante IHM A/B, D2-A/B, D3-A/B, fusion T181-01) + validation humaine.'
-  objectifs:
-  - 'D1 : supprimer la boucle de lecture arrière PRG_04→PRG_06 (read-back instance + aller-retour diag) ; PRG_06 publie Data.Diag:ST_OutputsDiag
-    ; PRG_07 assemble l''IHM depuis PRG_04.Data + PRG_06.Data.Diag'
-  - 'D2 : source de vérité unique PowerCutOff/SafeStop (recommandé : dans ST_WinchFinalInterlockRequest) ; ST_SafetyWinch
-    ne garde que BlockedBySafety'
-  - 'D3 : monter la commande drive M3 (M3DriveControlWord/M3DriveFreqCmdWord) sur ST_OutputsInterPrg (producteur unique)'
-  - '④ : regrouper les diag plats (M1/M2/M3*SafetyInfo, PowerCutOffActive…) dans un struct/bus diag propre'
-  contrat: ''
-  date: '2026-08-30T18:00:37+02:00'
   bloque_par: []
 - id: T145
   parent_id: ''
@@ -3752,8 +3689,12 @@ tasks:
   agent: —
   date: '2026-08-31T00:00:00'
   titre: Refactor POO — arbitrage de commande PRG_04/05 vers FB (bit-identique)
-  contexte: 'Intitulé complet : Déplacer l''arbitrage de commande (source joystick/boutons/cycle selon mode) de PRG_04 §3 et PRG_05 §1 vers FB_WinchCommandArbitration et FB_TranslationCommandArbitration, conformément à CODE_QUALITY_STANDARDS.md §5.'
-  description: '⚠️ **BLOQUÉ** sur la fin de T181 (implémentation actuelle). Refactor **bit-identique** (aucun changement de comportement machine). Violation POO : la décision combinant plusieurs causes est calculée dans le PRG, pas par son propriétaire fonctionnel. Contrat: TASK_CONTRACT_T188.yaml.'
+  contexte: 'Intitulé complet : Déplacer l''arbitrage de commande (source joystick/boutons/cycle selon mode) de PRG_04 §3
+    et PRG_05 §1 vers FB_WinchCommandArbitration et FB_TranslationCommandArbitration, conformément à CODE_QUALITY_STANDARDS.md
+    §5.'
+  description: '⚠️ **BLOQUÉ** sur la fin de T181 (implémentation actuelle). Refactor **bit-identique** (aucun changement de
+    comportement machine). Violation POO : la décision combinant plusieurs causes est calculée dans le PRG, pas par son propriétaire
+    fonctionnel. Contrat: TASK_CONTRACT_T188.yaml.'
   objectifs:
   - Créer FB_WinchCommandArbitration (2 instances M1/M2) bit-identique à PRG_04 §3
   - Créer FB_TranslationCommandArbitration (1 instance M3) bit-identique à PRG_05 §1
@@ -3770,8 +3711,9 @@ tasks:
   agent: —
   date: '2026-08-31T00:00:00'
   titre: Spec FB d'arbitrage + DUT interface (amendement AF_Partie-10/11)
-  contexte: 'Rédiger la spec des FB d''arbitrage et définir les DUT d''interface (ST_fbWinchCommandArbitration_*, ST_fbTranslationCommandArbitration_*).'
-  description: 'Définir l''interface typée (entrées joystick/Auth/ReqProgram/IHM/bucket/sync, sorties arbitrées) et les critères d''acceptation par mode. Valider la cible avec l''humain avant implémentation.'
+  contexte: Rédiger la spec des FB d'arbitrage et définir les DUT d'interface (ST_fbWinchCommandArbitration_*, ST_fbTranslationCommandArbitration_*).
+  description: Définir l'interface typée (entrées joystick/Auth/ReqProgram/IHM/bucket/sync, sorties arbitrées) et les critères
+    d'acceptation par mode. Valider la cible avec l'humain avant implémentation.
   objectifs:
   - Spec FB_WinchCommandArbitration (interface + logique par mode) validée
   - Spec FB_TranslationCommandArbitration (interface + logique par mode) validée
@@ -3787,8 +3729,9 @@ tasks:
   agent: —
   date: '2026-08-31T00:00:00'
   titre: Implémenter FB_WinchCommandArbitration + tests unitaires
-  contexte: 'Implémenter le FB d''arbitrage treuils (M1/M2) et ses tests harness par mode.'
-  description: 'FB bit-identique à PRG_04 §3. Tests unitaires par mode (SEMI_AUTO, MAINT_N1/N2, manuel joystick, boutons IHM) : sorties FB == sorties §3 actuel.'
+  contexte: Implémenter le FB d'arbitrage treuils (M1/M2) et ses tests harness par mode.
+  description: 'FB bit-identique à PRG_04 §3. Tests unitaires par mode (SEMI_AUTO, MAINT_N1/N2, manuel joystick, boutons IHM)
+    : sorties FB == sorties §3 actuel.'
   objectifs:
   - FB_WinchCommandArbitration implémenté (bit-identique §3)
   - Tests harness par mode PASS (sorties FB == sorties §3)
@@ -3804,8 +3747,8 @@ tasks:
   agent: —
   date: '2026-08-31T00:00:00'
   titre: Raccorder PRG_04 §3 → FB_WinchCommandArbitration
-  contexte: 'Remplacer la logique d''arbitrage §3 de PRG_04 par l''appel des 2 instances FB.'
-  description: 'PRG_04 §3 réduit au câblage des entrées FB + publication. Vérifier liaison G200 et tests d''intégration.'
+  contexte: Remplacer la logique d'arbitrage §3 de PRG_04 par l'appel des 2 instances FB.
+  description: PRG_04 §3 réduit au câblage des entrées FB + publication. Vérifier liaison G200 et tests d'intégration.
   objectifs:
   - PRG_04 §3 sans IF d'arbitrage (câblage FB + publication uniquement)
   - G200_check_linkage.py --report PASS (0 erreur)
@@ -3821,8 +3764,8 @@ tasks:
   agent: —
   date: '2026-08-31T00:00:00'
   titre: Implémenter FB_TranslationCommandArbitration + tests unitaires
-  contexte: 'Implémenter le FB d''arbitrage translation (M3) et ses tests harness par mode.'
-  description: 'FB bit-identique à PRG_05 §1. Tests unitaires par mode (SEMI_AUTO, MAINT_N1/N2, manuel joystick, boutons IHM).'
+  contexte: Implémenter le FB d'arbitrage translation (M3) et ses tests harness par mode.
+  description: FB bit-identique à PRG_05 §1. Tests unitaires par mode (SEMI_AUTO, MAINT_N1/N2, manuel joystick, boutons IHM).
   objectifs:
   - FB_TranslationCommandArbitration implémenté (bit-identique §1)
   - Tests harness par mode PASS (sorties FB == sorties §1)
@@ -3838,8 +3781,8 @@ tasks:
   agent: —
   date: '2026-08-31T00:00:00'
   titre: Raccorder PRG_05 §1 → FB_TranslationCommandArbitration
-  contexte: 'Remplacer la logique d''arbitrage §1 de PRG_05 par l''appel du FB.'
-  description: 'PRG_05 §1 réduit au câblage des entrées FB + publication. Vérifier liaison G200 et tests d''intégration.'
+  contexte: Remplacer la logique d'arbitrage §1 de PRG_05 par l'appel du FB.
+  description: PRG_05 §1 réduit au câblage des entrées FB + publication. Vérifier liaison G200 et tests d'intégration.
   objectifs:
   - PRG_05 §1 sans IF d'arbitrage (câblage FB + publication uniquement)
   - G200_check_linkage.py --report PASS (0 erreur)
@@ -3856,7 +3799,7 @@ tasks:
   date: '2026-08-31T00:00:00'
   titre: Validation finale T188 — gates complets + revue humaine + docs
   contexte: 'Validation globale du refactor POO : gates complets, revue humaine du diff, mise à jour docs.'
-  description: 'run_all_gates.py complet, revue humaine du diff réel, mise à jour AF_Partie-02/10/11, clôture T188.'
+  description: run_all_gates.py complet, revue humaine du diff réel, mise à jour AF_Partie-02/10/11, clôture T188.
   objectifs:
   - run_all_gates.py 100% PASS
   - Revue humaine du diff validée (aucune régression comportement)
@@ -3874,10 +3817,15 @@ tasks:
   agent: —
   date: '2026-08-31T00:00:00'
   titre: Refactor documentation AF en fonction du code implémenté
-  contexte: 'Mise à jour des specs AF pour refléter le code implémenté : FB d''arbitrage (M1/M2/M3/Benne), structs Data, palier au joystick, source unique WinchBothIntent, consolidation bus PRG_02.'
-  description: 'Gros refactor documentaire. Utiliser les templates standard (AF_SPEC_TEMPLATE.md, AF_FICHE_PRG_TEMPLATE.md, FB_SPEC_TEMPLATE.md, AF_ARCHITECTURE_PROGRAMME_TEMPLATE.md) + GUIDE_EDITION_AF_v1.0.md. 11 AF parties + 1 contrat concernés : AF-02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12/14, INTERPRG_CONTRACT_PRG03_MODES_CYCLE. ⚠️ Documenter d''abord le concept de « FB d''arbitrage non-mouvement » (pas de SafeStop/StartStop sécurité) dans AF_Partie-03.'
+  contexte: 'Mise à jour des specs AF pour refléter le code implémenté : FB d''arbitrage (M1/M2/M3/Benne), structs Data, palier
+    au joystick, source unique WinchBothIntent, consolidation bus PRG_02.'
+  description: 'Gros refactor documentaire. Utiliser les templates standard (AF_SPEC_TEMPLATE.md, AF_FICHE_PRG_TEMPLATE.md,
+    FB_SPEC_TEMPLATE.md, AF_ARCHITECTURE_PROGRAMME_TEMPLATE.md) + GUIDE_EDITION_AF_v1.0.md. 11 AF parties + 1 contrat concernés
+    : AF-02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12/14, INTERPRG_CONTRACT_PRG03_MODES_CYCLE. ⚠️ Documenter d''abord le concept
+    de « FB d''arbitrage non-mouvement » (pas de SafeStop/StartStop sécurité) dans AF_Partie-03.'
   objectifs:
-  - Documenter les FB d'arbitrage non-mouvement (FB_WinchCmdArbitrationM1/M2, FB_TranslationCmdArbitrationM3, FB_BucketCmdArbitration) dans AF-03
+  - Documenter les FB d'arbitrage non-mouvement (FB_WinchCmdArbitrationM1/M2, FB_TranslationCmdArbitrationM3, FB_BucketCmdArbitration)
+    dans AF-03
   - Mettre à jour AF-08 (palier au joystick, StepTgt), AF-10 (FB_Winch/SpeedStep/arbitrage benne), AF-11 (arbitrage M3)
   - Mettre à jour AF-04 (FB_Cycle palier + production ST_Program*Request, DiveSearch/ExtractionAssist), AF-09 (MachineHomingCycle)
   - Mettre à jour AF-02/05/06/07/12/14 (structs Data, source unique, consolidation bus, permis assistants)
@@ -3893,8 +3841,12 @@ tasks:
   agent: —
   date: '2026-08-31T00:00:00'
   titre: Corrections safety cycles — défaut latché et reprise consciente (audit cycles)
-  contexte: 'Constats S1+S2 des audits CYCLES_AUDIT_A/B_20260831 : contournement du redémarrage après défaut latché + reprise sans geste conscient.'
-  description: '🔴 S1 : FB_Cycle:324 teste NOT Fault.Error au lieu de NOT Fault.Latched → Abort+Start contourne le redémarrage après défaut latché non acquitté. Correctif : gater la transition X0→X1 sur NOT Fault.Latched. 🔴 S2 : WaitingResume code mort (FB_Cycle:269-272) → reprise sans geste conscient après bascule de mode ; AF-04 §4.1 non tenue. Correctif : reprise consciente BtnStart.'
+  contexte: 'Constats S1+S2 des audits CYCLES_AUDIT_A/B_20260831 : contournement du redémarrage après défaut latché + reprise
+    sans geste conscient.'
+  description: '🔴 S1 : FB_Cycle:324 teste NOT Fault.Error au lieu de NOT Fault.Latched → Abort+Start contourne le redémarrage
+    après défaut latché non acquitté. Correctif : gater la transition X0→X1 sur NOT Fault.Latched. 🔴 S2 : WaitingResume code
+    mort (FB_Cycle:269-272) → reprise sans geste conscient après bascule de mode ; AF-04 §4.1 non tenue. Correctif : reprise
+    consciente BtnStart.'
   objectifs:
   - FB_Cycle gate X0→X1 sur NOT Fault.Latched (plus de redémarrage après défaut non acquitté)
   - Reprise de cycle après bascule de mode exige un geste conscient (BtnStart)
@@ -3909,8 +3861,12 @@ tasks:
   agent: —
   date: '2026-08-31T00:00:00'
   titre: Corrections safety interfaces + PRG06 — permis fail-safe, ArmingPulse, RateInterlock (audits)
-  contexte: 'Constats S3+S4+S5 des audits INTERFACES/PRG06/PRG0405 : fail-safe des permis, diagnostic réarmement AU aveugle, garde-fou vitesse hors service.'
-  description: '🔴 S3 : DescendPermit/AscentPermit := TRUE par défaut dans FB_Winch (contraire au fail-safe NC-100) → passer à FALSE. 🟠 S4 : EmergencyArmingPulseActive jamais affectée dans PRG_06 → l''IHM n''affiche jamais l''impulsion de réarmement ; correctif := instSafetyEmergencyManagement.ArmPulse_RQ. 🟠 S5 : FB_WinchRateInterlock (T181-01) inexistant dans CODE/ mais SpeedGuardEnable := FALSE justifié par lui → trancher (créer/re-mapper/acter).'
+  contexte: 'Constats S3+S4+S5 des audits INTERFACES/PRG06/PRG0405 : fail-safe des permis, diagnostic réarmement AU aveugle,
+    garde-fou vitesse hors service.'
+  description: '🔴 S3 : DescendPermit/AscentPermit := TRUE par défaut dans FB_Winch (contraire au fail-safe NC-100) → passer
+    à FALSE. 🟠 S4 : EmergencyArmingPulseActive jamais affectée dans PRG_06 → l''IHM n''affiche jamais l''impulsion de réarmement
+    ; correctif := instSafetyEmergencyManagement.ArmPulse_RQ. 🟠 S5 : FB_WinchRateInterlock (T181-01) inexistant dans CODE/
+    mais SpeedGuardEnable := FALSE justifié par lui → trancher (créer/re-mapper/acter).'
   objectifs:
   - FB_Winch DescendPermit/AscentPermit défaut FALSE (fail-safe)
   - PRG_06 EmergencyArmingPulseActive affecté (= ArmPulse_RQ)
@@ -3927,7 +3883,10 @@ tasks:
   date: '2026-08-31T00:00:00'
   titre: Optimisations interfaces — paramètres morts et homogénéité FB (audit interfaces)
   contexte: 'Constats O1-O5 du rapport INTERFACES_AUDIT_A/B_20260831 : paramètres morts, interfaces hétérogènes.'
-  description: '🟠 O1 : SpeedStepTable morte sur FB_WinchCmdArbitrationM1/M2 → retirer. 🟠 O2 : Mode morte sur FB_Translation → retirer. 🟠 O3 : FB_WinchOutputInterlock (défaut plat) vs FB_TranslationOutputInterlock (Fault:ST_Fault) → homogénéiser vers ST_Fault. 🟠 O4 : FB_Winch struct Cfg vs FB_Translation ~13 scalaires [CFG] → regrouper. 🟠 O5 : ST_fbModes_Autorisations viole NC-110 (bus multi-consommateurs) → renommer ST_Modes_Autorisations.'
+  description: '🟠 O1 : SpeedStepTable morte sur FB_WinchCmdArbitrationM1/M2 → retirer. 🟠 O2 : Mode morte sur FB_Translation
+    → retirer. 🟠 O3 : FB_WinchOutputInterlock (défaut plat) vs FB_TranslationOutputInterlock (Fault:ST_Fault) → homogénéiser
+    vers ST_Fault. 🟠 O4 : FB_Winch struct Cfg vs FB_Translation ~13 scalaires [CFG] → regrouper. 🟠 O5 : ST_fbModes_Autorisations
+    viole NC-110 (bus multi-consommateurs) → renommer ST_Modes_Autorisations.'
   objectifs:
   - Retirer les paramètres morts (SpeedStepTable, Mode)
   - Homogénéiser les interfaces de défaut (Fault:ST_Fault)
@@ -3945,11 +3904,35 @@ tasks:
   date: '2026-08-31T00:00:00'
   titre: Optimisations PRG04/05 — alléger la vue code et débogage terrain (audit)
   contexte: 'Constats O6+O7+O8 des audits PRG0405_AUDIT_A/B : PRG04 chargé, manque de diagnostic terrain, polarité Kobold.'
-  description: '🟠 O6 : PRG04 ~200 l de logique métier inline + ~230 l de projection → extraire en FB (ex. FB_WinchStateProjection, FB_WinchPermitCoupler). 🟠 O7 : créer AxisBlockReason (cause de blocage hiérarchisée) pour le débogage sur site. 🟠 O8 : polarité Kobold contradictoire (FB_Cycle niveau haut = contact fond vs FB_DiveSearch front descendant = fond) sur le même signal → trancher au schéma électrique.'
+  description: '🟠 O6 : PRG04 ~200 l de logique métier inline + ~230 l de projection → extraire en FB (ex. FB_WinchStateProjection,
+    FB_WinchPermitCoupler). 🟠 O7 : créer AxisBlockReason (cause de blocage hiérarchisée) pour le débogage sur site. 🟠 O8 :
+    polarité Kobold contradictoire (FB_Cycle niveau haut = contact fond vs FB_DiveSearch front descendant = fond) sur le même
+    signal → trancher au schéma électrique.'
   objectifs:
   - Extraire les blocs lourds de PRG04 en FB (bit-identique)
   - Créer AxisBlockReason (cause de blocage publiée)
   - Trancher la polarité Kobold (FB_Cycle vs FB_DiveSearch)
   - G200 liaison PASS + tests + revue humaine
+  contrat: ''
+  bloque_par: []
+- id: T196
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: H_TREUILS_BENNE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: État ouvert/fermé de la benne absent — diagnostic et correction
+  contexte: 'Signalé en simulation : les 2 codeurs fonctionnent, mais l''état ouvert/fermé de la benne ne se met pas à jour
+    lors des commandes d''ouverture/fermeture. Peut être lié au refactor FB_BucketCmdArbitration / ST_fbBucketCmdArbitration_Context
+    / palier.'
+  description: 'Bug signalé : lorsqu''on commande l''ouverture ou la fermeture de la benne, l''état (ouvert/fermé) ne se met
+    pas à jour. Vérifier la chaîne : commande → FB_BucketCmdArbitration → FB_Bucket → état mécanique (ST_fbBucket_State) →
+    publication IHM. Diagnostiquer si un refactor récent (arbitrage benne, contexte, palier) a cassé le câblage de l''état.'
+  objectifs:
+  - Diagnostic de la chaîne état benne (commande → FB_Bucket → état → IHM)
+  - Identifier la cause (refactor, câblage, contexte)
+  - Correction et vérification en simulation
+  - G200 liaison PASS + tests
   contrat: ''
   bloque_par: []

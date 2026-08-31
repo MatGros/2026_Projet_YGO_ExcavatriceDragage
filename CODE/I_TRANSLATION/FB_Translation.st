@@ -5,6 +5,9 @@
    🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
       standard. Précédence Enable > SafeStop > StartStop.
    Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
+   🔧 Interface plate → structs : configuration regroupée en `Cfg : ST_fbTranslation_Cfg`
+      (pattern NC-110/G380, comme FB_Winch `Config : ST_fbWinch_Cfg`). Source unique
+      GVL_PERSISTENT (câblée par PRG_05_Translation).
    🧩 Compose FB_Brake (réutilisé TEL QUEL depuis COMMUN).
    🎯 Invariant : toute inversion de sens force la cible de rampe à 0.0 tant que le
       changement de sens est en attente, pour garantir le croisement du seuil d'arrêt
@@ -37,24 +40,8 @@ VAR_INPUT
     BrakeFeedback               : BOOL;       // --> [HW] Retour physique direct : TRUE = frein OUVERT (desserré)
     InvertDriveDirection        : BOOL;
 
-    // Réglages rampe
-    CfgRampAccelRate            : REAL := 20.0;    // --> [CFG] %/s — accélération
-    CfgRampDecelNormalRate      : REAL := 40.0;    // --> [CFG] %/s — décélération normale
-    CfgRampDecelFastRate        : REAL := 100.0;   // --> [CFG] %/s — décélération RAPIDE
-    DirectionInterlockDelay     : TIME := T#200ms; // --> [CFG] Délai avant d'autoriser un changement de sens à l'arrêt
-
-    // Réglages ETHERCAT
-    ApproachSpeedTremieHz       : REAL := 10.0;    // --> [CFG] Vitesse réduite d'approche Trémie en Hz
-    ApproachSpeedMaintenanceHz  : REAL := 10.0;    // --> [CFG] Vitesse réduite d'approche Maintenance en Hz
-    ApproachSpeedP1Hz           : REAL := 10.0;    // --> [CFG] Vitesse réduite d'approche P1 en Hz
-    DriveFreqScaleMaxHz         : REAL := 60.0;    // --> [CFG] Échelle 0..100 % → MaxHz
-
-    // Réglages communs
-    CaptorDebounce              : TIME := T#100ms; // --> [CFG] Filtrage capteur de position cible
-    BrakeDelayContactClose      : TIME := T#100ms; // --> [CFG] Voir FB_Brake
-    BrakeDelayMagnetise         : TIME := T#300ms; // --> [CFG] Voir FB_Brake
-    BrakeDelayMotorDecel        : TIME := T#500ms; // --> [CFG] Voir FB_Brake
-    BrakeFeedbackTimeout        : TIME := T#300ms; // --> [CFG] Strictement sous watchdog final 500 ms
+    // 🔧 Configuration regroupée (pattern NC-110/G380 — un seul point d'interface)
+    Cfg                         : ST_fbTranslation_Cfg; // --> [CFG] Rampe, vitesses d'approche, échelle, frein (source GVL_PERSISTENT)
 END_VAR
 VAR_OUTPUT
     Ready                       : BOOL;   // <-- [STAT] FB prêt (sortie libre, hors ST_Status)
@@ -161,7 +148,7 @@ CycleTimeCalc();
 {endregion}
 
 {region "§4 Arrivée sur cible et interlock direction"}
-CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
+CaptorDebounceTon(IN := PositionSensorTarget, PT := Cfg.CaptorDebounce);
 TargetReached := CaptorDebounceTon.Q;
 ArrivalEdge(CLK := TargetReached);
 
@@ -176,7 +163,7 @@ END_IF;
 
 DirectionChangeDelay(
     IN := (Direction <> 0) AND (Direction <> CommandedDirection) AND (ABS(SpeedRamp.Current) <= 0.1) AND (ABS(DriveActualFreqHz) <= 0.5),
-    PT := DirectionInterlockDelay
+    PT := Cfg.DirectionInterlockDelay
 );
 
 IF (CommandedDirection = 0) AND (Direction <> 0) THEN
@@ -206,8 +193,8 @@ END_IF;
 
 SpeedRamp(
     Target := RampTargetPct,
-    AccelRate := CfgRampAccelRate,
-    DecelRate := SEL(SafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
+    AccelRate := Cfg.CfgRampAccelRate,
+    DecelRate := SEL(SafeStop, Cfg.CfgRampDecelNormalRate, Cfg.CfgRampDecelFastRate),
     CycleTimeS := CycleTimeCalc.CycleTimeS
 );
 {endregion}
@@ -227,10 +214,10 @@ Brake(
     MovementRequested := MovementRequested,
     ContactorFeedback := BrakeFeedback,
     BypassContactorCheck := BypassContactorCheck,
-    DelayContactClose := BrakeDelayContactClose,
-    DelayMagnetise := BrakeDelayMagnetise,
-    DelayMotorDecel := BrakeDelayMotorDecel,
-    FeedbackTimeout := BrakeFeedbackTimeout
+    DelayContactClose := Cfg.BrakeDelayContactClose,
+    DelayMagnetise := Cfg.BrakeDelayMagnetise,
+    DelayMotorDecel := Cfg.BrakeDelayMotorDecel,
+    FeedbackTimeout := Cfg.BrakeFeedbackTimeout
 );
 
 BrakeReleaseRequest := Brake.BrakeCmd;
@@ -251,15 +238,15 @@ ELSE
     RequestedDriveControlWord := 0;
 END_IF;
 
-RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * DriveFreqScaleMaxHz;
+RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * Cfg.DriveFreqScaleMaxHz;
 
 // Ralentissements d'approche
 IF (CommandedDirection = 1) AND SlowdownSensorTremie THEN
-    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedTremieHz);
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedTremieHz);
 ELSIF (CommandedDirection = -1) AND SlowdownSensorMaintenance THEN
-    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedMaintenanceHz);
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedMaintenanceHz);
 ELSIF (CommandedDirection = -1) AND SlowdownSensorP1 THEN
-    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedP1Hz);
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedP1Hz);
 END_IF;
 
 IF Fault.Error THEN

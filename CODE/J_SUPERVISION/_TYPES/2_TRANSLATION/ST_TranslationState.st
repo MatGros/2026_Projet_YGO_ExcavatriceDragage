@@ -7,6 +7,7 @@ TYPE ST_TranslationState :
 STRUCT
     (* 🚦 États & diagnostics FB_Translation *)
     FBState                 : E_State; (* 🤖 État de l'automate interne (FB_Translation) *)
+    AxisBlockReason         : E_TranslationTraceBlockReason; (* 🧩 Cause prioritaire de blocage (miroir de TranslationTrace.BlockReason) *)
     Ready                   : BOOL;    (* 🟢 Translation prêt à fonctionner *)
     Busy                    : BOOL;    (* ⚙️ Mouvement en cours *)
     Done                    : BOOL;    (* ✅ Mouvement terminé avec succès *)
