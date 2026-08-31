@@ -5256,12 +5256,12 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔫 Homme-mort joystick armé</xhtml>
               </documentation>
             </variable>
-            <variable name="JoystickMotionActive">
+            <variable name="JoystickDeflected">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Joystick défléchi (non centré) — même signal que CycleMotionPermit (FB_Cycle) ; SANS homme-mort</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Joystick défléchi (non centré) — même signal que JoystickDeflected (FB_Cycle) ; SANS homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStepAtError">
@@ -5792,18 +5792,10 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
             </variable>
             <variable name="State">
               <type>
-                <derived name="ST_Safety_Emergency_State" />
+                <derived name="ST_EmergencyState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 État public AU (refactor AU)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Diag">
-              <type>
-                <derived name="ST_Safety_Emergency_Diag" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Diagnostic public AU (refactor AU)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 État AU + cmd FB AU + Diag interne</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5818,16 +5810,153 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
    🛡️ ST_EmergencyHMI — Données d'échange IHM de la chaîne AU / sécurité
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure dédiée `GVL_IHM.Emergency`. Regroupe les
-      champs emergency/safety sortis de `Modes`, en réutilisant les DUT
-      du refactor AU :
+      champs emergency/safety sortis de `Modes`, selon le standard IHM
+      projet (Cmd + State [+ Cfg]) :
         • Cmd   : ST_EmergencyCmd              (boutons opérateur IHM)
-        • State : ST_Safety_Emergency_State    (état public AU)
-        • Diag  : ST_Safety_Emergency_Diag     (diagnostic public AU)
+        • State : ST_EmergencyState            (état AU + cmd FB AU + Diag interne)
       Point de vue IHM : `Cmd` = les boutons. Les commandes physiques
       fail-safe (MaintainA/B_Cmd, ArmPulse_Cmd) sont des sorties du FB
-      AU, internes à PRG_06 — PAS des commandes IHM.
-   🔌 Interface : Produit par PRG_07_Supervision (State/Diag) et
+      AU, exposées dans `State` comme states/info. Le diagnostic vit
+      dans `State.Diag` (PAS de dossier `Diag` au top).
+   🔌 Interface : Produit par PRG_07_Supervision (State) et
       l'IHM (Cmd), consommé par PRG_02 / PRG_06 / FB_TroubleshootingView.
+   📄 Doc : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md §5
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_EmergencyState">
+        <baseType>
+          <struct>
+            <variable name="ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── État AU (champs plats, miroir du DUT AU ST_Safety_Emergency_State) ──
+Boucle AU fermee (EmergencyChainClosed = TRUE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance confirme engage (PowerContactorEngaged = TRUE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence armement OU lockout en cours (nouvelle demande ignoree)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── États publics FB AU (Ready/Done/Fault/OperatorMessage) ──
+Miroir des champs Status du FB_Safety_EmergencyManagement (produits par PRG_06).
+Busy n'est PAS exposé : redondant avec ArmingBusy (déjà présent ci-dessus).
+FB AU pret a fonctionner (Enable + pas de StartupFail)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle rearmement AU termine (contacteur puissance confirme engage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut latte de la chaine AU (socle FB_FaultCore, vue live + latchee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorMessage">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Message operateur par etat / par probleme de la chaine AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainA_Cmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Commandes physiques fail-safe du FB AU (exposées comme states/info) ──
+Sortie pilotage canal A (TRUE = voie maintenue) — interne FB AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainB_Cmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sortie pilotage canal B (TRUE = voie maintenue) — interne FB AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmPulse_Cmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion rearmement physique (1s) — interne FB AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Diag">
+              <type>
+                <derived name="ST_Safety_Emergency_Diag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">── Diagnostic AU (structure interne de State) ──
+Diagnostic et erreurs de la chaîne AU</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>60f821fa-d35a-58c5-ac8a-e1efe1044110</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📊 ST_EmergencyState — État IHM de la chaîne AU / sécurité
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : État/diagnostic IHM de la chaîne d'arrêt d'urgence,
+      sorti de `Modes.State`. Point de vue IHM : `State` regroupe les
+      champs d'état AU (ChainOk, ContactorOk, Armable, ArmingBusy, Step)
+      en champs plats, les commandes physiques fail-safe du FB AU
+      (MaintainA/B_Cmd, ArmPulse_Cmd) exposées comme states/info, et le
+      diagnostic AU (`Diag : ST_Safety_Emergency_Diag`) en structure
+      interne. PAS de sous-State imbriqué, PAS de dossier `Diag` au top
+      de `Emergency` — le diagnostic vit dans `State`.
+   🔌 Interface : Produit par PRG_07_Supervision, consommé par l'IHM.
    📄 Doc : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md §5
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -8072,7 +8201,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens autorisé (AscentPermit/DescendPermit)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens autorisé (AscentPermit/DescendPermit / TremiePermit/MaintenancePermit)</xhtml>
               </documentation>
             </variable>
             <variable name="Step7_BrakeReleased">
@@ -9424,50 +9553,6 @@ TRUE = Défaut sécurité actif</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d'arrêt d'urgence
    🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_Safety_Emergency_InternalCmd">
-        <baseType>
-          <struct>
-            <variable name="MaintainA_Cmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal A (TRUE = voie maintenue, FALSE = coupure demandee)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintainB_Cmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre maintien canal B (TRUE = voie maintenue, FALSE = coupure demandee)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ArmPulse_Cmd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre impulsion de rearmement (TRUE = bobine rearmement activee)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>231a5be8-1708-5e9a-a840-cc0ec056946d</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_Safety_Emergency_InternalCmd — Structure de commande interne
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Transporte les ordres logiques entre le bloc de décision et de sortie AU
-   🔒 Polarité : MaintainA/B_Cmd en maintien (TRUE = voie saine)
    📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    =======================================================================</xhtml>
         </documentation>
@@ -16827,7 +16912,7 @@ END_IF;
 
 ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND NOT BucketState.StateIncoherent
-                     AND (Fault.ErrorId = 16#0000)
+                     AND (Fault.ErrorId = 0)
                      AND (MachineHomed OR (BucketState.IsOpen XOR BucketState.IsClosed))
                      AND NOT MachineHomingActive;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
@@ -17615,7 +17700,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode arbitre (SEMI_AUTO pour instance cycle)</xhtml>
               </documentation>
             </variable>
-            <variable name="CycleMotionPermit">
+            <variable name="JoystickDeflected">
               <type>
                 <BOOL />
               </type>
@@ -18121,7 +18206,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GATE CONTINU HOMME-MORT (permis par action hardware) ===
-. [LOC] Permis ascending treuil M1 = CycleMotionPermit AND DeadmanArmed</xhtml>
+. [LOC] Permis ascending treuil M1 = JoystickDeflected AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
             <variable name="ProcessPermitM1_Descend">
@@ -18129,7 +18214,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis descending treuil M1 = CycleMotionPermit AND DeadmanArmed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis descending treuil M1 = JoystickDeflected AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
             <variable name="ProcessPermitM2_Ascent">
@@ -18137,7 +18222,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis ascending treuil M2 = CycleMotionPermit AND DeadmanArmed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis ascending treuil M2 = JoystickDeflected AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
             <variable name="ProcessPermitM2_Descend">
@@ -18145,7 +18230,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis descending treuil M2 = CycleMotionPermit AND DeadmanArmed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis descending treuil M2 = JoystickDeflected AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
             <variable name="ProcessPermitBucket_Open">
@@ -18153,7 +18238,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis ouverture benne = CycleMotionPermit AND DeadmanArmed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis ouverture benne = JoystickDeflected AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
             <variable name="ProcessPermitBucket_Close">
@@ -18161,7 +18246,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis fermeture benne = CycleMotionPermit AND DeadmanArmed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis fermeture benne = JoystickDeflected AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
             <variable name="ProcessPermitM3_Tremie">
@@ -18169,7 +18254,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis translation M3 cote tremie = CycleMotionPermit AND DeadmanArmed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis translation M3 cote tremie = JoystickDeflected AND DeadmanArmed</xhtml>
               </documentation>
             </variable>
             <variable name="ProcessPermitM3_Maintenance">
@@ -18177,7 +18262,19 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis translation M3 cote maintenance = CycleMotionPermit AND DeadmanArmed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis translation M3 cote maintenance = JoystickDeflected AND DeadmanArmed</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SampleCountDone">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMPTEUR PRELEVEMENTS (garde de front) ===
+. [LOC] F2: front de comptage SampleCount (1 seul increment par cycle)</xhtml>
               </documentation>
             </variable>
             <variable name="State">
@@ -18393,7 +18490,7 @@ StabilizationTimer(IN := (State = E_CycleStep.X7_CTRL_ASCENT), PT := CtrlAscentT
 // 📏 Comparaison vitesse réelle M1/M2
 SpeedMismatchMps := ABS(M1_MeasuredSpeedMps - M2_MeasuredSpeedMps);
 SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
-                       AND CycleMotionPermit
+                       AND JoystickDeflected
                        AND (SpeedMismatchThresholdMps &gt; 0.0)
                        AND (SpeedMismatchTimeout &gt; T#0ms)
                        AND (SpeedMismatchMps &gt; SpeedMismatchThresholdMps);
@@ -18403,7 +18500,7 @@ SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
 // Tempo max d'étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
 // Xi -&gt; STABILIZING : TON backstop durée d'état pour tous les états de mouvement.
-StepMaxTimer(IN := CycleMotionPermit AND (State &lt;&gt; E_CycleStep.X0_PREPARATION)
+StepMaxTimer(IN := JoystickDeflected AND (State &lt;&gt; E_CycleStep.X0_PREPARATION)
                   AND (State &lt;&gt; E_CycleStep.X13_DONE_SYNC)
                   AND (State &lt;&gt; E_CycleStep.STABILIZING),
              PT := StepMaxTimeout);
@@ -18486,17 +18583,17 @@ END_IF;
 Ready := Enable AND NOT Fault.Latched;
 
 // 🛡️ Gate continu homme-mort : le mouvement n'est autorisé que si le manche est
-// défléchi (CycleMotionPermit) ET l'homme-mort est armé (DeadmanArmed). Chaque
+// défléchi (JoystickDeflected) ET l'homme-mort est armé (DeadmanArmed). Chaque
 // commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
-// démarrage). Le séquenceur (transitions X0→X13) reste piloté par CycleMotionPermit.
-ProcessPermitM1_Ascent        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM1_Descend      := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM2_Ascent        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM2_Descend      := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitBucket_Open := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitBucket_Close := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM3_Tremie        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM3_Maintenance   := CycleMotionPermit AND DeadmanArmed;
+// démarrage). Le séquenceur (transitions X0→X13) reste piloté par JoystickDeflected.
+ProcessPermitM1_Ascent        := JoystickDeflected AND DeadmanArmed;
+ProcessPermitM1_Descend      := JoystickDeflected AND DeadmanArmed;
+ProcessPermitM2_Ascent        := JoystickDeflected AND DeadmanArmed;
+ProcessPermitM2_Descend      := JoystickDeflected AND DeadmanArmed;
+ProcessPermitBucket_Open := JoystickDeflected AND DeadmanArmed;
+ProcessPermitBucket_Close := JoystickDeflected AND DeadmanArmed;
+ProcessPermitM3_Tremie        := JoystickDeflected AND DeadmanArmed;
+ProcessPermitM3_Maintenance   := JoystickDeflected AND DeadmanArmed;
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
 IF WaitingResume THEN
@@ -18577,6 +18674,7 @@ CASE State OF
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0400;
         OperatorAction := 'Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
+        SampleCountDone := FALSE;   // F2: réarmement du front de comptage à chaque entrée en X0
 
         // Transition si système sain et réarmé (front reset ou démarrage).
         // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
@@ -18592,8 +18690,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0401;
         OperatorAction := 'Maintenir la montee lente vers les capteurs de referencement.';
 
@@ -18620,8 +18718,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
         ExpectedDirection := 0;
-        WaitingForOperator := (SelTarget = 0) OR NOT CycleMotionPermit;
-        WaitingForProcess := (SelTarget &lt;&gt; 0) AND CycleMotionPermit;
+        WaitingForOperator := (SelTarget = 0) OR NOT JoystickDeflected;
+        WaitingForProcess := (SelTarget &lt;&gt; 0) AND JoystickDeflected;
         OperatorActionId := 16#0402;
         OperatorAction := 'Selectionner la cible et maintenir la translation vers la position de travail.';
 
@@ -18630,7 +18728,7 @@ CASE State OF
             TranslationCmd.PositionTgt := SelTarget;
             TranslationCmd.ReqStart := ProcessPermitM3_Tremie;
             // Arrivée à la cible (Trémie/P1/Maintenance)
-            IF CycleMotionPermit AND (
+            IF JoystickDeflected AND (
                 (SelTarget = 1 AND Translation_At_Tremie) OR
                 (SelTarget = 3 AND Translation_At_P1) OR
                 (SelTarget = 4 AND Translation_At_Maintenance)) THEN
@@ -18646,8 +18744,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 0;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0403;
         OperatorAction := 'Maintenir le joystick : ouverture complete de la benne.';
 
@@ -18655,7 +18753,7 @@ CASE State OF
             State := E_CycleStep.X4_DESCEND_OPEN;
         ELSE
             BucketCmd.ReqOpen := ProcessPermitBucket_Open;
-            IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
+            IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
                 BucketCmd.ReqOpen := FALSE;
                 State := E_CycleStep.X4_DESCEND_OPEN;
             END_IF;
@@ -18668,8 +18766,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0404;
         OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
@@ -18683,7 +18781,7 @@ CASE State OF
         BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descend;
 
         // Transition uniquement sur le retour dédié Kobold.
-        IF CycleMotionPermit AND KoboldContactFond THEN
+        IF JoystickDeflected AND KoboldContactFond THEN
             WinchM1Cmd.ReqStartStop := FALSE;
             WinchM2Cmd.ReqStartStop := FALSE;
             BucketCmd.ReqKoboldMeasureEnable := FALSE;
@@ -18703,8 +18801,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0405;
         OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
 
@@ -18715,7 +18813,7 @@ CASE State OF
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt := 1;
 
-        IF CycleMotionPermit AND (M1_CablePosM &gt;= RaiseTargetM) AND (M2_CablePosM &gt;= RaiseTargetM) THEN
+        IF JoystickDeflected AND (M1_CablePosM &gt;= RaiseTargetM) AND (M2_CablePosM &gt;= RaiseTargetM) THEN
             WinchM1Cmd.ReqStartStop := FALSE;
             WinchM2Cmd.ReqStartStop := FALSE;
             State := E_CycleStep.X6_CLOSE_BUCKET;
@@ -18728,8 +18826,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0406;
         OperatorAction := 'Maintenir la commande : fermeture de la benne.';
 
@@ -18738,7 +18836,7 @@ CASE State OF
         // commande d'actionneur ne doit survivre à la perte du permis opérateur.
         BucketCmd.ReqClose := ProcessPermitBucket_Close;
 
-        IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
+        IF JoystickDeflected AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.ReqClose := FALSE;
             State := E_CycleStep.X7_CTRL_ASCENT;
         END_IF;
@@ -18750,8 +18848,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0407;
         OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
 
@@ -18762,7 +18860,7 @@ CASE State OF
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt  := 1;
 
-        IF CycleMotionPermit
+        IF JoystickDeflected
            AND (M1_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
            AND (M2_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
            AND (ABS(M1_CablePosM - M2_CablePosM) &lt;= CtrlAscentToleranceM) THEN
@@ -18776,8 +18874,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0408;
         OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
@@ -18788,7 +18886,7 @@ CASE State OF
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt  := 4;
 
-        IF CycleMotionPermit AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
+        IF JoystickDeflected AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
             WinchM1Cmd.ReqStartStop := FALSE;
             WinchM2Cmd.ReqStartStop := FALSE;
             State := E_CycleStep.X9_DRAIN_PAUSE;
@@ -18809,7 +18907,7 @@ CASE State OF
         WinchM2Cmd.ReqStartStop := FALSE;
 
         DrainingTimer(IN := TRUE, PT := DrainingTime);
-        IF CycleMotionPermit AND DrainingTimer.Q THEN
+        IF JoystickDeflected AND DrainingTimer.Q THEN
             DrainingTimer(IN := FALSE);
             State := E_CycleStep.X10_TRANSLATE_DUMP;
         END_IF;
@@ -18821,15 +18919,15 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040A;
         OperatorAction := 'Maintenir la translation vers la tremie de dechargement.';
 
         TranslationCmd.PositionTgt := 1; // Trémie
         TranslationCmd.ReqStart := ProcessPermitM3_Tremie;
 
-        IF CycleMotionPermit AND Translation_At_Tremie THEN
+        IF JoystickDeflected AND Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
             State := E_CycleStep.X11_OPEN_DUMP;
         END_IF;
@@ -18841,8 +18939,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
         OperatorAction := 'Deflechir vers le bas pour ouvrir la benne et vider la charge.';
 
@@ -18858,7 +18956,7 @@ CASE State OF
 
         BucketCmd.ReqOpen := ProcessPermitBucket_Open AND (WinchM1Cmd.ReqDirection = -1);
 
-        IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
+        IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
             State := E_CycleStep.X13_DONE_SYNC;
         END_IF;
@@ -18878,10 +18976,14 @@ CASE State OF
         OperatorActionId := 16#040D;
         OperatorAction := 'Cycle termine avec succes. Relancer un nouveau cycle.';
 
-        // Compteur de prélèvements (RETAIN)
-        SampleCount := SampleCount + 1;
+        // Compteur de prélèvements (RETAIN) — F2: incrément cadré par front (1 seul par cycle)
+        IF NOT SampleCountDone THEN
+            SampleCount := SampleCount + 1;
+            SampleCountDone := TRUE;
+        END_IF;
 
         IF StartEdge.Q THEN
+            SampleCountDone := FALSE;
             Lifecycle.Done := FALSE;
             State := E_CycleStep.X0_PREPARATION;
         END_IF;
@@ -20360,7 +20462,7 @@ DescentActive := Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1)
 IF Fault.Error OR Fault.Latched THEN
     Outputs.StepState := E_DiveSearchState.ERROR_HOLD;
     Outputs.KoboldContactorCmd := FALSE;
-    Outputs.OperatorActionId := 384;
+    Outputs.OperatorActionId := 16#0180;
     Outputs.OperatorAction := 'Verifier les conditions puis rearmer avant une nouvelle plongee.';
 ELSE
     CASE Outputs.StepState OF
@@ -20369,7 +20471,7 @@ ELSE
                AND (NOT Inputs.BucketIsOpen OR NOT Inputs.PositionsValid OR Inputs.KoboldImmersed
                     OR (Inputs.M1Position_M &lt; Inputs.DiveStartMin_M)
                     OR (Inputs.M2Position_M &lt; Inputs.DiveStartMin_M)) THEN
-                Outputs.OperatorActionId := 256;
+                Outputs.OperatorActionId := 16#0100;
                 Outputs.OperatorAction := 'Verifier benne ouverte, positions et Kobold au repos.';
             ELSE
                 Outputs.StepState := E_DiveSearchState.READY_TO_DESCEND;
@@ -20377,7 +20479,7 @@ ELSE
 
         E_DiveSearchState.READY_TO_DESCEND:
             Ready := TRUE;
-            Outputs.OperatorActionId := 257;
+            Outputs.OperatorActionId := 16#0101;
             Outputs.OperatorAction := 'Demander une descente pour rechercher le fond.';
             IF Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1) THEN
                 ImmersionTimerAcc := T#0ms;
@@ -20388,7 +20490,7 @@ ELSE
             Lifecycle.Busy := TRUE;
             Outputs.DescendPermit := DescentActive;
             Outputs.KoboldContactorCmd := DescentActive;
-            Outputs.OperatorActionId := 258;
+            Outputs.OperatorActionId := 16#0102;
             Outputs.OperatorAction := 'Maintenir la descente : recherche immersion Kobold.';
             IF Inputs.CurrentSpeedStep &gt; 4 THEN
                 IF NOT StepAtFaultCaptured THEN
@@ -20425,7 +20527,7 @@ ELSE
             Lifecycle.Busy := TRUE;
             Outputs.DescendPermit := DescentActive;
             Outputs.KoboldContactorCmd := DescentActive;
-            Outputs.OperatorActionId := 259;
+            Outputs.OperatorActionId := 16#0103;
             Outputs.OperatorAction := 'Maintenir la descente : immersion validee, recherche du fond.';
             IF Inputs.CurrentSpeedStep &gt; 4 THEN
                 IF NOT StepAtFaultCaptured THEN
@@ -20444,7 +20546,7 @@ ELSE
         E_DiveSearchState.BOTTOM_CONFIRMED:
             Lifecycle.Done := TRUE;
             Outputs.KoboldContactorCmd := FALSE;
-            Outputs.OperatorActionId := 260;
+            Outputs.OperatorActionId := 16#0104;
             Outputs.OperatorAction := 'Fond detecte : demander la fermeture ou extraction.';
 
         E_DiveSearchState.ERROR_HOLD:
@@ -20934,9 +21036,9 @@ IF NOT Enable THEN
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
-    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 16#0000;
+    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 0;
     Measurement.HomingLifecycle.Busy := FALSE; Measurement.HomingLifecycle.Done := FALSE;
-    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 16#0000;
+    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 0;
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
     // Frontiere HW sortie : aucun ordre preset publie hors autorisation
@@ -21492,7 +21594,7 @@ EncoderAvailable := NOT instCauses[0].Active;
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
     Ready := FALSE;
-    PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
+    PresetTriggerCmd := 0; CodeSeqTriggerCmd := 0; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetCompleted := FALSE;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
@@ -21523,7 +21625,7 @@ END_IF;
 // fonction n'est pas confirmée. Ne jamais lui donner une valeur arbitraire.
 PresetReqEdge(CLK := PresetRequest);
 PresetCompleted := FALSE;
-CodeSeqTriggerCmd := 16#0000;           // non piloté — rôle inconnu, voir note ci-dessus
+CodeSeqTriggerCmd := 0;                 // non piloté — rôle inconnu, voir note ci-dessus
 CASE PresetSeqStep OF
     0: // IDLE
         PresetTriggerCmd := 0;
@@ -27897,7 +27999,104 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bitfield cause abandon (16#0001=Cut, 16#0002=Chute chaine, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=PowerCutOff, 16#0020=Redondance A, 16#0040=Redondance B, 16#0080=Timeout contacteur)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bitfield cause abandon (voir constantes CST_ABORT_*)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmRequest_ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONDITIONS DECOMPOSEES (lisibilite §2quater) ===
+. [LOC] Preconditions chaine + repos + pas de coupure IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmRequest_NoBlock">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de coupure metier, pas de lockout, contacteur au repos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmRequestAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rearmement autorise (front ArmRequest + preconditions)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable_ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Boucle fermee + pas de coupure IHM/metier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable_Idle">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sequence au repos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable_NoBlock">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de lockout, pas de cause redondance, contacteur au repos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Maintain_ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Boucle fermee OU sequence en cours (maintien A/B)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Maintain_NoCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de coupure metier ni IHM (maintien A/B)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainA_NoFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de forcage A ni cause redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainB_NoFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de forcage B ni cause redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainA_NoBlock">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien A autorise (pas de coupure ni defaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintainB_NoBlock">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien B autorise (pas de coupure ni defaut)</xhtml>
               </documentation>
             </variable>
             <variable name="TonTestA">
@@ -28051,23 +28250,198 @@ Duree auto-test canal A ou B</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Anti-clignotement affichage IHM uniquement</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_STEP_IDLE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAPES SEQUENCE REARMEMENT (ArmingSeqStep reste INT) ===
+Repos</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_STEP_TEST_A">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autotest canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_STEP_RESTORE_A">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Restauration canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_STEP_TEST_B">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autotest canal B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_STEP_RESTORE_B">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Restauration canal B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_STEP_PULSE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion rearmement contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_STEP_CONFIRM">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="6" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente confirmation contacteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ABORT_NONE">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES D'ABANDON (LastAbortCause, valeurs load-bearing IHM) ===
+⚠️ Type INT (décimal) : valeurs identiques aux anciens masques hex (1,2,4,8,16,32,64,128).
+LastAbortCause reste WORD (bitfield) : conversion implicite INT→WORD en CODESYS.
+Aucun abandon</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ABORT_CUT_IHM">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure manuelle IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ABORT_CHAIN_DROP">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chute boucle AU pendant impulsion/confirmation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ABORT_TIMEOUT_RESTORE_A">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout restauration canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ABORT_TIMEOUT_RESTORE_B">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="8" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout restauration canal B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ABORT_POWER_CUTOFF">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="16" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure securite metier (PowerCutOff)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ABORT_REDUNDANCY_A">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="32" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut redondance canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ABORT_REDUNDANCY_B">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="64" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut redondance canal B</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ABORT_TIMEOUT_CONTACTOR">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="128" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout confirmation contacteur</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🛡️ FB_Safety_EmergencyManagement — Gestion de la réd'urgence AU (FB fusionné)
+   🛡️ FB_Safety_EmergencyManagement — Gestion de la réd'urgence AU
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Machine d'état, fronts Reset/Arm, autotest redondance A/B, réarmement
-      contacteur, interlock Cause brute, projection fail-safe et latch défaut.
-      Fusionne les 3 FB historiques (Composite + Logic + Output) en UN seul FB.
-   🔒 Sécurité :
-      - fronts Reset/Arm (jamais de redémarrage auto après défaut)
-      - interlock TOUJOURS sur la Cause brute (jamais sur l'Ack)
-      - fail-safe Enable=FALSE → commandes à FALSE, Ready/Busy à FALSE
-      - latch défaut via le socle standard FB_FaultCore (corrige le bug bit3
-        StartupFail effacé par la re-synthèse ErrorId := 0)
-   🧬 Sorties structurées (2 DUT) : Status : ST_Safety_Emergency_Status
-      (Ready/Busy/Done + State + Diag + Fault + OperatorMessage) + Cmd :
-      ST_Safety_Emergency_Cmd (MaintainA/B_Cmd + ArmPulse_Cmd).
+   🎯 Rôle : Machine d'état, fronts Reset/Arm, autotest redondance A/B,
+      réarmement contacteur, interlock Cause brute, projection fail-safe
+      et latch défaut via le socle FB_FaultCore.
+   🔒 Sécurité : fronts Reset/Arm (jamais de redémarrage auto), interlock
+      sur Cause brute (jamais sur l'Ack), fail-safe Enable=FALSE.
+   📤 Sorties structurées (2 DUT) : Status (ST_Safety_Emergency_Status) +
+      Cmd (ST_Safety_Emergency_Cmd).
    📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    =======================================================================</xhtml>
           </documentation>
@@ -28086,10 +28460,11 @@ ArmReqEdge(CLK := ArmRequest);
 {endregion}
 
 {region "§2 Gate Enable (neutralisation fail-safe)"}
-// 🛑 1. GATE — neutralisation si désactivé. Les sorties physiques sont forcées à FALSE
-// (fail-safe) ; le socle défaut reste appelé (§9) pour maintenir le latch non acquitté.
+// 🛑 GATE — neutralisation si désactivé : réinitialise l'état interne de la séquence.
+// Les sorties physiques sont forcées à FALSE par la projection fail-safe (§10) ; le socle
+// défaut reste appelé (§9) pour maintenir le latch non acquitté.
 IF NOT Enable THEN
-    ArmingSeqStep := 0;
+    ArmingSeqStep := CST_STEP_IDLE;
     ForceTestA := FALSE;
     ForceTestB := FALSE;
     StartupFail := FALSE;
@@ -28100,9 +28475,9 @@ IF NOT Enable THEN
     EmergencyArmingLockoutActive := FALSE;
     Armable := FALSE;
     ArmingBusy := FALSE;
-    LastAbortStep := 0;
-    LastAbortCause := 16#0000;
-    // 🩹 Neutralisation = coupure surveillance, pas un defaut : Cause et Ack repartent propres
+    LastAbortStep := CST_STEP_IDLE;
+    LastAbortCause := INT_TO_WORD(CST_ABORT_NONE);
+    // Neutralisation = coupure surveillance, pas un defaut : Cause et Ack repartent propres
     RedundancyTestFailedCause := FALSE;
     RedundancyTestFailedAck := TRUE;
     EmergencyArmingFailedCause := FALSE;
@@ -28116,9 +28491,12 @@ IF NOT Enable THEN
     TonArmingLockout(IN := FALSE);
     TonRedundancyDisplay(IN := FALSE);
     TonArmingFailedDisplay(IN := FALSE);
-ELSE
-    {region "§3 Autotest demarrage"}
-    // 🏁 2. AUTOTEST DÉMARRAGE (§5.4 AF01) — vérifications synchrones 1 cycle au 1er Enable=TRUE
+END_IF;
+{endregion}
+
+{region "§3 Autotest demarrage"}
+// 🏁 AUTOTEST DÉMARRAGE (§5.4 AF01) — vérifications synchrones 1 cycle au 1er Enable=TRUE
+IF Enable THEN
     IF EnableRising.Q THEN
         StartupCheckDone := FALSE;
     END_IF;
@@ -28127,19 +28505,19 @@ ELSE
         // Exécute les 4 contrôles en 1 cycle
         StartupCheckOK := EmergencyChainClosed          // 1. Boucle AU fermée
                           AND NOT PowerContactorEngaged // 2. Contacteur au repos
-                          AND (ArmingSeqStep = 0);      // 4. Pas de séquence résiduelle
+                          AND (ArmingSeqStep = CST_STEP_IDLE); // 4. Pas de séquence résiduelle
         StartupCheckDone := TRUE;
         StartupFail := NOT StartupCheckOK;
-        // bit3 (StartupFail) est laté via le socle FB_FaultCore (§9) — jamais effacé par
-        // la re-synthèse ErrorId (correction du bug bit3).
+        // StartupFail est laté via le socle FB_FaultCore (§9) : il reste jusqu'au front Reset.
     END_IF;
-    {endregion}
+END_IF;
+{endregion}
 
-    {region "§4 Acquittement defauts"}
-    // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
-    // ⚠️ Reset acquitte l'affichage (Ack:=TRUE). La cause de redondance reste verrouillée
-    // jusqu'au prochain test physique. L'échec d'armement précédent est réinitialisé pour autoriser un réessai.
-    // Le latch du socle (§9) est effacé par le front Reset (jamais conditionné).
+{region "§4 Acquittement defauts"}
+// 🔍 ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
+// ⚠️ Reset acquitte l'affichage (Ack:=TRUE). La cause de redondance reste verrouillée
+// jusqu'au prochain test physique. L'échec d'armement précédent est réinitialisé pour autoriser un réessai.
+IF Enable THEN
     IF ResetEdge.Q THEN
         RedundancyTestFailedAck := TRUE;
         EmergencyArmingFailedCause := FALSE;
@@ -28147,62 +28525,61 @@ ELSE
         EmergencyArmingLockoutActive := FALSE;
         StartupFail := FALSE;
     END_IF;
-    {endregion}
+END_IF;
+{endregion}
 
-    {region "§5 Sequence rearmement AU"}
+{region "§5 Sequence rearmement AU"}
+IF Enable THEN
     // 🛑 Coupure immédiate de toute séquence en cours
-    IF ArmingSeqStep &lt;&gt; 0 THEN
+    IF ArmingSeqStep &lt;&gt; CST_STEP_IDLE THEN
         IF BtnEmergencyCutOff THEN
             // Avortement volontaire : pas d'alarme d'échec
             LastAbortStep := ArmingSeqStep;
-            LastAbortCause := 16#0001; // Bit0: Demande coupure manuelle IHM
-            ArmingSeqStep := 0;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_CUT_IHM);
+            ArmingSeqStep := CST_STEP_IDLE;
         ELSIF PowerCutOffRequest THEN
             // Avortement sécurité d'urgence : coupure métier (PAS un défaut d'armement).
-            // Sécurité conservée : lockout 5s + interlock (Armable/Maintain* bloqués par
-            // PowerCutOffRequest). Ne pose PAS EmergencyArmingFailedCause -&gt; pas de fausse
-            // alarme "échec armement" pour une coupure métier voulue (D2 option c).
+            // Lockout 5s + interlock (Armable/Maintain* bloqués par PowerCutOffRequest).
+            // Ne pose PAS EmergencyArmingFailedCause : pas de fausse alarme "échec armement".
             EmergencyArmingLockoutActive := TRUE;
             LastAbortStep := ArmingSeqStep;
-            LastAbortCause := 16#0010; // Bit4: Coupure sécurité métier active (PowerCutOff)
-            ArmingSeqStep := 0;
-        ELSIF (ArmingSeqStep = 5 OR ArmingSeqStep = 6) AND NOT EmergencyChainClosed THEN
+            LastAbortCause := INT_TO_WORD(CST_ABORT_POWER_CUTOFF);
+            ArmingSeqStep := CST_STEP_IDLE;
+        ELSIF (ArmingSeqStep = CST_STEP_PULSE OR ArmingSeqStep = CST_STEP_CONFIRM) AND NOT EmergencyChainClosed THEN
             // Chute boucle matérielle : alarme d'échec + verrouillage 5s
             EmergencyArmingFailedCause := TRUE;
             EmergencyArmingLockoutActive := TRUE;
             LastAbortStep := ArmingSeqStep;
-            LastAbortCause := 16#0002; // Bit1: Chute boucle AU pendant impulsion/confirmation
-            ArmingSeqStep := 0;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_CHAIN_DROP);
+            ArmingSeqStep := CST_STEP_IDLE;
         END_IF;
     END_IF;
 
-    // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
-    // 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
-    // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis a FALSE,
-    // TC-P01-009). Ceci prouve par le run reel que la cause a disparu, pas juste un Reset optimiste.
-    IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed
-       AND NOT BtnEmergencyCutOff
-       AND NOT PowerCutOffRequest
-       AND NOT EmergencyArmingLockoutActive
-       AND NOT PowerContactorEngaged THEN
-        ArmingSeqStep := 1;
+    // 🚦 DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
+    // Une nouvelle tentative repart d'une Cause propre : si le problème persiste, il sera
+    // re-latché dès le prochain échec (RedundancyCauseEdge/ArmingFailedCauseEdge -&gt; Ack remis à FALSE).
+    ArmRequest_ChainOk := (ArmingSeqStep = CST_STEP_IDLE) AND EmergencyChainClosed AND NOT BtnEmergencyCutOff;
+    ArmRequest_NoBlock := NOT PowerCutOffRequest AND NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
+    ArmRequestAllowed := ArmRequest_ChainOk AND ArmRequest_NoBlock;
+    IF ArmReqEdge.Q AND ArmRequestAllowed THEN
+        ArmingSeqStep := CST_STEP_TEST_A;
         RedundancyTestFailedCause := FALSE;
         EmergencyArmingFailedCause := FALSE;
     END_IF;
 
     // ⏱️ Étape 1 : Coupe canal A seul, vérifie que la boucle tombe
-    TonTestA(IN := (ArmingSeqStep = 1), PT := CST_TestDuration);
-    IF ArmingSeqStep = 1 THEN
+    TonTestA(IN := (ArmingSeqStep = CST_STEP_TEST_A), PT := CST_TestDuration);
+    IF ArmingSeqStep = CST_STEP_TEST_A THEN
         ForceTestA := TRUE;
         IF TonTestA.Q THEN
             ForceTestA := FALSE;
             IF EmergencyChainClosed THEN
                 RedundancyTestFailedCause := TRUE;
-                LastAbortStep := 1;
-                LastAbortCause := 16#0020; // Defaut redondance canal A
-                ArmingSeqStep := 0;
+                LastAbortStep := CST_STEP_TEST_A;
+                LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_A);
+                ArmingSeqStep := CST_STEP_IDLE;
             ELSE
-                ArmingSeqStep := 2;
+                ArmingSeqStep := CST_STEP_RESTORE_A;
             END_IF;
         END_IF;
     ELSE
@@ -28210,30 +28587,30 @@ ELSE
     END_IF;
 
     // ⏱️ Étape 2 : Restaure A, attend le retour sain de la boucle amont
-    TonRestoreA(IN := (ArmingSeqStep = 2), PT := CST_TestDuration);
-    IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
+    TonRestoreA(IN := (ArmingSeqStep = CST_STEP_RESTORE_A), PT := CST_TestDuration);
+    IF (ArmingSeqStep = CST_STEP_RESTORE_A) AND TonRestoreA.Q THEN
         IF EmergencyChainClosed THEN
-            ArmingSeqStep := 3;
+            ArmingSeqStep := CST_STEP_TEST_B;
         ELSE
-            LastAbortStep := 2;
-            LastAbortCause := 16#0004; // Bit2: Timeout restauration canal A (chaine non remontee en 200ms)
-            ArmingSeqStep := 0;
+            LastAbortStep := CST_STEP_RESTORE_A;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A);
+            ArmingSeqStep := CST_STEP_IDLE;
         END_IF;
     END_IF;
 
     // ⏱️ Étape 3 : Coupe canal B seul, vérifie que la boucle tombe
-    TonTestB(IN := (ArmingSeqStep = 3), PT := CST_TestDuration);
-    IF ArmingSeqStep = 3 THEN
+    TonTestB(IN := (ArmingSeqStep = CST_STEP_TEST_B), PT := CST_TestDuration);
+    IF ArmingSeqStep = CST_STEP_TEST_B THEN
         ForceTestB := TRUE;
         IF TonTestB.Q THEN
             ForceTestB := FALSE;
             IF EmergencyChainClosed THEN
                 RedundancyTestFailedCause := TRUE;
-                LastAbortStep := 3;
-                LastAbortCause := 16#0040; // Defaut redondance canal B
-                ArmingSeqStep := 0;
+                LastAbortStep := CST_STEP_TEST_B;
+                LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_B);
+                ArmingSeqStep := CST_STEP_IDLE;
             ELSE
-                ArmingSeqStep := 4;
+                ArmingSeqStep := CST_STEP_RESTORE_B;
             END_IF;
         END_IF;
     ELSE
@@ -28241,35 +28618,35 @@ ELSE
     END_IF;
 
     // ⏱️ Étape 4 : Restaure B, attend le retour sain de la boucle amont
-    TonRestoreB(IN := (ArmingSeqStep = 4), PT := CST_TestDuration);
-    IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
+    TonRestoreB(IN := (ArmingSeqStep = CST_STEP_RESTORE_B), PT := CST_TestDuration);
+    IF (ArmingSeqStep = CST_STEP_RESTORE_B) AND TonRestoreB.Q THEN
         IF EmergencyChainClosed THEN
-            ArmingSeqStep := 5;
+            ArmingSeqStep := CST_STEP_PULSE;
         ELSE
-            LastAbortStep := 4;
-            LastAbortCause := 16#0008; // Bit3: Timeout restauration canal B (chaine non remontee en 200ms)
-            ArmingSeqStep := 0;
+            LastAbortStep := CST_STEP_RESTORE_B;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B);
+            ArmingSeqStep := CST_STEP_IDLE;
         END_IF;
     END_IF;
 
     // ⏱️ Étape 5 : Les 2 canaux validés -&gt; impulsion réarmement physique (1s)
-    TonArmingPulse(IN := (ArmingSeqStep = 5), PT := CST_ArmingPulseDuration);
-    IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
-        ArmingSeqStep := 6;
+    TonArmingPulse(IN := (ArmingSeqStep = CST_STEP_PULSE), PT := CST_ArmingPulseDuration);
+    IF (ArmingSeqStep = CST_STEP_PULSE) AND TonArmingPulse.Q THEN
+        ArmingSeqStep := CST_STEP_CONFIRM;
     END_IF;
 
     // ⏱️ Étape 6 : Attente confirmation contacteur principal (2s max)
-    TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := CST_ArmingConfirmTimeout);
-    IF ArmingSeqStep = 6 THEN
+    TonArmingConfirm(IN := (ArmingSeqStep = CST_STEP_CONFIRM), PT := CST_ArmingConfirmTimeout);
+    IF ArmingSeqStep = CST_STEP_CONFIRM THEN
         IF PowerContactorEngaged THEN
-            ArmingSeqStep := 0;
+            ArmingSeqStep := CST_STEP_IDLE;
             EmergencyArmingLockoutActive := FALSE;
         ELSIF TonArmingConfirm.Q THEN
             EmergencyArmingFailedCause := TRUE;
             EmergencyArmingLockoutActive := TRUE;
-            LastAbortStep := 6;
-            LastAbortCause := 16#0080; // Defaut confirmation contacteur
-            ArmingSeqStep := 0;
+            LastAbortStep := CST_STEP_CONFIRM;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR);
+            ArmingSeqStep := CST_STEP_IDLE;
         END_IF;
     END_IF;
 
@@ -28278,12 +28655,14 @@ ELSE
     IF TonArmingLockout.Q THEN
         EmergencyArmingLockoutActive := FALSE;
     END_IF;
-    {endregion}
+END_IF;
+{endregion}
 
-    {region "§6 Gestion cause et acquittement"}
-    // 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
-    // L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
-    // jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
+{region "§6 Gestion cause et acquittement"}
+// PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
+// L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
+// jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
+IF Enable THEN
     RedundancyCauseEdge(CLK := RedundancyTestFailedCause);
     IF RedundancyCauseEdge.Q THEN
         RedundancyTestFailedAck := FALSE; // nouvelle occurrence -&gt; ré-alarme, ré-acquittement requis
@@ -28293,40 +28672,38 @@ ELSE
     IF ArmingFailedCauseEdge.Q THEN
         EmergencyArmingFailedAck := FALSE;
     END_IF;
-    {endregion}
+END_IF;
+{endregion}
 
-    {region "§7 Etats publics (interlock sur Cause brute)"}
-    // 🚦 5. ÉTATS PUBLICS — interlock sur Cause brute (jamais sur l'Ack)
-    Armable := EmergencyChainClosed
-               AND NOT BtnEmergencyCutOff
-               AND NOT PowerCutOffRequest
-               AND (ArmingSeqStep = 0)
-               AND NOT EmergencyArmingLockoutActive
-               AND NOT RedundancyTestFailedCause
-               AND NOT PowerContactorEngaged;
+{region "§7 Etats publics (interlock sur Cause brute)"}
+// 🚦 ÉTATS PUBLICS — interlock sur Cause brute (jamais sur l'Ack)
+IF Enable THEN
+    Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+    Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
+    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT RedundancyTestFailedCause AND NOT PowerContactorEngaged;
+    Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
 
-    ArmingBusy := (ArmingSeqStep &lt;&gt; 0) OR EmergencyArmingLockoutActive;
-    {endregion}
+    ArmingBusy := (ArmingSeqStep &lt;&gt; CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
+END_IF;
+{endregion}
 
-    {region "§8 Affichage defauts IHM"}
-    // 📤 6. AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
-    // ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
-    // sur la Cause brute, jamais retardée par ce debounce.
+{region "§8 Affichage defauts IHM"}
+// 📤 AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
+// ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
+// sur la Cause brute, jamais retardée par ce debounce.
+IF Enable THEN
     TonRedundancyDisplay(IN := RedundancyTestFailedCause, PT := CST_FaultDisplayDebounce);
     RedundancyTestFailed := TonRedundancyDisplay.Q OR NOT RedundancyTestFailedAck;
 
     TonArmingFailedDisplay(IN := EmergencyArmingFailedCause, PT := CST_FaultDisplayDebounce);
     EmergencyArmingFailed := TonArmingFailedDisplay.Q OR NOT EmergencyArmingFailedAck;
-    {endregion}
 END_IF;
 {endregion}
 
-{region "§9 Synthese defaut via socle FB_FaultCore (latch bit3 corrige)"}
-// 📤 7. SYNTHÈSE DES ERREURS — socle standard FB_FaultCore (vue live + vue latchée).
+{region "§9 Synthese defaut via socle FB_FaultCore"}
+// 📤 SYNTHÈSE DES ERREURS — socle standard FB_FaultCore (vue live + vue latchée).
 //    Chaque cause est exprimée EN CLAIR (ST_FaultCause) ; le socle en déduit ST_Fault.
-//    🔒 Correction du bug bit3 : StartupFail est une cause indépendante (index 3, Latching=TRUE).
-//    Le socle ne réinitialise JAMAIS ErrorId := 0 (contrairement à l'ancienne synthèse) : le bit3
-//    StartupFail reste laté jusqu'au front Reset, même si bit0/bit1 sont recalculés.
+//    StartupFail est une cause indépendante (index 3, Latching=TRUE) : latée jusqu'au front Reset.
 //    Mapping bits (préservé pour FB_Hmi_BannerFormatter / PRG_07) :
 //      bit0 = RedundancyTestFailed, bit1 = EmergencyArmingFailed, bit3 = StartupFail.
 instCauses[0].Active := RedundancyTestFailed; instCauses[0].Latching := TRUE;
@@ -28349,11 +28726,15 @@ Status.Fault := instFault.Fault; // source de verite = socle
 // 🛡️ Maintien conditionné sur (chaîne fermée OU séquence en cours) : hors séquence, une
 // boucle AU ouverte (coup-de-poing) coupe le maintien (fail-safe). Pendant la séquence, la
 // chaîne est volontairement ouverte par ForceTestA/B -&gt; le maintien reste autorisé (restauration).
-Cmd.MaintainA_Cmd := Enable AND (EmergencyChainClosed OR (ArmingSeqStep &lt;&gt; 0))
-                     AND NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
-Cmd.MaintainB_Cmd := Enable AND (EmergencyChainClosed OR (ArmingSeqStep &lt;&gt; 0))
-                     AND NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
-Cmd.ArmPulse_Cmd  := Enable AND (ArmingSeqStep = 5) AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+Maintain_ChainOk := (EmergencyChainClosed OR (ArmingSeqStep &lt;&gt; CST_STEP_IDLE));
+Maintain_NoCutOff := NOT PowerCutOffRequest AND NOT BtnEmergencyCutOff;
+MaintainA_NoFault := NOT ForceTestA AND NOT RedundancyTestFailedCause;
+MaintainB_NoFault := NOT ForceTestB AND NOT RedundancyTestFailedCause;
+MaintainA_NoBlock := Maintain_NoCutOff AND MaintainA_NoFault;
+MaintainB_NoBlock := Maintain_NoCutOff AND MaintainB_NoFault;
+Cmd.MaintainA_Cmd := Enable AND Maintain_ChainOk AND MaintainA_NoBlock;
+Cmd.MaintainB_Cmd := Enable AND Maintain_ChainOk AND MaintainB_NoBlock;
+Cmd.ArmPulse_Cmd  := Enable AND (ArmingSeqStep = CST_STEP_PULSE) AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
 
 // 🚦 Bus d'état public
 Status.State.ChainOk     := Enable AND EmergencyChainClosed;
@@ -28373,9 +28754,9 @@ Status.Diag.LastAbortCause       := LastAbortCause;
 {endregion}
 
 {region "§11 Etats publics IEC + message operateur"}
-// 📤 8. ÉTATS PUBLICS IEC
+// 📤 ÉTATS PUBLICS IEC
 Status.Ready := Enable AND NOT StartupFail;
-Status.Busy  := (ArmingSeqStep &lt;&gt; 0) OR EmergencyArmingLockoutActive;
+Status.Busy  := (ArmingSeqStep &lt;&gt; CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
 Status.Done  := PowerContactorEngaged;
 
 // 💬 MESSAGE OPÉRATEUR — un message explicite par état et par problème de la chaîne AU.
@@ -28399,13 +28780,13 @@ ELSIF EmergencyArmingLockoutActive THEN
     Status.OperatorMessage := 'AU: verrouillage 5s actif - attendre puis rearmer';
 ELSE
     CASE ArmingSeqStep OF
-        0: Status.OperatorMessage := 'AU: repos - pret a rearmer';
-        1: Status.OperatorMessage := 'AU: autotest canal A en cours';
-        2: Status.OperatorMessage := 'AU: restauration canal A';
-        3: Status.OperatorMessage := 'AU: autotest canal B en cours';
-        4: Status.OperatorMessage := 'AU: restauration canal B';
-        5: Status.OperatorMessage := 'AU: impulsion rearmement contacteur';
-        6: Status.OperatorMessage := 'AU: attente confirmation contacteur';
+        CST_STEP_IDLE:      Status.OperatorMessage := 'AU: repos - pret a rearmer';
+        CST_STEP_TEST_A:    Status.OperatorMessage := 'AU: autotest canal A en cours';
+        CST_STEP_RESTORE_A: Status.OperatorMessage := 'AU: restauration canal A';
+        CST_STEP_TEST_B:    Status.OperatorMessage := 'AU: autotest canal B en cours';
+        CST_STEP_RESTORE_B: Status.OperatorMessage := 'AU: restauration canal B';
+        CST_STEP_PULSE:     Status.OperatorMessage := 'AU: impulsion rearmement contacteur';
+        CST_STEP_CONFIRM:   Status.OperatorMessage := 'AU: attente confirmation contacteur';
     END_CASE;
 END_IF;
 {endregion}
@@ -36282,7 +36663,7 @@ GVL_Troubleshooting.MotionM3.Step4_MotionRequested    := Translation.State.Busy 
 GVL_Troubleshooting.MotionM3.RequestedDirection       := Translation.State.ActiveDirection;
 GVL_Troubleshooting.MotionM3.RequestedSpeedPct        := Translation.State.SpeedCmd_Pct;
 GVL_Troubleshooting.MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
-GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := NOT Translation.State.HeightInterlockBlocking; // Interlock hauteur M1/M2 (risque collision)
+GVL_Troubleshooting.MotionM3.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.MotionM3.RequestedDirection = 1, Translation.Safety.MaintenancePermit, Translation.Safety.TremiePermit); // Permis directionnels M3 (Direction=+1 → Trémie, -1 → Maintenance) — HeightInterlockBlocking reste un blocage séparé (non directionnel)
 GVL_Troubleshooting.MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
 
@@ -41255,17 +41636,6 @@ PreviousQualified := Qualified;
 13 bits single-turn (8192 pts/tour)</xhtml>
               </documentation>
             </variable>
-            <variable name="ENCODER_MULTITURN_REVS_MAX">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="4096" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">12 bits multi-turn (4096 tours max)</xhtml>
-              </documentation>
-            </variable>
             <variable name="WINCH_CABLE_M_PER_REV">
               <type>
                 <REAL />
@@ -42105,7 +42475,7 @@ END_IF;
 
 // === 🔄 §3 SÉQUENCEUR DE CYCLE SEMI-AUTOMATIQUE ===
 {region "§3 Séquenceur de cycle"}
-// 🕹️ CycleMotionPermit = manche défléchi (non centré) — D2
+// 🕹️ JoystickDeflected = manche défléchi (non centré) — D2
 // ⚠️ Entrées consommées sur les bus publics Data (retard N-1 admis AF-02) :
 
 instCycleSemiAuto(
@@ -42113,7 +42483,7 @@ instCycleSemiAuto(
     Reset                   := GVL_IHM.Cycle.Cmd.BtnReset,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := instModes.Auth.Mode,
-    CycleMotionPermit       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
+    JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,
@@ -45256,6 +45626,38 @@ Data.TranslationTrace                 := TranslationTrace;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Diagnostic chaine AU</xhtml>
               </documentation>
             </variable>
+            <variable name="EmergencyReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB AU pret a fonctionner (Enable + pas de StartupFail)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Cycle rearmement AU termine (contacteur confirme engage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyFault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut latte chaine AU (socle FB_FaultCore)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyOperatorMessage">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Message operateur par etat / probleme chaine AU</xhtml>
+              </documentation>
+            </variable>
             <variable name="PowerCutOffActive">
               <type>
                 <BOOL />
@@ -45841,6 +46243,10 @@ RedundancyTestFailed := instSafetyEmergencyManagement.Status.Diag.RedundancyTest
 EmergencyArmingFailed := instSafetyEmergencyManagement.Status.Diag.ArmFailed;
 EmergencyState := instSafetyEmergencyManagement.Status.State;
 EmergencyDiag := instSafetyEmergencyManagement.Status.Diag;
+EmergencyReady := instSafetyEmergencyManagement.Status.Ready;
+EmergencyDone := instSafetyEmergencyManagement.Status.Done;
+EmergencyFault := instSafetyEmergencyManagement.Status.Fault;
+EmergencyOperatorMessage := instSafetyEmergencyManagement.Status.OperatorMessage;
 PowerCutOffActive := PowerCutOffReq;
 </xhtml>
           </ST>
@@ -46554,10 +46960,23 @@ GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Data.Auth.Mode;
 // — Chaîne AU / sécurité : sortie de Modes.State vers GVL_IHM.Emergency —
-// Point de vue IHM : Cmd = boutons (produits par l'IHM), State/Diag = bus
-// public AU (produits par PRG_06 via le FB AU). Recopies directes des bus.
-GVL_IHM.Emergency.State := PRG_06_Outputs.EmergencyState;
-GVL_IHM.Emergency.Diag := PRG_06_Outputs.EmergencyDiag;
+// Point de vue IHM : Cmd = boutons (produits par l'IHM), State = état AU
+// (champs plats) + cmd FB AU (MaintainA/B_Cmd, ArmPulse_Cmd) + Diag interne.
+GVL_IHM.Emergency.State.ChainOk     := PRG_06_Outputs.EmergencyState.ChainOk;
+GVL_IHM.Emergency.State.ContactorOk := PRG_06_Outputs.EmergencyState.ContactorOk;
+GVL_IHM.Emergency.State.Step        := PRG_06_Outputs.EmergencyState.Step;
+GVL_IHM.Emergency.State.Armable     := PRG_06_Outputs.EmergencyState.Armable;
+GVL_IHM.Emergency.State.ArmingBusy  := PRG_06_Outputs.EmergencyState.ArmingBusy;
+GVL_IHM.Emergency.State.MaintainA_Cmd := PRG_06_Outputs.PowerKeepAliveACmd;
+GVL_IHM.Emergency.State.MaintainB_Cmd := PRG_06_Outputs.PowerKeepAliveBCmd;
+GVL_IHM.Emergency.State.ArmPulse_Cmd  := PRG_06_Outputs.EmergencyArmingCmd;
+GVL_IHM.Emergency.State.Diag := PRG_06_Outputs.EmergencyDiag;
+// États publics FB AU (Ready/Done/Fault/OperatorMessage) — miroir Status du FB
+// (produits par PRG_06). Busy non exposé : redondant avec ArmingBusy (déjà câblé).
+GVL_IHM.Emergency.State.Ready := PRG_06_Outputs.EmergencyReady;
+GVL_IHM.Emergency.State.Done := PRG_06_Outputs.EmergencyDone;
+GVL_IHM.Emergency.State.Fault := PRG_06_Outputs.EmergencyFault;
+GVL_IHM.Emergency.State.OperatorMessage := PRG_06_Outputs.EmergencyOperatorMessage;
 // OR avec les défauts d'arbitrage de mode (refus Semi-Auto, bascule de mode refusée) —
 // publiés par PRG_03 : sans eux ces refus restaient silencieux pour l'opérateur.
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
@@ -46631,10 +47050,10 @@ GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceSt
 GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
 GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
-// 🕹️ JoystickMotionActive = déflexion joystick seule (SANS homme-mort) — même signal que
-// CycleMotionPermit (FB_Cycle, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
+// 🕹️ JoystickDeflected = déflexion joystick seule (SANS homme-mort) — même signal que
+// JoystickDeflected (FB_Cycle, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
 // « joystick défléchi » est projeté à l'IHM.
-GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
+GVL_IHM.Cycle.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
 // Projection Assistance Dragage (DredgingAssist.State)
 GVL_IHM.DredgingAssist.State.DiveReady                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveReady;
@@ -47746,6 +48165,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
               <Object Name="ST_ChainContextGlobal" ObjectId="601b64cb-498b-5fca-a2a0-11b24726fea1" />
               <Object Name="ST_EmergencyCmd" ObjectId="530ff0c1-144b-5832-bee8-f40edd2d06ee" />
               <Object Name="ST_EmergencyHMI" ObjectId="8d226a50-93cb-57af-8292-b85b6476b70d" />
+              <Object Name="ST_EmergencyState" ObjectId="60f821fa-d35a-58c5-ac8a-e1efe1044110" />
               <Object Name="ST_HomingChecklist" ObjectId="2d6561f4-76da-5ede-affd-bb7892225e3b" />
               <Object Name="ST_IOModuleDiag" ObjectId="99ce8dd2-5922-55d3-a0f2-73eba184a540" />
               <Object Name="ST_InputModuleDiagHMI" ObjectId="305fe275-43ac-5096-abc4-7a46cf78f5f9" />
@@ -47867,7 +48287,6 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
           <Folder Name="_TYPES">
             <Object Name="ST_Safety_Emergency_Cmd" ObjectId="c95cff59-9ed1-568b-a37b-15a3870e9e72" />
             <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />
-            <Object Name="ST_Safety_Emergency_InternalCmd" ObjectId="231a5be8-1708-5e9a-a840-cc0ec056946d" />
             <Object Name="ST_Safety_Emergency_State" ObjectId="dd3ab3f7-a7b2-54ae-a567-e544f71a8526" />
             <Object Name="ST_Safety_Emergency_Status" ObjectId="6173cf3f-450c-5726-948c-222b0205a4b3" />
           </Folder>

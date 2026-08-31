@@ -28,6 +28,10 @@ VAR_OUTPUT
     EmergencyArmingFailed        : BOOL; // <-- [DIAG] Echec rearmement AU
     EmergencyState               : ST_Safety_Emergency_State; // <-- [STAT] Etat chaine AU
     EmergencyDiag                : ST_Safety_Emergency_Diag;  // <-- [DIAG] Diagnostic chaine AU
+    EmergencyReady               : BOOL; // <-- [STAT] FB AU pret a fonctionner (Enable + pas de StartupFail)
+    EmergencyDone                : BOOL; // <-- [STAT] Cycle rearmement AU termine (contacteur confirme engage)
+    EmergencyFault               : ST_Fault; // <-- [DIAG] Defaut latte chaine AU (socle FB_FaultCore)
+    EmergencyOperatorMessage     : STRING(120); // <-- [DIAG] Message operateur par etat / probleme chaine AU
     PowerCutOffActive            : BOOL; // <-- [SAFE] Demande de coupure finale active
 
     M1InterlockEnable            : BOOL; // <-- [SAFE] Gate finale M1 (Enable AND NOT PowerCutOff)
@@ -328,6 +332,10 @@ RedundancyTestFailed := instSafetyEmergencyManagement.Status.Diag.RedundancyTest
 EmergencyArmingFailed := instSafetyEmergencyManagement.Status.Diag.ArmFailed;
 EmergencyState := instSafetyEmergencyManagement.Status.State;
 EmergencyDiag := instSafetyEmergencyManagement.Status.Diag;
+EmergencyReady := instSafetyEmergencyManagement.Status.Ready;
+EmergencyDone := instSafetyEmergencyManagement.Status.Done;
+EmergencyFault := instSafetyEmergencyManagement.Status.Fault;
+EmergencyOperatorMessage := instSafetyEmergencyManagement.Status.OperatorMessage;
 PowerCutOffActive := PowerCutOffReq;
 
 END_PROGRAM
