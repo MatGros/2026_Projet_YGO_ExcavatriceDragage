@@ -27,8 +27,8 @@ VAR_INPUT
 
     // === SECOURS ET PERMIS DE SÉCURITÉ ===
     SafeStop                        : BOOL;                           // --> [SAFE] Arret rapide de securite
-    DescendPermit                   : BOOL := TRUE;                  // --> [SAFE] Permis de descente (mou de cable)
-    AscentPermit                    : BOOL := TRUE;                  // --> [SAFE] Permis de montee (fin de course haut)
+    DescendPermit                   : BOOL := FALSE;                 // --> [SAFE] Permis de descente (mou de cable)
+    AscentPermit                    : BOOL := FALSE;                 // --> [SAFE] Permis de montee (fin de course haut)
 
     // === BYPASSES ET SIMULATION ===
     BypassContactorCheck            : BOOL;                           // --> [TST] Bypass diagnostic contacteurs (simu)

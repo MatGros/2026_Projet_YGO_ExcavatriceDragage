@@ -45,6 +45,7 @@ GVL_PERSISTENT = ROOT / "CODE" / "GVL_PERSISTENT.st"
 ST_WINCH_CMD = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "1_TREUILS_BENNE" / "ST_WinchCmd.st"
 ST_BYPASS_WINCH = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "1_TREUILS_BENNE" / "ST_BypassWinch.st"
 ST_MODES_INTERPRG = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "3_CYCLE_ET_MODES" / "ST_ModesCycleInterPrg.st"
+FB_SAFETY_WINCH = ROOT / "CODE" / "H_TREUILS_BENNE" / "FB_Safety_Winch.st"
 
 # Tolérances hors matrice, EXPLICITES et BORNÉES (1 occurrence + justification).
 # Un 2e usage non gaté du même nom fait échouer le gate.
@@ -270,6 +271,33 @@ def check_dut(text_cmd: str, text_bypass: str) -> list[str]:
     return errors
 
 
+def check_legal_limit_bypass(text: str) -> list[str]:
+    """T197: la cote legale a un bypass dedie, separe du groupe procede."""
+    errors: list[str] = []
+    body = compact(strip_comments(text))
+    if not re.search(r"LimitLegalReached\s+AND\s+NOT\s+BypassLimitLegal", body):
+        errors.append("T197: la limite legale n'est pas protegee par le seul BypassLimitLegal")
+    if re.search(r"LimitLegalReached\s+AND\s+NOT\s*\(\s*BypassProcess", body):
+        errors.append("T197: BypassProcess neutralise encore la limite legale")
+    return errors
+
+
+def check_simulation_bypass_gate(text: str) -> list[str]:
+    """T197: le bypass banc ne s'arme que dans le domaine simulation treuil."""
+    errors: list[str] = []
+    body = compact(strip_comments(text))
+    pattern = (
+        r"SimulationBypassEffective\s*:=\s*GVL_Simulation\.SimulationModeActive"
+        r"\s+AND\s+GVL_Simulation\.SimWinchActive"
+        r"\s+AND\s+GVL_Simulation\.SimulationBypassActive"
+    )
+    if not re.search(pattern, body):
+        errors.append("T197: SimulationBypassEffective non gate par SimulationModeActive AND SimWinchActive")
+    if re.search(r"SimBypass(?:Rise|Fall)\s*\(\s*CLK\s*:=\s*GVL_Simulation\.SimulationBypassActive", body):
+        errors.append("T197: front bypass simulation branche sans gate effectif")
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
     prg04_raw = read(PRG04)
@@ -283,6 +311,8 @@ def main() -> int:
         strip_comments(read(PRG03)), prg04, strip_comments(read(PRG07)), read(ST_MODES_INTERPRG)
     )
     errors += check_dut(read(ST_WINCH_CMD), read(ST_BYPASS_WINCH))
+    errors += check_legal_limit_bypass(read(FB_SAFETY_WINCH))
+    errors += check_simulation_bypass_gate(read(PRG07))
 
     if errors:
         print("[G483] FAIL — matrice de maintenance N1/N2 :")

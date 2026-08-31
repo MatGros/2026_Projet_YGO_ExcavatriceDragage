@@ -4843,6 +4843,14 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation MAINTENUE de dépasser le FDC</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnLearnSpeed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">💾 Bit IHM lancer l'apprentissage passif des vitesses</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

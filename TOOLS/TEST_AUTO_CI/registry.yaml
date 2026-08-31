@@ -386,7 +386,6 @@ FB_SimBench:
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
     - CODE/C_DIAG_RESEAUX/ST_Diag_Device.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
-    - CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st
     - CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st
     - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st
     - CODE/E_CODEURS/_TYPES/ST_EncoderHw.st
@@ -395,12 +394,10 @@ FB_SimBench:
     - CODE/F_MODES/E_Mode.st
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
-    - CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
     - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st
-    - CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMI.st
@@ -450,7 +447,6 @@ FB_SimBench:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st

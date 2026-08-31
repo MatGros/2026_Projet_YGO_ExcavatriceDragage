@@ -538,3 +538,54 @@ TEST 'TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chai
     ASSERT_TRUE(fb.PowerCutOff, 'Cause masque 16#2F84 -> PowerCutOff produit (brique amont de la chaine)');
     ASSERT_TRUE(fb.SafeStop, 'Cause masque -> SafeStop');
 END_TEST
+
+TEST 'TC-P10-052 Limite legale : BypassProcess simu ne leve pas le verrou sous -15m'
+    (* Regression T197 : SimulationBypassActive arme BypassProcess pour eviter les
+       faux defauts mecaniques du banc. Ce bypass de groupe ne doit pas neutraliser
+       la limite legale; seul BypassLimitLegal est habilite a le faire. *)
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := TRUE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, BenneBusy := FALSE,
+       OtherWinchInhibited := FALSE, InReferencingMode := FALSE,
+       CablePosM := -15.1, CfgCableLimitDescentM := -20.0,
+       LimitLegalReached := TRUE, Homed := TRUE, TopLimitM := 8.5,
+       BypassProcess := TRUE, BypassLimitLegal := FALSE);
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := TRUE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, BenneBusy := FALSE,
+       OtherWinchInhibited := FALSE, InReferencingMode := FALSE,
+       CablePosM := -15.1, CfgCableLimitDescentM := -20.0,
+       LimitLegalReached := TRUE, Homed := TRUE, TopLimitM := 8.5,
+       BypassProcess := TRUE, BypassLimitLegal := FALSE);
+    ASSERT_FALSE(fb.DescendPermit, 'BypassProcess seul ne doit pas autoriser la descente sous la limite legale');
+END_TEST
+
+TEST 'TC-P10-053 Limite legale : bypass dedie explicite autorise uniquement le test MAINT_N2'
+    (* Le bypass legal dedie conserve le comportement de mise en service; il est
+       gate par MAINT_N2 dans PRG_04 avant d arriver ici. *)
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := TRUE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, BenneBusy := FALSE,
+       OtherWinchInhibited := FALSE, InReferencingMode := FALSE,
+       CablePosM := -15.1, CfgCableLimitDescentM := -20.0,
+       LimitLegalReached := TRUE, Homed := TRUE, TopLimitM := 8.5,
+       BypassProcess := TRUE, BypassLimitLegal := TRUE);
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SyncEnable := TRUE,
+       PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
+       HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
+       TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
+       JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, BenneBusy := FALSE,
+       OtherWinchInhibited := FALSE, InReferencingMode := FALSE,
+       CablePosM := -15.1, CfgCableLimitDescentM := -20.0,
+       LimitLegalReached := TRUE, Homed := TRUE, TopLimitM := 8.5,
+       BypassProcess := TRUE, BypassLimitLegal := TRUE);
+    ASSERT_TRUE(fb.DescendPermit, 'BypassLimitLegal explicite autorise le test de descente');
+END_TEST

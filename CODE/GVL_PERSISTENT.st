@@ -153,6 +153,15 @@ VAR_GLOBAL PERSISTENT RETAIN
 
     // 💾 APPRENTISSAGE VITESSE PAR PALIER — collecteur passif FB_WinchSpeedLearning
     _WinchSpeedLearnTable : ST_fbWinchSpeedLearning_Table; // Table RETAIN {axe x sens x charge/vide x palier}
+    // Enveloppes de plausibilité par palier (bornes min/max de vitesse apprise, m/s) + seuil
+    // d'échantillons. Valeurs initiales cohérentes avec _WinchSpeedConfig.SpeedBandMaxMps
+    // [0.4, 0.8, 1.2, 1.6, 2.0] et _WinchSpeedStepTable.StepThreshold_Pct [20..100] — à
+    // confirmer sur site (mise en service). RETAIN : données de calibration.
+    _WinchSpeedLearnCfg : ST_fbWinchSpeedLearning_Cfg := (
+        MinSpeedMps := [0.0, 0.3, 0.5, 0.8, 1.0],
+        MaxSpeedMps := [0.5, 1.0, 1.5, 2.0, 2.5],
+        MinSamples  := 3
+    );
 
     // 🧭 RE-HOMING OBLIGATOIRE PAR AXE (AF-05 §4bis) — AJOUTÉ EN FIN DE LISTE
     // (mapping RETAIN positionnel : jamais d'insertion au milieu — NAMING_CONVENTION §pont persistant)

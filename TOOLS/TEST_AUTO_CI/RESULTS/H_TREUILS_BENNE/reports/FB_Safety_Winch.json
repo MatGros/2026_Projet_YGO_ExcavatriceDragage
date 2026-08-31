@@ -61,11 +61,19 @@
     {
       "name": "TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chaine PRG_04->PRG_06->AU = essai site",
       "passed": true
+    },
+    {
+      "name": "TC-P10-052 Limite legale : BypassProcess simu ne leve pas le verrou sous -15m",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-053 Limite legale : bypass dedie explicite autorise uniquement le test MAINT_N2",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 15,
-    "passed": 15,
+    "total": 17,
+    "passed": 17,
     "failed": 0
   }
 }

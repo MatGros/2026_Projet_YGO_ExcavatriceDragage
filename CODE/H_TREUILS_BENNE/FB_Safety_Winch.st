@@ -380,7 +380,11 @@ END_IF;
 DescendPermit := NOT (
     (((Fault.ErrorId AND 16#0040) <> 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM < 0.0) AND (CablePosM <= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
-    OR (LimitLegalReached AND NOT (BypassProcess OR BypassLimitLegal))
+    // La limite légale est une interdiction d'exploitation distincte du groupe
+    // SafeStop/Permit. Le bypass banc BypassProcess ne doit jamais la lever :
+    // seul le bypass dédié BypassLimitLegal, déjà filtré par la matrice MAINT_N2
+    // dans PRG_04, peut l'autoriser explicitement.
+    OR (LimitLegalReached AND NOT BypassLimitLegal)
     OR (((Fault.ErrorId AND 16#0008) <> 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
 );
 

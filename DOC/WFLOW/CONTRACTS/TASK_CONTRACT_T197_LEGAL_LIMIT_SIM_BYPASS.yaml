@@ -1,0 +1,87 @@
+contract:
+  task_id: T197_LEGAL_LIMIT_SIM_BYPASS
+  criticality: C4
+  strategy: patch
+  objective: >
+    Garantir que le bypass de banc des défauts de procédé ne puisse jamais
+    neutraliser la limite légale de profondeur; sous la cote légale, la descente
+    reste interdite sauf bypass légal explicite, armé par la matrice MAINT_N2.
+  acceptance:
+    - id: AC1
+      statement: >
+        Avec LimitLegalReached=TRUE, BypassProcess=TRUE et
+        BypassLimitLegal=FALSE, FB_Safety_Winch publie DescendPermit=FALSE.
+      verified_by: >
+        Test STruCpp dédié au FB_Safety_Winch, avec configuration physique
+        CfgCableLimitDescentM=-20.0 et cote légale atteinte à -15.0.
+    - id: AC2
+      statement: >
+        Avec LimitLegalReached=TRUE et BypassLimitLegal=TRUE, le bypass légal
+        explicite conserve le comportement MAINT_N2 documenté.
+      verified_by: >
+        Test STruCpp dédié, après vérification que BypassProcess seul ne suffit
+        plus à lever la protection.
+    - id: AC3
+      statement: >
+        Le chemin simulation ne positionne pas BypassLimitLegal et ne peut donc
+        pas autoriser une descente sous la cote légale.
+      verified_by: >
+        Revue statique PRG_07/GVL_Simulation et test de non-régression de
+        FB_Safety_Winch; validation CODESYS humaine requise.
+    - id: AC4
+      statement: >
+        La sortie finale de commande descente reste commandée par
+        EffectivePermit et aucun chemin direct ne contourne le permis.
+      verified_by: >
+        Audit PRG_04/FB_Winch/PRG_06 et contrôle de liaison G200 sur bundle frais.
+    - id: AC5
+      statement: >
+        Le nom de fichier est égal au nom du POU CODESYS (`FB_Safety_Winch.st`,
+        `PRG_07_Supervision.st`) et le suffixe est égal au langage du bundle
+        Structured Text IEC.
+      verified_by: >
+        Contrôle structurel du contrat et inspection du bundle PLCopenXML; aucun
+        renommage implicite de POU n'est accepté.
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_safety_winch.st
+      - DOC/WFLOW/AUDITS/T197_LEGAL_LIMIT_SIM_BYPASS_20260831.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T197_LEGAL_LIMIT_SIM_BYPASS.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_DiveSearch.st
+  conservation:
+    must_survive:
+      - "BypassProcess continue à neutraliser uniquement le groupe SafeStop/Permit documenté, hors limite légale explicite."
+      - "BypassLimitLegal reste disponible uniquement via la matrice MAINT_N2."
+      - "La limite câble physique conserve son bypass individuel BypassCableLimitSwitch."
+      - "Les modifications concurrentes hors périmètre restent intactes."
+    dropped_on_purpose: []
+  evidence_required:
+    - strucpp_fb_safety_winch_tests
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "deepseek-v4-flash:cloud"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute observation d'une descente encore autorisée sous -15 m, d'un bypass
+    retenu non explicite ou d'une divergence entre simulation et machine réelle
+    doit être signalée immédiatement; ne pas conclure à l'utilisabilité sans
+    validation humaine CODESYS.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex / root"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Cause identifiée; correction et test de non-régression en cours."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation humaine CODESYS et re-test simulation requis avant clôture."
