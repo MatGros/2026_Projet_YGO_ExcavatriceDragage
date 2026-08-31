@@ -98,3 +98,6 @@ La validation finale reste un test humain CODESYS de la chaîne réellement
 compilée : commande benne, atteinte d'offset, publication IHM, puis séquence
 de confirmation au capteur haut. Aucun bundle exporté non frais ni
 `Device.export` n'a été utilisé comme preuve.
+
+Compilation CODESYS : **PASS**, confirmée par l'utilisateur le 2026-08-31.
+L'essai fonctionnel reste à consigner.

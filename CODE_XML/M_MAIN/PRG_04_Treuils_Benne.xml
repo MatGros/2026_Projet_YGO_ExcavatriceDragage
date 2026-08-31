@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:49:22.352961" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:49:22.352961">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T03:03:34.044268" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T03:03:34.044268">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3204,6 +3204,245 @@ palier : 1..5</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_AcquisitionEncoderQualified">
+        <baseType>
+          <struct>
+            <variable name="Measurement">
+              <type>
+                <derived name="ST_fbEncoder_Measurement" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Mesure métrique (CablePosM, SpeedMps, etc.)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Façade codeur prête</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Diagnostic défaut codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Codeur référencé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Référencement suspect</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Défaut fiabilité (indisponible ou incohérent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedAndReliable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Référencé ET fiable (sans incohérence)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetConfirmationFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Échec confirmation preset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwOut">
+              <type>
+                <derived name="ST_fbEncoder_HwOut" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📡 Commandes hardware de preset (lecture seule)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>bc4dc502-575b-5c03-a159-0fc9e08c35c2</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🧲 ST_AcquisitionEncoderQualified — Façade codeur qualifiée
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les mesures métriques, statuts de référencement,
+      défauts et signaux hardware produits par FB_Encoder dans PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.EncoderM1 / Data.EncoderM2).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwWinch">
+        <baseType>
+          <struct>
+            <variable name="M1_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M1 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M1 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M1 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M2 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M2 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M2 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1M2_TopPositionFree_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute commun M1/M2 libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_TensionedCable_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur mou de câble M2 (câble tendu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD1 (M1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD1 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD2 (M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD2 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>72c8e04d-71ee-5733-9392-791d275a6b49</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
+   ───────────────────────────────────────────────────────────────
+   🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_State">
         <baseType>
           <enum>
@@ -3847,6 +4086,173 @@ Seuils de changement de palier (0..100%)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbEncoder_HwOut">
+        <baseType>
+          <struct>
+            <variable name="PresetTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES BUS ETHERCAT (ordres preset vers PDO Rx) ===
+&lt;-- [ACT] Declenchement preset vers PDO Rx</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CodeSeqTriggerCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Sequence code vers PDO Rx, maintenue a 0</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PresetValueOut">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Valeur brute envoyee au preset</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1d8c05ba-e087-546f-9435-81c2f041e74c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_fbEncoder_HwOut — Ordres preset de sortie codeur (HwOut)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les SEULES sorties/ordres preset d'un codeur absolu
+      EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
+   🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
+      vers le device.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbEncoder_Measurement">
+        <baseType>
+          <struct>
+            <variable name="RawPos">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DONNEES BRUTES &amp; STATUT BUS ===
+Position brute codeur (gelee si EncoderAvailable=FALSE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bus/esclave EtherCAT operationnel et disponible</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE POSITION CABLE ===
+Position cable (m, signee, + enroule)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CablePosMSafe">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position cable instantanee validee par EncoderIncoherent (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderIncoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = incoherence redemarrage ou hors bornes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Speed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE VITESSE CABLE ===
+Vitesse absolue sur fenetre glissante (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee (m/s, + montee, - descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si 6 echantillons valides sur au moins 50 ms</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingFault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STATUTS DES SOUS-FB &amp; REFERENCE ===
+Défaut FB_Encoder_Homing (état du référencement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingLifecycle">
+              <type>
+                <derived name="ST_Lifecycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle FB_Encoder_Homing (Busy/Done)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbsFault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut FB_Encoder_Abs (état acquisition bus)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingRefRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference brute du dernier homing reussi (re-expose)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>db273cb7-b66e-5a93-99be-e648e3db5387</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_fbEncoder_Measurement — Mesures codeur conditionnées (1 sous-DUT par treuil)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupement des mesures et faits de la chaîne codeur d'un treuil (Abs → Scale → Safety → Speed)
+   🔌 Interface : Interface de mesure normalisée pour PRG_02_Acquisition
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
     </dataTypes>
     <pous>
       <pou name="PRG_04_Treuils_Benne" pouType="program">
@@ -3896,6 +4302,16 @@ Seuils de changement de palier (0..100%)</xhtml>
               <type>
                 <derived name="FB_Winch" />
               </type>
+            </variable>
+            <variable name="instWinchStateProjection">
+              <type>
+                <derived name="FB_WinchStateProjection" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Projection lecture seule des états IHM treuils (T195) : décharge la §8
+(~250 lignes d'assignations pures) en un FB. Recopie bit-identique des
+sources → WinchM1State/WinchM2State/WinchM1Safety/WinchM2Safety/CableLimitAscent.</xhtml>
+              </documentation>
             </variable>
             <variable name="instWinchLoadEstimatorM1">
               <type>
@@ -5637,193 +6053,53 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
 {region "📊 §8 Publication états IHM"}
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
-// SpeedDelta_Mps = variation de vitesse ENTRE DEUX SCANS (ST_WinchState.st),
-// pas un écart M1/M2 (qui existe via SyncStateHMI.DeltaPos_M/instWinchSync).
-// Delta temporel via mémoire scan précédent.
-WinchM1State.MeasuredSpeed_Mps := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps;
-WinchM1State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps - M1_PrevSpeed_Mps;
-M1_PrevSpeed_Mps := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps;
-
-WinchM1State.Position_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
-WinchM1State.SpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct;
-WinchM1State.StepNumber := instWinchM1.StepNumber;
-IF instWinchM1.Fault.Error THEN
-    WinchM1State.FBState := E_State.ERROR;
-ELSIF instWinchM1.StepNumber &gt; 0 THEN
-    WinchM1State.FBState := E_State.BUSY;
-ELSE
-    WinchM1State.FBState := E_State.READY;
-END_IF;
-WinchM1State.Ready := instWinchM1.Ready;
-WinchM1State.Busy := (instWinchM1.StepNumber &gt; 0);
-WinchM1State.Done := FALSE;
-WinchM1State.Error := instWinchM1.Fault.Error;
-WinchM1State.ErrorId := instWinchM1.Fault.ErrorId;
-WinchM1State.RelayFwd := instWinchM1.RelayFwd;
-WinchM1State.RelayRev := instWinchM1.RelayRev;
-WinchM1State.Contactor1 := instWinchM1.Contactor1;
-WinchM1State.Contactor2 := instWinchM1.Contactor2;
-WinchM1State.Contactor3 := instWinchM1.Contactor3;
-WinchM1State.Contactor4 := instWinchM1.Contactor4;
-WinchM1State.BrakeCmd := PRG_06_Outputs.instWinchOutputInterlockM1.BrakeCmd;
-WinchM1State.BrakeCommandOpenConfirmed := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI;
-WinchM1State.FinalAuthorizedStep := instWinchM1.RequestedStep;
-WinchM1State.ContactorsCheck := instWinchM1.ContactorsCheck;
-WinchM1State.FinalInterlockState := PRG_06_Outputs.instWinchOutputInterlockM1.State;
-WinchM1State.FinalInterlockReason := PRG_06_Outputs.instWinchOutputInterlockM1.Reason;
-WinchM1State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM1.Fault.Error;
-WinchM1State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM1.Fault.ErrorId;
-WinchM1State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM1.RestartInhibit;
-WinchM1State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.BrakeTimeoutElapsed;
-WinchM1State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.RestartDelayElapsed;
-WinchM1State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM1.StepDelayElapsed;
-WinchM1State.Encoder.RawPos := PRG_02_Acquisition.Data.EncoderM1.Measurement.RawPos;
-WinchM1State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD1_Alarms;
-WinchM1State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD1_Warnings;
-WinchM1State.Encoder.SlaveOperational := PRG_02_Acquisition.Data.Network.EncoderM1.Operational;
-WinchM1State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.Data.EncoderM1.HwOut.PresetTriggerCmd;
-WinchM1State.Encoder.PresetValueOut := PRG_02_Acquisition.Data.EncoderM1.HwOut.PresetValueOut;
-WinchM1State.Encoder.Error := PRG_02_Acquisition.Data.EncoderM1.Measurement.AbsFault.Error;
-WinchM1State.Encoder.ErrorId := PRG_02_Acquisition.Data.EncoderM1.Measurement.AbsFault.ErrorId;
-WinchM1State.Encoder.Homed := PRG_02_Acquisition.Data.EncoderM1.Homed;
-WinchM1State.Encoder.HomingBusy := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy;
-WinchM1State.Encoder.HomingDone := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Done;
-WinchM1State.Encoder.HomingError := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingFault.Error;
-WinchM1State.Encoder.HomingErrorId := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingFault.ErrorId;
-WinchM1State.Encoder.HomingState := E_State.READY;
-WinchM1State.Encoder.HomingStateAtError := E_State.DISABLED;
-WinchM1State.Encoder.HomingSuspect := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect;
-WinchM1State.Encoder.HomingRefRaw := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingRefRaw;
-WinchM1State.InhibitActive := PRG_03_Modes_Cycle.Data.Auth.InhibitM1;
-WinchM1State.BottomLimitActiveM := BottomLimitM1_Active;
-WinchM1State.InTopSlowdownZone := instWinchM1.InTopSlowdownZone;
-WinchM1State.InBottomSlowdownZone := instWinchM1.InBottomSlowdownZone;
-WinchM1State.CommandedDirection := instWinchM1.CommandedDirection;
-WinchM1State.DirectionChangeDelayElapsed := instWinchM1.DirectionChangeDelayElapsed;
-WinchM1State.DirectionChangePending := instWinchM1.DirectionChangePending;
-
-// Voir bandeau M1 ci-dessus.
-WinchM2State.MeasuredSpeed_Mps := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps;
-WinchM2State.SpeedDelta_Mps    := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps - M2_PrevSpeed_Mps;
-M2_PrevSpeed_Mps := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps;
-
-WinchM2State.Position_M := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
-WinchM2State.SpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct;
-WinchM2State.StepNumber := instWinchM2.StepNumber;
-IF instWinchM2.Fault.Error THEN
-    WinchM2State.FBState := E_State.ERROR;
-ELSIF instWinchM2.StepNumber &gt; 0 THEN
-    WinchM2State.FBState := E_State.BUSY;
-ELSE
-    WinchM2State.FBState := E_State.READY;
-END_IF;
-WinchM2State.Ready := instWinchM2.Ready;
-WinchM2State.Busy := (instWinchM2.StepNumber &gt; 0);
-WinchM2State.Done := FALSE;
-WinchM2State.Error := instWinchM2.Fault.Error;
-WinchM2State.ErrorId := instWinchM2.Fault.ErrorId;
-WinchM2State.RelayFwd := instWinchM2.RelayFwd;
-WinchM2State.RelayRev := instWinchM2.RelayRev;
-WinchM2State.Contactor1 := instWinchM2.Contactor1;
-WinchM2State.Contactor2 := instWinchM2.Contactor2;
-WinchM2State.Contactor3 := instWinchM2.Contactor3;
-WinchM2State.Contactor4 := instWinchM2.Contactor4;
-WinchM2State.BrakeCmd := PRG_06_Outputs.instWinchOutputInterlockM2.BrakeCmd;
-WinchM2State.BrakeCommandOpenConfirmed := PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI;
-WinchM2State.FinalAuthorizedStep := instWinchM2.RequestedStep;
-WinchM2State.ContactorsCheck := instWinchM2.ContactorsCheck;
-WinchM2State.FinalInterlockState := PRG_06_Outputs.instWinchOutputInterlockM2.State;
-WinchM2State.FinalInterlockReason := PRG_06_Outputs.instWinchOutputInterlockM2.Reason;
-WinchM2State.FinalInterlockError := PRG_06_Outputs.instWinchOutputInterlockM2.Fault.Error;
-WinchM2State.FinalInterlockErrorId := PRG_06_Outputs.instWinchOutputInterlockM2.Fault.ErrorId;
-WinchM2State.FinalRestartInhibit := PRG_06_Outputs.instWinchOutputInterlockM2.RestartInhibit;
-WinchM2State.FinalBrakeTimeoutElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.BrakeTimeoutElapsed;
-WinchM2State.FinalRestartDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.RestartDelayElapsed;
-WinchM2State.FinalStepDelayElapsed := PRG_06_Outputs.instWinchOutputInterlockM2.StepDelayElapsed;
-WinchM2State.Encoder.RawPos := PRG_02_Acquisition.Data.EncoderM2.Measurement.RawPos;
-WinchM2State.Encoder.Alarms := PRG_02_Acquisition.HwReal.Winch.COD2_Alarms;
-WinchM2State.Encoder.Warnings := PRG_02_Acquisition.HwReal.Winch.COD2_Warnings;
-WinchM2State.Encoder.SlaveOperational := PRG_02_Acquisition.Data.Network.EncoderM2.Operational;
-WinchM2State.Encoder.PresetTriggerCmd := PRG_02_Acquisition.Data.EncoderM2.HwOut.PresetTriggerCmd;
-WinchM2State.Encoder.PresetValueOut := PRG_02_Acquisition.Data.EncoderM2.HwOut.PresetValueOut;
-WinchM2State.Encoder.Error := PRG_02_Acquisition.Data.EncoderM2.Measurement.AbsFault.Error;
-WinchM2State.Encoder.ErrorId := PRG_02_Acquisition.Data.EncoderM2.Measurement.AbsFault.ErrorId;
-WinchM2State.Encoder.Homed := PRG_02_Acquisition.Data.EncoderM2.Homed;
-WinchM2State.Encoder.HomingBusy := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy;
-WinchM2State.Encoder.HomingDone := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Done;
-WinchM2State.Encoder.HomingError := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingFault.Error;
-WinchM2State.Encoder.HomingErrorId := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingFault.ErrorId;
-WinchM2State.Encoder.HomingState := E_State.READY;
-WinchM2State.Encoder.HomingStateAtError := E_State.DISABLED;
-WinchM2State.Encoder.HomingSuspect := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect;
-WinchM2State.Encoder.HomingRefRaw := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingRefRaw;
-WinchM2State.InhibitActive := PRG_03_Modes_Cycle.Data.Auth.InhibitM2;
-WinchM2State.BottomLimitActiveM := BottomLimitM2_Active;
-WinchM2State.InTopSlowdownZone := instWinchM2.InTopSlowdownZone;
-WinchM2State.InBottomSlowdownZone := instWinchM2.InBottomSlowdownZone;
-WinchM2State.CommandedDirection := instWinchM2.CommandedDirection;
-WinchM2State.DirectionChangeDelayElapsed := instWinchM2.DirectionChangeDelayElapsed;
-WinchM2State.DirectionChangePending := instWinchM2.DirectionChangePending;
-
-// ⛔️ Limite haute atteinte (fait public) — miroir de la butée logicielle de AscentPermit
-// (Homed, hors homing, non suspect, position &gt;= limite). Fait pur "Reached", sans bypass.
-CableLimitAscentM1Reached := PRG_02_Acquisition.Data.EncoderM1.Homed
-    AND NOT PRG_02_Acquisition.Data.EncoderM1.HomingSuspect
-    AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
-    AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &gt;= _CommunCfgPersist.CfgCableLimitAscent_M);
-CableLimitAscentM2Reached := PRG_02_Acquisition.Data.EncoderM2.Homed
-    AND NOT PRG_02_Acquisition.Data.EncoderM2.HomingSuspect
-    AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
-    AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &gt;= (_CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift));
-
-WinchM1Safety.CableLimitAscent := CableLimitAscentM1Reached;
-WinchM1Safety.CableLimitDescent := (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &lt;= _WinchM1CfgPersist.CfgCableLimitDescent_M);
-WinchM1Safety.SafeStop := SafeStopM1_Active;
-WinchM1Safety.AscentPermit := EffectivePermitM1_Ascent;
-WinchM1Safety.DescendPermit := EffectivePermitM1_Descend;
-WinchM1Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M1_ThermalOk_DI;
-WinchM1Safety.PowerCutOff := instSafetyWinchM1.PowerCutOff;
-WinchM1Safety.Error := instWinchM1.Fault.Error OR instSafetyWinchM1.Fault.Error;
-WinchM1Safety.ErrorId := instSafetyWinchM1.Fault.ErrorId;
-WinchM1Safety.ErrorOperatorComm  := (instSafetyWinchM1.Fault.ErrorId AND 16#0001) &lt;&gt; 0;
-WinchM1Safety.ErrorEncoder       := (instSafetyWinchM1.Fault.ErrorId AND 16#0002) &lt;&gt; 0;
-WinchM1Safety.ErrorPhaseRotation := (instSafetyWinchM1.Fault.ErrorId AND 16#0010) &lt;&gt; 0;
-WinchM1Safety.ErrorBrakeThermal  := (instSafetyWinchM1.Fault.ErrorId AND 16#0400) &lt;&gt; 0;
-WinchM1Safety.ErrorMecaA         := (instSafetyWinchM1.Fault.ErrorId AND 16#0080) &lt;&gt; 0;
-WinchM1Safety.ErrorMecaB         := (instSafetyWinchM1.Fault.ErrorId AND 16#0100) &lt;&gt; 0;
-WinchM1Safety.ErrorMecaC         := (instSafetyWinchM1.Fault.ErrorId AND 16#0200) &lt;&gt; 0;
-WinchM1Safety.ErrorMecaD         := (instSafetyWinchM1.Fault.ErrorId AND 16#0800) &lt;&gt; 0;
-WinchM1Safety.ErrorMecaE         := (instSafetyWinchM1.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
-WinchM1Safety.ErrorOppositeDir   := (instSafetyWinchM1.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
-WinchM1Safety.ErrorNoMovement    := (instSafetyWinchM1.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
-WinchM1Safety.PowerCutOffSafety  := PRG_06_Outputs.M1PowerCutOffSafetyInfo;
-WinchM1Safety.SafeStopSafety     := PRG_06_Outputs.M1SafeStopSafetyInfo;
-WinchM1Safety.BlockedBySafety    := PRG_06_Outputs.M1BlockedBySafetyInfo;
-
-WinchM2Safety.CableLimitAscent := CableLimitAscentM2Reached;
-WinchM2Safety.CableLimitDescent := (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &lt;= _WinchM2CfgPersist.CfgCableLimitDescent_M);
-WinchM2Safety.SafeStop := SafeStopM2_Active;
-WinchM2Safety.AscentPermit := EffectivePermitM2_Ascent;
-WinchM2Safety.DescendPermit := EffectivePermitM2_Descend;
-WinchM2Safety.SlackCable := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI;
-WinchM2Safety.ThermalFault := NOT PRG_02_Acquisition.HwIn.Winch.M2_ThermalOk_DI;
-WinchM2Safety.PowerCutOff := instSafetyWinchM2.PowerCutOff;
-WinchM2Safety.Error := instWinchM2.Fault.Error OR instSafetyWinchM2.Fault.Error;
-WinchM2Safety.ErrorId := instSafetyWinchM2.Fault.ErrorId;
-WinchM2Safety.ErrorOperatorComm  := (instSafetyWinchM2.Fault.ErrorId AND 16#0001) &lt;&gt; 0;
-WinchM2Safety.ErrorEncoder       := (instSafetyWinchM2.Fault.ErrorId AND 16#0002) &lt;&gt; 0;
-WinchM2Safety.ErrorPhaseRotation := (instSafetyWinchM2.Fault.ErrorId AND 16#0010) &lt;&gt; 0;
-WinchM2Safety.ErrorBrakeThermal  := (instSafetyWinchM2.Fault.ErrorId AND 16#0400) &lt;&gt; 0;
-WinchM2Safety.ErrorMecaA         := (instSafetyWinchM2.Fault.ErrorId AND 16#0080) &lt;&gt; 0;
-WinchM2Safety.ErrorMecaB         := (instSafetyWinchM2.Fault.ErrorId AND 16#0100) &lt;&gt; 0;
-WinchM2Safety.ErrorMecaC         := (instSafetyWinchM2.Fault.ErrorId AND 16#0200) &lt;&gt; 0;
-WinchM2Safety.ErrorMecaD         := (instSafetyWinchM2.Fault.ErrorId AND 16#0800) &lt;&gt; 0;
-WinchM2Safety.ErrorMecaE         := (instSafetyWinchM2.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
-WinchM2Safety.ErrorOppositeDir   := (instSafetyWinchM2.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
-WinchM2Safety.ErrorNoMovement    := (instSafetyWinchM2.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
-WinchM2Safety.PowerCutOffSafety  := PRG_06_Outputs.M2PowerCutOffSafetyInfo;
-WinchM2Safety.SafeStopSafety     := PRG_06_Outputs.M2SafeStopSafetyInfo;
-WinchM2Safety.BlockedBySafety    := PRG_06_Outputs.M2BlockedBySafetyInfo;
+// Projection déléguée à FB_WinchStateProjection (T195) : recopie bit-identique
+// des sources → WinchM1State/WinchM2State/WinchM1Safety/WinchM2Safety/CableLimitAscent.
+// Aucune logique de commande modifiée (non-régression). SyncState/BucketState/
+// Benne_IsRoughlyClosed/GLV_IHM restent ici (hors scope du FB).
+instWinchStateProjection(
+    EncoderM1 := PRG_02_Acquisition.Data.EncoderM1,
+    EncoderM2 := PRG_02_Acquisition.Data.EncoderM2,
+    WinchM1 := instWinchM1,
+    WinchM2 := instWinchM2,
+    SafetyM1 := instSafetyWinchM1,
+    SafetyM2 := instSafetyWinchM2,
+    InterlockM1 := PRG_06_Outputs.instWinchOutputInterlockM1,
+    InterlockM2 := PRG_06_Outputs.instWinchOutputInterlockM2,
+    Auth := PRG_03_Modes_Cycle.Data.Auth,
+    HwInWinch := PRG_02_Acquisition.HwIn.Winch,
+    HwRealWinch := PRG_02_Acquisition.HwReal.Winch,
+    M1_PrevSpeed_Mps := M1_PrevSpeed_Mps,
+    M2_PrevSpeed_Mps := M2_PrevSpeed_Mps,
+    M1LogicRequestSpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct,
+    M2LogicRequestSpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct,
+    BottomLimitM1_Active := BottomLimitM1_Active,
+    BottomLimitM2_Active := BottomLimitM2_Active,
+    SafeStopM1_Active := SafeStopM1_Active,
+    SafeStopM2_Active := SafeStopM2_Active,
+    EffectivePermitM1_Ascent := EffectivePermitM1_Ascent,
+    EffectivePermitM1_Descend := EffectivePermitM1_Descend,
+    EffectivePermitM2_Ascent := EffectivePermitM2_Ascent,
+    EffectivePermitM2_Descend := EffectivePermitM2_Descend,
+    M2_LimitShift := M2_LimitShift,
+    CfgCableLimitAscent_M := _CommunCfgPersist.CfgCableLimitAscent_M,
+    CfgCableLimitDescentM1_M := _WinchM1CfgPersist.CfgCableLimitDescent_M,
+    CfgCableLimitDescentM2_M := _WinchM2CfgPersist.CfgCableLimitDescent_M,
+    EncoderM1_Operational := PRG_02_Acquisition.Data.Network.EncoderM1.Operational,
+    EncoderM2_Operational := PRG_02_Acquisition.Data.Network.EncoderM2.Operational,
+    M1PowerCutOffSafetyInfo := PRG_06_Outputs.M1PowerCutOffSafetyInfo,
+    M1SafeStopSafetyInfo := PRG_06_Outputs.M1SafeStopSafetyInfo,
+    M1BlockedBySafetyInfo := PRG_06_Outputs.M1BlockedBySafetyInfo,
+    M2PowerCutOffSafetyInfo := PRG_06_Outputs.M2PowerCutOffSafetyInfo,
+    M2SafeStopSafetyInfo := PRG_06_Outputs.M2SafeStopSafetyInfo,
+    M2BlockedBySafetyInfo := PRG_06_Outputs.M2BlockedBySafetyInfo
+);
+WinchM1State := instWinchStateProjection.WinchM1State;
+WinchM2State := instWinchStateProjection.WinchM2State;
+WinchM1Safety := instWinchStateProjection.WinchM1Safety;
+WinchM2Safety := instWinchStateProjection.WinchM2Safety;
+CableLimitAscentM1Reached := instWinchStateProjection.CableLimitAscentM1Reached;
+CableLimitAscentM2Reached := instWinchStateProjection.CableLimitAscentM2Reached;
 
 SyncState.DeltaPos_M := instWinchSync.SignedDeltaPosM;
 SyncState.SyncActive := instWinchSync.SyncActive;
@@ -10022,6 +10298,571 @@ TableComplete := (CellsFilled &gt;= CellsTotal);
           </data>
         </addData>
       </pou>
+      <pou name="FB_WinchStateProjection" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="M1LogicRequestSpeedCmd_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== LOCAUX / DIAGNOSTICS ===
+📈 Diagnostic % M1 (palier→%, IHM / simu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2LogicRequestSpeedCmd_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📈 Diagnostic % M2 (palier→%, IHM / simu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomLimitM1_Active">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Limite basse active M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomLimitM2_Active">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Limite basse active M2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopM1_Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 Arrêt rapide M1 actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStopM2_Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟧 Arrêt rapide M2 actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitM1_Ascent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis effectif montée M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitM1_Descend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis effectif descente M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitM2_Ascent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis effectif montée M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitM2_Descend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis effectif descente M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_LimitShift">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décalage benne M2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitAscent_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONFIG ===
+⛔ Limite haute exploitation normale (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitDescentM1_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⛔ Limite basse câble M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCableLimitDescentM2_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⛔ Limite basse câble M2 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1_Operational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RÉSEAU / DIAGNOSTICS ===
+🧲 Esclave EtherCAT COD1 opérationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2_Operational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Esclave EtherCAT COD2 opérationnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1PowerCutOffSafetyInfo">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Sécurités M1 coupant la puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SafeStopSafetyInfo">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sécurités M1 SafeStop</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BlockedBySafetyInfo">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚫 M1 bloqué par sécurité</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2PowerCutOffSafetyInfo">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Sécurités M2 coupant la puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SafeStopSafetyInfo">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Sécurités M2 SafeStop</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BlockedBySafetyInfo">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚫 M2 bloqué par sécurité</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="WinchM1State">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== STRUCTS D'ÉTAT PUBLICS (remplis, produits par PRG_04 via ce FB) ===
+🚦 État public treuil Retenue M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2State">
+              <type>
+                <derived name="ST_WinchState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 État public treuil Benne M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM1Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Diagnostic et sécurités treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2Safety">
+              <type>
+                <derived name="ST_SafetyWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Diagnostic et sécurités treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableLimitAscentM1Reached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⛔ Limite haute M1 atteinte (fait pur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CableLimitAscentM2Reached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⛔ Limite haute M2 atteinte (fait pur)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="EncoderM1">
+              <type>
+                <derived name="ST_AcquisitionEncoderQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOURCES (références lecture seule — le FB ne commande rien) ===
+🧲 Façade codeur M1 (PRG_02_Acquisition.Data.EncoderM1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2">
+              <type>
+                <derived name="ST_AcquisitionEncoderQualified" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Façade codeur M2 (PRG_02_Acquisition.Data.EncoderM2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM1">
+              <type>
+                <derived name="FB_Winch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 FB_Winch M1 (instWinchM1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2">
+              <type>
+                <derived name="FB_Winch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 FB_Winch M2 (instWinchM2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyM1">
+              <type>
+                <derived name="FB_Safety_Winch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ FB_Safety_Winch M1 (instSafetyWinchM1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafetyM2">
+              <type>
+                <derived name="FB_Safety_Winch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ FB_Safety_Winch M2 (instSafetyWinchM2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InterlockM1">
+              <type>
+                <derived name="FB_WinchOutputInterlock" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Barrière finale M1 (PRG_06_Outputs.instWinchOutputInterlockM1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InterlockM2">
+              <type>
+                <derived name="FB_WinchOutputInterlock" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Barrière finale M2 (PRG_06_Outputs.instWinchOutputInterlockM2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Auth">
+              <type>
+                <derived name="ST_Modes_Autorisations" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎛️ Autorisations mode (PRG_03_Modes_Cycle.Data.Auth)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwInWinch">
+              <type>
+                <derived name="ST_HwWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏗️ Image matérielle arbitrée (PRG_02_Acquisition.HwIn.Winch)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HwRealWinch">
+              <type>
+                <derived name="ST_HwWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🏗️ Image matérielle réelle (PRG_02_Acquisition.HwReal.Winch)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_PrevSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mémoire scan précédent pour SpeedDelta_Mps (delta vitesse entre 2 scans)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_PrevSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 FB_WinchStateProjection — Projection lecture seule des états IHM treuils
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Décharger PRG_04 de la §8 « Publication états IHM » (~250 lignes
+      d'assignations pures) en un FB de projection. Recopie bit-identique des
+      sources → structs d'état publics (WinchM1State/WinchM2State/
+      WinchM1Safety/WinchM2Safety/CableLimitAscent).
+   🧬 Responsabilité (1 FB = 1 responsabilité) :
+      - Projection pure : recopie de sources → structs d'état publics.
+        Aucune logique de commande, aucun calcul de sécurité.
+      - Producteur unique : les structs d'état restent produits par PRG_04
+        (via ce FB), consommés par PRG_07/IHM.
+   🔒 Non-régression : chaque assignation de la §8 de PRG_04 est déplacée
+      telle quelle (bit-identique, aucune logique modifiée).
+   📄 Doc : DOC/WFLOW/AUDITS/FB_WinchStateProjection_DESIGN.md (T195)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 📊 PROJECTION ÉTATS IHM (recopie bit-identique de la §8 de PRG_04)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── M1 : état public ────────────────────────────────────────────────────────
+// SpeedDelta_Mps = variation de vitesse ENTRE DEUX SCANS (ST_WinchState.st),
+// pas un écart M1/M2 (qui existe via SyncStateHMI.DeltaPos_M/instWinchSync).
+// Delta temporel via mémoire scan précédent.
+WinchM1State.MeasuredSpeed_Mps := EncoderM1.Measurement.Speed_Mps;
+WinchM1State.SpeedDelta_Mps    := EncoderM1.Measurement.Speed_Mps - M1_PrevSpeed_Mps;
+M1_PrevSpeed_Mps := EncoderM1.Measurement.Speed_Mps;
+
+WinchM1State.Position_M := EncoderM1.Measurement.CablePosM;
+WinchM1State.SpeedCmd_Pct := M1LogicRequestSpeedCmd_Pct;
+WinchM1State.StepNumber := WinchM1.StepNumber;
+IF WinchM1.Fault.Error THEN
+    WinchM1State.FBState := E_State.ERROR;
+ELSIF WinchM1.StepNumber &gt; 0 THEN
+    WinchM1State.FBState := E_State.BUSY;
+ELSE
+    WinchM1State.FBState := E_State.READY;
+END_IF;
+WinchM1State.Ready := WinchM1.Ready;
+WinchM1State.Busy := (WinchM1.StepNumber &gt; 0);
+WinchM1State.Done := FALSE;
+WinchM1State.Error := WinchM1.Fault.Error;
+WinchM1State.ErrorId := WinchM1.Fault.ErrorId;
+WinchM1State.RelayFwd := WinchM1.RelayFwd;
+WinchM1State.RelayRev := WinchM1.RelayRev;
+WinchM1State.Contactor1 := WinchM1.Contactor1;
+WinchM1State.Contactor2 := WinchM1.Contactor2;
+WinchM1State.Contactor3 := WinchM1.Contactor3;
+WinchM1State.Contactor4 := WinchM1.Contactor4;
+WinchM1State.BrakeCmd := InterlockM1.BrakeCmd;
+WinchM1State.BrakeCommandOpenConfirmed := HwInWinch.M1_BrakeIsOpen_DI;
+WinchM1State.FinalAuthorizedStep := WinchM1.RequestedStep;
+WinchM1State.ContactorsCheck := WinchM1.ContactorsCheck;
+WinchM1State.FinalInterlockState := InterlockM1.State;
+WinchM1State.FinalInterlockReason := InterlockM1.Reason;
+WinchM1State.FinalInterlockError := InterlockM1.Fault.Error;
+WinchM1State.FinalInterlockErrorId := InterlockM1.Fault.ErrorId;
+WinchM1State.FinalRestartInhibit := InterlockM1.RestartInhibit;
+WinchM1State.FinalBrakeTimeoutElapsed := InterlockM1.BrakeTimeoutElapsed;
+WinchM1State.FinalRestartDelayElapsed := InterlockM1.RestartDelayElapsed;
+WinchM1State.FinalStepDelayElapsed := InterlockM1.StepDelayElapsed;
+WinchM1State.Encoder.RawPos := EncoderM1.Measurement.RawPos;
+WinchM1State.Encoder.Alarms := HwRealWinch.COD1_Alarms;
+WinchM1State.Encoder.Warnings := HwRealWinch.COD1_Warnings;
+WinchM1State.Encoder.SlaveOperational := EncoderM1_Operational;
+WinchM1State.Encoder.PresetTriggerCmd := EncoderM1.HwOut.PresetTriggerCmd;
+WinchM1State.Encoder.PresetValueOut := EncoderM1.HwOut.PresetValueOut;
+WinchM1State.Encoder.Error := EncoderM1.Measurement.AbsFault.Error;
+WinchM1State.Encoder.ErrorId := EncoderM1.Measurement.AbsFault.ErrorId;
+WinchM1State.Encoder.Homed := EncoderM1.Homed;
+WinchM1State.Encoder.HomingBusy := EncoderM1.Measurement.HomingLifecycle.Busy;
+WinchM1State.Encoder.HomingDone := EncoderM1.Measurement.HomingLifecycle.Done;
+WinchM1State.Encoder.HomingError := EncoderM1.Measurement.HomingFault.Error;
+WinchM1State.Encoder.HomingErrorId := EncoderM1.Measurement.HomingFault.ErrorId;
+WinchM1State.Encoder.HomingState := E_State.READY;
+WinchM1State.Encoder.HomingStateAtError := E_State.DISABLED;
+WinchM1State.Encoder.HomingSuspect := EncoderM1.HomingSuspect;
+WinchM1State.Encoder.HomingRefRaw := EncoderM1.Measurement.HomingRefRaw;
+WinchM1State.InhibitActive := Auth.InhibitM1;
+WinchM1State.BottomLimitActiveM := BottomLimitM1_Active;
+WinchM1State.InTopSlowdownZone := WinchM1.InTopSlowdownZone;
+WinchM1State.InBottomSlowdownZone := WinchM1.InBottomSlowdownZone;
+WinchM1State.CommandedDirection := WinchM1.CommandedDirection;
+WinchM1State.DirectionChangeDelayElapsed := WinchM1.DirectionChangeDelayElapsed;
+WinchM1State.DirectionChangePending := WinchM1.DirectionChangePending;
+
+// ── M2 : état public (voir bandeau M1 ci-dessus) ────────────────────────────
+WinchM2State.MeasuredSpeed_Mps := EncoderM2.Measurement.Speed_Mps;
+WinchM2State.SpeedDelta_Mps    := EncoderM2.Measurement.Speed_Mps - M2_PrevSpeed_Mps;
+M2_PrevSpeed_Mps := EncoderM2.Measurement.Speed_Mps;
+
+WinchM2State.Position_M := EncoderM2.Measurement.CablePosM;
+WinchM2State.SpeedCmd_Pct := M2LogicRequestSpeedCmd_Pct;
+WinchM2State.StepNumber := WinchM2.StepNumber;
+IF WinchM2.Fault.Error THEN
+    WinchM2State.FBState := E_State.ERROR;
+ELSIF WinchM2.StepNumber &gt; 0 THEN
+    WinchM2State.FBState := E_State.BUSY;
+ELSE
+    WinchM2State.FBState := E_State.READY;
+END_IF;
+WinchM2State.Ready := WinchM2.Ready;
+WinchM2State.Busy := (WinchM2.StepNumber &gt; 0);
+WinchM2State.Done := FALSE;
+WinchM2State.Error := WinchM2.Fault.Error;
+WinchM2State.ErrorId := WinchM2.Fault.ErrorId;
+WinchM2State.RelayFwd := WinchM2.RelayFwd;
+WinchM2State.RelayRev := WinchM2.RelayRev;
+WinchM2State.Contactor1 := WinchM2.Contactor1;
+WinchM2State.Contactor2 := WinchM2.Contactor2;
+WinchM2State.Contactor3 := WinchM2.Contactor3;
+WinchM2State.Contactor4 := WinchM2.Contactor4;
+WinchM2State.BrakeCmd := InterlockM2.BrakeCmd;
+WinchM2State.BrakeCommandOpenConfirmed := HwInWinch.M2_BrakeIsOpen_DI;
+WinchM2State.FinalAuthorizedStep := WinchM2.RequestedStep;
+WinchM2State.ContactorsCheck := WinchM2.ContactorsCheck;
+WinchM2State.FinalInterlockState := InterlockM2.State;
+WinchM2State.FinalInterlockReason := InterlockM2.Reason;
+WinchM2State.FinalInterlockError := InterlockM2.Fault.Error;
+WinchM2State.FinalInterlockErrorId := InterlockM2.Fault.ErrorId;
+WinchM2State.FinalRestartInhibit := InterlockM2.RestartInhibit;
+WinchM2State.FinalBrakeTimeoutElapsed := InterlockM2.BrakeTimeoutElapsed;
+WinchM2State.FinalRestartDelayElapsed := InterlockM2.RestartDelayElapsed;
+WinchM2State.FinalStepDelayElapsed := InterlockM2.StepDelayElapsed;
+WinchM2State.Encoder.RawPos := EncoderM2.Measurement.RawPos;
+WinchM2State.Encoder.Alarms := HwRealWinch.COD2_Alarms;
+WinchM2State.Encoder.Warnings := HwRealWinch.COD2_Warnings;
+WinchM2State.Encoder.SlaveOperational := EncoderM2_Operational;
+WinchM2State.Encoder.PresetTriggerCmd := EncoderM2.HwOut.PresetTriggerCmd;
+WinchM2State.Encoder.PresetValueOut := EncoderM2.HwOut.PresetValueOut;
+WinchM2State.Encoder.Error := EncoderM2.Measurement.AbsFault.Error;
+WinchM2State.Encoder.ErrorId := EncoderM2.Measurement.AbsFault.ErrorId;
+WinchM2State.Encoder.Homed := EncoderM2.Homed;
+WinchM2State.Encoder.HomingBusy := EncoderM2.Measurement.HomingLifecycle.Busy;
+WinchM2State.Encoder.HomingDone := EncoderM2.Measurement.HomingLifecycle.Done;
+WinchM2State.Encoder.HomingError := EncoderM2.Measurement.HomingFault.Error;
+WinchM2State.Encoder.HomingErrorId := EncoderM2.Measurement.HomingFault.ErrorId;
+WinchM2State.Encoder.HomingState := E_State.READY;
+WinchM2State.Encoder.HomingStateAtError := E_State.DISABLED;
+WinchM2State.Encoder.HomingSuspect := EncoderM2.HomingSuspect;
+WinchM2State.Encoder.HomingRefRaw := EncoderM2.Measurement.HomingRefRaw;
+WinchM2State.InhibitActive := Auth.InhibitM2;
+WinchM2State.BottomLimitActiveM := BottomLimitM2_Active;
+WinchM2State.InTopSlowdownZone := WinchM2.InTopSlowdownZone;
+WinchM2State.InBottomSlowdownZone := WinchM2.InBottomSlowdownZone;
+WinchM2State.CommandedDirection := WinchM2.CommandedDirection;
+WinchM2State.DirectionChangeDelayElapsed := WinchM2.DirectionChangeDelayElapsed;
+WinchM2State.DirectionChangePending := WinchM2.DirectionChangePending;
+
+// ── Limite haute atteinte (fait public) ──────────────────────────────────────
+// ⛔️ Miroir de la butée logicielle de AscentPermit (Homed, hors homing, non
+// suspect, position &gt;= limite). Fait pur "Reached", sans bypass.
+CableLimitAscentM1Reached := EncoderM1.Homed
+    AND NOT EncoderM1.HomingSuspect
+    AND NOT EncoderM1.Measurement.HomingLifecycle.Busy
+    AND (EncoderM1.Measurement.CablePosM &gt;= CfgCableLimitAscent_M);
+CableLimitAscentM2Reached := EncoderM2.Homed
+    AND NOT EncoderM2.HomingSuspect
+    AND NOT EncoderM2.Measurement.HomingLifecycle.Busy
+    AND (EncoderM2.Measurement.CablePosM &gt;= (CfgCableLimitAscent_M + M2_LimitShift));
+
+// ── M1 : sécurités publiques ────────────────────────────────────────────────
+WinchM1Safety.CableLimitAscent := CableLimitAscentM1Reached;
+WinchM1Safety.CableLimitDescent := (EncoderM1.Measurement.CablePosM &lt;= CfgCableLimitDescentM1_M);
+WinchM1Safety.SafeStop := SafeStopM1_Active;
+WinchM1Safety.AscentPermit := EffectivePermitM1_Ascent;
+WinchM1Safety.DescendPermit := EffectivePermitM1_Descend;
+WinchM1Safety.ThermalFault := NOT HwInWinch.M1_ThermalOk_DI;
+WinchM1Safety.PowerCutOff := SafetyM1.PowerCutOff;
+WinchM1Safety.Error := WinchM1.Fault.Error OR SafetyM1.Fault.Error;
+WinchM1Safety.ErrorId := SafetyM1.Fault.ErrorId;
+WinchM1Safety.ErrorOperatorComm  := (SafetyM1.Fault.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM1Safety.ErrorEncoder       := (SafetyM1.Fault.ErrorId AND 16#0002) &lt;&gt; 0;
+WinchM1Safety.ErrorPhaseRotation := (SafetyM1.Fault.ErrorId AND 16#0010) &lt;&gt; 0;
+WinchM1Safety.ErrorBrakeThermal  := (SafetyM1.Fault.ErrorId AND 16#0400) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaA         := (SafetyM1.Fault.ErrorId AND 16#0080) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaB         := (SafetyM1.Fault.ErrorId AND 16#0100) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaC         := (SafetyM1.Fault.ErrorId AND 16#0200) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaD         := (SafetyM1.Fault.ErrorId AND 16#0800) &lt;&gt; 0;
+WinchM1Safety.ErrorMecaE         := (SafetyM1.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
+WinchM1Safety.ErrorOppositeDir   := (SafetyM1.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
+WinchM1Safety.ErrorNoMovement    := (SafetyM1.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM1Safety.PowerCutOffSafety  := M1PowerCutOffSafetyInfo;
+WinchM1Safety.SafeStopSafety     := M1SafeStopSafetyInfo;
+WinchM1Safety.BlockedBySafety    := M1BlockedBySafetyInfo;
+
+// ── M2 : sécurités publiques ───────────────────────────────────────────────
+WinchM2Safety.CableLimitAscent := CableLimitAscentM2Reached;
+WinchM2Safety.CableLimitDescent := (EncoderM2.Measurement.CablePosM &lt;= CfgCableLimitDescentM2_M);
+WinchM2Safety.SafeStop := SafeStopM2_Active;
+WinchM2Safety.AscentPermit := EffectivePermitM2_Ascent;
+WinchM2Safety.DescendPermit := EffectivePermitM2_Descend;
+WinchM2Safety.SlackCable := NOT HwInWinch.M2_TensionedCable_DI;
+WinchM2Safety.ThermalFault := NOT HwInWinch.M2_ThermalOk_DI;
+WinchM2Safety.PowerCutOff := SafetyM2.PowerCutOff;
+WinchM2Safety.Error := WinchM2.Fault.Error OR SafetyM2.Fault.Error;
+WinchM2Safety.ErrorId := SafetyM2.Fault.ErrorId;
+WinchM2Safety.ErrorOperatorComm  := (SafetyM2.Fault.ErrorId AND 16#0001) &lt;&gt; 0;
+WinchM2Safety.ErrorEncoder       := (SafetyM2.Fault.ErrorId AND 16#0002) &lt;&gt; 0;
+WinchM2Safety.ErrorPhaseRotation := (SafetyM2.Fault.ErrorId AND 16#0010) &lt;&gt; 0;
+WinchM2Safety.ErrorBrakeThermal  := (SafetyM2.Fault.ErrorId AND 16#0400) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaA         := (SafetyM2.Fault.ErrorId AND 16#0080) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaB         := (SafetyM2.Fault.ErrorId AND 16#0100) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaC         := (SafetyM2.Fault.ErrorId AND 16#0200) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaD         := (SafetyM2.Fault.ErrorId AND 16#0800) &lt;&gt; 0;
+WinchM2Safety.ErrorMecaE         := (SafetyM2.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
+WinchM2Safety.ErrorOppositeDir   := (SafetyM2.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
+WinchM2Safety.ErrorNoMovement    := (SafetyM2.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM2Safety.PowerCutOffSafety  := M2PowerCutOffSafetyInfo;
+WinchM2Safety.SafeStopSafety     := M2SafeStopSafetyInfo;
+WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f2aed5eb-4f2a-5dd3-b5bf-d783b6be0281</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_WinchSync" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -11267,6 +12108,952 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_WinchOutputInterlock" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ET ETATS GENERAL ===
+--&gt; [CMD] Autorisation generale FB (TRUE=Autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut sur front</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Entree securite pour interface standard</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerContactorEngaged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HARDWARE ET FEEDBACKS ===
+--&gt; [SAFE] Chaine AU rearmee et puissance OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeFeedback">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback physique ouverture frein (NC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FwdRevSpeedFeedbackOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Feedback retombe tous contacteurs sens/vitesse</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedRelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DEMANDES DE COMMANDE AMONT ===
+--&gt; [CMD] Demande contacteur sens montee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedRelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande contacteur sens descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedContactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande contacteur vitesse palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedContactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande contacteur vitesse palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedContactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande contacteur vitesse palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedContactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande contacteur vitesse palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Palier de vitesse demande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadTimeSameDir">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
+--&gt; [CFG] Temps mort redemarrage meme sens apres arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadTimeOppositeDir">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps mort redemarrage inversion sens apres arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DropConfirmDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MAINTIEN BORNÉ DU CONTACTEUR DE SENS (§3bis / AC6-AC8) ===
+Paramètres DÉDIÉS, distincts de DeadTimeSameDir/OppositeDir et de tout délai
+d'interlock direction (ne pas réutiliser ni recouvrir D10). Ordre garanti :
+DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
+--&gt; [CFG] Debounce confirmation retombee contacteurs (AC7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxSenseHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] T_max : borne superieure du maintien §3bis (AC7)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS IEC ET SYNOPTIQUE ===
+&lt;-- [STAT] FB pret a fonctionner</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Interlock actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Action terminee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut transverse standard (socle FB_FaultCore, bit0: timeout frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_WinchFinalInterlockState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Etat courant machine d'etat interlock</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_WinchFinalInterlockState" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Etat memorise lors du dernier defaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reason">
+              <type>
+                <derived name="E_WinchFinalInterlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Cause de neutralisation ou blocage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AuthorizedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRES ACTIONNEURS VALIDES ===
+&lt;-- [ACT] Palier de vitesse autorise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur sens montee valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur sens descente valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 1 valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 2 valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 3 valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Contactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre contacteur vitesse palier 4 valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre ouverture frein valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeTimeoutElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS ET TEMPORISATIONS ===
+&lt;-- [DIAG] Ecoule temporisation watchdog frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartInhibit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartDelayElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule temporisation anti-court-cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadTimeElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule temps mort directionnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepDelayElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule temporisation palier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SenseHoldActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS MAINTIEN §3bis (AC6/AC7) ===
+&lt;-- [DIAG] Maintien du contacteur de sens en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorStuck">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Latch T_max depasse sans confirmation retombee (AC7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SenseHoldElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule temporisation T_max maintien §3bis</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS ET TIMERS INTERNES ===
+. [LOC] Detecteur front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Erreur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeTimeoutCauseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front cause timeout frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeTimeout">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation watchdog frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepDelay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation changement de palier</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartDelay">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation anti-court-cycle redemarrage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadTime">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation temps mort directionnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SenseHoldTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation T_max maintien §3bis (AC7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SenseHoldFeedbackTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce DropConfirmDelay retombee contacteurs (AC7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartRequired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
+. [LOC] Exigence de retour au neutre pour redemarrage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetRequired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Exigence d'acquittement Reset conscient</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralRequestSeen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Observation passage consigne au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestedStepClamped">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier demande borne dans [0..5]</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepDelayTarget">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible palier memorisee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotorRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande mouvement moteur active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeTimeoutCause">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cause timeout frein presente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BrakeTimeoutAck">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Acquittement cause timeout frein</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens commande (1 montee / -1 descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadTimePending">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps mort directionnel en attente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NewDirection">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens de la nouvelle demande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequiredDeadTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps mort requis selon sens de la demande</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SenseHoldRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition §3bis demandee (palier 0 + sens commande)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SenseHoldDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] One-shot maintien effectue (anti-bouclage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorStuckLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch interne T_max depasse sans confirmation retombee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ÉTAT DÉFAUT INTERNE (gate machine) ===
+Gate interne PRÉSERVÉE à l'identique → sorties Error/ErrorId déplacées du scope
+VAR_OUTPUT vers locaux retenus : lecture en §2bis/§5 et écriture en §6bis inchangées,
+SEULE la publication est homogénéisée sur Fault:ST_Fault (§6bis2).
+. [LOC] Synthese defaut (gate interne, = ErrorId &lt;&gt; 0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Code erreur (bit0: timeout frein) — gate interne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOCLE DEFAUT (transverse standard AF-03 §3) ===
+* [INST] Socle defaut (vue live + latchee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Causes en clair pour le socle defaut</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🛡️ FB_WinchOutputInterlock — Barrière finale frein / puissance M1 ou M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Barrière de sécurité finale pour frein et contacteurs M1/M2
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs)
+   🧩 Défaut homogénéisé (AF-03 §3) : Fault:ST_Fault via FB_FaultCore (bit0 = timeout frein).
+   🔒 Sécurité : Surveillance feedback frein et temporisation d'inversion
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+// ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
+// Le front est échantillonné même pendant Enable/AU faux : un Reset maintenu
+// pendant une gate ne devient jamais un faux acquittement au retour.
+ResetEdge(CLK := Reset);
+
+// ── 2. GATE : neutralisation sûre ───────────────────────────────────────
+// ErrorId, RestartInhibit et ResetRequired ne sont jamais effacés par une perte
+// Enable/AU : celle-ci coupe uniquement les sorties. Le retour exige toujours un
+// acquittement conscient puis une nouvelle demande opérateur.
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    BrakeTimeout(IN := FALSE, PT := T#500ms);
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    RestartDelay(IN := FALSE, PT := T#1000ms);
+    DeadTime(IN := FALSE);
+    DeadTimePending := FALSE;
+    DeadTimeElapsed := T#0ms;
+    // 🔒 Transitoires §3bis neutralisés à la gate (latches de sûreté conservés ci-dessous).
+    SenseHoldActive := FALSE; SenseHoldDone := FALSE;
+    SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
+    SenseHoldElapsed := T#0ms;
+    ContactorStuck := ContactorStuckLatched;
+    RelayFwd := FALSE; RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    BrakeCmd := FALSE; AuthorizedStep := 0;
+    BrakeTimeoutElapsed := T#0ms; RestartDelayElapsed := T#0ms; StepDelayElapsed := T#0ms;
+    Ready := FALSE; Busy := FALSE; Done := FALSE;
+    Error := (ErrorId &lt;&gt; 16#0000);
+    State := E_WinchFinalInterlockState.DISABLED;
+    RestartRequired := TRUE;
+    // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
+    // - ErrorId &amp; RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d'Enable, acquittement conscient requis)
+    // - StateAtError &amp; Reason : snapshot d'état et cause de blocage préservés pour diagnostic IHM
+    RETURN;
+END_IF;
+
+RequestedStepClamped := LIMIT(0, RequestedStep, 5);
+// SafeStop reste une rampe rapide du FB_Winch (Enable maintenu, Partie 3 §1bis).
+// La demande métier reste donc autorisée ici pendant la décélération ; l'interlock
+// ne coupe qu'après sa retombée effective à zéro, sauf gate dur ou défaut final.
+MotorRequest := (RequestedStepClamped &gt; 0) AND (RequestedRelayFwd XOR RequestedRelayRev);
+
+// ── 2bis. Arbitrage Error/ErrorId AVANT §3/§5 ────────────────────────────
+// ErrorId bit0 (défaut frein) est mis à jour en FIN de scan (§6bis, après BrakeCmd) —
+// la valeur lue ici est donc celle de la fin du scan PRÉCÉDENT (retard d'un scan sur une
+// nouvelle occurrence, ~10ms, négligeable face au budget 500ms du watchdog). Voir bandeau.
+Error := (ErrorId &lt;&gt; 16#0000);
+ErrorEdge(CLK := Error);
+IF ErrorEdge.Q THEN
+    StateAtError := State;
+END_IF;
+
+// ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
+// Après timeout : cause disparue + front Reset, puis demande moteur à zéro,
+// puis nouvelle demande distincte. La retombée + T#1000ms sera ensuite refaite.
+IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
+    IF NOT MotorRequest THEN
+        NeutralRequestSeen := TRUE;
+        RestartRequired := TRUE;
+    ELSIF NeutralRequestSeen AND MotorRequest THEN
+        RestartInhibit := FALSE;
+        NeutralRequestSeen := FALSE;
+        RestartRequired := TRUE;
+        Reason := E_WinchFinalInterlockReason.NONE;
+    END_IF;
+END_IF;
+
+// ── 4. Mémorisation de l'arrêt : temporisation d'anti-redémarrage chaud ──────────
+// La temporisation RestartDelay (1500ms) s'arme à l'arrêt du mouvement (NOT MotorRequest) et
+// s'écoule pendant la pause à l'arrêt (au lieu de repartir de zéro à chaque nouvel appui) —
+// permet un redémarrage instantané si la pause dépasse 1.5s. Le décompte ne démarre/continue que
+// si le moteur n'est plus demandé ET que le frein est physiquement confirmé fermé
+// (NOT BrakeFeedback = bobine retombée, mâchoires serrées). Garde le comportement "purge pendant
+// la pause" (RestartRequired ne s'arme qu'à NOT MotorRequest, indépendant de la tempo).
+IF NOT MotorRequest THEN
+    RestartRequired := TRUE;
+END_IF;
+RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
+RestartDelayElapsed := RestartDelay.ET;
+IF RestartDelay.Q THEN
+    RestartRequired := FALSE;
+END_IF;
+
+// ── 4bis. Temps mort directionnel (TC-P10-021/022) ─────────────────────────────
+// Distinct du RestartDelay (anti-court-cycle uniforme) : temps mort de redémarrage
+// après arrêt, dépendant du sens de la nouvelle demande. Même sens → DeadTimeSameDir ;
+// inversion → DeadTimeOppositeDir. Neutre↔sens = immédiat (pas de temps mort à l'armement).
+// Le décompte se fait pendant la pause ET pendant l'attente après nouvelle demande
+// (purge pendant la pause, comme RestartDelay). PT = DeadTimeOppositeDir (le plus long) ;
+// à la nouvelle demande, on vérifie si le temps mort requis pour le sens réel est déjà
+// écoulé (cas même sens, plus court).
+IF MotorRequest THEN
+    IF RequestedRelayFwd THEN
+        LastDirection := 1;
+    ELSE
+        LastDirection := -1;
+    END_IF;
+END_IF;
+
+IF NOT MotorRequest THEN
+    DeadTimePending := TRUE;
+END_IF;
+
+DeadTime(IN := DeadTimePending AND NOT BrakeFeedback AND NOT RestartInhibit, PT := DeadTimeOppositeDir);
+DeadTimeElapsed := DeadTime.ET;
+IF DeadTime.Q THEN
+    DeadTimePending := FALSE;
+END_IF;
+
+IF MotorRequest AND DeadTimePending THEN
+    IF RequestedRelayFwd THEN
+        NewDirection := 1;
+    ELSE
+        NewDirection := -1;
+    END_IF;
+    IF NewDirection = LastDirection THEN
+        RequiredDeadTime := DeadTimeSameDir;
+    ELSE
+        RequiredDeadTime := DeadTimeOppositeDir;
+    END_IF;
+    IF DeadTime.ET &gt;= RequiredDeadTime THEN
+        DeadTimePending := FALSE;
+    END_IF;
+END_IF;
+
+// ── 4ter. Maintien borné du contacteur de sens (§3bis) — AC6/AC7/AC8 ─────────
+// Règle §3bis : quand RequestedStep retombe à 0 mais RequestedRelayFwd/Rev reste
+// TRUE (demande transitoire de chute de palier portée par FB_Winch), la barrière NE
+// force PLUS RelayFwd/Rev à FALSE immédiatement — elle TIENT le contacteur de sens
+// (jamais relâché avant les contacteurs de vitesse) jusqu'à :
+//   - FwdRevSpeedFeedbackOff confirmé, debounced par DropConfirmDelay (AC7 : pas
+//     d'ouverture du sens sur retour simple voie seul) ; OU
+//   - T_max (MaxSenseHoldTime) écoulé -&gt; chute du sens FORCÉE + latch ContactorStuck.
+// Le maintien indéfini du stator sous tension est INTERDIT (AC7). Les coupures dures
+// (NOT Enable / PowerContactorEngaged=FALSE / Error / RestartInhibit) ne passent
+// JAMAIS par ce maintien (AC9) : elles coupent RelayFwd/Rev immédiatement.
+SenseHoldRequested := (RequestedStepClamped = 0) AND (RequestedRelayFwd OR RequestedRelayRev)
+                      AND NOT Error AND NOT RestartInhibit AND NOT ContactorStuckLatched;
+
+IF NOT Enable OR NOT PowerContactorEngaged THEN
+    // 🔒 Gate dur : pas de maintien possible (les sorties sont déjà coupées §2).
+    SenseHoldActive := FALSE; SenseHoldDone := FALSE;
+    SenseHoldTimer(IN := FALSE, PT := MaxSenseHoldTime);
+    SenseHoldFeedbackTimer(IN := FALSE, PT := DropConfirmDelay);
+ELSIF Error OR RestartInhibit THEN
+    // Coupure par défaut : le maintien ne survit pas à un défaut (AC9).
+    SenseHoldActive := FALSE; SenseHoldDone := FALSE;
+    SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
+ELSE
+    IF MotorRequest THEN
+        SenseHoldDone := FALSE;
+        SenseHoldActive := FALSE;               // vraie nouvelle demande interrompt le maintien transitoire
+    END_IF;
+    IF NOT (RequestedRelayFwd OR RequestedRelayRev) THEN
+        SenseHoldDone := FALSE;
+        SenseHoldActive := FALSE;               // retour au neutre complet : plus rien a tenir
+    END_IF;
+    IF SenseHoldRequested AND NOT SenseHoldActive AND NOT SenseHoldDone THEN
+        SenseHoldActive := TRUE;              // entrée en maintien §3bis
+        SenseHoldTimer(IN := FALSE, PT := MaxSenseHoldTime);        // T_max arme au scan suivant
+        SenseHoldFeedbackTimer(IN := FALSE, PT := DropConfirmDelay);
+    ELSIF SenseHoldActive THEN
+        SenseHoldFeedbackTimer(IN := FwdRevSpeedFeedbackOff, PT := DropConfirmDelay);
+        SenseHoldTimer(IN := NOT FwdRevSpeedFeedbackOff, PT := MaxSenseHoldTime);
+        IF SenseHoldFeedbackTimer.Q THEN
+            // Retombée contacteurs CONFIRMÉE -&gt; chute normale du sens (one-shot).
+            SenseHoldActive := FALSE; SenseHoldDone := TRUE;
+        ELSIF SenseHoldTimer.Q THEN
+            // T_max sans confirmation -&gt; chute du sens FORCÉE + latch à acquitter (AC7).
+            SenseHoldActive := FALSE;
+            ContactorStuckLatched := TRUE;
+        END_IF;
+    ELSE
+        SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
+    END_IF;
+END_IF;
+SenseHoldElapsed := SenseHoldTimer.ET;
+ContactorStuck := ContactorStuckLatched;
+
+// ── 5. Autorisation moteur ────────────────────────────────────────────────
+RelayFwd := FALSE; RelayRev := FALSE;
+Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+Busy := FALSE; Done := FALSE; Ready := NOT Error AND NOT ContactorStuckLatched;
+
+IF Error THEN
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    State := E_WinchFinalInterlockState.FAULT;
+ELSIF RestartInhibit THEN
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    Reason := E_WinchFinalInterlockReason.RESTART_INHIBITED;
+    State := E_WinchFinalInterlockState.FAULT;
+ELSIF ContactorStuckLatched THEN
+    // AC7 : T_max §3bis dépassé sans confirmation retombée -&gt; chute du sens FORCÉE.
+    // RelayFwd/Rev et BrakeCmd (= RelayFwd OR RelayRev) retombent à FALSE ci-dessus.
+    // Latch à acquittement conscient (ResetEdge) — jamais de redémarrage auto.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    Reason := E_WinchFinalInterlockReason.SENSE_DROP_TIMEOUT;
+    State := E_WinchFinalInterlockState.FAULT;
+ELSIF SenseHoldActive THEN
+    // §3bis : RequestedStep retombé à 0 mais sens encore commandé -&gt; on TIENT le
+    // contacteur de sens jusqu'à FwdRevSpeedFeedbackOff (debounced DropConfirmDelay)
+    // OU T_max. AuthorizedStep=0 (aucun contacteur de vitesse), seul le sens est tenu.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    IF RequestedRelayFwd THEN RelayFwd := TRUE; END_IF;
+    IF RequestedRelayRev THEN RelayRev := TRUE; END_IF;
+    State := E_WinchFinalInterlockState.WAIT_SENSE_DROP_CONFIRM;
+    Busy := TRUE;
+ELSIF NOT MotorRequest THEN
+    // Toute annulation de demande annule la temporisation de hausse en cours.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    State := E_WinchFinalInterlockState.READY;
+ELSIF RestartRequired OR DeadTimePending THEN
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    State := E_WinchFinalInterlockState.WAIT_RESTART_DELAY;
+    Busy := TRUE;
+ELSE
+    // ⚡ Progression de palier directe : la temporisation (tempo palier) est gérée
+    // par le métier (FB_Winch). La barrière finale transmet directement la consigne
+    // sans micro-coupure des contacteurs.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := RequestedStepClamped;
+
+    IF (AuthorizedStep &gt; 0) OR (RequestedStepClamped &gt; 0) THEN
+        RelayFwd := RequestedRelayFwd;
+        RelayRev := RequestedRelayRev;
+        Contactor1 := RequestedContactor1;
+        Contactor2 := RequestedContactor2;
+        Contactor3 := RequestedContactor3;
+        Contactor4 := RequestedContactor4;
+    END_IF;
+
+    IF NOT BrakeFeedback THEN
+        State := E_WinchFinalInterlockState.WAIT_BRAKE_COMMAND_CONFIRMATION;
+        Busy := TRUE;
+    ELSE
+        State := E_WinchFinalInterlockState.READY;
+    END_IF;
+END_IF;
+
+// ── 6. Commande frein — couplage direct ────────────────────────────────
+// BrakeCmd suit STRUCTURELLEMENT RelayFwd/RelayRev, calculé APRÈS leur
+// finalisation ci-dessus (§5) : il hérite donc automatiquement de toutes leurs
+// conditions de sécurité (Error, RestartInhibit, RestartRequired, MotorRequest)
+// sans avoir à les répéter. Aucun risque d'écart frein/mouvement possible : le
+// frein ne PEUT pas être commandé ouvert sans qu'un des deux relais de sens le
+// soit aussi, puisque c'est la même expression. PRG_06_Outputs recalcule la
+// MÊME expression indépendamment sur les DQ finaux (M1RelayFwd OR M1RelayRev)
+// pour piloter physiquement la bobine — ce BrakeCmd ici sert de miroir/diagnostic
+// (State, IHM) mais n'est plus câblé sur la sortie physique (voir PRG_06 §2).
+BrakeCmd := RelayFwd OR RelayRev;
+
+// ── 6bis. Watchdog frein : uniquement sur la commande RÉELLEMENT FINALE ────
+// Watchdog armé sur BrakeCmd (fin §5/§6), JAMAIS sur RequestedRelayFwd/Rev (demande amont pas
+// encore autorisée par le state-machine §5 — RestartRequired peut la retenir jusqu'à T#1000ms,
+// largement &gt; le seuil 500ms ci-dessous, ce qui déclencherait un faux défaut à chaque redémarrage
+// normal).
+BrakeTimeout(IN := BrakeCmd AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#500ms);
+BrakeTimeoutElapsed := BrakeTimeout.ET;
+IF BrakeTimeout.Q THEN
+    BrakeTimeoutCause := TRUE;
+ELSIF BrakeFeedback THEN
+    BrakeTimeoutCause := FALSE;   // cause réellement disparue (retour desserrage confirmé)
+END_IF;
+BrakeTimeoutCauseEdge(CLK := BrakeTimeoutCause);
+IF BrakeTimeoutCauseEdge.Q THEN
+    BrakeTimeoutAck := FALSE;    // nouvelle occurrence -&gt; ré-alarme, ack remis à zéro
+    RestartInhibit := TRUE;
+    ResetRequired := TRUE;
+    NeutralRequestSeen := FALSE;
+    RestartRequired := TRUE;
+    Reason := E_WinchFinalInterlockReason.BRAKE_COMMAND_NOT_CONFIRMED;
+END_IF;
+IF ResetEdge.Q THEN
+    BrakeTimeoutAck := TRUE;     // toujours effectif, sans condition externe
+    ResetRequired := FALSE;
+    ContactorStuckLatched := FALSE;   // acquittement conscient du latch T_max §3bis (AC7)
+END_IF;
+IF BrakeTimeoutCause OR NOT BrakeTimeoutAck THEN
+    ErrorId := ErrorId OR 16#0001;
+ELSE
+    ErrorId := ErrorId AND 16#FFFE;
+END_IF;
+
+// ── 6bis2. Publication Fault transverse (socle FB_FaultCore) ──────────────
+// 🧩 Homogénéisation interface (AF-03 §3) : le défaut est exposé sous la forme
+// standard Fault:ST_Fault (comme FB_TranslationOutputInterlock) au lieu du plat
+// Error/ErrorId. La cause unique bit0 = timeout frein, strictement identique à la
+// gate interne (ErrorId) ; Latching reproduit le latch existant restitué au front
+// Reset (jamais de re-armement auto). La gate interne (Error/ErrorId) reste
+// inchangée — la publication n'ajoute ni ne modifie aucune coupure.
+instCauses[0].Active   := ((ErrorId AND 16#0001) &lt;&gt; 16#0000);
+instCauses[0].Latching := TRUE;
+instCauses[0].Texte    := 'Timeout confirmation ouverture frein treuil';
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+
+// ── 6ter. Synchronisation defaut frein en fin de scan (TC-P10-012/013/020) ──
+// ErrorId bit0 (defaut frein) est pose en §6bis, APRES la machine d'etat §5.
+// Sans ce bloc, la synthese Error et l'etat FAULT accusaient un retard d'un scan
+// (~10 ms) sur le watchdog frein. On resynchronise Error/State et on coupe les
+// sorties le MEME scan que l'apparition du defaut : c'est un defaut FINAL, coupure
+// immediate (jamais un maintien ordonne §3bis).
+Error := (ErrorId &lt;&gt; 16#0000);
+IF Error THEN
+    RelayFwd := FALSE; RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    BrakeCmd := FALSE;
+    AuthorizedStep := 0;
+    Busy := FALSE; Done := FALSE; Ready := FALSE;
+    State := E_WinchFinalInterlockState.FAULT;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>2a1928e0-077f-59ff-bf93-fa875e0de69c</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_SyncContactor" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -11776,6 +13563,7 @@ END_IF;
               <Object Name="ST_WinchFinalInterlockRequest" ObjectId="1a0be5b9-7748-52ea-86e2-35102e49b3f8" />
               <Object Name="ST_WinchInterPrg" ObjectId="3ec62512-5b23-55ca-ae68-cc9ed0fefa58" />
               <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
+              <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
             </Folder>
             <Folder Name="7_COMMUN_CONFIG">
               <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
@@ -11788,6 +13576,7 @@ END_IF;
             </Folder>
             <Folder Name="4_JOYSTICK_ACQUISITION">
               <Object Name="ST_AcquisitionJoystickQualified" ObjectId="e915927d-33f8-504a-9060-48dca13140d7" />
+              <Object Name="ST_AcquisitionEncoderQualified" ObjectId="bc4dc502-575b-5c03-a159-0fc9e08c35c2" />
               <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
             </Folder>
           </Folder>
@@ -11807,11 +13596,13 @@ END_IF;
           <Object Name="FB_WinchCmdArbitrationM2" ObjectId="7b19e1be-7f57-5fd6-90fc-6767873f41ea" />
           <Object Name="FB_WinchLoadEstimator" ObjectId="1ca57a3d-7abe-5417-80b9-b0b83cdad590" />
           <Object Name="FB_WinchSpeedLearning" ObjectId="6afdf87d-eb65-57d6-8e0e-3c8115a778a0" />
+          <Object Name="FB_WinchStateProjection" ObjectId="f2aed5eb-4f2a-5dd3-b5bf-d783b6be0281" />
           <Object Name="FB_WinchSync" ObjectId="05970ca2-4250-543c-bfcf-5f8ad1f9efae" />
           <Object Name="FB_DriftGuard" ObjectId="e215f19f-4c29-5289-9559-f2cf7fa9d55e" />
           <Object Name="FB_SpeedStep" ObjectId="12afad9c-c87d-50d6-b33c-dd7c6f83a8e4" />
           <Object Name="FB_WinchDirectionInterlock" ObjectId="97add528-91a0-5b3e-8fa4-2513b1dd5dca" />
           <Object Name="FB_WinchStepShaper" ObjectId="9ff21482-5982-5964-8b75-503c2d5a480e" />
+          <Object Name="FB_WinchOutputInterlock" ObjectId="2a1928e0-077f-59ff-bf93-fa875e0de69c" />
           <Object Name="FB_SyncContactor" ObjectId="afd229de-316d-5899-8a37-8c30dbfd06db" />
           <Object Name="FB_SyncDeviation" ObjectId="24ca6948-aaa5-587d-b1af-7e9dbd94d79d" />
           <Folder Name="_TYPES">
@@ -11848,6 +13639,12 @@ END_IF;
         </Folder>
         <Folder Name="D_JOYSTICK">
           <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
+        </Folder>
+        <Folder Name="E_CODEURS">
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbEncoder_HwOut" ObjectId="1d8c05ba-e087-546f-9435-81c2f041e74c" />
+            <Object Name="ST_fbEncoder_Measurement" ObjectId="db273cb7-b66e-5a93-99be-e648e3db5387" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>
