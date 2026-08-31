@@ -58,7 +58,7 @@
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">F11.02</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Protéger M3 (Méca A/B, incohérence, bypass)</b></small></td>
-      <td style="padding: 6px 8px; line-height: 1.55;">Arrêt commandé mais mouvement résiduel / incohérence prolongée → SafeStop+PowerCutOff</td>
+      <td style="padding: 6px 8px; line-height: 1.55;">Arrêt commandé mais mouvement résiduel / incohérence prolongée → SafeStop+PowerCutOff ; produit les permits directionnels <code>TremiePermit</code>/<code>MaintenancePermit</code> (source safety unique, §3bis)</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_Translation</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P11-002, 010, 011, 014</span></td>
@@ -224,6 +224,7 @@ flowchart TD
     Safe["🛡️ FB_Safety_Translation<br/>Méca A/B, incohérence, bypass"]
     Move["⚙️ FB_Translation<br/>Rampe lissée & consigne AC600"]
     Out["🔒 FB_TranslationOutputInterlock<br/>Barrière finale matérielle outputs"]
+    IHM["🖥️ GVL_IHM.TranslationM3.Safety<br/>TremiePermit / MaintenancePermit (projection)"]
 
     Treuils["📡 PRG_04_Treuils_Benne<br/>CablePosM1 / CablePosM2"]
 
@@ -231,6 +232,7 @@ flowchart TD
     Treuils -.->|"CablePosM1/M2 vs seuil hauteur mini"| Height
     Height -.->|"M3_HeightInterlockOk"| Move
     Safe -.->|"Autorisations & bypass"| Move
+    Safe -.->|"TremiePermit / MaintenancePermit"| IHM
     Move ==>|"Consigne vitesse & sens AC600"| Out
 
     classDef acq fill:#0c1e2e,stroke:#38bdf8,stroke-width:2px,color:#e2e8f0
@@ -244,6 +246,7 @@ flowchart TD
     class Safe safe
     class Move cmd
     class Out outp
+    class IHM outp
 
     linkStyle 0 stroke:#38bdf8,stroke-width:3px
     linkStyle 1 stroke:#f43f5e,stroke-width:2px
@@ -273,6 +276,27 @@ même dictionnaire que `GUIDE_EDITION_AF_v1.0.md §3quater`.
 
 ---
 
+## 🧭 3bis · Modèle uniforme des permits directionnels M3 (T184)
+
+Modèle identique aux treuils M1/M2 (`AscentPermit`/`DescendPermit`) : **1 source safety → 2
+permits directionnels nommés selon la sémantique métier → projection IHM**.
+
+| Étape | Élément | Détail |
+|---|---|---|
+| 1 source safety | `FB_Safety_Translation` (producteur unique) | Sorties `VAR_OUTPUT` `TremiePermit`/`MaintenancePermit`, polarité fail-safe (`TRUE`=autorisé), gatées par `Enable` — fiche `FB_Safety_Translation_v1.1.md` §2bis |
+| 2 permits directionnels | `TremiePermit` (vers Trémie, `Direction=+1`) · `MaintenancePermit` (vers Maintenance, `Direction=-1`) | Nommés par la **sémantique métier** (pas Fwd/Rev) |
+| Projection IHM | `GVL_IHM.TranslationM3.Safety.TremiePermit` / `.MaintenancePermit` | Alimentés par `PRG_05_Translation` (§4) puis projetés par `PRG_07_Supervision` |
+| Diagnostic | `MotionM3.Step6_DirectionAllowed` (`FB_TroubleshootingView`) | `SEL(RequestedDirection=1, MaintenancePermit, TremiePermit)` — même pattern que M1/M2 |
+
+- **Sens** : `Direction=+1` → Trémie, `Direction=-1` → Maintenance (convention §4, inchangée).
+- **`HeightInterlockBlocking`** (anti-télescopage hauteur M1/M2, F11.05) reste un **blocage
+  séparé non directionnel** — il n'entre plus dans `Step6_DirectionAllowed` (diagnostic), mais
+  reste tracé dans la chaîne `TranslationPontM3.Safety_300.Idx308_HeightInterlockBlocking`.
+- **Uniformité** : M1/M2 (`AscentPermit`/`DescendPermit`) et M3 (`TremiePermit`/`MaintenancePermit`)
+  suivent le même modèle — 1 source safety par axe, 2 permits directionnels, 1 projection IHM.
+
+---
+
 ## 📏 4 · Convention de position M3 (REX 2026-08-21)
 
 **0 m = Trémie (Extrême gauche)** · **30 m = Maintenance (Extrême droite)**. Le sens physique
@@ -299,6 +323,7 @@ Consommateurs : `FB_Translation_PositionEstimator` (odométrie + recalage), `FB_
 | Version | Date | Changement |
 |---|---|---|
 | v2.3 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié (était totalement désynchronisé des sections réelles), section `🎯 Rôle et périmètre` explicite, Table des fonctions ajoutée (obligatoire, famille Fonctions métier, absente jusqu'ici), diagramme composition HTML/SVG → Mermaid `flowchart TD` stylisé, Suivi historique + TBD + **Documents liés ajoutés (section entièrement absente jusqu'ici)**, renumérotation complète. **Correctifs de fond majeurs** (review sous-agent expert automatisme) : (1) le catalogue TC du chapô (IDs `010` à `060`) était **entièrement inventé**, ne correspondant à aucun test réel des 4 fiches FB — reconstruit à partir des vrais catalogues (IDs `001` à `014`) ; (2) l'anti-télescopage était attribué à tort à `FB_Safety_Translation` — l'interlock réel (`M3_HeightInterlockOk`) est câblé directement dans `PRG_05_Translation.st` §0, hors de toute fiche FB, avec entrée croisée depuis `PRG_04_Treuils_Benne` — nouvelle fonction `F11.05` créée pour cette réalité, diagramme corrigé avec le flux inter-domaine manquant, TBD ajouté (aucun TC ne couvre cette fonction C4 aujourd'hui) |
+| v2.3 (T184) | 2026-08-31 | Ajout §3bis « Modèle uniforme des permits directionnels M3 » : 1 source safety (`FB_Safety_Translation`) → 2 permits directionnels nommés par la sémantique métier (`TremiePermit`/`MaintenancePermit`) → projection IHM (`GVL_IHM.TranslationM3.Safety`) + diagnostic `MotionM3.Step6_DirectionAllowed` (même pattern que M1/M2). Ligne F11.02 + diagramme Mermaid mis à jour. Pas de bump de version (références croisées multiples dans CODE/CODE_XML/TOOLS). |
 | v2.2 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 
 ## ❓ 6 · TBD

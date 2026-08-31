@@ -23,7 +23,7 @@ STRUCT
     M1Position_M           : REAL;        (* 📊 Position câble M1 *)
     M2Position_M           : REAL;        (* 📊 Position câble M2 *)
     DeadmanArmed           : BOOL;        (* 🔫 Homme-mort joystick armé *)
-    JoystickMotionActive   : BOOL;        (* 🕹️ Joystick défléchi (non centré) — même signal que CycleMotionPermit (FB_Cycle) ; SANS homme-mort *)
+    JoystickDeflected      : BOOL;        (* 🕹️ Joystick défléchi (non centré) — même signal que JoystickDeflected (FB_Cycle) ; SANS homme-mort *)
     CycleStepAtError       : E_CycleStep; (* 🧊 Étape spécifique au moment du défaut  *)
     SampleCount            : INT;         (* Compteur de prélèvements (RETAIN, Q3bis) *)
 END_STRUCT

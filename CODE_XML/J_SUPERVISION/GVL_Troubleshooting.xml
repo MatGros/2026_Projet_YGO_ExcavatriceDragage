@@ -1591,7 +1591,7 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens autorisé (AscentPermit/DescendPermit)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Sens autorisé (AscentPermit/DescendPermit / TremiePermit/MaintenancePermit)</xhtml>
               </documentation>
             </variable>
             <variable name="Step7_BrakeReleased">

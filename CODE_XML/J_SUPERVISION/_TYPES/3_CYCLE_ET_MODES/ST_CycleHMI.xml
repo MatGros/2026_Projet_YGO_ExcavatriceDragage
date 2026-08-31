@@ -318,12 +318,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔫 Homme-mort joystick armé</xhtml>
               </documentation>
             </variable>
-            <variable name="JoystickMotionActive">
+            <variable name="JoystickDeflected">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Joystick défléchi (non centré) — même signal que CycleMotionPermit (FB_Cycle) ; SANS homme-mort</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Joystick défléchi (non centré) — même signal que JoystickDeflected (FB_Cycle) ; SANS homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStepAtError">
