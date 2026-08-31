@@ -80,12 +80,6 @@ Trait plein = composition/données transférées. `Logic` et `Output` sont des s
 - **🎯 Cartouche ST (`🎯 Rôle`)** : `Enable gate + copie consignes logiques vers sorties physiques`
 - **Responsabilité** : Barrière physique finale pour les signaux `MaintainA_RQ` et `MaintainB_RQ` (polarité maintien, `TRUE` = voie saine).
 
-#### 🧩 `ST_Safety_Emergency_InternalCmd` *(DUT Bus Interne)*
-
-- **Fichier Source** : [`ST_Safety_Emergency_InternalCmd.st`](../../../../CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st)
-- **🎯 Cartouche ST (`🎯 Rôle`)** : `Transporte les ordres logiques entre le bloc de décision et le bloc de sortie`
-- **Responsabilité** : Structure d'échange interne à 3 champs `BOOL` reliant `Logic` et `Output`.
-
 Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop` ni `SafeStop`.
 `Reset` sur front. Pas de redémarrage auto après défaut.
 
@@ -758,7 +752,6 @@ Fichiers code de référence :
 - `ARCHIVES/Code/AU/FB_Safety_EmergencyManagementOutput_v2.1_OLD.st` (archivé, fusionné)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Status.st` (DUT état/diagnostic)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Cmd.st` (DUT commandes de pilotage)
-- `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st` (interne Logic→Output)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st` (bus état public)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st` (bus diagnostic)
 - `ARCHIVES/Code/SUPERVISION/ST_Safety_Emergency_HmiCmd.st` (bus commande IHM, test archivé T99)
