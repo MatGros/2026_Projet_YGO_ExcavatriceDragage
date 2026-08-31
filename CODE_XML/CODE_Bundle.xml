@@ -9164,7 +9164,7 @@ TRUE = Défaut sécurité actif</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie EFFECTIF (Safety AND Process, TRUE = autorisé, fail-safe) — fusion D1 §1ter PRG_05</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenancePermit">
@@ -9172,7 +9172,7 @@ TRUE = Défaut sécurité actif</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance EFFECTIF (Safety AND Process, TRUE = autorisé, fail-safe) — fusion D1 §1ter PRG_05</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
               </documentation>
             </variable>
             <variable name="BlockedBySafety">
@@ -10595,7 +10595,7 @@ Seuils de changement de palier (0..100%)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
-🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety AND Process, D1 §1ter PRG_05)</xhtml>
+🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenancePermitEffective">
@@ -10603,7 +10603,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety AND Process, D1 §1ter PRG_05)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
               </documentation>
             </variable>
             <variable name="HeightInterlockBlocking">
@@ -44338,10 +44338,13 @@ ProcessAndSafetyPermitM2_Ascent := SafetyPermitM2_Ascent
 SafeStopM1_Active := SafeStopM1_Raw OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active := SafeStopM2_Raw OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
 // EffectivePermit = ProcessAndSafetyPermit combine au couplage synchro (anti-télescopage)
-EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Descend);
-EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Descend);
-EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Ascent);
-EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Ascent);
+// ET gaté par NOT SafeStop (défauts thermique/phase/codeur/méca) : le permit reflète « prêt à
+// fonctionner », aligné sur M3 (PRG_05 §1ter). SafeStopM1/M2_Active agrège déjà le couplage
+// synchro (SafeStop de l'autre treuil pendant SyncActive) — cohérent avec l'anti-télescopage.
+EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND NOT SafeStopM1_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Descend);
+EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND NOT SafeStopM2_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Descend);
+EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND NOT SafeStopM1_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Ascent);
+EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND NOT SafeStopM2_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Ascent);
 
 // 🛡️ ArmingPermit (général — permis de mouvement) : on ne peut armer QUE si au moins
 // un axe (treuil M1/M2 ou translation M3) a un permis de mouvement effectif.
@@ -45359,14 +45362,18 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 // Le permit effectif = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff
 // (prêt à fonctionner), aligné sur le modèle treuils où le Safety produit déjà des
 // permits gatés par les défauts. Pas de Process supplémentaire (pas de benne/Kobold).
+// ⚠️ Le verrou « descente treuil interdite tant que M3 pas à P1 » (DumpAtTremieDescentLocked)
+// est côté TREUIL (PRG_04 §5, lignes 802-805), pas dans le permit M3 : le permit M3 reste une
+// information de possibilité de mouvement de la translation, indépendante de l'état de la trémie.
 // ⚠️ Ces permis effectifs sont des valeurs de DIAGNOSTIC/IHM (lecture seule) : la commande
-// réelle reste gatée par SafeStop/PowerCutOff (instSafetyTranslationM3) et l'homme-mort
-// (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle). Aucun impact sur la chaîne de sécurité.
+// réelle reste gatée par M3_SafeStop_Aggregate (PRG_05:343, superset incluant InputModuleFault)
+// et l'homme-mort (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle). Aucun impact sur la
+// chaîne de sécurité.
 EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremiePermit
-                               AND NOT instSafetyTranslationM3.SafeStop
+                               AND NOT M3_SafeStop_Aggregate
                                AND NOT instSafetyTranslationM3.PowerCutOff;
 EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenancePermit
-                                 AND NOT instSafetyTranslationM3.SafeStop
+                                 AND NOT M3_SafeStop_Aggregate
                                  AND NOT instSafetyTranslationM3.PowerCutOff;
 
 {endregion}

@@ -16,8 +16,8 @@ STRUCT
     // Permis de mouvement effectif (agrégat diagnostic : toutes les barrières levées)
     MotionPermitEffective    : BOOL;   // 🟢 Translation réellement autorisée à se déplacer
     // Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
-    TremiePermitEffective    : BOOL;   // 🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety AND Process, D1 §1ter PRG_05)
-    MaintenancePermitEffective : BOOL; // 🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety AND Process, D1 §1ter PRG_05)
+    TremiePermitEffective    : BOOL;   // 🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)
+    MaintenancePermitEffective : BOOL; // 🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)
     HeightInterlockBlocking  : BOOL;   // 🚧 Interlock hauteur M1/M2 actif (risque collision)
 
     // Source de blocage — pour distinguer l'origine
