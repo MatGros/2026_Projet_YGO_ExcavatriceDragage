@@ -36,5 +36,7 @@ STRUCT
     PowerKeepAliveACmd    : BOOL; // 🔒 Maintien puissance voie A (1=Maintenu)
     PowerKeepAliveBCmd    : BOOL; // 🔒 Maintien puissance voie B (1=Maintenu)
     EmergencyArmingCmd    : BOOL; // 🎯 Impulsion rearmement puissance AU
+    TestCutActive         : BOOL; // 🧪 Test de redondance AU en cours (canal A ou B coupe) — consommé par FB_SimBench
+    PowerCutOffRequest    : BOOL; // 🛑 Requête coupure métier (arrêt d'urgence) — consommé par FB_SimBench
 END_STRUCT
 END_TYPE

@@ -10,6 +10,10 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
        BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
     ASSERT_FALSE(fb.STATUS.READY, 'Enable=FALSE -> Ready=FALSE (neutralise)');
     ASSERT_FALSE(fb.STATUS.DIAG.ERROR, 'Enable=FALSE -> Pas d erreur');
+    ASSERT_FALSE(fb.CMD.MAINTAINA_CMD, 'Enable=FALSE -> MaintainA_Cmd=FALSE (projection fail-safe §10)');
+    ASSERT_FALSE(fb.CMD.MAINTAINB_CMD, 'Enable=FALSE -> MaintainB_Cmd=FALSE (projection fail-safe §10)');
+    ASSERT_FALSE(fb.CMD.ARMPULSE_CMD, 'Enable=FALSE -> ArmPulse_Cmd=FALSE (projection fail-safe §10)');
+    ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'Enable=FALSE -> sequence neutralisee, Step=0');
 
     ADVANCE_TIME(10000000);
 
@@ -268,7 +272,7 @@ TEST 'TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -> pulse 1s puis 
        BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
     ASSERT_EQ(fb.STATUS.STATE.STEP, 6, 'pulse de 1s termine -> attente confirmation contacteur');
     ASSERT_FALSE(fb.CMD.ARMPULSE_CMD, 'pulse retombe apres 1s');
-    ASSERT_TRUE(fb.STATUS.BUSY, 'sequence toujours en cours (attente confirmation)');
+    ASSERT_TRUE(fb.STATUS.STATE.ARMINGBUSY, 'sequence toujours en cours (attente confirmation)');
 
     (* contacteur confirme engage -> succes, retour IDLE *)
     ADVANCE_TIME(10000000);
@@ -276,7 +280,7 @@ TEST 'TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -> pulse 1s puis 
        BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := TRUE);
     ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'confirmation contacteur -> retour IDLE');
     ASSERT_TRUE(fb.STATUS.DONE, 'contacteur engage confirme -> Done');
-    ASSERT_FALSE(fb.STATUS.BUSY, 'sequence terminee');
+    ASSERT_FALSE(fb.STATUS.STATE.ARMINGBUSY, 'sequence terminee');
     ASSERT_FALSE(fb.STATUS.DIAG.LOCKOUTACTIVE, 'succes -> pas de lockout');
     ASSERT_FALSE(fb.STATUS.DIAG.ERROR, 'reamement reussi -> pas de defaut');
 END_TEST
@@ -342,6 +346,11 @@ TEST 'TC-P01-006 canal colle bloque le reamement (echec auto-test)'
     ASSERT_TRUE(fb.STATUS.DIAG.ERROR, 'canal colle doit lever une erreur (RedundancyTestFailed)');
     ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'echec auto-test doit ramener la sequence a IDLE');
     ASSERT_FALSE(fb.CMD.MAINTAINA_CMD, 'un canal colle bloque aussi le maintien normal (interlock sur Cause brute)');
+    (* Complement 2026-08-31 : preuve du code d abandon (symetrie avec TC-P01-014 canal B) *)
+    ASSERT_EQ(fb.STATUS.DIAG.LASTABORTSTEP, 1, 'abandon a l etape 1 (TestA)');
+    ASSERT_EQ(fb.STATUS.DIAG.LASTABORTCAUSE, 16#0020, 'cause = 16#0020 (CST_ABORT_REDUNDANCY_A = 32)');
+    ASSERT_TRUE(fb.STATUS.DIAG.REDUNDANCYTESTFAILED, 'defaut redondance leve (Diag.RedundancyTestFailed)');
+    ASSERT_FALSE(fb.CMD.MAINTAINB_CMD, 'canal colle bloque aussi le maintien B (interlock Cause brute sur les 2 canaux)');
 END_TEST
 
 TEST 'TC-P01-007 timeout confirmation contacteur -> lockout 5s'
@@ -379,6 +388,9 @@ TEST 'TC-P01-007 timeout confirmation contacteur -> lockout 5s'
     fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
        BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
     ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'timeout confirmation doit ramener la sequence a IDLE');
+    (* Complement 2026-08-31 : preuve du code d abandon CST_ABORT_TIMEOUT_CONTACTOR (critere 5 du contrat) *)
+    ASSERT_EQ(fb.STATUS.DIAG.LASTABORTSTEP, 6, 'abandon a l etape 6 (Confirm)');
+    ASSERT_EQ(fb.STATUS.DIAG.LASTABORTCAUSE, 16#0080, 'cause = 16#0080 (CST_ABORT_TIMEOUT_CONTACTOR = 128)');
     ASSERT_TRUE(fb.STATUS.DIAG.LOCKOUTACTIVE, 'timeout doit declencher le lockout (TC-P01-007)');
     ASSERT_TRUE(fb.STATUS.DIAG.ARMFAILED, 'timeout doit lever le defaut EmergencyArmingFailed');
     ASSERT_TRUE(fb.STATUS.DIAG.ERROR, 'defaut doit etre visible sur Error');
@@ -965,5 +977,69 @@ TEST 'TC-P01-020 Autotest demarrage : chaine ouverte au 1er Enable -> StartupFai
     ASSERT_TRUE(fb.STATUS.READY, 'Reset purge StartupFail -> Ready=TRUE');
     ASSERT_FALSE(fb.STATUS.DIAG.ERROR, 'Reset acquitte le defaut -> Error=FALSE');
     ASSERT_TRUE(fb.STATUS.STATE.ARMABLE, 'apres Reset -> Armable=TRUE');
+END_TEST
+
+(* =========================================================================
+   REX 2026-08-31 — Complément neutralisation fail-safe EN SÉQUENCE.
+   TC-P01-021 : Enable=FALSE pendant l'impulsion (step 5) → neutralisation
+   immédiate (gate §2) : séquence et commandes à zéro, neutralisation ≠ abandon
+   (LastAbortCause repart à CST_ABORT_NONE), reprise propre au re-Enable
+   (autotest repasse, aucun état collé, séquence relançable).
+   ========================================================================= *)
+
+TEST 'TC-P01-021 Enable=FALSE pendant l impulsion (step 5) -> neutralisation fail-safe immediate'
+    (* 💤 t=-20ms : demarrage + regime etabli, sain (boucle fermee, contacteur repos) *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    (* 🚀 t=0 : front ArmRequest -> TestA (step 1) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    (* 🔍 t=200ms : TestA reussi (boucle tombe) -> RestoreA *)
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
+    (* 🔍 t=400ms : RestoreA reussi -> TestB *)
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    (* 🔍 t=600ms : TestB reussi -> RestoreB *)
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := FALSE, POWERCONTACTORENGAGED := FALSE);
+    (* 🔍 t=800ms : RestoreB reussi -> PULSE (step 5), impulsion active *)
+    ADVANCE_TIME(200000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_EQ(fb.STATUS.STATE.STEP, 5, 'precondition : pulse en cours (step 5)');
+    ASSERT_TRUE(fb.CMD.ARMPULSE_CMD, 'precondition : impulsion active');
+
+    (* ⛔ t=810ms : Enable=FALSE EN PLEINE IMPULSION -> neutralisation fail-safe (gate §2) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := FALSE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_EQ(fb.STATUS.STATE.STEP, 0, 'Enable=FALSE -> sequence ramenee a IDLE (gate §2)');
+    ASSERT_FALSE(fb.CMD.ARMPULSE_CMD, 'impulsion coupee immediatement (fail-safe)');
+    ASSERT_FALSE(fb.CMD.MAINTAINA_CMD, 'maintien A coupe (fail-safe)');
+    ASSERT_FALSE(fb.CMD.MAINTAINB_CMD, 'maintien B coupe (fail-safe)');
+    ASSERT_FALSE(fb.STATUS.READY, 'Enable=FALSE -> Ready=FALSE');
+    ASSERT_FALSE(fb.STATUS.DIAG.ERROR, 'neutralisation != defaut : causes repartent propres');
+    ASSERT_EQ(fb.STATUS.DIAG.LASTABORTCAUSE, 0, 'neutralisation != abandon : trace repart a CST_ABORT_NONE');
+
+    (* 🔁 t=820ms : re-Enable -> autotest repasse (boucle OK, contacteur repos) -> pret *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := FALSE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_TRUE(fb.STATUS.READY, 're-Enable sain -> Ready=TRUE (autotest repasse)');
+    ASSERT_TRUE(fb.STATUS.STATE.ARMABLE, 're-Enable -> Armable=TRUE (aucun etat colle)');
+
+    (* 🚀 t=830ms : nouvel front ArmRequest -> la sequence repart proprement depuis IDLE *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMREQUEST := TRUE, POWERCUTOFFREQUEST := FALSE,
+       BTNEMERGENCYCUTOFF := FALSE, EMERGENCYCHAINCLOSED := TRUE, POWERCONTACTORENGAGED := FALSE);
+    ASSERT_EQ(fb.STATUS.STATE.STEP, 1, 'nouveau front ArmRequest -> TestA relance (retour arriere propre)');
 END_TEST
 

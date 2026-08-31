@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.180771" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.180771">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T14:24:03.021071" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T14:24:03.021071">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -172,6 +172,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Impulsion rearmement puissance AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestCutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Test de redondance AU en cours (canal A ou B coupe) — consommé par FB_SimBench</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Requête coupure métier (arrêt d'urgence) — consommé par FB_SimBench</xhtml>
               </documentation>
             </variable>
           </struct>

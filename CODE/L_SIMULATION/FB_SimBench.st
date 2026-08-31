@@ -57,6 +57,9 @@ VAR_INPUT
     PowerKeepAlive_A           : BOOL;             (* --> [SAFE] TRUE = relais A maintenu sagement par le PLC *)
     PowerKeepAlive_B           : BOOL;             (* --> [SAFE] TRUE = relais B maintenu sagement par le PLC *)
     EmergencyArming_RQ         : BOOL;             (* --> [CMD] Impulsion de réarmement puissance *)
+    TestCutActive              : BOOL;             (* --> [SAFE] Test de redondance AU en cours (canal A ou B coupé) *)
+    PowerCutOffRequest         : BOOL;             (* --> [SAFE] Requête coupure métier (TRUE = arrêt d'urgence) *)
+    SimChainOkBit              : BOOL;             (* --> [TST] Bit opérateur : TRUE = simuler chaîne AU fermée *)
 
     // ── Stimuli & Paramètres de banc ─────────────────────────────────────────
     SimEncoderSpeedFactor      : REAL := 1.0;   (* --> [CFG] Facteur vitesse codeur *)
@@ -334,11 +337,14 @@ Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 {region "§5 Simulation securite et image machine"}
 // ── 4. MODÈLE SÉCURITÉ & COMMUNS MACHINE ─────────────────────────────────────
 instSimSafety(
-    Enable           := TRUE,
-    PowerCutOff_A    := PowerKeepAlive_A,
-    PowerCutOff_B    := PowerKeepAlive_B,
-    EmergencyArming  := EmergencyArming_RQ,
-    BtnEmergencyStop := BtnEmergencyStop
+    Enable            := TRUE,
+    SimChainOkBit     := SimChainOkBit,
+    PowerCutOff_A     := PowerKeepAlive_A,
+    PowerCutOff_B     := PowerKeepAlive_B,
+    PowerCutOffRequest:= PowerCutOffRequest,
+    EmergencyArming   := EmergencyArming_RQ,
+    BtnEmergencyStop  := BtnEmergencyStop,
+    TestCutActive     := TestCutActive
 );
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
