@@ -97,6 +97,7 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimJoystickOvershoot_Active := FALSE;
     GVL_Simulation.SimJoystickBagotement_Active := FALSE;
     GVL_Simulation.SimEncoderSpeedFactor := 1.0;
+    GVL_Simulation.SimTopPositionActive := FALSE;
     GVL_Simulation.SimSyncDeviationInjectM1 := FALSE;
     GVL_Simulation.SimSyncDeviationInjectM2 := FALSE;
     GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
@@ -269,6 +270,7 @@ instSimBench(
     EmergencyArming_RQ       := PRG_06_Outputs.Data.EmergencyArmingCmd
                                  OR (PRG_06_Outputs.ArmingSeqStep = 5),
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
+    SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
     SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
