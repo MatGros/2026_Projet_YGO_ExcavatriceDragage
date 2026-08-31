@@ -278,22 +278,30 @@ même dictionnaire que `GUIDE_EDITION_AF_v1.0.md §3quater`.
 
 ## 🧭 3bis · Modèle uniforme des permits directionnels M3 (T184)
 
-Modèle identique aux treuils M1/M2 (`AscentPermit`/`DescendPermit`) : **1 source safety → 2
-permits directionnels nommés selon la sémantique métier → projection IHM**.
+Modèle aligné sur les treuils M1/M2 (`AscentPermit`/`DescendPermit`) : **1 source safety → 2
+permits directionnels nommés selon la sémantique métier → fusion Process → projection IHM du
+niveau EFFECTIF** (D1 — Phase 3).
 
 | Étape | Élément | Détail |
 |---|---|---|
 | 1 source safety | `FB_Safety_Translation` (producteur unique) | Sorties `VAR_OUTPUT` `TremiePermit`/`MaintenancePermit`, polarité fail-safe (`TRUE`=autorisé), gatées par `Enable` — fiche `FB_Safety_Translation_v1.1.md` §2bis |
 | 2 permits directionnels | `TremiePermit` (vers Trémie, `Direction=+1`) · `MaintenancePermit` (vers Maintenance, `Direction=-1`) | Nommés par la **sémantique métier** (pas Fwd/Rev) |
-| Projection IHM | `GVL_IHM.TranslationM3.Safety.TremiePermit` / `.MaintenancePermit` | Alimentés par `PRG_05_Translation` (§4) puis projetés par `PRG_07_Supervision` |
-| Diagnostic | `MotionM3.Step6_DirectionAllowed` (`FB_TroubleshootingView`) | `SEL(RequestedDirection=1, MaintenancePermit, TremiePermit)` — même pattern que M1/M2 |
+| 3 fusion Process (D1) | `EffectivePermitM3_Tremie`/`EffectivePermitM3_Maintenance` = Safety **AND** Process | Calculée en local dans `PRG_05_Translation` (§1ter), cohérent avec `PRG_04` qui fusionne en local (pas dans `FB_Safety_Winch`). Process M3 = homme-mort (`JoystickDeflected AND DeadmanArmed`), même définition que `FB_Cycle` §2 (`ProcessPermitM3_Tremie`/`Maintenance`) |
+| Projection IHM | `GVL_IHM.TranslationM3.Safety.TremiePermit` / `.MaintenancePermit` | Alimentés par `PRG_05_Translation` (§4, **niveau EFFECTIF**) puis projetés par `PRG_07_Supervision` |
+| Diagnostic | `MotionM3.Step6_DirectionAllowed` (`FB_TroubleshootingView`) | `SEL(RequestedDirection=1, MaintenancePermit, TremiePermit)` — même pattern que M1/M2 (qui consomment aussi le niveau effectif) |
 
 - **Sens** : `Direction=+1` → Trémie, `Direction=-1` → Maintenance (convention §4, inchangée).
+- **Niveau exposé = EFFECTIF** : `GVL_IHM.TranslationM3.Safety.TremiePermit`/`.MaintenancePermit`
+  portent désormais `Safety AND Process` (D1), pas le Safety brut. Le Safety brut reste produit
+  par `FB_Safety_Translation` (sorties `VAR_OUTPUT`), consommé en interne par `PRG_05` pour la
+  fusion — il n'est plus projeté tel quel à l'IHM. Alignement strict sur les treuils
+  (`WinchM1Safety.AscentPermit := EffectivePermitM1_Ascent`, `FB_WinchStateProjection.st:224`).
 - **`HeightInterlockBlocking`** (anti-télescopage hauteur M1/M2, F11.05) reste un **blocage
   séparé non directionnel** — il n'entre plus dans `Step6_DirectionAllowed` (diagnostic), mais
   reste tracé dans la chaîne `TranslationPontM3.Safety_300.Idx308_HeightInterlockBlocking`.
 - **Uniformité** : M1/M2 (`AscentPermit`/`DescendPermit`) et M3 (`TremiePermit`/`MaintenancePermit`)
-  suivent le même modèle — 1 source safety par axe, 2 permits directionnels, 1 projection IHM.
+  suivent le même modèle — 1 source safety par axe, 2 permits directionnels, fusion Process,
+  1 projection IHM du niveau effectif.
 
 ---
 
@@ -324,6 +332,7 @@ Consommateurs : `FB_Translation_PositionEstimator` (odométrie + recalage), `FB_
 |---|---|---|
 | v2.3 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié (était totalement désynchronisé des sections réelles), section `🎯 Rôle et périmètre` explicite, Table des fonctions ajoutée (obligatoire, famille Fonctions métier, absente jusqu'ici), diagramme composition HTML/SVG → Mermaid `flowchart TD` stylisé, Suivi historique + TBD + **Documents liés ajoutés (section entièrement absente jusqu'ici)**, renumérotation complète. **Correctifs de fond majeurs** (review sous-agent expert automatisme) : (1) le catalogue TC du chapô (IDs `010` à `060`) était **entièrement inventé**, ne correspondant à aucun test réel des 4 fiches FB — reconstruit à partir des vrais catalogues (IDs `001` à `014`) ; (2) l'anti-télescopage était attribué à tort à `FB_Safety_Translation` — l'interlock réel (`M3_HeightInterlockOk`) est câblé directement dans `PRG_05_Translation.st` §0, hors de toute fiche FB, avec entrée croisée depuis `PRG_04_Treuils_Benne` — nouvelle fonction `F11.05` créée pour cette réalité, diagramme corrigé avec le flux inter-domaine manquant, TBD ajouté (aucun TC ne couvre cette fonction C4 aujourd'hui) |
 | v2.3 (T184) | 2026-08-31 | Ajout §3bis « Modèle uniforme des permits directionnels M3 » : 1 source safety (`FB_Safety_Translation`) → 2 permits directionnels nommés par la sémantique métier (`TremiePermit`/`MaintenancePermit`) → projection IHM (`GVL_IHM.TranslationM3.Safety`) + diagnostic `MotionM3.Step6_DirectionAllowed` (même pattern que M1/M2). Ligne F11.02 + diagramme Mermaid mis à jour. Pas de bump de version (références croisées multiples dans CODE/CODE_XML/TOOLS). |
+| v2.3 (D1) | 2026-09-01 | **Phase 3 — Niveau EFFECTIF M3** : `GVL_IHM.TranslationM3.Safety.TremiePermit`/`.MaintenancePermit` exposent désormais `Safety AND Process` (fusion D1, §1ter `PRG_05_Translation`), aligné sur les treuils (`EffectivePermitM1/M2`). Process M3 = homme-mort (`JoystickDeflected AND DeadmanArmed`, même définition que `FB_Cycle` §2). §3bis mis à jour (retrait du « modèle identique » trompeur, documentation de la fusion). Safety brut conservé en interne (`FB_Safety_Translation`), non projeté tel quel. |
 | v2.2 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 
 ## ❓ 6 · TBD
