@@ -54,7 +54,7 @@ ELSE
     IF Context.BucketBusy AND Context.BucketM2StartStop THEN
         StartStop := Context.BucketM2StartStop;
         Direction := SEL(Context.BucketM2Open, -1, 1);  // Open → +1, Close → -1
-        StepTgt   := 1;   // override benne = vitesse lente (palier 1)
+        StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -72,13 +72,13 @@ ELSE
                 IF BothIntent.Active THEN
                     // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
                     Direction := BothIntent.Direction;
-                    StepTgt   := 5;   // 100 % → palier max
+                    StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
                 ELSIF IHM.BtnUpM2 THEN
                     Direction := 1;
-                    StepTgt   := 5;
+                    StepTgt   := Cfg.BtnStepTgt;
                 ELSIF IHM.BtnDownM2 THEN
                     Direction := -1;
-                    StepTgt   := 5;
+                    StepTgt   := Cfg.BtnStepTgt;
                 ELSE
                     Direction := 0;
                     StepTgt   := 0;

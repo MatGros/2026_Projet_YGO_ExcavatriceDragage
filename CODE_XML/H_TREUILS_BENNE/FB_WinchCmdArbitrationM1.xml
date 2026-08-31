@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:16:51.557335" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:16:51.557335">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:20:27.424490" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:20:27.424490">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -504,6 +504,51 @@ treuils avant de changer de mode ».
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_fbWinchCmdArbitration_Cfg">
+        <baseType>
+          <struct>
+            <variable name="BtnStepTgt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier boutons/both (100 % → palier max)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketOverrideStepTgt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier override benne (vitesse lente)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>975ccf22-73db-5c3e-bfac-c985552bde6f</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_fbWinchCmdArbitration_Cfg — Config treuil (partagé M1/M2)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Config statique de FB_WinchCmdArbitrationM1/M2.
+       Structure UNIQUE partagée : M1 consomme BtnStepTgt (boutons/both),
+       M2 consomme BtnStepTgt (boutons/both) + BucketOverrideStepTgt (chemin benne).
+   📤 Producteur : PRG_04_Treuils_Benne (câblage).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   🔌 Remplace les paliers codés en dur (StepTgt := 5 / StepTgt := 1) par des constantes nommées.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_fbWinchCmdArbitration_Context">
         <baseType>
           <struct>
@@ -930,6 +975,14 @@ treuils avant de changer de mode ».
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Gating benne/synchro (partagé M1/M2)</xhtml>
               </documentation>
             </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_fbWinchCmdArbitration_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier boutons/both (BtnStepTgt)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SpeedStepTable">
               <type>
                 <derived name="ST_SpeedStepTable" />
@@ -1033,13 +1086,13 @@ ELSE
             IF BothIntent.Active THEN
                 // Both (BtnWinchBothUp/Down) — source unique PRG_03, plus de re-dérivation
                 Direction := BothIntent.Direction;
-                StepTgt   := 5;   // 100 % → palier max
+                StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
             ELSIF IHM.BtnUpM1 THEN
                 Direction := 1;
-                StepTgt   := 5;
+                StepTgt   := Cfg.BtnStepTgt;
             ELSIF IHM.BtnDownM1 THEN
                 Direction := -1;
-                StepTgt   := 5;
+                StepTgt   := Cfg.BtnStepTgt;
             ELSE
                 Direction := 0;
                 StepTgt   := 0;
@@ -1094,6 +1147,7 @@ END_IF;
           <Object Name="FB_WinchCmdArbitrationM1" ObjectId="ed58a992-e090-5b40-8cf2-91ea992d9d52" />
           <Folder Name="_TYPES">
             <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
+            <Object Name="ST_fbWinchCmdArbitration_Cfg" ObjectId="975ccf22-73db-5c3e-bfac-c985552bde6f" />
             <Object Name="ST_fbWinchCmdArbitration_Context" ObjectId="58dd8b92-25cb-5b24-b149-4d148f2014bb" />
             <Object Name="ST_fbWinchCmdArbitration_IHM" ObjectId="b2c6293b-40b7-50ed-85f4-51c0c572dd06" />
           </Folder>

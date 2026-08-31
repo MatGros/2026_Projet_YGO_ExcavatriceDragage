@@ -770,25 +770,6 @@ tasks:
   date: '2026-08-31T00:00:00+02:00'
   bloque_par:
   - T165-A
-- id: T131
-  parent_id: ''
-  statut: ❌
-  criticite: C4
-  domaine: SÉCURITÉ
-  agent: —
-  date: '2026-08-31T00:00:00+02:00'
-  titre: Vitesse par paliers (1-5) dans le cycle au lieu de %
-  contexte: 'Intitulé complet : Vitesse par paliers (1-5) dans le cycle au lieu de % : ST_WinchCmdDemand + FB_Cycle + PRG_04'
-  description: '❌ CLÔTURÉE 2026-08-31 (audit DSH + décision utilisateur) : périmée — design retenu : % en amont (joystick/M3/cycle),
-    paliers 1-5 UNIQUEMENT treuils en aval (déjà implémenté via FB_Winch §5 + FB_SpeedStep + T181-06/07 DriveRequest/MinStepNumber).
-    Le cycle DOIT rester en % (SpeedPct:REAL), pas de conversion palier dans le cycle. Historique conservé : ⏸️ Décision D-03
-    de T165-A : conserver temporairement le % tant que le choix humain n''est pas visé. Historique : ST_WinchCmdDemand.SpeedPct
-    (REAL %) → FB_SpeedStep ; le cycle hardcode 10/50/20/70% ; l''éventuel palier 1-5 est une évolution fonctionnelle séparée,
-    pas un ride-along du remappage inter-PRG.'
-  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T165-A_ARCHITECTURE_PRG02_PRG03.yaml
-  objectifs: []
-  bloque_par:
-  - T165-A
 - id: T132
   parent_id: ''
   statut: ✅
