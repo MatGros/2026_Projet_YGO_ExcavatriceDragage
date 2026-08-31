@@ -3956,6 +3956,23 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Masque brut complet (latch cause) — source d'arbitrage PowerCutOff</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx318_TremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels M3 (source unique : FB_Safety_Translation) — TRUE = autorisé, fail-safe
+1 = Translation vers Trémie autorisée | 0 = SENS TRÉMIE BLOQUÉ</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx319_MaintenancePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Translation vers Maintenance autorisée | 0 = SENS MAINTENANCE BLOQUÉ</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -10570,6 +10587,23 @@ Seuils de changement de palier (0..100%)</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis de mouvement effectif (agrégat diagnostic : toutes les barrières levées)
 🟢 Translation réellement autorisée à se déplacer</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TremiePermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
+🟢 Sens Trémie effectivement permis (instSafetyTranslationM3.TremiePermit)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (instSafetyTranslationM3.MaintenancePermit)</xhtml>
               </documentation>
             </variable>
             <variable name="HeightInterlockBlocking">
@@ -36431,6 +36465,8 @@ GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx314_ErrorMecaA        := Tra
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx315_ErrorLimitSwitch  := Translation.Safety.ErrorLimitSwitch;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent := Translation.Safety.ErrorSensorIncoherent;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx317_ErrorId := Translation.Safety.ErrorId; // Masque brut complet (latch cause, source d'arbitrage PowerCutOff)
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx318_TremiePermit := Translation.Safety.TremiePermit; // 🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx319_MaintenancePermit := Translation.Safety.MaintenancePermit; // 🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)
 
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqCmd_Hz;
@@ -45478,6 +45514,9 @@ TranslationTrace.PowerCutOffActive        := instSafetyTranslationM3.PowerCutOff
 TranslationTrace.HeightInterlockBlocking  := NOT M3_HeightInterlockOk;
 TranslationTrace.DriveOperational         := PRG_02_Acquisition.Data.Network.DriveM3.Operational;
 TranslationTrace.FinalInterlockError      := TranslationState.FinalInterlockError;
+// 🟢 Permis directionnels par sens (source unique : FB_Safety_Translation) — reflet exact des permis appliqués
+TranslationTrace.TremiePermitEffective    := instSafetyTranslationM3.TremiePermit;
+TranslationTrace.MaintenancePermitEffective := instSafetyTranslationM3.MaintenancePermit;
 
 // Permis de mouvement effectif = toutes les barrières levées (agrégat diagnostic)
 TranslationTrace.MotionPermitEffective := NOT M3_SafeStop_Aggregate

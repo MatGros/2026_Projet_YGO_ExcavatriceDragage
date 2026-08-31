@@ -18,5 +18,8 @@ STRUCT
     Idx315_ErrorLimitSwitch  : BOOL; // bit6 Limite extrême atteinte
     Idx316_ErrorSensorIncoherent: BOOL; // bit7 Mot capteurs position incohérent
     Idx317_ErrorId           : WORD; // Masque brut complet (latch cause) — source d'arbitrage PowerCutOff
+    (* Permis directionnels M3 (source unique : FB_Safety_Translation) — TRUE = autorisé, fail-safe *)
+    Idx318_TremiePermit      : BOOL; // 1 = Translation vers Trémie autorisée | 0 = SENS TRÉMIE BLOQUÉ
+    Idx319_MaintenancePermit : BOOL; // 1 = Translation vers Maintenance autorisée | 0 = SENS MAINTENANCE BLOQUÉ
 END_STRUCT
 END_TYPE

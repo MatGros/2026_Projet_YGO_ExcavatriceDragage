@@ -469,6 +469,9 @@ TranslationTrace.PowerCutOffActive        := instSafetyTranslationM3.PowerCutOff
 TranslationTrace.HeightInterlockBlocking  := NOT M3_HeightInterlockOk;
 TranslationTrace.DriveOperational         := PRG_02_Acquisition.Data.Network.DriveM3.Operational;
 TranslationTrace.FinalInterlockError      := TranslationState.FinalInterlockError;
+// 🟢 Permis directionnels par sens (source unique : FB_Safety_Translation) — reflet exact des permis appliqués
+TranslationTrace.TremiePermitEffective    := instSafetyTranslationM3.TremiePermit;
+TranslationTrace.MaintenancePermitEffective := instSafetyTranslationM3.MaintenancePermit;
 
 // Permis de mouvement effectif = toutes les barrières levées (agrégat diagnostic)
 TranslationTrace.MotionPermitEffective := NOT M3_SafeStop_Aggregate
