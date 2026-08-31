@@ -14,7 +14,7 @@ VAR_INPUT
     Reset                   : BOOL;         // --> [CMD] Acquittement defaut (front)
     PowerContactorEngaged   : BOOL;         // --> [SAFE] Chaine de securite OK
     Mode                    : E_Mode;       // --> [CMD] Mode arbitre (SEMI_AUTO pour instance cycle)
-    CycleMotionPermit       : BOOL;         // --> [CMD] Manche deflecte (non centre)
+    JoystickDeflected       : BOOL;         // --> [CMD] Manche deflecte (non centre)
     DeadmanArmed            : BOOL;         // --> [CMD] Appui homme-mort (fenetre 3 s)
     HeartbeatIhmOk          : BOOL;         // --> [SAFE] IHM<->PLC valide
 
@@ -104,14 +104,17 @@ VAR
     ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
 
     // === GATE CONTINU HOMME-MORT (permis par action hardware) ===
-    ProcessPermitM1_Ascent   : BOOL; // . [LOC] Permis ascending treuil M1 = CycleMotionPermit AND DeadmanArmed
-    ProcessPermitM1_Descend  : BOOL; // . [LOC] Permis descending treuil M1 = CycleMotionPermit AND DeadmanArmed
-    ProcessPermitM2_Ascent   : BOOL; // . [LOC] Permis ascending treuil M2 = CycleMotionPermit AND DeadmanArmed
-    ProcessPermitM2_Descend  : BOOL; // . [LOC] Permis descending treuil M2 = CycleMotionPermit AND DeadmanArmed
-    ProcessPermitBucket_Open   : BOOL; // . [LOC] Permis ouverture benne = CycleMotionPermit AND DeadmanArmed
-    ProcessPermitBucket_Close   : BOOL; // . [LOC] Permis fermeture benne = CycleMotionPermit AND DeadmanArmed
-    ProcessPermitM3_Tremie          : BOOL; // . [LOC] Permis translation M3 cote tremie = CycleMotionPermit AND DeadmanArmed
-    ProcessPermitM3_Maintenance     : BOOL; // . [LOC] Permis translation M3 cote maintenance = CycleMotionPermit AND DeadmanArmed
+    ProcessPermitM1_Ascent   : BOOL; // . [LOC] Permis ascending treuil M1 = JoystickDeflected AND DeadmanArmed
+    ProcessPermitM1_Descend  : BOOL; // . [LOC] Permis descending treuil M1 = JoystickDeflected AND DeadmanArmed
+    ProcessPermitM2_Ascent   : BOOL; // . [LOC] Permis ascending treuil M2 = JoystickDeflected AND DeadmanArmed
+    ProcessPermitM2_Descend  : BOOL; // . [LOC] Permis descending treuil M2 = JoystickDeflected AND DeadmanArmed
+    ProcessPermitBucket_Open   : BOOL; // . [LOC] Permis ouverture benne = JoystickDeflected AND DeadmanArmed
+    ProcessPermitBucket_Close   : BOOL; // . [LOC] Permis fermeture benne = JoystickDeflected AND DeadmanArmed
+    ProcessPermitM3_Tremie          : BOOL; // . [LOC] Permis translation M3 cote tremie = JoystickDeflected AND DeadmanArmed
+    ProcessPermitM3_Maintenance     : BOOL; // . [LOC] Permis translation M3 cote maintenance = JoystickDeflected AND DeadmanArmed
+
+    // === COMPTEUR PRELEVEMENTS (garde de front) ===
+    SampleCountDone         : BOOL := FALSE; // . [LOC] F2: front de comptage SampleCount (1 seul increment par cycle)
 
     // === ETATS INTERNES ===
     State                   : E_CycleStep := E_CycleStep.X0_PREPARATION; // . [LOC] Etape courante machine d'etat
@@ -158,7 +161,7 @@ StabilizationTimer(IN := (State = E_CycleStep.X7_CTRL_ASCENT), PT := CtrlAscentT
 // 📏 Comparaison vitesse réelle M1/M2
 SpeedMismatchMps := ABS(M1_MeasuredSpeedMps - M2_MeasuredSpeedMps);
 SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
-                       AND CycleMotionPermit
+                       AND JoystickDeflected
                        AND (SpeedMismatchThresholdMps > 0.0)
                        AND (SpeedMismatchTimeout > T#0ms)
                        AND (SpeedMismatchMps > SpeedMismatchThresholdMps);
@@ -168,7 +171,7 @@ SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
 // Tempo max d'étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
 // Xi -> STABILIZING : TON backstop durée d'état pour tous les états de mouvement.
-StepMaxTimer(IN := CycleMotionPermit AND (State <> E_CycleStep.X0_PREPARATION)
+StepMaxTimer(IN := JoystickDeflected AND (State <> E_CycleStep.X0_PREPARATION)
                   AND (State <> E_CycleStep.X13_DONE_SYNC)
                   AND (State <> E_CycleStep.STABILIZING),
              PT := StepMaxTimeout);
@@ -251,17 +254,17 @@ END_IF;
 Ready := Enable AND NOT Fault.Latched;
 
 // 🛡️ Gate continu homme-mort : le mouvement n'est autorisé que si le manche est
-// défléchi (CycleMotionPermit) ET l'homme-mort est armé (DeadmanArmed). Chaque
+// défléchi (JoystickDeflected) ET l'homme-mort est armé (DeadmanArmed). Chaque
 // commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
-// démarrage). Le séquenceur (transitions X0→X13) reste piloté par CycleMotionPermit.
-ProcessPermitM1_Ascent        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM1_Descend      := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM2_Ascent        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM2_Descend      := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitBucket_Open := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitBucket_Close := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM3_Tremie        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM3_Maintenance   := CycleMotionPermit AND DeadmanArmed;
+// démarrage). Le séquenceur (transitions X0→X13) reste piloté par JoystickDeflected.
+ProcessPermitM1_Ascent        := JoystickDeflected AND DeadmanArmed;
+ProcessPermitM1_Descend      := JoystickDeflected AND DeadmanArmed;
+ProcessPermitM2_Ascent        := JoystickDeflected AND DeadmanArmed;
+ProcessPermitM2_Descend      := JoystickDeflected AND DeadmanArmed;
+ProcessPermitBucket_Open := JoystickDeflected AND DeadmanArmed;
+ProcessPermitBucket_Close := JoystickDeflected AND DeadmanArmed;
+ProcessPermitM3_Tremie        := JoystickDeflected AND DeadmanArmed;
+ProcessPermitM3_Maintenance   := JoystickDeflected AND DeadmanArmed;
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
 IF WaitingResume THEN
@@ -342,6 +345,7 @@ CASE State OF
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0400;
         OperatorAction := 'Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
+        SampleCountDone := FALSE;   // F2: réarmement du front de comptage à chaque entrée en X0
 
         // Transition si système sain et réarmé (front reset ou démarrage).
         // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
@@ -357,8 +361,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0401;
         OperatorAction := 'Maintenir la montee lente vers les capteurs de referencement.';
 
@@ -385,8 +389,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
         ExpectedDirection := 0;
-        WaitingForOperator := (SelTarget = 0) OR NOT CycleMotionPermit;
-        WaitingForProcess := (SelTarget <> 0) AND CycleMotionPermit;
+        WaitingForOperator := (SelTarget = 0) OR NOT JoystickDeflected;
+        WaitingForProcess := (SelTarget <> 0) AND JoystickDeflected;
         OperatorActionId := 16#0402;
         OperatorAction := 'Selectionner la cible et maintenir la translation vers la position de travail.';
 
@@ -395,7 +399,7 @@ CASE State OF
             TranslationCmd.PositionTgt := SelTarget;
             TranslationCmd.ReqStart := ProcessPermitM3_Tremie;
             // Arrivée à la cible (Trémie/P1/Maintenance)
-            IF CycleMotionPermit AND (
+            IF JoystickDeflected AND (
                 (SelTarget = 1 AND Translation_At_Tremie) OR
                 (SelTarget = 3 AND Translation_At_P1) OR
                 (SelTarget = 4 AND Translation_At_Maintenance)) THEN
@@ -411,8 +415,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 0;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0403;
         OperatorAction := 'Maintenir le joystick : ouverture complete de la benne.';
 
@@ -420,7 +424,7 @@ CASE State OF
             State := E_CycleStep.X4_DESCEND_OPEN;
         ELSE
             BucketCmd.ReqOpen := ProcessPermitBucket_Open;
-            IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
+            IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
                 BucketCmd.ReqOpen := FALSE;
                 State := E_CycleStep.X4_DESCEND_OPEN;
             END_IF;
@@ -433,8 +437,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0404;
         OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
@@ -448,7 +452,7 @@ CASE State OF
         BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descend;
 
         // Transition uniquement sur le retour dédié Kobold.
-        IF CycleMotionPermit AND KoboldContactFond THEN
+        IF JoystickDeflected AND KoboldContactFond THEN
             WinchM1Cmd.ReqStartStop := FALSE;
             WinchM2Cmd.ReqStartStop := FALSE;
             BucketCmd.ReqKoboldMeasureEnable := FALSE;
@@ -468,8 +472,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0405;
         OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
 
@@ -480,7 +484,7 @@ CASE State OF
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt := 1;
 
-        IF CycleMotionPermit AND (M1_CablePosM >= RaiseTargetM) AND (M2_CablePosM >= RaiseTargetM) THEN
+        IF JoystickDeflected AND (M1_CablePosM >= RaiseTargetM) AND (M2_CablePosM >= RaiseTargetM) THEN
             WinchM1Cmd.ReqStartStop := FALSE;
             WinchM2Cmd.ReqStartStop := FALSE;
             State := E_CycleStep.X6_CLOSE_BUCKET;
@@ -493,8 +497,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0406;
         OperatorAction := 'Maintenir la commande : fermeture de la benne.';
 
@@ -503,7 +507,7 @@ CASE State OF
         // commande d'actionneur ne doit survivre à la perte du permis opérateur.
         BucketCmd.ReqClose := ProcessPermitBucket_Close;
 
-        IF CycleMotionPermit AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
+        IF JoystickDeflected AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.ReqClose := FALSE;
             State := E_CycleStep.X7_CTRL_ASCENT;
         END_IF;
@@ -515,8 +519,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0407;
         OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
 
@@ -527,7 +531,7 @@ CASE State OF
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt  := 1;
 
-        IF CycleMotionPermit
+        IF JoystickDeflected
            AND (M1_CablePosM >= (TouchPositionM + CtrlAscentDistM))
            AND (M2_CablePosM >= (TouchPositionM + CtrlAscentDistM))
            AND (ABS(M1_CablePosM - M2_CablePosM) <= CtrlAscentToleranceM) THEN
@@ -541,8 +545,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0408;
         OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
@@ -553,7 +557,7 @@ CASE State OF
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt  := 4;
 
-        IF CycleMotionPermit AND M1_CablePosM >= CableLimitM1AscentM THEN
+        IF JoystickDeflected AND M1_CablePosM >= CableLimitM1AscentM THEN
             WinchM1Cmd.ReqStartStop := FALSE;
             WinchM2Cmd.ReqStartStop := FALSE;
             State := E_CycleStep.X9_DRAIN_PAUSE;
@@ -574,7 +578,7 @@ CASE State OF
         WinchM2Cmd.ReqStartStop := FALSE;
 
         DrainingTimer(IN := TRUE, PT := DrainingTime);
-        IF CycleMotionPermit AND DrainingTimer.Q THEN
+        IF JoystickDeflected AND DrainingTimer.Q THEN
             DrainingTimer(IN := FALSE);
             State := E_CycleStep.X10_TRANSLATE_DUMP;
         END_IF;
@@ -586,15 +590,15 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040A;
         OperatorAction := 'Maintenir la translation vers la tremie de dechargement.';
 
         TranslationCmd.PositionTgt := 1; // Trémie
         TranslationCmd.ReqStart := ProcessPermitM3_Tremie;
 
-        IF CycleMotionPermit AND Translation_At_Tremie THEN
+        IF JoystickDeflected AND Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
             State := E_CycleStep.X11_OPEN_DUMP;
         END_IF;
@@ -606,8 +610,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT CycleMotionPermit;
-        WaitingForProcess := CycleMotionPermit;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
         OperatorAction := 'Deflechir vers le bas pour ouvrir la benne et vider la charge.';
 
@@ -623,7 +627,7 @@ CASE State OF
 
         BucketCmd.ReqOpen := ProcessPermitBucket_Open AND (WinchM1Cmd.ReqDirection = -1);
 
-        IF CycleMotionPermit AND Benne_Done AND Benne_IsOpen THEN
+        IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
             State := E_CycleStep.X13_DONE_SYNC;
         END_IF;
@@ -643,10 +647,14 @@ CASE State OF
         OperatorActionId := 16#040D;
         OperatorAction := 'Cycle termine avec succes. Relancer un nouveau cycle.';
 
-        // Compteur de prélèvements (RETAIN)
-        SampleCount := SampleCount + 1;
+        // Compteur de prélèvements (RETAIN) — F2: incrément cadré par front (1 seul par cycle)
+        IF NOT SampleCountDone THEN
+            SampleCount := SampleCount + 1;
+            SampleCountDone := TRUE;
+        END_IF;
 
         IF StartEdge.Q THEN
+            SampleCountDone := FALSE;
             Lifecycle.Done := FALSE;
             State := E_CycleStep.X0_PREPARATION;
         END_IF;
