@@ -1009,28 +1009,41 @@ tasks:
   bloque_par: []
 - id: T146
   parent_id: ''
-  statut: ✅
+  statut: ⏳
   criticite: C4
   domaine: SÉCURITÉ
   agent: AGY-01
-  date: '2026-08-27T21:25:00'
-  titre: 'Référencement / homing des codeurs : état incohérent & suspect'
-  contexte: 'Intitulé complet : Référencement / homing des codeurs : état incohérent
-    & suspect — mise à plat, challenge & simplification'
-  description: '**TÂCHE EN COURS (NON CLÔTURÉE)**. Audit 2026-08-22 : Façade FB_Encoder
-    créée (Abs, Homing, Scale, Safety, Speed), mais 2 points critiques restent à traiter
-    avant clôture : ① Interlock hauteur Translation M3 (M3_HeightInterlockOk) : fail-safe
-    incomplet — un codeur non homé mais dans les bornes est cru par l''interlock ;
-    imposer strictement la condition positive Homed = TRUE. ② Synchronisation de l''état
-    Homed entre FB_Encoder_Homing et FB_Encoder_Safety. ③ Mise à jour de l''AF-09
-    §5 (acter le homing en configuration benne fermée).'
+  date: '2026-08-31T00:00:00'
+  titre: 'Référencement / homing des codeurs : arbitrage vitesse/position sans homing'
+  contexte: 'Intitulé complet : Référencement / homing des codeurs : arbitrage vitesse/position
+    sans homing (bridage hors homing, débridage capteur TOP haut, interlock grille/trémie)'
+  description: '**REQUALIFIÉE 2026-08-31 (analyse statique)**. 2 volets du blocage
+    initial sont PÉRIMÉS (déjà conformes dans le code courant) : ① Interlock hauteur
+    Translation M3 (M3_HeightInterlockOk) exige déjà Homed=TRUE strict via HomedAndReliable
+    M1∧M2 (PRG_05_Translation.st:102-106, commit d66728f6) ; ② Synchronisation Homed
+    Homing↔Safety : producteur unique FB_Encoder_Homing (Calib.Homed), FB_Encoder_Safety
+    n''émet que EncoderIncoherent — pas de désynchronisation. ✅ Ces 2 volets sont clos.
+    ⚠️ PÉRIMÈTRE RESTANT (le vrai écart) : l''arbitrage « vitesse bridée sans homing »
+    n''existe PAS — hors homing le mouvement treuil est possible à pleine vitesse, les
+    protections logicielles de position deviennent inertes, seul le capteur physique
+    haut protège. Aucun débridage « capteur TOP haut », aucun interlock « grille levée
+    / trémie pleine » (TremieFull_OR_GateRaised_DI déclaré non consommé). Décision
+    métier ISO 13849 requise : bridage progressif vs repos capteur physique assumé.
+    Formulation « Homed=TRUE strict » : correcte pour l''anti-collision hauteur M3 et
+    la benne, à NE PAS généraliser — à coupler à un bridage vitesse (Homed strict là
+    où la position est critique, bridage sinon, levé si capteur TOP haut).'
   contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T146_C4_FBCODER_COMPLET.yaml
   objectifs:
-  - 'Interlock hauteur Translation M3 (M3_HeightInterlockOk) : fail-safe incomplet
-    — un codeur non homé mais dans les bornes est cru par l''interlock ; imposer strictement
-    la condition positive Homed = TRUE.'
-  - Synchronisation de l'état Homed entre FB_Encoder_Homing et FB_Encoder_Safety.
-  - Mise à jour de l'AF-09 §5 (acter le homing en configuration benne fermée).
+  - 'Clos : interlock hauteur M3 exige Homed=TRUE strict (HomedAndReliable M1∧M2) —
+    déjà conforme (commit d66728f6).'
+  - 'Clos : synchronisation Homed Homing↔Safety — producteur unique, pas de désynchronisation.'
+  - 'Restant : arbitrer la posture sécurité bridage hors homing (ISO 13849) — plafond
+    de palier réduit si non homé, ou repos capteur physique assumé et documenté.'
+  - 'Restant : définir la règle « capteur TOP haut ⇒ position connue ⇒ levée du bridage ».'
+  - 'Restant : câbler l''interlock grille levée / trémie pleine (TremieFull_OR_GateRaised_DI)
+    dans le permis M3→Trémie.'
+  - 'Restant : poursuivre le garde-fou vitesse (SpeedGuardEnable=FALSE, FB_WinchRateInterlock)
+    avant tout bridage fondé sur la vitesse.'
   bloque_par: []
 - id: T147
   parent_id: ''
@@ -4686,7 +4699,7 @@ tasks:
 - id: T199
   parent_id: ''
   statut: ⏳
-  criticite: C3
+  criticite: C4
   domaine: SÉCURITÉ
   agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
@@ -4705,7 +4718,7 @@ tasks:
   - Proposition de restructuration (flux clarifié, régions, extraction)
   - Zéro changement de logique de sécurité
   - Plan d'implémentation + contrat testable
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T199_CASE_AU.yaml
   bloque_par: []
 - id: T200
   parent_id: ''
@@ -5107,4 +5120,37 @@ tasks:
   - 'run_tests.py --domain G_CYCLE = 4/4 PASS (baseline verte figée avant T202-B..E)'
   - 'WARN de cohérence AF↔tests documenté (TC-P04 manquants listés, non bloquant)'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T202.yaml
+  bloque_par: []
+- id: T203
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: IHM
+  agent: DSH-02
+  date: '2026-08-31T00:00:00'
+  titre: 'Réorganisation chronologique GVL_Troubleshooting (ordre de lecture haut→bas)'
+  contexte: 'Intitulé complet : Réorganiser GVL_Troubleshooting par ordre chronologique
+    de la chaîne de commande (contexte machine → entrées → joystick → homing → safety
+    → modes/cycle → treuils → benne → translation → motion → traces), sans casser
+    les structures ST_* ni la numérotation existante. Demande utilisateur : le GVL
+    actuel est mal ordonné (Inputs en bas, Safety au milieu, Joystick après Safety)
+    — à réorganiser pour une lecture de haut en bas cohérente avec la mise en service.'
+  description: 'Réorganiser l''ordre des déclarations VAR_GLOBAL de GVL_Troubleshooting.st
+    pour suivre le flux chronologique de la chaîne de commande (PRG_02 → PRG_03 →
+    PRG_04/05 → PRG_06 → PRG_07). Aucun changement de type ST_*, aucun changement de
+    nom de variable, aucun changement de logique — pure réorganisation de l''ordre de
+    lecture + renumérotation des commentaires. Vérifier les effets de bord (consommateurs
+    FB_TroubleshootingView, GVL_IHM, snapshot troubleshooting_variables.txt) et l''auto-vérification
+    (bundle + G200 + gates).'
+  contrat: ''
+  objectifs:
+  - 'GVL_Troubleshooting.st réordonné : ordre de lecture haut→bas = chaîne de commande
+    (contexte → inputs → joystick → homing → safety → modes/cycle → treuils → benne
+    → translation → motion → traces)'
+  - 'Aucun type ST_* modifié, aucun nom de variable modifié, aucune logique changée
+    (réorganisation pure)'
+  - 'Renumérotation des commentaires cohérente avec le nouvel ordre'
+  - 'Effets de bord vérifiés : FB_TroubleshootingView, GVL_IHM, snapshot troubleshooting_variables.txt
+    toujours cohérents'
+  - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS'
   bloque_par: []

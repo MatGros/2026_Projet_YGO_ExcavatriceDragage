@@ -35,4 +35,5 @@ VAR_GLOBAL CONSTANT
     CST_ABORT_REDUNDANCY_A       : INT := 32;  // Defaut redondance canal A
     CST_ABORT_REDUNDANCY_B       : INT := 64;  // Defaut redondance canal B
     CST_ABORT_TIMEOUT_CONTACTOR  : INT := 128; // Timeout confirmation contacteur
+    CST_ABORT_INVALID_STEP       : INT := 256; // Etape sequence inconnue
 END_VAR

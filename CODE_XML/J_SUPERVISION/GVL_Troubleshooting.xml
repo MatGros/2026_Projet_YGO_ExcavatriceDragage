@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:37:56.862103" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:37:56.862103">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T17:12:08.176081" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T17:12:08.176081">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -4274,52 +4274,44 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 0. Contexte Global Machine (Mode, Simu, Commande, Bypass)</xhtml>
           </documentation>
         </variable>
-        <variable name="LevageSynchroniseM1M2">
+        <variable name="Inputs">
           <type>
-            <derived name="ST_ChainWinchSync" />
+            <derived name="ST_HardwareImage" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 1. Levage Synchronisé M1+M2 (Mode Couplé Nominal)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">📥 1. Image complète des entrées réelles / qualifiées / simulées</xhtml>
           </documentation>
         </variable>
-        <variable name="LevageUnitaireM1">
+        <variable name="Safety">
           <type>
-            <derived name="ST_ChainWinch" />
+            <derived name="ST_SafetyChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 2. Levage Unitaire M1 (Treuil Retenue)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ 2. Diagnostic chronologique Chaîne de Sécurité &amp; Réarmement AU</xhtml>
           </documentation>
         </variable>
-        <variable name="LevageUnitaireM2">
+        <variable name="Joystick">
           <type>
-            <derived name="ST_ChainWinch" />
+            <derived name="ST_JoystickChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 3. Levage Unitaire M2 (Treuil Benne)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ 3. Diagnostic chronologique Bus CANopen &amp; Homme-Mort Joystick</xhtml>
           </documentation>
         </variable>
-        <variable name="BenneOuvertureFermeture">
+        <variable name="HomingM1">
           <type>
-            <derived name="ST_ChainBucket" />
+            <derived name="ST_HomingChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 4. Ouverture / Fermeture Benne</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 4. Diagnostic chronologique Homing M1 (Treuil Retenue)</xhtml>
           </documentation>
         </variable>
-        <variable name="TranslationPontM3">
+        <variable name="HomingM2">
           <type>
-            <derived name="ST_ChainTranslation" />
+            <derived name="ST_HomingChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ 5. Translation Pont M3 (Variateur AC600)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="AssistanceDragage">
-          <type>
-            <derived name="ST_ChainDredgingAssist" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌊 5bis. Assistance Plongée/Extraction/Vidage Trémie</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 5. Diagnostic chronologique Homing M2 (Treuil Benne)</xhtml>
           </documentation>
         </variable>
         <variable name="CycleSemiAuto">
@@ -4330,36 +4322,52 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 6. Séquenceur de Cycle Semi-Automatique (X0 à X13)</xhtml>
           </documentation>
         </variable>
-        <variable name="HomingM1">
+        <variable name="LevageSynchroniseM1M2">
           <type>
-            <derived name="ST_HomingChecklist" />
+            <derived name="ST_ChainWinchSync" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Diagnostic chronologique Homing M1 (Treuil Retenue)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 7. Levage Synchronisé M1+M2 (Mode Couplé Nominal)</xhtml>
           </documentation>
         </variable>
-        <variable name="HomingM2">
+        <variable name="LevageUnitaireM1">
           <type>
-            <derived name="ST_HomingChecklist" />
+            <derived name="ST_ChainWinch" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Diagnostic chronologique Homing M2 (Treuil Benne)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 8. Levage Unitaire M1 (Treuil Retenue)</xhtml>
           </documentation>
         </variable>
-        <variable name="Safety">
+        <variable name="LevageUnitaireM2">
           <type>
-            <derived name="ST_SafetyChecklist" />
+            <derived name="ST_ChainWinch" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Diagnostic chronologique Chaîne de Sécurité &amp; Réarmement AU</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 9. Levage Unitaire M2 (Treuil Benne)</xhtml>
           </documentation>
         </variable>
-        <variable name="Joystick">
+        <variable name="BenneOuvertureFermeture">
           <type>
-            <derived name="ST_JoystickChecklist" />
+            <derived name="ST_ChainBucket" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Diagnostic chronologique Bus CANopen &amp; Homme-Mort Joystick</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 10. Ouverture / Fermeture Benne</xhtml>
+          </documentation>
+        </variable>
+        <variable name="TranslationPontM3">
+          <type>
+            <derived name="ST_ChainTranslation" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ 11. Translation Pont M3 (Variateur AC600)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="AssistanceDragage">
+          <type>
+            <derived name="ST_ChainDredgingAssist" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🌊 12. Assistance Plongée/Extraction/Vidage Trémie</xhtml>
           </documentation>
         </variable>
         <variable name="MotionM1">
@@ -4367,7 +4375,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <derived name="ST_MotionChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic chronologique Mouvement M1 (Treuil Retenue)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ 13. Diagnostic chronologique Mouvement M1 (Treuil Retenue)</xhtml>
           </documentation>
         </variable>
         <variable name="MotionM2">
@@ -4375,7 +4383,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <derived name="ST_MotionChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic chronologique Mouvement M2 (Treuil Benne)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ 14. Diagnostic chronologique Mouvement M2 (Treuil Benne)</xhtml>
           </documentation>
         </variable>
         <variable name="MotionM3">
@@ -4383,15 +4391,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <derived name="ST_MotionChecklist" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic chronologique Mouvement M3 (Translation)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="Inputs">
-          <type>
-            <derived name="ST_HardwareImage" />
-          </type>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">📥 Image complète des entrées réelles / qualifiées / simulées</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ 15. Diagnostic chronologique Mouvement M3 (Translation)</xhtml>
           </documentation>
         </variable>
         <variable name="TraceWinchM1">
@@ -4400,7 +4400,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🕵️ Trace de blocage terrain (cause priorisée + horodatage) — produite par PRG_04/05
-🕵️ Trace blocage treuil M1 (cause priorisée + horodatage)</xhtml>
+🕵️ 16. Trace blocage treuil M1 (cause priorisée + horodatage)</xhtml>
           </documentation>
         </variable>
         <variable name="TraceWinchM2">
@@ -4408,7 +4408,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <derived name="ST_TraceWinch" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕵️ Trace blocage treuil M2 (cause priorisée + horodatage)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🕵️ 17. Trace blocage treuil M2 (cause priorisée + horodatage)</xhtml>
           </documentation>
         </variable>
         <variable name="TraceTranslation">
@@ -4416,7 +4416,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <derived name="ST_TraceTranslation" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Trace blocage translation M3 (cause priorisée + horodatage)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ 18. Trace blocage translation M3 (cause priorisée + horodatage)</xhtml>
           </documentation>
         </variable>
         <addData>
