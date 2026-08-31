@@ -304,10 +304,15 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 // ⚠️ Le verrou « descente treuil interdite tant que M3 pas à P1 » (DumpAtTremieDescentLocked)
 // est côté TREUIL (PRG_04 §5, lignes 802-805), pas dans le permit M3 : le permit M3 reste une
 // information de possibilité de mouvement de la translation, indépendante de l'état de la trémie.
+// ⚠️ Le permit M3 est un permit EFFECTIF « pouvoir bouger » (prêt à fonctionner), PAS un pur
+// directionnel. Quand l'axe est en défaut (SafeStop/PowerCutOff), TOUS les sens sont bloqués ;
+// au retour en condition, un sens peut être permis et pas l'autre (ex. Maintenance interdite ->
+// MaintenancePermit=FALSE, TremiePermit=TRUE). Ce niveau effectif est exposé à l'IHM.
 // ⚠️ Ces permis effectifs sont des valeurs de DIAGNOSTIC/IHM (lecture seule) : la commande
 // réelle reste gatée par M3_SafeStop_Aggregate (PRG_05:343, superset incluant InputModuleFault)
 // et l'homme-mort (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle). Aucun impact sur la
-// chaîne de sécurité.
+// chaîne de sécurité. Le gate (FB_Translation, EffectiveSafeStop) consomme les permits
+// directionnels SAFETY (instSafetyTranslationM3.TremiePermit/MaintenancePermit), pas ce niveau effectif.
 EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremiePermit
                                AND NOT M3_SafeStop_Aggregate
                                AND NOT instSafetyTranslationM3.PowerCutOff;
@@ -360,6 +365,9 @@ instTranslationM3(
                                    AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
     LimitSwitchTremie       := M3_LimitSwitchTremieStable,
     LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
+    // 🛡️ Permis directionnels SAFETY (source unique instSafetyTranslationM3) — gate de sens FB_Translation
+    TremiePermit            := instSafetyTranslationM3.TremiePermit,
+    MaintenancePermit       := instSafetyTranslationM3.MaintenancePermit,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     Cfg                     := TranslationCfg,

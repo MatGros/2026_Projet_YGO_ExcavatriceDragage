@@ -31,6 +31,10 @@ VAR_INPUT
     LimitSwitchTremie           : BOOL;        // --> [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)
     LimitSwitchMaintenance      : BOOL;        // --> [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)
 
+    // 🛡️ Permis directionnels SAFETY (source FB_Safety_Translation) — gate de sens
+    TremiePermit                : BOOL := FALSE;  // --> [SAFE] Permis directionnel SAFETY vers Trémie (TRUE = autorisé, fail-safe)
+    MaintenancePermit           : BOOL := FALSE;  // --> [SAFE] Permis directionnel SAFETY vers Maintenance (TRUE = autorisé, fail-safe)
+
     // 🔌 Spécifique ETHERCAT
     DriveStatusWord             : WORD;       // --> [HW] Mot d'état AC600 lu depuis l'image d'entrée EtherCAT
     DriveActualFreqHz           : REAL;       // --> [HW] Fréquence réelle mesurée (Hz)
@@ -71,6 +75,7 @@ VAR
     MovementRequested           : BOOL;         // . [LOC] Pilote FB_Brake
     FirstScanDone               : BOOL;   // . [LOC] Initialisation premier scan
     TonBrakeRealFreqTimeout     : TON;
+    EffectiveSafeStop           : BOOL;   // . [LOC] SafeStop effectif = SafeStop OR sens non permis (gate de sens)
 
     // Défauts
     DriveFaultLatching          : BOOL;   // . [LOC] Latch défaut variateur
@@ -184,8 +189,22 @@ IF Direction = 0 THEN
 END_IF;
 {endregion}
 
+{region "§4bis Permis directionnels et EffectiveSafeStop"}
+// 🛡️ 4bis. GATE DE SENS (permis directionnels SAFETY) — modèle treuils FB_Winch
+// EffectiveSafeStop = SafeStop OR (Direction>0 ET Trémie non permise). Bloque la RAMPE
+// (arrêt réel) vers un sens non autorisé SANS toucher à Direction : l'estimateur de position,
+// les verrous bistables et la sélection PositionSensorTarget (PRG_05) restent informés.
+// Consommé dans la gate de rampe (§5) et le choix de décélération.
+// ⚠️ Le sens Maintenance (−1) n'est PAS gaté ici : le segment P1→Maintenance est déjà protégé
+// par la coupure dure M3_LimitSwitchMaintenanceEffective (PRG_05:128-130) et les ralentissements.
+// Gater −1 sur MaintenancePermit bloquerait l'accès à P1 quand Maintenance n'est pas autorisée
+// (régression fonctionnelle). Le gate ne bloque que +1 (Trémie).
+EffectiveSafeStop := SafeStop
+                      OR (Direction > 0 AND NOT TremiePermit);
+{endregion}
+
 {region "§5 Consigne et rampe de vitesse"}
-IF DirectionChangePending OR (Direction = 0) OR ArrivalLock OR SafeStop OR NOT StartStop THEN
+IF DirectionChangePending OR (Direction = 0) OR ArrivalLock OR EffectiveSafeStop OR NOT StartStop THEN
     RampTargetPct := 0.0;
 ELSE
     RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
@@ -194,7 +213,7 @@ END_IF;
 SpeedRamp(
     Target := RampTargetPct,
     AccelRate := Cfg.CfgRampAccelRate,
-    DecelRate := SEL(SafeStop, Cfg.CfgRampDecelNormalRate, Cfg.CfgRampDecelFastRate),
+    DecelRate := SEL(EffectiveSafeStop, Cfg.CfgRampDecelNormalRate, Cfg.CfgRampDecelFastRate),
     CycleTimeS := CycleTimeCalc.CycleTimeS
 );
 {endregion}

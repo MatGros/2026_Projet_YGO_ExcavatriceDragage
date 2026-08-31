@@ -62,8 +62,8 @@ VAR_OUTPUT
     ErrorMecaA          : BOOL;        // <-- [DIAG] Mouvement non commandé (Méca A - bit5)
     ErrorLimitSwitch    : BOOL;        // <-- [DIAG] Limite extrême Translation atteinte (bit6)
     ErrorSensorIncoherent: BOOL;       // <-- [DIAG] Incohérence mot capteurs position (bit7)
-    TremiePermit        : BOOL;        // <-- [SAFE] Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)
-    MaintenancePermit   : BOOL;        // <-- [SAFE] Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)
+    TremiePermit        : BOOL;        // <-- [SAFE] Permis directionnel SAFETY vers Trémie (TRUE = autorisé, fail-safe). Niveau SAFETY (pur directionnel : fin de course). Le permit EFFECTIF « pouvoir bouger » est calculé en PRG_05 §1ter (AND NOT SafeStop AND NOT PowerCutOff).
+    MaintenancePermit   : BOOL;        // <-- [SAFE] Permis directionnel SAFETY vers Maintenance (TRUE = autorisé, fail-safe). Niveau SAFETY (pur directionnel : autorisation cible + fin de course). Le permit EFFECTIF « pouvoir bouger » est calculé en PRG_05 §1ter (AND NOT SafeStop AND NOT PowerCutOff).
 END_VAR
 VAR
     ResetEdge           : R_TRIG;   // . [LOC] Front Reset
@@ -257,7 +257,15 @@ ErrorMecaA            := instCauses[5].Active;
 ErrorLimitSwitch      := instCauses[6].Active;
 ErrorSensorIncoherent := instCauses[7].Active;
 
-// 🛡️ Permis directionnels M3 (polarité fail-safe : TRUE = autorisé)
+// 🛡️ Permis directionnels M3 — NIVEAU SAFETY (polarité fail-safe : TRUE = autorisé)
+// ⚠️ Ces sorties sont des permits directionnels SAFETY (pur directionnel), PAS le permit
+// EFFECTIF « pouvoir bouger ». Le permit effectif (prêt à fonctionner) est calculé en
+// PRG_05_Translation §1ter : Safety directionnel AND NOT M3_SafeStop_Aggregate AND NOT
+// PowerCutOff. C'est LUI qui reflète la sémantique « pouvoir bouger » : quand l'axe est en
+// défaut (SafeStop/PowerCutOff), TOUS les sens sont bloqués ; au retour en condition, un sens
+// peut être permis et pas l'autre (ex. Maintenance interdite -> MaintenancePermit=FALSE,
+// TremiePermit=TRUE). Ces sorties SAFETY alimentent aussi le gate de FB_Translation
+// (EffectiveSafeStop).
 // TremiePermit : autorisé vers Trémie tant que la fin de course Trémie n'est pas atteinte.
 TremiePermit := NOT LimitSwitchTremie;
 // MaintenancePermit : autorisé vers Maintenance uniquement si la cible Maintenance est

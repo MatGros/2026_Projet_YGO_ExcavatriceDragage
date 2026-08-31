@@ -309,6 +309,40 @@ niveau EFFECTIF** (D1 — Phase 3).
   lignes 802-805), **pas dans le permit M3**. Le permit M3 reste une information de possibilité de
   mouvement de la translation, indépendante de l'état de la trémie.
 
+### 🧭 3ter · Sémantique D2 du permit M3 & Enforcement en gate (T204) — Phase 4
+
+**Décision D2 (utilisateur)** : le permit M3 est un permit **EFFECTIF « pouvoir bouger »**, PAS un
+pur directionnel. Il reflète que l'axe est **prêt à fonctionner** (pas de défaut, puissance,
+thermique) **ET** que la direction est physiquement possible (fins de course, autorisation cible).
+Il ne reflète **PAS** la commande (homme-mort).
+
+- **Quand l'axe est en défaut** (`SafeStop`/`PowerCutOff` actifs) → **TOUS les sens sont bloqués**.
+- **Au retour en condition** → un sens peut être permis et pas l'autre (ex. Maintenance interdite
+  → `MaintenancePermit=FALSE`, `TremiePermit=TRUE`).
+
+Cette sémantique est portée par le **niveau EFFECTIF** (`EffectivePermitM3_Tremie`/
+`EffectivePermitM3_Maintenance`, `PRG_05_Translation` §1ter) = Safety directionnel
+**AND NOT `M3_SafeStop_Aggregate` AND NOT `PowerCutOff`** (prêt à fonctionner). Les sorties
+`TremiePermit`/`MaintenancePermit` de `FB_Safety_Translation` restent des permits directionnels
+**SAFETY** (pur directionnel), distincts du niveau effectif — conformité T109 (le nom porte le
+niveau : `EffectivePermitM3_*` ≠ `TremiePermit`/`MaintenancePermit`).
+
+**T204 — Enforcement en gate (FB_Translation)** : les permits directionnels SAFETY
+(`TremiePermit`/`MaintenancePermit`) sont câblés en `VAR_INPUT` de `FB_Translation` (source
+unique `instSafetyTranslationM3`). Un `EffectiveSafeStop` local imite le modèle treuils
+(`FB_Winch.st:163`) :
+
+```st
+EffectiveSafeStop := SafeStop OR (Direction > 0 AND NOT TremiePermit)
+                              OR (Direction < 0 AND NOT MaintenancePermit);
+```
+
+`EffectiveSafeStop` est consommé dans la gate de rampe (`FB_Translation` §5) et le choix de
+décélération, **à la place de `SafeStop`**. Le gate bloque la **RAMPE** (arrêt réel) vers un sens
+non autorisé **sans toucher à `Direction`** : l'estimateur de position, les verrous bistables
+`M3_LimitSwitch*Stable`, la sélection `PositionSensorTarget` et les ralentissements restent
+informés. Alignement strict sur les treuils M1/M2 (T204).
+
 ---
 
 ## 📏 4 · Convention de position M3 (REX 2026-08-21)
@@ -340,6 +374,7 @@ Consommateurs : `FB_Translation_PositionEstimator` (odométrie + recalage), `FB_
 | v2.3 (T184) | 2026-08-31 | Ajout §3bis « Modèle uniforme des permits directionnels M3 » : 1 source safety (`FB_Safety_Translation`) → 2 permits directionnels nommés par la sémantique métier (`TremiePermit`/`MaintenancePermit`) → projection IHM (`GVL_IHM.TranslationM3.Safety`) + diagnostic `MotionM3.Step6_DirectionAllowed` (même pattern que M1/M2). Ligne F11.02 + diagramme Mermaid mis à jour. Pas de bump de version (références croisées multiples dans CODE/CODE_XML/TOOLS). |
 | v2.3 (Permits A+B+C+D) | 2026-08-31 | **Corrections permits directionnels M1/M2/M3** (challenges MAJOR) : (A) doc — retrait de l'affirmation fausse « Process M3 = homme-mort » ; M3 n'a PAS de Process (pas de benne/Kobold), l'homme-mort est une condition de COMMANDE exclue du permit ; permit M3 = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff (prêt à fonctionner). (B) treuils alignés sur M3 — `EffectivePermitM1/M2_*` gatés par `NOT SafeStop` (prêt à fonctionner). (C) `EffectivePermitM3_*` gatés par `M3_SafeStop_Aggregate` (inclut `InputModuleFault`). (D) verrou `DumpAtTremieDescentLocked` documenté côté treuil, hors permit M3. |
 | v2.3 (D1) | 2026-08-31 | **Phase 3 — Niveau EFFECTIF M3** : `GVL_IHM.TranslationM3.Safety.TremiePermit`/`.MaintenancePermit` exposent désormais le niveau effectif (permit = possibilité + prêt à fonctionner, §1ter `PRG_05_Translation`), aligné sur les treuils (`EffectivePermitM1/M2`). §3bis mis à jour (retrait du « modèle identique » trompeur, documentation de la sémantique). Safety brut conservé en interne (`FB_Safety_Translation`), non projeté tel quel. |
+| v2.3 (D2+T204) | 2026-09-01 | **Phase 4 — Sémantique D2 + Enforcement en gate T204** : (D2) clarification que le permit M3 est un permit EFFECTIF « pouvoir bouger » (prêt à fonctionner), porté par le niveau effectif `EffectivePermitM3_*` (AND NOT SafeStop AND NOT PowerCutOff) — les sorties `TremiePermit`/`MaintenancePermit` de `FB_Safety_Translation` restent des permits directionnels SAFETY (pur directionnel), conformité T109. (T204) enforcement en gate : `TremiePermit`/`MaintenancePermit` câblés en `VAR_INPUT` de `FB_Translation`, `EffectiveSafeStop` local (modèle `FB_Winch.st:163`) consommé dans la gate de rampe et le choix de décélération — bloque la rampe vers un sens non autorisé sans toucher à `Direction`. Nouveau §3ter. |
 | v2.2 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 
 ## ❓ 6 · TBD
