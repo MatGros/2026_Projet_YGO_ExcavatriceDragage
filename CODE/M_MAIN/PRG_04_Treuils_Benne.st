@@ -225,7 +225,7 @@ VAR
     TraceM2_PrevReason    : E_WinchTraceBlockReason; // . [LOC] Cause précédente M2 (détection de changement)
 END_VAR
 
-{region "§1 Intention maintenance et assistants"}
+{region "🎯 §1 Intention & assistants"}
 // === 🪨 §1 INTENTION MAINTENANCE & ASSISTANTS ===
 
 // Consommation de l'intention both continue opérateur (source unique PRG_03, tous modes)
@@ -272,7 +272,7 @@ KoboldContactorCmdArbitrated    := instArbBucket.KoboldContactorCmdArbitrated;
 
 {endregion}
 
-{region "§2 Commande benne"}
+{region "🪣 §2 Commande benne"}
 // === 🏗️ §2 COMMANDE DU BENNE (FB_Bucket) ===
 
 instBucket(
@@ -343,7 +343,7 @@ END_IF;
 
 {endregion}
 
-{region "§3 Arbitrage consignes M1/M2"}
+{region "🔀 §3 Arbitrage M1/M2"}
 // === 🔀 §3 ARBITRAGE CONSIGNES M1 / M2 ===
 
 // ── Arbitrage M1/M2 (FB_WinchCmdArbitrationM1/M2) ──
@@ -444,7 +444,7 @@ END_IF;
 
 {endregion}
 
-{region "§3bis ArmingPermit (Option B)"}
+{region "🛡️ §3bis ArmingPermit"}
 // === 🛡️ §3bis ARMINGPERMIT (Option B — combiné interlock benne) ===
 // ArmingPermit = permission d'armement homme-mort (entrée FB_Joystick, consommée PRG_02).
 // Combiné interlock benne : interdit l'armement pendant une action benne
@@ -456,7 +456,7 @@ END_IF;
 ArmingPermit := NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
 {endregion}
 
-{region "§4 Synchronisation M1/M2"}
+{region "🔄 §4 Synchro M1/M2"}
 // === 🔄 §4 SYNCHRONISATION M1 / M2 ===
 
 instWinchSync(
@@ -496,7 +496,7 @@ instWinchSync(
 
 {endregion}
 
-{region "§5 Couplage croise et securites"}
+{region "🔗 §5 Couplage & sécurités"}
 // === 🛑 §5 COUPLAGE CROISÉ & SÉCURITÉS ===
 
 // La limite légale (profondeur min. autorisée) doit elle aussi
@@ -585,7 +585,7 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Mod
 
 {endregion}
 
-{region "§5-0 Matrice maintenance N1/N2 — bypass effectifs & override FDC"}
+{region "🧮 §5-0 Matrice N1/N2"}
 // === 🛡️ §5-0 MATRICE DE MAINTENANCE N1/N2 (AF-05 §4bis) ===
 // Règle : bypass_effectif := bypass_IHM AND (Mode = MAINT_N2), pour TOUTES les bascules treuil.
 // Un bypass IHM activé hors MAINT_N2 est IGNORÉ (l'IHM l'affiche « inactif — passer en N2 »).
@@ -653,7 +653,7 @@ PositionLimitOverriddenM2 := OverrideTopSoftwareN1M2 OR BypassM2TopLimitSwitchEf
                              OR BypassM2LimitLegalEff OR BypassM2MecaDEff;
 {endregion}
 
-{region "§5bis Sécurité treuils M1/M2"}
+{region "🛡️ §5bis Sécurité M1/M2"}
 
 // FB_Safety_Winch M1/M2.
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
@@ -815,7 +815,7 @@ EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinch
 
 {endregion}
 
-{region "§5ter Agrégateur de clamp de palier (commun M1=M2 + M2-propre)"}
+{region "📐 §5ter Clamp palier"}
 // === 🧮 §5ter AGRÉGATEUR DE CLAMP DE PALIER ===
 // Bornes communes identiques M1=M2, puis M2 applique ses limites benne propres.
 // Plafond = MIN des sources plafond ; plancher = MAX des sources plancher ; plafond gagne.
@@ -853,7 +853,7 @@ M2MinStepUp   := CommonMinStepUp;
 M2MinStepDown := CommonMinStepDown;
 {endregion}
 
-{region "§6 Execution treuils M1/M2"}
+{region "⚙️ §6 Exécution M1/M2"}
 // === ⚙️ §6 EXÉCUTION FB_Winch (M1 & M2) ===
 
 // Estimateurs de bande vitesse réelle appelés AVANT instWinchM1/M2 : leur sortie
@@ -1032,7 +1032,7 @@ instWinchSpeedLearningM2(
 
 {endregion}
 
-{region "§7 Publication demandes brutes"}
+{region "📤 §7 Publication demandes"}
 // === 📤 §7 PUBLICATION DEMANDES BRUTES (WinchM1/M2FinalInterlockRequest) ===
 
 WinchM1FinalInterlockRequest.Enable := TRUE;
@@ -1071,7 +1071,7 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 
 {endregion}
 
-{region "§8 Publication etats IHM"}
+{region "📊 §8 Publication états IHM"}
 // === 📤 §8 PUBLICATION ÉTATS IHM (faits publics, lecture seule) ===
 // SpeedDelta_Mps = variation de vitesse ENTRE DEUX SCANS (ST_WinchState.st),
 // pas un écart M1/M2 (qui existe via SyncStateHMI.DeltaPos_M/instWinchSync).
@@ -1322,7 +1322,7 @@ Benne_IsRoughlyClosed := _BucketState.IsClosed
     OR (_BucketState.IsIntermediate
         AND (instBucket.DeltaPosition_M >= (_BucketCfgPersist.Config.OffsetCloseM - 2.0)));
 
-{region "§8bis Trace de blocage terrain M1/M2 (ST_TraceWinch)"}
+{region "🕵️ §8bis Trace blocage"}
 // === 🕵️ §8bis TRACE DE BLOCAGE TERRAIN (cause priorisée + horodatage) ===
 // Diagnostic lecture seule, publié via Data.TraceM1/M2 et consommé par FB_TroubleshootingView.
 // L'ordre IF/ELSIF EST l'ordre de priorité (cf. E_WinchTraceBlockReason) : la cause la plus
