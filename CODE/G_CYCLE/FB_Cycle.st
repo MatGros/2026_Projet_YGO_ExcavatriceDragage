@@ -104,10 +104,10 @@ VAR
     ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
 
     // === GATE CONTINU HOMME-MORT (permis par action hardware) ===
-    ProcessPermitM1_Ascending   : BOOL; // . [LOC] Permis ascending treuil M1 = CycleMotionPermit AND DeadmanArmed
-    ProcessPermitM1_Descending  : BOOL; // . [LOC] Permis descending treuil M1 = CycleMotionPermit AND DeadmanArmed
-    ProcessPermitM2_Ascending   : BOOL; // . [LOC] Permis ascending treuil M2 = CycleMotionPermit AND DeadmanArmed
-    ProcessPermitM2_Descending  : BOOL; // . [LOC] Permis descending treuil M2 = CycleMotionPermit AND DeadmanArmed
+    ProcessPermitM1_Ascent   : BOOL; // . [LOC] Permis ascending treuil M1 = CycleMotionPermit AND DeadmanArmed
+    ProcessPermitM1_Descend  : BOOL; // . [LOC] Permis descending treuil M1 = CycleMotionPermit AND DeadmanArmed
+    ProcessPermitM2_Ascent   : BOOL; // . [LOC] Permis ascending treuil M2 = CycleMotionPermit AND DeadmanArmed
+    ProcessPermitM2_Descend  : BOOL; // . [LOC] Permis descending treuil M2 = CycleMotionPermit AND DeadmanArmed
     ProcessPermitBucket_Open   : BOOL; // . [LOC] Permis ouverture benne = CycleMotionPermit AND DeadmanArmed
     ProcessPermitBucket_Close   : BOOL; // . [LOC] Permis fermeture benne = CycleMotionPermit AND DeadmanArmed
     ProcessPermitM3_Tremie          : BOOL; // . [LOC] Permis translation M3 cote tremie = CycleMotionPermit AND DeadmanArmed
@@ -254,10 +254,10 @@ Ready := Enable AND NOT Fault.Latched;
 // défléchi (CycleMotionPermit) ET l'homme-mort est armé (DeadmanArmed). Chaque
 // commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par CycleMotionPermit.
-ProcessPermitM1_Ascending        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM1_Descending      := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM2_Ascending        := CycleMotionPermit AND DeadmanArmed;
-ProcessPermitM2_Descending      := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM1_Ascent        := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM1_Descend      := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM2_Ascent        := CycleMotionPermit AND DeadmanArmed;
+ProcessPermitM2_Descend      := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitBucket_Open := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitBucket_Close := CycleMotionPermit AND DeadmanArmed;
 ProcessPermitM3_Tremie        := CycleMotionPermit AND DeadmanArmed;
@@ -364,10 +364,10 @@ CASE State OF
 
         // Vitesses lentes pour chercher capteur top + référencement
         IF NOT HomedM1 OR NOT HomedM2 THEN
-            WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+            WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
             WinchM1Cmd.ReqDirection := 1;   // montée lente vers capteur top
             WinchM1Cmd.StepTgt := 1;
-            WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+            WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
             WinchM2Cmd.ReqDirection := 1;
             WinchM2Cmd.StepTgt := 1;
             IF HomingRequest THEN
@@ -439,13 +439,13 @@ CASE State OF
         OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
         // M1 et M2 descendent ensemble (synchro gérée en aval)
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descend;
         WinchM1Cmd.ReqDirection := -1;
         WinchM1Cmd.StepTgt  := 3;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descend;
         WinchM2Cmd.ReqDirection := -1;
         WinchM2Cmd.StepTgt  := 3;
-        BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descending;
+        BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descend;
 
         // Transition uniquement sur le retour dédié Kobold.
         IF CycleMotionPermit AND KoboldContactFond THEN
@@ -473,10 +473,10 @@ CASE State OF
         OperatorActionId := 16#0405;
         OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
 
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
         WinchM1Cmd.ReqDirection := 1;
         WinchM1Cmd.StepTgt := 1;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt := 1;
 
@@ -520,10 +520,10 @@ CASE State OF
         OperatorActionId := 16#0407;
         OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
 
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
         WinchM1Cmd.ReqDirection := 1;
         WinchM1Cmd.StepTgt  := 1;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt  := 1;
 
@@ -546,10 +546,10 @@ CASE State OF
         OperatorActionId := 16#0408;
         OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Ascent;
         WinchM1Cmd.ReqDirection := 1;
         WinchM1Cmd.StepTgt  := 4;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Ascent;
         WinchM2Cmd.ReqDirection := 1;
         WinchM2Cmd.StepTgt  := 4;
 
@@ -615,10 +615,10 @@ CASE State OF
         // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
         // précédent). Les deux treuils restent synchrones et sous homme-mort.
         WinchM1Cmd.ReqDirection := -1;
-        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descending;
+        WinchM1Cmd.ReqStartStop := ProcessPermitM1_Descend;
         WinchM1Cmd.StepTgt  := 1;
         WinchM2Cmd.ReqDirection := -1;
-        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descending;
+        WinchM2Cmd.ReqStartStop := ProcessPermitM2_Descend;
         WinchM2Cmd.StepTgt  := 1;
 
         BucketCmd.ReqOpen := ProcessPermitBucket_Open AND (WinchM1Cmd.ReqDirection = -1);
@@ -677,7 +677,7 @@ END_IF;
 // 🛑 Relâchement du manche (retour au centre) OU de l'homme-mort : neutralisation
 // des demandes actives. Gate continu : aucune commande d'actionneur ne survit à la
 // perte du permis opérateur (manche défléchi ET homme-mort armé).
-IF Lifecycle.Busy AND NOT ProcessPermitM1_Ascending THEN
+IF Lifecycle.Busy AND NOT ProcessPermitM1_Ascent THEN
     WinchM1Cmd.ReqStartStop := FALSE;
     WinchM2Cmd.ReqStartStop := FALSE;
     TranslationCmd.ReqStart := FALSE;
