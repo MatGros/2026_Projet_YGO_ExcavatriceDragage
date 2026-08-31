@@ -36,6 +36,8 @@ contract:
       - TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml
       - TOOLS/AGENT_WORKFLOW/config/fb_cartouche_sync.json
       - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/TEST_AUTO_CI/scripts/html_report.py
+      - TOOLS/TEST_AUTO_CI/scripts/parse_st_io.py
       - TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/contract_deferred/
       - TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/test_fb_safety_emergency.st
       - TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/reports/

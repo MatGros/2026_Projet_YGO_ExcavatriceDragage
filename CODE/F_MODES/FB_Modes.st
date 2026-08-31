@@ -2,12 +2,13 @@
    ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
     🎯 Rôle : Source unique du mode arbitré et calcul du bus d'autorisations
-    🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur, de re-homing requis ou
-                  d'AU non armé (repli MAINT_N1) ; refus de toute bascule N1/N2/SEMI_AUTO
-                  tant que les treuils ne sont pas à l'arrêt mécanique confirmé ; re-homing
-                  obligatoire après usage effectif d'un override/bypass de position (AF-05 §4bis).
-                  L'arbitrage de mode reste actif même AU non armé (homing, réarmement défaut) :
-                  aucune autorisation de mouvement n'est accordée sans la chaîne AU physique.
+    🔒 Sécurité : La sélection de mode est découplée de l'autorisation de mouvement (T207) :
+                  le mode suit la sélection IHM même sous AU, arrêt d'urgence ou défaut ; le
+                  mouvement est coupé en aval par la chaîne AU physique (PowerContactorEngaged)
+                  et les interlocks (FB_Cycle, FB_Safety_Winch, FB_Winch). Bascule N1/N2/SEMI_AUTO
+                  soumise à l'arrêt mécanique confirmé des treuils ; re-homing obligatoire après
+                  usage effectif d'un override/bypass de position (AF-05 §4bis) — publié à l'IHM,
+                  ne bloque pas la sélection mais le cycle.
     🔌 Interface : Standard composant d'arbitrage applicatif
     📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
                     DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
@@ -69,10 +70,8 @@ VAR_OUTPUT
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
-    ResetEdge               : R_TRIG; // * [INST] Detecteur front montant Reset
 
     // === GESTION DES DEFAUTS ===
-    SemiAutoRefusedFault    : BOOL;   // . [LOC] Latch refus semi-auto
     instFault               : FB_FaultCore;                  // * [INST] Socle défaut transverse
     instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
 
@@ -85,22 +84,16 @@ VAR
     ModeChangeAllowed       : BOOL;   // . [LOC] Treuils à l'arrêt mécanique confirmé (condition de bascule)
     MaintHomingRequiredM1   : BOOL;   // . [LOC] M1 : re-homing obligatoire avant tout SEMI_AUTO
     MaintHomingRequiredM2   : BOOL;   // . [LOC] M2 : re-homing obligatoire avant tout SEMI_AUTO
-    SemiAutoRefusedHoming   : BOOL;   // . [LOC] Latch refus semi-auto pour re-homing obligatoire
-    SemiAutoRefusedMachineHoming : BOOL;   // . [LOC] Refus live : reference machine incomplete
+    SemiAutoCycleNotReadyFault        : BOOL;   // . [LOC] Diag live : SEMI_AUTO sélectionné mais défaut codeur (cycle non prêt)
+    SemiAutoCycleNotReadyHoming       : BOOL;   // . [LOC] Diag live : SEMI_AUTO sélectionné mais re-homing requis (cycle non prêt)
+    SemiAutoCycleNotReadyMachineHoming : BOOL;  // . [LOC] Diag live : SEMI_AUTO sélectionné mais référencement incomplet (cycle non prêt)
     FirstScanDone           : BOOL;   // . [LOC] Initialisation premier scan (restauration PERSISTENT)
 END_VAR
 
 // === IMPLEMENTATION ===
 
 {region "§1 Causes & Socle Défaut (évalué en continu)"}
-// 🔑 1. RESET FRONT
-ResetEdge(CLK := Reset);
-IF ResetEdge.Q THEN
-    SemiAutoRefusedFault  := FALSE;
-    SemiAutoRefusedHoming := FALSE;
-END_IF;
-
-// 🔑 1bis. RESTAURATION BOOT DES DRAPEAUX PERSISTANTS
+// 🔑 1. RESTAURATION BOOT DES DRAPEAUX PERSISTANTS
 // Non-RETAIN -> réinitialisé à chaque warm/cold reset ; relu depuis GVL_PERSISTENT (miroir
 // réécrit chaque scan par PRG_03). Aucune perte du re-homing obligatoire sur coupure.
 IF NOT FirstScanDone THEN
@@ -112,9 +105,11 @@ END_IF;
 
 // 🔑 1ter. RE-HOMING OBLIGATOIRE — ARMEMENT IMMÉDIAT (AF-05 §4bis)
 // Armé AVANT l'arbitrage de mode (§3) et non à la sortie du mode maintenance :
-//   1. pas de fenêtre d'un scan où SEMI_AUTO serait arbitré malgré un re-homing requis ;
+//   1. pas de fenêtre d'un scan où le re-homing serait perdu malgré un override effectif ;
 //   2. pas de perte de l'obligation sur coupure / download pendant la maintenance
 //      (la valeur est écrite dans le miroir PERSISTENT dès le scan courant, pas à la sortie).
+// Le re-homing ne bloque PAS la sélection SEMI_AUTO (T207) : il est publié à l'IHM
+// (Auth.HomingRequiredM1/M2) et le cycle ne progresse pas tant qu'il n'est pas levé.
 IF M1PositionLimitOverridden THEN
     MaintHomingRequiredM1 := TRUE;
 END_IF;
@@ -130,26 +125,25 @@ IF MaintHomingRequiredM2 AND M2HomingDone AND M2Homed AND NOT M2HomingSuspect TH
     MaintHomingRequiredM2 := FALSE;
 END_IF;
 
-// Refus semi-auto — une cause = un fait (AF03 §4) : défaut codeur et re-homing sont distincts.
-IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
-    SemiAutoRefusedFault := TRUE;
-END_IF;
-IF (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
-    SemiAutoRefusedHoming := TRUE;
-END_IF;
-SemiAutoRefusedMachineHoming := (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed;
+// Diagnostic « cycle non prêt » — le mode SEMI_AUTO reste sélectionnable (T207) mais le
+// cycle ne tournera pas tant que ces conditions ne sont pas saines. Info NON-bloquante :
+// la sélection n'est pas refusée, le mouvement est coupé en aval (FB_Cycle/FB_Safety_Winch).
+// Une cause = un fait (AF03 §4) : défaut codeur, re-homing et référencement sont distincts.
+SemiAutoCycleNotReadyFault         := (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent;
+SemiAutoCycleNotReadyHoming        := (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2);
+SemiAutoCycleNotReadyMachineHoming := (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed;
 
-instCauses[0].Active   := SemiAutoRefusedFault;
-instCauses[0].Latching := TRUE;
-instCauses[0].Texte    := 'Mode Semi-Auto refuse car defaut codeur present';
+instCauses[0].Active   := SemiAutoCycleNotReadyFault;
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := 'Mode Semi-Auto selectionne mais cycle non pret : defaut codeur present';
 
-instCauses[2].Active   := SemiAutoRefusedHoming;
-instCauses[2].Latching := TRUE;
-instCauses[2].Texte    := 'Mode Semi-Auto refuse : re-homing obligatoire (depassement limite position)';
+instCauses[2].Active   := SemiAutoCycleNotReadyHoming;
+instCauses[2].Latching := FALSE;
+instCauses[2].Texte    := 'Mode Semi-Auto selectionne mais cycle non pret : re-homing obligatoire (depassement limite position)';
 
-instCauses[3].Active   := SemiAutoRefusedMachineHoming;
+instCauses[3].Active   := SemiAutoCycleNotReadyMachineHoming;
 instCauses[3].Latching := FALSE;
-instCauses[3].Texte    := 'Mode Semi-Auto refuse : referencement M1/M2/benne incomplet';
+instCauses[3].Texte    := 'Mode Semi-Auto selectionne mais cycle non pret : referencement M1/M2/benne incomplet';
 
 // Cause 1 — changement de mode refusé : treuils non à l'arrêt mécanique confirmé.
 // Non latchée (live) : l'information disparaît dès que la condition redevient vraie, sans
@@ -203,14 +197,12 @@ ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
                      AND M2ContactorsReleased AND NOT M2BrakeIsOpen
                      AND (ABS(M2SpeedAbsMps) < MovementSpeedThresholdMps);
 
-// 3.2 ARBITRAGE — priorité du refus de sécurité, puis du refus de bascule
-IF (SelMode = E_Mode.SEMI_AUTO)
-   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2 OR NOT MachineHomed
-        OR NOT PowerContactorEngaged) THEN
-    // Défaut codeur, re-homing obligatoire ou AU non armé : SEMI_AUTO interdit, repli MAINT_N1.
-    Auth.Mode := E_Mode.MAINT_N1;
-    Auth.ModeChangePendingBlocked := FALSE;
-ELSIF (SelMode <> PrevArbitratedMode)
+// 3.2 ARBITRAGE — le mode suit la sélection IHM (découplé de l'AU/défaut, T207)
+// La sélection de mode n'est JAMAIS bloquée par l'AU, l'arrêt d'urgence ou un défaut :
+// le mode est un état de sélection, le mouvement est coupé en aval (FB_Cycle, FB_Safety_Winch,
+// FB_Winch) par PowerContactorEngaged et les interlocks. Seule la bascule N1/N2/SEMI_AUTO
+// reste soumise à l'arrêt mécanique confirmé des treuils (ModeChangeAllowed).
+IF (SelMode <> PrevArbitratedMode)
       AND (SelMode <> E_Mode.DISABLE) AND (PrevArbitratedMode <> E_Mode.DISABLE)
       AND NOT ModeChangeAllowed THEN
     // Bascule N1/N2/SEMI_AUTO refusée : le mode courant est MAINTENU.

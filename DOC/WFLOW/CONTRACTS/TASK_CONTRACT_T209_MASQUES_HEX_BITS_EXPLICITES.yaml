@@ -1,0 +1,99 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T209 : Refactorisation FB_Safety_Winch
+#        masques hexadécimaux → bits explicites
+# ═══════════════════════════════════════════════════════════════════════════
+# Criticité : C2 (safety-adjacent) · Stratégie : patch (refactorisation pure)
+# Exécution : par agent externe (à déléguer)
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T209_MASQUES_HEX_BITS_EXPLICITES
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Remplacer les 6 masques hexadécimaux de FB_Safety_Winch (16#FF97, 16#FF9F,
+    16#0040, 16#0020, 16#0008, 16#2F84) par des bits explicites dérivés de
+    instCauses[i].Active, pour rendre le code lisible et auditable (safety).
+    SANS changer la logique (non-régression stricte).
+
+  # ── TABLE DE BITS CORRECTE (source : FB_Safety_Winch.st:179-333 + ST_SafetyWinch.st:27-37) ──
+  # ⚠️ NE PAS utiliser le préambule erroné (bit10=MecaD, bit11=MecaE) — FAUX.
+  # bit0=OperatorComm · bit1=Encoder · bit2=MotorThermal · bit3=SlackCable
+  # bit4=PhaseRotation · bit5=TopLimitSwitch · bit6=CableLimitDescent
+  # bit7=MecaA · bit8=MecaB · bit9=MecaC · bit10=BrakeThermal · bit11=MecaD
+  # bit12=MecaE écart · bit13=MecaE escalade · bit14=OppositeDir · bit15=NoMovement
+
+  # ── DÉCODAGE DES 6 MASQUES ──
+  # 16#FF97 = {0,1,2,4,7,8,9,10,11,12,13,14,15} = tout sauf SlackCable(3), TopLimitSwitch(5), CableLimitDescent(6)
+  # 16#FF9F = {0,1,2,3,4,7,8,9,10,11,12,13,14,15} = tout sauf TopLimitSwitch(5), CableLimitDescent(6)
+  # 16#0040 = {6} = CableLimitDescent
+  # 16#0020 = {5} = TopLimitSwitch
+  # 16#0008 = {3} = SlackCable
+  # 16#2F84 = {2,7,8,9,10,11,13} = MotorThermal, MecaA, MecaB, MecaC, BrakeThermal, MecaD, MecaE-escalade
+
+  acceptance:
+    - id: AC1
+      statement: "Les 6 masques hexadécimaux de FB_Safety_Winch sont remplacés par des bits explicites (booléens locaux dérivés de instCauses[i].Active)."
+      verified_by: "grep des masques 16#FF97/16#FF9F/16#0040/16#0020/16#0008/16#2F84 dans FB_Safety_Winch.st → 0 occurrence"
+    - id: AC2
+      statement: "La logique est IDENTIQUE (mêmes causes testées) — vérifié masque par masque (non-régression)."
+      verified_by: "Comparaison table de décodage vs bits explicites (SafeStop, DescendPermit, AscentPermit, PowerCutOff)"
+    - id: AC3
+      statement: "La table de bits CORRECTE est utilisée (bit10=BrakeThermal, bit11=MecaD, bit12=MecaE écart, bit13=MecaE escalade)."
+      verified_by: "Lecture FB_Safety_Winch.st:179-333 (instCauses) + ST_SafetyWinch.st:27-37"
+    - id: AC4
+      statement: "La doc TROUBLESHOOTING_RearmementAU_PowerCutOff_20260901.md:56 est corrigée (liste 2F84 = {2,7,8,9,10,11,13})."
+      verified_by: "Lecture du fichier doc"
+    - id: AC5
+      statement: "Le commentaire FB_Safety_Winch.st:61 est clarifié (BypassGlobal ne force pas ErrorId=0)."
+      verified_by: "Lecture FB_Safety_Winch.st:61"
+    - id: AC6
+      statement: "test_fb_safety_winch.st reste 100% vert (couvre tous les masques)."
+      verified_by: "run_tests.py --fb FB_Safety_Winch"
+    - id: AC7
+      statement: "Gates mécaniques : bundle frais, G200 liaison PASS, palier C PASS."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py --report + run_all_gates.py --palier C"
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - DOC/WFLOW/TROUBLESHOOTING/TROUBLESHOOTING_RearmementAU_PowerCutOff_20260901.md
+      - TOOLS/TEST_AUTO_CI/**  # tests CI si besoin
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/B_AU_SECURITE/**  # chantier FB_Safety_EmergencyManagement (autre agent)
+      - Code hors liste allowed
+
+  conservation:
+    must_survive:
+      - "Logique de SafeStop, DescendPermit, AscentPermit, PowerCutOff (mêmes causes testées)."
+      - "Polarité fail-safe (TRUE = autorisé pour les permits)."
+      - "Comportement des treuils M1/M2 strictement inchangé."
+    dropped_on_purpose:
+      - "Les 6 masques hexadécimaux (remplacés par des bits explicites)."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - unit_test_winch
+
+  alert_duty: >
+    Toute divergence de logique (cause testée différente) est une alerte C2 immédiate.
+    La table de bits CORRECTE est obligatoire (bit10=BrakeThermal, bit11=MecaD) —
+    une erreur ici inverse BrakeThermal/MecaD et casse la sécurité.
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation humaine safety requise avant modification ST."

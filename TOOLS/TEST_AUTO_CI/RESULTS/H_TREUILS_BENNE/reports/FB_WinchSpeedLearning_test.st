@@ -4,13 +4,14 @@
    Collecteur STRICTEMENT PASSIF des vitesses reelles par palier (RETAIN).
    Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T181-15_SPEED_LEARNING.yaml
    Conventions : 1 appel fb() = 1 scan ; Table est VAR_IN_OUT.
-   ⚠️ Harnais (README.md:120-125) : une VAR_IN_OUT n'est JAMAIS re-copiee
-   vers la variable de test apres fb() (s.FB.X = s.NX; sans retour s.NX =
-   s.FB.X;). On ne peut donc PAS asserter sur Table.Cell[...] apres l'appel.
-   Strategie : pre-remplir la variable de test Table AVANT fb(), puis
-   asserter uniquement sur les SORTIES FB (CellsFilled/TableComplete/
-   CellsTotal/Ready/Learning/LampLearn). La valeur SpeedMps moyenne n'est
-   pas lisible via ce harnais (signale a l'orchestrateur).
+   ✅ Harnais copy-out (T181-21) : run_tests.py injecte le copy-out des
+   VAR_IN_OUT apres chaque fb() (inject_var_in_out_copyout.py) — la variable
+   de test Table reflete donc les ecritures du FB apres l'appel. On peut
+   desormais asserter sur Table.Cell[...] (moyenne glissante + persistance
+   RETAIN, TC-T181-15j).
+   Strategie : pre-remplir la variable de test Table AVANT fb() pour les
+   tests de frontiere/completude (a..i), et asserter sur Table.Cell[...]
+   apres fb() pour prouver la moyenne glissante et la persistance RETAIN (j).
    Passivite (AC1/AC7) : verifiee par grep de l'interface FB (aucune sortie
    actionneur Relay* / Contactor* / Brake* / SpeedCmd ni Overspeed* / SpeedGuard* ).
    ======================================================================= *)
@@ -371,4 +372,40 @@ END_VAR
        LoadPresent := FALSE, StableForLearn := TRUE, Config := Cfg, Table := Table);
     ASSERT_EQ(fb.CellsFilled, 40, 'M2 : cellule [2,1,1,1] ecrite et validee (40)');
     ASSERT_TRUE(fb.TableComplete, 'M2 : table complete apres ecriture M2');
+END_TEST
+
+TEST 'TC-T181-15j Moyenne glissante + persistance RETAIN via copy-out (AC2)'
+    (* Copy-out (T181-21) : apres fb(), la variable de test Table reflete les
+       ecritures du FB sur la VAR_IN_OUT. On prouve ici la moyenne glissante
+       (SpeedMps) et la persistance RETAIN (accumulation d'un scan a l'autre). *)
+    Cfg.MinSpeedMps[1] := 0.5; Cfg.MaxSpeedMps[1] := 2.0;
+    Cfg.MinSpeedMps[2] := 1.0; Cfg.MaxSpeedMps[2] := 3.0;
+    Cfg.MinSpeedMps[3] := 1.5; Cfg.MaxSpeedMps[3] := 4.0;
+    Cfg.MinSpeedMps[4] := 2.0; Cfg.MaxSpeedMps[4] := 5.0;
+    Cfg.MinSpeedMps[5] := 2.5; Cfg.MaxSpeedMps[5] := 6.0;
+    Cfg.MinSamples := 3;
+
+    (* Cellule [1,1,1,1] vide. 1er echantillon 1.0 (plausible) -> SpeedMps=1.0, SampleCount=1 *)
+    fb(Enable := TRUE, LearnStart := TRUE, WinchId := 1, Direction := 1,
+       StepNumber := 1, MeasuredSpeedMps := 1.0, MeasuredSpeedValid := TRUE,
+       LoadPresent := FALSE, StableForLearn := TRUE, Config := Cfg, Table := Table);
+    ASSERT_EQ(Table.Cell[1][1][1][1].SampleCount, 1, '1er scan : SampleCount=1');
+    ASSERT_NEAR(Table.Cell[1][1][1][1].SpeedMps, 1.0, 0.0001, '1er scan : SpeedMps=1.0');
+    ASSERT_FALSE(Table.Cell[1][1][1][1].Valid, '1er scan : SampleCount<MinSamples -> Valid=FALSE');
+
+    (* 2e echantillon 1.5 -> moyenne (1.0+1.5)/2 = 1.25, SampleCount=2 *)
+    fb(Enable := TRUE, LearnStart := TRUE, WinchId := 1, Direction := 1,
+       StepNumber := 1, MeasuredSpeedMps := 1.5, MeasuredSpeedValid := TRUE,
+       LoadPresent := FALSE, StableForLearn := TRUE, Config := Cfg, Table := Table);
+    ASSERT_EQ(Table.Cell[1][1][1][1].SampleCount, 2, '2e scan : SampleCount=2');
+    ASSERT_NEAR(Table.Cell[1][1][1][1].SpeedMps, 1.25, 0.0001, '2e scan : moyenne (1.0+1.5)/2=1.25');
+    ASSERT_FALSE(Table.Cell[1][1][1][1].Valid, '2e scan : SampleCount<MinSamples -> Valid=FALSE');
+
+    (* 3e echantillon 1.5 -> moyenne (1.25*2+1.5)/3 = 1.3333, SampleCount=3 -> Valid *)
+    fb(Enable := TRUE, LearnStart := TRUE, WinchId := 1, Direction := 1,
+       StepNumber := 1, MeasuredSpeedMps := 1.5, MeasuredSpeedValid := TRUE,
+       LoadPresent := FALSE, StableForLearn := TRUE, Config := Cfg, Table := Table);
+    ASSERT_EQ(Table.Cell[1][1][1][1].SampleCount, 3, '3e scan : SampleCount=3');
+    ASSERT_NEAR(Table.Cell[1][1][1][1].SpeedMps, 1.3333, 0.0001, '3e scan : moyenne (1.25*2+1.5)/3=1.3333');
+    ASSERT_TRUE(Table.Cell[1][1][1][1].Valid, '3e scan : MinSamples atteint -> Valid=TRUE');
 END_TEST

@@ -86,22 +86,24 @@ TEST 'TC-P05-003 Mode MAINT_N2 M1 seul : M2 bloque, frein serre'
     ASSERT_EQ(FB.Auth.JoystickWinchSelectArbitrated, 1, 'MAINT_N2 -> select joystick = 1 (M1 seul)');
 END_TEST
 
-TEST 'TC-P05-004 Refus mode SEMI_AUTO si codeurs invalides'
-    (* SEMI_AUTO + defaut codeur -> bascule MAINT_N1 (refus) + defaut latche *)
+TEST 'TC-P05-004 SEMI_AUTO selectionnable sous defaut codeur (cycle non pret, non-bloquant)'
+    (* T207 : le defaut codeur ne refuse plus la SELECTION SEMI_AUTO ; le mode reste
+       selectionne, le cycle ne tourne pas (coupure en aval FB_Safety_Winch). *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
        EncoderFaultPresent := TRUE, MachineHomed := TRUE);
-    ASSERT_EQ(FB.Auth.Mode, E_Mode.MAINT_N1, 'SEMI_AUTO + defaut codeur -> bascule MAINT_N1 (refus)');
-    ASSERT_TRUE(FB.Fault.Latched, 'Refus semi-auto -> defaut latche');
-    ASSERT_FALSE(FB.Ready, 'Defaut latche -> Ready=FALSE');
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.SEMI_AUTO, 'SEMI_AUTO + defaut codeur -> mode reste SEMI_AUTO (T207)');
+    ASSERT_TRUE(FB.Fault.Error, 'Defaut codeur -> diagnostic live visible');
+    ASSERT_FALSE(FB.Fault.Latched, 'Diagnostic non-bloquant -> pas de latch');
+    ASSERT_TRUE(FB.Ready, 'Pas de latch -> Ready reste TRUE');
 END_TEST
 
-TEST 'TC-P05-004bis Refus mode SEMI_AUTO si machine non referencee'
-    (* Les codeurs peuvent etre sains : l'absence de reference machine reste un refus distinct. *)
+TEST 'TC-P05-004bis SEMI_AUTO selectionnable sans reference machine (cycle non pret)'
+    (* T207 : l absence de reference machine ne refuse plus la SELECTION SEMI_AUTO. *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
        EncoderFaultPresent := FALSE, MachineHomed := FALSE);
-    ASSERT_EQ(FB.Auth.Mode, E_Mode.MAINT_N1, 'SEMI_AUTO sans reference -> bascule MAINT_N1');
-    ASSERT_TRUE(FB.Fault.Error, 'Refus reference machine -> defaut live visible');
-    ASSERT_TRUE(FB.Ready, 'Refus reference machine seul -> Ready reste TRUE');
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.SEMI_AUTO, 'SEMI_AUTO sans reference -> mode reste SEMI_AUTO (T207)');
+    ASSERT_TRUE(FB.Fault.Error, 'Reference incomplete -> diagnostic live visible');
+    ASSERT_TRUE(FB.Ready, 'Diagnostic non-bloquant -> Ready reste TRUE');
 END_TEST
 
 TEST 'TC-P05-005 Limite legale = blocage exploitation, pas safety (aucune sortie PowerCutOff)'
@@ -115,27 +117,38 @@ TEST 'TC-P05-005 Limite legale = blocage exploitation, pas safety (aucune sortie
        FB_Modes = Ready, Fault, Auth uniquement -- aucune sortie PowerCutOff/SafeStop. *)
 END_TEST
 
-TEST 'TC-P05-006 Pas de redemarrage automatique apres defaut : Reset + nouvel ordre requis'
-    (* Defaut semi-auto *)
-    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
-       EncoderFaultPresent := TRUE, MachineHomed := TRUE);
-    ASSERT_TRUE(FB.Fault.Latched, 'Defaut latche');
-    ASSERT_FALSE(FB.Ready, 'Ready=FALSE sous defaut');
+TEST 'TC-P05-006 SEMI_AUTO selectionnable sous AU (PowerContactorEngaged=FALSE)'
+    (* T207 : la selection SEMI_AUTO n est plus repliee vers MAINT_N1 sous AU. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := FALSE, SelMode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.SEMI_AUTO, 'SEMI_AUTO sous AU -> mode reste SEMI_AUTO (T207)');
+    ASSERT_TRUE(FB.Ready, 'Selection sous AU -> Ready reste TRUE (mouvement coupe en aval)');
+END_TEST
 
-    (* La cause disparait mais le defaut reste latche (pas de redemarrage auto) *)
-    ADVANCE_TIME(10000000);
-    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
+TEST 'TC-P05-007 Modes N1/N2/SEMI_AUTO selectionnables sous AU (aucun repli)'
+    (* T207 : les trois modes restent selectionnables sous AU, sans repli automatique. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := FALSE, SelMode := E_Mode.MAINT_N1,
        EncoderFaultPresent := FALSE, MachineHomed := TRUE);
-    ASSERT_TRUE(FB.Fault.Latched, 'Cause disparue sans Reset -> defaut reste latche');
-    ASSERT_FALSE(FB.Ready, 'Pas de redemarrage auto : Ready reste FALSE');
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.MAINT_N1, 'MAINT_N1 sous AU -> mode reste MAINT_N1');
 
-    (* Reset front acquitte *)
-    ADVANCE_TIME(10000000);
-    FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := FALSE, SelMode := E_Mode.MAINT_N2,
        EncoderFaultPresent := FALSE, MachineHomed := TRUE);
-    ADVANCE_TIME(10000000);
-    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.MAINT_N2, 'MAINT_N2 sous AU -> mode reste MAINT_N2');
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := FALSE, SelMode := E_Mode.SEMI_AUTO,
        EncoderFaultPresent := FALSE, MachineHomed := TRUE);
-    ASSERT_FALSE(FB.Fault.Latched, 'Reset front -> defaut acquitte');
-    ASSERT_TRUE(FB.Ready, 'Apres Reset -> Ready=TRUE');
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.SEMI_AUTO, 'SEMI_AUTO sous AU -> mode reste SEMI_AUTO');
+END_TEST
+
+TEST 'TC-P05-008 Bascule de mode sous AU (treuils a l arret mecanique)'
+    (* T207 : on peut changer de mode sous AU si les treuils sont a l arret mecanique confirme. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := FALSE, SelMode := E_Mode.MAINT_N1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE,
+       M1ContactorsReleased := TRUE, M2ContactorsReleased := TRUE);
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.MAINT_N1, 'MAINT_N1 sous AU');
+
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := FALSE, SelMode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE,
+       M1ContactorsReleased := TRUE, M2ContactorsReleased := TRUE);
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.SEMI_AUTO, 'Bascule MAINT_N1 -> SEMI_AUTO sous AU (treuils arretes)');
 END_TEST

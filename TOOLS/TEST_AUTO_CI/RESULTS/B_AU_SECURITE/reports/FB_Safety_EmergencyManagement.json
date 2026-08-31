@@ -15,6 +15,10 @@
       "passed": true
     },
     {
+      "name": "TC-P01-001 Coupure AU physique (essai site, non automatise)",
+      "passed": true
+    },
+    {
       "name": "TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu",
       "passed": true
     },
@@ -27,6 +31,10 @@
       "passed": true
     },
     {
+      "name": "TC-P01-005 Sequence 2 temps : ArmRequest sans Reset bloque ; Reset puis ArmRequest arme",
+      "passed": true
+    },
+    {
       "name": "TC-P01-006 canal colle bloque le reamement (echec auto-test)",
       "passed": true
     },
@@ -35,19 +43,11 @@
       "passed": true
     },
     {
-      "name": "TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien",
-      "passed": true
-    },
-    {
       "name": "TC-P01-008 PowerCutOffRequest coupe A et B sans armer",
       "passed": true
     },
     {
-      "name": "TC-P01-001 Coupure AU physique (essai site, non automatise)",
-      "passed": true
-    },
-    {
-      "name": "TC-P01-005 Sequence 2 temps : ArmRequest sans Reset bloque ; Reset puis ArmRequest arme",
+      "name": "TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien",
       "passed": true
     }
   ],

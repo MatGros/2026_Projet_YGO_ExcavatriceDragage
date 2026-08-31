@@ -13,6 +13,7 @@ VAR_INPUT
     Enable                  : BOOL;         // --> [CMD] Activation generale du sequenceur
     Reset                   : BOOL;         // --> [CMD] Acquittement defaut (front)
     PowerContactorEngaged   : BOOL;         // --> [SAFE] Chaine de securite OK
+    EncoderFaultPresent     : BOOL;         // --> [SAFE] Defaut codeur agrege (cycle non autorise, T207)
     Mode                    : E_Mode;       // --> [CMD] Mode arbitre (SEMI_AUTO pour instance cycle)
     JoystickDeflected       : BOOL;         // --> [CMD] Manche deflecte (non centre)
     DeadmanArmed            : BOOL;         // --> [CMD] Appui homme-mort (fenetre 3 s)
@@ -210,7 +211,10 @@ ErrorEdge(CLK := Fault.Error);
 
 {region "§2 Gate securite & Bascule Mode"}
 // 🛑 2. GATES DE SÉCURITÉ ET NEUTRALISATION
-IF NOT Enable OR NOT PowerContactorEngaged THEN
+// T207 : le mode SEMI_AUTO peut être sélectionné sous AU/défaut (FB_Modes), mais le cycle
+// ne tourne JAMAIS sans puissance (PowerContactorEngaged) ni avec un codeur défaillant
+// (EncoderFaultPresent) — les données de position invalides rendraient le Grafcet erroné.
+IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     WinchM1Cmd.ReqStartStop   := FALSE;
     WinchM1Cmd.ReqDirection   := 0;
     WinchM1Cmd.StepTgt        := 0;
@@ -233,7 +237,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     END_IF;
 
     CycleStep            := State;
-    CycleStateStr        := 'Cycle desactive : securite absente ou mode hors semi-auto';
+    CycleStateStr        := 'Cycle desactive : securite absente, defaut codeur ou mode hors semi-auto';
     Ready                := FALSE;
     Lifecycle.Busy       := FALSE;
     Lifecycle.Done       := FALSE;
@@ -242,7 +246,11 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     SpeedMismatchActive := FALSE;
     SpeedMismatchConfirmed := FALSE;
     OperatorActionId := 0;
-    OperatorAction := 'Passer en mode Semi-Auto et engager la securite pour activer le cycle.';
+    IF EncoderFaultPresent THEN
+        OperatorAction := 'Cycle non autorise : defaut codeur present. Reinitialiser le defaut codeur.';
+    ELSE
+        OperatorAction := 'Passer en mode Semi-Auto et engager la securite pour activer le cycle.';
+    END_IF;
     ExpectedAxis := E_OperatorAxis.NONE;
     ExpectedDirection := 0;
     WaitingForOperator := FALSE;

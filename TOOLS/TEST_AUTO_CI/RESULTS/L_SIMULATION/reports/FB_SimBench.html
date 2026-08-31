@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — FB_SimBench [PASS]</title>
+<title>Rapport de test — FB_SimBench [FAIL]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -312,14 +312,14 @@
         <div style="display:flex;align-items:center;gap:12px;">
             <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-pass">PASS</span>
+            <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-31 08:51:45</div>
+    <div class="exec-time">2026-08-31 21:42:51</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (23 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-simbench-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-1">TC-P13-001 Sim_Safety : neutralisation sans Enable</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-2">TC-P13-010 SimBench Enable=FALSE neutralise tout le banc</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-3">TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-4">TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-5">TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-6">T196-003 Capteur haut manuel et polarite Free_DI correcte</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-7">T196-004 Capteur haut auto : seuil M1 atteint sans forçage manuel</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-8">TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-9">TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-10">TC-P13-022 Sim_Safety Enable=FALSE neutralise tout</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-11">TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-12">TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-13">TC-P13-031 Sim_Encoder PresetCmd charge PresetValue</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-14">TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-15">TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-16">TC-P13-040 Sim_Translation progression publie des mots thermometre valides</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-17">TC-P13-041 Sim_Translation Direction +1/-1/0</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-18">TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance]</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-19">TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-20">TC-P13-050 Sim_Joystick initialise au neutre au premier cycle</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-21">TC-P13-051 Sim_Joystick sorties forçables en instance (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-22">TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)</a></li></ul>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-simbench-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-1">TC-P13-001 Sim_Safety : neutralisation sans Enable</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-2">TC-P13-010 SimBench Enable=FALSE neutralise tout le banc</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-3">TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-4">TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-5">TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-6">T196-003 Capteur haut manuel et polarite Free_DI correcte</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-7">T196-004 Capteur haut auto : seuil M1 atteint sans forçage manuel</a></li><li class="toc-item toc-fail"><a href="#test-fb-simbench-8">TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop</a></li><li class="toc-item toc-fail"><a href="#test-fb-simbench-9">TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-10">TC-P13-022 Sim_Safety Enable=FALSE neutralise tout</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-11">TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-12">TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-13">TC-P13-031 Sim_Encoder PresetCmd charge PresetValue</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-14">TC-P13-032 Sim_Encoder RawPos ne descend jamais sous 0</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-15">TC-P13-033 Sim_Encoder RawPos survit a un reset froid (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-16">TC-P13-040 Sim_Translation progression publie des mots thermometre valides</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-17">TC-P13-041 Sim_Translation Direction +1/-1/0</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-18">TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance]</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-19">TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-20">TC-P13-050 Sim_Joystick initialise au neutre au premier cycle</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-21">TC-P13-051 Sim_Joystick sorties forçables en instance (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-simbench-22">TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -328,7 +328,7 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            23/23 vérifications validées
+            21/23 vérifications validées
         </div>
     </div>
     
@@ -1382,7 +1382,7 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_SimBench</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 54 flux entrants · 41 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_SimBench</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 57 flux entrants · 41 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimEncoderM1 <span style="color:var(--muted);font-weight:500;">(FB_Sim_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimEncoderM2 <span style="color:var(--muted);font-weight:500;">(FB_Sim_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimTranslation <span style="color:var(--muted);font-weight:500;">(FB_Sim_Translation)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimJoystick <span style="color:var(--muted);font-weight:500;">(FB_Sim_Joystick)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimSafety <span style="color:var(--muted);font-weight:500;">(FB_Sim_Safety)</span></span></div>
@@ -1393,7 +1393,7 @@
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>CST_M3FullTravelTimeS</b> : REAL := 8.0</span></div>
         </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_Direction <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_A <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_B <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyArming_RQ <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimEncoderSpeedFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgTopSensorRawPos <span class="pin-type" style="color:var(--muted);">UDINT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimTopPositionActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationOffset_M <span class="pin-type" style="color:var(--muted);">REAL := 0.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWordOverrideActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWord <span class="pin-type" style="color:var(--muted);">BYTE := 16#07</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickLeft_Rev_TREMIE_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRight_Fwd_MAINT_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickFwd_Up_Close_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRev_Down_Open_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawX <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawY <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawButton <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickOvershoot_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickBagotement_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimKoboldContactValue <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnEmergencyStop <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HwReal <span class="pin-type" style="color:var(--muted);">ST_HardwareImage</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM1 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM2 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M1_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_RelayRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_2 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_3 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedContactor_4 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_StepNumber <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetTriggerCmd <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_PresetValueOut <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M2_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_Direction <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_SpeedCmd_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">M3_BrakeCmd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_A <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerKeepAlive_B <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EmergencyArming_RQ <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">TestCutActive <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerCutOffRequest <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimChainOkBit <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimEncoderSpeedFactor <span class="pin-type" style="color:var(--muted);">REAL := 1.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgTopSensorRawPos <span class="pin-type" style="color:var(--muted);">UDINT := 0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimTopPositionActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM1 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationInjectM2 <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimSyncDeviationOffset_M <span class="pin-type" style="color:var(--muted);">REAL := 0.5</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWordOverrideActive <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimM3SensorsWord <span class="pin-type" style="color:var(--muted);">BYTE := 16#07</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickLeft_Rev_TREMIE_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRight_Fwd_MAINT_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickFwd_Up_Close_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRev_Down_Open_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawX <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawY <span class="pin-type" style="color:var(--muted);">INT := 5000</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickRawButton <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickOvershoot_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimJoystickBagotement_Active <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SimKoboldContactValue <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BtnEmergencyStop <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">HwReal <span class="pin-type" style="color:var(--muted);">ST_HardwareImage</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM1 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#a78bfa;font-weight:700;font-size:11px;font-family:monospace;">[VAR_IN_OUT]</span></div><div class="pin-name">RawPosM2 <span class="pin-type" style="color:var(--muted);">UDINT</span></div></div>
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(100,116,139,0.18);border:1px solid #475569;cursor:pointer;">
@@ -1432,7 +1432,7 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">51</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">54</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
@@ -1440,7 +1440,7 @@
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">7</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">38</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">54 IN</b> / <b style="color:#ffffff;">41 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">57 IN</b> / <b style="color:#ffffff;">41 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -1656,188 +1656,198 @@
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 58 écarts</span></summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 61 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 58 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>BTNEMERGENCYSTOP</code> jamais câblé en production</li><li>Pin <code>BUSY</code> jamais câblé en production</li><li>Pin <code>CFGTOPSENSORRAWPOS</code> jamais câblé en production</li><li>Pin <code>DONE</code> jamais câblé en production</li><li>Pin <code>EMERGENCYARMING_RQ</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>HWREAL</code> jamais câblé en production</li><li>Pin <code>M1_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M1_PRESETTRIGGERCMD</code> jamais câblé en production</li><li>Pin <code>M1_PRESETVALUEOUT</code> jamais câblé en production</li><li>Pin <code>M1_RELAYFWD</code> jamais câblé en production</li><li>Pin <code>M1_RELAYREV</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_1</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_2</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_3</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_4</code> jamais câblé en production</li><li>Pin <code>M1_STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>M2_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M2_PRESETTRIGGERCMD</code> jamais câblé en production</li><li>Pin <code>M2_PRESETVALUEOUT</code> jamais câblé en production</li><li>Pin <code>M2_RELAYFWD</code> jamais câblé en production</li><li>Pin <code>M2_RELAYREV</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_1</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_2</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_3</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_4</code> jamais câblé en production</li><li>Pin <code>M2_STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>M3_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M3_DIRECTION</code> jamais câblé en production</li><li>Pin <code>M3_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>MACHINE</code> jamais câblé en production</li><li>Pin <code>OPERATOR</code> jamais câblé en production</li><li>Pin <code>POWERKEEPALIVE_A</code> jamais câblé en production</li><li>Pin <code>POWERKEEPALIVE_B</code> jamais câblé en production</li><li>Pin <code>RAWPOSM1</code> jamais câblé en production</li><li>Pin <code>RAWPOSM2</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>SIMENCODERSPEEDFACTOR</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKBAGOTEMENT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKFWD_UP_CLOSE_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKLEFT_REV_TREMIE_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKOVERSHOOT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWBUTTON</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWX</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWY</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKREV_DOWN_OPEN_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRIGHT_FWD_MAINT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMKOBOLDCONTACTVALUE</code> jamais câblé en production</li><li>Pin <code>SIMM3SENSORSWORD</code> jamais câblé en production</li><li>Pin <code>SIMM3SENSORSWORDOVERRIDEACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONINJECTM1</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONINJECTM2</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONOFFSET_M</code> jamais câblé en production</li><li>Pin <code>SIMTOPPOSITIONACTIVE</code> jamais câblé en production</li><li>Pin <code>TRANSLATION</code> jamais câblé en production</li><li>Pin <code>WINCH</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 61 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>BTNEMERGENCYSTOP</code> jamais câblé en production</li><li>Pin <code>BUSY</code> jamais câblé en production</li><li>Pin <code>CFGTOPSENSORRAWPOS</code> jamais câblé en production</li><li>Pin <code>DONE</code> jamais câblé en production</li><li>Pin <code>EMERGENCYARMING_RQ</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>HWREAL</code> jamais câblé en production</li><li>Pin <code>M1_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M1_PRESETTRIGGERCMD</code> jamais câblé en production</li><li>Pin <code>M1_PRESETVALUEOUT</code> jamais câblé en production</li><li>Pin <code>M1_RELAYFWD</code> jamais câblé en production</li><li>Pin <code>M1_RELAYREV</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_1</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_2</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_3</code> jamais câblé en production</li><li>Pin <code>M1_SPEEDCONTACTOR_4</code> jamais câblé en production</li><li>Pin <code>M1_STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>M2_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M2_PRESETTRIGGERCMD</code> jamais câblé en production</li><li>Pin <code>M2_PRESETVALUEOUT</code> jamais câblé en production</li><li>Pin <code>M2_RELAYFWD</code> jamais câblé en production</li><li>Pin <code>M2_RELAYREV</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_1</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_2</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_3</code> jamais câblé en production</li><li>Pin <code>M2_SPEEDCONTACTOR_4</code> jamais câblé en production</li><li>Pin <code>M2_STEPNUMBER</code> jamais câblé en production</li><li>Pin <code>M3_BRAKECMD</code> jamais câblé en production</li><li>Pin <code>M3_DIRECTION</code> jamais câblé en production</li><li>Pin <code>M3_SPEEDCMD_PCT</code> jamais câblé en production</li><li>Pin <code>MACHINE</code> jamais câblé en production</li><li>Pin <code>OPERATOR</code> jamais câblé en production</li><li>Pin <code>POWERCUTOFFREQUEST</code> jamais câblé en production</li><li>Pin <code>POWERKEEPALIVE_A</code> jamais câblé en production</li><li>Pin <code>POWERKEEPALIVE_B</code> jamais câblé en production</li><li>Pin <code>RAWPOSM1</code> jamais câblé en production</li><li>Pin <code>RAWPOSM2</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>SIMCHAINOKBIT</code> jamais câblé en production</li><li>Pin <code>SIMENCODERSPEEDFACTOR</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKBAGOTEMENT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKFWD_UP_CLOSE_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKLEFT_REV_TREMIE_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKOVERSHOOT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWBUTTON</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWX</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRAWY</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKREV_DOWN_OPEN_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMJOYSTICKRIGHT_FWD_MAINT_ACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMKOBOLDCONTACTVALUE</code> jamais câblé en production</li><li>Pin <code>SIMM3SENSORSWORD</code> jamais câblé en production</li><li>Pin <code>SIMM3SENSORSWORDOVERRIDEACTIVE</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONINJECTM1</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONINJECTM2</code> jamais câblé en production</li><li>Pin <code>SIMSYNCDEVIATIONOFFSET_M</code> jamais câblé en production</li><li>Pin <code>SIMTOPPOSITIONACTIVE</code> jamais câblé en production</li><li>Pin <code>TESTCUTACTIVE</code> jamais câblé en production</li><li>Pin <code>TRANSLATION</code> jamais câblé en production</li><li>Pin <code>WINCH</code> jamais câblé en production</li></ul>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN ENABLE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_RELAYFWD <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_RELAYFWD <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_RELAYREV <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_RELAYREV <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_SPEEDCONTACTOR_1 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_SPEEDCONTACTOR_1 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_SPEEDCONTACTOR_2 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_SPEEDCONTACTOR_2 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_SPEEDCONTACTOR_3 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_SPEEDCONTACTOR_3 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_SPEEDCONTACTOR_4 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_SPEEDCONTACTOR_4 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_SPEEDCMD_PCT <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_SPEEDCMD_PCT <span class="pin-type">IEC_REAL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_STEPNUMBER <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_STEPNUMBER <span class="pin-type">IEC_INT</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_PRESETTRIGGERCMD <span class="pin-type">IEC_WORD</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_PRESETTRIGGERCMD <span class="pin-type">IEC_WORD</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_PRESETVALUEOUT <span class="pin-type">IEC_UDINT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_PRESETVALUEOUT <span class="pin-type">IEC_UDINT</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M1_BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M1_BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_RELAYFWD <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_RELAYFWD <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_RELAYREV <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_RELAYREV <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_SPEEDCONTACTOR_1 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_SPEEDCONTACTOR_1 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_SPEEDCONTACTOR_2 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_SPEEDCONTACTOR_2 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_SPEEDCONTACTOR_3 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_SPEEDCONTACTOR_3 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_SPEEDCONTACTOR_4 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_SPEEDCONTACTOR_4 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_SPEEDCMD_PCT <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_SPEEDCMD_PCT <span class="pin-type">IEC_REAL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_STEPNUMBER <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_STEPNUMBER <span class="pin-type">IEC_INT</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_PRESETTRIGGERCMD <span class="pin-type">IEC_WORD</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_PRESETTRIGGERCMD <span class="pin-type">IEC_WORD</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_PRESETVALUEOUT <span class="pin-type">IEC_UDINT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_PRESETVALUEOUT <span class="pin-type">IEC_UDINT</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M2_BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M2_BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M3_DIRECTION <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M3_DIRECTION <span class="pin-type">IEC_INT</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M3_SPEEDCMD_PCT <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M3_SPEEDCMD_PCT <span class="pin-type">IEC_REAL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">M3_BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN M3_BRAKECMD <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERKEEPALIVE_A <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN POWERKEEPALIVE_A <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERKEEPALIVE_B <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN POWERKEEPALIVE_B <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">EMERGENCYARMING_RQ <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN EMERGENCYARMING_RQ <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMENCODERSPEEDFACTOR <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN TESTCUTACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CFGTOPSENSORRAWPOS <span class="pin-type">IEC_UDINT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN POWERCUTOFFREQUEST <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMTOPPOSITIONACTIVE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMCHAINOKBIT <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMSYNCDEVIATIONINJECTM1 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMENCODERSPEEDFACTOR <span class="pin-type">IEC_REAL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMSYNCDEVIATIONINJECTM2 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN CFGTOPSENSORRAWPOS <span class="pin-type">IEC_UDINT</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMSYNCDEVIATIONOFFSET_M <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMTOPPOSITIONACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMM3SENSORSWORDOVERRIDEACTIVE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMSYNCDEVIATIONINJECTM1 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMM3SENSORSWORD <span class="pin-type">IEC_BYTE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMSYNCDEVIATIONINJECTM2 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKLEFT_REV_TREMIE_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMSYNCDEVIATIONOFFSET_M <span class="pin-type">IEC_REAL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKRIGHT_FWD_MAINT_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMM3SENSORSWORDOVERRIDEACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKFWD_UP_CLOSE_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMM3SENSORSWORD <span class="pin-type">IEC_BYTE</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKREV_DOWN_OPEN_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMJOYSTICKLEFT_REV_TREMIE_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKRAWX <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMJOYSTICKRIGHT_FWD_MAINT_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKRAWY <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMJOYSTICKFWD_UP_CLOSE_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKRAWBUTTON <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMJOYSTICKREV_DOWN_OPEN_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKOVERSHOOT_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMJOYSTICKRAWX <span class="pin-type">IEC_INT</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMJOYSTICKBAGOTEMENT_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMJOYSTICKRAWY <span class="pin-type">IEC_INT</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SIMKOBOLDCONTACTVALUE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMJOYSTICKRAWBUTTON <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BTNEMERGENCYSTOP <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMJOYSTICKOVERSHOOT_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">HWREAL <span class="pin-type">ST_HARDWAREIMAGE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMJOYSTICKBAGOTEMENT_ACTIVE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RAWPOSM1<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_UDINT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SIMKOBOLDCONTACTVALUE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RAWPOSM2<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_UDINT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN BTNEMERGENCYSTOP <span class="pin-type">IEC_BOOL</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN HWREAL <span class="pin-type">ST_HARDWAREIMAGE</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN RAWPOSM1<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_UDINT</span></div>
+        </div><div class="pin-row pin-row-unwired">
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN RAWPOSM2<span class='pin-tag'>IN_OUT</span> <span class="pin-type">IEC_UDINT</span></div>
         </div></div>
             <div class="pin-block">FB_SimBench</div>
             <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BUSY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT BUSY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">DONE <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT DONE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">WINCH <span class="pin-type">ST_HWWINCH</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT WINCH <span class="pin-type">ST_HWWINCH</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">TRANSLATION <span class="pin-type">ST_HWTRANSLATION</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT TRANSLATION <span class="pin-type">ST_HWTRANSLATION</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">OPERATOR <span class="pin-type">ST_HWOPERATOR</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT OPERATOR <span class="pin-type">ST_HWOPERATOR</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">MACHINE <span class="pin-type">ST_HWMACHINE</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT MACHINE <span class="pin-type">ST_HWMACHINE</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div></div>
         </div>
     </details>
@@ -1945,9 +1955,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Sim_Safety</code></td>
-                <td>5</td><td>2</td>
-                <td>0</td><td>1</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (1 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>8</td><td>2</td>
+                <td>0</td><td>12</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (12 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1959,7 +1969,7 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_SimBench</code></td>
-                <td>49</td><td>7</td>
+                <td>52</td><td>7</td>
                 <td>2</td><td>16</td>
                 <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (16 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
@@ -2123,9 +2133,9 @@
                 
             </div>
         </article>
-        <article id="test-fb-simbench-8" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-8" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
+                <span class="badge badge-fail">FAIL</span>
                 <h3 style="flex: 1;">TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -2136,13 +2146,13 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
                 <ul class="checks-list"><li>A et B maintenus -&gt; SimChainOk=TRUE</li><li>canal A coupe -&gt; SimChainOk=FALSE</li><li>BtnEmergencyStop -&gt; SimChainOk=FALSE</li></ul>
             </details>
-                
+                <div class='failure'><div class='failure-head'>ASSERT_FALSE — FB_SIMSAFE.SIMCHAINOK expected FALSE, got TRUE</div><div class='failure-loc'>test_fb_simbench.st:107</div><div class='failure-msg'>canal A coupe -&gt; SimChainOk=FALSE</div></div>
                 
             </div>
         </article>
-        <article id="test-fb-simbench-9" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-simbench-9" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
+                <span class="badge badge-fail">FAIL</span>
                 <h3 style="flex: 1;">TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -2153,7 +2163,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
                 <ul class="checks-list"><li>pas encore arme -&gt; contacteur FALSE</li><li>EmergencyArming -&gt; contacteur engage</li><li>auto-maintien : contacteur reste engage</li><li>SimChainOk=FALSE -&gt; contacteur retombe</li></ul>
             </details>
-                
+                <div class='failure'><div class='failure-head'>ASSERT_TRUE — FB_SIMSAFE.SIMCONTACTOROK expected TRUE, got FALSE</div><div class='failure-loc'>test_fb_simbench.st:118</div><div class='failure-msg'>EmergencyArming -&gt; contacteur engage</div></div>
                 
             </div>
         </article>
@@ -2804,7 +2814,7 @@ STRUCT
     ChainOk     : BOOL; // Boucle AU fermee (EmergencyChainClosed = TRUE)
     ContactorOk : BOOL; // Contacteur puissance confirme engage (PowerContactorEngaged = TRUE)
     Step        : INT;  // Etape sequence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm
-    Armable     : BOOL; // Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance
+    Armable     : BOOL; // Rearmement possible maintenant : chain OK, step=0, pas de lockout
     ArmingBusy  : BOOL; // Sequence armement OU lockout en cours (nouvelle demande ignoree)
 END_STRUCT
 END_TYPE
@@ -3336,6 +3346,9 @@ TYPE ST_TraceTranslation :
 STRUCT
     // Permis de mouvement effectif (agrégat diagnostic : toutes les barrières levées)
     MotionPermitEffective    : BOOL;   // 🟢 Translation réellement autorisée à se déplacer
+    // Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
+    TremiePermitEffective    : BOOL;   // 🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)
+    MaintenancePermitEffective : BOOL; // 🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)
     HeightInterlockBlocking  : BOOL;   // 🚧 Interlock hauteur M1/M2 actif (risque collision)
 
     // Source de blocage — pour distinguer l&#x27;origine
@@ -3667,8 +3680,8 @@ END_TYPE</pre>
 STRUCT
     Idx201_JoyRawPhysical_ANA    : INT;  // [pts] Bruts convertisseur (-2048 à +2048)
     Idx202_JoyScaledPhysical_Pct : REAL; // [%] Consigne Joystick (-100% à +100%)
-    Idx203_HmiManualCmd_BtnUp    : BOOL; // 1 = Appui Bouton Ascending IHM | 0 = Relâché
-    Idx204_HmiManualCmd_BtnDown  : BOOL; // 1 = Appui Bouton Descending IHM | 0 = Relâché
+    Idx203_HmiManualCmd_BtnAscent : BOOL; // 1 = Appui Bouton Ascending IHM | 0 = Relâché
+    Idx204_HmiManualCmd_BtnDescent : BOOL; // 1 = Appui Bouton Descending IHM | 0 = Relâché
     Idx205_CycleAutoCmd_Pct      : REAL; // [%] Consigne auto envoyée par le Cycle
     Idx206_ModeActive            : E_Mode;// Mode courant (MANU_N1, AUTO_N1, MAINT_N2...)
     Idx207_BypassOperatorComm    : BOOL; // 0 = Comm Normale OK | 1 = Bypass Réseau Actif ⚠️
@@ -3696,8 +3709,8 @@ END_TYPE
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\1_TREUILS_BENNE\ST_Chain_Winch_Outputs.st</code></summary>
                 <pre>TYPE ST_Chain_Winch_Outputs :
 STRUCT
-    Idx501_CmdRelayFwd_Up_DQ     : BOOL; // 1 = Relais Ascending ON | 0 = OFF
-    Idx502_CmdRelayRev_Down_DQ   : BOOL; // 1 = Relais Descending ON | 0 = OFF
+    Idx501_CmdRelayAscent_DQ   : BOOL; // 1 = Relais Ascending ON | 0 = OFF
+    Idx502_CmdRelayDescent_DQ  : BOOL; // 1 = Relais Descending ON | 0 = OFF
     Idx503_CmdSpeedContactor1_DQ : BOOL; // 1 = Contacteur Vitesse 1 ON | 0 = OFF
     Idx504_CmdSpeedContactor4_DQ : BOOL; // 1 = Contacteur Vitesse 4 ON (Plein Gaz) | 0 = OFF
     Idx505_CmdBrakeRelease_RQ    : BOOL; // 1 = Bobine Frein Alimentée (Ouvert) | 0 = Non Alimentée (Serré)
@@ -3817,6 +3830,8 @@ STRUCT
     PowerKeepAliveACmd    : BOOL; // 🔒 Maintien puissance voie A (1=Maintenu)
     PowerKeepAliveBCmd    : BOOL; // 🔒 Maintien puissance voie B (1=Maintenu)
     EmergencyArmingCmd    : BOOL; // 🎯 Impulsion rearmement puissance AU
+    TestCutActive         : BOOL; // 🧪 Test de redondance AU en cours (canal A ou B coupe) — consommé par FB_SimBench
+    PowerCutOffRequest    : BOOL; // 🛑 Requête coupure métier (arrêt d&#x27;urgence) — consommé par FB_SimBench
 END_STRUCT
 END_TYPE
 </pre>
@@ -3929,8 +3944,8 @@ END_TYPE
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_WinchCmd :
 STRUCT
-    BtnUp               : BOOL;             (* ⬆️ Mouvement montee maintenu (mode boutons IHM, MAINT_N1 accessible) *)
-    BtnDown             : BOOL;             (* ⬇️ Mouvement descente maintenu (mode boutons IHM, MAINT_N1 accessible) *)
+    BtnAscent               : BOOL;             (* ⬆️ Mouvement montee maintenu (mode boutons IHM, MAINT_N1 accessible) *)
+    BtnDescent             : BOOL;             (* ⬇️ Mouvement descente maintenu (mode boutons IHM, MAINT_N1 accessible) *)
     BtnReset            : BOOL;             (* 🔑 Demande reset exposée par treuil ; agrégée dans le reset domaine partagé *)
     BtnHome             : BOOL;             (* 🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2 *)
     BtnConfirmCoherence : BOOL;             (* 🔓 Confirmation de cohérence au démarrage *)
@@ -4236,8 +4251,8 @@ END_TYPE</pre>
 STRUCT
     Idx201_JoyXRaw_ANA           : INT;  // [pts] Bruts Joystick Axe X
     Idx202_JoyXScaled_Pct        : REAL; // [%] Consigne Joystick Axe X (-100% à +100%)
-    Idx203_HmiCmd_BtnFwd         : BOOL; // 1 = Bouton Avance IHM | 0 = Relâché
-    Idx204_HmiCmd_BtnRev         : BOOL; // 1 = Bouton Recul IHM | 0 = Relâché
+    Idx203_HmiCmd_BtnTremie : BOOL; // 1 = Bouton vers Trémie IHM | 0 = Relâché (ex-Idx203_HmiCmd_BtnFwd)
+    Idx204_HmiCmd_BtnMaintenance : BOOL; // 1 = Bouton vers Maintenance IHM | 0 = Relâché (ex-Idx204_HmiCmd_BtnRev)
     Idx205_HmiTargetPosition     : INT;  // Cible Sélectionnée IHM (1=Trémie, 2=P2, 3=P1)
     Idx206_CycleTargetPosition   : INT;  // Cible Sélectionnée par le Cycle Auto
     Idx207_ModeActive            : E_Mode;// Mode courant (MANU_N1, AUTO_N1...)
@@ -4280,8 +4295,8 @@ STRUCT
     Idx301_EmergencyChainClosed  : BOOL; // 1 = Boucle Urgence OK | 0 = Arrêt d&#x27;Urgence Appuyé
     Idx302_SafeStopActive        : BOOL; // 0 = Sain (Autorisé) | 1 = Arrêt Rapide Translation
     Idx303_PowerCutOffActive     : BOOL; // 0 = Puissance OK | 1 = Coupure Puissance
-    Idx304_LimitSwitchFwdActive  : BOOL; // 0 = Sain | 1 = Fin de Course Extrême Avance
-    Idx305_LimitSwitchRevActive  : BOOL; // 0 = Sain | 1 = Fin de Course Extrême Recul
+    Idx304_LimitSwitchTremieActive  : BOOL; // 0 = Sain | 1 = Fin de Course Extrême Trémie (ex-Idx304_LimitSwitchFwdActive)
+    Idx305_LimitSwitchMaintenanceActive : BOOL; // 0 = Sain | 1 = Fin de Course Extrême Maintenance (ex-Idx305_LimitSwitchRevActive)
     Idx306_BypassLimitSwitch     : BOOL; // 0 = Fins de course actives | 1 = Shuntés IHM ⚠️
     Idx307_PositionDecoderIncoherent: BOOL; // 0 = Décodage 5 Capteurs OK | 1 = Incohérence Position
     Idx308_HeightInterlockBlocking: BOOL; // : 0 = M1 ET M2 ≥ hauteur mini (ou bypass) | 1 = Translation bloquée (risque collision)
@@ -4295,6 +4310,9 @@ STRUCT
     Idx315_ErrorLimitSwitch  : BOOL; // bit6 Limite extrême atteinte
     Idx316_ErrorSensorIncoherent: BOOL; // bit7 Mot capteurs position incohérent
     Idx317_ErrorId           : WORD; // Masque brut complet (latch cause) — source d&#x27;arbitrage PowerCutOff
+    (* Permis directionnels M3 (source unique : FB_Safety_Translation) — TRUE = autorisé, fail-safe *)
+    Idx318_TremiePermit      : BOOL; // 1 = Translation vers Trémie autorisée | 0 = SENS TRÉMIE BLOQUÉ
+    Idx319_MaintenancePermit : BOOL; // 1 = Translation vers Maintenance autorisée | 0 = SENS MAINTENANCE BLOQUÉ
 END_STRUCT
 END_TYPE</pre>
             </details>
@@ -4342,6 +4360,8 @@ STRUCT
     ErrorSensorIncoherent : BOOL; (* 🧭 Mot capteurs M3 incohérent (bit7) *)
     SafeStop          : BOOL;    (* 🛡️ Décélération de sécurité demandée *)
     PowerCutOff       : BOOL;    (* 🧨 Coupure puissance demandée *)
+    TremiePermit      : BOOL;    (* 🟢 Permis directionnel vers Trémie EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit *)
+    MaintenancePermit : BOOL;    (* 🟢 Permis directionnel vers Maintenance EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit *)
     BlockedBySafety   : BOOL;    (* 🚫 Synthèse globale : translation bloquée par la sécurité *)
     PowerCutOffSafety : BOOL;    (* 🧨 Synthèse sécurités critiques entraînant une coupure puissance *)
     SafeStopSafety    : BOOL;    (* 🛡️ Synthèse défauts entraînant un SafeStop / Rampe rapide *)
@@ -4376,14 +4396,14 @@ END_TYPE
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au pilotage de la translation M3 depuis l&#x27;IHM.
    📄 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
-      sans pont générique pour ne jamais persister BtnFwd/BtnRev.
+      sans pont générique pour ne jamais persister BtnTremie/BtnMaintenance.
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_TranslationCmd :
 STRUCT
     SelPositioning     : BOOL;    (* 🎯 TRUE = positionneur sur SelTarget ; FALSE = jog libre *)
     SelTarget          : INT;     (* 🔢 Numéro de la cible de position sélectionnée *)
-    BtnFwd             : BOOL;    (* ↔️ Requête marche avant (→ Trémie), pilotage IHM exclusif *)
-    BtnRev             : BOOL;    (* ↔️ Requête marche arrière (→ Maintenance), pilotage IHM exclusif *)
+    BtnTremie         : BOOL;    (* ↔️ Requête marche vers Trémie (ex-BtnFwd), pilotage IHM exclusif *)
+    BtnMaintenance    : BOOL;    (* ↔️ Requête marche vers Maintenance (ex-BtnRev), pilotage IHM exclusif *)
     SetFreq_Hz         : REAL;    (* 🎯 Consigne fréquence manuelle [Hz], limitée par PRG_06_Outputs *)
     // 🔀 Switch machine unique : GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
     InvertDirection    : BOOL;    (* 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service) *)
@@ -4477,20 +4497,7 @@ STRUCT
     TranslationSafety                : ST_SafetyTranslation; // 🛡️ Diagnostic et securites translation M3
 
     // === 🎯 Faits decodeur position M3 (produits par PRG_05, AF-02 TBD §8 #5) ===
-    TranslationPosTremie      : BOOL; // 📍 Zone Tremie (1=Present)
-    TranslationPosPV          : BOOL; // 📍 Zone pre-ralentissement PV (1=Present)
-    TranslationPosP2          : BOOL; // 📍 Zone P2 (1=Present)
-    TranslationPosP1          : BOOL; // 📍 Zone P1 (1=Present)
-    TranslationPosMaintenance : BOOL; // 📍 Zone Maintenance (1=Present)
-    TranslationAtTremie       : BOOL; // 🎯 Position exacte Tremie (1=Atteint)
-    TranslationAtPV           : BOOL; // 🎯 Position exacte PV (1=Atteint)
-    TranslationAtP2           : BOOL; // 🎯 Position exacte P2 (1=Atteint)
-    TranslationAtP1           : BOOL; // 🎯 Position exacte P1 (1=Atteint)
-    TranslationAtMaintenance  : BOOL; // 🎯 Position exacte Maintenance (1=Atteint)
-    M3_LimitSwitchFwd         : BOOL; // 🛡️ Fin de course avant M3 (1=Actionne)
-    M3_LimitSwitchRev         : BOOL; // 🛡️ Fin de course arriere M3 (1=Actionne)
     M3_SensorWordIncoherent   : BOOL; // ❌ Incoherence detectee mot capteurs M3
-    M3_SensorsWord             : BYTE; // 📊 Mot d&#x27;etat capteurs M3
 
     // === ⚙️ États dynamiques &amp; positions stables translation M3 ===
     TranslationBusy           : BOOL; // ⚙️ Translation M3 en mouvement effectif
@@ -4557,8 +4564,8 @@ STRUCT
     EstimatedPosM3_M        : REAL;    (* 📏 Position continue estimée en mètres (0.0 m Maint -&gt; +X m Trémie) — persistante, survit reboot *)
     SensorsWord             : BYTE;    (* bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance *)
     SensorWordIncoherent    : BOOL;
-    LimitSwitchFwd          : BOOL;
-    LimitSwitchRev          : BOOL;
+    LimitSwitchTremie       : BOOL;    (* 🚧 Fin de course extrême Trémie (ex-LimitSwitchFwd) *)
+    LimitSwitchMaintenance  : BOOL;    (* 🚧 Fin de course extrême Maintenance (ex-LimitSwitchRev) *)
     DriveThermalOk          : BOOL;    (* Retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l&#x27;AC600 se protège lui-même *)
     MaintenanceTargetEnable : BOOL;    (* 🔓 TRUE = Autorise le déplacement vers la cible 4 (Maintenance) ; actif uniquement en mode MAINT_N2 *)
     SimulationModeActive    : BOOL;
@@ -4711,8 +4718,7 @@ STRUCT
     M1Position_M           : REAL;        (* 📊 Position câble M1 *)
     M2Position_M           : REAL;        (* 📊 Position câble M2 *)
     DeadmanArmed           : BOOL;        (* 🔫 Homme-mort joystick armé *)
-    JoystickMotionActive   : BOOL;        (* 🕹️ Mouvement joystick actif *)
-    MotionPermit           : BOOL;        (* 🟢 Homme-mort + axe Y actif (CycleMotionPermit) *)
+    JoystickDeflected      : BOOL;        (* 🕹️ Joystick défléchi (non centré) — même signal que JoystickDeflected (FB_Cycle) ; SANS homme-mort *)
     CycleStepAtError       : E_CycleStep; (* 🧊 Étape spécifique au moment du défaut  *)
     SampleCount            : INT;         (* Compteur de prélèvements (RETAIN, Q3bis) *)
 END_STRUCT
@@ -4729,10 +4735,6 @@ STRUCT
     SelMode            : E_Mode := E_Mode.MAINT_N1; (* 🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM () *)
     BtnFaultReset      : BOOL;   (* 🔔 Acquittement défauts/alarmes domaine sécurité/métier — jamais Modes/Cycle *)
     BtnModeReset       : BOOL;   (* 🔁 Acquittement défaut FB_Modes uniquement () *)
-
-    // — Séquence réarmement AU (voir DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md §5)
-    BtnEmergencyArming : BOOL;   (* 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique *)
-    BtnEmergencyCutOff : BOOL;   (* 🎮 Commande IHM coupure d&#x27;urgence puissance amont (arrêt à distance) *)
 
     // Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
     SelJoystickWinch   : INT := 0; (* 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement *)
@@ -4770,23 +4772,10 @@ END_TYPE
 TYPE ST_ModesState :
 STRUCT
     CurrentMode           : E_Mode; (* 🎚️ Mode de marche actuellement actif *)
-    PowerContactorEngaged       : BOOL;   (* 🛡️ État de la chaîne d&#x27;arrêt d&#x27;urgence *)
     AnyFaultActive        : BOOL;   (* : au moins un défaut/alarme actif dans le domaine
                                         sécurité/métier — s&#x27;éteint seul quand la cause disparaît ET que
                                         BtnFaultReset a été pressé (OR de tous les .Error du domaine,
                                         même périmètre que BtnFaultReset) *)
-    PowerCutOffActive     : BOOL;   (* 🧨 : au moins un Méca A/B/C (FB_Safety_Winch) ou
-                                        PowerCutOff Translation actif — TRUE = coupure demandée. Attention :
-                                        PowerCutOff_A_RQ/B_RQ (sortie physique réelle) sont à la polarité
-                                        INVERSÉE (fail-safe, TRUE=maintenu/OK) — ce champ IHM reste en
-                                        polarité &quot;alarme&quot; (TRUE=problème) pour cohérence avec AnyFaultActive *)
-    EmergencyChainOk      : BOOL;   (* 🔗 Boucle AU saine (coup-de-poing relâchés + pas de PowerCutOff PLC actif) *)
-    PowerContactorOk      : BOOL;   (* 🔌 Contacteur de puissance confirmé engagé (miroir PowerContactorEngaged) *)
-    EmergencyArmable      : BOOL;   (* 🟢 Réarmement possible maintenant (chaîne saine, ni séquence ni verrouillage en cours,
-                                        ni RedundancyTestFailed) *)
-    EmergencyArmingBusy   : BOOL;   (* ⏳ Auto-test A/B, pulse, confirmation OU verrouillage 5s en cours — nouvelle demande ignorée *)
-    RedundancyTestFailed  : BOOL;   (* Canal A ou B non fonctionnel détecté à l&#x27;auto-test — bloque tout réarmement (front Reset requis) *)
-    EmergencyArmingFailed : BOOL;   (* Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis) *)
 
     (* Miroir IHM des états de maintenance (AF-05 §4bis) *)
     ModeChangePendingBlocked : BOOL;   (* 🚦 Changement de mode refusé : treuils non à l&#x27;arrêt confirmé (contacteurs retombés + frein serré + |v| &lt; seuil) *)
@@ -5499,7 +5488,7 @@ STRUCT
 
     (* 3. Chaîne de Sécurité &amp; Verrous *)
     Step5_NoSafetyFault          : BOOL; (* TRUE = Pas de SafeStop ni AU actif sur cet axe *)
-    Step6_DirectionAllowed       : BOOL; (* TRUE = Sens autorisé (AscentPermit/DescendPermit) *)
+    Step6_DirectionAllowed       : BOOL; (* TRUE = Sens autorisé (AscentPermit/DescendPermit / TremiePermit/MaintenancePermit) *)
     Step7_BrakeReleased          : BOOL; (* TRUE = Commande frein activée &amp; retour frein OK *)
     Step8_OutputInterlockOk      : BOOL; (* TRUE = Étage de sortie LD débloqué (pas d&#x27;interlock actif) *)
 
@@ -5600,7 +5589,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────
    🎨 Distinct des bypass individuels M1/M2 (ST_BypassWinch)
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage &quot;both&quot;,
-      GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
+      GVL_IHM.Commun.BtnWinchBothAscent/Descent), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
       pilotage groupé — SANS retirer les bypass individuels pour le pilotage à l&#x27;unité.
       ⚠️ Ne remplace PAS les bypass individuels : les deux se combinent en OR, jamais l&#x27;un
@@ -5682,7 +5671,7 @@ STRUCT
     LimitLegalDepthMinAllowed_M : REAL := -999.0; (* 📐 Cote min de dragage autorisée (m, négatif) *)
     LimitLegalEnabled           : BOOL; (* 🟢 Activation de la limite légale *)
     SelHomingApproachEnable     : BOOL; (* 🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2) *)
-    WinchMaxStepDescending      : INT := 3;     (* 🛑 Limitation palier vitesse en descending (1..5), commun M1/M2 *)
+    WinchMaxStepDescent      : INT := 3;     (* 🛑 Limitation palier vitesse en descending (1..5), commun M1/M2 *)
     WinchMaxStepAscent          : INT := 5;     (* 🚀 Limitation palier vitesse en montée (1..5), commun M1/M2 *)
     WinchSlowdownDistance_M     : REAL := 1.0;  (* 📏 Distance avant limite pour enclencher le ralentissement (m), commun M1/M2 *)
     // : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
@@ -5737,8 +5726,8 @@ STRUCT
     HeartbeatIhmElapsed       : TIME; (* PLC→IHM : temps depuis dernier front IHM *)
 
     // Boutons pilotage direct des 2 treuils (communs, remplace SelJoystickWinch en mode boutons)
-    BtnWinchBothUp     : BOOL; (* ⬆️ Monte les 2 treuils simultanément *)
-    BtnWinchBothDown   : BOOL; (* ⬇️ Descend les 2 treuils simultanément *)
+    BtnWinchBothAscent     : BOOL; (* ⬆️ Monte les 2 treuils simultanément *)
+    BtnWinchBothDescent   : BOOL; (* ⬇️ Descend les 2 treuils simultanément *)
 
     // Alarme restauration config PERSISTENT (RETAIN invalidé, ex. changement de
     // struct ST_*HMI) — visible et acquittable, jamais de disparition automatique silencieuse
@@ -6248,29 +6237,51 @@ END_FUNCTION_BLOCK
                 <pre>(* ═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Safety — Simulation de la chaîne d&#x27;AU et du contacteur de puissance
    ───────────────────────────────────────────────────────────────
-   📥 Enable          : activation de la simulation (SimulationModeActive AND NOT SensorEmergencyStopChainIsReal)
-   📥 PowerCutOff_A   : demande de coupure PLC canal A (maintenu à TRUE en marche normale)
-   📥 PowerCutOff_B   : demande de coupure PLC canal B (maintenu à TRUE en marche normale)
-   📥 EmergencyArming : impulsion de réarmement (EmergencyArming_RQ)
-   
-   📤 SimChainOk      : simulation de la boucle AU (boutons relâchés et coupures PLC inactives)
-   📤 SimContactorOk  : simulation du contacteur engagé (PowerContactorEngaged)
-   
-   ⚙️ Logique physique :
-      - La chaîne d&#x27;AU (SimChainOk) est saine si les deux relais PLC de coupure sont maintenus fermés (TRUE).
-      - Le contacteur s&#x27;engage (SimContactorOk) lors d&#x27;une impulsion de réarmement (EmergencyArming) 
-        et s&#x27;auto-maintient tant que la chaîne reste saine (SimChainOk).
-      - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
+   📥 Enable            : activation de la simulation (SimulationModeActive AND NOT SensorEmergencyStopChainIsReal)
+   📥 SimChainOkBit     : bit opérateur — TRUE = simuler la chaîne AU fermée ; FALSE = chaîne ouverte (non simulée)
+   📥 PowerCutOff_A     : demande de coupure PLC canal A (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
+   📥 PowerCutOff_B     : demande de coupure PLC canal B (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
+   📥 PowerCutOffRequest: requête de coupure métier (PowerCutOffRequest du FB AU) — TRUE = arrêt d&#x27;urgence (chaîne ouverte)
+   📥 EmergencyArming   : impulsion de réarmement (EmergencyArming_RQ)
+   📥 BtnEmergencyStop   : appui coup-de-poing AU (TRUE = boucle ouverte)
+   📥 TestCutActive     : test de redondance en cours (canal A ou B coupé par le FB AU)
+
+   📤 SimChainOk        : simulation de la boucle AU (fermée si SimChainOkBit, ouverte sur coup-de-poing/test/coupure)
+   📤 SimContactorOk    : simulation du contacteur engagé (PowerContactorEngaged)
+
+   ⚙️ MÉCANISME GRANULAIRE (contrôle opérateur de la chaîne AU) :
+      - `SimChainOkBit` pilote la chaîne : FALSE → chaîne OUVERTE (on ne peut pas armer) ;
+        TRUE → chaîne FERMÉE (le bouton Armable s&#x27;active, on arme, la séquence teste les sorties).
+      - Pendant le test de redondance (TestCutActive), la chaîne CLIGNOTE (s&#x27;ouvre pendant TEST_A/B,
+        se referme pendant RESTORE_A/B) puis revient à 1 — comme en réel.
+      - `PowerCutOffRequest` (coupure métier) ouvre la chaîne → ARRÊT D&#x27;URGENCE.
+      - `BtnEmergencyStop` (coup-de-poing) ouvre la chaîne.
+      - Le contacteur ne s&#x27;engage QUE pendant l&#x27;impulsion d&#x27;armement (EmergencyArming), avec une
+        temporisation d&#x27;engagement (CST_ContactorEngageDelay), puis s&#x27;auto-maintient tant que la
+        chaîne est saine ; il retombe (CST_ContactorDropDelay) dès que la chaîne s&#x27;ouvre.
+      - À la ré-entrée en simulation (Enable FALSE→TRUE), SimChainOkBit = FALSE → chaîne OUVERTE et
+        contacteur NON engagé (on n&#x27;a pas armé) — pas de faux « OK » immédiat.
+
+   🔒 NON-RÉGRESSION ARMEMENT (dépendance circulaire) :
+      - La chaîne n&#x27;est PAS fermée par défaut : elle est fermée UNIQUEMENT si l&#x27;opérateur pose
+        `SimChainOkBit`. Elle ne dépend PAS de PowerCutOff_A/B (qui sont dans le cercle) : le
+        réarmement après échec de test de redondance (RedundancyTestFailedCause laté → PowerCutOff_A=FALSE)
+        reste possible car la chaîne est maintenue fermée par le bit opérateur, pas par le PLC.
+      - L&#x27;ouverture « PLC coupe un canal » est représentée par TestCutActive (test redondance) et
+        PowerCutOffRequest (coupure métier) — jamais par PowerCutOff_A/B seuls.
    ═══════════════════════════════════════════════════════════════
    📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
 *)
 FUNCTION_BLOCK FB_Sim_Safety
 VAR_INPUT
-    Enable          : BOOL; // --&gt; [CMD] Activation de la simulation
-    PowerCutOff_A   : BOOL; // --&gt; [SAFE] Commande coupure canal A (TRUE = OK/fermé)
-    PowerCutOff_B   : BOOL; // --&gt; [SAFE] Commande coupure canal B (TRUE = OK/fermé)
-    EmergencyArming : BOOL; // --&gt; [CMD] Impulsion de réarmement (TRUE = pulse)
-    BtnEmergencyStop : BOOL; // --&gt; [HW] Force l&#x27;ouverture de la boucle (TRUE = bouton appuyé/défaut)
+    Enable            : BOOL; // --&gt; [CMD] Activation de la simulation
+    SimChainOkBit     : BOOL; // --&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée
+    PowerCutOff_A     : BOOL; // --&gt; [SAFE] Commande coupure canal A (TRUE = OK/fermé)
+    PowerCutOff_B     : BOOL; // --&gt; [SAFE] Commande coupure canal B (TRUE = OK/fermé)
+    PowerCutOffRequest: BOOL; // --&gt; [SAFE] Requête coupure métier (TRUE = arrêt d&#x27;urgence)
+    EmergencyArming   : BOOL; // --&gt; [CMD] Impulsion de réarmement (TRUE = pulse)
+    BtnEmergencyStop   : BOOL; // --&gt; [HW] Force l&#x27;ouverture de la boucle (TRUE = bouton appuyé/défaut)
+    TestCutActive      : BOOL; // --&gt; [SAFE] Test de redondance en cours (canal A ou B coupé par le FB AU)
 END_VAR
 VAR_OUTPUT
     SimChainOk      : BOOL; // &lt;-- [STAT] Boucle AU simulée saine
@@ -6278,6 +6289,23 @@ VAR_OUTPUT
 END_VAR
 VAR
     ContactorLatch  : BOOL; // . [LOC] Mémorisation de l&#x27;auto-maintien du contacteur
+    ChainOpenReq    : BOOL; // . [LOC] Demande brute d&#x27;ouverture de la chaîne (bit off / coup-de-poing / test / coupure)
+    ChainOpen       : BOOL; // . [LOC] État latche de la chaîne (TRUE = ouverte)
+    ContactorEngageReq : BOOL; // . [LOC] Demande d&#x27;engagement du contacteur (pulse ET chaîne saine)
+    TonChainOpen    : TON;  // . [LOC] Temporisation d&#x27;ouverture de la chaîne (retombée relais)
+    TonChainClose   : TON;  // . [LOC] Temporisation de fermeture de la chaîne (retombée relais)
+    TonContactorEngage : TON; // . [LOC] Temporisation d&#x27;engagement du contacteur (temps de collage bobine)
+    TonContactorDrop   : TON; // . [LOC] Temporisation de retombée du contacteur (temps de décollage bobine)
+END_VAR
+VAR CONSTANT
+    // === TEMPORISATIONS PHYSIQUES SIMULÉES (compatibles séquence FB AU) ===
+    // ⚠️ Doivent rester &lt; durées de la séquence FB AU (CST_TestDuration=200ms, CST_ArmingPulseDuration=1s,
+    //    CST_ArmingConfirmTimeout=2s) pour que le test de redondance et la confirmation contacteur
+    //    restent validés : ouverture/fermeture chaîne &lt; 200ms, engagement contacteur &lt; 1s.
+    CST_ChainOpenDelay       : TIME := T#50ms;  // Temps de retombée relais AU (ouverture chaîne)
+    CST_ChainCloseDelay      : TIME := T#50ms;  // Temps de retombée relais AU (fermeture chaîne)
+    CST_ContactorEngageDelay : TIME := T#100ms; // Temps de collage bobine contacteur (engagement)
+    CST_ContactorDropDelay   : TIME := T#50ms;  // Temps de décollage bobine contacteur (retombée)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -6286,22 +6314,77 @@ IF NOT Enable THEN
     SimChainOk     := FALSE;
     SimContactorOk := FALSE;
     ContactorLatch := FALSE;
+    ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n&#x27;a pas armé)
+    ChainOpenReq   := FALSE;
+    ContactorEngageReq := FALSE;
+    TonChainOpen(IN := FALSE);
+    TonChainClose(IN := FALSE);
+    TonContactorEngage(IN := FALSE);
+    TonContactorDrop(IN := FALSE);
     RETURN;
 END_IF;
 {endregion}
 
-{region &quot;§2 Chaîne AU&quot;}
-// 1. La chaîne AU est saine si le PLC maintient les deux relais de coupure de puissance
-// AND if no emergency stop button is pressed (BtnEmergencyStop is FALSE)
-SimChainOk := PowerCutOff_A AND PowerCutOff_B AND NOT BtnEmergencyStop;
+{region &quot;§2 Chaîne AU (contrôle granulaire + dynamique)&quot;}
+// 1. La chaîne AU est saine si l&#x27;opérateur la simule fermée (SimChainOkBit = TRUE) ET si aucun
+//    événement ne l&#x27;ouvre : coup-de-poing (BtnEmergencyStop), test de redondance (TestCutActive),
+//    coupure métier (PowerCutOffRequest).
+// 🔧 DEADLOCK SIMULATION (corrigé) : la chaîne n&#x27;est PAS fermée par défaut ni dépendante de
+//    PowerCutOff_A/B (qui sont dans le cercle). Elle est fermée UNIQUEMENT par le bit opérateur
+//    `SimChainOkBit`. Le réarmement après échec de test de redondance (RedundancyTestFailedCause laté
+//    → PowerCutOff_A=FALSE) reste possible car la chaîne est maintenue fermée par le bit, pas par
+//    le PLC. Hors simulation (Enable=FALSE), la chaîne reste pilotée par le matériel via le repli
+//    HwReal (PRG_02 §1/§2) — aucune régression sécurité réelle.
+// 🆕 DYNAMIQUE : l&#x27;ouverture/fermeture suit une temporisation (CST_ChainOpenDelay / CST_ChainCloseDelay)
+//    qui simule le temps de retombée des relais AU, tout en restant &lt; 200ms (CST_TestDuration) pour
+//    ne pas fausser le test de redondance. Pendant le test, la chaîne clignote (s&#x27;ouvre en TEST_A/B,
+//    se referme en RESTORE_A/B) puis revient à 1.
+ChainOpenReq := (NOT SimChainOkBit) OR BtnEmergencyStop OR TestCutActive OR PowerCutOffRequest;
+
+// Temporisation d&#x27;ouverture : la chaîne s&#x27;ouvre après CST_ChainOpenDelay de demande soutenue
+TonChainOpen(IN := ChainOpenReq, PT := CST_ChainOpenDelay);
+// Temporisation de fermeture : la chaîne se ferme après CST_ChainCloseDelay d&#x27;absence de demande
+TonChainClose(IN := NOT ChainOpenReq, PT := CST_ChainCloseDelay);
+
+// Latch de la chaîne avec temporisations (défaut = ouverte à la ré-entrée)
+IF ChainOpenReq THEN
+    IF TonChainOpen.Q THEN
+        ChainOpen := TRUE;
+    END_IF;
+ELSE
+    IF TonChainClose.Q THEN
+        ChainOpen := FALSE;
+    END_IF;
+END_IF;
+
+SimChainOk := NOT ChainOpen;
 {endregion}
 
-{region &quot;§3 Auto-maintien contacteur&quot;}
-// 2. Logique d&#x27;auto-maintien (latch) du contacteur avec priorité à la coupure
+{region &quot;§3 Auto-maintien contacteur (dynamique réaliste)&quot;}
+// 2. Logique d&#x27;auto-maintien (latch) du contacteur avec priorité à la coupure.
+// 🆕 DYNAMIQUE : le contacteur ne s&#x27;engage QUE pendant l&#x27;impulsion d&#x27;armement (EmergencyArming)
+//    tant que la chaîne est saine, après CST_ContactorEngageDelay (temps de collage bobine), puis
+//    s&#x27;auto-maintient. Il retombe après CST_ContactorDropDelay (temps de décollage bobine) dès que
+//    la chaîne s&#x27;ouvre — comme une bobine réelle qui décolle sans alimentation. Ces temporisations
+//    restent &lt; CST_ArmingPulseDuration (1s) et CST_ArmingConfirmTimeout (2s) pour que la
+//    confirmation contacteur reste validée. À la ré-entrée en simulation, le contacteur est NON
+//    engagé (on n&#x27;a pas armé).
+ContactorEngageReq := EmergencyArming AND SimChainOk;
+
+// Temporisation d&#x27;engagement : le contacteur se colle après CST_ContactorEngageDelay de pulse soutenu
+TonContactorEngage(IN := ContactorEngageReq, PT := CST_ContactorEngageDelay);
+// Temporisation de retombée : le contacteur décolle après CST_ContactorDropDelay de chaîne ouverte
+TonContactorDrop(IN := NOT SimChainOk, PT := CST_ContactorDropDelay);
+
+// Latch du contacteur avec priorité à la coupure (retombée &gt; engagement)
 IF NOT SimChainOk THEN
-    ContactorLatch := FALSE;
-ELSIF EmergencyArming THEN
-    ContactorLatch := TRUE;
+    IF TonContactorDrop.Q THEN
+        ContactorLatch := FALSE;
+    END_IF;
+ELSIF ContactorEngageReq THEN
+    IF TonContactorEngage.Q THEN
+        ContactorLatch := TRUE;
+    END_IF;
 END_IF;
 
 // Recopie vers la sortie
@@ -6499,6 +6582,9 @@ VAR_INPUT
     PowerKeepAlive_A           : BOOL;             (* --&gt; [SAFE] TRUE = relais A maintenu sagement par le PLC *)
     PowerKeepAlive_B           : BOOL;             (* --&gt; [SAFE] TRUE = relais B maintenu sagement par le PLC *)
     EmergencyArming_RQ         : BOOL;             (* --&gt; [CMD] Impulsion de réarmement puissance *)
+    TestCutActive              : BOOL;             (* --&gt; [SAFE] Test de redondance AU en cours (canal A ou B coupé) *)
+    PowerCutOffRequest         : BOOL;             (* --&gt; [SAFE] Requête coupure métier (TRUE = arrêt d&#x27;urgence) *)
+    SimChainOkBit              : BOOL;             (* --&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée *)
 
     // ── Stimuli &amp; Paramètres de banc ─────────────────────────────────────────
     SimEncoderSpeedFactor      : REAL := 1.0;   (* --&gt; [CFG] Facteur vitesse codeur *)
@@ -6776,11 +6862,14 @@ Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 {region &quot;§5 Simulation securite et image machine&quot;}
 // ── 4. MODÈLE SÉCURITÉ &amp; COMMUNS MACHINE ─────────────────────────────────────
 instSimSafety(
-    Enable           := TRUE,
-    PowerCutOff_A    := PowerKeepAlive_A,
-    PowerCutOff_B    := PowerKeepAlive_B,
-    EmergencyArming  := EmergencyArming_RQ,
-    BtnEmergencyStop := BtnEmergencyStop
+    Enable            := TRUE,
+    SimChainOkBit     := SimChainOkBit,
+    PowerCutOff_A     := PowerKeepAlive_A,
+    PowerCutOff_B     := PowerKeepAlive_B,
+    PowerCutOffRequest:= PowerCutOffRequest,
+    EmergencyArming   := EmergencyArming_RQ,
+    BtnEmergencyStop  := BtnEmergencyStop,
+    TestCutActive     := TestCutActive
 );
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
@@ -6814,8 +6903,14 @@ test_fb_simbench.st
   [PASS] TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret
   [PASS] T196-003 Capteur haut manuel et polarite Free_DI correcte
   [PASS] T196-004 Capteur haut auto : seuil M1 atteint sans forçage manuel
-  [PASS] TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop
-  [PASS] TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming
+         ASSERT_FALSE failed: FB_SIMSAFE.SIMCHAINOK expected FALSE, got TRUE
+         at test_fb_simbench.st:107
+         Message: canal A coupe -&gt; SimChainOk=FALSE
+  [FAIL] TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop
+         ASSERT_TRUE failed: FB_SIMSAFE.SIMCONTACTOROK expected TRUE, got FALSE
+         at test_fb_simbench.st:118
+         Message: EmergencyArming -&gt; contacteur engage
+  [FAIL] TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming
   [PASS] TC-P13-022 Sim_Safety Enable=FALSE neutralise tout
   [PASS] TC-P13-023 Sim_Safety latch AU non lie a la sim (essai manuel — stub)
   [PASS] TC-P13-030 Sim_Encoder RelayFwd/Rev font compter RawPos
@@ -6831,7 +6926,7 @@ test_fb_simbench.st
   [PASS] TC-P13-052 Sim_Joystick homme-mort : RawButton reflete l appui (partie AUTO)
 
 -----------------------------------------
-23 tests, 23 passed, 0 failed
+23 tests, 21 passed, 2 failed
 </pre>
     </details>
 </div>

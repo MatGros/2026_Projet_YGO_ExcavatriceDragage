@@ -129,6 +129,9 @@ FB_Safety_EmergencyManagement:
 
 FB_Diag_CanOpen:
   domain: C_DIAG_RESEAUX
+  prod_instance:
+    file: CODE/M_MAIN/PRG_02_Acquisition.st
+    name: instDiagCanOpen
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
@@ -138,6 +141,9 @@ FB_Diag_CanOpen:
 
 FB_Diag_Ethercat:
   domain: C_DIAG_RESEAUX
+  prod_instance:
+    file: CODE/M_MAIN/PRG_02_Acquisition.st
+    name: instDiagEthercat
   sources:
     - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
@@ -147,6 +153,9 @@ FB_Diag_Ethercat:
 
 FB_Diag_IhmHeartbeat:
   domain: C_DIAG_RESEAUX
+  prod_instance:
+    file: CODE/M_MAIN/PRG_07_Supervision.st
+    name: instDiagIhmHeartbeat
   sources:
     - CODE/C_DIAG_RESEAUX/FB_Diag_IhmHeartbeat.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/C_DIAG_RESEAUX/tests/test_fb_diag_ihmheartbeat.st
@@ -159,7 +168,7 @@ FB_Modes:
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
     - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/F_MODES/E_Mode.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/F_MODES/FB_Modes.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/F_MODES/tests/test_fb_modes.st
 
@@ -597,7 +606,7 @@ FB_Hmi_BannerFormatter:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
@@ -724,7 +733,7 @@ FB_TroubleshootingView:
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st
@@ -899,7 +908,7 @@ PRG_03_Modes_Cycle:
     - CODE/G_CYCLE/FB_ExtractionSequence.st
     - CODE/G_CYCLE/_TYPES/E_OperatorAxis.st
     - CODE/G_CYCLE/FB_Cycle.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st
@@ -969,7 +978,7 @@ PRG_04_Treuils_Benne:
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st
     - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
@@ -1013,7 +1022,7 @@ PRG_05_Translation:
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
@@ -1091,7 +1100,7 @@ PRG_07_Supervision:
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st
     - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
@@ -1214,7 +1223,7 @@ MAIN_GLOBAL:
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st
@@ -1356,7 +1365,7 @@ WINCH_INTEG:
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st
     - CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st
-    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_fbModes_Autorisations.st
+    - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st
     - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st

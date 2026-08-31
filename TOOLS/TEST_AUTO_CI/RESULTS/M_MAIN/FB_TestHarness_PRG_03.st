@@ -84,6 +84,7 @@ instCycleSemiAuto(
     Enable                  := (Auth.Mode = E_Mode.SEMI_AUTO),
     Reset                   := BtnCycleReset,
     PowerContactorEngaged   := PowerContactorEngaged,
+    EncoderFaultPresent     := EncoderFaultPresent,
     Mode                    := Auth.Mode,
     CycleMotionPermit       := JoystickDeflected,
     DeadmanArmed            := DeadmanArmed,

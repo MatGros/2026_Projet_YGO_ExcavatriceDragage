@@ -509,6 +509,50 @@ TEST 'TC-P09-020.2 Homing unitaire : front Home seul -> cible CfgHomingTargetM'
     ASSERT_NEAR(fb.Measurement.CablePosM, 1.0, 0.01, 'position cable = CfgHomingTargetM (1.0m)');
 END_TEST
 
+TEST 'T198-001 Commande BtnHome : cible haute explicite meme sans capteur'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 0;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+
+    (* PRG_02 transmet CfgTopSensorPos_M comme cible libre de BtnHome. *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       TopPositionSensor := FALSE, CfgHomingTargetM := 8.5,
+       CfgTopSensorPosM := 8.5, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       TopPositionSensor := FALSE, CfgHomingTargetM := 8.5,
+       CfgTopSensorPosM := 8.5, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Homed, 'BtnHome : homing reussi');
+    ASSERT_NEAR(fb.Measurement.CablePosM, 8.5, 0.01,
+                'BtnHome sans capteur conserve la cible 8.5m');
+END_TEST
+
+TEST 'T198-002 Commande BtnHomingAtZero : cible zero explicite'
+    hwIn.SlaveOperational := TRUE;
+    hwIn.RawPosIn := 100000;
+    calib.Homed := FALSE;
+    calib.HomingSuspect := FALSE;
+    calib.HomingRefRaw := 0;
+    calib.LastKnownRawPos := 0;
+    cfg.PresetConfirmMode := E_PresetConfirmMode.READBACK_ONLY;
+
+    (* PRG_02 inclut BtnHomingAtZero dans Home et transmet la cible 0.0m. *)
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := TRUE,
+       TopPositionSensor := FALSE, CfgHomingTargetM := 0.0,
+       CfgTopSensorPosM := 0.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ADVANCE_TIME(600000000);
+    fb(Enable := TRUE, HomingPermit := TRUE, HomingAtTargetM := FALSE,
+       TopPositionSensor := FALSE, CfgHomingTargetM := 0.0,
+       CfgTopSensorPosM := 0.0, HwIn := hwIn, Cfg := cfg, Calib := calib);
+    ASSERT_TRUE(fb.Homed, 'BtnHomingAtZero : homing reussi');
+    ASSERT_NEAR(fb.Measurement.CablePosM, 0.0, 0.01,
+                'BtnHomingAtZero reference exactement 0m');
+END_TEST
+
 TEST 'TC-P09-020.3 Homing dynamique : front UseDynamicTarget -> cible DynamicHomingTargetM'
     hwIn.SlaveOperational := TRUE;
     hwIn.RawPosIn := 100000;
@@ -887,4 +931,3 @@ TEST 'TC-P09-050.6 Speed : SignedSpeed=(P[5]-P[0])/WindowElapsed, Speed=ABS'
     ASSERT_NEAR(fb.Measurement.SignedSpeed_Mps, 1.50, 0.05, 'SignedSpeed positive (montee)');
     ASSERT_EQ(fb.Measurement.Speed_Mps, fb.Measurement.SignedSpeed_Mps, 'Speed=ABS(SignedSpeed)');
 END_TEST
-

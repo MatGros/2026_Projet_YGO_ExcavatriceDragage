@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-30 09:33:15</div>
+    <div class="exec-time">2026-08-31 21:42:15</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (4 tests)</summary>
@@ -420,15 +420,16 @@
             <div class="af-warning-title">⚠️ 2 écart(s) interface ↔ câblage production</div>
             <ul><li>Pin <code>CYCLETIMES</code> jamais câblé en production</li><li>Pin <code>DEFAULTVALUES</code> jamais câblé en production</li></ul>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DEFAULTVALUES <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN DEFAULTVALUES <span class="pin-type">IEC_REAL</span></div>
         </div></div>
             <div class="pin-block">FB_CycleTime</div>
             <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">CYCLETIMES <span class="pin-type">IEC_REAL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT CYCLETIMES <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div></div>
         </div>
     </details>
