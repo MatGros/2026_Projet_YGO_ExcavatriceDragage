@@ -6,6 +6,9 @@
       meme si les codeurs sont bypasses.
    🔌 Interface : Bloc de surveillance transverse (1 instance)
    🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee.
+   ⚖️ Concordance ACTIVE des que les 2 treuils sont commandes (relais ou
+      contacteur) OU en mode synchronisme (SyncEnable). Seul BypassGlobal
+      neutralise.
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 
@@ -43,6 +46,7 @@ VAR
 
     // === VARIABLES LOCALES INTERNES ===
     MismatchActive                  : BOOL;                           // . [LOC] Discordance commande active
+    BothCommanded                   : BOOL;                           // . [LOC] Les 2 treuils sont commandes (relais ou contacteur)
 END_VAR
 
 {region "§1 Gate neutralisation"}
@@ -58,9 +62,15 @@ END_IF;
 {region "§2 Detection discordance"}
 // 🔍 2. COHÉRENCE DES COMMANDES SÉCURITÉ — verifie que les commandes envoyees
 // aux deux treuils sont identiques (sens et contacteurs).
+// Concordance ACTIVE des que les 2 treuils sont commandes (relais ou contacteur)
+// OU en mode synchronisme (SyncEnable). Seul BypassGlobal neutralise.
 // Filtre de 500ms pour tolerer les transitions et rampes.
 IF NOT BypassGlobal THEN
-    MismatchActive := SyncEnable AND (
+    BothCommanded := (RelayFwdM1 OR RelayRevM1 OR Contactor1_M1 OR Contactor2_M1
+                      OR Contactor3_M1 OR Contactor4_M1)
+                 AND (RelayFwdM2 OR RelayRevM2 OR Contactor1_M2 OR Contactor2_M2
+                      OR Contactor3_M2 OR Contactor4_M2);
+    MismatchActive := (BothCommanded OR SyncEnable) AND (
         (RelayFwdM1 <> RelayFwdM2) OR
         (RelayRevM1 <> RelayRevM2) OR
         (Contactor1_M1 <> Contactor1_M2) OR
@@ -73,6 +83,7 @@ IF NOT BypassGlobal THEN
 ELSE
     ContactorMismatch := FALSE;
     MismatchActive := FALSE;
+    BothCommanded := FALSE;
     MismatchTimer(IN := FALSE);
 END_IF;
 {endregion}

@@ -1,0 +1,120 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# T210 — FB_WinchSync : découpler la concordance contacteurs (FB_SyncContactor)
+# du mode synchronisme (FB_SyncDeviation / SyncEnable).
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T210_FB_WINCHSYNC_DECOUPLAGE_CONCORDANCE_CONTACTEURS
+  criticality: C2            # C0 | C1 | C2 | C3 | C4
+  strategy: patch            # patch | rebuild
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    La concordance commandes/contacteurs M1/M2 (FB_SyncContactor) devient
+    OBLIGATOIRE dès que les deux treuils sont commandés, indépendamment du
+    mode synchronisme (SyncEnable) — seul un bypass la neutralise. Le mode
+    synchronisme (SyncEnable) ne pilote plus que l'écart de position
+    (FB_SyncDeviation), désactivé par défaut et non bloquant.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_SyncContactor détecte une discordance contacteurs M1/M2 même quand SyncEnable=FALSE, dès que les 2 treuils sont commandés."
+      verified_by: "test STruCpp FB_SyncContactor : SyncEnable=FALSE + discordance contacteurs → ContactorMismatch=TRUE"
+    - id: AC2
+      statement: "FB_SyncContactor reste neutralisable par BypassGlobal (aucune discordance signalée)."
+      verified_by: "test STruCpp FB_SyncContactor : BypassGlobal=TRUE + discordance → ContactorMismatch=FALSE"
+    - id: AC3
+      statement: "FB_SyncDeviation reste gaté par SyncEnable : SyncEnable=FALSE → aucun Warn/Fault d'écart de position."
+      verified_by: "test STruCpp FB_SyncDeviation : SyncEnable=FALSE + écart > seuil → SyncDeviationWarn/Fault=FALSE"
+    - id: AC4
+      statement: "Le mode synchronisme est désactivé par défaut (SyncEnable défaut FALSE) et non bloquant en production."
+      verified_by: "grep défaut SyncEnable + revue AF_Partie-10 §7.6"
+    - id: AC5
+      statement: "Aucune régression des sécurités existantes (SafeStop croisé, EffectivePermit, Méca E)."
+      verified_by: "G200 liaison PASS + gates palier C PASS + tests CI treuils inchangés"
+    - id: AC6
+      statement: "AF_Partie-10 §7.6 et fiche FB_WinchSync_v1.1 reflètent la frontière découplée."
+      verified_by: "G340 doc-links PASS + relecture humaine"
+    - id: AC7
+      statement: "Nom de fichier correspond au nom de POU et le suffixe correspond au langage généré dans le bundle (PRG_04_Treuils_Benne.st → PRG_04_Treuils_Benne.xml)."
+      verified_by: "bundle régénéré + G200 liaison PASS"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:                 # fichiers que la tache PEUT modifier
+      - CODE/H_TREUILS_BENNE/FB_WinchSync.st
+      - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+      - CODE/H_TREUILS_BENNE/FB_SyncDeviation.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/F_MODES/FB_Modes.st
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_WinchSync_v1.1.md
+    forbidden:               # explicitement hors scope — ne pas y toucher
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st   # sécurités Méca A-E : à auditer, pas à modifier ici
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:            # comportements/donnees a preserver imperativement
+      - "SafeStop croisé M1/M2 pendant SyncActive (PRG_04 §4bis)"
+      - "EffectivePermitM1/M2_Ascent/Descend (PRG_04 §5bis)"
+      - "SyncActive / SyncState / SyncWarn / SyncDeviationWarn publiés sur le bus PRG_04.Data"
+      - "Méca E (écart critique) et Méca A (dérive) inchangés dans FB_Safety_Winch"
+    dropped_on_purpose:      # abandonne sciemment — decision humaine, tracee
+      - "Gating de la concordance contacteurs par SyncEnable (comportement actuel jugé incorrect)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison"
+    - run_all_gates          # resultat des gates
+    - bundle                 # CODE/CODE_Bundle.xml regenere
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "deepseek-v4-flash:cloud"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout problème constaté en cours de route (incohérence de spec, bug
+    préexistant, risque hors scope) est remonté IMMÉDIATEMENT à l'orchestrateur,
+    pas à la fin et jamais silencieusement. Signaler n'est pas élargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: VALIDATED               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "DSH (DeepSeek)"
+  completed_at: "2026-08-31T23:20:00+02:00"
+  status: COMPLETED            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Périmètre minimal validé : changement isolé dans FB_SyncContactor.st. Gate
+    `SyncEnable` → `(BothCommanded OR SyncEnable)` — concordance active dès que les
+    2 treuils sont commandés OU en mode synchronisme, seul BypassGlobal neutralise.
+    `BothCommanded` = variable locale BOOL (aucune structure créée/modifiée, interface
+    inchangée). Revue critique : régression en mode sync évitée (gate OR), SyncEnable
+    reste utilisé. Bundle frais + G200 PASS (0 erreur). ⚠️ Validation banc/CODESYS
+    NON FAITE (utilisateur : « j'ai pas testé ta modif ») — suivi séparé requis.
+  evidence_submitted: ["G200: PASS (0 erreur)", "bundle: CODE_XML/CODE_Bundle.xml frais", "check_task_contract: PASS"]
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: APPROVED            # PENDING | APPROVED | REJECTED
+  validated_by: "Utilisateur"
+  validated_at: "2026-08-31T23:20:00+02:00"
+  notes: >
+    Validé par l'utilisateur 2026-08-31 (« ok je valide »). ⚠️ La modification compile
+    mais n'a PAS été testée sur banc/CODESYS — validation terrain requise avant
+    production (changement safety-adjacent : concordance contacteurs → SafeStop).
+    Points V2/V3/V4 (FB_Safety_Winch Méca E, instWinchSync.Enable, paliers différents
+    en non-sync) hors périmètre minimal, à valider séparément.
