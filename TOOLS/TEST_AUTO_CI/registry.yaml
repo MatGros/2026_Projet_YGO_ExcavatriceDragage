@@ -118,7 +118,6 @@ FB_Safety_EmergencyManagement:
     - CODE/A_COMMUN/_TYPES/ST_Fault.st
     - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
     - CODE/A_COMMUN/FB_FaultCore.st
-    - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Status.st
@@ -522,7 +521,6 @@ FB_Hmi_BannerFormatter:
     - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
     - CODE/A_COMMUN/FB_FaultCore.st
-    - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
@@ -650,7 +648,6 @@ FB_TroubleshootingView:
     - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
     - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
     - CODE/A_COMMUN/FB_FaultCore.st
-    - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st
     - CODE/C_DIAG_RESEAUX/E_Diag_State.st
@@ -1068,7 +1065,6 @@ PRG_07_Supervision:
     - CODE/G_CYCLE/_TYPES/E_CycleStep.st
     - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
     - CODE/G_CYCLE/_TYPES/E_ExtractionSequenceState.st
-    - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_InternalCmd.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st

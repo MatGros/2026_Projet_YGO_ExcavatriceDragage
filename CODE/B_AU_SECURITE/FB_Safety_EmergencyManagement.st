@@ -1,18 +1,13 @@
 (* =======================================================================
-   🛡️ FB_Safety_EmergencyManagement — Gestion de la réd'urgence AU (FB fusionné)
+   🛡️ FB_Safety_EmergencyManagement — Gestion de la réd'urgence AU
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Machine d'état, fronts Reset/Arm, autotest redondance A/B, réarmement
-      contacteur, interlock Cause brute, projection fail-safe et latch défaut.
-      Fusionne les 3 FB historiques (Composite + Logic + Output) en UN seul FB.
-   🔒 Sécurité :
-      - fronts Reset/Arm (jamais de redémarrage auto après défaut)
-      - interlock TOUJOURS sur la Cause brute (jamais sur l'Ack)
-      - fail-safe Enable=FALSE → commandes à FALSE, Ready/Busy à FALSE
-      - latch défaut via le socle standard FB_FaultCore (corrige le bug bit3
-        StartupFail effacé par la re-synthèse ErrorId := 0)
-   🧬 Sorties structurées (2 DUT) : Status : ST_Safety_Emergency_Status
-      (Ready/Busy/Done + State + Diag + Fault + OperatorMessage) + Cmd :
-      ST_Safety_Emergency_Cmd (MaintainA/B_Cmd + ArmPulse_Cmd).
+   🎯 Rôle : Machine d'état, fronts Reset/Arm, autotest redondance A/B,
+      réarmement contacteur, interlock Cause brute, projection fail-safe
+      et latch défaut via le socle FB_FaultCore.
+   🔒 Sécurité : fronts Reset/Arm (jamais de redémarrage auto), interlock
+      sur Cause brute (jamais sur l'Ack), fail-safe Enable=FALSE.
+   📤 Sorties structurées (2 DUT) : Status (ST_Safety_Emergency_Status) +
+      Cmd (ST_Safety_Emergency_Cmd).
    📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
    ======================================================================= *)
 
@@ -65,7 +60,21 @@ VAR
     Armable                   : BOOL; // . [LOC] Rearmement possible actuellement
     ArmingBusy                : BOOL; // . [LOC] Sequence ou lockout en cours
     LastAbortStep             : INT;  // . [LOC] Etape sequence lors du dernier abandon (0 a 6)
-    LastAbortCause            : WORD; // . [LOC] Bitfield cause abandon (16#0001=Cut, 16#0002=Chute chaine, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=PowerCutOff, 16#0020=Redondance A, 16#0040=Redondance B, 16#0080=Timeout contacteur)
+    LastAbortCause            : WORD; // . [LOC] Bitfield cause abandon (voir constantes CST_ABORT_*)
+
+    // === CONDITIONS DECOMPOSEES (lisibilite §2quater) ===
+    ArmRequest_ChainOk        : BOOL; // . [LOC] Preconditions chaine + repos + pas de coupure IHM
+    ArmRequest_NoBlock        : BOOL; // . [LOC] Pas de coupure metier, pas de lockout, contacteur au repos
+    ArmRequestAllowed         : BOOL; // . [LOC] Rearmement autorise (front ArmRequest + preconditions)
+    Armable_ChainOk           : BOOL; // . [LOC] Boucle fermee + pas de coupure IHM/metier
+    Armable_Idle              : BOOL; // . [LOC] Sequence au repos
+    Armable_NoBlock           : BOOL; // . [LOC] Pas de lockout, pas de cause redondance, contacteur au repos
+    Maintain_ChainOk          : BOOL; // . [LOC] Boucle fermee OU sequence en cours (maintien A/B)
+    Maintain_NoCutOff         : BOOL; // . [LOC] Pas de coupure metier ni IHM (maintien A/B)
+    MaintainA_NoFault         : BOOL; // . [LOC] Pas de forcage A ni cause redondance
+    MaintainB_NoFault         : BOOL; // . [LOC] Pas de forcage B ni cause redondance
+    MaintainA_NoBlock         : BOOL; // . [LOC] Maintien A autorise (pas de coupure ni defaut)
+    MaintainB_NoBlock         : BOOL; // . [LOC] Maintien B autorise (pas de coupure ni defaut)
 
     // === TEMPORISATEURS LOGIQUES ===
     TonTestA                : TON; // . [LOC] Timer auto-test canal A
@@ -89,6 +98,28 @@ VAR CONSTANT
     CST_ArmingConfirmTimeout : TIME := T#2s;    // Timeout confirmation engagement contacteur
     CST_ArmingLockout        : TIME := T#5s;    // Duree verrouillage anti-reessai apres echec
     CST_FaultDisplayDebounce : TIME := T#200ms; // Anti-clignotement affichage IHM uniquement
+
+    // === ETAPES SEQUENCE REARMEMENT (ArmingSeqStep reste INT) ===
+    CST_STEP_IDLE      : INT := 0; // Repos
+    CST_STEP_TEST_A    : INT := 1; // Autotest canal A
+    CST_STEP_RESTORE_A : INT := 2; // Restauration canal A
+    CST_STEP_TEST_B    : INT := 3; // Autotest canal B
+    CST_STEP_RESTORE_B : INT := 4; // Restauration canal B
+    CST_STEP_PULSE     : INT := 5; // Impulsion rearmement contacteur
+    CST_STEP_CONFIRM   : INT := 6; // Attente confirmation contacteur
+
+    // === CAUSES D'ABANDON (LastAbortCause, valeurs load-bearing IHM) ===
+    // ⚠️ Type INT (décimal) : valeurs identiques aux anciens masques hex (1,2,4,8,16,32,64,128).
+    //    LastAbortCause reste WORD (bitfield) : conversion implicite INT→WORD en CODESYS.
+    CST_ABORT_NONE               : INT := 0;   // Aucun abandon
+    CST_ABORT_CUT_IHM            : INT := 1;   // Coupure manuelle IHM
+    CST_ABORT_CHAIN_DROP         : INT := 2;   // Chute boucle AU pendant impulsion/confirmation
+    CST_ABORT_TIMEOUT_RESTORE_A  : INT := 4;   // Timeout restauration canal A
+    CST_ABORT_TIMEOUT_RESTORE_B  : INT := 8;   // Timeout restauration canal B
+    CST_ABORT_POWER_CUTOFF       : INT := 16;  // Coupure securite metier (PowerCutOff)
+    CST_ABORT_REDUNDANCY_A       : INT := 32;  // Defaut redondance canal A
+    CST_ABORT_REDUNDANCY_B       : INT := 64;  // Defaut redondance canal B
+    CST_ABORT_TIMEOUT_CONTACTOR  : INT := 128; // Timeout confirmation contacteur
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -101,10 +132,11 @@ ArmReqEdge(CLK := ArmRequest);
 {endregion}
 
 {region "§2 Gate Enable (neutralisation fail-safe)"}
-// 🛑 1. GATE — neutralisation si désactivé. Les sorties physiques sont forcées à FALSE
-// (fail-safe) ; le socle défaut reste appelé (§9) pour maintenir le latch non acquitté.
+// 🛑 GATE — neutralisation si désactivé : réinitialise l'état interne de la séquence.
+// Les sorties physiques sont forcées à FALSE par la projection fail-safe (§10) ; le socle
+// défaut reste appelé (§9) pour maintenir le latch non acquitté.
 IF NOT Enable THEN
-    ArmingSeqStep := 0;
+    ArmingSeqStep := CST_STEP_IDLE;
     ForceTestA := FALSE;
     ForceTestB := FALSE;
     StartupFail := FALSE;
@@ -115,9 +147,9 @@ IF NOT Enable THEN
     EmergencyArmingLockoutActive := FALSE;
     Armable := FALSE;
     ArmingBusy := FALSE;
-    LastAbortStep := 0;
-    LastAbortCause := 16#0000;
-    // 🩹 Neutralisation = coupure surveillance, pas un defaut : Cause et Ack repartent propres
+    LastAbortStep := CST_STEP_IDLE;
+    LastAbortCause := INT_TO_WORD(CST_ABORT_NONE);
+    // Neutralisation = coupure surveillance, pas un defaut : Cause et Ack repartent propres
     RedundancyTestFailedCause := FALSE;
     RedundancyTestFailedAck := TRUE;
     EmergencyArmingFailedCause := FALSE;
@@ -131,9 +163,12 @@ IF NOT Enable THEN
     TonArmingLockout(IN := FALSE);
     TonRedundancyDisplay(IN := FALSE);
     TonArmingFailedDisplay(IN := FALSE);
-ELSE
-    {region "§3 Autotest demarrage"}
-    // 🏁 2. AUTOTEST DÉMARRAGE (§5.4 AF01) — vérifications synchrones 1 cycle au 1er Enable=TRUE
+END_IF;
+{endregion}
+
+{region "§3 Autotest demarrage"}
+// 🏁 AUTOTEST DÉMARRAGE (§5.4 AF01) — vérifications synchrones 1 cycle au 1er Enable=TRUE
+IF Enable THEN
     IF EnableRising.Q THEN
         StartupCheckDone := FALSE;
     END_IF;
@@ -142,19 +177,19 @@ ELSE
         // Exécute les 4 contrôles en 1 cycle
         StartupCheckOK := EmergencyChainClosed          // 1. Boucle AU fermée
                           AND NOT PowerContactorEngaged // 2. Contacteur au repos
-                          AND (ArmingSeqStep = 0);      // 4. Pas de séquence résiduelle
+                          AND (ArmingSeqStep = CST_STEP_IDLE); // 4. Pas de séquence résiduelle
         StartupCheckDone := TRUE;
         StartupFail := NOT StartupCheckOK;
-        // bit3 (StartupFail) est laté via le socle FB_FaultCore (§9) — jamais effacé par
-        // la re-synthèse ErrorId (correction du bug bit3).
+        // StartupFail est laté via le socle FB_FaultCore (§9) : il reste jusqu'au front Reset.
     END_IF;
-    {endregion}
+END_IF;
+{endregion}
 
-    {region "§4 Acquittement defauts"}
-    // 🔍 3. ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
-    // ⚠️ Reset acquitte l'affichage (Ack:=TRUE). La cause de redondance reste verrouillée
-    // jusqu'au prochain test physique. L'échec d'armement précédent est réinitialisé pour autoriser un réessai.
-    // Le latch du socle (§9) est effacé par le front Reset (jamais conditionné).
+{region "§4 Acquittement defauts"}
+// 🔍 ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
+// ⚠️ Reset acquitte l'affichage (Ack:=TRUE). La cause de redondance reste verrouillée
+// jusqu'au prochain test physique. L'échec d'armement précédent est réinitialisé pour autoriser un réessai.
+IF Enable THEN
     IF ResetEdge.Q THEN
         RedundancyTestFailedAck := TRUE;
         EmergencyArmingFailedCause := FALSE;
@@ -162,62 +197,61 @@ ELSE
         EmergencyArmingLockoutActive := FALSE;
         StartupFail := FALSE;
     END_IF;
-    {endregion}
+END_IF;
+{endregion}
 
-    {region "§5 Sequence rearmement AU"}
+{region "§5 Sequence rearmement AU"}
+IF Enable THEN
     // 🛑 Coupure immédiate de toute séquence en cours
-    IF ArmingSeqStep <> 0 THEN
+    IF ArmingSeqStep <> CST_STEP_IDLE THEN
         IF BtnEmergencyCutOff THEN
             // Avortement volontaire : pas d'alarme d'échec
             LastAbortStep := ArmingSeqStep;
-            LastAbortCause := 16#0001; // Bit0: Demande coupure manuelle IHM
-            ArmingSeqStep := 0;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_CUT_IHM);
+            ArmingSeqStep := CST_STEP_IDLE;
         ELSIF PowerCutOffRequest THEN
             // Avortement sécurité d'urgence : coupure métier (PAS un défaut d'armement).
-            // Sécurité conservée : lockout 5s + interlock (Armable/Maintain* bloqués par
-            // PowerCutOffRequest). Ne pose PAS EmergencyArmingFailedCause -> pas de fausse
-            // alarme "échec armement" pour une coupure métier voulue (D2 option c).
+            // Lockout 5s + interlock (Armable/Maintain* bloqués par PowerCutOffRequest).
+            // Ne pose PAS EmergencyArmingFailedCause : pas de fausse alarme "échec armement".
             EmergencyArmingLockoutActive := TRUE;
             LastAbortStep := ArmingSeqStep;
-            LastAbortCause := 16#0010; // Bit4: Coupure sécurité métier active (PowerCutOff)
-            ArmingSeqStep := 0;
-        ELSIF (ArmingSeqStep = 5 OR ArmingSeqStep = 6) AND NOT EmergencyChainClosed THEN
+            LastAbortCause := INT_TO_WORD(CST_ABORT_POWER_CUTOFF);
+            ArmingSeqStep := CST_STEP_IDLE;
+        ELSIF (ArmingSeqStep = CST_STEP_PULSE OR ArmingSeqStep = CST_STEP_CONFIRM) AND NOT EmergencyChainClosed THEN
             // Chute boucle matérielle : alarme d'échec + verrouillage 5s
             EmergencyArmingFailedCause := TRUE;
             EmergencyArmingLockoutActive := TRUE;
             LastAbortStep := ArmingSeqStep;
-            LastAbortCause := 16#0002; // Bit1: Chute boucle AU pendant impulsion/confirmation
-            ArmingSeqStep := 0;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_CHAIN_DROP);
+            ArmingSeqStep := CST_STEP_IDLE;
         END_IF;
     END_IF;
 
-    // 🚦 4. DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
-    // 🩹 Une nouvelle tentative repart d'une Cause propre : si le probleme persiste, il sera
-    // re-latche des le prochain echec (RedundancyCauseEdge/ArmingFailedCauseEdge -> Ack remis a FALSE,
-    // TC-P01-009). Ceci prouve par le run reel que la cause a disparu, pas juste un Reset optimiste.
-    IF ArmReqEdge.Q AND (ArmingSeqStep = 0) AND EmergencyChainClosed
-       AND NOT BtnEmergencyCutOff
-       AND NOT PowerCutOffRequest
-       AND NOT EmergencyArmingLockoutActive
-       AND NOT PowerContactorEngaged THEN
-        ArmingSeqStep := 1;
+    // 🚦 DÉCLENCHEMENT DE LA SÉQUENCE DE SÉCURITÉ
+    // Une nouvelle tentative repart d'une Cause propre : si le problème persiste, il sera
+    // re-latché dès le prochain échec (RedundancyCauseEdge/ArmingFailedCauseEdge -> Ack remis à FALSE).
+    ArmRequest_ChainOk := (ArmingSeqStep = CST_STEP_IDLE) AND EmergencyChainClosed AND NOT BtnEmergencyCutOff;
+    ArmRequest_NoBlock := NOT PowerCutOffRequest AND NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
+    ArmRequestAllowed := ArmRequest_ChainOk AND ArmRequest_NoBlock;
+    IF ArmReqEdge.Q AND ArmRequestAllowed THEN
+        ArmingSeqStep := CST_STEP_TEST_A;
         RedundancyTestFailedCause := FALSE;
         EmergencyArmingFailedCause := FALSE;
     END_IF;
 
     // ⏱️ Étape 1 : Coupe canal A seul, vérifie que la boucle tombe
-    TonTestA(IN := (ArmingSeqStep = 1), PT := CST_TestDuration);
-    IF ArmingSeqStep = 1 THEN
+    TonTestA(IN := (ArmingSeqStep = CST_STEP_TEST_A), PT := CST_TestDuration);
+    IF ArmingSeqStep = CST_STEP_TEST_A THEN
         ForceTestA := TRUE;
         IF TonTestA.Q THEN
             ForceTestA := FALSE;
             IF EmergencyChainClosed THEN
                 RedundancyTestFailedCause := TRUE;
-                LastAbortStep := 1;
-                LastAbortCause := 16#0020; // Defaut redondance canal A
-                ArmingSeqStep := 0;
+                LastAbortStep := CST_STEP_TEST_A;
+                LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_A);
+                ArmingSeqStep := CST_STEP_IDLE;
             ELSE
-                ArmingSeqStep := 2;
+                ArmingSeqStep := CST_STEP_RESTORE_A;
             END_IF;
         END_IF;
     ELSE
@@ -225,30 +259,30 @@ ELSE
     END_IF;
 
     // ⏱️ Étape 2 : Restaure A, attend le retour sain de la boucle amont
-    TonRestoreA(IN := (ArmingSeqStep = 2), PT := CST_TestDuration);
-    IF (ArmingSeqStep = 2) AND TonRestoreA.Q THEN
+    TonRestoreA(IN := (ArmingSeqStep = CST_STEP_RESTORE_A), PT := CST_TestDuration);
+    IF (ArmingSeqStep = CST_STEP_RESTORE_A) AND TonRestoreA.Q THEN
         IF EmergencyChainClosed THEN
-            ArmingSeqStep := 3;
+            ArmingSeqStep := CST_STEP_TEST_B;
         ELSE
-            LastAbortStep := 2;
-            LastAbortCause := 16#0004; // Bit2: Timeout restauration canal A (chaine non remontee en 200ms)
-            ArmingSeqStep := 0;
+            LastAbortStep := CST_STEP_RESTORE_A;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A);
+            ArmingSeqStep := CST_STEP_IDLE;
         END_IF;
     END_IF;
 
     // ⏱️ Étape 3 : Coupe canal B seul, vérifie que la boucle tombe
-    TonTestB(IN := (ArmingSeqStep = 3), PT := CST_TestDuration);
-    IF ArmingSeqStep = 3 THEN
+    TonTestB(IN := (ArmingSeqStep = CST_STEP_TEST_B), PT := CST_TestDuration);
+    IF ArmingSeqStep = CST_STEP_TEST_B THEN
         ForceTestB := TRUE;
         IF TonTestB.Q THEN
             ForceTestB := FALSE;
             IF EmergencyChainClosed THEN
                 RedundancyTestFailedCause := TRUE;
-                LastAbortStep := 3;
-                LastAbortCause := 16#0040; // Defaut redondance canal B
-                ArmingSeqStep := 0;
+                LastAbortStep := CST_STEP_TEST_B;
+                LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_B);
+                ArmingSeqStep := CST_STEP_IDLE;
             ELSE
-                ArmingSeqStep := 4;
+                ArmingSeqStep := CST_STEP_RESTORE_B;
             END_IF;
         END_IF;
     ELSE
@@ -256,35 +290,35 @@ ELSE
     END_IF;
 
     // ⏱️ Étape 4 : Restaure B, attend le retour sain de la boucle amont
-    TonRestoreB(IN := (ArmingSeqStep = 4), PT := CST_TestDuration);
-    IF (ArmingSeqStep = 4) AND TonRestoreB.Q THEN
+    TonRestoreB(IN := (ArmingSeqStep = CST_STEP_RESTORE_B), PT := CST_TestDuration);
+    IF (ArmingSeqStep = CST_STEP_RESTORE_B) AND TonRestoreB.Q THEN
         IF EmergencyChainClosed THEN
-            ArmingSeqStep := 5;
+            ArmingSeqStep := CST_STEP_PULSE;
         ELSE
-            LastAbortStep := 4;
-            LastAbortCause := 16#0008; // Bit3: Timeout restauration canal B (chaine non remontee en 200ms)
-            ArmingSeqStep := 0;
+            LastAbortStep := CST_STEP_RESTORE_B;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B);
+            ArmingSeqStep := CST_STEP_IDLE;
         END_IF;
     END_IF;
 
     // ⏱️ Étape 5 : Les 2 canaux validés -> impulsion réarmement physique (1s)
-    TonArmingPulse(IN := (ArmingSeqStep = 5), PT := CST_ArmingPulseDuration);
-    IF (ArmingSeqStep = 5) AND TonArmingPulse.Q THEN
-        ArmingSeqStep := 6;
+    TonArmingPulse(IN := (ArmingSeqStep = CST_STEP_PULSE), PT := CST_ArmingPulseDuration);
+    IF (ArmingSeqStep = CST_STEP_PULSE) AND TonArmingPulse.Q THEN
+        ArmingSeqStep := CST_STEP_CONFIRM;
     END_IF;
 
     // ⏱️ Étape 6 : Attente confirmation contacteur principal (2s max)
-    TonArmingConfirm(IN := (ArmingSeqStep = 6), PT := CST_ArmingConfirmTimeout);
-    IF ArmingSeqStep = 6 THEN
+    TonArmingConfirm(IN := (ArmingSeqStep = CST_STEP_CONFIRM), PT := CST_ArmingConfirmTimeout);
+    IF ArmingSeqStep = CST_STEP_CONFIRM THEN
         IF PowerContactorEngaged THEN
-            ArmingSeqStep := 0;
+            ArmingSeqStep := CST_STEP_IDLE;
             EmergencyArmingLockoutActive := FALSE;
         ELSIF TonArmingConfirm.Q THEN
             EmergencyArmingFailedCause := TRUE;
             EmergencyArmingLockoutActive := TRUE;
-            LastAbortStep := 6;
-            LastAbortCause := 16#0080; // Defaut confirmation contacteur
-            ArmingSeqStep := 0;
+            LastAbortStep := CST_STEP_CONFIRM;
+            LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR);
+            ArmingSeqStep := CST_STEP_IDLE;
         END_IF;
     END_IF;
 
@@ -293,12 +327,14 @@ ELSE
     IF TonArmingLockout.Q THEN
         EmergencyArmingLockoutActive := FALSE;
     END_IF;
-    {endregion}
+END_IF;
+{endregion}
 
-    {region "§6 Gestion cause et acquittement"}
-    // 3bis. PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
-    // L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
-    // jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
+{region "§6 Gestion cause et acquittement"}
+// PATTERN CAUSE/ACK — détection ré-apparition + acquittement (§3.4bis AF01, §9 STD)
+// L'interlock sécurité (ci-dessous, arbitrage Cmd/Armable) utilise TOUJOURS la Cause brute,
+// jamais l'Ack : l'acquittement opérateur n'ouvre jamais un interlock de sécurité.
+IF Enable THEN
     RedundancyCauseEdge(CLK := RedundancyTestFailedCause);
     IF RedundancyCauseEdge.Q THEN
         RedundancyTestFailedAck := FALSE; // nouvelle occurrence -> ré-alarme, ré-acquittement requis
@@ -308,40 +344,38 @@ ELSE
     IF ArmingFailedCauseEdge.Q THEN
         EmergencyArmingFailedAck := FALSE;
     END_IF;
-    {endregion}
+END_IF;
+{endregion}
 
-    {region "§7 Etats publics (interlock sur Cause brute)"}
-    // 🚦 5. ÉTATS PUBLICS — interlock sur Cause brute (jamais sur l'Ack)
-    Armable := EmergencyChainClosed
-               AND NOT BtnEmergencyCutOff
-               AND NOT PowerCutOffRequest
-               AND (ArmingSeqStep = 0)
-               AND NOT EmergencyArmingLockoutActive
-               AND NOT RedundancyTestFailedCause
-               AND NOT PowerContactorEngaged;
+{region "§7 Etats publics (interlock sur Cause brute)"}
+// 🚦 ÉTATS PUBLICS — interlock sur Cause brute (jamais sur l'Ack)
+IF Enable THEN
+    Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+    Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
+    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT RedundancyTestFailedCause AND NOT PowerContactorEngaged;
+    Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
 
-    ArmingBusy := (ArmingSeqStep <> 0) OR EmergencyArmingLockoutActive;
-    {endregion}
+    ArmingBusy := (ArmingSeqStep <> CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
+END_IF;
+{endregion}
 
-    {region "§8 Affichage defauts IHM"}
-    // 📤 6. AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
-    // ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
-    // sur la Cause brute, jamais retardée par ce debounce.
+{region "§8 Affichage defauts IHM"}
+// 📤 AFFICHAGE IHM — debounce anti-clignotement (Cause lissée) OR NOT Ack (§9 STD)
+// ⚠️ Uniquement pour l'affichage : l'action de sécurité ci-dessus (§5/§6) reste instantanée
+// sur la Cause brute, jamais retardée par ce debounce.
+IF Enable THEN
     TonRedundancyDisplay(IN := RedundancyTestFailedCause, PT := CST_FaultDisplayDebounce);
     RedundancyTestFailed := TonRedundancyDisplay.Q OR NOT RedundancyTestFailedAck;
 
     TonArmingFailedDisplay(IN := EmergencyArmingFailedCause, PT := CST_FaultDisplayDebounce);
     EmergencyArmingFailed := TonArmingFailedDisplay.Q OR NOT EmergencyArmingFailedAck;
-    {endregion}
 END_IF;
 {endregion}
 
-{region "§9 Synthese defaut via socle FB_FaultCore (latch bit3 corrige)"}
-// 📤 7. SYNTHÈSE DES ERREURS — socle standard FB_FaultCore (vue live + vue latchée).
+{region "§9 Synthese defaut via socle FB_FaultCore"}
+// 📤 SYNTHÈSE DES ERREURS — socle standard FB_FaultCore (vue live + vue latchée).
 //    Chaque cause est exprimée EN CLAIR (ST_FaultCause) ; le socle en déduit ST_Fault.
-//    🔒 Correction du bug bit3 : StartupFail est une cause indépendante (index 3, Latching=TRUE).
-//    Le socle ne réinitialise JAMAIS ErrorId := 0 (contrairement à l'ancienne synthèse) : le bit3
-//    StartupFail reste laté jusqu'au front Reset, même si bit0/bit1 sont recalculés.
+//    StartupFail est une cause indépendante (index 3, Latching=TRUE) : latée jusqu'au front Reset.
 //    Mapping bits (préservé pour FB_Hmi_BannerFormatter / PRG_07) :
 //      bit0 = RedundancyTestFailed, bit1 = EmergencyArmingFailed, bit3 = StartupFail.
 instCauses[0].Active := RedundancyTestFailed; instCauses[0].Latching := TRUE;
@@ -364,11 +398,15 @@ Status.Fault := instFault.Fault; // source de verite = socle
 // 🛡️ Maintien conditionné sur (chaîne fermée OU séquence en cours) : hors séquence, une
 // boucle AU ouverte (coup-de-poing) coupe le maintien (fail-safe). Pendant la séquence, la
 // chaîne est volontairement ouverte par ForceTestA/B -> le maintien reste autorisé (restauration).
-Cmd.MaintainA_Cmd := Enable AND (EmergencyChainClosed OR (ArmingSeqStep <> 0))
-                     AND NOT PowerCutOffRequest AND NOT ForceTestA AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
-Cmd.MaintainB_Cmd := Enable AND (EmergencyChainClosed OR (ArmingSeqStep <> 0))
-                     AND NOT PowerCutOffRequest AND NOT ForceTestB AND NOT BtnEmergencyCutOff AND NOT RedundancyTestFailedCause;
-Cmd.ArmPulse_Cmd  := Enable AND (ArmingSeqStep = 5) AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+Maintain_ChainOk := (EmergencyChainClosed OR (ArmingSeqStep <> CST_STEP_IDLE));
+Maintain_NoCutOff := NOT PowerCutOffRequest AND NOT BtnEmergencyCutOff;
+MaintainA_NoFault := NOT ForceTestA AND NOT RedundancyTestFailedCause;
+MaintainB_NoFault := NOT ForceTestB AND NOT RedundancyTestFailedCause;
+MaintainA_NoBlock := Maintain_NoCutOff AND MaintainA_NoFault;
+MaintainB_NoBlock := Maintain_NoCutOff AND MaintainB_NoFault;
+Cmd.MaintainA_Cmd := Enable AND Maintain_ChainOk AND MaintainA_NoBlock;
+Cmd.MaintainB_Cmd := Enable AND Maintain_ChainOk AND MaintainB_NoBlock;
+Cmd.ArmPulse_Cmd  := Enable AND (ArmingSeqStep = CST_STEP_PULSE) AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
 
 // 🚦 Bus d'état public
 Status.State.ChainOk     := Enable AND EmergencyChainClosed;
@@ -388,9 +426,9 @@ Status.Diag.LastAbortCause       := LastAbortCause;
 {endregion}
 
 {region "§11 Etats publics IEC + message operateur"}
-// 📤 8. ÉTATS PUBLICS IEC
+// 📤 ÉTATS PUBLICS IEC
 Status.Ready := Enable AND NOT StartupFail;
-Status.Busy  := (ArmingSeqStep <> 0) OR EmergencyArmingLockoutActive;
+Status.Busy  := (ArmingSeqStep <> CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
 Status.Done  := PowerContactorEngaged;
 
 // 💬 MESSAGE OPÉRATEUR — un message explicite par état et par problème de la chaîne AU.
@@ -414,13 +452,13 @@ ELSIF EmergencyArmingLockoutActive THEN
     Status.OperatorMessage := 'AU: verrouillage 5s actif - attendre puis rearmer';
 ELSE
     CASE ArmingSeqStep OF
-        0: Status.OperatorMessage := 'AU: repos - pret a rearmer';
-        1: Status.OperatorMessage := 'AU: autotest canal A en cours';
-        2: Status.OperatorMessage := 'AU: restauration canal A';
-        3: Status.OperatorMessage := 'AU: autotest canal B en cours';
-        4: Status.OperatorMessage := 'AU: restauration canal B';
-        5: Status.OperatorMessage := 'AU: impulsion rearmement contacteur';
-        6: Status.OperatorMessage := 'AU: attente confirmation contacteur';
+        CST_STEP_IDLE:      Status.OperatorMessage := 'AU: repos - pret a rearmer';
+        CST_STEP_TEST_A:    Status.OperatorMessage := 'AU: autotest canal A en cours';
+        CST_STEP_RESTORE_A: Status.OperatorMessage := 'AU: restauration canal A';
+        CST_STEP_TEST_B:    Status.OperatorMessage := 'AU: autotest canal B en cours';
+        CST_STEP_RESTORE_B: Status.OperatorMessage := 'AU: restauration canal B';
+        CST_STEP_PULSE:     Status.OperatorMessage := 'AU: impulsion rearmement contacteur';
+        CST_STEP_CONFIRM:   Status.OperatorMessage := 'AU: attente confirmation contacteur';
     END_CASE;
 END_IF;
 {endregion}

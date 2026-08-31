@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[3]
 CODE_DIR = ROOT / "CODE"
 
 TARGETS = {
-    "B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st",
+    "B_AU_SECURITE/FB_Safety_EmergencyManagement.st",
     "E_CODEURS/FB_Encoder_Homing.st",
     "G_CYCLE/FB_Cycle.st",
     "G_CYCLE/FB_DiveSearch.st",
