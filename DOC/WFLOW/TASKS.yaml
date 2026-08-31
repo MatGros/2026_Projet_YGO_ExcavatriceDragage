@@ -3838,7 +3838,7 @@ tasks:
   - T181-10
 - id: T181-15
   parent_id: T181
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: TREUILS
   agent: Agent externe E — implémentation livrée ; Agent externe F — TC challengés
@@ -4237,7 +4237,7 @@ tasks:
   bloque_par: []
 - id: T187
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: H_TREUILS_BENNE
   agent: —
@@ -4258,7 +4258,7 @@ tasks:
   bloque_par: []
 - id: T188
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: H_TREUILS_BENNE
   agent: —
@@ -4282,7 +4282,7 @@ tasks:
   - T181
 - id: T188-A
   parent_id: T188
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: H_TREUILS_BENNE
   agent: —
@@ -4302,7 +4302,7 @@ tasks:
   - T188
 - id: T188-B
   parent_id: T188
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: H_TREUILS_BENNE
   agent: —
@@ -4321,7 +4321,7 @@ tasks:
   - T188-A
 - id: T188-C
   parent_id: T188
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: H_TREUILS_BENNE
   agent: —
@@ -4340,7 +4340,7 @@ tasks:
   - T188-B
 - id: T188-D
   parent_id: T188
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: I_TRANSLATION
   agent: —
@@ -4359,7 +4359,7 @@ tasks:
   - T188-A
 - id: T188-E
   parent_id: T188
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: I_TRANSLATION
   agent: —
@@ -4377,7 +4377,7 @@ tasks:
   - T188-D
 - id: T188-F
   parent_id: T188
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: H_TREUILS_BENNE
   agent: —
