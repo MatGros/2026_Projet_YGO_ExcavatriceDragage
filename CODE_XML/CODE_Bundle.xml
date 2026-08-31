@@ -13712,31 +13712,11 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
               <type>
                 <derived name="ST_SpeedStepTable" />
               </type>
-              <initialValue>
-                <structValue>
-                  <value member="StepThreshold_Pct">
-                    <arrayValue>
-                      <value>
-                        <simpleValue value="20" />
-                      </value>
-                      <value>
-                        <simpleValue value="40" />
-                      </value>
-                      <value>
-                        <simpleValue value="60" />
-                      </value>
-                      <value>
-                        <simpleValue value="80" />
-                      </value>
-                      <value>
-                        <simpleValue value="100" />
-                      </value>
-                    </arrayValue>
-                  </value>
-                </structValue>
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les initialiseurs imbriqués de STRUCT (notamment les ARRAY) ne sont pas
+acceptés par STruCpp/CODESYS dans une déclaration de type. La table est
+fournie par la configuration persistante de l'appelant.
+🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedStepHystMargin">
@@ -17638,6 +17618,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine de securite OK</xhtml>
               </documentation>
             </variable>
+            <variable name="EncoderFaultPresent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Defaut codeur agrege (cycle non autorise, T207)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Mode">
               <type>
                 <derived name="E_Mode" />
@@ -18485,7 +18473,10 @@ ErrorEdge(CLK := Fault.Error);
 
 {region "§2 Gate securite &amp; Bascule Mode"}
 // 🛑 2. GATES DE SÉCURITÉ ET NEUTRALISATION
-IF NOT Enable OR NOT PowerContactorEngaged THEN
+// T207 : le mode SEMI_AUTO peut être sélectionné sous AU/défaut (FB_Modes), mais le cycle
+// ne tourne JAMAIS sans puissance (PowerContactorEngaged) ni avec un codeur défaillant
+// (EncoderFaultPresent) — les données de position invalides rendraient le Grafcet erroné.
+IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     WinchM1Cmd.ReqStartStop   := FALSE;
     WinchM1Cmd.ReqDirection   := 0;
     WinchM1Cmd.StepTgt        := 0;
@@ -18508,7 +18499,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     END_IF;
 
     CycleStep            := State;
-    CycleStateStr        := 'Cycle desactive : securite absente ou mode hors semi-auto';
+    CycleStateStr        := 'Cycle desactive : securite absente, defaut codeur ou mode hors semi-auto';
     Ready                := FALSE;
     Lifecycle.Busy       := FALSE;
     Lifecycle.Done       := FALSE;
@@ -18517,7 +18508,11 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     SpeedMismatchActive := FALSE;
     SpeedMismatchConfirmed := FALSE;
     OperatorActionId := 0;
-    OperatorAction := 'Passer en mode Semi-Auto et engager la securite pour activer le cycle.';
+    IF EncoderFaultPresent THEN
+        OperatorAction := 'Cycle non autorise : defaut codeur present. Reinitialiser le defaut codeur.';
+    ELSE
+        OperatorAction := 'Passer en mode Semi-Auto et engager la securite pour activer le cycle.';
+    END_IF;
     ExpectedAxis := E_OperatorAxis.NONE;
     ExpectedDirection := 0;
     WaitingForOperator := FALSE;
@@ -27230,30 +27225,14 @@ ET frein serré, redondés par la mesure de vitesse.
             </variable>
           </outputVars>
           <localVars>
-            <variable name="ResetEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
-* [INST] Detecteur front montant Reset</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SemiAutoRefusedFault">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GESTION DES DEFAUTS ===
-. [LOC] Latch refus semi-auto</xhtml>
-              </documentation>
-            </variable>
             <variable name="instFault">
               <type>
                 <derived name="FB_FaultCore" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Socle défaut transverse</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+=== GESTION DES DEFAUTS ===
+* [INST] Socle défaut transverse</xhtml>
               </documentation>
             </variable>
             <variable name="instCauses">
@@ -27319,20 +27298,28 @@ ET frein serré, redondés par la mesure de vitesse.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] M2 : re-homing obligatoire avant tout SEMI_AUTO</xhtml>
               </documentation>
             </variable>
-            <variable name="SemiAutoRefusedHoming">
+            <variable name="SemiAutoCycleNotReadyFault">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch refus semi-auto pour re-homing obligatoire</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Diag live : SEMI_AUTO sélectionné mais défaut codeur (cycle non prêt)</xhtml>
               </documentation>
             </variable>
-            <variable name="SemiAutoRefusedMachineHoming">
+            <variable name="SemiAutoCycleNotReadyHoming">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Refus live : reference machine incomplete</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Diag live : SEMI_AUTO sélectionné mais re-homing requis (cycle non prêt)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SemiAutoCycleNotReadyMachineHoming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Diag live : SEMI_AUTO sélectionné mais référencement incomplet (cycle non prêt)</xhtml>
               </documentation>
             </variable>
             <variable name="FirstScanDone">
@@ -27349,12 +27336,13 @@ ET frein serré, redondés par la mesure de vitesse.
    ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
     🎯 Rôle : Source unique du mode arbitré et calcul du bus d'autorisations
-    🔒 Sécurité : Refus du mode Semi-Auto en cas de défaut codeur, de re-homing requis ou
-                  d'AU non armé (repli MAINT_N1) ; refus de toute bascule N1/N2/SEMI_AUTO
-                  tant que les treuils ne sont pas à l'arrêt mécanique confirmé ; re-homing
-                  obligatoire après usage effectif d'un override/bypass de position (AF-05 §4bis).
-                  L'arbitrage de mode reste actif même AU non armé (homing, réarmement défaut) :
-                  aucune autorisation de mouvement n'est accordée sans la chaîne AU physique.
+    🔒 Sécurité : La sélection de mode est découplée de l'autorisation de mouvement (T207) :
+                  le mode suit la sélection IHM même sous AU, arrêt d'urgence ou défaut ; le
+                  mouvement est coupé en aval par la chaîne AU physique (PowerContactorEngaged)
+                  et les interlocks (FB_Cycle, FB_Safety_Winch, FB_Winch). Bascule N1/N2/SEMI_AUTO
+                  soumise à l'arrêt mécanique confirmé des treuils ; re-homing obligatoire après
+                  usage effectif d'un override/bypass de position (AF-05 §4bis) — publié à l'IHM,
+                  ne bloque pas la sélection mais le cycle.
     🔌 Interface : Standard composant d'arbitrage applicatif
     📄 Doc métier : DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
                     DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md
@@ -27368,14 +27356,7 @@ ET frein serré, redondés par la mesure de vitesse.
 // === IMPLEMENTATION ===
 
 {region "§1 Causes &amp; Socle Défaut (évalué en continu)"}
-// 🔑 1. RESET FRONT
-ResetEdge(CLK := Reset);
-IF ResetEdge.Q THEN
-    SemiAutoRefusedFault  := FALSE;
-    SemiAutoRefusedHoming := FALSE;
-END_IF;
-
-// 🔑 1bis. RESTAURATION BOOT DES DRAPEAUX PERSISTANTS
+// 🔑 1. RESTAURATION BOOT DES DRAPEAUX PERSISTANTS
 // Non-RETAIN -&gt; réinitialisé à chaque warm/cold reset ; relu depuis GVL_PERSISTENT (miroir
 // réécrit chaque scan par PRG_03). Aucune perte du re-homing obligatoire sur coupure.
 IF NOT FirstScanDone THEN
@@ -27387,9 +27368,11 @@ END_IF;
 
 // 🔑 1ter. RE-HOMING OBLIGATOIRE — ARMEMENT IMMÉDIAT (AF-05 §4bis)
 // Armé AVANT l'arbitrage de mode (§3) et non à la sortie du mode maintenance :
-//   1. pas de fenêtre d'un scan où SEMI_AUTO serait arbitré malgré un re-homing requis ;
+//   1. pas de fenêtre d'un scan où le re-homing serait perdu malgré un override effectif ;
 //   2. pas de perte de l'obligation sur coupure / download pendant la maintenance
 //      (la valeur est écrite dans le miroir PERSISTENT dès le scan courant, pas à la sortie).
+// Le re-homing ne bloque PAS la sélection SEMI_AUTO (T207) : il est publié à l'IHM
+// (Auth.HomingRequiredM1/M2) et le cycle ne progresse pas tant qu'il n'est pas levé.
 IF M1PositionLimitOverridden THEN
     MaintHomingRequiredM1 := TRUE;
 END_IF;
@@ -27405,26 +27388,25 @@ IF MaintHomingRequiredM2 AND M2HomingDone AND M2Homed AND NOT M2HomingSuspect TH
     MaintHomingRequiredM2 := FALSE;
 END_IF;
 
-// Refus semi-auto — une cause = un fait (AF03 §4) : défaut codeur et re-homing sont distincts.
-IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent THEN
-    SemiAutoRefusedFault := TRUE;
-END_IF;
-IF (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2) THEN
-    SemiAutoRefusedHoming := TRUE;
-END_IF;
-SemiAutoRefusedMachineHoming := (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed;
+// Diagnostic « cycle non prêt » — le mode SEMI_AUTO reste sélectionnable (T207) mais le
+// cycle ne tournera pas tant que ces conditions ne sont pas saines. Info NON-bloquante :
+// la sélection n'est pas refusée, le mouvement est coupé en aval (FB_Cycle/FB_Safety_Winch).
+// Une cause = un fait (AF03 §4) : défaut codeur, re-homing et référencement sont distincts.
+SemiAutoCycleNotReadyFault         := (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent;
+SemiAutoCycleNotReadyHoming        := (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2);
+SemiAutoCycleNotReadyMachineHoming := (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed;
 
-instCauses[0].Active   := SemiAutoRefusedFault;
-instCauses[0].Latching := TRUE;
-instCauses[0].Texte    := 'Mode Semi-Auto refuse car defaut codeur present';
+instCauses[0].Active   := SemiAutoCycleNotReadyFault;
+instCauses[0].Latching := FALSE;
+instCauses[0].Texte    := 'Mode Semi-Auto selectionne mais cycle non pret : defaut codeur present';
 
-instCauses[2].Active   := SemiAutoRefusedHoming;
-instCauses[2].Latching := TRUE;
-instCauses[2].Texte    := 'Mode Semi-Auto refuse : re-homing obligatoire (depassement limite position)';
+instCauses[2].Active   := SemiAutoCycleNotReadyHoming;
+instCauses[2].Latching := FALSE;
+instCauses[2].Texte    := 'Mode Semi-Auto selectionne mais cycle non pret : re-homing obligatoire (depassement limite position)';
 
-instCauses[3].Active   := SemiAutoRefusedMachineHoming;
+instCauses[3].Active   := SemiAutoCycleNotReadyMachineHoming;
 instCauses[3].Latching := FALSE;
-instCauses[3].Texte    := 'Mode Semi-Auto refuse : referencement M1/M2/benne incomplet';
+instCauses[3].Texte    := 'Mode Semi-Auto selectionne mais cycle non pret : referencement M1/M2/benne incomplet';
 
 // Cause 1 — changement de mode refusé : treuils non à l'arrêt mécanique confirmé.
 // Non latchée (live) : l'information disparaît dès que la condition redevient vraie, sans
@@ -27478,14 +27460,12 @@ ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
                      AND M2ContactorsReleased AND NOT M2BrakeIsOpen
                      AND (ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps);
 
-// 3.2 ARBITRAGE — priorité du refus de sécurité, puis du refus de bascule
-IF (SelMode = E_Mode.SEMI_AUTO)
-   AND (EncoderFaultPresent OR MaintHomingRequiredM1 OR MaintHomingRequiredM2 OR NOT MachineHomed
-        OR NOT PowerContactorEngaged) THEN
-    // Défaut codeur, re-homing obligatoire ou AU non armé : SEMI_AUTO interdit, repli MAINT_N1.
-    Auth.Mode := E_Mode.MAINT_N1;
-    Auth.ModeChangePendingBlocked := FALSE;
-ELSIF (SelMode &lt;&gt; PrevArbitratedMode)
+// 3.2 ARBITRAGE — le mode suit la sélection IHM (découplé de l'AU/défaut, T207)
+// La sélection de mode n'est JAMAIS bloquée par l'AU, l'arrêt d'urgence ou un défaut :
+// le mode est un état de sélection, le mouvement est coupé en aval (FB_Cycle, FB_Safety_Winch,
+// FB_Winch) par PowerContactorEngaged et les interlocks. Seule la bascule N1/N2/SEMI_AUTO
+// reste soumise à l'arrêt mécanique confirmé des treuils (ModeChangeAllowed).
+IF (SelMode &lt;&gt; PrevArbitratedMode)
       AND (SelMode &lt;&gt; E_Mode.DISABLE) AND (PrevArbitratedMode &lt;&gt; E_Mode.DISABLE)
       AND NOT ModeChangeAllowed THEN
     // Bascule N1/N2/SEMI_AUTO refusée : le mode courant est MAINTENU.
@@ -29737,7 +29717,7 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Force ErrorId=0 global</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Inhibe l'evaluation des causes + RAZ latches ; ne force pas ErrorId=0 (causes live deja posees restent visibles)</xhtml>
               </documentation>
             </variable>
             <variable name="BypassSafety">
@@ -30107,6 +30087,152 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation premier scan</xhtml>
               </documentation>
             </variable>
+            <variable name="CauseOperatorCommActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MIROIRS LISIBLES DES CAUSES (bits ErrorId, source instCauses[i].Active) ===
+Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §4).
+. [LOC] bit0  Perte com operateur (live)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseEncoderActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit1  Perte codeur (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseMotorThermalActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit2  Surchauffe moteur (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseSlackCableActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit3  Mou de cable (live)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CausePhaseRotationActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit4  Rotation phases (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseTopLimitSwitchActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit5  Fin de course haut capteur (live)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseCableLimitActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit6  Limite basse cable descente (live)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseMecaAActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit7  Derive non commandee (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseMecaBActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit8  Absence confirmation arret (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseMecaCActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit9  Glissement pendant benne (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseBrakeThermalActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit10 Surchauffe frein (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseMecaDActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit11 Escalade fin de course haut (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseMecaEActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit12 Ecart critique synchro (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseMecaEEscaladeActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit13 Escalade ecart synchro (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseOppositeDirActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit14 Sens reel oppose (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseNoMovementActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] bit15 Absence mouvement (latched)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CausesSafeStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Causes non directionnelles -&gt; SafeStop</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CausesPowerCutOffActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Causes critiques -&gt; PowerCutOff</xhtml>
+              </documentation>
+            </variable>
             <variable name="EncoderFaultLatched">
               <type>
                 <BOOL />
@@ -30439,6 +30565,42 @@ OverspeedFault := OverspeedFaultLatched;
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
+
+// Miroirs des causes : exactement les bits de la vue LIVE ErrorId (le socle pose
+// ErrorId bit i = Causes[i].Active quand Enable). §2 fait RETURN si Enable=FALSE,
+// ces miroirs ne servent qu'en aval, sous Enable.
+CauseOperatorCommActive   := instCauses[0].Active;
+CauseEncoderActive        := instCauses[1].Active;
+CauseMotorThermalActive   := instCauses[2].Active;
+CauseSlackCableActive     := instCauses[3].Active;
+CausePhaseRotationActive  := instCauses[4].Active;
+CauseTopLimitSwitchActive := instCauses[5].Active;
+CauseCableLimitActive     := instCauses[6].Active;
+CauseMecaAActive          := instCauses[7].Active;
+CauseMecaBActive          := instCauses[8].Active;
+CauseMecaCActive          := instCauses[9].Active;
+CauseBrakeThermalActive   := instCauses[10].Active;
+CauseMecaDActive          := instCauses[11].Active;
+CauseMecaEActive          := instCauses[12].Active;
+CauseMecaEEscaladeActive  := instCauses[13].Active;
+CauseOppositeDirActive    := instCauses[14].Active;
+CauseNoMovementActive     := instCauses[15].Active;
+
+// Agregats safety (causes homogenes, AF03 §4 — jamais de masque hexa) :
+// CausesSafeStop : toutes les causes sauf les 3 purement directionnelles
+// (SlackCable bit3, TopLimitSwitch bit5, CableLimitDescent bit6), traitees
+// par les permis de sens. CausesPowerCutOff : defauts a coupure immediate,
+// SANS MecaE-ecart (bit12, laisse au SafeStop tant que non confirme).
+CausesSafeStopActive := CauseOperatorCommActive OR CauseEncoderActive
+    OR CauseMotorThermalActive OR CausePhaseRotationActive
+    OR CauseMecaAActive OR CauseMecaBActive OR CauseMecaCActive
+    OR CauseBrakeThermalActive OR CauseMecaDActive
+    OR CauseMecaEActive OR CauseMecaEEscaladeActive
+    OR CauseOppositeDirActive OR CauseNoMovementActive;
+
+CausesPowerCutOffActive := CauseMotorThermalActive OR CauseMecaAActive
+    OR CauseMecaBActive OR CauseMecaCActive OR CauseBrakeThermalActive
+    OR CauseMecaDActive OR CauseMecaEEscaladeActive;
 {endregion}
 
 {region "§2 Gate neutralisation"}
@@ -30464,27 +30626,31 @@ Ready := Enable AND NOT Fault.Latched;
 
 {region "§3 Arbitrage sorties securite"}
 // 📤 3. ARBITRAGE SÉCURITÉ
+// Interlocks sur les miroirs de causes (bits ErrorId) — jamais de masque hexa.
 IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
-ELSIF NOT SyncEnable THEN
-    SafeStop := ((Fault.ErrorId AND 16#FF97) &lt;&gt; 16#0000) OR OverspeedFaultLatched;
 ELSE
-    SafeStop := ((Fault.ErrorId AND 16#FF9F) &lt;&gt; 16#0000) OR OverspeedFaultLatched;
+    // Causes non directionnelles + survitesse. Hors synchro (SyncEnable=FALSE),
+    // le mou de cable (bit3) n'entraine pas SafeStop : il bloque la descente
+    // seule via DescendPermit (retendre en montant reste possible).
+    SafeStop := CausesSafeStopActive
+                OR (SyncEnable AND CauseSlackCableActive)
+                OR OverspeedFaultLatched;
 END_IF;
 
 DescendPermit := NOT (
-    (((Fault.ErrorId AND 16#0040) &lt;&gt; 16#0000 OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
+    ((CauseCableLimitActive OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
     OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
     // La limite légale est une interdiction d'exploitation distincte du groupe
     // SafeStop/Permit. Le bypass banc BypassProcess ne doit jamais la lever :
     // seul le bypass dédié BypassLimitLegal, déjà filtré par la matrice MAINT_N2
     // dans PRG_04, peut l'autoriser explicitement.
     OR (LimitLegalReached AND NOT BypassLimitLegal)
-    OR (((Fault.ErrorId AND 16#0008) &lt;&gt; 16#0000 AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
+    OR ((CauseSlackCableActive AND NOT SyncEnable) AND NOT (BypassProcess OR BypassGlobal))
 );
 
 AscentPermit := NOT (
-    (((Fault.ErrorId AND 16#0020) &lt;&gt; 16#0000
+    ((CauseTopLimitSwitchActive
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
     // TopLimitM porte deja la relaxation 7,5-&gt;8,5 m (override N1 / bypass N2, bornee par la
@@ -30493,7 +30659,7 @@ AscentPermit := NOT (
     OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM))
 );
 
-PowerCutOff := (Fault.ErrorId AND 16#2F84) &lt;&gt; 16#0000;
+PowerCutOff := CausesPowerCutOffActive;
 {endregion}
 </xhtml>
           </ST>
@@ -33342,6 +33508,14 @@ END_CASE;
 . [LOC] Discordance commande active</xhtml>
               </documentation>
             </variable>
+            <variable name="BothCommanded">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Les 2 treuils sont commandes (relais ou contacteur)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -33352,6 +33526,9 @@ END_CASE;
       meme si les codeurs sont bypasses.
    🔌 Interface : Bloc de surveillance transverse (1 instance)
    🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee.
+   ⚖️ Concordance ACTIVE des que les 2 treuils sont commandes (relais ou
+      contacteur) OU en mode synchronisme (SyncEnable). Seul BypassGlobal
+      neutralise.
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
           </documentation>
@@ -33373,9 +33550,15 @@ END_IF;
 {region "§2 Detection discordance"}
 // 🔍 2. COHÉRENCE DES COMMANDES SÉCURITÉ — verifie que les commandes envoyees
 // aux deux treuils sont identiques (sens et contacteurs).
+// Concordance ACTIVE des que les 2 treuils sont commandes (relais ou contacteur)
+// OU en mode synchronisme (SyncEnable). Seul BypassGlobal neutralise.
 // Filtre de 500ms pour tolerer les transitions et rampes.
 IF NOT BypassGlobal THEN
-    MismatchActive := SyncEnable AND (
+    BothCommanded := (RelayFwdM1 OR RelayRevM1 OR Contactor1_M1 OR Contactor2_M1
+                      OR Contactor3_M1 OR Contactor4_M1)
+                 AND (RelayFwdM2 OR RelayRevM2 OR Contactor1_M2 OR Contactor2_M2
+                      OR Contactor3_M2 OR Contactor4_M2);
+    MismatchActive := (BothCommanded OR SyncEnable) AND (
         (RelayFwdM1 &lt;&gt; RelayFwdM2) OR
         (RelayRevM1 &lt;&gt; RelayRevM2) OR
         (Contactor1_M1 &lt;&gt; Contactor1_M2) OR
@@ -33388,6 +33571,7 @@ IF NOT BypassGlobal THEN
 ELSE
     ContactorMismatch := FALSE;
     MismatchActive := FALSE;
+    BothCommanded := FALSE;
     MismatchTimer(IN := FALSE);
 END_IF;
 {endregion}
@@ -42562,6 +42746,7 @@ instCycleSemiAuto(
     Enable                  := (instModes.Auth.Mode = E_Mode.SEMI_AUTO),
     Reset                   := GVL_IHM.Cycle.Cmd.BtnReset,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
+    EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState &lt;&gt; DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState &lt;&gt; DEVICE_STATE.RUNNING),
     Mode                    := instModes.Auth.Mode,
     JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,

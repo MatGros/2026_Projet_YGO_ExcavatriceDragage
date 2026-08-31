@@ -5307,8 +5307,8 @@ tasks:
   statut: ⏳
   criticite: C2
   domaine: TREUILS / SÉCURITÉ
-  agent: DSH-02
-  date: '2026-08-31T00:00:00'
+  agent: CC
+  date: '2026-08-31T21:58:35'
   titre: 'Refactorisation FB_Safety_Winch : masques hexadécimaux → bits explicites'
   contexte: 'Intitulé complet : Remplacer les 6 masques hexadécimaux de FB_Safety_Winch
     (16#FF97, 16#FF9F, 16#0040, 16#0020, 16#0008, 16#2F84) par des bits explicites,
@@ -5327,7 +5327,7 @@ tasks:
     Corriger aussi la doc TROUBLESHOOTING_RearmementAU_PowerCutOff_20260901.md:56
     (liste 2F84 fausse) et le commentaire FB_Safety_Winch.st:61 (BypassGlobal ne force
     pas ErrorId=0).'
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T209_MASQUES_HEX_BITS_EXPLICITES.yaml
   objectifs:
   - 'Remplacer les 6 masques hexadécimaux de FB_Safety_Winch par des bits explicites
     dérivés de instCauses[i].Active (booléens locaux)'
@@ -5338,4 +5338,42 @@ tasks:
   - 'Clarifier le commentaire FB_Safety_Winch.st:61 (BypassGlobal ne force pas ErrorId=0)'
   - 'test_fb_safety_winch.st reste 100% vert (couvre tous les masques)'
   - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS'
+  bloque_par: []
+- id: T210
+  parent_id: ''
+  statut: ✅
+  criticite: C2
+  domaine: TREUILS / SÉCURITÉ
+  agent: DSH (DeepSeek)
+  date: '2026-09-01T00:00:00+02:00'
+  completed_at: '2026-08-31T23:20:00+02:00'
+  titre: 'FB_WinchSync — découpler la concordance contacteurs (FB_SyncContactor) du mode synchronisme'
+  contexte: 'Le FB_WinchSync coordonne FB_SyncDeviation (écart position M1/M2) et FB_SyncContactor
+    (concordance commandes/contacteurs). Actuellement les DEUX sous-blocs sont gatés par
+    SyncActive/SyncEnable (FB_WinchSync.st §3, FB_SyncContactor.st:63, FB_SyncDeviation.st:81-82).
+    Or la concordance contacteurs doit être OBLIGATOIRE dès que les 2 treuils sont commandés,
+    indépendamment du mode synchronisme — seul un bypass la neutralise. Le mode synchronisme
+    (SyncEnable) ne doit piloter que l''écart de position (FB_SyncDeviation), désactivé par
+    défaut et non bloquant (la machine n''est pas au millimètre).'
+  description: '✅ **Implémenté + validé 2026-08-31** (périmètre minimal, fiabilité d''abord).
+    Changement isolé dans FB_SyncContactor.st : gate `SyncEnable` → `(BothCommanded OR SyncEnable)`
+    (concordance active dès que les 2 treuils sont commandés OU en mode synchronisme, seul
+    BypassGlobal neutralise). `BothCommanded` = variable locale BOOL (aucune structure créée/modifiée,
+    interface inchangée). Revue critique : régression en mode sync évitée (gate OR), SyncEnable
+    reste utilisé. Bundle frais + G200 PASS (0 erreur). ⚠️ **Validation banc/CODESYS NON FAITE**
+    (utilisateur : « j''ai pas testé ta modif ») — suivi séparé requis avant production. Points
+    V2/V3/V4 (FB_Safety_Winch Méca E, instWinchSync.Enable, paliers différents en non-sync)
+    hors périmètre minimal, à valider. Design : DOC/WFLOW/AUDITS/DESIGN/DESIGN_T210_DECOUPLAGE_CONCORDANCE_CONTACTEURS_v0.1.md.'
+  objectifs:
+  - 'Analyse : cartographier le câblage actuel (FB_WinchSync, FB_SyncContactor, FB_SyncDeviation,
+    PRG_04 §4, FB_Safety_Winch SyncEnable) et définir la frontière cible (concordance contacteurs
+    toujours active vs écart de position gaté par SyncEnable)'
+  - 'Découpler FB_SyncContactor de SyncEnable : concordance contacteurs active dès que les
+    2 treuils sont commandés, sauf bypass'
+  - 'FB_SyncDeviation reste gaté par SyncEnable (mode synchronisme = écart de position),
+    désactivé par défaut, non bloquant'
+  - 'Aucune régression des sécurités existantes (SafeStop croisé, EffectivePermit, Méca E)'
+  - 'Mettre à jour AF_Partie-10 §7.6 + fiche FB_WinchSync_v1.1'
+  - 'G200 liaison PASS + bundle + gates palier C PASS'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T210.yaml
   bloque_par: []
