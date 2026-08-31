@@ -28185,16 +28185,14 @@ Duree auto-test canal A ou B</xhtml>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🛡️ FB_Safety_EmergencyManagement — Gestion de la réd'urgence AU
+   🛡️ FB_Safety_EmergencyManagement — Spec composant (v1.2)
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Machine d'état, fronts Reset/Arm, autotest redondance A/B,
-      réarmement contacteur, interlock Cause brute, projection fail-safe
-      et latch défaut via le socle FB_FaultCore.
+   🎯 Rôle : Répond au besoin fonctionnel F01.01-F01.08 (AF01 §1, Table des fonctions) : gère la coupure de puissance amont (canaux PLC redondants fail-safe) et la séquence explicite de réarmement du contacteur général, avec auto-test A/B.
    🔒 Sécurité : fronts Reset/Arm (jamais de redémarrage auto), interlock
       sur Cause brute (jamais sur l'Ack), fail-safe Enable=FALSE.
    📤 Sorties structurées (2 DUT) : Status (ST_Safety_Emergency_Status) +
       Cmd (ST_Safety_Emergency_Cmd).
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.2.md (F01.01-F01.08)
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -28986,7 +28984,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel SAFETY vers Trémie (TRUE = autorisé, fail-safe). Niveau SAFETY (pur directionnel : fin de course). Le permit EFFECTIF « pouvoir bouger » est calculé en PRG_05 §1ter (AND NOT SafeStop AND NOT PowerCutOff).</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenancePermit">
@@ -28994,7 +28992,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel SAFETY vers Maintenance (TRUE = autorisé, fail-safe). Niveau SAFETY (pur directionnel : autorisation cible + fin de course). Le permit EFFECTIF « pouvoir bouger » est calculé en PRG_05 §1ter (AND NOT SafeStop AND NOT PowerCutOff).</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -29332,7 +29330,15 @@ ErrorMecaA            := instCauses[5].Active;
 ErrorLimitSwitch      := instCauses[6].Active;
 ErrorSensorIncoherent := instCauses[7].Active;
 
-// 🛡️ Permis directionnels M3 (polarité fail-safe : TRUE = autorisé)
+// 🛡️ Permis directionnels M3 — NIVEAU SAFETY (polarité fail-safe : TRUE = autorisé)
+// ⚠️ Ces sorties sont des permits directionnels SAFETY (pur directionnel), PAS le permit
+// EFFECTIF « pouvoir bouger ». Le permit effectif (prêt à fonctionner) est calculé en
+// PRG_05_Translation §1ter : Safety directionnel AND NOT M3_SafeStop_Aggregate AND NOT
+// PowerCutOff. C'est LUI qui reflète la sémantique « pouvoir bouger » : quand l'axe est en
+// défaut (SafeStop/PowerCutOff), TOUS les sens sont bloqués ; au retour en condition, un sens
+// peut être permis et pas l'autre (ex. Maintenance interdite -&gt; MaintenancePermit=FALSE,
+// TremiePermit=TRUE). Ces sorties SAFETY alimentent aussi le gate de FB_Translation
+// (EffectiveSafeStop).
 // TremiePermit : autorisé vers Trémie tant que la fin de course Trémie n'est pas atteinte.
 TremiePermit := NOT LimitSwitchTremie;
 // MaintenancePermit : autorisé vers Maintenance uniquement si la cible Maintenance est
@@ -33771,6 +33777,29 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
               </documentation>
             </variable>
+            <variable name="TremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Permis directionnels SAFETY (source FB_Safety_Translation) — gate de sens
+--&gt; [SAFE] Permis directionnel SAFETY vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermit">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis directionnel SAFETY vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DriveStatusWord">
               <type>
                 <WORD />
@@ -34019,6 +34048,14 @@ END_IF;
                 <derived name="TON" />
               </type>
             </variable>
+            <variable name="EffectiveSafeStop">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] SafeStop effectif = SafeStop OR sens non permis (gate de sens)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DriveFaultLatching">
               <type>
                 <BOOL />
@@ -34178,8 +34215,22 @@ IF Direction = 0 THEN
 END_IF;
 {endregion}
 
+{region "§4bis Permis directionnels et EffectiveSafeStop"}
+// 🛡️ 4bis. GATE DE SENS (permis directionnels SAFETY) — modèle treuils FB_Winch
+// EffectiveSafeStop = SafeStop OR (Direction&gt;0 ET Trémie non permise). Bloque la RAMPE
+// (arrêt réel) vers un sens non autorisé SANS toucher à Direction : l'estimateur de position,
+// les verrous bistables et la sélection PositionSensorTarget (PRG_05) restent informés.
+// Consommé dans la gate de rampe (§5) et le choix de décélération.
+// ⚠️ Le sens Maintenance (−1) n'est PAS gaté ici : le segment P1→Maintenance est déjà protégé
+// par la coupure dure M3_LimitSwitchMaintenanceEffective (PRG_05:128-130) et les ralentissements.
+// Gater −1 sur MaintenancePermit bloquerait l'accès à P1 quand Maintenance n'est pas autorisée
+// (régression fonctionnelle). Le gate ne bloque que +1 (Trémie).
+EffectiveSafeStop := SafeStop
+                      OR (Direction &gt; 0 AND NOT TremiePermit);
+{endregion}
+
 {region "§5 Consigne et rampe de vitesse"}
-IF DirectionChangePending OR (Direction = 0) OR ArrivalLock OR SafeStop OR NOT StartStop THEN
+IF DirectionChangePending OR (Direction = 0) OR ArrivalLock OR EffectiveSafeStop OR NOT StartStop THEN
     RampTargetPct := 0.0;
 ELSE
     RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
@@ -34188,7 +34239,7 @@ END_IF;
 SpeedRamp(
     Target := RampTargetPct,
     AccelRate := Cfg.CfgRampAccelRate,
-    DecelRate := SEL(SafeStop, Cfg.CfgRampDecelNormalRate, Cfg.CfgRampDecelFastRate),
+    DecelRate := SEL(EffectiveSafeStop, Cfg.CfgRampDecelNormalRate, Cfg.CfgRampDecelFastRate),
     CycleTimeS := CycleTimeCalc.CycleTimeS
 );
 {endregion}
@@ -45365,10 +45416,15 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 // ⚠️ Le verrou « descente treuil interdite tant que M3 pas à P1 » (DumpAtTremieDescentLocked)
 // est côté TREUIL (PRG_04 §5, lignes 802-805), pas dans le permit M3 : le permit M3 reste une
 // information de possibilité de mouvement de la translation, indépendante de l'état de la trémie.
+// ⚠️ Le permit M3 est un permit EFFECTIF « pouvoir bouger » (prêt à fonctionner), PAS un pur
+// directionnel. Quand l'axe est en défaut (SafeStop/PowerCutOff), TOUS les sens sont bloqués ;
+// au retour en condition, un sens peut être permis et pas l'autre (ex. Maintenance interdite -&gt;
+// MaintenancePermit=FALSE, TremiePermit=TRUE). Ce niveau effectif est exposé à l'IHM.
 // ⚠️ Ces permis effectifs sont des valeurs de DIAGNOSTIC/IHM (lecture seule) : la commande
 // réelle reste gatée par M3_SafeStop_Aggregate (PRG_05:343, superset incluant InputModuleFault)
 // et l'homme-mort (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle). Aucun impact sur la
-// chaîne de sécurité.
+// chaîne de sécurité. Le gate (FB_Translation, EffectiveSafeStop) consomme les permits
+// directionnels SAFETY (instSafetyTranslationM3.TremiePermit/MaintenancePermit), pas ce niveau effectif.
 EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremiePermit
                                AND NOT M3_SafeStop_Aggregate
                                AND NOT instSafetyTranslationM3.PowerCutOff;
@@ -45421,6 +45477,9 @@ instTranslationM3(
                                    AND NOT PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
     LimitSwitchTremie       := M3_LimitSwitchTremieStable,
     LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
+    // 🛡️ Permis directionnels SAFETY (source unique instSafetyTranslationM3) — gate de sens FB_Translation
+    TremiePermit            := instSafetyTranslationM3.TremiePermit,
+    MaintenancePermit       := instSafetyTranslationM3.MaintenancePermit,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     Cfg                     := TranslationCfg,
