@@ -51,6 +51,8 @@ contract:
       - CODE/J_SUPERVISION/FB_TroubleshootingView.st  # A3 conso WaitingResume/PausedState
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/   # champs bus séquenceur si besoin
       - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+      - TOOLS/TEST_AUTO_CI/registry.yaml                       # sources/nom d'entrée G_CYCLE périmés
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/              # harnais de test périmés à réaligner
     forbidden:
       - PRJ_CODESYS/**/Device.export
       - DOC/STDS/NAMING_CONVENTION.md

@@ -257,6 +257,22 @@ L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agen
 | R7 | **Liaison inter-lots** | si plusieurs lots parallèles, vérifier le câblage entre eux |
 | R8 | **Traçabilité d'impact** | la chaîne producteur → routeur → consommateur a été tracée **avant** de coder, et le consommateur final est nommé dans la restitution (`CODE_QUALITY_STANDARDS.md §3ter`) |
 
+### 🎯 Standard de test (ni trop, ni rien)
+
+> Le « quoi » est dans R2–R4 ; ce standard fixe le **quand** pour éviter de sur-tester (suite
+> complète à chaque micro-édition) ou de sous-tester (livrer sans le minimum).
+
+| Niveau | Quand | Commande | Coût |
+|---|---|---|---|
+| **① Minimum obligatoire** | à **chaque** livraison de code | `generate_codesys_bundle.py .` + `G200_check_linkage.py --report` (R2+R3) | ~secondes |
+| **② Suite complète** | à la livraison d'un **lot** (fin de lot) | `run_all_gates.py` (ou `--palier C`) (R4) | secondes |
+| **③ Palier ciblé** | pendant l'édition (micro-éditions) | `run_all_gates.py --palier A/B` (GUIDE_GATES_ET_TESTS §2) | instantané |
+
+- ⛔ **Ne pas sous-tester** : jamais livrer sans le minimum (bundle + G200) — seule preuve de
+  câblage réel (R2).
+- ⛔ **Ne pas sur-tester** : ne pas lancer la suite complète à chaque micro-édition (perte de
+  temps) — la réserver à la fin de lot (R4).
+
 ### Règles
 
 - **Agent différent** : le réviseur n'est jamais l'implémenteur de la sous-tâche.

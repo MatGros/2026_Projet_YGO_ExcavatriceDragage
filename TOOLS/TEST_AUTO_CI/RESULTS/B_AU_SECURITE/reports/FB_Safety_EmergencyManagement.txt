@@ -1,89 +1,26 @@
-Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp: In member function 'void strucpp::FB_SAFETY_EMERGENCYMANAGEMENT::operator()()':
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12855:18: error: the value of 'strucpp::CST_STEP_IDLE' is not usable in a constant expression
-12855 |             case CST_STEP_IDLE:
-      |                  ^~~~~~~~~~~~~
-In file included from C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:4:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:117:22: note: 'strucpp::CST_STEP_IDLE' was not declared 'constexpr'
-  117 | const inline IEC_INT CST_STEP_IDLE = 0;
-      |                      ^~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12855:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
-12855 |             case CST_STEP_IDLE:
-      |                  ^~~~~~~~~~~~~
-In file included from C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:7:
-C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
-  212 |     operator T() const noexcept {
-      |     ^~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12858:18: error: the value of 'strucpp::CST_STEP_TEST_A' is not usable in a constant expression
-12858 |             case CST_STEP_TEST_A:
-      |                  ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:118:22: note: 'strucpp::CST_STEP_TEST_A' was not declared 'constexpr'
-  118 | const inline IEC_INT CST_STEP_TEST_A = 1;
-      |                      ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12858:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
-12858 |             case CST_STEP_TEST_A:
-      |                  ^~~~~~~~~~~~~~~
-C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
-  212 |     operator T() const noexcept {
-      |     ^~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12861:18: error: the value of 'strucpp::CST_STEP_RESTORE_A' is not usable in a constant expression
-12861 |             case CST_STEP_RESTORE_A:
-      |                  ^~~~~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:119:22: note: 'strucpp::CST_STEP_RESTORE_A' was not declared 'constexpr'
-  119 | const inline IEC_INT CST_STEP_RESTORE_A = 2;
-      |                      ^~~~~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12861:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
-12861 |             case CST_STEP_RESTORE_A:
-      |                  ^~~~~~~~~~~~~~~~~~
-C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
-  212 |     operator T() const noexcept {
-      |     ^~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12864:18: error: the value of 'strucpp::CST_STEP_TEST_B' is not usable in a constant expression
-12864 |             case CST_STEP_TEST_B:
-      |                  ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:120:22: note: 'strucpp::CST_STEP_TEST_B' was not declared 'constexpr'
-  120 | const inline IEC_INT CST_STEP_TEST_B = 3;
-      |                      ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12864:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
-12864 |             case CST_STEP_TEST_B:
-      |                  ^~~~~~~~~~~~~~~
-C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
-  212 |     operator T() const noexcept {
-      |     ^~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12867:18: error: the value of 'strucpp::CST_STEP_RESTORE_B' is not usable in a constant expression
-12867 |             case CST_STEP_RESTORE_B:
-      |                  ^~~~~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:121:22: note: 'strucpp::CST_STEP_RESTORE_B' was not declared 'constexpr'
-  121 | const inline IEC_INT CST_STEP_RESTORE_B = 4;
-      |                      ^~~~~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12867:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
-12867 |             case CST_STEP_RESTORE_B:
-      |                  ^~~~~~~~~~~~~~~~~~
-C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
-  212 |     operator T() const noexcept {
-      |     ^~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12870:18: error: the value of 'strucpp::CST_STEP_PULSE' is not usable in a constant expression
-12870 |             case CST_STEP_PULSE:
-      |                  ^~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:122:22: note: 'strucpp::CST_STEP_PULSE' was not declared 'constexpr'
-  122 | const inline IEC_INT CST_STEP_PULSE = 5;
-      |                      ^~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12870:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
-12870 |             case CST_STEP_PULSE:
-      |                  ^~~~~~~~~~~~~~
-C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
-  212 |     operator T() const noexcept {
-      |     ^~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12873:18: error: the value of 'strucpp::CST_STEP_CONFIRM' is not usable in a constant expression
-12873 |             case CST_STEP_CONFIRM:
-      |                  ^~~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:123:22: note: 'strucpp::CST_STEP_CONFIRM' was not declared 'constexpr'
-  123 | const inline IEC_INT CST_STEP_CONFIRM = 6;
-      |                      ^~~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12873:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
-12873 |             case CST_STEP_CONFIRM:
-      |                  ^~~~~~~~~~~~~~~~
-C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
-  212 |     operator T() const noexcept {
-      |     ^~~~~~~~
+Error compiling source files:
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->—<- at offset: 307, skipped 1 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->É<- at offset: 315, skipped 1 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->É<- at offset: 334, skipped 1 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->É<- at offset: 352, skipped 1 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->É<- at offset: 366, skipped 1 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->É<- at offset: 378, skipped 1 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->É<- at offset: 464, skipped 1 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->À<- at offset: 498, skipped 1 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->É<- at offset: 739, skipped 1 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->�<- at offset: 752, skipped 2 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->É<- at offset: 760, skipped 1 characters.
+
+GVL_Safety_Emergency.st:0:0: error: unexpected character: ->═<- at offset: 822, skipped 63 characters.
 
