@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:51:45.433060" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:51:45.433060">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T07:21:46.100882" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T07:21:46.100882">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -477,7 +477,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Confirmation visuelle IHM : benne ouverte</xhtml>
               </documentation>
             </variable>
             <variable name="ConfirmClosePosition">
@@ -485,7 +485,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Legacy IHM, ignore : front traite par FB_MachineHomingCycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Confirmation visuelle IHM : benne fermee</xhtml>
               </documentation>
             </variable>
             <variable name="PowerContactorEngaged">
@@ -738,6 +738,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur entree en etat Busy</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmOpenEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front confirmation ouverture IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConfirmCloseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front confirmation fermeture IHM</xhtml>
               </documentation>
             </variable>
             <variable name="TonTimeout">
@@ -996,6 +1012,29 @@ IF FirstCycle THEN
        OR (NOT BucketState.IsOpen AND NOT BucketState.IsClosed) THEN
         BucketState.StateIncoherent := TRUE;
     END_IF;
+END_IF;
+
+// Les confirmations IHM restent les commandes fonctionnelles de référence
+// benne, indépendantes du cycle global. Elles ne sont acceptées qu'à l'arrêt
+// en maintenance : un front qualifie l'observation visuelle opérateur.
+ConfirmOpenEdge(CLK := ConfirmOpenPosition);
+IF ConfirmOpenEdge.Q
+   AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
+   AND NOT Lifecycle.Busy THEN
+    BucketState.IsOpen := TRUE;
+    BucketState.IsClosed := FALSE;
+    BucketState.LastPosM2Open := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
+END_IF;
+
+ConfirmCloseEdge(CLK := ConfirmClosePosition);
+IF ConfirmCloseEdge.Q
+   AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
+   AND NOT Lifecycle.Busy THEN
+    BucketState.IsOpen := FALSE;
+    BucketState.IsClosed := TRUE;
+    BucketState.LastPosM2Close := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
 END_IF;
 
 IF MachineHomingCommitOpen AND NOT Lifecycle.Busy THEN

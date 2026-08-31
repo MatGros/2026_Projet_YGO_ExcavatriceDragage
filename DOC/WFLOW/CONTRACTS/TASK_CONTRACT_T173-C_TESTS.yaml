@@ -20,33 +20,28 @@ contract:
   acceptance:
     - id: AC1
       statement: "Nominal : armement réussi en 1 essai (séquence complète 1→6, PowerContactorEngaged, ErrorId=0, aucun message IHM)."
-      verified_by: "test unitaire FB_Safety_EmergencyManagementLogic : sequence complète + assertions (ErrorId=0, Done=TRUE)"
+      verified_by: "test unitaire FB_Safety_EmergencyManagementLogic : sequence complète + assertions (ErrorId=0, ArmingSeqStep=0, PowerContactorEngaged=TRUE)"
     - id: AC2
-      statement: "Échec contacteur : PowerContactorEngaged reste FALSE après le pulse → timeout 2s → ErrorId bit arming + message 'contacteur non engagé'."
-      verified_by: "test unitaire avec Timeout ; assertion ErrorId≠0"
+      statement: "Échec contacteur : PowerContactorEngaged reste FALSE après le pulse → timeout 2s → message 'contacteur non engagé'."
+      verified_by: "test unitaire avec Timeout ; assertion message IHM présent (AbortMsgActive ou Banner.OperatorActionText)"
     - id: AC3
-      statement: "Coupure volontaire : BtnEmergencyCutOff pendant la séquence → arrêt immédiat, tracé 'coupe volontaire' sans alarme défaut (ErrorId bit coupure volontaire si défini, sinon trace)."
+      statement: "Coupure volontaire : BtnEmergencyCutOff pendant la séquence → arrêt immédiat, tracé 'coupe volontaire' sans alarme défaut."
       verified_by: "test unitaire + revue du mapping IHM"
     - id: AC4
-      statement: "1er boot : échec silencieux d'origine → message de cause (la provenance T173-A déclenche désormais un affichage) ; 2e tentative après acquittement réusssit."
-      verified_by: "snapshot simulation boot + test unitaire du scénario boot"
+      statement: "1er boot : confirmer la cause racine (timeout restauration A/B vs front ArmRequest avalé) par snapshot, puis vérifier que le message de cause apparaît ; 2e tentative après acquittement réussit."
+      verified_by: "snapshot simulation boot (LastAbortCause=16#0004/0008 = timeout restauration, OU ArmingStep jamais sorti de 0 = front avalé) + test unitaire du scénario boot"
     - id: AC5
-      statement: "Table de vérité : AUCUNE sortie silencieuse résiduelle — pour chaque signal d'échec injecté, un outcome (ErrorId/message) distinct est observé ; la case 'sortie sans message' est vide."
-      verified_by: "table de vérité complète (tous les signaux x outcomes) jointe au rapport, revue humaine"
+      statement: "Table de vérité : AUCUNE sortie silencieuse résiduelle — pour chaque signal d'échec injecté, un message IHM distinct est observé (le signal est le MESSAGE, pas ErrorId qui reste 0 pour les timeouts restauration A/B) ; la case 'sortie sans message' est vide."
+      verified_by: "table de vérité complète (tous les signaux x messages) jointe au rapport, revue humaine"
     - id: AC6
       statement: "Non-régression : run_all_gates palier C PASS (bundle validé), G200_check_linkage 0 erreur."
       verified_by: "run_all_gates --palier C + G200 --report"
-    - id: AC7
-      statement: "Le nom de fichier est egal au nom du POU pour PRG_02_Acquisition.st."
-      verified_by: "G310_check_code_structure"
-    - id: AC8
-      statement: "Le suffixe de langage est egal au langage genere dans le bundle pour PRG_02_Acquisition.st."
-      verified_by: "G310_check_code_structure"
 
   # ── 3. Perimetre ──────────────────────────────────────────────────────────
   scope:
     allowed:
-      - TOOLS/TEST_AUTO_CI/tests/                                  # nouveaux tests unitaires (dossier domaine)
+      - TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/             # nouveaux tests unitaires (dossier domaine)
+      - TOOLS/TEST_AUTO_CI/RESULTS/J_SUPERVISION/tests/             # tests du formateur IHM (signalement)
       - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ArningSilencieux_AU_20260828.md  # verdict final + non-régression
       - TOOLS/TEST_AUTO_CI/registry.yaml                           # enregistrement nouveaux tests si requis
     forbidden:

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:16:09.686217" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:16:09.686217">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T06:51:18.154207" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T06:51:18.154207">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -295,7 +295,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: bitfield brut FB_Bucket (bit0 timeout, bit1 incohérence, bit2 limites, bit3 codeur non référencé, bit4 glissement M1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: bitfield brut FB_Bucket (bit0 configuration, bit1 écart M2/M1, bit2 timeout, bit3 glissement M1, bit4 codeurs non référencés)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_BucketBusy">

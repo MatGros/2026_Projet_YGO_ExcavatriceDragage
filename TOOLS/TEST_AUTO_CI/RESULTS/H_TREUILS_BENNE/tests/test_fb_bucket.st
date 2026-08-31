@@ -466,7 +466,7 @@ TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Directi
     ASSERT_FALSE(BucketState.IsClosed, 'Recul a M2StartPosM -> IsClosed restaure FALSE');
 END_TEST
 
-TEST 'TC-P10-030 ConfirmOpen/ClosePosition legacy ignores : commit ReferenceCycle seul'
+TEST 'TC-P10-030 ConfirmOpen/ClosePosition reference directement la benne en maintenance'
     Config.OffsetOpenM := 0.0;
     Config.OffsetCloseM := 3.0;
     Config.CoherenceLimitM := 5.0;
@@ -503,9 +503,9 @@ TEST 'TC-P10-030 ConfirmOpen/ClosePosition legacy ignores : commit ReferenceCycl
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     BucketState := FB.BucketState;
-    ASSERT_FALSE(BucketState.IsOpen, 'MAINT_N1 + ConfirmOpen legacy ignore');
+    ASSERT_TRUE(BucketState.IsOpen, 'MAINT_N1 + ConfirmOpen -> IsOpen=TRUE');
     ASSERT_FALSE(BucketState.IsClosed, 'MAINT_N1 + ConfirmOpen -> IsClosed=FALSE');
-    ASSERT_TRUE(BucketState.StateIncoherent, 'Sans commit atomique, incoherence conservee');
+    ASSERT_FALSE(BucketState.StateIncoherent, 'Confirmation visuelle -> etat coherent');
 
     (* Scan 3 : relâche la confirmation ouverture. *)
     ADVANCE_TIME(10000000);
@@ -523,7 +523,7 @@ TEST 'TC-P10-030 ConfirmOpen/ClosePosition legacy ignores : commit ReferenceCycl
        Config := Config, BucketState := BucketState);
     BucketState := FB.BucketState;
     ASSERT_FALSE(BucketState.IsOpen, 'MAINT_N2 + ConfirmClose -> IsOpen=FALSE');
-    ASSERT_FALSE(BucketState.IsClosed, 'MAINT_N2 + ConfirmClose legacy ignore');
+    ASSERT_TRUE(BucketState.IsClosed, 'MAINT_N2 + ConfirmClose -> IsClosed=TRUE');
 
     (* Scan 5 : Mode SEMI_AUTO, ConfirmOpenPosition -> AUCUN effet. *)
     ADVANCE_TIME(10000000);
@@ -533,7 +533,7 @@ TEST 'TC-P10-030 ConfirmOpen/ClosePosition legacy ignores : commit ReferenceCycl
        Config := Config, BucketState := BucketState);
     BucketState := FB.BucketState;
     ASSERT_FALSE(BucketState.IsOpen, 'SEMI_AUTO + ConfirmOpen -> IsOpen reste FALSE');
-    ASSERT_FALSE(BucketState.IsClosed, 'SEMI_AUTO + ConfirmOpen legacy ignore');
+    ASSERT_TRUE(BucketState.IsClosed, 'SEMI_AUTO + ConfirmOpen conserve etat ferme');
 END_TEST
 
 TEST 'TC-P10-031 Codeur(s) non reference(s) -> defaut permanent, independant de Reset'

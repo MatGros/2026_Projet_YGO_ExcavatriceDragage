@@ -561,10 +561,13 @@ y est un `BOOL` "au neutre", vs `INT` valeur réelle dans `ST_JoystickState`) �
 
 ## 10 · ❓ TBD
 
-- ✅ **Q1 — `ArmingPermit` câblé** (résolu 2026-08-29, T176) : producteur légitime = **PRG_04_Treuils_Benne**
-  (combiné interlock benne : `NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q` — Option B
-  arbitré humain), publié via le bus `Data` et consommé `PRG_02_Acquisition.st` (plus de littéral `TRUE` —
-  gate anti-littéral **G461** en palier C). Délai fin de cycle benne → ré-armement : **1 scan = 10 ms** (prouvé).
+- ✅ **Q1 — `ArmingPermit` câblé** (résolu 2026-08-29, T176 ; **révisé 2026-08-31**) : producteur légitime = **PRG_04_Treuils_Benne**.
+  **Règle générale** : on ne peut armer QUE si au moins un axe (treuil M1/M2 ou translation M3) a un
+  **permis de mouvement effectif** — sinon aucun mouvement n'est possible, l'armement serait trompeur.
+  `ArmingPermit := (EffectivePermitM1_Ascent OR EffectivePermitM1_Descend OR EffectivePermitM2_Ascent
+  OR EffectivePermitM2_Descend OR NOT TranslationSafety.SafeStop) AND NOT instBucket.Lifecycle.Busy
+  AND NOT BenneBusyFallEdge.Q` (combiné interlock benne conservé). Publié via le bus `Data` et consommé
+  `PRG_02_Acquisition.st` (plus de littéral `TRUE` — gate anti-littéral **G461** en palier C).
   Le désarmement par changement de mode (`Auth.Mode`, signal 1 de la v0.1) reste un point d'arbitrage ouvert
   (voir `DOC/WFLOW/AUDITS/PRG02_20260824/`).
 - ✅ **Q2 — arbitré 2026-08-29** (validation humaine) : **ne pas confondre**. L'**armement** homme-mort

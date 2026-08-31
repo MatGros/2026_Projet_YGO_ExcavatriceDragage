@@ -101,3 +101,24 @@ de confirmation au capteur haut. Aucun bundle exporté non frais ni
 
 Compilation CODESYS : **PASS**, confirmée par l'utilisateur le 2026-08-31.
 L'essai fonctionnel reste à consigner.
+
+## Correctif simulation capteur haut — 2026-08-31 08:49
+
+Le blocage observé en `MachineHomingStep = NEED_TOP_POSITION (30)` venait du
+modèle de simulation : le capteur haut ne pouvait devenir actif qu'en forçant
+manuellement `GVL_Simulation.SimTopPositionActive`.
+
+`FB_SimBench` calcule maintenant le capteur haut depuis la position brute M1 et
+le seuil configuré de M1. `PRG_02_Acquisition` lui transmet ce seuil depuis
+`CfgTopSensorPos_M`. L'injection manuelle reste disponible pour les essais de
+défaut ciblés, mais n'est plus nécessaire au cycle nominal.
+
+- `T196-004` : capteur haut libre sous le seuil, actif au seuil M1 sans forçage ;
+- `FB_SimBench` : **23/23 PASS** ;
+- `FB_Bucket` : **24/24 PASS** en exécution concurrente ;
+- lint ST : `FB_SimBench` et `ST_ChainBucket` propres ;
+- la table de diagnostic IHM de `ST_ChainBucket` est alignée sur les causes
+  réelles de `FB_Bucket` : `ErrorId = 18` = codeurs non référencés (16) +
+  écart M1/M2 hors plage (2).
+
+Une recompilation CODESYS est requise avant l'essai de ce correctif.
