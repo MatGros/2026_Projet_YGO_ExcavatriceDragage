@@ -94,12 +94,24 @@ contract:
 status: IN_PROGRESS
 execution:
   executed_by: "Codex / root"
-  completed_at: ""
-  status: IN_PROGRESS
-  summary: "Contrat créé avant correction; diagnostic et tests en cours."
-  evidence_submitted: []
+  completed_at: "2026-08-31T04:34:24+02:00"
+  status: COMPLETED
+  summary: >
+    Chaîne source auditée et banc STruCpp rendu fiable en concurrence : le
+    runner de chaque FB utilise un TEMP isolé, empêchant la confusion de
+    résultats entre FB_Bucket et FB_SimBench.
+  evidence_submitted:
+    - "FB_Bucket : STruCpp 24/24 PASS ; T196-001, T196-002 et T181-21 PASS."
+    - "FB_MachineHomingCycle : STruCpp 18/18 PASS (transactions de référence)."
+    - "FB_SimBench : STruCpp 22/22 PASS ; T196-003 polarité capteur haut PASS."
+    - "Exécution concurrente FB_Bucket + FB_SimBench : 24/24 et 22/22, sans mélange de runner."
+    - "Lint ST propre : FB_Bucket, FB_MachineHomingCycle, FB_SimBench."
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
-  notes: "Validation humaine CODESYS requise avant clôture."
+  notes: >
+    Validation humaine CODESYS requise : Clean/Rebuild, commande ouverte/fermée
+    jusqu'à l'offset, publication GVL_IHM et transaction de référencement N2.
+    La liaison globale G200 exige un bundle frais généré depuis le projet CODESYS
+    courant ; Device.export n'est pas une preuve admissible.

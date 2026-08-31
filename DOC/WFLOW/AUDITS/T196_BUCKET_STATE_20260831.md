@@ -72,3 +72,29 @@ Si une condition manque, le cycle reste dans son guide (`NEED_TOP_POSITION`,
 Une confirmation refusée doit être expliquée par
 `Bucket.State.MachineHomingInstruction`; aucun forçage direct de `IsOpen` ou
 `IsClosed` n'est acceptable en production.
+
+## Addendum de validation hors CODESYS — 2026-08-31 04:34
+
+Cette section remplace le verdict provisoire de la section « Vérification ».
+
+- `FB_Bucket` : **24/24 PASS** avec STruCpp. `T196-001` et `T196-002`
+  prouvent l'écriture de `BucketState.IsClosed` / `IsOpen` uniquement après
+  atteinte de la position physique. `T181-21` prouve le copy-out réel du
+  `VAR_IN_OUT` partagé.
+- `FB_MachineHomingCycle` : **18/18 PASS**. Les cas `TC-T185-020` à `091`
+  couvrent la fenêtre N2, capteur haut, arrêt mécanique, front de confirmation,
+  commit exclusif et perte de qualification.
+- `FB_SimBench` : **22/22 PASS**, dont `T196-003` :
+  `M1M2_TopPositionFree_DI := NOT SimTopPositionActive`.
+- Lint ST propre sur `FB_Bucket`, `FB_MachineHomingCycle` et `FB_SimBench`.
+
+Garde-fou de banc ajouté : chaque processus STruCpp utilise désormais son
+répertoire `TEMP` isolé. Avant cela, deux tests lancés simultanément pouvaient
+sélectionner le runner temporaire d'un autre FB et afficher un résultat
+erroné. Le test concurrent `FB_Bucket` + `FB_SimBench` a désormais confirmé
+respectivement **24/24** et **22/22**.
+
+La validation finale reste un test humain CODESYS de la chaîne réellement
+compilée : commande benne, atteinte d'offset, publication IHM, puis séquence
+de confirmation au capteur haut. Aucun bundle exporté non frais ni
+`Device.export` n'a été utilisé comme preuve.

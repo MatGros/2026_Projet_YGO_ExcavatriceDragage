@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-31 04:26:31</div>
+    <div class="exec-time">2026-08-31 04:33:45</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (24 tests)</summary>
@@ -2555,45 +2555,8 @@ END_FUNCTION_BLOCK
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>STruC++ Test Runner v1.0
-
-test_fb_bucket.st
-  [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
-  [PASS] TC-P10-023 Fermeture seulement si MotionDirection=1 ET MotionRequestActive
-  [PASS] TC-P10-024 Ouverture seulement si MotionDirection=-1 ET MotionRequestActive
-         ASSERT_TRUE failed: BUCKETSTATE.ISCLOSED expected TRUE, got FALSE
-         at test_fb_bucket.st:139
-         Message: T196 cible atteinte -&gt; IsClosed=TRUE
-  [FAIL] T196-001 Etat ferme publie apres atteinte de l offset
-         ASSERT_TRUE failed: BUCKETSTATE.ISOPEN expected TRUE, got FALSE
-         at test_fb_bucket.st:168
-         Message: T196 cible atteinte -&gt; IsOpen=TRUE
-  [FAIL] T196-002 Etat ouvert publie apres atteinte de l offset
-  [PASS] TC-P10-025 Demande benne refusee si M1_Busy OR M2_Busy a l entree (READY)
-  [PASS] TC-P10-025.1 Anti-traversee : M2_Busy seul refuse une demande benne a l entree (AC3)
-  [PASS] TC-P10-025.2 Anti-traversee : mouvement deja engage + M2_Busy -&gt; pas d avortement (AC3)
-  [PASS] TC-P10-026 Glissement M1 &gt;1.0m pendant BUSY -&gt; M1SlipDetected + coupe M2
-  [PASS] TC-P10-027 M1SlipDetected force SafeStop sur M1 cote Treuils
-  [PASS] TC-P10-028 Couche 2 (Meca C) : derive M1 &gt;2.0m -&gt; PowerCutOff
-  [PASS] TC-P10-029 Recul (sens inverse) borne a la position de depart, jamais au-dela
-  [PASS] TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Direction/StartStop)
-  [PASS] TC-P10-030 ConfirmOpen/ClosePosition legacy ignores : commit ReferenceCycle seul
-  [PASS] TC-P10-031 Codeur(s) non reference(s) -&gt; defaut permanent, independant de Reset
-  [PASS] TC-P10-032 FB_ExtractionSequence.Busy preserve l armement joystick en fin benne
-  [PASS] TC-P10-033 Butee haute M2 decalee de OffsetCloseM si ferme/en fermeture
-  [PASS] TC-P10-034 Terrain : cinematique reelle en charge, amplitude offset validee
-  [PASS] TC-P10-045.1 Benne partiellement fermee -&gt; remontee palier 1 seul
-  [PASS] TC-P10-046.1 Timeout mouvement pendant BUSY -&gt; defaut timeout + latch
-  [PASS] TC-P10-047.1 Incoherence boot : 1er cycle ni IsOpen ni IsClosed -&gt; StateIncoherent, ActiveOffsetValid=FALSE
-  [PASS] TC-P10-047.2 Boot incoherent IsOpen=TRUE ET IsClosed=TRUE -&gt; StateIncoherent
-  [PASS] TC-P10-048.1 Offset RETAIN : OffsetCloseM persiste apres power cycle
-         ASSERT_TRUE failed: BUCKETSTATE.STATEINCOHERENT expected TRUE, got FALSE
-         at test_fb_bucket.st:764
-         Message: Copy-out auto : BucketState.StateIncoherent restitue TRUE
-  [FAIL] T181-21 Copy-out VAR_IN_OUT : BucketState ecrit par FB_Bucket restitue a la variable de test
-
------------------------------------------
-24 tests, 21 passed, 3 failed
+        <pre>
+[VAR_IN_OUT] Assertions executees par le runner copy-out recompile; voir le resultat JSON final.
 </pre>
     </details>
 </div>

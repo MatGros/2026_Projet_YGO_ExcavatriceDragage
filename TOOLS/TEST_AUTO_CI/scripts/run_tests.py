@@ -213,7 +213,19 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
 
         converted_files = [str(converted_dir / s.name) for s in sources]
         out_cpp = converted_dir / f"{fb_name}.cpp"
-        tmp_root = pathlib.Path(tempfile.gettempdir())
+
+        # Un STruCpp --test cree son runner dans %TEMP%/strucpp-test-*.  Le
+        # balayage du TEMP global etait ambigu lorsque deux FB etaient lances
+        # en parallele : un processus pouvait reprendre le runner d'un autre
+        # FB et publier un faux rapport vert. Isole le TEMP de CE processus
+        # dans son repertoire de conversion; le runner retrouve est alors
+        # necessairement celui associe au couple FB/test courant.
+        tmp_root = converted_dir / "strucpp_tmp"
+        tmp_root.mkdir(parents=True, exist_ok=True)
+        strucpp_env = os.environ.copy()
+        strucpp_env["TEMP"] = str(tmp_root)
+        strucpp_env["TMP"] = str(tmp_root)
+        strucpp_env["TMPDIR"] = str(tmp_root)
         before = {p for p in tmp_root.glob("strucpp-test-*") if p.is_dir()}
 
         if debug:
@@ -222,7 +234,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         strucpp_cmd = [str(STRUCPP), *converted_files, "-o", str(out_cpp), "-O", "0", "--cxx-flags", "-O0 -pipe", "--test", str(test_file)]
         proc = subprocess.Popen(strucpp_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                  text=True, encoding="utf-8", cwd=str(converted_dir), bufsize=1,
-                                 creationflags=subproc_flags)
+                                 creationflags=subproc_flags, env=strucpp_env)
         lines = list(proc.stdout)
         proc.wait()
         t_comp = _time.perf_counter() - t_comp_start

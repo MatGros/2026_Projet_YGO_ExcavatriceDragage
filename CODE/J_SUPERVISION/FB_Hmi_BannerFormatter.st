@@ -324,10 +324,12 @@ DirectionBlocked := (CurrentDirection < 0 AND NOT DescendPermit)
 
 // 🩹 Signaler la cause du dernier abandon de séquence AU (message cause+action),
 // sans modifier le comportement de l'AU. Front descendant ArmingSeqStep (sequence en
-// cours -> 0) = abandon -> message maintenu 5s. Robuste aux abandons repetes (meme cause).
+// cours -> 0) = fin de sequence. Gating sur NOT PowerContactorEngaged : un SUCCES
+// (step 6 -> 0 avec contacteur engage) ne produit AUCUN message (AC4) ; seul un
+// ABANDON (step -> 0 sans contacteur engage) affiche la cause. Robuste aux abandons repetes.
 ArmingInProgress := (ArmingSeqStep <> 0);
 LastAbortEdge(CLK := ArmingInProgress);
-IF LastAbortEdge.Q THEN
+IF LastAbortEdge.Q AND NOT PowerContactorEngaged THEN
     AbortMsgActive := TRUE;
     TonAbortHold(IN := FALSE);
 END_IF;

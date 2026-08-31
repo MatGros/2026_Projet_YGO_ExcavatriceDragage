@@ -25,17 +25,17 @@ contract:
   # ── 2. Criteres testables ─────────────────────────────────────────────────
   acceptance:
     - id: AC1
-      statement: "Chaque branche silencieuse identifiée (165 PowerCutOff/coupe, 168 chute chaîne, 207/234 restauration, 145 autotest, front avalé) produit une erreur/message explicite (ErrorId bit dédié + message IHM cause/action) au lieu d'un retour silencieux."
-      verified_by: "table de vérité : pour chaque signal d'échec injecté, un ErrorId/message distinct est observé (test unitaire ou snapshot)"
+      statement: "Chaque branche silencieuse identifiée (165 PowerCutOff/coupe, 168 chute chaîne, 207/234 restauration, 145 autotest, front avalé) produit un message IHM explicite (cause + action) au lieu d'un retour silencieux. Le signal est le MESSAGE IHM (via LastAbortCause), pas nécessairement ErrorId (décision utilisateur : ne pas modifier l'AU)."
+      verified_by: "table de vérité : pour chaque signal d'échec injecté, un message distinct est observé (test unitaire ou snapshot)"
     - id: AC2
       statement: "L'interlock de sécurité reste inchangé : jamais l'Ack n'ouvre l'arbitrage ; la Cause brute reste l'arbitre de Cmd/Armable (même logique qu'avant)."
       verified_by: "grep : aucune occurrence de l'Ack dans les conditions de Cmd.Maintain*, Cmd.ArmPulse, Armable ; lecture §7 Logic"
     - id: AC3
       statement: "Un message IHM présente cause + action : l'utilisateur sait POURQUOI (ex. 'chaîne d'urgence tombée pendant le test') et QUOI faire (ex. 'relâcher les coup-de-poing, puis réarmer')."
-      verified_by: "présence mapping ErrorId → (cause, action) dans l'IHM/affichage, revue humaine"
+      verified_by: "présence mapping LastAbortCause → (cause, action) dans FB_Hmi_BannerFormatter, revue humaine"
     - id: AC4
-      statement: "Un échec produit ErrorId ≠ 0 ET ArmingFailed (ou équivalent) ; un succès nominal ne produit aucun message (régression évitée)."
-      verified_by: "tests unitaires nominal (ErrorId=0) + échecs (ErrorId≠0)"
+      statement: "Un abandon de séquence produit un message IHM (AbortMsgActive) ; un succès nominal ne produit aucun message (régression évitée). ErrorId peut rester 0 pour les timeouts restauration A/B : le signal est le message."
+      verified_by: "tests unitaires nominal (aucun message) + abandons (message présent)"
     - id: AC5
       statement: "La coupure volontaire (BtnEmergencyCutOff) est distinguée d'un défaut (tracée mais pas alarmée comme anomalie)."
       verified_by: "table de vérité : BtnEmergencyCutOff → trace 'coupe volontaire', pas d'alarme défaut"
@@ -49,11 +49,13 @@ contract:
   # ── 3. Perimetre ──────────────────────────────────────────────────────────
   scope:
     allowed:
-      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st    # séquence : poser Cause/ErrorId sur chaque sortie anormale
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st    # séquence : poser Cause/ErrorId sur chaque sortie anormale (si décidé)
       - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st         # propagation erreurs/messages
       - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementOutput.st   # buses State/Diag si besoin
       - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/                # struct diag AU si nouveau champ
       - CODE/J_SUPERVISION/FB_TroubleshootingView.st                # exposition snapshot
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st                # message IHM cause+action (décision utilisateur : signalement en aval)
+      - CODE/M_MAIN/PRG_07_Supervision.st                           # câblage LastAbortCause/ArmingSeqStep vers formateur
       - DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md + sous-fiche FB_Safety_EmergencyManagement_v1.2.md  # doc du nouveau comportement
     forbidden:
       - Code safety procédé (PRG_04/05, FB_Safety_Winch, FB_Safety_Translation, PRG_06_Outputs)  # hors scope
@@ -81,17 +83,29 @@ contract:
     arbitrage : un acquittement ne doit jamais lever une Cause bruter. Toute divergence avec la
     spec AF-01 (pattern Cause/Ack, auto-test) remontée immédiatement.
 
-status: PENDING
+status: READY_FOR_REVIEW
 
 execution:
-  executed_by: ""
-  completed_at: ""
-  status: PENDING
-  summary: ""
-  evidence_submitted: []
+  executed_by: "DSH/Claude (orchestrateur) + challenge 2 agents"
+  completed_at: "2026-08-31T04:30:00+02:00"
+  status: READY_FOR_REVIEW
+  summary: >
+    Signalement IHM des sorties silencieuses du réarmement AU, SANS modifier le comportement
+    de la séquence AU (décision utilisateur). FB_Hmi_BannerFormatter.st : ajout entrée
+    LastAbortCause + ArmingSeqStep, F_TRIG sur ArmingInProgress (front descendant = fin de
+    séquence) gated sur NOT PowerContactorEngaged (succès = aucun message, abandon = message),
+    mapping CASE LastAbortCause -> message cause+action maintenu 5s, priorité §4 avant
+    RedundancyTestFailed/EmergencyArmingFailed. PRG_07_Supervision.st : câblage
+    ArmingSeqStep/LastAbortCause. Contrat amendé (AC1/AC4 = message IHM pas ErrorId, scope étendu).
+    G200 liaison PASS (0 erreur). Gates fichiers modifiés ALL PASSED.
+  evidence_submitted:
+    - check_linkage: PASS (0 erreur, 1567 instances)
+    - run_all_gates_files: PASS (FB_Hmi_BannerFormatter.st + PRG_07_Supervision.st)
+    - bundle_freshness: PASS (CODE_XML/CODE_Bundle.xml frais)
+    - challenge_final: AC4 satisfait (succès nominal = aucun message, abandon = message)
 
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
-  notes: ""
+  notes: "En attente de validation humaine (snapshot simulation boot + verdict)."
