@@ -3326,7 +3326,7 @@ tasks:
   bloque_par: []
 - id: T181-00
   parent_id: T181
-  statut: ⏳
+  statut: ⛔
   criticite: C4
   domaine: TEST_AUTO_CI
   agent: ''
@@ -3366,10 +3366,10 @@ tasks:
     phase)
   - Liste des vecteurs croisée avec les CAS-xxx de T180 (au moins CAS-001, CAS-012)
   bloque_par:
-  - T169-A
+  - 'CODESYS: verification 32/32 requiert execution reelle (hors portee agent)'
 - id: T181-00b
   parent_id: T181-00
-  statut: ⏳
+  statut: ⛔
   criticite: C3
   domaine: TEST_AUTO_CI
   agent: Codex — stimulus réel WINCH_INTEG en cours
@@ -3387,7 +3387,8 @@ tasks:
   - Montées palier >1 avec benne fermée cohérente
   - RestartRequired purgé avant stimulus nominal
   - Vrais rouges fonctionnels distingués des rouges de stimulus
-  bloque_par: []
+  bloque_par:
+  - 'CODESYS: verification 32/32 requiert execution reelle (hors portee agent)'
 - id: T181-01
   parent_id: T181
   statut: ⏳
