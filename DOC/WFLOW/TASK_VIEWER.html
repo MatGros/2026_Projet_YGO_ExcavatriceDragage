@@ -343,14 +343,157 @@
             #task-table td[data-label]::before { content: attr(data-label); display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; }
             .modal-box { width: calc(100% - 24px) !important; max-width: none !important; }
         }
+
+        /* ===== Encart Orchestrateur (accordéon) — bloc dissocié du tableau ===== */
+        /* Thème harmonisé avec le reste (fond neutre, bordure discrète) — plus de surlignage orange */
+        .orchestrator-section {
+            margin-top: 18px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .orchestrator-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #191a21;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 13px;
+            padding: 10px 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s;
+        }
+        .orchestrator-toggle:hover { border-color: var(--accent); }
+        .orch-chevron { transition: transform 0.2s; font-size: 11px; }
+        .orchestrator-section.open .orch-chevron { transform: rotate(90deg); }
+        .orch-count { margin-left: auto; font-size: 11px; color: var(--subtext); font-weight: normal; }
+        .orch-refresh { font-size: 13px; color: var(--subtext); cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+        .orch-refresh:hover { color: var(--cyan); background: rgba(255,255,255,0.05); }
+        .orchestrator-panel {
+            display: none;
+            margin-top: 8px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        .orchestrator-section.open .orchestrator-panel { display: block; }
+        .orch-panel-note {
+            font-size: 11px;
+            color: var(--subtext);
+            background: rgba(0,0,0,0.2);
+            border: 1px dashed var(--border);
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin-bottom: 10px;
+        }
+        .orch-card {
+            background: #21222c;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+        .orch-card:last-child { margin-bottom: 0; }
+        /* En-tête de carte cliquable : déplie / replie le détail de l'entrée */
+        .orch-head { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; cursor: pointer; user-select: none; }
+        .orch-head:hover .orch-id { border-color: var(--accent); }
+        .orch-card-chevron { transition: transform 0.2s; font-size: 11px; color: var(--subtext); }
+        .orch-card.open .orch-card-chevron { transform: rotate(90deg); }
+        .orch-id { background: rgba(189,147,249,0.15); color: var(--accent); border: 1px solid var(--accent); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace; }
+        .orch-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .orch-type-tache { background: rgba(139,233,253,0.15); color: var(--cyan); }
+        .orch-type-diagnostic { background: rgba(255,184,108,0.15); color: var(--orange); }
+        .orch-type-conception { background: rgba(241,250,140,0.15); color: #f1fa8c; }
+        .orch-type-action { background: rgba(80,250,123,0.15); color: var(--green); }
+        .orch-type-recherche { background: rgba(255,121,198,0.15); color: #ff79c6; }
+        .orch-type-outillage { background: rgba(98,114,164,0.2); color: #c9d1ff; }
+        .orch-prio-haute { background: rgba(255,85,85,0.2); color: var(--red); }
+        .orch-prio-moyenne { background: rgba(255,184,108,0.2); color: var(--orange); }
+        .orch-statut-termine { background: rgba(80,250,123,0.2); color: var(--green); }
+        .orch-statut-en_attente { background: rgba(139,233,253,0.2); color: var(--cyan); }
+        .orch-statut-en_cours { background: rgba(255,184,108,0.2); color: var(--orange); }
+        .orch-agent { font-family: monospace; font-size: 11px; color: var(--subtext); }
+        .orch-date { font-family: monospace; font-size: 11px; color: var(--subtext); }
+        .orch-sujet { font-size: 13px; font-weight: bold; color: var(--text); margin-bottom: 6px; }
+        /* Détail replié par défaut ; déplié quand la carte a la classe .open */
+        .orch-detail { display: none; }
+        .orch-card.open .orch-detail { display: block; }
+        .orch-field { margin-top: 6px; }
+        .orch-label { font-size: 10px; font-weight: bold; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; }
+        .orch-text { font-size: 12px; line-height: 1.5; color: var(--text); white-space: pre-line; }
+        .orch-verdict { background: rgba(0,0,0,0.3); border-left: 3px solid var(--accent); padding: 6px 10px; border-radius: 4px; }
+        .orch-decision { background: rgba(0,0,0,0.3); border-left: 3px solid var(--green); padding: 6px 10px; border-radius: 4px; }
+        .orch-note { background: rgba(0,0,0,0.3); border-left: 3px solid var(--cyan); padding: 6px 10px; border-radius: 4px; }
+        .orch-empty { color: var(--subtext); font-size: 13px; font-style: italic; padding: 10px; }
+
+        /* ===== Tableau général des tâches (accordéon) — déployé par défaut ===== */
+        .tasks-section {
+            margin-top: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .tasks-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #191a21;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 13px;
+            padding: 10px 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s;
+        }
+        .tasks-toggle:hover { border-color: var(--accent); }
+        .tasks-chevron { transition: transform 0.2s; font-size: 11px; }
+        .tasks-section.open .tasks-chevron { transform: rotate(90deg); }
+        .tasks-panel { margin-top: 8px; }
+        .tasks-section:not(.open) .tasks-panel { display: none; }
+        /* Compteurs rattachés au bloc tableau */
+        .tasks-panel .tasks-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        /* Barre d'outils rattachée au tableau : bandeau interne du bloc tâches */
+        .tasks-panel .controls-wrapper {
+            background: rgba(0,0,0,0.18);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="title">🗂️ TASK VIEWER — CATALOGUE DES TÂCHES</div>
-        <div class="stats" id="stats"></div>
     </div>
     
+    <!-- 🗂️ Tableau général des tâches — déployé par défaut, repliable d'un clic -->
+    <div class="tasks-section open" id="tasks-section">
+        <button class="tasks-toggle" onclick="toggleTasks()" title="Afficher / masquer le tableau des tâches">
+            <span class="tasks-chevron" id="tasks-chevron">▶</span>
+            🗂️ TABLEAU DES TÂCHES
+        </button>
+        <div class="tasks-panel" id="tasks-panel">
+    <div class="tasks-stats" id="stats"></div>
     <div class="controls-wrapper">
         <!-- Ligne 1 : Recherche, Tri & Actions globales -->
         <div class="controls-row">
@@ -401,9 +544,6 @@
             <button class="filter-btn" onclick="setDomain('CYCLE', this)">⚙️ Cycle</button>
         </div>
     </div>
-
-
-    
     <div class="table-container">
         <table id="task-table">
             <thead>
@@ -421,6 +561,28 @@
             </thead>
             <tbody id="table-body"></tbody>
         </table>
+    </div>
+        </div>
+    </div>
+
+    <!-- 🤖 Encart Orchestrateur — Registre des agents & verdicts (accordéon) -->
+    <div class="orchestrator-section" id="orchestrator-section">
+        <button class="orchestrator-toggle" onclick="toggleOrchestrator()" title="Afficher / masquer le registre des agents (TASKS_ORCHESTRATOR.yaml)">
+            <span class="orch-chevron" id="orch-chevron">▶</span>
+            🤖 ORCHESTRATEUR — Registre des agents &amp; verdicts
+            <span class="orch-count" id="orch-count"></span>
+            <span class="orch-refresh" onclick="event.stopPropagation(); loadOrchestrator(true);" title="Recharger TASKS_ORCHESTRATOR.yaml">🔄</span>
+        </button>
+        <div class="orchestrator-panel" id="orchestrator-panel">
+            <div class="orch-panel-note">📌 Registre en lecture seule — <strong>auto-nettoyage</strong> : les entrées <code>terminé</code> sont masquées par défaut (source : TASKS_ORCHESTRATOR.yaml)</div>
+            <div class="controls-row" style="background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 10px;">
+                <span style="font-size: 11px; font-weight: bold; color: var(--subtext); text-transform: uppercase;">Filtre :</span>
+                <button class="filter-btn active" id="orch-filter-active" onclick="setOrchFilter('ACTIVE', this)">🔄 Actives</button>
+                <button class="filter-btn" id="orch-filter-termine" onclick="setOrchFilter('TERMINE', this)">✅ Terminées</button>
+                <button class="filter-btn" id="orch-filter-all" onclick="setOrchFilter('ALL', this)">📋 Toutes</button>
+            </div>
+            <div id="orchestrator-body"></div>
+        </div>
     </div>
 
     <!-- Modal d'Édition / Création de Tâche -->
@@ -1796,6 +1958,163 @@
     }
     refreshServerHealth();
     setInterval(refreshServerHealth, 3000);
+    </script>
+
+    <script>
+    /* ============================================================
+       🤖 ORCHESTRATEUR — Registre des agents & verdicts
+       Source : TASKS_ORCHESTRATOR.yaml (liste plate : id, date, type,
+       priorite, agent_id, sujet, statut, livrable, verdict,
+       decision, note).
+       Mécanisme identique à TASKS.yaml : fetch local avec fallback
+       sur données embarquées (mode file:// où le fetch est bloqué).
+       ============================================================ */
+    const defaultOrchestrator = [
+        {"id":"T188","date":"2026-08-31","type":"tache","priorite":"haute","agent_id":"5e4146cc","sujet":"Vérification implémentation T188 (bit-identique + SimBench)","statut":"terminé","livrable":"DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T188.yaml (à mettre à jour)","verdict":"ÉCARTS — PAS bit-identique (5 écarts: A interlock hauteur M3, B Direction Select=0, C priorité boutons, D source BothIntent, E SpeedPct→StepTgt). Raccordement PRG_04/05 OK, SimBench OK, aucun mouvement non commandé.","decision":"Option A actée — documenter écarts A/D/E comme décisions, B/C laissés en edge cases.","note":"T188 réouverte (⏳) pour documentation des écarts + mise à jour contrat."},
+        {"id":"DIAG-SYNCHRO","date":"2026-08-31","type":"diagnostic","priorite":"haute","agent_id":"447b5a8b","sujet":"Diagnostic synchro M1/M2 + échec silencieux réarmement AU","statut":"terminé","livrable":"DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_SynchroM1M2_RedUrgence_20260831.md","verdict":"Cause 1: défaut synchro LATCHÉ (SyncDelta=-9.32m>0.5m, SyncFaultActive=TRUE) + SyncActive forcé TRUE par mode. Cause 2: abandon armement step5 cause 16#0010 (PowerCutOff) ne pose PAS de cause → échec silencieux.","decision":"Option 1: réduire écart + Reset. Option 2: message IHM explicite + reset enchaîné (→ T173-B).","note":"Relancé après saturation contexte 62a3d2a4 (boucle lecture). Périmètre resserré + anti-boucle."},
+        {"id":"DIAG-TRANSLATION","date":"2026-08-31","type":"diagnostic","priorite":"haute","agent_id":"8fd6a6b6","sujet":"Investigation translation M3 en simulation (SimBench)","statut":"terminé","livrable":"Rapport verbal (flux translation simu + verdict)","verdict":"Translation M3 PAS cassée ni bloquée par PowerCutOff. Non commandée: mode DISABLE (Enable=FALSE) + AU non engagé + défaut synchro latched. SimBench simule bien capteurs M3 (11111=Trémie). DISCREPANCE: PowerCutOffRequest=FALSE actuellement.","decision":"Débloquer état global (Reset synchro + réarmer AU + mode MAINT) avant de tester translation.","note":"Relancé après saturation contexte fc71fc72. Suspect: commit fc8115d9 ArmingPermit [NON TESTE]."},
+        {"id":"TROUBLESHOOTING-M123","date":"2026-08-31","type":"conception","priorite":"moyenne","agent_id":"0b13089a","sujet":"Conception vue troubleshooting M1/M2/M3 (top-down inputs→logique→sorties)","statut":"terminé","livrable":"Rapport verbal (audit structure + conception structs + trous d'acquisition)","verdict":"Structure DÉJÀ top-down et typée (ST_ChainWinch/Translation: Inputs_100→Demandes_200→Safety_300→Control_400→Outputs_500). M1/M2 OK. M3 = maillon faible: pas de permis Fwd/Rev (T184), intention M3 non publiée (A1), permis directionnels manquants (A2).","decision":"T184 prérequis (permits directionnels M3) + publier intention M3 + corriger checklists.","note":"5 trous d'acquisition A1-A5, dont 2 bloquants (A1/A2) → intégrés à T184."},
+        {"id":"T184","date":"2026-08-31","type":"action","priorite":"moyenne","agent_id":"DSH (DeepSeek)","sujet":"Permits directionnels M3 (Fwd/Rev) + trous A1/A2 troubleshooting","statut":"en_attente","livrable":"DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T184_PERMITS_DIRECTIONNELS_M3.yaml","verdict":"Prérequis validé. M3 n'a aucun permit directionnel; proxy non-directionnel Step6_DirectionAllowed à corriger. Trous A1 (publier M3_Direction_Active) + A2 (Fwd/RevPermit) intégrés.","decision":"Plan d'implémentation à valider humainement avant code (safety-adjacent).","note":"Verrouillée 2026-08-31 (⏳). Prérequis débogage M3 directionnel."},
+        {"id":"T192","date":"2026-08-31","type":"action","priorite":"haute","agent_id":"—","sujet":"Safety cycles — défaut latché + reprise consciente (S1+S2)","statut":"en_attente","livrable":"—","verdict":"Constats S1 (FB_Cycle:324 teste NOT Fault.Error au lieu de NOT Fault.Latched) + S2 (WaitingResume code mort).","decision":"Gater X0→X1 sur NOT Fault.Latched + reprise consciente BtnStart.","note":"Prochaine action prioritaire (sécurité)."},
+        {"id":"T193","date":"2026-08-31","type":"action","priorite":"haute","agent_id":"—","sujet":"Permis fail-safe FALSE + ArmingPulse + RateInterlock (S3+S4+S5)","statut":"en_attente","livrable":"—","verdict":"S3 DescendPermit/AscentPermit := TRUE par défaut (contraire fail-safe NC-100). S4 EmergencyArmingPulseActive jamais affectée. S5 dette FB_WinchRateInterlock.","decision":"Passer permis à FALSE + affecter ArmingPulse + trancher RateInterlock.","note":"Prochaine action prioritaire (sécurité)."},
+        {"id":"T196","date":"2026-08-31","type":"action","priorite":"moyenne","agent_id":"AGENT EXTERNE","sujet":"État ouvert/fermé benne absent en simulation","statut":"en_attente","livrable":"—","verdict":"Bug signalé: état benne ne se met pas à jour en simu. Peut être lié au refactor FB_BucketCmdArbitration.","decision":"Diagnostic chaîne commande→FB_Bucket→état→IHM.","note":"Confié à un agent externe (TASK_LOCKS.json)."},
+        {"id":"TASKVIEWER-ORCH","date":"2026-08-31","type":"outillage","priorite":"moyenne","agent_id":"afe7ccb5","sujet":"Intégrer TASKS_ORCHESTRATOR.yaml dans le task viewer (encart déroulant)","statut":"en_cours","livrable":"DOC/WFLOW/TASK_VIEWER.html (modifié)","verdict":"—","decision":"Encart déroulant sur la même page du task viewer pour voir l'état de l'orchestrator.yaml.","note":"Fichier renommé TASKS_ORCHESTRATOR.yaml (homogène avec TASKS.yaml)."},
+        {"id":"T184-RECHERCHE","date":"2026-08-31","type":"recherche","priorite":"haute","agent_id":"eeeef0e3","sujet":"Tracer chaîne complète permis directionnels M1/M2 (modèle pour T184/M3)","statut":"en_cours","livrable":"Rapport verbal (formule AscentPermit/DescendPermit + chaîne source→taxonomie→IHM)","verdict":"—","decision":"Modèle de référence pour mirroir M3 dans T184.","note":"Recherche approfondie demandée par l'utilisateur avant implémentation T184."}
+    ];
+
+    let orchestratorData = [...defaultOrchestrator];
+    let orchestratorLoaded = false;
+    // Filtre orchestrateur : 'ACTIVE' (défaut, masque les terminé) | 'TERMINE' | 'ALL'
+    let orchFilter = 'ACTIVE';
+
+    function parseOrchestratorYaml(text) {
+        const lines = text.split(/\r?\n/);
+        const list = [];
+        let cur = null;
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith('#')) continue;
+            const start = line.match(/^-\s+id:\s*"?([^"\r\n]+)"?/);
+            if (start) {
+                if (cur) list.push(cur);
+                cur = { id: start[1].trim(), date:'', type:'', priorite:'', agent_id:'', sujet:'', statut:'', livrable:'', verdict:'', decision:'', note:'' };
+                continue;
+            }
+            if (!cur) continue;
+            const kv = line.match(/^\s+([a-zA-Z0-9_]+):\s*(.*)$/);
+            if (kv) {
+                const key = kv[1];
+                let val = kv[2].trim();
+                val = val.replace(/^["'](.*)["']$/, '$1');
+                cur[key] = val;
+            }
+        }
+        if (cur) list.push(cur);
+        return list;
+    }
+
+    function orchBadgeClass(prefix, value) {
+        return prefix + '-' + String(value).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+    }
+
+    function orchEsc(s) {
+        return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // Déplie / replie le détail d'une entrée orchestrateur (accordéon par carte)
+    function toggleOrchCard(idx) {
+        const card = document.getElementById('orch-card-' + idx);
+        if (!card) return;
+        card.classList.toggle('open');
+    }
+
+    // Change le filtre de statut de l'orchestrateur et re-rend les cartes
+    function setOrchFilter(mode, btn) {
+        orchFilter = mode;
+        document.querySelectorAll('#orchestrator-panel .filter-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        renderOrchestrator();
+    }
+
+    function renderOrchestrator() {
+        const body = document.getElementById('orchestrator-body');
+        const count = document.getElementById('orch-count');
+        if (!body) return;
+        // Filtrage par statut : par défaut on masque les entrées 'terminé' (auto-nettoyage)
+        const filtered = orchestratorData.filter(e => {
+            if (orchFilter === 'ACTIVE') return e.statut !== 'terminé';
+            if (orchFilter === 'TERMINE') return e.statut === 'terminé';
+            return true; // 'ALL'
+        });
+        if (count) count.textContent = '(' + filtered.length + '/' + orchestratorData.length + ' entrée' + (orchestratorData.length > 1 ? 's' : '') + ')';
+        if (!filtered.length) {
+            body.innerHTML = '<div class="orch-empty">' + (orchFilter === 'TERMINE' ? 'Aucune entrée terminée.' : 'Aucune entrée active.') + '</div>';
+            return;
+        }
+        body.innerHTML = filtered.map((e, idx) => {
+            const typeCls = orchBadgeClass('orch-type', e.type || '');
+            const prioCls = orchBadgeClass('orch-prio', e.priorite || '');
+            const statCls = orchBadgeClass('orch-statut', e.statut || '');
+            return `
+            <div class="orch-card" id="orch-card-${idx}">
+                <div class="orch-head" onclick="toggleOrchCard(${idx})" title="Déplier / replier le détail">
+                    <span class="orch-card-chevron">▶</span>
+                    <span class="orch-id">${orchEsc(e.id)}</span>
+                    <span class="orch-badge ${typeCls}">${orchEsc(e.type)}</span>
+                    <span class="orch-badge ${prioCls}">${orchEsc(e.priorite)}</span>
+                    <span class="orch-badge ${statCls}">${orchEsc(e.statut)}</span>
+                    <span class="orch-agent">🤖 ${orchEsc(e.agent_id)}</span>
+                    <span class="orch-date">📅 ${orchEsc(e.date)}</span>
+                </div>
+                <div class="orch-sujet">${orchEsc(e.sujet)}</div>
+                <div class="orch-detail">
+                    ${e.livrable ? `<div class="orch-field"><div class="orch-label">📦 Livrable</div><div class="orch-text">${orchEsc(e.livrable)}</div></div>` : ''}
+                    ${e.verdict ? `<div class="orch-field"><div class="orch-label">⚖️ Verdict</div><div class="orch-text orch-verdict">${orchEsc(e.verdict)}</div></div>` : ''}
+                    ${e.decision ? `<div class="orch-field"><div class="orch-label">🎯 Décision</div><div class="orch-text orch-decision">${orchEsc(e.decision)}</div></div>` : ''}
+                    ${e.note ? `<div class="orch-field"><div class="orch-label">📝 Note</div><div class="orch-text orch-note">${orchEsc(e.note)}</div></div>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    async function loadOrchestrator(force = false) {
+        if (orchestratorLoaded && !force) return;
+        try {
+            const res = await fetch('TASKS_ORCHESTRATOR.yaml?' + Date.now());
+            if (res.ok) {
+                const text = await res.text();
+                const parsed = parseOrchestratorYaml(text);
+                if (parsed && parsed.length > 0) {
+                    orchestratorData = parsed;
+                    orchestratorLoaded = true;
+                    renderOrchestrator();
+                    return;
+                }
+            }
+        } catch (e) {
+            // fetch local bloqué (file:// CORS) → fallback sur données embarquées
+        }
+        orchestratorData = [...defaultOrchestrator];
+        orchestratorLoaded = true;
+        renderOrchestrator();
+    }
+
+    function toggleOrchestrator() {
+        const section = document.getElementById('orchestrator-section');
+        if (!section) return;
+        section.classList.toggle('open');
+        if (section.classList.contains('open')) loadOrchestrator();
+    }
+
+    function toggleTasks() {
+        const section = document.getElementById('tasks-section');
+        if (!section) return;
+        section.classList.toggle('open');
+    }
+
+    // Chargement initial silencieux (données prêtes dès l'ouverture de l'accordéon)
+    loadOrchestrator();
     </script>
 </body>
 </html>

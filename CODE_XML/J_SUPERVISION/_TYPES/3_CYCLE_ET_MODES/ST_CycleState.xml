@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:13:33.920836" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:13:33.920836">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:12:59.460411" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:12:59.460411">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -191,15 +191,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Mouvement joystick actif</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MotionPermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Homme-mort + axe Y actif (CycleMotionPermit)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Joystick défléchi (non centré) — même signal que CycleMotionPermit (FB_Cycle) ; SANS homme-mort</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStepAtError">
