@@ -28250,186 +28250,6 @@ Duree auto-test canal A ou B</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Anti-clignotement affichage IHM uniquement</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_STEP_IDLE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAPES SEQUENCE REARMEMENT (ArmingSeqStep reste INT) ===
-Repos</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_STEP_TEST_A">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autotest canal A</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_STEP_RESTORE_A">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Restauration canal A</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_STEP_TEST_B">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autotest canal B</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_STEP_RESTORE_B">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="4" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Restauration canal B</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_STEP_PULSE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion rearmement contacteur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_STEP_CONFIRM">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="6" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente confirmation contacteur</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ABORT_NONE">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES D'ABANDON (LastAbortCause, valeurs load-bearing IHM) ===
-⚠️ Type INT (décimal) : valeurs identiques aux anciens masques hex (1,2,4,8,16,32,64,128).
-LastAbortCause reste WORD (bitfield) : conversion implicite INT→WORD en CODESYS.
-Aucun abandon</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ABORT_CUT_IHM">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure manuelle IHM</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ABORT_CHAIN_DROP">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Chute boucle AU pendant impulsion/confirmation</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ABORT_TIMEOUT_RESTORE_A">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="4" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout restauration canal A</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ABORT_TIMEOUT_RESTORE_B">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="8" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout restauration canal B</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ABORT_POWER_CUTOFF">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="16" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure securite metier (PowerCutOff)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ABORT_REDUNDANCY_A">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="32" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut redondance canal A</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ABORT_REDUNDANCY_B">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="64" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut redondance canal B</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_ABORT_TIMEOUT_CONTACTOR">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="128" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout confirmation contacteur</xhtml>
-              </documentation>
-            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -47543,6 +47363,211 @@ instTroubleshootingView(
       </globalVars>
     </data>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
+      <globalVars name="GVL_Safety_Emergency_Constants" constant="true">
+        <variable name="CST_STEP_IDLE">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETAPES SEQUENCE REARMEMENT (ArmingSeqStep reste INT) ===
+Repos</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_TEST_A">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Autotest canal A</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_RESTORE_A">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="2" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Restauration canal A</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_TEST_B">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="3" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Autotest canal B</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_RESTORE_B">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="4" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Restauration canal B</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_PULSE">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="5" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion rearmement contacteur</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_STEP_CONFIRM">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="6" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente confirmation contacteur</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_NONE">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES D'ABANDON (LastAbortCause, valeurs load-bearing IHM) ===
+⚠️ Type INT (décimal) : valeurs identiques aux anciens masques hex (1,2,4,8,16,32,64,128).
+LastAbortCause reste WORD (bitfield) : conversion implicite INT→WORD en CODESYS.
+Aucun abandon</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_CUT_IHM">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure manuelle IHM</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_CHAIN_DROP">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="2" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Chute boucle AU pendant impulsion/confirmation</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_TIMEOUT_RESTORE_A">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="4" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout restauration canal A</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_TIMEOUT_RESTORE_B">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="8" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout restauration canal B</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_POWER_CUTOFF">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="16" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure securite metier (PowerCutOff)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_REDUNDANCY_A">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="32" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut redondance canal A</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_REDUNDANCY_B">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="64" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut redondance canal B</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CST_ABORT_TIMEOUT_CONTACTOR">
+          <type>
+            <INT />
+          </type>
+          <initialValue>
+            <simpleValue value="128" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Timeout confirmation contacteur</xhtml>
+          </documentation>
+        </variable>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>4a06a006-d4b4-5486-9390-2bd7d17e0c27</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ GVL_Safety_Emergency_Constants — Constantes globales chaîne AU
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Constantes symboliques de la séquence de réarmement AU —
+      étapes CST_STEP_* et causes d'abandon CST_ABORT_* — partagées
+      entre POU. Sorties du bloc `VAR CONSTANT` local du FB
+      FB_Safety_EmergencyManagement (conformité IEC : CODESYS refuse
+      les constantes locales d'un FUNCTION_BLOCK comme étiquettes de
+      CASE — erreur C0218). En `VAR_GLOBAL CONSTANT`, elles sont des
+      labels de CASE valides.
+   🔒 Sécurité : valeurs figées par conception (étapes 0..6, causes
+      bitfield 1,2,4,8,16,32,64,128) — jamais modifiables à l'exécution.
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </globalVars>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Simulation">
         <variable name="SimulationModeActive">
           <type>
@@ -48284,6 +48309,7 @@ TRUE = Kobold détecte un contact fond simulé</xhtml>
         </Folder>
         <Folder Name="B_AU_SECURITE">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
+          <Object Name="GVL_Safety_Emergency_Constants" ObjectId="4a06a006-d4b4-5486-9390-2bd7d17e0c27" />
           <Folder Name="_TYPES">
             <Object Name="ST_Safety_Emergency_Cmd" ObjectId="c95cff59-9ed1-568b-a37b-15a3870e9e72" />
             <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />

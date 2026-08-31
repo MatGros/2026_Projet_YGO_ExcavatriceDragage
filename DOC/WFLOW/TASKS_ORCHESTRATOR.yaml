@@ -819,6 +819,18 @@
   decision: "—"
   note: "Demande utilisateur: préférer INT à HEX sauf exception client/technique. Suite conversion CST_ABORT_* en INT. Audit read-only."
 
+- id: "C0218-FIX2"
+  date: "2026-08-31"
+  type: "tache"
+  priorite: "haute"
+  agent_id: "b01d381d"
+  sujet: "Corriger C0218 (CASE constantes locales) + migration IHM Visualization_1"
+  statut: "en_cours"
+  livrable: "GVL constantes CST_STEP_* + FB CASE + T197_BINDINGS_IHM_MIGRATION.md + bundle + G200"
+  verdict: "—"
+  decision: "—"
+  note: "Utilisateur a confirmé: CODESYS refuse les constantes locales VAR CONSTANT comme labels de CASE (IEC). Déplacer CST_STEP_* en GVL (ou littéraux). + migration IHM bindings."
+
 - id: "T201-PLAN"
   date: "2026-08-31"
   type: "planification"
