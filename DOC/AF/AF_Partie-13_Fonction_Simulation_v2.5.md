@@ -1,4 +1,4 @@
-# 🧪 Analyse Fonctionnelle — Partie 13 : Simulation (v2.4)
+# 🧪 Analyse Fonctionnelle — Partie 13 : Simulation (v2.5)
 
 > **Projet** : Excavatrice de dragage — CODESYS 3.5
 > **Statut** : référence active · décision documentaire préalable au retrait de `PRG_01/FB_Input`
@@ -307,6 +307,11 @@ Le sélecteur est atomique par domaine : `HwIn.<Domaine> := HwSim.<Domaine>` ou
 > Il ne dépend plus de la position M1. Seul le stimulus manuel `SimTopPositionActive` injecte un fait
 > capteur (capteur actif ⇒ `M1M2_TopPositionFree_DI := FALSE`). Le modèle piloté par la position M1
 > (`TopPositionModelActive`/`CfgTopSensorRawPos`) a été retiré — **régression `fc8115d9` corrigée**.
+
+> 🎯 **Procédure homing en simulation** : le homing auto (T173 / `FB_MachineHomingCycle`) dépend du
+> capteur TOP (`TopPositionActive = SimTopPositionActive`, `PRG_02:436`). Le capteur TOP simulé étant
+> **libre par défaut**, l'opérateur **doit poser `SimTopPositionActive=TRUE`** pour déclencher le
+> homing nominal/conjoint en simulation. Sans ce stimulus, le cycle reste en `NEED_TOP_POSITION`.
 
 Au front descendant du bit maître, tous les flags de domaine et stimuli ci-dessus reprennent leurs
 valeurs nominales. Les positions codeurs persistantes ne sont pas des stimuli et ne sont pas effacées.
