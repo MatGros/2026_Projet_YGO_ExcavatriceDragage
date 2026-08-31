@@ -4124,13 +4124,14 @@ tasks:
   bloque_par: []
 - id: T184
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: TRANSLATION / SECURITE / IHM
   agent: DSH (DeepSeek)
   date: '2026-08-31T02:30:00+02:00'
+  completed_at: '2026-08-31T00:00:00'
   titre: Homogénéisation cohérence « sens par axe » M1/M2/M3 — permit directionnel
-    M3 (Fwd/Rev) + nettoyage redondance MotionPermit
+    M3 (TremiePermit/MaintenancePermit) + nettoyage redondance MotionPermit
   contexte: 'Audit cohérence WT5_SIMBENCH (verdict MAJOR) : M1/M2 exposent un permit
     directionnel exemplaire (FB_Safety_Winch.AscentPermit/DescendPermit → EffectivePermitM1/M2_*
     → GVL_IHM.M1TreuilRetenue.Safety / M2TreuilBenne.Safety), producteur unique respecté.
@@ -5154,3 +5155,94 @@ tasks:
     toujours cohérents'
   - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS'
   bloque_par: []
+- id: T204
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: TRANSLATION / SECURITE / IHM
+  agent: DSH-02
+  date: '2026-08-31T00:00:00'
+  titre: 'Enforcement des permits directionnels M3 en gate de commande'
+  contexte: 'Intitulé complet : Rendre les permits directionnels M3 (TremiePermit/MaintenancePermit)
+    effectifs en gate de commande — bloquer réellement le mouvement vers un sens non
+    autorisé, à l''unisson des treuils M1/M2 (FB_Winch.st:163 EffectiveSafeStop).'
+  description: 'Complément de T184 (qui crée + projette les permits M3 mais ne les
+    enforcent PAS en gate — contrat T184 dit « sans changer aucun blocage de mouvement »).
+    Objectif : pour chaque axe/drive, avant de lancer une commande de mouvement dans
+    un sens, vérifier le permit directionnel (TremiePermit/MaintenancePermit) et bloquer
+    réellement le mouvement si le sens n''est pas autorisé. Modèle : FB_Winch.st:163
+    (EffectiveSafeStop := SafeStop OR (Direction>0 AND NOT AscentPermit) OR (Direction<0
+    AND NOT DescendPermit)). Point d''insertion à déterminer (FB_TranslationCmdArbitrationM3
+    ou FB_Translation). Bits IHM déjà projetés (GVL_IHM.TranslationM3.Safety).'
+  contrat: ''
+  objectifs:
+  - 'Les permits directionnels M3 (TremiePermit/MaintenancePermit) bloquent réellement
+    le mouvement vers un sens non autorisé (gate de commande), à l''unisson des treuils
+    M1/M2'
+  - 'Point d''insertion du gate déterminé et justifié (FB_TranslationCmdArbitrationM3
+    ou FB_Translation) — cohérent avec le modèle FB_Winch.st:163'
+  - 'Aucun interlock de sécurité M3 existant (Méca A/B, LimitSwitch, SensorIncoherent,
+    PowerCutOff, SafeStop) modifié dans son comportement'
+  - 'Bits IHM directionnels M3 déjà projetés (GVL_IHM.TranslationM3.Safety) reflètent
+    le blocage réel'
+  - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS + tests
+    CI étendus'
+  bloque_par:
+  - T184
+- id: T205
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: SÉCURITÉ / CI / STANDARDS
+  agent: Codex
+  date: '2026-08-31T00:00:00'
+  titre: 'Rationaliser la CI AU : contrat Ready + TC fonctionnels F01 uniquement'
+  contexte: >
+    Décision utilisateur 2026-08-31 : les essais de causes, ErrorId, latch,
+    messages et codes d'abandon ne sont pas des fonctions métier F01. Ils seront
+    conçus ultérieurement comme socle de contrat d'interface générique, à l'image
+    du contrat Enable/Ready. Le rapport AU courant doit rester court et orienté
+    fonctions F01 réellement couvertes.
+  description: >
+    Distinguer dans la CI FB_Safety_EmergencyManagement le contrat de base
+    TC-P03-001 (Enable/Ready) des TC P01 rattachés aux fonctions F01.01..F01.08.
+    Construire une matrice AF↔Fonctions↔TC exploitable par G450, signaler les
+    fonctions ou TC orphelins, et inventorier sans suppression les essais de
+    causes à migrer vers un futur socle de contrat. Aucune modification du code
+    safety sans décision humaine dédiée.
+  objectifs:
+  - 'Rapport AU lisible : contrat Ready séparé des preuves fonctionnelles F01'
+  - 'Chaque TC fonctionnel est attaché à au moins une fonction F01 ; aucune fonction F01 n''est orpheline'
+  - 'TC-P01-SCEN-NOM et TC-P01-SCEN-DYN conservés comme TC standardisés multi-fonctions'
+  - 'Essais de causes/latch/messages inventoriés et reportés au futur socle de contrat, sans suppression'
+  - 'G450 enrichi pour alerter fonctions orphelines, TC AF orphelins et TC CI orphelins'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T205_CI_AU_FUNCTIONNEL.yaml
+  bloque_par:
+  - T199
+- id: T206
+  parent_id: ''
+  statut: ⬜
+  criticite: C4
+  domaine: SÉCURITÉ / AU
+  agent: Codex
+  date: '2026-08-31T00:00:00'
+  titre: 'StartupFail AU : verrouillage 5 s non court-circuitable par Reset'
+  contexte: >
+    Décision utilisateur 2026-08-31 : un échec d'autotest de démarrage démarre
+    immédiatement une temporisation de verrouillage de 5 s. Reset précoce ne peut
+    pas la raccourcir ; Reset après expiration autorise le réarmement immédiat si
+    toutes les autres préconditions sont réunies.
+  description: >
+    Corriger le contrat StartupFail de FB_Safety_EmergencyManagement : Armable reste
+    FALSE pendant le verrouillage mesuré depuis l'échec, indépendamment de la date
+    du Reset. Distinguer ce verrouillage de celui d'échec de réarmement si nécessaire,
+    mettre à jour AF et tests chronométrés, puis exécuter la voie safety C4.
+  objectifs:
+  - 'StartupFail déclenche un lockout de 5 s dès détection ; Armable=FALSE pendant ce délai'
+  - 'Reset précoce acquitte la cause mais ne court-circuite pas le délai'
+  - 'Reset après expiration permet Armable=TRUE immédiatement si chaîne et autres préconditions saines'
+  - 'ArmRequest est refusé pendant StartupFail ou son lockout'
+  - 'Aucune régression sur AU, PowerCutOff, lockout contacteur et neutralisation Enable'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T206_STARTUPFAIL_LOCKOUT.yaml
+  bloque_par:
+  - T199
