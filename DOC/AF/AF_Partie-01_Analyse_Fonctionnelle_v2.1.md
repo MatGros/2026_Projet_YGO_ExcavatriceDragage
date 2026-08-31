@@ -66,7 +66,7 @@
       <td style="padding: 6px 8px; line-height: 1.55;">Front <code>ArmRequest</code> + boucle saine ➔ séquence de réarmement ; jamais automatique</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-003, TC-P01-005</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-003, TC-P01-005, TC-P01-SCEN-NOM</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>
@@ -86,7 +86,7 @@
       <td style="padding: 6px 8px; line-height: 1.55;">Test croisé des 2 canaux à chaque réarmement (preuve runtime, pas de procédure manuelle séparée)</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-006</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-006, TC-P01-SCEN-NOM</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>
@@ -96,7 +96,7 @@
       <td style="padding: 6px 8px; line-height: 1.55;">Non-confirmation contacteur après pulse ➔ lockout 5s avant nouvel essai</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🟠 C3</small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-007</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-007, TC-P01-SCEN-DYN</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>
@@ -106,7 +106,7 @@
       <td style="padding: 6px 8px; line-height: 1.55;"><code>PowerCutOffRequest</code> (agrégat M1/M2/M3) ➔ coupe A et B sans déclencher d'armement</td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>FB_Safety_EmergencyManagement</code></small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>🔴 C4</small></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-008</span></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-008, TC-P01-SCEN-DYN</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>✅</small></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><code>NV-I</code></small></td>
     </tr>

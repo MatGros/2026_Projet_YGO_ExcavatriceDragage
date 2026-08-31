@@ -5246,3 +5246,28 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T206_STARTUPFAIL_LOCKOUT.yaml
   bloque_par:
   - T199
+- id: T207
+  parent_id: ''
+  statut: ⏳
+  criticite: C4
+  domaine: MODES / SÉCURITÉ
+  agent: DSH (DeepSeek)
+  date: '2026-08-31T20:22:31'
+  titre: 'Sélection des modes autorisée sous AU et défaut, sans mouvement ni cycle'
+  contexte: >
+    Diagnostic 2026-08-31 : FB_Modes replie SEMI_AUTO vers MAINT_N1 lorsque
+    PowerContactorEngaged=FALSE, donc systématiquement sous AU. Décision utilisateur :
+    les trois modes doivent rester sélectionnables sous AU ou défaut pour sortir du cycle
+    ou préparer la reprise ; aucune commande ni progression de cycle n'est permise.
+  description: >
+    Découpler la sélection du mode de l'autorisation de mouvement. Retirer le repli
+    SEMI_AUTO lié au seul contacteur ouvert et gater séparément le cycle/les demandes
+    automatiques sur la puissance réellement engagée. Ne pas contourner les interlocks
+    physiques de mouvement, ni toucher Translation M3 en cours de travail par un autre agent.
+  objectifs:
+  - 'MAINT_N1, MAINT_N2 et SEMI_AUTO sélectionnables sous AU et défaut'
+  - 'Aucune requête cycle/actionneur sous contacteur ouvert ou interlock safety actif'
+  - 'Aucune reprise automatique après réarmement ; nouvel ordre explicite requis'
+  - 'Interlocks physiques et permits M3 inchangés'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T207_MODE_SELECTION_AU_FAULT.yaml
+  bloque_par: []

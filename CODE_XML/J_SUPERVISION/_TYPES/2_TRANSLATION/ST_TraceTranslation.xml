@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:50:15.340555" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:50:15.340555">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T18:16:25.975119" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T18:16:25.975119">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -33,6 +33,23 @@
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis de mouvement effectif (agrégat diagnostic : toutes les barrières levées)
 🟢 Translation réellement autorisée à se déplacer</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TremiePermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
+🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
               </documentation>
             </variable>
             <variable name="HeightInterlockBlocking">

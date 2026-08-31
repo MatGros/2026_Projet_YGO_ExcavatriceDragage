@@ -43,7 +43,7 @@ TEST 'TC-P11-010 Translation : commande variateur nominale'
 
     (* Scan 2 : mise en service *)
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, PowerContactorEngaged := TRUE,
-         SpeedTgt_Pct := 50.0, Direction := 1);
+         SpeedTgt_Pct := 50.0, Direction := 1, TremiePermit := TRUE);
     ASSERT_TRUE(FB_T.Ready, 'Translation active et prete');
 END_TEST
 
@@ -102,7 +102,7 @@ END_TEST
 TEST 'TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop'
     (* Enable=FALSE avec StartStop=TRUE et SafeStop=FALSE -> tout coupe *)
     FB_T(Enable := FALSE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE);
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE);
     ASSERT_FALSE(FB_T.Ready, 'Enable=FALSE -> Ready=FALSE');
     ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'Enable=FALSE -> mot 0');
     ASSERT_EQ(FB_T.RequestedDriveFreqHz, 0.0, 'Enable=FALSE -> freq 0');
@@ -112,40 +112,40 @@ END_TEST
 TEST 'TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)'
     (* Scan 1 : init Fwd *)
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     (* Scans 2-7 : rampe monte a 50% *)
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     (* Scan 7 : sans ralentissement, freq pleine ~30Hz *)
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ASSERT_GT(FB_T.RequestedDriveFreqHz, 20.0, 'sans PV, freq pleine ~30Hz');
 
     (* Scan 8 : SlowdownSensorTremie=TRUE -> cap a ApproachSpeedTremieHz (10Hz) *)
     ADVANCE_TIME(10000000);
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE,
          SlowdownSensorTremie := TRUE);
     ASSERT_LE(FB_T.RequestedDriveFreqHz, 10.0, 'ralentissement PV -> freq <= 10Hz');
@@ -155,45 +155,45 @@ END_TEST
 TEST 'TC-P11-005 Translation interlock sens : inversion Fwd->Rev differee (pas immediate)'
     (* Scan 1 : init Fwd (petits delais frein pour ouvrir vite) *)
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, CfgRampDecelNormalRate := 1000.0,
          BrakeDelayMagnetise := T#10ms, BrakeDelayContactClose := T#10ms,
          BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     (* Scans 2-6 : rampe monte a 50% *)
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, CfgRampDecelNormalRate := 1000.0,
          BrakeDelayMagnetise := T#10ms, BrakeDelayContactClose := T#10ms,
          BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, CfgRampDecelNormalRate := 1000.0,
          BrakeDelayMagnetise := T#10ms, BrakeDelayContactClose := T#10ms,
          BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, CfgRampDecelNormalRate := 1000.0,
          BrakeDelayMagnetise := T#10ms, BrakeDelayContactClose := T#10ms,
          BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, CfgRampDecelNormalRate := 1000.0,
          BrakeDelayMagnetise := T#10ms, BrakeDelayContactClose := T#10ms,
          BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, CfgRampDecelNormalRate := 1000.0,
          BrakeDelayMagnetise := T#10ms, BrakeDelayContactClose := T#10ms,
          BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
     ADVANCE_TIME(10000000);
     (* Scan 7 : mouvement Fwd etabli *)
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, CfgRampDecelNormalRate := 1000.0,
          BrakeDelayMagnetise := T#10ms, BrakeDelayContactClose := T#10ms,
          BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
@@ -202,7 +202,7 @@ TEST 'TC-P11-005 Translation interlock sens : inversion Fwd->Rev differee (pas i
     (* Scan 8 : inversion demandee Direction=-1 -> pas immediate (interlock) *)
     ADVANCE_TIME(10000000);
     FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
-         Direction := -1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
          CfgRampAccelRate := 1000.0, CfgRampDecelNormalRate := 1000.0,
          BrakeDelayMagnetise := T#10ms, BrakeDelayContactClose := T#10ms,
          BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
@@ -435,4 +435,839 @@ TEST 'TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)'
        M1.CablePosM >= _TranslationMinHeightM1M2_M AND M2.CablePosM >= _TranslationMinHeightM1M2_M).
        A verifier manuellement sur le PRG_04/PRG_05 composite. (essai manuel — stub) *)
     ASSERT_TRUE(TRUE, 'Stub anti-telescopage : a verifier manuellement sur PRG_05 composite (essai manuel)');
+END_TEST
+
+(* =========================================================================
+   AF-11 — CHRONOGRAMMES RÉALISTES (lot 2026-08-29)
+   Modes de marche classiques + modes de défaillance + interlocks + reset.
+   Config réaliste : rampe 100%/s, frein 300ms magnétisation + 100ms contact,
+   échelle 60Hz, ADVANCE_TIME(100ms)/scan -> chronogramme temporel réaliste.
+   ========================================================================= *)
+
+(* -------------------------------------------------------------------------
+   A. MODES DE MARCHE CLASSIQUES — FB_Translation
+   ------------------------------------------------------------------------- *)
+
+TEST 'TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)'
+    (* Scan 1 : warmup (CycleTimeS=0.004) + démarrage rampe *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'frein non desserré -> mot 0');
+
+    ADVANCE_TIME(100000000); (* 100ms *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'magnétisation en cours -> mot 0');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'magnétisation en cours -> mot 0');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'magnétisation en cours -> mot 0');
+
+    ADVANCE_TIME(100000000);
+    (* Scan 5 : 400ms -> frein desserré -> mot FWD *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 1, 'frein desserré -> mot 1 (FWD)');
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 20.0, 'fréquence ~24Hz');
+
+    ADVANCE_TIME(100000000);
+    (* Scan 6 : rampe à 50% -> fréquence pleine 30Hz *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 1, 'mouvement FWD maintenu');
+    ASSERT_NEAR(FB_T.RequestedDriveFreqHz, 30.0, 1.0, 'fréquence pleine ~30Hz');
+END_TEST
+
+TEST 'TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine'
+    (* Scan 1 : warmup + démarrage rampe vers Maintenance (Direction=-1) *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'frein non desserré -> mot 0');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'magnétisation en cours -> mot 0');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'magnétisation en cours -> mot 0');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'magnétisation en cours -> mot 0');
+
+    ADVANCE_TIME(100000000);
+    (* Scan 5 : 400ms -> frein desserré -> mot REV *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 2, 'frein desserré -> mot 2 (REV)');
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 20.0, 'fréquence ~24Hz');
+
+    ADVANCE_TIME(100000000);
+    (* Scan 6 : rampe à 50% -> fréquence pleine 30Hz *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 2, 'mouvement REV maintenu');
+    ASSERT_NEAR(FB_T.RequestedDriveFreqHz, 30.0, 1.0, 'fréquence pleine ~30Hz');
+END_TEST
+
+TEST 'TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé'
+    (* Monter à 50% FWD (6 scans, cf. TC-P11-016) *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 1, 'mouvement FWD établi');
+    ASSERT_FALSE(FB_T.TargetReached, 'pas encore de capteur cible');
+
+    (* Capteur cible activé -> debounce 100ms *)
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         PositionSensorTarget := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_FALSE(FB_T.TargetReached, 'debounce 100ms pas encore écoulé');
+
+    ADVANCE_TIME(100000000);
+    (* Scan 8 : debounce écoulé -> TargetReached + ArrivalLock -> rampe à 0 *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         PositionSensorTarget := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_TRUE(FB_T.TargetReached, 'debounce écoulé -> TargetReached=TRUE');
+
+    (* Décélération normale 100%/s -> 10%/100ms ; frein collé quand Current<0.1 *)
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         PositionSensorTarget := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 0.0, 'décélération en cours');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         PositionSensorTarget := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         PositionSensorTarget := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         PositionSensorTarget := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         CaptorDebounce := T#100ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'arrêt sur capteur -> frein collé, mot 0');
+    ASSERT_EQ(FB_T.RequestedDriveFreqHz, 0.0, 'arrêt sur capteur -> freq 0');
+    ASSERT_FALSE(FB_T.BrakeReleaseRequest, 'arrêt sur capteur -> frein non desserré');
+END_TEST
+
+TEST 'TC-P11-019 Translation : interlock sens complet Fwd->Rev (délai 200ms à vitesse nulle)'
+    (* Monter à 50% FWD (6 scans) *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 1, 'mouvement FWD établi');
+
+    (* Inversion demandée Direction=-1 -> pas immédiate, décélération d'abord *)
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         DriveActualFreqHz := 0.0,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_NEQ(FB_T.RequestedDriveControlWord, 2, 'inversion pas immédiate (interlock)');
+
+    (* Décélération à 0 puis délai 200ms -> bascule REV *)
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         DriveActualFreqHz := 0.0,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         DriveActualFreqHz := 0.0,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'vitesse nulle, délai interlock en cours -> mot 0');
+
+    ADVANCE_TIME(100000000);
+    (* Scan 10 : délai 200ms écoulé -> CommandedDirection=-1 -> rampe REV *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         DriveActualFreqHz := 0.0,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'bascule REV, magnétisation en cours -> mot 0');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         DriveActualFreqHz := 0.0,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         DriveActualFreqHz := 0.0,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    (* Scan 13 : 400ms de magnétisation -> frein desserré -> mot REV *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         DriveActualFreqHz := 0.0,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         DirectionInterlockDelay := T#200ms, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 2, 'inversion complète -> mot 2 (REV)');
+END_TEST
+
+TEST 'TC-P11-020 Translation : SafeStop -> rampe rapide (décélération rapide)'
+    (* Monter à 50% FWD (6 scans) *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 1, 'mouvement FWD établi');
+
+    (* SafeStop=TRUE -> rampe rapide 300%/s -> 30%/100ms *)
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 0.0, 'SafeStop -> décélération en cours');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_LT(FB_T.RequestedDriveFreqHz, 20.0, 'SafeStop -> fréquence chute rapide');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := TRUE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'SafeStop -> frein collé, mot 0');
+    ASSERT_EQ(FB_T.RequestedDriveFreqHz, 0.0, 'SafeStop -> freq 0');
+END_TEST
+
+TEST 'TC-P11-021 Translation : StartStop=FALSE -> rampe normale (décélération normale)'
+    (* Monter à 50% FWD (6 scans) *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 1, 'mouvement FWD établi');
+
+    (* StartStop=FALSE -> rampe normale 100%/s -> 10%/100ms *)
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := FALSE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 20.0, 'décélération normale -> freq encore élevée (~24Hz)');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := FALSE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 10.0, 'décélération normale -> freq ~18Hz');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := FALSE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 5.0, 'décélération normale -> freq ~12Hz');
+
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := FALSE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'arrêt normal -> frein collé, mot 0');
+    ASSERT_EQ(FB_T.RequestedDriveFreqHz, 0.0, 'arrêt normal -> freq 0');
+END_TEST
+
+(* -------------------------------------------------------------------------
+   B. MODES DE DÉFAILLANCE — FB_Safety_Translation
+   ------------------------------------------------------------------------- *)
+
+TEST 'TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -> SafeStop seul, pas de PowerCutOff'
+    (* Warmup 3s nominal *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ADVANCE_TIME(3000000000); (* 3s warmup *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_FALSE(FB_Safety.SafeStop, 'nominal -> pas de SafeStop');
+
+    (* Perte comm drive *)
+    ADVANCE_TIME(10000000);
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := FALSE, DriveOperational := FALSE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.ErrorDriveComm, 'perte comm drive -> bit1');
+    ASSERT_TRUE(FB_Safety.SafeStop, 'SafeStop');
+    ASSERT_FALSE(FB_Safety.PowerCutOff, 'bit1 -> pas de PowerCutOff (comms ne coupent pas la puissance)');
+END_TEST
+
+TEST 'TC-P11-023 Safety : perte comm opérateur (bit0) -> SafeStop seul, pas de PowerCutOff'
+    (* Warmup 3s nominal *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ADVANCE_TIME(3000000000);
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_FALSE(FB_Safety.SafeStop, 'nominal -> pas de SafeStop');
+
+    (* Perte heartbeat IHM *)
+    ADVANCE_TIME(10000000);
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := FALSE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.ErrorOperatorComm, 'perte heartbeat IHM -> bit0');
+    ASSERT_TRUE(FB_Safety.SafeStop, 'SafeStop');
+    ASSERT_FALSE(FB_Safety.PowerCutOff, 'bit0 -> pas de PowerCutOff');
+END_TEST
+
+TEST 'TC-P11-024 Safety : défaut rotation de phases (bit2) -> SafeStop seul, pas de PowerCutOff'
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := FALSE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.ErrorPhaseRotation, 'mauvaise rotation phases -> bit2');
+    ASSERT_TRUE(FB_Safety.SafeStop, 'SafeStop');
+    ASSERT_FALSE(FB_Safety.PowerCutOff, 'bit2 -> pas de PowerCutOff');
+END_TEST
+
+TEST 'TC-P11-025 Safety : surchauffe thermique frein (bit3) -> SafeStop + PowerCutOff'
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := TRUE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.ErrorBrakeThermal, 'thermique frein -> bit3');
+    ASSERT_TRUE(FB_Safety.SafeStop, 'SafeStop');
+    ASSERT_TRUE(FB_Safety.PowerCutOff, 'bit3 -> PowerCutOff');
+END_TEST
+
+TEST 'TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -> SafeStop + PowerCutOff'
+    (* Direction=0, BrakeCmd=FALSE, DriveActualFreqHz=1.0 -> mouvement résiduel non commandé *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 1.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ADVANCE_TIME(10000000);
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 1.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ADVANCE_TIME(1000000000); (* 1s -> MecaA timeout *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 1.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.ErrorMecaA, 'mouvement non commandé -> bit5');
+    ASSERT_TRUE(FB_Safety.SafeStop, 'SafeStop');
+    ASSERT_TRUE(FB_Safety.PowerCutOff, 'bit5 -> PowerCutOff');
+END_TEST
+
+TEST 'TC-P11-027 Safety : escalade fin de course (bit6) -> SafeStop + PowerCutOff'
+    (* Direction=1 + LimitSwitchTremie + fréquence >0.5 -> escalade Fdc *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 1.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 1, LimitSwitchTremie := TRUE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ADVANCE_TIME(10000000);
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 1.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 1, LimitSwitchTremie := TRUE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ADVANCE_TIME(1500000000); (* 1.5s -> overrun timeout *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 1.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 1, LimitSwitchTremie := TRUE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.ErrorLimitSwitch, 'escalade Fdc -> bit6');
+    ASSERT_TRUE(FB_Safety.SafeStop, 'SafeStop');
+    ASSERT_TRUE(FB_Safety.PowerCutOff, 'bit6 -> PowerCutOff');
+END_TEST
+
+(* -------------------------------------------------------------------------
+   C. INTERLOCKS & PERMITS — FB_Safety_Translation
+   ------------------------------------------------------------------------- *)
+
+TEST 'TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe)'
+    (* TremiePermit = NOT LimitSwitchTremie ; MaintenancePermit = MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              MaintenanceM3TargetEnable := TRUE, SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.TremiePermit, 'Fdc Trémie libre -> TremiePermit=TRUE');
+    ASSERT_TRUE(FB_Safety.MaintenancePermit, 'cible MAINT autorisée + Fdc libre -> MaintenancePermit=TRUE');
+
+    ADVANCE_TIME(10000000);
+    (* Fdc Trémie atteinte -> TremiePermit=FALSE *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := TRUE, LimitSwitchMaintenance := FALSE,
+              MaintenanceM3TargetEnable := TRUE, SensorWordIncoherent := FALSE);
+    ASSERT_FALSE(FB_Safety.TremiePermit, 'Fdc Trémie -> TremiePermit=FALSE');
+    ASSERT_TRUE(FB_Safety.MaintenancePermit, 'MaintenancePermit inchangé');
+
+    ADVANCE_TIME(10000000);
+    (* Fdc Maintenance atteinte -> MaintenancePermit=FALSE *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := TRUE,
+              MaintenanceM3TargetEnable := TRUE, SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.TremiePermit, 'TremiePermit inchangé');
+    ASSERT_FALSE(FB_Safety.MaintenancePermit, 'Fdc Maintenance -> MaintenancePermit=FALSE');
+
+    ADVANCE_TIME(10000000);
+    (* Maintenance non autorisée -> MaintenancePermit=FALSE même Fdc libre *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              MaintenanceM3TargetEnable := FALSE, SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.TremiePermit, 'TremiePermit inchangé');
+    ASSERT_FALSE(FB_Safety.MaintenancePermit, 'cible MAINT non autorisée -> MaintenancePermit=FALSE');
+END_TEST
+
+TEST 'TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -> SafeStop'
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := FALSE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.SafeStop, 'PowerContactorEngaged=FALSE -> SafeStop');
+    ASSERT_FALSE(FB_Safety.PowerCutOff, 'pas de défaut -> pas de PowerCutOff');
+END_TEST
+
+(* -------------------------------------------------------------------------
+   D. RESET / ACQUITTEMENT — FB_Safety_Translation
+   ------------------------------------------------------------------------- *)
+
+TEST 'TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal)'
+    (* Défaut laté : BrakeThermal *)
+    FB_Safety(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := TRUE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_TRUE(FB_Safety.ErrorBrakeThermal, 'thermique -> bit3');
+    ASSERT_TRUE(FB_Safety.PowerCutOff, 'bit3 -> PowerCutOff');
+
+    (* Cause disparue + Reset front -> acquittement *)
+    ADVANCE_TIME(10000000);
+    FB_Safety(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,
+              JoystickOnline := TRUE, JoystickOperational := TRUE, HeartbeatIhmOk := TRUE,
+              PhaseRotationOk := TRUE, BrakeThermalFeedback := FALSE,
+              DriveOnline := TRUE, DriveOperational := TRUE, DriveStatusWord := 16#0000,
+              DriveActualFreqHz := 0.0, BrakeFeedback := FALSE, BrakeCmd := FALSE,
+              Direction := 0, LimitSwitchTremie := FALSE, LimitSwitchMaintenance := FALSE,
+              SensorWordIncoherent := FALSE);
+    ASSERT_FALSE(FB_Safety.ErrorBrakeThermal, 'Reset -> bit3 effacé');
+    ASSERT_FALSE(FB_Safety.SafeStop, 'Reset -> SafeStop levé');
+    ASSERT_FALSE(FB_Safety.PowerCutOff, 'Reset -> PowerCutOff levé');
+END_TEST
+
+(* -------------------------------------------------------------------------
+   E. FIN DE COURSE EXTREME — FB_Translation (bit6)
+   ------------------------------------------------------------------------- *)
+
+TEST 'TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)'
+    (* Monter à 50% FWD (6 scans) *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 1, 'mouvement FWD établi');
+
+    (* Fdc Trémie atteinte pendant mouvement FWD -> Fault.Error -> coupure *)
+    ADVANCE_TIME(100000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         LimitSwitchTremie := TRUE,
+         CfgRampAccelRate := 100.0, CfgRampDecelNormalRate := 100.0, CfgRampDecelFastRate := 300.0,
+         DriveFreqScaleMaxHz := 60.0, BrakeDelayMagnetise := T#300ms, BrakeDelayContactClose := T#100ms,
+         BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_TRUE(FB_T.Fault.Error, 'Fdc Trémie -> défaut');
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'défaut -> mot 0');
+    ASSERT_EQ(FB_T.RequestedDriveFreqHz, 0.0, 'défaut -> freq 0');
+    ASSERT_FALSE(FB_T.BrakeReleaseRequest, 'défaut -> frein non desserré');
+END_TEST
+
+(* =========================================================================
+   AF-11 — GATE DE SENS T204 — FB_Translation (EffectiveSafeStop)
+   Le gate bloque la RAMPE vers un sens non autorisé (permit SAFETY=FALSE)
+   sans toucher à Direction. Config rapide : rampe 1000%/s, frein bypass.
+   ========================================================================= *)
+
+TEST 'TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -> rampe bloquee (mot 0, freq 0)'
+    (* TremiePermit=FALSE (defaut) -> EffectiveSafeStop=TRUE -> rampe bloquee *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 0, 'TremiePermit=FALSE -> mot 0');
+    ASSERT_EQ(FB_T.RequestedDriveFreqHz, 0.0, 'TremiePermit=FALSE -> freq 0');
+    ASSERT_FALSE(FB_T.BrakeReleaseRequest, 'TremiePermit=FALSE -> frein non desserre');
+END_TEST
+
+TEST 'TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -> mouvement AUTORISE (P1 accessible)'
+    (* Le gate ne bloque QUE +1 (Trémie). Le sens −1 (Maintenance) n'est PAS gaté ici : le segment
+       P1→Maintenance est protégé par la coupure dure M3_LimitSwitchMaintenanceEffective (PRG_05:128-130).
+       Gater −1 sur MaintenancePermit bloquerait l'accès à P1 quand Maintenance n'est pas autorisée
+       (régression fonctionnelle, REX challenge expert Phase 4). Donc −1 sans MaintenancePermit = autorisé. *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 2, 'Direction=-1 sans MaintenancePermit -> mot 2 (REV, P1 accessible)');
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 0.0, 'Direction=-1 sans MaintenancePermit -> freq > 0');
+    ASSERT_TRUE(FB_T.BrakeReleaseRequest, 'Direction=-1 sans MaintenancePermit -> frein desserre');
+END_TEST
+
+TEST 'TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -> mouvement autorise'
+    (* TremiePermit=TRUE -> EffectiveSafeStop=FALSE -> rampe monte, mot FWD *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := 1, TremiePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 1, 'TremiePermit=TRUE -> mot 1 (FWD)');
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 0.0, 'TremiePermit=TRUE -> freq > 0');
+END_TEST
+
+TEST 'TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -> mouvement autorise'
+    (* MaintenancePermit=TRUE -> EffectiveSafeStop=FALSE -> rampe monte, mot REV *)
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_T(Enable := TRUE, Reset := FALSE, StartStop := TRUE, SafeStop := FALSE,
+         Direction := -1, MaintenancePermit := TRUE, SpeedTgt_Pct := 50.0, PowerContactorEngaged := TRUE,
+         CfgRampAccelRate := 1000.0, BypassContactorCheck := TRUE, BrakeFeedback := TRUE);
+    ASSERT_EQ(FB_T.RequestedDriveControlWord, 2, 'MaintenancePermit=TRUE -> mot 2 (REV)');
+    ASSERT_GT(FB_T.RequestedDriveFreqHz, 0.0, 'MaintenancePermit=TRUE -> freq > 0');
 END_TEST

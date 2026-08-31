@@ -1,0 +1,78 @@
+contract:
+  task_id: T207_MODE_SELECTION_AU_FAULT
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Autoriser la sélection et la sortie de tous les modes, y compris SEMI_AUTO,
+    lorsque l'AU ou un défaut est actif, sans jamais autoriser un mouvement, une
+    progression de cycle ou une nouvelle commande automatique avant réarmement réel.
+
+  acceptance:
+    - id: AC1
+      statement: "Sous PowerContactorEngaged=FALSE, la demande SEMI_AUTO est acceptée et l'état mode publié vaut SEMI_AUTO ; elle n'est plus repliée automatiquement vers MAINT_N1."
+      verified_by: "test CI FB_Modes : demande SEMI_AUTO, contacteur ouvert, retours arrêtés -> Auth.Mode=SEMI_AUTO"
+    - id: AC2
+      statement: "Sous AU, PowerCutOff ou défaut, les demandes de changement entre MAINT_N1, MAINT_N2 et SEMI_AUTO restent acceptées sans exiger de déplacement ni de contacteur engagé."
+      verified_by: "tests CI table de sélection des trois modes avec contacteur ouvert et causes safety actives"
+    - id: AC3
+      statement: "Un mode sélectionné sous AU/défaut ne produit aucune demande de cycle ni commande actionneur : le cycle Semi-Auto est désactivé tant que PowerContactorEngaged=FALSE."
+      verified_by: "test intégration PRG_03 : SEMI_AUTO sélectionné + contacteur ouvert -> aucune requête cycle ; après réarmement, aucune reprise sans ordre explicite"
+    - id: AC4
+      statement: "Le changement de mode ne contourne aucun interlock de mouvement, permit directionnel M3, frein, vitesse ou arrêt physique ; il ne modifie que l'état de sélection."
+      verified_by: "revue de flux + tests existants mouvements/safety inchangés"
+    - id: AC5
+      statement: "Bundle frais, G200 liaison, gates et CI ciblée passent ; le diagnostic IHM expose le mode sélectionné et le motif de blocage restant si applicable."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py --report + run_all_gates.py + rapports CI"
+    - id: AC6
+      statement: "Le nom de fichier est égal au nom du POU PRG_03_Modes_Cycle et son suffixe est égal au langage Structured Text généré dans le bundle."
+      verified_by: "check_task_contract.py puis G310_check_code_structure.py sur bundle frais"
+
+  scope:
+    allowed:
+      - CODE/F_MODES/FB_Modes.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/F_MODES/_TYPES/
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+      - DOC/AF/AF_Partie-05_Modes_Operationnels_v2.3.md
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/F_MODES/tests/
+      - TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/tests/
+      - DOC/WFLOW/CONTRACTS/
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/I_TRANSLATION/**
+      - CODE/H_TREUILS_BENNE/**
+      - PRJ_CODESYS/**/Device.export
+
+  conservation:
+    must_survive:
+      - "AU, PowerCutOff et les défauts conservent leur coupure physique et leurs interlocks actionneurs."
+      - "Aucun cycle ne progresse ni ne redémarre automatiquement lors de la sélection d'un mode sous défaut/AU."
+      - "Les retours de repos matériel restent une condition de commande de mouvement ; ils ne sont pas transformés en bypass de sécurité."
+      - "Les travaux en cours de l'autre agent sur Translation M3 et ses permits ne sont ni lus comme source de vérité ni modifiés."
+    dropped_on_purpose:
+      - "Le repli automatique SEMI_AUTO -> MAINT_N1 causé uniquement par PowerContactorEngaged=FALSE."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    STOP si sélectionner un mode écrit directement une demande actionneur, si le cycle
+    continue à produire une requête sous contacteur ouvert, ou si la mise en oeuvre exige
+    de modifier les fichiers Translation M3 en cours par un autre agent.
+
+status: PENDING
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: "Décision utilisateur du 2026-08-31 ; validation C4 du plan requise avant code."

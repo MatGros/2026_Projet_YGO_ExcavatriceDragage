@@ -30,6 +30,7 @@ domains:
         tc_couvrants:
         - TC-P01-003
         - TC-P01-005
+        - TC-P01-SCEN-NOM
         statut: ✅
         etat: NV-I
       F01.04:
@@ -51,6 +52,7 @@ domains:
         criticite: 🔴 C4
         tc_couvrants:
         - TC-P01-006
+        - TC-P01-SCEN-NOM
         statut: ✅
         etat: NV-I
       F01.06:
@@ -61,6 +63,7 @@ domains:
         criticite: 🟠 C3
         tc_couvrants:
         - TC-P01-007
+        - TC-P01-SCEN-DYN
         statut: ✅
         etat: NV-I
       F01.07:
@@ -71,6 +74,7 @@ domains:
         criticite: 🔴 C4
         tc_couvrants:
         - TC-P01-008
+        - TC-P01-SCEN-DYN
         statut: ✅
         etat: NV-I
       F01.08:
@@ -827,27 +831,29 @@ domains:
         ref: §4
         etat: NV-I
   AF-09:
-    file: AF_Partie-09_Fonction_Encoder_v2.3.md
+    file: AF_Partie-09_Fonction_Encoder_v2.4.md
     functions:
       F09.01:
         fonction: Acquérir position brute + gérer le preset SDO
         description: Lit RawPosIn/AlarmsIn/SlaveOperational (EtherCAT), séquence l'écriture
-          preset (déclenchement, tolérance, timeout)
+          preset (déclenchement, tolérance, timeout) — la valeur preset transmise
+          est produite par FB_Encoder_Homing (centre-plage, F09.08)
         realisee_par: FB_Encoder_Abs
         criticite: 🟠 C3
         tc_couvrants:
         - TC-P09-010
-        statut: ✅
+        statut: ⚠️
         etat: NV-I
       F09.02:
         fonction: Référencer l'axe (homing)
         description: '3 modes : nominal (capteur haut, front), unitaire (cible libre
-          CfgHomingTargetM), dynamique (cible calculée par l''appelant, ex. benne)'
+          CfgHomingTargetM), dynamique (cible calculée par l''appelant, ex. benne).
+          Toute cible est gravée dans le référentiel centre-plage (F09.08)'
         realisee_par: FB_Encoder_Homing
         criticite: 🟠 C3
         tc_couvrants:
         - TC-P09-020
-        statut: ✅
+        statut: ⚠️
         etat: NV-I
       F09.03:
         fonction: Détecter une incohérence codeur au redémarrage
@@ -898,6 +904,19 @@ domains:
         - TC-P09-050
         statut: ✅
         etat: NV-I
+      F09.08:
+        fonction: Centrer le compteur au référencement (garde anti-dépassement)
+        description: 'Tout référencement (nominal, unitaire, forcé, dynamique benne)
+          écrit au codeur le centre de sa plage de résolution (PointsPerRev × MultiTurnRevsMax)/2
+          (déf. 16 777 216 pts = 16#1000000) et grave HomingRefRaw dans ce référentiel.
+          La course physique (~20 m ≈ 1% de la plage) ne peut jamais atteindre les
+          bornes 0 / 2^25 : le wrap-around du compteur est physiquement impossible'
+        realisee_par: FB_Encoder_Homing FB_Encoder_Abs
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P09-070
+        statut: ⬜
+        etat: NV
     validation_points:
       TC-P09-010:
         intention: "\U0001F4A4 Étape 0 : Bus EtherCAT opérationnel, EncoderAvailable=TRUE\
@@ -954,6 +973,21 @@ domains:
         type: —
         ref: —
         etat: NV
+      TC-P09-070:
+        intention: "\U0001F4A4 Étape 0 : Codeur disponible, compteur en position physique\
+          \ quelconque (ex. près d'une borne : RawPos = 40 000 pts) \n        \U0001F680\
+          \ Étape 1 : Homing (tout mode) → PresetValue = (PointsPerRev × MultiTurnRevsMax)/2\
+          \ (16 777 216) et PendingHomingRefRaw = 16 777 216 − TargetPoints \n   \
+          \     ⚡ Étape 2 : Transaction preset (§13) : compteur charge le centre,\
+          \ readback CandidateCablePosM = cible ± 0.010 m ; consommateurs de position\
+          \ gelés pendant la fenêtre de saut \n        ⚡ Étape 3 : Post-commit : descente\
+          \ de la course physique complète (~20 m) puis remontée — compteur reste\
+          \ dans [Centre − 1 M pts ; Centre + 1 M pts] \n        ✅ Étape 4 : Aucun\
+          \ wrap : CablePosM continue, pas de EncoderIncoherent, pas de faux HomingSuspect\
+          \ au boot"
+        type: 💻 AUTO
+        ref: FB_Encoder_Homing FB_Encoder_Abs
+        etat: NV
       TC-P09-010.1:
         intention: "\U0001F4A4 Étape 0 : Bus EtherCAT opérationnel, RawPos actif \n\
           \        \U0001F680 Étape 1 : AlarmsIn≠0 OU NOT SlaveOperational \n    \
@@ -991,8 +1025,10 @@ domains:
       TC-P09-020.1:
         intention: "\U0001F4A4 Étape 0 : Homed=FALSE, HomingPermit=TRUE \n       \
           \ \U0001F680 Étape 1 : Front Home + front TopPositionSensor (dans les 2\
-          \ ordres) \n        ⚡ Étape 2 : Calcul HomingRefRaw pour CablePosM = CfgTopSensorPosM\
-          \ \n        ✅ Étape 3 : Homed=TRUE, PresetRequest pulsé vers FB_Encoder_Abs"
+          \ ordres) \n        ⚡ Étape 2 : Calcul PendingHomingRefRaw pour CablePosM\
+          \ = CfgTopSensorPosM (référentiel centre-plage, §4) \n        ✅ Étape 3\
+          \ : Homed=TRUE après readback, PresetRequest pulsé vers FB_Encoder_Abs avec\
+          \ PresetValue = CentrePts"
         type: 💻 AUTO
         ref: §4
         etat: NV
@@ -1000,16 +1036,17 @@ domains:
         intention: "\U0001F4A4 Étape 0 : Homed=FALSE, HomingPermit=TRUE, UseDynamicTarget=FALSE\
           \ \n        \U0001F680 Étape 1 : Front Home seul (sans capteur haut) \n\
           \        ⚡ Étape 2 : Cible = CfgHomingTargetM (libre, MAINT_N2 typiquement)\
-          \ \n        ✅ Étape 3 : Homed=TRUE, HomingRefRaw calculé pour cible unitaire"
+          \ \n        ✅ Étape 3 : Homed=TRUE, PendingHomingRefRaw = CentrePts − TargetPoints\
+          \ pour cible unitaire"
         type: 💻 AUTO
         ref: §4
         etat: NV
       TC-P09-020.3:
-        intention: "\U0001F4A4 Étape 0 : Homed=FALSE, HomingPermit=TRUE \n       \
-          \ \U0001F680 Étape 1 : Front UseDynamicTarget (ou combiné Home) \n     \
-          \   ⚡ Étape 2 : Cible = DynamicHomingTargetM (calculée par l'appelant, ex.\
-          \ auto-référencement benne M2) \n        ✅ Étape 3 : Homed=TRUE, HomingRefRaw\
-          \ calculé pour cible dynamique"
+        intention: "\U0001F4A4 Étape 0 : Homed=FALSE, HomingPermit=TRUE, M1 HomedAndReliable=TRUE\
+          \ \n        \U0001F680 Étape 1 : Front UseDynamicTarget (ou combiné Home)\
+          \ \n        ⚡ Étape 2 : Cible = DynamicHomingTargetM (calculée par l'appelant,\
+          \ ex. auto-référencement benne M2) \n        ✅ Étape 3 : Homed=TRUE, référence\
+          \ gravée au centre-plage pour cible dynamique"
         type: 💻 AUTO
         ref: §4
         etat: NV
@@ -1025,15 +1062,14 @@ domains:
         intention: "\U0001F4A4 Étape 0 : TopPositionSensor=FALSE (absent), HomingPermit=TRUE\
           \ \n        \U0001F680 Étape 1 : Front Home en mode nominal \n        ⚡\
           \ Étape 2 : Mode nominal ne déclenche pas (capteur haut requis) \n     \
-          \   ✅ Étape 3 : Seuls unitaire/dynamique fonctionnent (FB_Encoder_Homing.st:206-207)"
+          \   ✅ Étape 3 : Seuls unitaire/dynamique fonctionnent"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
       TC-P09-020.7:
         intention: "\U0001F4A4 Étape 0 : HomingPermit=FALSE, Homed=FALSE \n      \
           \  \U0001F680 Étape 1 : Front Home sans HomingPermit \n        ⚡ Étape 2\
-          \ : HomingModeError (bit0) levé \n        ✅ Étape 3 : Pas d'écriture RETAIN\
-          \ (FB_Encoder_Homing.st:202-204)"
+          \ : HomingModeError (bit0) levé \n        ✅ Étape 3 : Pas d'écriture RETAIN"
         type: 💻 AUTO
         ref: §4
         etat: NV-I
@@ -1041,19 +1077,51 @@ domains:
         intention: "\U0001F4A4 Étape 0 : HomingSuspect=TRUE stocké dans Calib RETAIN\
           \ \n        \U0001F680 Étape 1 : Redémarrage PLC (cycle froid) \n      \
           \  ⚡ Étape 2 : Calib.HomingSuspect restauré depuis RETAIN \n        ✅ Étape\
-          \ 3 : HomingSuspect persiste après redémarrage (FB_Encoder_Homing.st:185)"
+          \ 3 : HomingSuspect persiste après redémarrage"
         type: 💻 AUTO
         ref: §5
         etat: NV-I
       TC-P09-020.5:
         intention: "\U0001F4A4 Étape 0 : Boot PLC, Calib.LastKnownRawPos RETAIN restauré\
-          \ \n        \U0001F680 Étape 1 : Premier scan EncoderAvailable=TRUE, écart\
-          \ RawPos vs Calib.LastKnownRawPos > tolérance (1000 pts) \n        ⚡ Étape\
-          \ 2 : HomingSuspect=TRUE, Homed=FALSE (référence non fiable) \n        ✅\
-          \ Étape 3 : Levé uniquement par front BtnConfirmCoherence ET HomingPermit=TRUE\
+          \ (près du centre) \n        \U0001F680 Étape 1 : Premier scan EncoderAvailable=TRUE,\
+          \ écart RawPos vs Calib.LastKnownRawPos > tolérance (1000 pts) \n      \
+          \  ⚡ Étape 2 : HomingSuspect=TRUE, Homed=FALSE (référence non fiable) \n\
+          \        ✅ Étape 3 : Levé uniquement par front BtnConfirmCoherence ET HomingPermit=TRUE\
           \ (pas d'auto-effacement)"
         type: 💻 AUTO
         ref: §5
+        etat: NV
+      TC-P09-070.1:
+        intention: "\U0001F4A4 Étape 0 : Codeur disponible, RawPos = 40 000 pts (proche\
+          \ borne basse, position physique quelconque) \n        \U0001F680 Étape\
+          \ 1 : Homing (tout mode) → PresetValue = CentrePts = 16 777 216, PendingHomingRefRaw\
+          \ = CentrePts − TargetPoints \n        ⚡ Étape 2 : Compteur charge le centre\
+          \ (RawPos → 16 777 216), readback CablePosM = cible ± 0.010 m \n       \
+          \ ✅ Étape 3 : Homed=TRUE ; PresetValue ≠ position physique : preuve que\
+          \ le preset a bien chargé le centre"
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-070.2:
+        intention: "\U0001F4A4 Étape 0 : Référencé centre-plage, compteur à CentrePts\
+          \ \n        \U0001F680 Étape 1 : Descente course physique complète (~20\
+          \ m ≈ 327 680 pts) puis remontée \n        ⚡ Étape 2 : Compteur reste dans\
+          \ [CentrePts − 0.5M ; CentrePts + 0.5M] (marge ~±2048 m consommée < 2%)\
+          \ \n        ✅ Étape 3 : Aucun wrap 0↔2^25 : CablePosM continue, pas de EncoderIncoherent,\
+          \ pas de faux HomingSuspect au boot — pré-requis : simulation avec wrap\
+          \ réel (clamp actuel à corriger, §7)"
+        type: 💻 AUTO
+        ref: §4
+        etat: NV
+      TC-P09-070.3:
+        intention: "\U0001F4A4 Étape 0 : M1 non référencé ou EncoderFault M1 actif\
+          \ \n        \U0001F680 Étape 1 : Demande référencement dynamique M2 (front\
+          \ BtnConfirmOpenPos/ClosePos) \n        ⚡ Étape 2 : Cible dynamique refusée\
+          \ (ErrorId dédié, bit libre à allouer) \n        ✅ Étape 3 : Aucune écriture\
+          \ RETAIN, aucun preset — une référence ne peut pas être bâtie sur une mesure\
+          \ non fiable"
+        type: 💻 AUTO
+        ref: §4
         etat: NV
       TC-P09-030.4:
         intention: "\U0001F4A4 Étape 0 : CablePosM dans [PositionMinM;PositionMaxM]\
@@ -1312,9 +1380,9 @@ domains:
           \ serré \n        \U0001F680 Étape 1 : Consigne opérateur (joystick/boutons)\
           \ → arbitrage palier/sens \n        ⚡ Étape 2 : Activation contacteurs selon\
           \ palier, décodage FB_SpeedStep \n        ✅ Étape 3 : Mouvement treuil piloté\
-          \ — détail dans FB_Winch_v1.0.md"
+          \ — détail dans FB_Winch_v2.0.md"
         type: —
-        ref: FB_Winch_v1.0.md
+        ref: FB_Winch_v2.0.md
         etat: NV-I
       TC-P10-001 à 010:
         intention: "\U0001F4A4 Étape 0 : Mouvement nominal, aucun défaut actif \n\
@@ -1631,63 +1699,6 @@ domains:
         type: ⚡ AUTO
         ref: §6
         etat: NV
-      TC-P10-011:
-        intention: "\U0001F4A4 Étape 0 : Treuil en mouvement, sens commandé établi\
-          \ (RelayFwd ou RelayRev) \n        \U0001F680 Étape 1 : Demande inversion\
-          \ Fwd↔Rev (vitesse < 0.1 requise) \n        ⚡ Étape 2 : DirectionChangePending\
-          \ force la rampe à 0.0 ; délai typé : descente 400ms (+100ms palier=500ms),\
-          \ montée 900ms (+100ms=1000ms) ; redémarrage temps mort 1s (même sens /\
-          \ inversion) \n        ✅ Étape 3 : Neutre↔sens = immédiat ; aucune inversion\
-          \ directe sans délai typé respecté"
-        type: 💻 AUTO
-        ref: §3
-        etat: NV-I
-      TC-P10-017:
-        intention: "\U0001F4A4 Étape 0 : FB_SpeedStep chargé, table ST_SpeedStepTable\
-          \ en validation \n        \U0001F680 Étape 1 : Injection config invalide\
-          \ (seuils non croissants, hystérésis ≤0, ou contacteurs incohérents) \n\
-          \        ⚡ Étape 2 : ConfigError := TRUE, StepNumber forcé à 0 \n      \
-          \  ✅ Étape 3 : Contactor1..4 := FALSE (sorties sûres), palier 0 maintenu"
-        type: 💻 AUTO
-        ref: §5
-        etat: NV
-      TC-P10-018:
-        intention: "\U0001F4A4 Étape 0 : Treuil à l'arrêt commandé, contacteurs commandés\
-          \ OFF \n        \U0001F680 Étape 1 : AllContactorsCommandedOff = TRUE mais\
-          \ FwdRevSpeedFeedbackOff = FALSE (contacteur/bobine collé) \n        ⚡ Étape\
-          \ 2 : Attente ContactorFeedbackTimeout = 500ms sans confirmation arrêt \n\
-          \        ✅ Étape 3 : bit1 ErrorId levé (StuckClosed)"
-        type: 💻 AUTO
-        ref: §4
-        etat: NV
-      TC-P10-019:
-        intention: "\U0001F4A4 Étape 0 : Programme chargé, MainTask 4ms active \n\
-          \        \U0001F680 Étape 1 : Exécution d'un scan MainTask \n        ⚡ Étape\
-          \ 2 : Ordre d'appel vérifié : Safety ➔ WinchControl ➔ PRG_06_Outputs \n\
-          \        ✅ Étape 3 : Aucune remontée Safety traitée après Outputs sur le\
-          \ même scan"
-        type: ⚡ SITE+AUTO
-        ref: —
-        etat: NV
-      TC-P10-042.1:
-        intention: "\U0001F4A4 Étape 0 : Treuil Enable, SpeedTgt_Pct reçu \n     \
-          \   \U0001F680 Étape 1 : Changement de contexte (descente / montée / approche\
-          \ capteur haut / zone ralentissement) \n        ⚡ Étape 2 : StepNumber plafonné\
-          \ par contexte : descente max 3, montée max 5, approche capteur haut = 1,\
-          \ zones ralentissement haut/bas capent le palier \n        ✅ Étape 3 : Palier\
-          \ effectif ≤ plafond dynamique du contexte, aucun dépassement"
-        type: 💻 AUTO
-        ref: §4
-        etat: NV-I
-      TC-P10-052.1:
-        intention: "\U0001F4A4 Étape 0 : SpeedGuardEnable activé (désactivé par défaut),\
-          \ treuil en mouvement \n        \U0001F680 Étape 1 : Vitesse mesurée non-stable\
-          \ OU MeasuredSpeedBand < StepNumber \n        ⚡ Étape 2 : SpeedGuardLimited\
-          \ bride le palier à 1 \n        ✅ Étape 3 : StepNumber réduit, pas de passage\
-          \ aux paliers supérieurs sans vitesse confirmée"
-        type: 💻 AUTO
-        ref: §5
-        etat: NV-I
       TC-P10-012:
         intention: "\U0001F4A4 Étape 0 : BrakeCmd=TRUE, BrakeFeedback=FALSE, RestartInhibit=FALSE\
           \ — watchdog armé \n        \U0001F680 Étape 1 : Maintien 500ms sans confirmation\
@@ -1788,7 +1799,8 @@ domains:
       F11.02:
         fonction: Protéger M3 (Méca A/B, incohérence, bypass)
         description: Arrêt commandé mais mouvement résiduel / incohérence prolongée
-          → SafeStop+PowerCutOff
+          → SafeStop+PowerCutOff ; produit les permits directionnels TremiePermit/MaintenancePermit
+          (source safety unique, §3bis)
         realisee_par: FB_Safety_Translation
         criticite: 🔴 C4
         tc_couvrants:

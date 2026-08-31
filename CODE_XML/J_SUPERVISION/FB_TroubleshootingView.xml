@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T12:06:40.880436" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T12:06:40.880436">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T17:45:25.022760" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T17:45:25.022760">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -948,6 +948,23 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis de mouvement effectif (agrégat diagnostic : toutes les barrières levées)
 🟢 Translation réellement autorisée à se déplacer</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TremiePermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
+🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
               </documentation>
             </variable>
             <variable name="HeightInterlockBlocking">
@@ -3693,7 +3710,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenancePermit">
@@ -3701,7 +3718,7 @@ TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
               </documentation>
             </variable>
             <variable name="BlockedBySafety">
@@ -7628,6 +7645,8 @@ GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx314_ErrorMecaA        := Tra
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx315_ErrorLimitSwitch  := Translation.Safety.ErrorLimitSwitch;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent := Translation.Safety.ErrorSensorIncoherent;
 GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx317_ErrorId := Translation.Safety.ErrorId; // Masque brut complet (latch cause, source d'arbitrage PowerCutOff)
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx318_TremiePermit := Translation.Safety.TremiePermit; // 🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)
+GVL_Troubleshooting.TranslationPontM3.Safety_300.Idx319_MaintenancePermit := Translation.Safety.MaintenancePermit; // 🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)
 
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
 GVL_Troubleshooting.TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqCmd_Hz;
