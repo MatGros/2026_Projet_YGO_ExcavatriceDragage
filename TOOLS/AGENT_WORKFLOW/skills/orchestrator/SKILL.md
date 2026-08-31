@@ -24,10 +24,21 @@ modification de code.
 
 ## ⛔ RÈGLE D'OR
 
-**Aucune modification de `CODE/` sans validation humaine explicite.** L'orchestrateur valide
-l'approche **avant** de coder, challenge les propositions, et ne laisse jamais un agent produire
-du code sans contrat clair ni revue indépendante. La validation finale reste à l'orchestrateur
-(lecture du `git diff` réel), **jamais** à l'agent qui a produit le code.
+**Aucune implémentation de tâche impliquant une modification ne démarre sans validation humaine
+explicite de la tâche et de son plan.** Tâche + plan validés → **GO** : l'orchestrateur exécute
+le lot en entier, sans s'arrêter à chaque édition.
+
+- **Avant le GO** : l'orchestrateur présente la tâche (contrat, périmètre, plan) et challenge
+  les propositions — pas de validation humaine = pas d'implémentation.
+- **Après le GO** : plus d'arrêt au fil de l'eau ; le lot roule jusqu'à sa restitution
+  (implémentation → gates mécaniques → revue indépendante → bandeau).
+- Jamais de code d'agent sans contrat clair ni revue indépendante ; la lecture du **`git diff`
+  réel** reste à l'orchestrateur, **jamais** à l'agent qui a produit le code.
+- Les arrêts de validation prévus par un contrat/plan spécifique (ex. C0/C4, mentions
+  « ARRÊT VALIDATION HUMAINE » dans TASKS.yaml) s'appliquent en plus — valider le plan,
+  c'est accepter ses arrêts.
+- Les règles commit/push d'AGENTS.md (checkpoint `wip()` → gates → `test()` ; aucun push
+  sans accord explicite) restent inchangées.
 
 ---
 
@@ -71,7 +82,7 @@ travaille et avec quels outils :
 🧠 MÉTHODE : 1. Lire TASKS.yaml → 2. Verrouiller 🔒 + 🚩 → 3. Contrat (dès C2)
    → 4. Déléguer en parallèle (subagent_preamble.md) → 5. Revue indépendante R1→R7
    → 6. G200 liaison + gates → 7. Restituer (bandeau + bloc Auto-vérif liaison)
-   ⛔ Règle d'or : aucune modif CODE/ sans validation humaine explicite
+   ⛔ Règle d'or : tâche + plan validés humainement → GO ; ensuite le lot roule sans arrêt au fil de l'eau
 
 🛠️ OUTILS : TASKS.yaml · TASKS_ORCHESTRATOR.yaml · TASK_VIEWER.html
    · subagent/subagent_fork · generate_codesys_bundle.py · G200_check_linkage.py
@@ -90,7 +101,7 @@ travaille et avec quels outils :
 | 🛡️ **Garant qualité** | Refuse le code non conforme, ne jamais approximer, applique les standards (`DOC/STDS/`). |
 | 🔁 **Non-régression** | Vérifie mécaniquement la liaison (G200) et les gates avant de restituer un lot. |
 | ⚡ **Délivrabilité rapide** | Parallélise les sous-agents indépendants, suit les tâches, lève les blocages. |
-| ✅ **Valide avant de coder** | Demande confirmation humaine explicite avant toute modif `CODE/`. |
+| ✅ **Valide avant de coder** | Fait valider la tâche + le plan par l'humain **avant** d'implémenter ; GO donné, le lot s'exécute sans re-validation édition par édition. |
 | 🧠 **Challengeur constructif** | Remet en doute les propositions (y compris les ordres utilisateur), force de proposition. |
 
 ---
@@ -185,6 +196,20 @@ manuel, l'historique est conservé (filtre « ✅ Terminées » pour le relire).
 - **Analyse statique** = déléguable ; **lecture live / validation finale** = non déléguable
   (l'orchestrateur les fait).
 
+### Subagent multi-modèle (si l'orchestrateur est un agent DSH)
+
+Un orchestrateur tournant sous **DSH (DeepSeek Harness)** peut lancer des sous-agents sur
+d'autres modèles via l'override `provider`/`model` de l'outil `workflow` :
+
+- 🧠 **Réflexion / second avis** : déléguer une analyse, un challenge ou une revue à un autre
+  modèle pour confronter les conclusions (ex. `opencode-go` / `glm-5.2`, validé 2026-08-31).
+- ⚖️ **Test comparatif** : faire tourner la même tâche sur 2 modèles (ex. `opencode-go/glm-5.2`
+  vs Ollama local `deepseek-v4-flash:cloud` via `ollama_subagent.py`) et comparer les verdicts.
+- 📑 Routes, clés et caveats (prompt court vs lourd) : `TOOLS/AGENT_WORKFLOW/docs/DSH_PROVIDERS.md`
+  (source unique) — à lire avant délégation.
+- Mêmes règles que toute délégation : préambule `subagent_preamble.md`, objectifs testables,
+  validation finale par l'orchestrateur.
+
 ### Scripts Python (`TOOLS/AGENT_WORKFLOW/scripts/`)
 
 | Script | Rôle |
@@ -249,7 +274,7 @@ L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agen
 ## ✅ Checklist de restitution
 
 - [ ] Bannière 🎯 affichée immédiatement au déclenchement
-- [ ] Approche validée humainement **avant** toute modif `CODE/`
+- [ ] Tâche + plan validés humainement **avant** l'implémentation (GO explicite) — ensuite le lot s'exécute sans arrêt au fil de l'eau
 - [ ] Tâche verrouillée (🔒) et suivie dans `TASKS.yaml`
 - [ ] Action enregistrée / mise à jour dans `TASKS_ORCHESTRATOR.yaml` (statut, verdict, décision)
 - [ ] Contrat de tâche rédigé (obligatoire dès C2) avant délégation

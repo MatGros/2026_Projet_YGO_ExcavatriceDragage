@@ -401,20 +401,17 @@ GVL_IHM.TranslationM3.State := PRG_05_Translation.Data.TranslationState;
 GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Data.Auth.Mode;
-GVL_IHM.Modes.State.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
-GVL_IHM.Modes.State.PowerContactorOk := PRG_06_Outputs.EmergencyState.ContactorOk;
-GVL_IHM.Modes.State.EmergencyChainOk := PRG_06_Outputs.EmergencyState.ChainOk;
-GVL_IHM.Modes.State.EmergencyArmable := PRG_06_Outputs.EmergencyState.Armable;
-GVL_IHM.Modes.State.EmergencyArmingBusy := PRG_06_Outputs.EmergencyState.ArmingBusy;
-GVL_IHM.Modes.State.RedundancyTestFailed := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed;
-GVL_IHM.Modes.State.EmergencyArmingFailed := PRG_06_Outputs.EmergencyDiag.ArmFailed;
+// — Chaîne AU / sécurité : sortie de Modes.State vers GVL_IHM.Emergency —
+// Point de vue IHM : Cmd = boutons (produits par l'IHM), State/Diag = bus
+// public AU (produits par PRG_06 via le FB AU). Recopies directes des bus.
+GVL_IHM.Emergency.State := PRG_06_Outputs.EmergencyState;
+GVL_IHM.Emergency.Diag := PRG_06_Outputs.EmergencyDiag;
 // OR avec les défauts d'arbitrage de mode (refus Semi-Auto, bascule de mode refusée) —
 // publiés par PRG_03 : sans eux ces refus restaient silencieux pour l'opérateur.
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
                                       OR PRG_02_Acquisition.Data.InputModules.Fault
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Error
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Latched;
-GVL_IHM.Modes.State.PowerCutOffActive := PRG_06_Outputs.PowerCutOffActive;
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
 GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;
 GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;

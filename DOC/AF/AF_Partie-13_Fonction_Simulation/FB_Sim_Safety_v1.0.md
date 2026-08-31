@@ -158,4 +158,4 @@ et `.ArmingFailed`.
 | AF01 / FB_Safety_EmergencyManagement | Consommateur réel de `SimChainOk`/`SimContactorOk` (via `HwIn.Machine`), propriétaire des latches `Cause`/`Ack` |
 | AF13 / FB_SimBench | Câblage des entrées (`PowerCutOff_A/B`, `BtnEmergencyStop`, décalage 1 scan) |
 | `CODE_QUALITY_STANDARDS.md §9` | Pattern Cause/Ack, Reset inconditionnel |
-| Code | `CODE/L_SIMULATION/FB_Sim_Safety.st`, `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st` |
+| Code | `CODE/L_SIMULATION/FB_Sim_Safety.st`, `ARCHIVES/Code/AU/FB_Safety_EmergencyManagementLogic_v2.1_OLD.st` (archivé, fusionné dans `FB_Safety_EmergencyManagement`) |

@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:22:59.334809" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:22:59.334809">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_EmergencyHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_EmergencyCmd" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Boutons opérateur IHM (réarmement / coupure)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_Safety_Emergency_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 État public AU (refactor AU)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Diag">
+              <type>
+                <derived name="ST_Safety_Emergency_Diag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Diagnostic public AU (refactor AU)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8d226a50-93cb-57af-8292-b85b6476b70d</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ ST_EmergencyHMI — Données d'échange IHM de la chaîne AU / sécurité
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure dédiée `GVL_IHM.Emergency`. Regroupe les
+      champs emergency/safety sortis de `Modes`, en réutilisant les DUT
+      du refactor AU :
+        • Cmd   : ST_EmergencyCmd              (boutons opérateur IHM)
+        • State : ST_Safety_Emergency_State    (état public AU)
+        • Diag  : ST_Safety_Emergency_Diag     (diagnostic public AU)
+      Point de vue IHM : `Cmd` = les boutons. Les commandes physiques
+      fail-safe (MaintainA/B_Cmd, ArmPulse_Cmd) sont des sorties du FB
+      AU, internes à PRG_06 — PAS des commandes IHM.
+   🔌 Interface : Produit par PRG_07_Supervision (State/Diag) et
+      l'IHM (Cmd), consommé par PRG_02 / PRG_06 / FB_TroubleshootingView.
+   📄 Doc : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md §5
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_EmergencyCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnEmergencyArming">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnEmergencyCutOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commande IHM coupure d'urgence puissance amont (arrêt à distance)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>530ff0c1-144b-5832-bee8-f40edd2d06ee</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_EmergencyCmd — Commandes IHM de la chaîne AU / sécurité
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Commandes opérateur (boutons IHM) de la chaîne d'arrêt
+      d'urgence, sorties de `Modes.Cmd`. Point de vue IHM : `Cmd` =
+      les boutons. Distinctes des commandes physiques fail-safe
+      `ST_Safety_Emergency_Cmd` (MaintainA/B_Cmd, ArmPulse_Cmd) qui
+      sont des sorties du FB AU, internes à PRG_06 — PAS des commandes
+      IHM.
+   🔌 Interface : Produit par l'IHM, consommé par PRG_02 / PRG_06 /
+      FB_TroubleshootingView.
+   📄 Doc : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md §5
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Safety_Emergency_Diag">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synthese defaut active : (ErrorId &lt;&gt; 0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield erreurs : bit0=Redundancy, bit1=Arming, bit3=Startup</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B reste colle/shunte detecte a l'auto-test (Reset requis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyee mais contacteur puissance non confirme sous 2s (Reset requis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre tentatives de rearmement echouees</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastAbortStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape de la sequence AU lors du dernier abandon (0 a 6)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastAbortCause">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield cause abandon : 16#0001=Cut IHM, 16#0002=Chute chaine pulse/confirm, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=PowerCutOff metier</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>960e6dac-c920-5489-a179-e9465fa4bc67</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Safety_Emergency_State">
+        <baseType>
+          <struct>
+            <variable name="ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermee (EmergencyChainClosed = TRUE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance confirme engage (PowerContactorEngaged = TRUE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence armement OU lockout en cours (nouvelle demande ignoree)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>dd3ab3f7-a7b2-54ae-a567-e544f71a8526</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Bus d'état public de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="6_DIAG_ET_CHAINES">
+              <Object Name="ST_EmergencyHMI" ObjectId="8d226a50-93cb-57af-8292-b85b6476b70d" />
+              <Object Name="ST_EmergencyCmd" ObjectId="530ff0c1-144b-5832-bee8-f40edd2d06ee" />
+            </Folder>
+          </Folder>
+        </Folder>
+        <Folder Name="B_AU_SECURITE">
+          <Folder Name="_TYPES">
+            <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />
+            <Object Name="ST_Safety_Emergency_State" ObjectId="dd3ab3f7-a7b2-54ae-a567-e544f71a8526" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

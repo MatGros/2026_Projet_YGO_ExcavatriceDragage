@@ -7,10 +7,6 @@ STRUCT
     BtnFaultReset      : BOOL;   (* 🔔 Acquittement défauts/alarmes domaine sécurité/métier — jamais Modes/Cycle *)
     BtnModeReset       : BOOL;   (* 🔁 Acquittement défaut FB_Modes uniquement () *)
 
-    // — Séquence réarmement AU (voir DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md §5)
-    BtnEmergencyArming : BOOL;   (* 🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique *)
-    BtnEmergencyCutOff : BOOL;   (* 🎮 Commande IHM coupure d'urgence puissance amont (arrêt à distance) *)
-
     // Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
     SelJoystickWinch   : INT := 0; (* 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement *)
 

@@ -98,6 +98,7 @@ VAR
     AbortMsgActive       : BOOL; // . [LOC] Message d'abandon AU affiché (fenêtre de maintien)
     AbortMsgLatched      : BOOL; // . [LOC] Message d'abandon verrouillé jusqu'à Reset (causes sans latch)
     AbortMsgText         : STRING(120); // . [LOC] Texte cause+action du dernier abandon AU
+    SeqReachedConfirm    : BOOL; // . [LOC] La sequence AU a atteint l'etape 6 (confirmation) -> distingue SUCCES d'un ABANDON
     TonAlarmBanner       : TON; // . [LOC] §5 Tempo de maintien par message du carrousel
     AlarmArray           : ARRAY[0..49] OF STRING(120); // . [LOC] §5 Messages actifs collectés ce scan
     AlarmCount           : INT; // . [LOC] §5 Nombre de messages actifs
@@ -328,9 +329,12 @@ DirectionBlocked := (CurrentDirection < 0 AND NOT DescendPermit)
 
 // 🩹 Signaler la cause du dernier abandon de séquence AU (message cause+action),
 // sans modifier le comportement de l'AU. Front descendant ArmingSeqStep (sequence en
-// cours -> 0) = fin de sequence. Gating sur NOT PowerContactorEngaged : un SUCCES
-// (step 6 -> 0 avec contacteur engage) ne produit AUCUN message (AC4) ; seul un
-// ABANDON (step -> 0 sans contacteur engage) affiche la cause.
+// cours -> 0) = fin de sequence.
+// 🐛 BUG A corrigé : l'ancien gating `NOT PowerContactorEngaged` supprimait le message
+// d'abandon à l'étape 5 (PowerCutOff) car le contacteur venait d'être pulsé
+// (PowerContactorEngaged=TRUE). On déclenche désormais sur la CAUSE (LastAbortCause <> 0),
+// en excluant uniquement le SUCCÈS réel (séquence ayant atteint l'étape 6 de confirmation
+// ET contacteur engagé au retour à IDLE) — un succès ne produit AUCUN message (AC4).
 // Verrouillage : les causes SANS latch (16#0010 PowerCutOff, 16#0004/0008 timeout
 // restauration) restent affichées jusqu'à Reset (ou nouvelle séquence) pour que
 // l'opérateur voie l'échec. Les causes déjà latched (16#0002/0020/0040/0080) et la
@@ -340,7 +344,14 @@ LastAbortEdge(CLK := ArmingInProgress);
 ResetEdge(CLK := Reset);
 ArmStartEdge(CLK := ArmingInProgress);
 
-IF LastAbortEdge.Q AND NOT PowerContactorEngaged THEN
+// 🩹 Détection d'un SUCCÈS de séquence : la séquence a atteint l'étape 6 (confirmation).
+// Ce drapeau est consommé par le test de LastAbortEdge ci-dessous AVANT d'être remis à
+// zéro hors séquence (fin de bloc), pour distinguer un succès d'un abandon à l'étape 5.
+IF ArmingSeqStep = 6 THEN
+    SeqReachedConfirm := TRUE;
+END_IF;
+
+IF LastAbortEdge.Q AND (LastAbortCause <> 0) AND NOT (SeqReachedConfirm AND PowerContactorEngaged) THEN
     AbortMsgActive := TRUE;
     AbortMsgLatched := (LastAbortCause = 16#0010) OR (LastAbortCause = 16#0004) OR (LastAbortCause = 16#0008);
     TonAbortHold(IN := FALSE);
@@ -351,6 +362,12 @@ IF ResetEdge.Q OR ArmStartEdge.Q THEN
     AbortMsgActive := FALSE;
     AbortMsgLatched := FALSE;
     TonAbortHold(IN := FALSE);
+END_IF;
+
+// Remise à zéro du drapeau de confirmation hors séquence (après le test de LastAbortEdge
+// ci-dessus, qui consomme sa valeur du scan précédent pour distinguer succès/abandon).
+IF NOT ArmingInProgress THEN
+    SeqReachedConfirm := FALSE;
 END_IF;
 
 // Maintien transitoire 5s UNIQUEMENT pour les causes non latched
@@ -367,7 +384,35 @@ IF AbortMsgActive THEN
         16#0002: AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
         16#0004: AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
         16#0008: AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
-        16#0010: AbortMsgText := '[AU] Coupure securite metier active - lever la cause puis rearmer';
+        16#0010:
+            // 🩹 Décodage de la cause 16#0010 (PowerCutOff métier) en cause explicite
+            // M1/M2/M3 + bit MecaA/MecaB/thermique, à partir des DUT Safety déjà en entrée.
+            // Priorité : M3 (translation) puis M1 puis M2 ; MecaA > MecaB > thermique.
+            IF TranslationSafety.ErrorMecaA THEN
+                AbortMsgText := '[M3] MecaA (mouvement non commandé) - Reset puis réarmer';
+            ELSIF TranslationSafety.ErrorMecaB THEN
+                AbortMsgText := '[M3] MecaB (arrêt non confirmé) - Reset puis réarmer';
+            ELSIF TranslationSafety.ErrorBrakeThermal THEN
+                AbortMsgText := '[M3] Surchauffe frein - Reset puis réarmer';
+            ELSIF WinchM1Safety.ErrorMecaA THEN
+                AbortMsgText := '[M1] MecaA (mouvement non commandé) - Reset puis réarmer';
+            ELSIF WinchM1Safety.ErrorMecaB THEN
+                AbortMsgText := '[M1] MecaB (arrêt non confirmé) - Reset puis réarmer';
+            ELSIF WinchM1Safety.ThermalFault THEN
+                AbortMsgText := '[M1] Surchauffe moteur - Reset puis réarmer';
+            ELSIF WinchM1Safety.ErrorBrakeThermal THEN
+                AbortMsgText := '[M1] Surchauffe frein - Reset puis réarmer';
+            ELSIF WinchM2Safety.ErrorMecaA THEN
+                AbortMsgText := '[M2] MecaA (mouvement non commandé) - Reset puis réarmer';
+            ELSIF WinchM2Safety.ErrorMecaB THEN
+                AbortMsgText := '[M2] MecaB (arrêt non confirmé) - Reset puis réarmer';
+            ELSIF WinchM2Safety.ThermalFault THEN
+                AbortMsgText := '[M2] Surchauffe moteur - Reset puis réarmer';
+            ELSIF WinchM2Safety.ErrorBrakeThermal THEN
+                AbortMsgText := '[M2] Surchauffe frein - Reset puis réarmer';
+            ELSE
+                AbortMsgText := '[AU] Coupure securite metier active - lever la cause puis rearmer';
+            END_IF;
         16#0020: AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
         16#0040: AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
         16#0080: AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
@@ -390,15 +435,17 @@ ELSIF NOT EncM1Valid OR NOT EncM2Valid THEN
     OperatorActionCandidate := '[ECAT] Codeurs non détectés - vérifier liaison';
 ELSIF NOT VarM3Valid THEN
     OperatorActionCandidate := '[ECAT] Variateur non détecté - vérifier liaison';
+ELSIF AbortMsgActive THEN
+    // 🩹 Cause du dernier abandon de séquence AU (message explicite cause+action).
+    // 🐛 BUG B corrigé : placé AVANT PowerCutOffActiveAny pour que la cause racine
+    // (dont 16#0010 PowerCutOff décodée en M1/M2/M3 + MecaA/MecaB/thermique) prime sur
+    // le message générique de coupure puissance. Placé aussi avant
+    // RedundancyTestFailed/EmergencyArmingFailed/SafeStop pour que chaque cause montre
+    // son message spécifique — le message d'abandon est la CAUSE RACINE (plus pertinente
+    // que le SafeStop qui en est une conséquence) — il prime sur SafeStop/DirectionBlocked.
+    OperatorActionCandidate := AbortMsgText;
 ELSIF PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[SÉCURITÉ] Coupure puissance active - acquitter défaut treuil/pont';
-ELSIF AbortMsgActive THEN
-    // 🩹 Cause du dernier abandon de séquence AU (message explicite cause+action)
-    // Placé avant RedundancyTestFailed/EmergencyArmingFailed/SafeStop pour que chaque
-    // cause (dont chute chaîne, PowerCutOff, timeout contacteur, redondance) montre son
-    // message spécifique. Le message d'abandon est la CAUSE RACINE (plus pertinente que
-    // le SafeStop qui en est une conséquence) — il prime sur SafeStop/DirectionBlocked.
-    OperatorActionCandidate := AbortMsgText;
 ELSIF RedundancyTestFailed THEN
     OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer (Reset)';
 ELSIF EmergencyArmingFailed THEN

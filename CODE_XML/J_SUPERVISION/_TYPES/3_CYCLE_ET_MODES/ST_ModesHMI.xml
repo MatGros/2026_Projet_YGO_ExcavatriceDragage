@@ -82,23 +82,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Acquittement défaut FB_Modes uniquement ()</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnEmergencyArming">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">— Séquence réarmement AU (voir DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md §5)
-🎮 Commande IHM réarmement contacteur puissance (front) — PAS de réarmement automatique</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnEmergencyCutOff">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Commande IHM coupure d'urgence puissance amont (arrêt à distance)</xhtml>
-              </documentation>
-            </variable>
             <variable name="SelJoystickWinch">
               <type>
                 <INT />
@@ -150,14 +133,6 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎚️ Mode de marche actuellement actif</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerContactorEngaged">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ État de la chaîne d'arrêt d'urgence</xhtml>
-              </documentation>
-            </variable>
             <variable name="AnyFaultActive">
               <type>
                 <BOOL />
@@ -166,69 +141,12 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: au moins un défaut/alarme actif dans le domaine</xhtml>
               </documentation>
             </variable>
-            <variable name="PowerCutOffActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 : au moins un Méca A/B/C (FB_Safety_Winch) ou</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyChainOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Boucle AU saine (coup-de-poing relâchés + pas de PowerCutOff PLC actif)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PowerContactorOk">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Contacteur de puissance confirmé engagé (miroir PowerContactorEngaged)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Réarmement possible maintenant (chaîne saine, ni séquence ni verrouillage en cours,</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingBusy">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏳ Auto-test A/B, pulse, confirmation OU verrouillage 5s en cours — nouvelle demande ignorée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RedundancyTestFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B non fonctionnel détecté à l'auto-test — bloque tout réarmement (front Reset requis)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="EmergencyArmingFailed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyée mais contacteur puissance jamais confirmé sous 2s (front Reset + contacteur confirmé requis)</xhtml>
-              </documentation>
-            </variable>
             <variable name="ModeChangePendingBlocked">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Miroir IHM des états de maintenance (AF-05 §4bis)
-🚦 Changement de mode refusé : treuils non à l'arrêt confirmé (contacteurs retombés + frein serré + |v| &lt; seuil)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Changement de mode refusé : treuils non à l'arrêt confirmé (contacteurs retombés + frein serré + |v| &lt; seuil)</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRequiredM1">

@@ -19,6 +19,29 @@ C'est la cause n°1 d'échec d'override (REX 2026-08-16).
 
 ---
 
+## 🔌 Provider `opencode-go` (validé 2026-08-31)
+
+| Info | Valeur |
+|---|---|
+| **Nom de la route** | `opencode-go` |
+| **Clé API** | `OPENCODE_GO_API_KEY` |
+| **Modèle validé** | `glm-5.2` (test PONG via `workflow`, override `provider`/`model`) |
+
+- ✅ `provider: "opencode-go"` + `model: "glm-5.2"` → réponse reçue (2026-08-31). Usages :
+  **réflexion / second avis** et **test comparatif** (ex. vs `deepseek-v4-flash:cloud` local).
+- ❌ `glm-5.2` via `omniroute` (`ollamacloud/glm-5.2`) → échec (2 tentatives 2026-08-31) :
+  pour glm-5.2, la route est **`opencode-go`**, pas omniroute.
+- ✅ **Prompt lourd mesuré 2026-08-31** (test réel) : préambule + contrat 5 objectifs + FB ST
+  intégral 426 lignes (~7k tokens) → analyse safety structurée reçue, **sans timeout**. Qualité :
+  constats concordants avec l'analyse de référence de l'orchestrateur + trouvailles propres
+  (ex. contacteur tardif sous alarme, Reset annulant le lockout) ; hypothèses déclarées, pas
+  devinées. **Utilisable pour revue/audit.**
+- ⚠️ Limite observée : grille de criticité C0..C4 non fournie inline → échelle improvisée
+  (correctement signalée par l'agent). Inclure la grille ou un pointeur dans les futures
+  délégations d'analyse.
+
+---
+
 ## 🧠 Modèles utilisables pour les sous-agents (matrice 2026-08-28)
 
 > Testé sur un **prompt court** (« PONG ») + un **prompt lourd de ~7,6k tokens** (taille d'une revue de
@@ -105,6 +128,7 @@ Timeout via `OMNIROUTE_TIMEOUT_S` (défaut 300). Injecte `subagent_preamble.md` 
 
 ## ✅ Vérifié (REX 2026-08-16)
 
+- ✅ `workflow` + `provider: "opencode-go"` + `model: "glm-5.2"` → PONG prompt court + **analyse safety FB 426 lignes (~7k tokens) reçue structurée, sans timeout** (2026-08-31) — validé revue/audit.
 - ✅ `workflow` + `provider: "omniroute"` + `model: "auto/best-reasoning"` → réponse en ~15 s sur prompt lourd (matrice 2026-08-28).
 - ⚠️ `codex/gpt-5.6-*-high` / `*-max`, `ollamacloud/*`, `claude/claude-sonnet-5` (via omniroute) : **timeout** sur prompt lourd (matrice 2026-08-28).
 - ✅ `ollama_subagent.py` + `model: "deepseek-v4-flash:cloud"` → réponse locale instantanée reçue.

@@ -112,7 +112,7 @@ contacteur, attesté au succès du step 6), **pas** sur `Armable`.
 | Doc | Lien |
 |---|---|
 | Tâche | T11 |
-| FB AU | `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagementLogic.st` · `FB_Safety_EmergencyManagement.st` |
+| FB AU | `ARCHIVES/Code/AU/FB_Safety_EmergencyManagementLogic_v2.1_OLD.st` (archivé, fusionné) · `FB_Safety_EmergencyManagement.st` |
 | Spec FB | `DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.2.md` |
 | Bugs liés | `VERSION_HISTORY.md:398` (lockout step Trip) |
 | Convention | `DOC/STDS/NAMING_CONVENTION.md` (polarité NC-100) |

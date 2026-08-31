@@ -1,0 +1,332 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T10:46:36.249843" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T10:46:36.249843">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_Safety_Emergency_Status">
+        <baseType>
+          <struct>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS PUBLICS IEC ===
+&lt;-- [STAT] FB pret a fonctionner (Enable + pas de StartupFail)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Sequence ou lockout en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Contacteur puissance confirme engage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_Safety_Emergency_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS D'ETAT &amp; DIAGNOSTIC ===
+&lt;-- [STAT] Bus d'etat public</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Diag">
+              <type>
+                <derived name="ST_Safety_Emergency_Diag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bus de diagnostic public</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DEFAUT LATCHE (socle FB_FaultCore) ===
+&lt;-- [DIAG] Brique defaut (vue live + latchee), corrige le bug bit3 StartupFail</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorMessage">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESSAGE OPERATEUR PAR ETAT / PAR PROBLEME ===
+&lt;-- [DIAG] Message explicite par etat / par probleme de la chaine AU</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6173cf3f-450c-5726-948c-222b0205a4b3</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_Status — État &amp; diagnostic de la chaîne AU
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : DUT d'état/diagnostic du FB_Safety_EmergencyManagement fusionné.
+      Regroupe les états publics IEC (Ready/Busy/Done), le bus d'état (State),
+      le bus de diagnostic (Diag), le défaut laté (Fault : ST_Fault, socle
+      FB_FaultCore) et le message opérateur par état / par problème.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (State/Diag), jamais sur le latch.
+      Fail-safe : Enable=FALSE → Ready/Busy à FALSE.
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement.Status, consommé par
+      PRG_07_Supervision / IHM / Troubleshooting.
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Fault">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu'au front Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] ErrorId figé à l'apparition du défaut, effacé au Reset</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ffe904a3-501c-5aac-bc38-202f178a61f2</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l'état défaut d'un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu'au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l'acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Safety_Emergency_Diag">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Synthese defaut active : (ErrorId &lt;&gt; 0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield erreurs : bit0=Redundancy, bit1=Arming, bit3=Startup</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RedundancyTestFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Canal A ou B reste colle/shunte detecte a l'auto-test (Reset requis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmFailed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyee mais contacteur puissance non confirme sous 2s (Reset requis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LockoutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrouillage temporel de 5s entre tentatives de rearmement echouees</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastAbortStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape de la sequence AU lors du dernier abandon (0 a 6)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastAbortCause">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield cause abandon : 16#0001=Cut IHM, 16#0002=Chute chaine pulse/confirm, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=PowerCutOff metier</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>960e6dac-c920-5489-a179-e9465fa4bc67</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_Diag — Diagnostic et erreurs de la chaîne AU
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de diagnostic et erreurs de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Safety_Emergency_State">
+        <baseType>
+          <struct>
+            <variable name="ChainOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermee (EmergencyChainClosed = TRUE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur puissance confirme engage (PowerContactorEngaged = TRUE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape sequence armement : 0=IDLE, 1=TestA, 2=RestoreA, 3=TestB, 4=RestoreB, 5=Pulse, 6=Confirm</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Armable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingBusy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sequence armement OU lockout en cours (nouvelle demande ignoree)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>dd3ab3f7-a7b2-54ae-a567-e544f71a8526</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Safety_Emergency_State — État public de la chaîne d'arrêt d'urgence
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Bus d'état public de la chaîne d'arrêt d'urgence
+   🔌 Interface : Produit par FB_Safety_EmergencyManagement, consommé par Supervision/Troubleshooting
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="B_AU_SECURITE">
+          <Folder Name="_TYPES">
+            <Object Name="ST_Safety_Emergency_Status" ObjectId="6173cf3f-450c-5726-948c-222b0205a4b3" />
+            <Object Name="ST_Safety_Emergency_Diag" ObjectId="960e6dac-c920-5489-a179-e9465fa4bc67" />
+            <Object Name="ST_Safety_Emergency_State" ObjectId="dd3ab3f7-a7b2-54ae-a567-e544f71a8526" />
+          </Folder>
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Folder Name="_TYPES">
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
