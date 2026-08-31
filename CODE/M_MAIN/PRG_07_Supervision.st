@@ -402,10 +402,23 @@ GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Data.Auth.Mode;
 // — Chaîne AU / sécurité : sortie de Modes.State vers GVL_IHM.Emergency —
-// Point de vue IHM : Cmd = boutons (produits par l'IHM), State/Diag = bus
-// public AU (produits par PRG_06 via le FB AU). Recopies directes des bus.
-GVL_IHM.Emergency.State := PRG_06_Outputs.EmergencyState;
-GVL_IHM.Emergency.Diag := PRG_06_Outputs.EmergencyDiag;
+// Point de vue IHM : Cmd = boutons (produits par l'IHM), State = état AU
+// (champs plats) + cmd FB AU (MaintainA/B_Cmd, ArmPulse_Cmd) + Diag interne.
+GVL_IHM.Emergency.State.ChainOk     := PRG_06_Outputs.EmergencyState.ChainOk;
+GVL_IHM.Emergency.State.ContactorOk := PRG_06_Outputs.EmergencyState.ContactorOk;
+GVL_IHM.Emergency.State.Step        := PRG_06_Outputs.EmergencyState.Step;
+GVL_IHM.Emergency.State.Armable     := PRG_06_Outputs.EmergencyState.Armable;
+GVL_IHM.Emergency.State.ArmingBusy  := PRG_06_Outputs.EmergencyState.ArmingBusy;
+GVL_IHM.Emergency.State.MaintainA_Cmd := PRG_06_Outputs.PowerKeepAliveACmd;
+GVL_IHM.Emergency.State.MaintainB_Cmd := PRG_06_Outputs.PowerKeepAliveBCmd;
+GVL_IHM.Emergency.State.ArmPulse_Cmd  := PRG_06_Outputs.EmergencyArmingCmd;
+GVL_IHM.Emergency.State.Diag := PRG_06_Outputs.EmergencyDiag;
+// États publics FB AU (Ready/Done/Fault/OperatorMessage) — miroir Status du FB
+// (produits par PRG_06). Busy non exposé : redondant avec ArmingBusy (déjà câblé).
+GVL_IHM.Emergency.State.Ready := PRG_06_Outputs.EmergencyReady;
+GVL_IHM.Emergency.State.Done := PRG_06_Outputs.EmergencyDone;
+GVL_IHM.Emergency.State.Fault := PRG_06_Outputs.EmergencyFault;
+GVL_IHM.Emergency.State.OperatorMessage := PRG_06_Outputs.EmergencyOperatorMessage;
 // OR avec les défauts d'arbitrage de mode (refus Semi-Auto, bascule de mode refusée) —
 // publiés par PRG_03 : sans eux ces refus restaient silencieux pour l'opérateur.
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
@@ -479,10 +492,10 @@ GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceSt
 GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
 GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
-// 🕹️ JoystickMotionActive = déflexion joystick seule (SANS homme-mort) — même signal que
-// CycleMotionPermit (FB_Cycle, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
+// 🕹️ JoystickDeflected = déflexion joystick seule (SANS homme-mort) — même signal que
+// JoystickDeflected (FB_Cycle, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
 // « joystick défléchi » est projeté à l'IHM.
-GVL_IHM.Cycle.State.JoystickMotionActive   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
+GVL_IHM.Cycle.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
 // Projection Assistance Dragage (DredgingAssist.State)
 GVL_IHM.DredgingAssist.State.DiveReady                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveReady;
