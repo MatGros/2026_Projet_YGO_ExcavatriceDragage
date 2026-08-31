@@ -76,8 +76,8 @@ VAR
     instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
 
     // === VARIABLES LOCALES & MEMOIRES ===
-    PrevInhibitM1           : BOOL;   // . [LOC] Memoire etat inhibition M1 (exclusion mutuelle)
-    PrevInhibitM2           : BOOL;   // . [LOC] Memoire etat inhibition M2 (exclusion mutuelle)
+    PrevInhibitM1           : BOOL;   // . [LOC] Memoire front bouton inhibition M1 (détection front montant, toggle)
+    PrevInhibitM2           : BOOL;   // . [LOC] Memoire front bouton inhibition M2 (détection front montant, toggle)
 
     // === MAINTENANCE : BASCULE DE MODE & RE-HOMING ===
     PrevArbitratedMode      : E_Mode; // . [LOC] Mode arbitré au scan précédent (maintien si bascule refusée)
@@ -231,27 +231,31 @@ Auth.HomingRequiredM2 := MaintHomingRequiredM2;
 // FALSE (désactivé) seulement si en MAINT_N1/N2 ET case décochée ; TRUE partout ailleurs.
 Auth.SyncEnable := NOT ((Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2) AND NOT SelSyncEnable);
 
-// 4bis. EXCLUSION MUTUELLE INHIBITIONS + RESET SYNC ENABLE
+// 4bis. TOGGLE INHIBITIONS + EXCLUSION MUTUELLE + RESET SYNC ENABLE
+// Chaque bouton est un TOGGLE (écran tactile simple, pas d'appui simultané possible) :
+//   - front montant d'un bouton dont le treuil n'est PAS inhibé  -> pose l'inhibition
+//     et lève l'autre (exclusion mutuelle), coupe la synchro.
+//   - front montant d'un bouton dont le treuil EST déjà inhibé   -> lève l'inhibition
+//     (retour à l'état normal), sans toucher à l'autre ni à la synchro.
 IF InhibitM1Request AND NOT PrevInhibitM1 THEN
-    IF PrevInhibitM2 THEN
+    IF Auth.InhibitM1 THEN
+        // M1 déjà inhibé -> lever (toggle off)
         Auth.InhibitM1 := FALSE;
     ELSE
+        // inhiber M1, lever M2 (exclusion mutuelle)
         Auth.InhibitM1 := TRUE;
         Auth.InhibitM2 := FALSE;
         SelSyncEnable := FALSE;
     END_IF;
 ELSIF InhibitM2Request AND NOT PrevInhibitM2 THEN
-    IF PrevInhibitM1 THEN
+    IF Auth.InhibitM2 THEN
+        // M2 déjà inhibé -> lever (toggle off)
         Auth.InhibitM2 := FALSE;
     ELSE
+        // inhiber M2, lever M1 (exclusion mutuelle)
         Auth.InhibitM2 := TRUE;
         Auth.InhibitM1 := FALSE;
         SelSyncEnable := FALSE;
-    END_IF;
-ELSE
-    IF InhibitM1Request AND InhibitM2Request THEN
-        Auth.InhibitM1 := FALSE;
-        Auth.InhibitM2 := FALSE;
     END_IF;
 END_IF;
 

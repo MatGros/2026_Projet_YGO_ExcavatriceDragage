@@ -23,6 +23,14 @@
       "passed": true
     },
     {
+      "name": "TC-P05-003bis Toggle inhibition : re-appui du meme bouton leve l inhibition",
+      "passed": true
+    },
+    {
+      "name": "TC-P05-003ter Toggle inhibition : bascule M1 -> M2 par appui M2, puis re-appui M2 leve",
+      "passed": true
+    },
+    {
       "name": "TC-P05-004 SEMI_AUTO selectionnable sous defaut codeur (cycle non pret, non-bloquant)",
       "passed": true
     },
@@ -40,16 +48,7 @@
     },
     {
       "name": "TC-P05-007 Modes N1/N2/SEMI_AUTO selectionnables sous AU (aucun repli)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.AUTH.MODE expected 2, got 1",
-        "file": "test_fb_modes.st",
-        "line": 136,
-        "message": "MAINT_N2 sous AU -> mode reste MAINT_N2",
-        "expected": "2",
-        "actual": "1"
-      }
+      "passed": true
     },
     {
       "name": "TC-P05-008 Bascule de mode sous AU (treuils a l arret mecanique)",
@@ -57,8 +56,8 @@
     }
   ],
   "summary": {
-    "total": 11,
-    "passed": 10,
-    "failed": 1
+    "total": 13,
+    "passed": 13,
+    "failed": 0
   }
 }

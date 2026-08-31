@@ -4,7 +4,7 @@
 > « dans le logiciel de programmation »). Il couvre les **commandes disponibles**, leurs
 > **compatibilités** et les **pièges** propres à ce contexte.
 > Ne définit **aucun contrat de données** : les échanges PLC ↔ IHM (`GVL_IHM`, états, commandes)
-> restent la propriété de [`AF_Partie-07_Interface_IHM_v2.2.md`](../../AF/AF_Partie-07_Interface_IHM_v2.2.md).
+> restent la propriété de [`AF_Partie-07_Interface_IHM_v2.2.md`](../../AF/AF_Partie-07_Interface_IHM_v2.3.md).
 > Périmètre : **CODESYS Visualization (Runtime)** — pas TargetVisualization (sauf comparaisons ponctuelles).
 
 ---
@@ -239,7 +239,7 @@ Visu. Le câblage Visu → `GVL_IHM` se relit **manuellement** contre AF07 à ch
 
 ## 🔗 9. Références
 
-- [`AF_Partie-07_Interface_IHM_v2.2.md`](../../AF/AF_Partie-07_Interface_IHM_v2.2.md) — contrats de données IHM
+- [`AF_Partie-07_Interface_IHM_v2.2.md`](../../AF/AF_Partie-07_Interface_IHM_v2.3.md) — contrats de données IHM
 - [`AF_Partie-01_Analyse_Fonctionnelle_v2.1.md`](../../AF/AF_Partie-01_Analyse_Fonctionnelle_v2.1.md) §6 — modèle de commande et d'arrêt (front, AU)
 - [`NAMING_CONVENTION.md`](../NAMING_CONVENTION.md) — noms des écrans, boutons, variables liées
 - Aide CODESYS 3.5 : *Visualization > Elements > Commands / Events*

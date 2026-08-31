@@ -489,6 +489,7 @@ TranslationSafety.SafeStop := M3_SafeStop_Aggregate;
 TranslationSafety.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
 TranslationSafety.Error := instSafetyTranslationM3.Fault.Error;
 TranslationSafety.ErrorId := instSafetyTranslationM3.Fault.ErrorId;
+TranslationSafety.LatchedId := instSafetyTranslationM3.Fault.LatchedId;
 TranslationSafety.ErrorOperatorComm := instSafetyTranslationM3.ErrorOperatorComm;
 TranslationSafety.ErrorDriveComm := instSafetyTranslationM3.ErrorDriveComm;
 TranslationSafety.ErrorPhaseRotation := instSafetyTranslationM3.ErrorPhaseRotation;

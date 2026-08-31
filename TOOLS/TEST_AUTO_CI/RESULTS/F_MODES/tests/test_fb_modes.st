@@ -86,6 +86,60 @@ TEST 'TC-P05-003 Mode MAINT_N2 M1 seul : M2 bloque, frein serre'
     ASSERT_EQ(FB.Auth.JoystickWinchSelectArbitrated, 1, 'MAINT_N2 -> select joystick = 1 (M1 seul)');
 END_TEST
 
+TEST 'TC-P05-003bis Toggle inhibition : re-appui du meme bouton leve l inhibition'
+    (* Front M1 -> inhibe M1, leve M2 *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N2,
+       InhibitM1Request := TRUE, InhibitM2Request := FALSE, JoystickWinchSelectRequest := 1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+    ASSERT_TRUE(FB.Auth.InhibitM1, 'Front M1 -> InhibitM1=TRUE');
+    ASSERT_FALSE(FB.Auth.InhibitM2, 'Front M1 -> InhibitM2=FALSE');
+
+    (* Relache M1 : l inhibition reste (latch) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N2,
+       InhibitM1Request := FALSE, InhibitM2Request := FALSE, JoystickWinchSelectRequest := 1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+    ASSERT_TRUE(FB.Auth.InhibitM1, 'Relache M1 -> InhibitM1 reste TRUE (latch)');
+
+    (* Re-appui M1 -> toggle off : retour etat normal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N2,
+       InhibitM1Request := TRUE, InhibitM2Request := FALSE, JoystickWinchSelectRequest := 1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+    ASSERT_FALSE(FB.Auth.InhibitM1, 'Re-appui M1 -> InhibitM1=FALSE (toggle off)');
+    ASSERT_FALSE(FB.Auth.InhibitM2, 'Re-appui M1 -> InhibitM2=FALSE');
+END_TEST
+
+TEST 'TC-P05-003ter Toggle inhibition : bascule M1 -> M2 par appui M2, puis re-appui M2 leve'
+    (* Front M1 -> inhibe M1 *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N2,
+       InhibitM1Request := TRUE, InhibitM2Request := FALSE, JoystickWinchSelectRequest := 1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+    ASSERT_TRUE(FB.Auth.InhibitM1, 'Front M1 -> InhibitM1=TRUE');
+
+    (* Relache M1 *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N2,
+       InhibitM1Request := FALSE, InhibitM2Request := FALSE, JoystickWinchSelectRequest := 1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+
+    (* Front M2 -> leve M1, inhibe M2 (bascule) *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N2,
+       InhibitM1Request := FALSE, InhibitM2Request := TRUE, JoystickWinchSelectRequest := 1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+    ASSERT_FALSE(FB.Auth.InhibitM1, 'Front M2 -> InhibitM1=FALSE (bascule)');
+    ASSERT_TRUE(FB.Auth.InhibitM2, 'Front M2 -> InhibitM2=TRUE');
+
+    (* Relache M2 *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N2,
+       InhibitM1Request := FALSE, InhibitM2Request := FALSE, JoystickWinchSelectRequest := 1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+
+    (* Re-appui M2 -> toggle off : retour etat normal *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N2,
+       InhibitM1Request := FALSE, InhibitM2Request := TRUE, JoystickWinchSelectRequest := 1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+    ASSERT_FALSE(FB.Auth.InhibitM2, 'Re-appui M2 -> InhibitM2=FALSE (toggle off)');
+    ASSERT_FALSE(FB.Auth.InhibitM1, 'Re-appui M2 -> InhibitM1=FALSE');
+END_TEST
+
 TEST 'TC-P05-004 SEMI_AUTO selectionnable sous defaut codeur (cycle non pret, non-bloquant)'
     (* T207 : le defaut codeur ne refuse plus la SELECTION SEMI_AUTO ; le mode reste
        selectionne, le cycle ne tourne pas (coupure en aval FB_Safety_Winch). *)
@@ -126,17 +180,22 @@ TEST 'TC-P05-006 SEMI_AUTO selectionnable sous AU (PowerContactorEngaged=FALSE)'
 END_TEST
 
 TEST 'TC-P05-007 Modes N1/N2/SEMI_AUTO selectionnables sous AU (aucun repli)'
-    (* T207 : les trois modes restent selectionnables sous AU, sans repli automatique. *)
+    (* T207 : les trois modes restent selectionnables sous AU, sans repli automatique.
+       Sous AU, les treuils sont a l arret mecanique confirme (contacteurs retombes,
+       freins serres) -> la bascule N1/N2/SEMI_AUTO est autorisee. *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := FALSE, SelMode := E_Mode.MAINT_N1,
-       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE,
+       M1ContactorsReleased := TRUE, M2ContactorsReleased := TRUE);
     ASSERT_EQ(FB.Auth.Mode, E_Mode.MAINT_N1, 'MAINT_N1 sous AU -> mode reste MAINT_N1');
 
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := FALSE, SelMode := E_Mode.MAINT_N2,
-       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE,
+       M1ContactorsReleased := TRUE, M2ContactorsReleased := TRUE);
     ASSERT_EQ(FB.Auth.Mode, E_Mode.MAINT_N2, 'MAINT_N2 sous AU -> mode reste MAINT_N2');
 
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := FALSE, SelMode := E_Mode.SEMI_AUTO,
-       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE,
+       M1ContactorsReleased := TRUE, M2ContactorsReleased := TRUE);
     ASSERT_EQ(FB.Auth.Mode, E_Mode.SEMI_AUTO, 'SEMI_AUTO sous AU -> mode reste SEMI_AUTO');
 END_TEST
 

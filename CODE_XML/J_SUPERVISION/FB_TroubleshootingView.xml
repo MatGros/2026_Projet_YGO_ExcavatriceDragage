@@ -3602,7 +3602,15 @@ fournie par la configuration persistante de l'appelant.
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité (vue LIVE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕘 Vue LATCHÉE : ErrorId figé au défaut, effacé au Reset (marqueur [HISTO])</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorOperatorComm">
@@ -4464,7 +4472,15 @@ fournie par la configuration persistante de l'appelant.
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité (vue LIVE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕘 Vue LATCHÉE : ErrorId figé au défaut, effacé au Reset (marqueur [HISTO])</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">

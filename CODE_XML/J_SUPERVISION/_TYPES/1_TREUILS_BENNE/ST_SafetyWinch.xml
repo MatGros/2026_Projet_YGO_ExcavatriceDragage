@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:53.989463" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:53.989463">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T22:48:44.074806" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T22:48:44.074806">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -39,7 +39,15 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité (vue LIVE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕘 Vue LATCHÉE : ErrorId figé au défaut, effacé au Reset (marqueur [HISTO])</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">

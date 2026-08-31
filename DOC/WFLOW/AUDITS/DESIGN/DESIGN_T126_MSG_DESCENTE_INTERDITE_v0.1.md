@@ -75,5 +75,5 @@ Remplacer le libellé figé par un contexte **composé dynamiquement** (concaté
 |---|---|
 | Tâche | T126 |
 | FB | `CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st` (L191, L244-262) |
-| Spec IHM | `DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md` |
+| Spec IHM | `DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md` |
 | Contexte | `GVL_IHM`, `ST_HmiBanner` |

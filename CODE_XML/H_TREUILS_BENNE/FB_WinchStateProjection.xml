@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T03:23:07.825527" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T03:23:07.825527">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T22:48:46.967999" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T22:48:46.967999">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -389,7 +389,15 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité (vue LIVE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕘 Vue LATCHÉE : ErrorId figé au défaut, effacé au Reset (marqueur [HISTO])</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -2982,6 +2990,7 @@ WinchM1Safety.ThermalFault := NOT HwInWinch.M1_ThermalOk_DI;
 WinchM1Safety.PowerCutOff := SafetyM1.PowerCutOff;
 WinchM1Safety.Error := WinchM1Ref.Fault.Error OR SafetyM1.Fault.Error;
 WinchM1Safety.ErrorId := SafetyM1.Fault.ErrorId;
+WinchM1Safety.LatchedId := SafetyM1.Fault.LatchedId;
 WinchM1Safety.ErrorOperatorComm  := (SafetyM1.Fault.ErrorId AND 16#0001) &lt;&gt; 0;
 WinchM1Safety.ErrorEncoder       := (SafetyM1.Fault.ErrorId AND 16#0002) &lt;&gt; 0;
 WinchM1Safety.ErrorPhaseRotation := (SafetyM1.Fault.ErrorId AND 16#0010) &lt;&gt; 0;
@@ -3008,6 +3017,7 @@ WinchM2Safety.ThermalFault := NOT HwInWinch.M2_ThermalOk_DI;
 WinchM2Safety.PowerCutOff := SafetyM2.PowerCutOff;
 WinchM2Safety.Error := WinchM2Ref.Fault.Error OR SafetyM2.Fault.Error;
 WinchM2Safety.ErrorId := SafetyM2.Fault.ErrorId;
+WinchM2Safety.LatchedId := SafetyM2.Fault.LatchedId;
 WinchM2Safety.ErrorOperatorComm  := (SafetyM2.Fault.ErrorId AND 16#0001) &lt;&gt; 0;
 WinchM2Safety.ErrorEncoder       := (SafetyM2.Fault.ErrorId AND 16#0002) &lt;&gt; 0;
 WinchM2Safety.ErrorPhaseRotation := (SafetyM2.Fault.ErrorId AND 16#0010) &lt;&gt; 0;
@@ -4198,7 +4208,7 @@ IF NOT BypassGlobal THEN
     instCauses[11].Texte    := 'Escalade fin de course haut (Meca D)';
 
     // Cause 12 &amp; 13 : Méca E écart critique synchro &amp; escalade (latched)
-    IF NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
+    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
        AND (ABS(CablePosM - ExpectedOtherWinchPosM) &gt; CriticalSyncToleranceM) THEN
         MecaEFaultLatched := TRUE;
     END_IF;
@@ -5691,9 +5701,10 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 RequestedStepClamped := LIMIT(0, RequestedStep, 5);
-// SafeStop reste une rampe rapide du FB_Winch (Enable maintenu, Partie 3 §1bis).
-// La demande métier reste donc autorisée ici pendant la décélération ; l'interlock
-// ne coupe qu'après sa retombée effective à zéro, sauf gate dur ou défaut final.
+// 🛡️ SafeStop : coupure dure à la barrière finale (défense en profondeur).
+// SafeStop est consommé en §5 : quand TRUE, RelayFwd/Rev, contacteurs et frein
+// sont coupés indépendamment de FB_Winch. Enable reste actif (≠ neutralisation) ;
+// SafeStop n'est pas un défaut (pas de FAULT, pas de latch, pas de Reset requis).
 MotorRequest := (RequestedStepClamped &gt; 0) AND (RequestedRelayFwd XOR RequestedRelayRev);
 
 // ── 2bis. Arbitrage Error/ErrorId AVANT §3/§5 ────────────────────────────
@@ -5861,6 +5872,18 @@ ELSIF ContactorStuckLatched THEN
     AuthorizedStep := 0;
     Reason := E_WinchFinalInterlockReason.SENSE_DROP_TIMEOUT;
     State := E_WinchFinalInterlockState.FAULT;
+ELSIF SafeStop THEN
+    // 🛡️ SafeStop : coupure dure indépendante de FB_Winch (défense en profondeur).
+    // SafeStop n'est PAS un défaut : pas de FAULT, pas de latch, pas de Reset requis.
+    // Les sorties sont coupées tant que SafeStop=TRUE ; retour nominal dès sa retombée.
+    // BrakeCmd (= RelayFwd OR RelayRev, §6) retombe à FALSE automatiquement.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    RelayFwd := FALSE; RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    State := E_WinchFinalInterlockState.READY;
 ELSIF SenseHoldActive THEN
     // §3bis : RequestedStep retombé à 0 mais sens encore commandé -&gt; on TIENT le
     // contacteur de sens jusqu'à FwdRevSpeedFeedbackOff (debounced DropConfirmDelay)

@@ -1,4 +1,4 @@
-# Analyse Fonctionnelle - Partie 7 : Interface IHM (v2.2)
+# Analyse Fonctionnelle - Partie 7 : Interface IHM (v2.3)
 
 > La tracabilite des versions programme/document est portee par `DOC/VERSION_HISTORY.md`.
 
@@ -114,7 +114,7 @@
     </tr>
     <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P07-009</span></td>
-      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Aucun défaut actif → bandeau d'alarme vide</b></small></td>
+      <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Aucun défaut bloquant actif → bandeau d'alarme vide</b></small></td>
       <td style="padding: 6px 8px; line-height: 1.55;"><code>HasAlarm=FALSE</code>, <code>Text=''</code>, <code>Index=0</code>, <code>Count=0</code></td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§6</small></td>
@@ -241,6 +241,7 @@ flowchart LR
 - **Pas de manipulation de texte dans les FB procédé** : Les FB métier (`FB_Cycle`, `FB_DiveSearch`, `FB_Safety_Winch`, etc.) publient exclusivement des états typés (`E_CycleStep`, `E_DiveSearchState`, `ActionId : WORD`, flags booléens de bypass).
 - **Arbitre central dans `PRG_07_Supervision`** : Le POU `PRG_07_Supervision` instancie un formateur dédié (`FB_Hmi_BannerFormatter`) qui assemble les 4 champs selon les priorités machine et met à jour `GVL_IHM.Banner`.
 - **Séparation stricte avec les alarmes** : Les alarmes et pannes restent publiées dans `Error`/`ErrorId` et traitées par le gestionnaire d'alarmes / journal de supervision IHM. Le bandeau d'information ne remplace pas le journal d'alarmes.
+- **Code `ErrorID` dans les messages** (décision 2026-09-01) : les messages d'alarme contiennent le code `ErrorID` pour que l'opérateur voie immédiatement le défaut sans ouvrir le journal (ex. `ErrorID:08`). Conforme à la séparation stricte ci-dessus : les alarmes restent publiées dans `Error`/`ErrorId`, le code est simplement repris dans le texte du bandeau.
 
 ### 🧊 5.3 Stratégie anti-clignotement (décision 2026-08-17)
 
@@ -282,20 +283,38 @@ l'opérateur. Stratégie **hybride** :
 > et fonctionne en code (`ST_AlarmBanner.st`, `FB_Hmi_BannerFormatter.st`), documenté ici pour la
 > première fois.
 
-`GVL_IHM.Banner.AlarmBanner : ST_AlarmBanner` liste **tous** les défauts/warnings actifs de la
-machine et les affiche **un à la fois, en rotation** (carrousel), distinct du bandeau
-d'information (§5) qui ne porte que 4 messages fixes par responsabilité.
+`GVL_IHM.Banner.AlarmBanner : ST_AlarmBanner` liste **uniquement les défauts actifs bloquants**
+de la machine (SafeStop / PowerCutOff / interlock) et les affiche **un à la fois, en rotation**
+(carrousel), distinct du bandeau d'information (§5) qui ne porte que 4 messages fixes par
+responsabilité. Les **warnings non bloquants** (ex. `[M1] mou de cable`, `[M1] surchauffe moteur`)
+**ne sont pas publiés** dans le carrousel : ils relèvent du bandeau d'information / journal de
+supervision, pas du carrousel de défauts bloquants.
 
 | Champ | Type | Rôle |
 |---|---|---|
-| `HasAlarm` | `BOOL` | `TRUE` = au moins un défaut/warning actif |
-| `Text` | `STRING(120)` | Message courant, préfixé `n/N` (ex. `1/2 [M1] perte codeur`) |
-| `Index` | `INT` | Position courante, 1-based, `0` si aucun défaut |
-| `Count` | `INT` | Nombre total de messages actifs |
-| `AlarmArray` | `ARRAY[0..49] OF STRING(120)` | 📋 Liste instantanée et exhaustive de tous les défauts actifs |
+| `HasAlarm` | `BOOL` | `TRUE` = au moins un **défaut actif bloquant** (SafeStop / PowerCutOff / interlock) |
+| `Text` | `STRING(120)` | Message courant, préfixé `n/N` (ex. `1/2 [M1] ErrorID:08 - MecaA`) |
+| `Index` | `INT` | Position courante, 1-based, `0` si aucun défaut bloquant |
+| `Count` | `INT` | Nombre total de défauts bloquants actifs |
+| `AlarmArray` | `ARRAY[0..49] OF STRING(120)` | 📋 Liste instantanée et exhaustive des défauts bloquants actifs |
 
 **Rotation & Affichage instantané** : un message affiché `AlarmHoldTime` (déf. `T#1s`) avant de passer au suivant
-(`(AlarmIndex + 1) MOD AlarmCount`) ; capacité `CST_NbMaxAlarmes = 50` messages. L'ensemble des messages actifs du scan est simultanément publié dans `AlarmArray[0..Count-1]`.
+(`(AlarmIndex + 1) MOD AlarmCount`) ; capacité `CST_NbMaxAlarmes = 50` messages. L'ensemble des défauts bloquants actifs du scan est simultanément publié dans `AlarmArray[0..Count-1]`.
+
+**Marqueur `[HISTO]` — défauts latched passés** (décision 2026-09-01) : un défaut **latched passé**
+(cause disparue mais non acquittée) est marqué `[HISTO]` dans le carrousel, en complément des
+défauts bloquants actifs. Calcul par bit :
+
+```text
+[HISTO] bit i  ⇔  (LatchedId bit i = 1)  AND  (ErrorId bit i = 0)
+```
+
+- **Entrée** : `LatchedId : WORD` par domaine (même mapping de bits que `ErrorId`).
+- **Vue latched M1/M2/M3** : les DUT safety `ST_SafetyWinch` / `ST_SafetyTranslation` exposent
+  désormais la vue latched (`LatchedId`) en plus des bits actifs, ce qui rend `[HISTO]` possible
+  sur les treuils et la translation.
+- **Affichage** : message préfixé `[HISTO]` (ex. `[HISTO] [M1] surchauffe moteur`), inséré dans le
+  carrousel en complément des défauts bloquants actifs.
 
 **Qualification E/S & Masquage des fausses alarmes en cascade (Root Cause Masking)** :
 Lors de la perte d'un module d'E/S ou d'un bus de communication, l'alarme parente racine est affichée en tête absolue du carrousel et toutes les alarmes filles secondaires portées par l'équipement défaillant sont masquées pour éviter la panique opérateur.
@@ -342,6 +361,7 @@ plus un TBD (voir §9).
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.3 | 2026-09-01 | Tri du carrousel : ne publie que les **défauts actifs bloquants** (SafeStop / PowerCutOff / interlock), warnings non bloquants exclus ; sémantique `HasAlarm` restreinte aux bloquants. Marqueur `[HISTO]` pour les défauts latched passés (`LatchedId AND NOT ErrorId`) + vue latched M1/M2/M3 exposée dans les DUT safety. Messages d'alarme avec code `ErrorID` (ex. `ErrorID:08`). |
 | v2.2 | 2026-08-26 | Intégration Root Cause Masking dans `ST_AlarmBanner` (`AlarmArray[0..49]`), 11 alarmes parentes E/S et bus (P1..P11), temporisation démarrage (4s) et debouncing TOF (1.5s). Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié, section `🎯 Rôle et périmètre` explicite, Suivi historique ajouté. |
 | v2.1 | — | Version precedente (voir `ARCHIVES/Doc/`) |
 

@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-31 22:40:30</div>
+    <div class="exec-time">2026-09-01 01:27:16</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (10 tests)</summary>
@@ -1284,8 +1284,25 @@ TableComplete := (CellsFilled &gt;= CellsTotal);
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>
-[VAR_IN_OUT] Assertions executees par le runner copy-out recompile; voir le resultat JSON final.
+        <pre>STruC++ Test Runner v1.0
+
+test_fb_winch_speed_learning.st
+  [PASS] TC-T181-15a LearnStart=FALSE : aucune collecte, table inchangee (AC3)
+  [PASS] TC-T181-15b Conditions de collecte manquantes une a une : aucune ecriture (AC4)
+  [PASS] TC-T181-15c Valid seulement a MinSamples : frontiere via CellsFilled (AC2/AC5)
+  [PASS] TC-T181-15d Hors enveloppe : cellule invalidee (Valid=FALSE, SampleCount=0, SpeedMps=0) (AC5)
+  [PASS] TC-T181-15e TableComplete : FALSE si une cellule manque, TRUE avec 40 cellules valides (AC6)
+  [PASS] TC-T181-15f Passivite : sorties limitees au statut/diagnostic, aucune commande moteur (AC1/AC7)
+  [PASS] TC-T181-15g Sens descente : cellule descente [1,2,1,1] ecrite, montee inchangee (AC2)
+  [PASS] TC-T181-15h Charge presente : cellule charge [1,1,2,1] ecrite, vide inchangee (AC2)
+  [PASS] TC-T181-15i Axe M2 (WinchId=2) : cellule [2,1,1,1] ecrite, M1 inchangee (AC2)
+         ASSERT_EQ failed: TABLE.CELL.SAMPLECOUNT expected 1, got 0
+         at test_fb_winch_speed_learning.st:392
+         Message: 1er scan : SampleCount=1
+  [FAIL] TC-T181-15j Moyenne glissante + persistance RETAIN via copy-out (AC2)
+
+-----------------------------------------
+10 tests, 9 passed, 1 failed
 </pre>
     </details>
 </div>

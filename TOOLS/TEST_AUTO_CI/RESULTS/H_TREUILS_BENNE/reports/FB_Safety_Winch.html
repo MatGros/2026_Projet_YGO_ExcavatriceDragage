@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-31 22:46:13</div>
+    <div class="exec-time">2026-09-01 01:27:11</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (17 tests)</summary>
@@ -2389,7 +2389,7 @@ IF NOT BypassGlobal THEN
     instCauses[11].Texte    := &#x27;Escalade fin de course haut (Meca D)&#x27;;
 
     // Cause 12 &amp; 13 : Méca E écart critique synchro &amp; escalade (latched)
-    IF NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
+    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
        AND (ABS(CablePosM - ExpectedOtherWinchPosM) &gt; CriticalSyncToleranceM) THEN
         MecaEFaultLatched := TRUE;
     END_IF;
