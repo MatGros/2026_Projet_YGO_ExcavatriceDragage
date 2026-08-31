@@ -1,0 +1,81 @@
+contract:
+  task_id: T198_TROUBLESHOOTING_SNAPSHOT
+  criticality: C2
+  strategy: patch
+  objective: >
+    Rendre le snapshot de dépannage fiable lorsqu'un chemin CODESYS est périmé :
+    une erreur de lecture isolée ne doit plus marquer tout le lot comme invalide,
+    et la liste des variables doit rester dérivée des structures source actuelles.
+  acceptance:
+    - id: AC1
+      statement: >
+        Si read_values(tuple(batch)) échoue, chaque variable du batch est relue
+        individuellement et seules les expressions réellement invalides sont
+        marquées ERREUR.
+      verified_by: >
+        Revue du script et test Python avec un faux online_app simulant une seule
+        variable invalide dans un batch de plusieurs variables.
+    - id: AC2
+      statement: >
+        La liste de snapshot est régénérée depuis CODE/J_SUPERVISION/GVL_Troubleshooting.st
+        et contient toutes les feuilles des structures déclarées.
+      verified_by: >
+        generate_variable_list_from_code.py puis comparaison sans différence avec
+        troubleshooting_variables.txt.
+    - id: AC3
+      statement: >
+        Le rapport de snapshot distingue clairement une erreur de chemin d'une
+        erreur globale de lot et conserve les valeurs valides déjà lues.
+      verified_by: Revue du format CSV et essai contrôlé de la stratégie de repli.
+    - id: AC4
+      statement: >
+        Aucun script ne lit ni ne modifie Device.export; les chemins proviennent
+        exclusivement des sources CODE versionnées.
+      verified_by: Recherche statique des références et revue du diff.
+  scope:
+    allowed:
+      - TOOLS/PLC_CSV_SNAPSHOT/codesys_console/codesys_snapshot_troubleshooting.py
+      - TOOLS/PLC_CSV_SNAPSHOT/codesys_console/codesys_snapshot_all.py
+      - TOOLS/PLC_CSV_SNAPSHOT/codesys_console/codesys_acquisition_periodique_troubleshooting.py
+      - TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt
+      - TOOLS/PLC_CSV_SNAPSHOT/variable_lists/generate_variable_list_from_code.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T198_TROUBLESHOOTING_SNAPSHOT.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/**
+  conservation:
+    must_survive:
+      - Le format CSV Variable;Valeur avec terminaison CRLF.
+      - La lecture en lots reste utilisée quand le lot est valide.
+      - Les erreurs sont conservées dans les lignes concernées pour diagnostic.
+    dropped_on_purpose:
+      - Le marquage artificiel de toutes les variables d'un lot après une seule erreur.
+  evidence_required:
+    - unit_test_snapshot_fallback
+    - generated_variable_list_comparison
+    - git_diff_review
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Tout chemin présent dans les sources mais rejeté par CODESYS après Clean & Rebuild
+    doit être remonté comme incompatibilité de déploiement et non masqué par le script.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex / root"
+  completed_at: "2026-08-31T04:17:35+02:00"
+  status: COMPLETED
+  summary: >
+    Lecture par lot durcie avec repli individuel en cas d'expression invalide;
+    liste troubleshooting régénérée depuis les structures CODE, de 450 à 495
+    feuilles sans dépendance à Device.export.
+  evidence_submitted:
+    - "snapshot fallback tests (single/all/acquisition): PASS"
+    - "100-row isolation scenario: PASS (99 valid, 1 KO)"
+    - "generated variable list comparison: PASS (495 paths, no difference)"
+    - "python -m py_compile: PASS"
+    - "git diff --check: PASS"
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation avec un snapshot CODESYS réel après Clean & Rebuild requise."

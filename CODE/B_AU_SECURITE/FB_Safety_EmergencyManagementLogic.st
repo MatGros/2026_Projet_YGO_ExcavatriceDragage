@@ -34,7 +34,7 @@ VAR_OUTPUT
     ArmingBusy                   : BOOL; // <-- [STAT] Sequence ou lockout en cours
     StartupFail                  : BOOL; // <-- [DIAG] Autotest demarrage echoue
     LastAbortStep                : INT;  // <-- [DIAG] Etape sequence lors du dernier abandon (0 a 6)
-    LastAbortCause               : WORD; // <-- [DIAG] Bitfield cause abandon (16#0001=Cut, 16#0002=Chute chaine pulse/confirm, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=Startup front)
+    LastAbortCause               : WORD; // <-- [DIAG] Bitfield cause abandon (16#0001=Cut, 16#0002=Chute chaine pulse/confirm, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=PowerCutOff, 16#0020=Redondance A, 16#0040=Redondance B, 16#0080=Timeout contacteur)
 END_VAR
 VAR
     // === DETECTEURS DE FRONT INTERNES ===
@@ -285,16 +285,6 @@ IF ArmingSeqStep = 6 THEN
         LastAbortCause := 16#0080; // Defaut confirmation contacteur
         ArmingSeqStep := 0;
     END_IF;
-END_IF;
-
-// 🛑 Reset immédiat des TON si séquence retombée à 0 (évite le piège IEC des timers qui restent Q=TRUE)
-IF ArmingSeqStep = 0 THEN
-    TonTestA(IN := FALSE);
-    TonRestoreA(IN := FALSE);
-    TonTestB(IN := FALSE);
-    TonRestoreB(IN := FALSE);
-    TonArmingPulse(IN := FALSE);
-    TonArmingConfirm(IN := FALSE);
 END_IF;
 
 // ⏱️ Séquence de verrouillage temporel (5s)

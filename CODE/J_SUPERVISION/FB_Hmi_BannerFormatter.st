@@ -66,6 +66,7 @@ VAR_INPUT
     EmergencyErrorId     : WORD;   // --> [DIAG] Code défaut chaîne AU (FB_Safety_EmergencyManagement.Diag.ErrorId)
     RedundancyTestFailed : BOOL;   // --> [DIAG] Defaut redondance contacteurs AU (lisee -> message explicite)
     EmergencyArmingFailed: BOOL;   // --> [DIAG] Echec rearmement contacteur AU (lisee -> message explicite)
+    LastAbortCause       : WORD;   // --> [DIAG] Cause du dernier abandon de sequence AU (T173 : message explicite cause+action)
     AlarmHoldTime        : TIME := T#1s; // --> [CFG] Durée d'affichage par message du carrousel
     Network              : ST_NetworkDiagHMI; // --> [DIAG] Diagnostic réseau, bus et modules E/S
 END_VAR
@@ -87,6 +88,10 @@ VAR
     StepAtErrorStr            : STRING(40);   // . [LOC] Libellé de l'étape d'origine du défaut
     AntiFlickSpecial     : FB_AntiFlickerText; // * [INST] §3 Condition spéciale (warning → maintenu)
     AntiFlickOperator    : FB_AntiFlickerText; // * [INST] §4 Action opérateur (critique → direct, warning → maintenu)
+    LastAbortEdge        : R_TRIG; // . [LOC] Front montant LastAbortCause (T173 : nouvel abandon AU)
+    TonAbortHold         : TON; // . [LOC] Maintien du message d'abandon AU (T173)
+    AbortMsgActive       : BOOL; // . [LOC] Message d'abandon AU affiché (fenêtre de maintien)
+    AbortMsgText         : STRING(120); // . [LOC] Texte cause+action du dernier abandon AU
     TonAlarmBanner       : TON; // . [LOC] §5 Tempo de maintien par message du carrousel
     AlarmArray           : ARRAY[0..49] OF STRING(120); // . [LOC] §5 Messages actifs collectés ce scan
     AlarmCount           : INT; // . [LOC] §5 Nombre de messages actifs
@@ -118,6 +123,7 @@ VAR
 END_VAR
 VAR CONSTANT
     CST_BannerHoldTime   : TIME := T#500ms; // . [LOC] Anti-clignotement warnings/états (AF-07 §5.3)
+    CST_AbortHoldTime    : TIME := T#5s; // . [LOC] Maintien message d'abandon AU (T173)
     CST_NbMaxAlarmes     : INT := 50; // . [LOC] Taille du carrousel d'alarmes (AF-07 §6)
 END_VAR
 
@@ -314,6 +320,35 @@ END_IF;
 DirectionBlocked := (CurrentDirection < 0 AND NOT DescendPermit)
                 OR (CurrentDirection > 0 AND NOT AscentPermit);
 
+// 🩹 T173 : signaler la cause du dernier abandon de séquence AU (message cause+action),
+// sans modifier le comportement de l'AU. Front sur LastAbortCause -> message maintenu 5s.
+LastAbortEdge(CLK := LastAbortCause);
+IF LastAbortEdge.Q THEN
+    AbortMsgActive := TRUE;
+    TonAbortHold(IN := FALSE);
+END_IF;
+IF AbortMsgActive THEN
+    TonAbortHold(IN := TRUE, PT := CST_AbortHoldTime);
+    IF TonAbortHold.Q THEN
+        AbortMsgActive := FALSE;
+        TonAbortHold(IN := FALSE);
+    END_IF;
+END_IF;
+IF AbortMsgActive THEN
+    CASE LastAbortCause OF
+        16#0001: AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
+        16#0002: AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
+        16#0004: AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
+        16#0008: AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
+        16#0010: AbortMsgText := '[AU] Coupure securite metier active - lever la cause puis rearmer';
+        16#0020: AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
+        16#0040: AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
+        16#0080: AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
+    ELSE
+        AbortMsgText := '[AU] Rearmement interrompu - verifier et rearmer';
+    END_CASE;
+END_IF;
+
 IF NOT EmergencyChainClosed THEN
     OperatorActionCandidate := '[PUPITRE] Boucle urgence ouverte - réarmer';
 ELSIF NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid THEN
@@ -334,6 +369,9 @@ ELSIF RedundancyTestFailed THEN
     OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer (Reset)';
 ELSIF EmergencyArmingFailed THEN
     OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
+ELSIF AbortMsgActive THEN
+    // 🩹 T173 : cause du dernier abandon de séquence AU (message explicite cause+action)
+    OperatorActionCandidate := AbortMsgText;
 ELSIF NOT PowerContactorEngaged THEN
     OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN
