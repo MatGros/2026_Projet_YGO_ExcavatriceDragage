@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-31 22:40:32</div>
+    <div class="exec-time">2026-09-01 01:27:10</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (4 tests)</summary>
@@ -1240,9 +1240,8 @@ END_IF;
    🔌 Interface : Bloc de surveillance transverse (1 instance)
    🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee.
    ⚖️ Concordance ACTIVE des que les 2 treuils sont commandes (relais ou
-      contacteur), independamment du mode synchronisme. Seul BypassGlobal
-      neutralise. (SyncEnable conserve en entree pour compatibilite
-      d&#x27;interface — inutilise, nettoyage differe.)
+      contacteur) OU en mode synchronisme (SyncEnable). Seul BypassGlobal
+      neutralise.
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    ======================================================================= *)
 
@@ -1296,15 +1295,15 @@ END_IF;
 {region &quot;§2 Detection discordance&quot;}
 // 🔍 2. COHÉRENCE DES COMMANDES SÉCURITÉ — verifie que les commandes envoyees
 // aux deux treuils sont identiques (sens et contacteurs).
-// Concordance ACTIVE des que les 2 treuils sont commandes (relais ou contacteur),
-// independamment du mode synchronisme (SyncEnable). Seul BypassGlobal neutralise.
+// Concordance ACTIVE des que les 2 treuils sont commandes (relais ou contacteur)
+// OU en mode synchronisme (SyncEnable). Seul BypassGlobal neutralise.
 // Filtre de 500ms pour tolerer les transitions et rampes.
 IF NOT BypassGlobal THEN
     BothCommanded := (RelayFwdM1 OR RelayRevM1 OR Contactor1_M1 OR Contactor2_M1
                       OR Contactor3_M1 OR Contactor4_M1)
                  AND (RelayFwdM2 OR RelayRevM2 OR Contactor1_M2 OR Contactor2_M2
                       OR Contactor3_M2 OR Contactor4_M2);
-    MismatchActive := BothCommanded AND (
+    MismatchActive := (BothCommanded OR SyncEnable) AND (
         (RelayFwdM1 &lt;&gt; RelayFwdM2) OR
         (RelayRevM1 &lt;&gt; RelayRevM2) OR
         (Contactor1_M1 &lt;&gt; Contactor1_M2) OR

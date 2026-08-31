@@ -149,9 +149,10 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 RequestedStepClamped := LIMIT(0, RequestedStep, 5);
-// SafeStop reste une rampe rapide du FB_Winch (Enable maintenu, Partie 3 §1bis).
-// La demande métier reste donc autorisée ici pendant la décélération ; l'interlock
-// ne coupe qu'après sa retombée effective à zéro, sauf gate dur ou défaut final.
+// 🛡️ SafeStop : coupure dure à la barrière finale (défense en profondeur).
+// SafeStop est consommé en §5 : quand TRUE, RelayFwd/Rev, contacteurs et frein
+// sont coupés indépendamment de FB_Winch. Enable reste actif (≠ neutralisation) ;
+// SafeStop n'est pas un défaut (pas de FAULT, pas de latch, pas de Reset requis).
 MotorRequest := (RequestedStepClamped > 0) AND (RequestedRelayFwd XOR RequestedRelayRev);
 
 // ── 2bis. Arbitrage Error/ErrorId AVANT §3/§5 ────────────────────────────
@@ -319,6 +320,18 @@ ELSIF ContactorStuckLatched THEN
     AuthorizedStep := 0;
     Reason := E_WinchFinalInterlockReason.SENSE_DROP_TIMEOUT;
     State := E_WinchFinalInterlockState.FAULT;
+ELSIF SafeStop THEN
+    // 🛡️ SafeStop : coupure dure indépendante de FB_Winch (défense en profondeur).
+    // SafeStop n'est PAS un défaut : pas de FAULT, pas de latch, pas de Reset requis.
+    // Les sorties sont coupées tant que SafeStop=TRUE ; retour nominal dès sa retombée.
+    // BrakeCmd (= RelayFwd OR RelayRev, §6) retombe à FALSE automatiquement.
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    RelayFwd := FALSE; RelayRev := FALSE;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    State := E_WinchFinalInterlockState.READY;
 ELSIF SenseHoldActive THEN
     // §3bis : RequestedStep retombé à 0 mais sens encore commandé -> on TIENT le
     // contacteur de sens jusqu'à FwdRevSpeedFeedbackOff (debounced DropConfirmDelay)

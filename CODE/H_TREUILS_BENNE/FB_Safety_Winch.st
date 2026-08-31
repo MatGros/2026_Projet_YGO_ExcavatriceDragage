@@ -315,7 +315,7 @@ IF NOT BypassGlobal THEN
     instCauses[11].Texte    := 'Escalade fin de course haut (Meca D)';
 
     // Cause 12 & 13 : Méca E écart critique synchro & escalade (latched)
-    IF NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
+    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
        AND (ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM) THEN
         MecaEFaultLatched := TRUE;
     END_IF;

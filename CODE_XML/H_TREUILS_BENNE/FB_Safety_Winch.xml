@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T20:44:23.991742" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T20:44:23.991742">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T23:20:54.572893" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T23:20:54.572893">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1353,7 +1353,7 @@ IF NOT BypassGlobal THEN
     instCauses[11].Texte    := 'Escalade fin de course haut (Meca D)';
 
     // Cause 12 &amp; 13 : Méca E écart critique synchro &amp; escalade (latched)
-    IF NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
+    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
        AND (ABS(CablePosM - ExpectedOtherWinchPosM) &gt; CriticalSyncToleranceM) THEN
         MecaEFaultLatched := TRUE;
     END_IF;

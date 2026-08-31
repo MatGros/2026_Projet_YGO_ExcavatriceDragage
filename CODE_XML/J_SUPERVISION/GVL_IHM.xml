@@ -414,7 +414,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §4, §4bis
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md §4, §4bis
    🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
       IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -2066,7 +2066,7 @@ Diagnostic et erreurs de la chaîne AU</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Role : liste les defauts/warnings actifs de toute la machine,
       affiches un a la fois en rotation (FB_Hmi_BannerFormatter S5)
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md S6
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md S6
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3049,7 +3049,15 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité (vue LIVE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕘 Vue LATCHÉE : ErrorId figé au défaut, effacé au Reset (marqueur [HISTO])</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorOperatorComm">
@@ -3911,7 +3919,15 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité (vue LIVE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕘 Vue LATCHÉE : ErrorId figé au défaut, effacé au Reset (marqueur [HISTO])</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">

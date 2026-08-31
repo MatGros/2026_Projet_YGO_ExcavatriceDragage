@@ -6,7 +6,8 @@
 TYPE ST_SafetyTranslation :
 STRUCT
     Error             : BOOL;    (* 🛡️ Bloc sécurité (Safety) en défaut *)
-    ErrorId           : WORD;    (* ❌ Code bitfield du défaut de sécurité *)
+    ErrorId           : WORD;    (* ❌ Code bitfield du défaut de sécurité (vue LIVE) *)
+    LatchedId         : WORD;    (* 🕘 Vue LATCHÉE : ErrorId figé au défaut, effacé au Reset (marqueur [HISTO]) *)
     ErrorOperatorComm : BOOL;    (* 🎮 Perte communication opérateur : joystick CAN ou heartbeat IHM (bit0) *)
     ErrorDriveComm    : BOOL;    (* 📡 Perte communication EtherCAT variateur (bit1) *)
     ErrorPhaseRotation: BOOL;    (* ⚡ Mauvaise rotation de phases électriques (bit2) *)

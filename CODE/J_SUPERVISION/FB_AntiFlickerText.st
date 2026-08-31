@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧊 FB_AntiFlickerText — Lissage anti-clignotement d'un texte IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §5.3
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md §5.3
    🎯 Responsabilité : maintient un texte warning/état un temps minimum
       avant de laisser le contenu changer, et laisse passer en direct
       (sans maintien) les messages critiques (défauts AU/puissance).

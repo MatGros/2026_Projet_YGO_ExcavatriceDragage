@@ -6,7 +6,8 @@
 TYPE ST_SafetyWinch :
 STRUCT
     Error             : BOOL;    (* 🛡️ Bloc sécurité (Safety) en défaut *)
-    ErrorId           : WORD;    (* ❌ Code bitfield du défaut de sécurité *)
+    ErrorId           : WORD;    (* ❌ Code bitfield du défaut de sécurité (vue LIVE) *)
+    LatchedId         : WORD;    (* 🕘 Vue LATCHÉE : ErrorId figé au défaut, effacé au Reset (marqueur [HISTO]) *)
     SafeStop          : BOOL;    (* 🟧 Arrêt rapide activé par la sécurité *)
     DescendPermit     : BOOL;    (* 🟢 Descending autorisée (TRUE = OK | FALSE = mou de câble / limite basse) *)
     AscentPermit      : BOOL;    (* 🟢 Ascending autorisée (TRUE = OK | FALSE = fin de course haut) *)

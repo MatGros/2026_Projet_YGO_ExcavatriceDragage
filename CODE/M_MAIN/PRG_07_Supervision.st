@@ -4,7 +4,7 @@
    ⚙️ Exécuté par la tâche PLC en position 7.
    ✅ Regroupe tout le mapping bidirectionnel GVL_IHM / GVL_PERSISTENT.
    ✅ Expose FaultMachineReset_IHM pour tous les programmes du domaine sécurité/métier.
-   📄 Docs : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md
+   📄 Docs : DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md
    ═══════════════════════════════════════════════════════════════ *)
 
 PROGRAM PRG_07_Supervision
@@ -424,7 +424,14 @@ GVL_IHM.Emergency.State.OperatorMessage := PRG_06_Outputs.EmergencyOperatorMessa
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
                                       OR PRG_02_Acquisition.Data.InputModules.Fault
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Error
-                                      OR PRG_03_Modes_Cycle.Data.ModesFault.Latched;
+                                      OR PRG_03_Modes_Cycle.Data.ModesFault.Latched
+                                      OR GVL_IHM.M1TreuilRetenue.Safety.Error
+                                      OR GVL_IHM.M2TreuilBenne.Safety.Error
+                                      OR GVL_IHM.TranslationM3.Safety.Error
+                                      OR GVL_IHM.M1M2Sync.State.Error
+                                      OR GVL_IHM.M2TreuilBenne.Bucket.State.Error
+                                      OR GVL_IHM.Cycle.State.Error
+                                      OR GVL_IHM.JOY1Joystick.State.Error;
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
 GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;
 GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;

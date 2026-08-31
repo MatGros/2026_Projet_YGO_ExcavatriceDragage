@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T21:45:00.303928" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T21:45:00.303928">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T22:56:49.363881" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T22:56:49.363881">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -379,7 +379,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §4, §4bis
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md §4, §4bis
    🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
       IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
    ═══════════════════════════════════════════════════════════════</xhtml>
@@ -515,7 +515,15 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité (vue LIVE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕘 Vue LATCHÉE : ErrorId figé au défaut, effacé au Reset (marqueur [HISTO])</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorOperatorComm">
@@ -669,7 +677,15 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut de sécurité (vue LIVE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕘 Vue LATCHÉE : ErrorId figé au défaut, effacé au Reset (marqueur [HISTO])</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -965,7 +981,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Role : liste les defauts/warnings actifs de toute la machine,
       affiches un a la fois en rotation (FB_Hmi_BannerFormatter S5)
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md S6
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md S6
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -2145,6 +2161,30 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Validité filtrée Variateur M3</xhtml>
               </documentation>
             </variable>
+            <variable name="HistoM1">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 [HISTO] M1 : LatchedId AND NOT ErrorId (défauts latched passés)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HistoM2">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 [HISTO] M2 : LatchedId AND NOT ErrorId (défauts latched passés)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HistoM3">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 [HISTO] M3 : LatchedId AND NOT ErrorId (défauts latched passés)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_BannerHoldTime">
               <type>
                 <TIME />
@@ -2183,7 +2223,7 @@
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧠 FB_Hmi_BannerFormatter — Formateur du bandeau d'information IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §5, §6
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md §5, §6
    🎯 Responsabilité : assemble les 4 textes du bandeau + le carrousel
       d'alarmes, expose la cause observable du blocage courant, sans
       piloter la machine.
@@ -2669,219 +2709,308 @@ IF EcatBusValid AND NOT VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
 END_IF;
 
 // 5a. Collecte — treuil M1 (ST_SafetyWinch, bits ErrorId décodés)
+// 🧊 Tri bloquant/warning (AF-07 §6, décision 2026-09-01) : seuls les défauts
+//    BLOQUANTS (SafeStop/PowerCutOff/interlock) sont publiés. Les warnings non
+//    bloquants (mou de câble, surchauffe moteur/frein, limites basse/haute) sont
+//    EXCLUS du carrousel — ils restent visibles via OperatorActionText/SpecialCondition.
 IF WinchM1Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] perte com operateur'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:01 - perte com operateur'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorEncoder AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] perte codeur'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM1Safety.ThermalFault AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] surchauffe moteur'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM1Safety.SlackCable AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] mou de cable'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:02 - perte codeur'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] rotation phases'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM1Safety.CableLimitDescent AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] limite basse cable'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM1Safety.CableLimitAscent AND LocalIoValid AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] butee haute'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM1Safety.ErrorBrakeThermal AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] surchauffe frein'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorMecaA AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:08 - MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorMecaB AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:09 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorMecaC AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:10 - MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorMecaD AND LocalIoValid AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:12 - MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorMecaE AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] MecaE - ecart synchro M1/M2 critique'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:13 - MecaE - ecart synchro M1/M2 critique'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorOppositeDir AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] sens oppose'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorNoMovement AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] absence mouvement'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5b. Collecte — treuil M2 (mêmes bits que M1)
+// 5b. Collecte — treuil M2 (mêmes bits que M1, tri bloquant/warning identique)
 IF WinchM2Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] perte com operateur'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:01 - perte com operateur'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorEncoder AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] perte codeur'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM2Safety.ThermalFault AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] surchauffe moteur'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM2Safety.SlackCable AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] mou de cable'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:02 - perte codeur'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] rotation phases'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM2Safety.CableLimitDescent AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] limite basse cable'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM2Safety.CableLimitAscent AND LocalIoValid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] butee haute'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF WinchM2Safety.ErrorBrakeThermal AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] surchauffe frein'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorMecaA AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:08 - MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorMecaB AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:09 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorMecaC AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:10 - MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorMecaD AND LocalIoValid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:12 - MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorMecaE AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] MecaE - ecart synchro M1/M2 critique'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:13 - MecaE - ecart synchro M1/M2 critique'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorOppositeDir AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] sens oppose'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorNoMovement AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] absence mouvement'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5c. Collecte — translation M3 (ST_SafetyTranslation)
+// 5c. Collecte — translation M3 (ST_SafetyTranslation, tri bloquant/warning identique)
 IF TranslationSafety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M3] perte com operateur'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M3] ErrorID:01 - perte com operateur'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF TranslationSafety.ErrorDriveComm AND VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M3] perte EtherCAT'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M3] ErrorID:02 - perte EtherCAT'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF TranslationSafety.ErrorPhaseRotation AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M3] rotation phases'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF TranslationSafety.ErrorBrakeThermal AND Vh0800Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M3] surchauffe frein'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M3] ErrorID:03 - rotation phases'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF TranslationSafety.ErrorMecaB AND VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M3] MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M3] ErrorID:05 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF TranslationSafety.ErrorMecaA AND VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M3] MecaA - deplacement sans commande'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M3] ErrorID:06 - MecaA - deplacement sans commande'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF TranslationSafety.ErrorLimitSwitch AND Vh0808Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M3] butee extreme'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M3] ErrorID:07 - butee extreme'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF TranslationSafety.ErrorSensorIncoherent AND Vh0808Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M3] capteurs incoherents'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M3] ErrorID:08 - capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)
 //    Mapping = index cause FB_Bucket (FB_FaultCore : bit i = cause i) :
 //    bit0 config géométrie · bit1 écart max · bit2 timeout · bit3 glissement M1 · bit4 codeurs non référencés
 IF ((BucketErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] configuration geometrie invalide'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] ErrorID:01 - configuration geometrie invalide'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] depassement ecart max autorise'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] ErrorID:02 - depassement ecart max autorise'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0004) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] timeout commande deplacement'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] ErrorID:03 - timeout commande deplacement'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] glissement treuil M1'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] ErrorID:04 - glissement treuil M1'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] codeurs treuils non references'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] ErrorID:05 - codeurs treuils non references'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5e. Collecte — synchro M1/M2 (FB_WinchSync.ErrorId)
 IF ((SyncErrorId AND 16#0001) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[SYNC] ecart M1/M2'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[SYNC] ErrorID:01 - ecart M1/M2'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((SyncErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[SYNC] incoherence commande'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[SYNC] ErrorID:02 - incoherence commande'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionAssist)
 IF ((DiveErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[DIVE] timeout immersion'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[DIVE] ErrorID:01 - timeout immersion'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((DiveErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[DIVE] timeout fond'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[DIVE] ErrorID:02 - timeout fond'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((DiveErrorId AND 16#0004) &lt;&gt; 16#0000) AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[DIVE] limite basse atteinte'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[DIVE] ErrorID:03 - limite basse atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((DiveErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[DIVE] contact fond perdu'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[DIVE] ErrorID:04 - contact fond perdu'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((DiveErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[DIVE] perte tension cable'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[DIVE] ErrorID:05 - perte tension cable'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((DiveErrorId AND 16#0020) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[DIVE] anomalie vitesse'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[DIVE] ErrorID:06 - anomalie vitesse'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((DiveErrorId AND 16#0040) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[DIVE] config invalide'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[DIVE] ErrorID:07 - config invalide'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((ExtractionErrorId AND 16#0001) &lt;&gt; 16#0000) AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[EXTRACTION] fond'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[EXTRACTION] ErrorID:01 - fond'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((ExtractionErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[EXTRACTION] fermeture'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[EXTRACTION] ErrorID:02 - fermeture'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((ExtractionErrorId AND 16#0004) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[EXTRACTION] controle'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[EXTRACTION] ErrorID:03 - controle'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((ExtractionErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[EXTRACTION] config'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[EXTRACTION] ErrorID:04 - config'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5g. Collecte — AU / armement (FB_Safety_EmergencyManagement.Diag.ErrorId)
 IF ((EmergencyErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[AU] redondance contacteurs'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[AU] ErrorID:01 - redondance contacteurs'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((EmergencyErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[AU] echec confirmation armement'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[AU] ErrorID:02 - echec confirmation armement'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((EmergencyErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[AU] echec autotest demarrage'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[AU] ErrorID:04 - echec autotest demarrage'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId)
 IF ((CycleErrorId AND 16#0001) &lt;&gt; 16#0000) AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] limite legale atteinte'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:01 - limite legale atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((CycleErrorId AND 16#0002) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] defaut synchro treuils'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:02 - defaut synchro treuils'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((CycleErrorId AND 16#0008) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] ecart codeurs remontee'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:04 - ecart codeurs remontee'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((CycleErrorId AND 16#0010) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] ecart vitesse confirme'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:05 - ecart vitesse confirme'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((CycleErrorId AND 16#0020) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] perte communication IHM'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:06 - perte communication IHM'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((CycleErrorId AND 16#0040) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[CYCLE] timeout etape'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[CYCLE] ErrorID:07 - timeout etape'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5i. Rotation carrousel — un message à la fois, maintien AlarmHoldTime
+// 5i. Collecte [HISTO] — défauts latched passés (LatchedId AND NOT ErrorId)
+// 🕘 Marqueur [HISTO] (AF-07 §6, décision 2026-09-01) : un défaut laté dont la cause a
+//    disparu (bit LatchedId=1 ET bit ErrorId=0) reste affiché préfixé [HISTO] tant qu'il
+//    n'est pas acquitté (Reset). M1/M2/M3 uniquement (vue latched exposée dans les DUT
+//    safety). Les warnings (mou de câble, surchauffe) sont inclus ici : ce sont des défauts
+//    passés à acquitter, distincts du carrousel actif (bloquants seuls).
+HistoM1 := WinchM1Safety.LatchedId AND (NOT WinchM1Safety.ErrorId);
+HistoM2 := WinchM2Safety.LatchedId AND (NOT WinchM2Safety.ErrorId);
+HistoM3 := TranslationSafety.LatchedId AND (NOT TranslationSafety.ErrorId);
+
+// ── M1 [HISTO] ──
+IF (HistoM1 AND 16#0001) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:01 - perte com operateur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#0002) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:02 - perte codeur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#0004) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:03 - surchauffe moteur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#0008) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:04 - mou de cable'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#0010) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#0080) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:08 - MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#0100) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:09 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#0200) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:10 - MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#0400) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:11 - surchauffe frein'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#0800) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:12 - MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#1000) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:13 - MecaE - ecart synchro M1/M2 critique'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#4000) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM1 AND 16#8000) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M1] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// ── M2 [HISTO] ──
+IF (HistoM2 AND 16#0001) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:01 - perte com operateur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#0002) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:02 - perte codeur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#0004) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:03 - surchauffe moteur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#0008) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:04 - mou de cable'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#0010) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:05 - rotation phases'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#0080) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:08 - MecaA - deplacement sans commande (vitesse/derive)'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#0100) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:09 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#0200) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:10 - MecaC - glissement pendant benne figee'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#0400) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:11 - surchauffe frein'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#0800) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:12 - MecaD - non-arret au capteur haut'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#1000) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:13 - MecaE - ecart synchro M1/M2 critique'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#4000) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM2 AND 16#8000) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M2] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// ── M3 [HISTO] ──
+IF (HistoM3 AND 16#0001) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:01 - perte com operateur'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM3 AND 16#0002) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:02 - perte EtherCAT'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM3 AND 16#0004) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:03 - rotation phases'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM3 AND 16#0008) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:04 - surchauffe frein'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM3 AND 16#0010) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:05 - MecaB - arret non confirme apres stop'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM3 AND 16#0020) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:06 - MecaA - deplacement sans commande'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM3 AND 16#0040) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:07 - butee extreme'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (HistoM3 AND 16#0080) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:08 - capteurs incoherents'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5j. Rotation carrousel — un message à la fois, maintien AlarmHoldTime
 // Publication du tableau complet instantane dans le DUT IHM
 FOR i := AlarmCount TO (CST_NbMaxAlarmes - 1) DO
     AlarmArray[i] := '';
@@ -2980,7 +3109,7 @@ END_IF;
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧊 FB_AntiFlickerText — Lissage anti-clignotement d'un texte IHM
    ───────────────────────────────────────────────────────────────
-   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.2.md §5.3
+   📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md §5.3
    🎯 Responsabilité : maintient un texte warning/état un temps minimum
       avant de laisser le contenu changer, et laisse passer en direct
       (sans maintien) les messages critiques (défauts AU/puissance).
