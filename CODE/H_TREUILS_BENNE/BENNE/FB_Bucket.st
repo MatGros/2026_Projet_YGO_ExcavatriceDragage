@@ -212,8 +212,8 @@ END_IF;
 // en maintenance : un front qualifie l'observation visuelle opérateur.
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
 IF ConfirmOpenEdge.Q
-   AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
-   AND NOT Lifecycle.Busy THEN
+   AND (Mode = E_Mode.MAINT_N2)
+   AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
@@ -222,8 +222,8 @@ END_IF;
 
 ConfirmCloseEdge(CLK := ConfirmClosePosition);
 IF ConfirmCloseEdge.Q
-   AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
-   AND NOT Lifecycle.Busy THEN
+   AND (Mode = E_Mode.MAINT_N2)
+   AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;

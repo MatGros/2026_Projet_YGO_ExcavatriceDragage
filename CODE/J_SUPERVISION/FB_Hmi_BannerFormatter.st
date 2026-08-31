@@ -392,12 +392,12 @@ ELSIF NOT VarM3Valid THEN
     OperatorActionCandidate := '[ECAT] Variateur non détecté - vérifier liaison';
 ELSIF PowerCutOffActiveAny THEN
     OperatorActionCandidate := '[SÉCURITÉ] Coupure puissance active - acquitter défaut treuil/pont';
-ELSIF AbortMsgActive AND NOT SafeStopActive AND NOT DirectionBlocked THEN
+ELSIF AbortMsgActive THEN
     // 🩹 Cause du dernier abandon de séquence AU (message explicite cause+action)
-    // Placé avant RedundancyTestFailed/EmergencyArmingFailed pour que chaque cause
-    // (dont chute chaîne, PowerCutOff, timeout contacteur, redondance) montre son message spécifique.
-    // Gating NOT SafeStopActive AND NOT DirectionBlocked : le message verrouillé ne masque
-    // jamais une condition de sécurité courante (SafeStop/DirectionBlocked).
+    // Placé avant RedundancyTestFailed/EmergencyArmingFailed/SafeStop pour que chaque
+    // cause (dont chute chaîne, PowerCutOff, timeout contacteur, redondance) montre son
+    // message spécifique. Le message d'abandon est la CAUSE RACINE (plus pertinente que
+    // le SafeStop qui en est une conséquence) — il prime sur SafeStop/DirectionBlocked.
     OperatorActionCandidate := AbortMsgText;
 ELSIF RedundancyTestFailed THEN
     OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer (Reset)';
