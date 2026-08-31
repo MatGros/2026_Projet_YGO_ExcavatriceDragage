@@ -364,8 +364,7 @@ instArbM1(
     IHM        := ArbIHM,
     TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext,
-    Cfg        := ArbM1Cfg,
-    SpeedStepTable := _WinchSpeedStepTable
+    Cfg        := ArbM1Cfg
 );
 M1LogicRequestStartStop := instArbM1.StartStop;
 M1LogicRequestDirection := instArbM1.Direction;
@@ -387,8 +386,7 @@ instArbM2(
     IHM        := ArbIHM,
     TglJoystickMaster := GVL_IHM.Modes.Cmd.TglJoystickMaster,
     Context    := ArbContext,
-    Cfg        := ArbM2Cfg,
-    SpeedStepTable := _WinchSpeedStepTable
+    Cfg        := ArbM2Cfg
 );
 M2LogicRequestStartStop := instArbM2.StartStop;
 M2LogicRequestDirection := instArbM2.Direction;

@@ -1,14 +1,14 @@
 (* =======================================================================
-   ðŸª ST_fbWinch_Cfg â€” Configuration statique d'un treuil
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ðŸŽ¯ RÃ´le : RÃ©glages persistants propres Ã  l'instance treuil (statique)
-   ðŸ“„ Doc mÃ©tier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   ðŸ“¤ Producteur : configuration persistante
-   ðŸ“¥ Consommateur : FB_Winch (statique uniquement)
-   ðŸ”’ Structs cibles + champs conservÃ©s pour garder le dÃ©codage %â†’palier
+   🪝 ST_fbWinch_Cfg — Configuration statique d'un treuil
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Réglages persistants propres à l'instance treuil (statique)
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : configuration persistante
+   📥 Consommateur : FB_Winch (statique uniquement)
+   🔒 Structs cibles + champs conservés pour garder le décodage %→palier
       et les deux cadences de rampe DANS FB_Winch (comportement
-      bit-identique). Le champ StepRampDelay est dÃ©clarÃ© mais non
-      consommÃ© (usage aval).
+      bit-identique). Le champ StepRampDelay est déclaré mais non
+      consommé (usage aval).
    ======================================================================= *)
 TYPE ST_fbWinch_Cfg :
 STRUCT
@@ -24,14 +24,14 @@ STRUCT
     StepRampDelayAscent             : TIME := T#1000ms;  // [08a] Cadence palier montee (D10, dedie)
     StepRampDelayDescending         : TIME := T#500ms;   // [08a] Cadence palier descending (D10, dedie)
 
-    // === RETOMBÃ‰E CONTACTEURS ===
+    // === RETOMBÉE CONTACTEURS ===
     ContactorFeedbackTimeout        : TIME := T#500ms;   // Delai d'attente retombee des contacteurs
 
     // === RALENTISSEMENT BORDURE ===
     SlowdownDistance_M              : REAL := 1.0;   // Distance d'approche avant limite pour ralentir (m)
     SlowdownMaxStep                 : INT := 1;      // Plafond palier dans zone de ralentissement (1..5)
 
-    // === DÃ‰CODAGE %â†’PALIER (conservÃ©) ===
+    // === DÉCODAGE %→PALIER (conservé) ===
     SpeedStepHystMargin             : REAL := 2.0;   // [08a] Marge d'hysteresis palier (%)
 END_STRUCT
 END_TYPE
