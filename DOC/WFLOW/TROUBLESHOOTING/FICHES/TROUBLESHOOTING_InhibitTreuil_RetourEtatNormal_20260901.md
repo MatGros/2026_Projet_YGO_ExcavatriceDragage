@@ -68,10 +68,16 @@ Après inhibition d'un treuil (M1 ou M2), rappuyer sur le **même** bouton d'inh
 - **Option 2 (définitif)** : transformer le bouton en **toggle** dans `FB_Modes` §4bis — sur front montant du même bouton, si l'inhibition de ce treuil est déjà active, la **lever** (au lieu de la re-poser). Préserver l'exclusion mutuelle (lever M2 ⇒ ne pas toucher M1). — impact : comportement conforme à l'attente utilisateur.
 - **⚠️ Validation requise** : [humaine] — ne pas modifier le code sans validation. Vérifier l'intention de conception (set-latch volontaire vs toggle) dans la spec `AF_Partie-05` §Inhibition (actuellement silencieuse sur la levée).
 
+> ✅ **APPLIQUÉ (2026-09-01)** : Option 2 retenue (écran tactile simple, pas d'appui simultané possible). `FB_Modes.st` §4bis converti en **toggle** : front montant d'un bouton dont le treuil est déjà inhibé → lève l'inhibition ; sinon pose l'inhibition et lève l'autre (exclusion mutuelle). Tests `TC-P05-003bis`/`003ter` ajoutés. **13/13 PASS** (test CI `FB_Modes`).
+
 ## 9. ✅ Vérification de la correction / non-régression
 
-- (à remplir après validation humaine)
+- ✅ Test CI `FB_Modes` : **13/13 PASS** (dont 2 nouveaux tests toggle `TC-P05-003bis`/`003ter`).
+- ✅ `TC-P05-003` (inhibition M1 seule) inchangé et PASS.
+- ✅ `TC-P05-007` corrigé (setup : conditions d'arrêt mécanique sous AU) — préexistant, non lié au toggle.
+- ⚠️ **Hand-off humain** : appliquer la modif dans CODESYS 3.5 (copie du ST de `FB_Modes.st` puis import PLCopenXML).
 
 ## 10. 📝 Journal (chronologique)
 
 - 2026-09-01 : ouverture — cause racine identifiée par lecture `FB_Modes.st` §4bis (set-latch, pas de lever par re-appui).
+- 2026-09-01 : validation humaine — toggle retenu (écran tactile simple). `FB_Modes.st` §4bis converti en toggle + tests `TC-P05-003bis`/`003ter` ajoutés. Test CI `FB_Modes` **13/13 PASS**.
