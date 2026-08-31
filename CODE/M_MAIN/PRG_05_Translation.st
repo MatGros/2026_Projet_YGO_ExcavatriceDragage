@@ -301,14 +301,18 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 // Le permit effectif = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff
 // (prêt à fonctionner), aligné sur le modèle treuils où le Safety produit déjà des
 // permits gatés par les défauts. Pas de Process supplémentaire (pas de benne/Kobold).
+// ⚠️ Le verrou « descente treuil interdite tant que M3 pas à P1 » (DumpAtTremieDescentLocked)
+// est côté TREUIL (PRG_04 §5, lignes 802-805), pas dans le permit M3 : le permit M3 reste une
+// information de possibilité de mouvement de la translation, indépendante de l'état de la trémie.
 // ⚠️ Ces permis effectifs sont des valeurs de DIAGNOSTIC/IHM (lecture seule) : la commande
-// réelle reste gatée par SafeStop/PowerCutOff (instSafetyTranslationM3) et l'homme-mort
-// (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle). Aucun impact sur la chaîne de sécurité.
+// réelle reste gatée par M3_SafeStop_Aggregate (PRG_05:343, superset incluant InputModuleFault)
+// et l'homme-mort (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle). Aucun impact sur la
+// chaîne de sécurité.
 EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremiePermit
-                               AND NOT instSafetyTranslationM3.SafeStop
+                               AND NOT M3_SafeStop_Aggregate
                                AND NOT instSafetyTranslationM3.PowerCutOff;
 EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenancePermit
-                                 AND NOT instSafetyTranslationM3.SafeStop
+                                 AND NOT M3_SafeStop_Aggregate
                                  AND NOT instSafetyTranslationM3.PowerCutOff;
 
 {endregion}

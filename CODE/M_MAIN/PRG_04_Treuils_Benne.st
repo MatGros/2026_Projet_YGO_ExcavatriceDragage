@@ -817,10 +817,13 @@ ProcessAndSafetyPermitM2_Ascent := SafetyPermitM2_Ascent
 SafeStopM1_Active := SafeStopM1_Raw OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
 SafeStopM2_Active := SafeStopM2_Raw OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
 // EffectivePermit = ProcessAndSafetyPermit combine au couplage synchro (anti-télescopage)
-EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Descend);
-EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Descend);
-EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Ascent);
-EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Ascent);
+// ET gaté par NOT SafeStop (défauts thermique/phase/codeur/méca) : le permit reflète « prêt à
+// fonctionner », aligné sur M3 (PRG_05 §1ter). SafeStopM1/M2_Active agrège déjà le couplage
+// synchro (SafeStop de l'autre treuil pendant SyncActive) — cohérent avec l'anti-télescopage.
+EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND NOT SafeStopM1_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Descend);
+EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND NOT SafeStopM2_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Descend);
+EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND NOT SafeStopM1_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Ascent);
+EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND NOT SafeStopM2_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Ascent);
 
 // 🛡️ ArmingPermit (général — permis de mouvement) : on ne peut armer QUE si au moins
 // un axe (treuil M1/M2 ou translation M3) a un permis de mouvement effectif.
