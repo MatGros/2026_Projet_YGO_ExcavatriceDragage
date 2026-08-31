@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T22:31:39.132481" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T22:31:39.132481">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.644619" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.644619">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -66,7 +66,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncBlocksUp">
+            <variable name="SyncBlocksAscent">
               <type>
                 <BOOL />
               </type>
@@ -74,7 +74,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncBlocksDown">
+            <variable name="SyncBlocksDescent">
               <type>
                 <BOOL />
               </type>

@@ -96,9 +96,9 @@ IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     WinchBothMotionActive := PRG_02_Acquisition.Data.Joystick.DeadmanArmed
                                      AND (instModes.Auth.JoystickWinchSelectArbitrated = 0);
 ELSE
-    IF GVL_IHM.Commun.BtnWinchBothUp THEN
+    IF GVL_IHM.Commun.BtnWinchBothAscent THEN
         WinchBothMotionDirection := 1;
-    ELSIF GVL_IHM.Commun.BtnWinchBothDown THEN
+    ELSIF GVL_IHM.Commun.BtnWinchBothDescent THEN
         WinchBothMotionDirection := -1;
     ELSE
         WinchBothMotionDirection := 0;

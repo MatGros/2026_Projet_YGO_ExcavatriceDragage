@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-07-27T13:56:34.390297" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-07-27T13:56:34.390297">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:54.751512" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:54.751512">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -42,20 +42,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick Axe X (-100% à +100%)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx203_HmiCmd_BtnFwd">
+            <variable name="Idx203_HmiCmd_BtnTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Avance IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton vers Trémie IHM | 0 = Relâché (ex-Idx203_HmiCmd_BtnFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx204_HmiCmd_BtnRev">
+            <variable name="Idx204_HmiCmd_BtnMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Recul IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton vers Maintenance IHM | 0 = Relâché (ex-Idx204_HmiCmd_BtnRev)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx205_HmiTargetPosition">

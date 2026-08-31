@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:39:50.874148" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:39:50.874148">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:50.775906" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:50.775906">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -297,15 +297,21 @@
                 <BOOL />
               </type>
             </variable>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Fin de course extrême Trémie (ex-LimitSwitchFwd)</xhtml>
+              </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
+              </documentation>
             </variable>
             <variable name="DriveThermalOk">
               <type>

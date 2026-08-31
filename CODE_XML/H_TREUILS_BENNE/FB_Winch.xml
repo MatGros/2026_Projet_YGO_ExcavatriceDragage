@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T03:22:19.744138" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T03:22:19.744138">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.624977" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.624977">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -197,7 +197,7 @@
 Table de seuils des paliers de vitesse</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionInterlockDelayUp">
+            <variable name="DirectionInterlockDelayAscent">
               <type>
                 <TIME />
               </type>
@@ -209,7 +209,7 @@ Table de seuils des paliers de vitesse</xhtml>
 Delai interlock changement de sens montee</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionInterlockDelayDown">
+            <variable name="DirectionInterlockDelayDescent">
               <type>
                 <TIME />
               </type>
@@ -243,7 +243,7 @@ Delai interlock changement de sens montee</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier montee (D10, dedie)</xhtml>
               </documentation>
             </variable>
-            <variable name="StepRampDelayDescending">
+            <variable name="StepRampDelayDescent">
               <type>
                 <TIME />
               </type>
@@ -1238,8 +1238,8 @@ Fault := instFault.Fault;
 IF NOT Enable THEN
     SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := Config.SpeedStepTable);
     DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqDirection := 0,
-                       ChangeDelayUp := Config.DirectionInterlockDelayUp,
-                       ChangeDelayDown := Config.DirectionInterlockDelayDown);
+                       ChangeDelayAscent := Config.DirectionInterlockDelayAscent,
+                       ChangeDelayDescent := Config.DirectionInterlockDelayDescent);
     StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := Config.StepRampDelayAscent);
     RelayFwd := FALSE;
     RelayRev := FALSE;
@@ -1297,8 +1297,8 @@ DirectionInterlock(
     EnableRising := EnableRisingEdge.Q,
     Reset := Reset,
     ReqDirection := DriveRequest.Direction,
-    ChangeDelayUp := Config.DirectionInterlockDelayUp,
-    ChangeDelayDown := Config.DirectionInterlockDelayDown
+    ChangeDelayAscent := Config.DirectionInterlockDelayAscent,
+    ChangeDelayDescent := Config.DirectionInterlockDelayDescent
 );
 CommandedDirection := DirectionInterlock.CommandedDirection;
 DirectionChangePending := DirectionInterlock.DirectionChangePending;
@@ -1358,7 +1358,7 @@ END_IF;
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
 IF CommandedDirection = -1 THEN
-    EffectiveStepRampDelay := Config.StepRampDelayDescending;
+    EffectiveStepRampDelay := Config.StepRampDelayDescent;
 ELSE
     EffectiveStepRampDelay := Config.StepRampDelayAscent;
 END_IF;
@@ -1846,7 +1846,7 @@ END_CASE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens demande (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
               </documentation>
             </variable>
-            <variable name="ChangeDelayUp">
+            <variable name="ChangeDelayAscent">
               <type>
                 <TIME />
               </type>
@@ -1854,7 +1854,7 @@ END_CASE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai interlock changement de sens montee</xhtml>
               </documentation>
             </variable>
-            <variable name="ChangeDelayDown">
+            <variable name="ChangeDelayDescent">
               <type>
                 <TIME />
               </type>
@@ -1961,9 +1961,9 @@ END_IF;
 
 // Delai effectif selon le sens demande
 IF ReqDirection &gt; 0 THEN
-    EffectiveDelay := ChangeDelayUp;
+    EffectiveDelay := ChangeDelayAscent;
 ELSE
-    EffectiveDelay := ChangeDelayDown;
+    EffectiveDelay := ChangeDelayDescent;
 END_IF;
 
 // D18 : au front montant Enable avec sens maintenu, armer le temps mort

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:16:20.607865" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:16:20.607865">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:15:03.051981" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:15:03.051981">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -95,7 +95,7 @@
    ───────────────────────────────────────────────────────────────
    🎨 Distinct des bypass individuels M1/M2 (ST_BypassWinch)
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
-      GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
+      GVL_IHM.Commun.BtnWinchBothAscent/Descent), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
       pilotage groupé — SANS retirer les bypass individuels pour le pilotage à l'unité.
       ⚠️ Ne remplace PAS les bypass individuels : les deux se combinent en OR, jamais l'un

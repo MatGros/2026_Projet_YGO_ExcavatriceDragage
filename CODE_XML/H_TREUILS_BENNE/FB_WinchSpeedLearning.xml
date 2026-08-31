@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:12.745067" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:12.745067">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.631005" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.631005">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -475,7 +475,7 @@ palier : 1..5</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de paliers (1..5)</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_IdxAscending">
+            <variable name="CST_IdxAscent">
               <type>
                 <INT />
               </type>
@@ -486,7 +486,7 @@ palier : 1..5</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Index sens ascending</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_IdxDescending">
+            <variable name="CST_IdxDescent">
               <type>
                 <INT />
               </type>
@@ -552,7 +552,7 @@ CollectAllowed := LearnRequested AND MeasureUsable AND ContextValid;
 {region "§2 Collecte passive"}
 IF CollectAllowed THEN
     // Index sens et charge
-    IF Direction &gt; 0 THEN SensIdx := CST_IdxAscending; ELSE SensIdx := CST_IdxDescending; END_IF;
+    IF Direction &gt; 0 THEN SensIdx := CST_IdxAscent; ELSE SensIdx := CST_IdxDescent; END_IF;
     IF LoadPresent THEN ChargeIdx := CST_IdxCharge; ELSE ChargeIdx := CST_IdxVide; END_IF;
 
     // Plausibilite : vitesse dans l'enveloppe du palier (borne min/max)

@@ -21,8 +21,8 @@ VAR_INPUT
     SensorMaintenance : BOOL;   // --> [HW] Capteur extrême droite (Maintenance, accès MAINT_N2 uniquement)
 END_VAR
 VAR_OUTPUT
-    LimitSwitchFwd    : BOOL;   // <-- [STAT] Extrême Trémie confirmé (mot = 11111)
-    LimitSwitchRev    : BOOL;   // <-- [STAT] Extrême Maintenance confirmé (mot = 00000)
+    LimitSwitchTremie    : BOOL;   // <-- [STAT] Extrême Trémie confirmé (mot = 11111) (ex-LimitSwitchFwd)
+    LimitSwitchMaintenance : BOOL; // <-- [STAT] Extrême Maintenance confirmé (mot = 00000) (ex-LimitSwitchRev)
     Incoherent        : BOOL;   // <-- [DIAG] Mot hors des 6 combinaisons valides -> défaut sécurité (SafeStop+PowerCutOff, voir FB_Safety_Translation)
     SensorsWord       : BYTE;   // <-- [DIAG] Diagnostic (bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance)
 
@@ -84,8 +84,8 @@ CASE SensorsWord OF
 END_CASE;
 
 // 🚧 Limites extrêmes — uniquement sur mot valide (évite un Fdc fantôme déclenché par une incohérence)
-LimitSwitchFwd := (NOT Incoherent) AND (SensorsWord = 2#11111);
-LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
+LimitSwitchTremie := (NOT Incoherent) AND (SensorsWord = 2#11111);
+LimitSwitchMaintenance := (NOT Incoherent) AND (SensorsWord = 2#00000);
 {endregion}
 
 {region "§2 Reprise capteurs"}

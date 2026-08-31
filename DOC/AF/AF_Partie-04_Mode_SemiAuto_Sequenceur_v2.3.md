@@ -239,7 +239,8 @@ PRG_03_Modes_Cycle
 ```
 
 - **Mémorisation d'étape** : Lors d'un basculement en Maintenance, `instCycleSemiAuto` conserve son étape courante (`PausedState`). Les demandes d'actionneurs sont neutralisées.
-- **Reprise sécurisée** : Au retour en `SEMI_AUTO`, l'étape est conservée en pause (`WaitingResume := TRUE`). Un appui volontaire sur `BtnStart` ou armement homme-mort est exigé pour reprendre le cycle.
+- **Reprise sécurisée** : Au retour en `SEMI_AUTO`, l'étape est conservée en pause (`WaitingResume := TRUE`). La reprise du cycle exige un **geste conscient** : un appui volontaire sur `BtnStart` (bouton Start). L'armement homme-mort (joystick) **n'est pas** un geste de reprise de cycle : il autorise les mouvements mais ne relance pas le cycle. Cohérent avec le code (`FB_Cycle` gate X0→X1 sur `NOT Fault.Latched`, reprise par `BtnStart`).
+- **Après arrêt d'urgence** : la reprise est un **double geste séquentiel** — (1) réarmement AU (bouton réarmement, efface `Fault.Latched`), puis (2) relance du cycle par `BtnStart`. Aucune reprise automatique après défaut.
 
 ### 4.2 Enum `E_CycleStep`
 

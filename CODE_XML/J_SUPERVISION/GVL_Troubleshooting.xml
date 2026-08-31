@@ -2648,20 +2648,20 @@ Cause de blocage prioritaire</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick Axe X (-100% à +100%)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx203_HmiCmd_BtnFwd">
+            <variable name="Idx203_HmiCmd_BtnTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Avance IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton vers Trémie IHM | 0 = Relâché (ex-Idx203_HmiCmd_BtnFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx204_HmiCmd_BtnRev">
+            <variable name="Idx204_HmiCmd_BtnMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Recul IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton vers Maintenance IHM | 0 = Relâché (ex-Idx204_HmiCmd_BtnRev)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx205_HmiTargetPosition">
@@ -2857,20 +2857,20 @@ Cause de blocage prioritaire</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx304_LimitSwitchFwdActive">
+            <variable name="Idx304_LimitSwitchTremieActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Avance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Trémie (ex-Idx304_LimitSwitchFwdActive)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx305_LimitSwitchRevActive">
+            <variable name="Idx305_LimitSwitchMaintenanceActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Recul</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Maintenance (ex-Idx305_LimitSwitchRevActive)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx306_BypassLimitSwitch">
@@ -3120,7 +3120,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick (-100% à +100%)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx203_HmiManualCmd_BtnUp">
+            <variable name="Idx203_HmiManualCmd_BtnAscent">
               <type>
                 <BOOL />
               </type>
@@ -3128,7 +3128,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Appui Bouton Ascending IHM | 0 = Relâché</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx204_HmiManualCmd_BtnDown">
+            <variable name="Idx204_HmiManualCmd_BtnDescent">
               <type>
                 <BOOL />
               </type>
@@ -3254,7 +3254,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
       <dataType name="ST_Chain_Winch_Outputs">
         <baseType>
           <struct>
-            <variable name="Idx501_CmdRelayFwd_Up_DQ">
+            <variable name="Idx501_CmdRelayAscent_DQ">
               <type>
                 <BOOL />
               </type>
@@ -3262,7 +3262,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Relais Ascending ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx502_CmdRelayRev_Down_DQ">
+            <variable name="Idx502_CmdRelayDescent_DQ">
               <type>
                 <BOOL />
               </type>

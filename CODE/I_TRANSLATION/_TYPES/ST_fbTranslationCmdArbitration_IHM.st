@@ -11,8 +11,8 @@
 
 TYPE ST_fbTranslationCmdArbitration_IHM :
 STRUCT
-    BtnFwd            : BOOL;  // --> [CMD] Bouton translation avant (TranslationM3.Cmd.BtnFwd)
-    BtnRev            : BOOL;  // --> [CMD] Bouton translation arrière (TranslationM3.Cmd.BtnRev)
+    BtnTremie         : BOOL;  // --> [CMD] Bouton translation vers Trémie (TranslationM3.Cmd.BtnTremie, ex-BtnFwd)
+    BtnMaintenance    : BOOL;  // --> [CMD] Bouton translation vers Maintenance (TranslationM3.Cmd.BtnMaintenance, ex-BtnRev)
     SelPositioning    : BOOL;  // --> [CMD] Sélecteur positionnement (TranslationM3.Cmd.SelPositioning)
     SetFreq_Hz        : REAL;  // --> [CMD] Consigne fréquence (TranslationM3.Cmd.SetFreq_Hz)
     BypassGlobal      : BOOL;  // --> [TST] Bypass global translation (TranslationM3.Bypass.Global)

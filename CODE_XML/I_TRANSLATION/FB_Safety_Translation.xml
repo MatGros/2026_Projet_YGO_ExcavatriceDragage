@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T20:26:45.701869" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T20:26:45.701869">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:17.392279" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:17.392279">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -315,23 +315,31 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction commandée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction commandée (-1: vers Maintenance, 0: Stop, 1: vers Trémie)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême avant</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême arrière</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceM3TargetEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation cible Maintenance (Auth.MaintenanceM3TargetEnable)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorWordIncoherent">
@@ -560,6 +568,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incohérence mot capteurs position (bit7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -825,8 +849,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 6 : Limite extrême escalade (live)
     IF NOT (BypassSafety OR BypassLimitSwitch) THEN
-        OverrunCondition := (LimitSwitchFwd AND (Direction = 1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
-                         OR (LimitSwitchRev AND (Direction = -1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
+        OverrunCondition := (LimitSwitchTremie AND (Direction = 1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchMaintenance AND (Direction = -1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
         instCauses[6].Active := TonLimitSwitchOverrun.Q;
     ELSE
@@ -868,6 +892,8 @@ IF NOT Enable THEN
     ErrorMecaA := FALSE;
     ErrorLimitSwitch := FALSE;
     ErrorSensorIncoherent := FALSE;
+    TremiePermit := FALSE;
+    MaintenancePermit := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
@@ -894,6 +920,13 @@ ErrorMecaB            := instCauses[4].Active;
 ErrorMecaA            := instCauses[5].Active;
 ErrorLimitSwitch      := instCauses[6].Active;
 ErrorSensorIncoherent := instCauses[7].Active;
+
+// 🛡️ Permis directionnels M3 (polarité fail-safe : TRUE = autorisé)
+// TremiePermit : autorisé vers Trémie tant que la fin de course Trémie n'est pas atteinte.
+TremiePermit := NOT LimitSwitchTremie;
+// MaintenancePermit : autorisé vers Maintenance uniquement si la cible Maintenance est
+// autorisée (Auth.MaintenanceM3TargetEnable) ET la fin de course Maintenance non atteinte.
+MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
 {endregion}
 </xhtml>
           </ST>

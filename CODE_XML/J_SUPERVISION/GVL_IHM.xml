@@ -132,7 +132,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : temps depuis dernier front IHM</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothUp">
+            <variable name="BtnWinchBothAscent">
               <type>
                 <BOOL />
               </type>
@@ -141,7 +141,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
 ⬆️ Monte les 2 treuils simultanément</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothDown">
+            <variable name="BtnWinchBothDescent">
               <type>
                 <BOOL />
               </type>
@@ -853,7 +853,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Distinct des bypass individuels M1/M2 (ST_BypassWinch)
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
-      GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
+      GVL_IHM.Commun.BtnWinchBothAscent/Descent), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
       pilotage groupé — SANS retirer les bypass individuels pour le pilotage à l'unité.
       ⚠️ Ne remplace PAS les bypass individuels : les deux se combinent en OR, jamais l'un
@@ -898,7 +898,7 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2)</xhtml>
               </documentation>
             </variable>
-            <variable name="WinchMaxStepDescending">
+            <variable name="WinchMaxStepDescent">
               <type>
                 <INT />
               </type>
@@ -3010,6 +3010,22 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
               </documentation>
             </variable>
+            <variable name="TremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BlockedBySafety">
               <type>
                 <BOOL />
@@ -3132,20 +3148,20 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔢 Numéro de la cible de position sélectionnée</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnFwd">
+            <variable name="BtnTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche avant (→ Trémie), pilotage IHM exclusif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche vers Trémie (ex-BtnFwd), pilotage IHM exclusif</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnRev">
+            <variable name="BtnMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche arrière (→ Maintenance), pilotage IHM exclusif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Requête marche vers Maintenance (ex-BtnRev), pilotage IHM exclusif</xhtml>
               </documentation>
             </variable>
             <variable name="SetFreq_Hz">
@@ -3197,7 +3213,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
    ───────────────────────────────────────────────────────────────
    🎨 Destiné au pilotage de la translation M3 depuis l'IHM.
    📄 : Initialized protège SetFreq_Hz (seul réglage à survivre au reboot),
-      sans pont générique pour ne jamais persister BtnFwd/BtnRev.
+      sans pont générique pour ne jamais persister BtnTremie/BtnMaintenance.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -3475,15 +3491,21 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
             </variable>
-            <variable name="LimitSwitchFwd">
+            <variable name="LimitSwitchTremie">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Fin de course extrême Trémie (ex-LimitSwitchFwd)</xhtml>
+              </documentation>
             </variable>
-            <variable name="LimitSwitchRev">
+            <variable name="LimitSwitchMaintenance">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
+              </documentation>
             </variable>
             <variable name="DriveThermalOk">
               <type>
@@ -4101,7 +4123,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
       <dataType name="ST_WinchCmd">
         <baseType>
           <struct>
-            <variable name="BtnUp">
+            <variable name="BtnAscent">
               <type>
                 <BOOL />
               </type>
@@ -4109,7 +4131,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⬆️ Mouvement montee maintenu (mode boutons IHM, MAINT_N1 accessible)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnDown">
+            <variable name="BtnDescent">
               <type>
                 <BOOL />
               </type>

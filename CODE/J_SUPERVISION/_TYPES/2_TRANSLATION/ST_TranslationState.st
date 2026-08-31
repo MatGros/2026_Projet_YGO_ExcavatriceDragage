@@ -48,8 +48,8 @@ STRUCT
     EstimatedPosM3_M        : REAL;    (* 📏 Position continue estimée en mètres (0.0 m Maint -> +X m Trémie) — persistante, survit reboot *)
     SensorsWord             : BYTE;    (* bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance *)
     SensorWordIncoherent    : BOOL;
-    LimitSwitchFwd          : BOOL;
-    LimitSwitchRev          : BOOL;
+    LimitSwitchTremie       : BOOL;    (* 🚧 Fin de course extrême Trémie (ex-LimitSwitchFwd) *)
+    LimitSwitchMaintenance  : BOOL;    (* 🚧 Fin de course extrême Maintenance (ex-LimitSwitchRev) *)
     DriveThermalOk          : BOOL;    (* Retour disjoncteur thermique moteur/variateur AC600 — diagnostic seul, l'AC600 se protège lui-même *)
     MaintenanceTargetEnable : BOOL;    (* 🔓 TRUE = Autorise le déplacement vers la cible 4 (Maintenance) ; actif uniquement en mode MAINT_N2 *)
     SimulationModeActive    : BOOL;

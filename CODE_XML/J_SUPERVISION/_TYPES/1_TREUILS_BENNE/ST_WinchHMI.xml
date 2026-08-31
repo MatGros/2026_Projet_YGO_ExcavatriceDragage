@@ -616,7 +616,7 @@
       <dataType name="ST_WinchCmd">
         <baseType>
           <struct>
-            <variable name="BtnUp">
+            <variable name="BtnAscent">
               <type>
                 <BOOL />
               </type>
@@ -624,7 +624,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⬆️ Mouvement montee maintenu (mode boutons IHM, MAINT_N1 accessible)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnDown">
+            <variable name="BtnDescent">
               <type>
                 <BOOL />
               </type>

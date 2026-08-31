@@ -29,9 +29,10 @@ VAR_INPUT
     DriveActualFreqHz   : REAL;        // --> [HW] Vitesse réelle variateur (Hz)
     BrakeFeedback       : BOOL;        // --> [HW] Retour d'état bobine frein (TRUE = ouvert/desserré)
     BrakeCmd            : BOOL;        // --> [HW] Commande frein
-    Direction           : INT;         // --> [CMD] Direction commandée
-    LimitSwitchFwd      : BOOL;        // --> [HW] Fin de course extrême avant
-    LimitSwitchRev      : BOOL;        // --> [HW] Fin de course extrême arrière
+    Direction           : INT;         // --> [CMD] Direction commandée (-1: vers Maintenance, 0: Stop, 1: vers Trémie)
+    LimitSwitchTremie   : BOOL;        // --> [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)
+    LimitSwitchMaintenance : BOOL;     // --> [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)
+    MaintenanceM3TargetEnable : BOOL;  // --> [CMD] Autorisation cible Maintenance (Auth.MaintenanceM3TargetEnable)
     SensorWordIncoherent: BOOL;        // --> [HW] Mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)
 
     // 🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass)
@@ -61,6 +62,8 @@ VAR_OUTPUT
     ErrorMecaA          : BOOL;        // <-- [DIAG] Mouvement non commandé (Méca A - bit5)
     ErrorLimitSwitch    : BOOL;        // <-- [DIAG] Limite extrême Translation atteinte (bit6)
     ErrorSensorIncoherent: BOOL;       // <-- [DIAG] Incohérence mot capteurs position (bit7)
+    TremiePermit        : BOOL;        // <-- [SAFE] Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)
+    MaintenancePermit   : BOOL;        // <-- [SAFE] Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)
 END_VAR
 VAR
     ResetEdge           : R_TRIG;   // . [LOC] Front Reset
@@ -182,8 +185,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 6 : Limite extrême escalade (live)
     IF NOT (BypassSafety OR BypassLimitSwitch) THEN
-        OverrunCondition := (LimitSwitchFwd AND (Direction = 1) AND (ABS(DriveActualFreqHz) > 0.5 OR DriveStatusWord.0))
-                         OR (LimitSwitchRev AND (Direction = -1) AND (ABS(DriveActualFreqHz) > 0.5 OR DriveStatusWord.0));
+        OverrunCondition := (LimitSwitchTremie AND (Direction = 1) AND (ABS(DriveActualFreqHz) > 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchMaintenance AND (Direction = -1) AND (ABS(DriveActualFreqHz) > 0.5 OR DriveStatusWord.0));
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
         instCauses[6].Active := TonLimitSwitchOverrun.Q;
     ELSE
@@ -225,6 +228,8 @@ IF NOT Enable THEN
     ErrorMecaA := FALSE;
     ErrorLimitSwitch := FALSE;
     ErrorSensorIncoherent := FALSE;
+    TremiePermit := FALSE;
+    MaintenancePermit := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
@@ -251,6 +256,13 @@ ErrorMecaB            := instCauses[4].Active;
 ErrorMecaA            := instCauses[5].Active;
 ErrorLimitSwitch      := instCauses[6].Active;
 ErrorSensorIncoherent := instCauses[7].Active;
+
+// 🛡️ Permis directionnels M3 (polarité fail-safe : TRUE = autorisé)
+// TremiePermit : autorisé vers Trémie tant que la fin de course Trémie n'est pas atteinte.
+TremiePermit := NOT LimitSwitchTremie;
+// MaintenancePermit : autorisé vers Maintenance uniquement si la cible Maintenance est
+// autorisée (Auth.MaintenanceM3TargetEnable) ET la fin de course Maintenance non atteinte.
+MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
 {endregion}
 
 END_FUNCTION_BLOCK

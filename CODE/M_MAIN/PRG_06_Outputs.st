@@ -138,8 +138,8 @@ M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
 
 // ── Sorties physiques M1 ──
-M1_RelayFwd_Up_DQ            := M1RelayFwd;
-M1_RelayRev_Down_DQ          := M1RelayRev;
+M1_RelayAscent_DQ            := M1RelayFwd;
+M1_RelayDescent_DQ           := M1RelayRev;
 M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
 M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
 M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
@@ -211,8 +211,8 @@ M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
 M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
 // ── Sorties physiques M2 ──
-M2_RelayFwd_Up_Close_DQ      := M2RelayFwd;
-M2_RelayRev_Down_Open_DQ     := M2RelayRev;
+M2_RelayAscent_Close_DQ      := M2RelayFwd;
+M2_RelayDescent_Open_DQ      := M2RelayRev;
 M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
 M2_SpeedContactor_2_DQ       := M2SpeedContactor2;
 M2_SpeedContactor_3_DQ       := M2SpeedContactor3;

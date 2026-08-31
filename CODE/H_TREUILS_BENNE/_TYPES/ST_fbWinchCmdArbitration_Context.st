@@ -16,7 +16,7 @@ STRUCT
     BucketM2Open                   : BOOL;  // --> [CMD] Ouverture benne (instBucket.M2_Direction = 1)
     BucketM2Close                  : BOOL;  // --> [CMD] Fermeture benne (instBucket.M2_Direction = -1)
     WinchBothMotionBlockedByBucket : BOOL;  // --> [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)
-    SyncBlocksUp                   : BOOL;  // --> [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)
-    SyncBlocksDown                 : BOOL;  // --> [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)
+    SyncBlocksAscent                   : BOOL;  // --> [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)
+    SyncBlocksDescent                 : BOOL;  // --> [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)
 END_STRUCT
 END_TYPE

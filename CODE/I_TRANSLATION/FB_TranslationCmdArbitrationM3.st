@@ -26,7 +26,7 @@ END_VAR
 VAR_OUTPUT
     Ready             : BOOL;  // <-- [STAT] FB prêt à arbitrer (Enable)
     StartStop         : BOOL;  // <-- [CMD] Commande marche/arrêt arbitrée
-    Direction         : INT;   // <-- [CMD] Sens arbitré (-1: Rev, 0: Stop, 1: Fwd)
+    Direction         : INT;   // <-- [CMD] Sens arbitré (-1: vers Maintenance, 0: Stop, 1: vers Trémie)
     SpeedPct          : REAL;  // <-- [CMD] Consigne vitesse arbitrée (0..100 %)
     PositioningActive : BOOL;  // <-- [CMD] Mode positionnement actif (SEMI_AUTO)
     SelTarget         : INT;   // <-- [CMD] Cible position (1=Trémie, 2=P2, 3=P1, 4=Maintenance) — SEMI_AUTO
@@ -67,9 +67,9 @@ ELSE
         PositioningActive := IHM.SelPositioning;
         SelTarget := 0;
 
-        IF NOT TglJoystickMaster AND IHM.BtnFwd THEN
+        IF NOT TglJoystickMaster AND IHM.BtnTremie THEN
             Direction := 1;
-        ELSIF NOT TglJoystickMaster AND IHM.BtnRev THEN
+        ELSIF NOT TglJoystickMaster AND IHM.BtnMaintenance THEN
             Direction := -1;
         ELSIF TglJoystickMaster THEN
             Direction := Joystick.AxisX.Direction;

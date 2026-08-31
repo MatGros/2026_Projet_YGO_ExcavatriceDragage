@@ -22,14 +22,14 @@ VAR_INPUT
     Mode                        : E_Mode;      // --> [CMD] Mode courant
     StartStop                   : BOOL;        // --> [CMD] TRUE = rampe accélération, FALSE = rampe décélération NORMALE
     SafeStop                    : BOOL;        // --> [SAFE] Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
-    Direction                   : INT;         // --> [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d'autorité du sens)
+    Direction                   : INT;         // --> [CMD] -1 = vers Maintenance, 0 = Neutre, +1 = vers Trémie (source d'autorité du sens)
     SpeedTgt_Pct                : REAL;        // --> [CMD] Magnitude de la consigne (de 0 à 100%)
     PositionSensorTarget        : BOOL;        // --> [HW] Capteur position cible courante
     SlowdownSensorTremie        : BOOL;        // --> [HW] Capteur PV — ralentissement avant Trémie (Direction=1)
     SlowdownSensorMaintenance   : BOOL;        // --> [HW] Capteur P1 — ralentissement avant Maintenance (Direction=-1)
     SlowdownSensorP1            : BOOL;        // --> [HW] Capteur P2 — ralentissement avant P1 (Direction=-1)
-    LimitSwitchFwd              : BOOL;        // --> [HW] Fin de course extrême avant
-    LimitSwitchRev              : BOOL;        // --> [HW] Fin de course extrême arrière
+    LimitSwitchTremie           : BOOL;        // --> [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)
+    LimitSwitchMaintenance      : BOOL;        // --> [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)
 
     // 🔌 Spécifique ETHERCAT
     DriveStatusWord             : WORD;       // --> [HW] Mot d'état AC600 lu depuis l'image d'entrée EtherCAT
@@ -100,7 +100,7 @@ instCauses[3].Active   := DriveFaultLatching;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Defaut variateur translation AC600';
 
-IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev)) THEN
+IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchTremie) OR (CommandedDirection = -1 AND LimitSwitchMaintenance)) THEN
     instCauses[6].Active := TRUE;
 ELSE
     instCauses[6].Active := FALSE;

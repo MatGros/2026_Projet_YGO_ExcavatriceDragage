@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T16:59:27.781718" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T16:59:27.781718">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.642616" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.642616">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -132,7 +132,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : temps depuis dernier front IHM</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothUp">
+            <variable name="BtnWinchBothAscent">
               <type>
                 <BOOL />
               </type>
@@ -141,7 +141,7 @@ IHM→PLC : toggle périodique, jamais valeur constante</xhtml>
 ⬆️ Monte les 2 treuils simultanément</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothDown">
+            <variable name="BtnWinchBothDescent">
               <type>
                 <BOOL />
               </type>
@@ -322,7 +322,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Distinct des bypass individuels M1/M2 (ST_BypassWinch)
       un OUI ici lève la protection sur LES DEUX treuils simultanément (pilotage "both",
-      GVL_IHM.Commun.BtnWinchBothUp/Down), en OR avec le bypass individuel de chaque instance
+      GVL_IHM.Commun.BtnWinchBothAscent/Descent), en OR avec le bypass individuel de chaque instance
       (PRG_04_Treuils_Benne). Évite de devoir activer 2 fois le même bypass (M1 ET M2) avant un
       pilotage groupé — SANS retirer les bypass individuels pour le pilotage à l'unité.
       ⚠️ Ne remplace PAS les bypass individuels : les deux se combinent en OR, jamais l'un
@@ -367,7 +367,7 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2)</xhtml>
               </documentation>
             </variable>
-            <variable name="WinchMaxStepDescending">
+            <variable name="WinchMaxStepDescent">
               <type>
                 <INT />
               </type>

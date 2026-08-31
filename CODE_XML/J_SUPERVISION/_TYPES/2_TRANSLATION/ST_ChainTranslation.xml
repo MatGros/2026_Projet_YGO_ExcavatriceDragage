@@ -145,20 +145,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[%] Consigne Joystick Axe X (-100% à +100%)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx203_HmiCmd_BtnFwd">
+            <variable name="Idx203_HmiCmd_BtnTremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Avance IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton vers Trémie IHM | 0 = Relâché (ex-Idx203_HmiCmd_BtnFwd)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx204_HmiCmd_BtnRev">
+            <variable name="Idx204_HmiCmd_BtnMaintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton Recul IHM | 0 = Relâché</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Bouton vers Maintenance IHM | 0 = Relâché (ex-Idx204_HmiCmd_BtnRev)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx205_HmiTargetPosition">
@@ -354,20 +354,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Puissance OK | 1 = Coupure Puissance</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx304_LimitSwitchFwdActive">
+            <variable name="Idx304_LimitSwitchTremieActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Avance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Trémie (ex-Idx304_LimitSwitchFwdActive)</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx305_LimitSwitchRevActive">
+            <variable name="Idx305_LimitSwitchMaintenanceActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Recul</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = Sain | 1 = Fin de Course Extrême Maintenance (ex-Idx305_LimitSwitchRevActive)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx306_BypassLimitSwitch">

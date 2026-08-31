@@ -5,8 +5,8 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_WinchCmd :
 STRUCT
-    BtnUp               : BOOL;             (* ⬆️ Mouvement montee maintenu (mode boutons IHM, MAINT_N1 accessible) *)
-    BtnDown             : BOOL;             (* ⬇️ Mouvement descente maintenu (mode boutons IHM, MAINT_N1 accessible) *)
+    BtnAscent               : BOOL;             (* ⬆️ Mouvement montee maintenu (mode boutons IHM, MAINT_N1 accessible) *)
+    BtnDescent             : BOOL;             (* ⬇️ Mouvement descente maintenu (mode boutons IHM, MAINT_N1 accessible) *)
     BtnReset            : BOOL;             (* 🔑 Demande reset exposée par treuil ; agrégée dans le reset domaine partagé *)
     BtnHome             : BOOL;             (* 🎯 Homing nominal si Couplé, unitaire si M1/M2 sélectionné en MAINT_N2 *)
     BtnConfirmCoherence : BOOL;             (* 🔓 Confirmation de cohérence au démarrage *)

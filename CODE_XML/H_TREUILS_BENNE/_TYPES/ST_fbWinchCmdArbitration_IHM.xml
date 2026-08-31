@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:05:11.952769" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:05:11.952769">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.641617" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.641617">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -26,7 +26,7 @@
       <dataType name="ST_fbWinchCmdArbitration_IHM">
         <baseType>
           <struct>
-            <variable name="BtnUpM1">
+            <variable name="BtnAscentM1">
               <type>
                 <BOOL />
               </type>
@@ -34,7 +34,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée treuil M1 (nommage hardware)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnDownM1">
+            <variable name="BtnDescentM1">
               <type>
                 <BOOL />
               </type>
@@ -42,7 +42,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton descente treuil M1</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnUpM2">
+            <variable name="BtnAscentM2">
               <type>
                 <BOOL />
               </type>
@@ -50,7 +50,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnDownM2">
+            <variable name="BtnDescentM2">
               <type>
                 <BOOL />
               </type>
@@ -58,7 +58,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton descente treuil M2</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothUp">
+            <variable name="BtnWinchBothAscent">
               <type>
                 <BOOL />
               </type>
@@ -66,7 +66,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton montée couplée both (Commun)</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnWinchBothDown">
+            <variable name="BtnWinchBothDescent">
               <type>
                 <BOOL />
               </type>
@@ -91,7 +91,7 @@
        paramètre séparé des FB (I4 — factorisation, source unique GVL_IHM.Modes.Cmd).
    📤 Producteur : PRG_04_Treuils_Benne (câblage GVL_IHM).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Nommage : BtnUpM1/BtnUpM2 = nommage hardware propagé (convention projet).
+   🔌 Nommage : BtnAscentM1/BtnAscentM2 = nommage hardware propagé (convention projet).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
