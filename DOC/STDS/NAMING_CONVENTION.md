@@ -127,6 +127,7 @@ Le nom doit permettre de comprendre ce que représente la donnée **sans connaî
 | <nobr><code>NC-090</code></nobr> | Une notion = un seul nom dans tout le projet (pas de synonyme parallèle) | Revue sémantique, pas mécanisable | 👁️ MANUEL | `CODE_QUALITY_STANDARDS.md §1` |
 | <nobr><code>NC-100</code></nobr> | Polarité positive des arbitrages `*Permit`/`*Allowed` : `TRUE` = autorisé, `FALSE` = bloqué | Tout signal d'arbitrage répond à « que signifie `TRUE` ? » = autorisation positive ; jamais d'`OR` d'autorisations | 👁️ MANUEL | §Polarité positive des arbitrages (T109) |
 | <nobr><code>NC-110</code></nobr> | DUT **propriété d'un seul FB** (produit en `VAR_OUTPUT` / échangé en `VAR_IN_OUT` par une seule instance) préfixé `ST_fb<NomFb>_<Rôle>` — `fb` minuscule collé + `_` après le nom du FB (2 indices visuels le distinguant d'un `ST_<Domaine>_<Rôle>` public et d'un `ST_*HMI`) | Tout DUT référencé dans l'interface d'exactement un `FB_*` porte le préfixe `ST_fb<NomFb>_` | 🤖 AUTO (`G120`) | §Structures de données (DUT) |
+| <nobr><code>NC-120</code></nobr> | Préférer INT décimal à HEX (`16#xxxx`) pour tout littéral numérique, sauf exception client/technique (masques de bits, codes bit-codés WORD, registres matériels/protocole, valeurs imposées client/constructeur) | Aucun littéral `16#xxxx` hors des exceptions légitimes ; jamais de duplication d'un hex correspondant à une constante `CST_*` existante | 👁️ MANUEL | §Littéraux numériques : préférer INT à HEX |
 
 ---
 
@@ -174,7 +175,7 @@ Pour regrouper naturellement les types dans l'autocomplétion CODESYS et les fen
 **Exemples conformes :**
 - `ST_Safety_Emergency_State` (État public arrêt d'urgence)
 - `ST_Safety_Emergency_Diag` (Diagnostic arrêt d'urgence)
-- `ST_Safety_Emergency_InternalCmd` (Commande interne Logic → Output)
+- `ST_Safety_Emergency_Cmd` (Commandes arrêt d'urgence)
 - `ST_Safety_Emergency_HmiCmd` (Commandes IHM)
 - `ST_Safety_Emergency_HmiState` (Retours état IHM)
 
@@ -704,6 +705,27 @@ constante d'affichage, elle ne doit jamais être modifiable à chaud)
   persistante), PAS une constante `CST_`.
 - Sauf dérogation documentée, le préfixe `CST_` est **obligatoire** pour toute constante —
   il n'existe pas de constante sans préfixe.
+
+---
+
+## Littéraux numériques : préférer INT à HEX (NC-120)
+
+> **NC-120 — Préférer INT à HEX, sauf exception client ou technique**
+> Pour toute valeur numérique littérale, préférer le décimal (INT) à l'hexadécimal (`16#xxxx`).
+> L'hex est réservé aux cas où il apporte une lisibilité réelle.
+
+**Exceptions légitimes (GARDER en HEX)** :
+- Masques de bits / bitfields (`ErrorId AND 16#0001`, `OR 16#0010`)
+- Codes bit-codés WORD (`OperatorActionId 16#0100..16#0480`)
+- Registres matériels / mots de protocole (`StatusWord` variateur, PDO CANopen/EtherCAT, adresses `0x3100`)
+- Valeurs imposées par le client / constructeur
+
+**Cas à écrire en INT décimal** : valeurs simples, comparaisons d'égalité, `CASE` labels,
+remises à zéro (`:= 0`), identifiants non-bitfield.
+
+**Anti-pattern** : dupliquer un littéral hex qui correspond à une constante `CST_*` existante.
+
+**Type** : MANUEL (jugement sémantique).
 
 ---
 

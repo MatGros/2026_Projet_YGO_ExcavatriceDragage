@@ -185,7 +185,7 @@ DescentActive := Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1)
 IF Fault.Error OR Fault.Latched THEN
     Outputs.StepState := E_DiveSearchState.ERROR_HOLD;
     Outputs.KoboldContactorCmd := FALSE;
-    Outputs.OperatorActionId := 384;
+    Outputs.OperatorActionId := 16#0180;
     Outputs.OperatorAction := 'Verifier les conditions puis rearmer avant une nouvelle plongee.';
 ELSE
     CASE Outputs.StepState OF
@@ -194,7 +194,7 @@ ELSE
                AND (NOT Inputs.BucketIsOpen OR NOT Inputs.PositionsValid OR Inputs.KoboldImmersed
                     OR (Inputs.M1Position_M < Inputs.DiveStartMin_M)
                     OR (Inputs.M2Position_M < Inputs.DiveStartMin_M)) THEN
-                Outputs.OperatorActionId := 256;
+                Outputs.OperatorActionId := 16#0100;
                 Outputs.OperatorAction := 'Verifier benne ouverte, positions et Kobold au repos.';
             ELSE
                 Outputs.StepState := E_DiveSearchState.READY_TO_DESCEND;
@@ -202,7 +202,7 @@ ELSE
 
         E_DiveSearchState.READY_TO_DESCEND:
             Ready := TRUE;
-            Outputs.OperatorActionId := 257;
+            Outputs.OperatorActionId := 16#0101;
             Outputs.OperatorAction := 'Demander une descente pour rechercher le fond.';
             IF Inputs.MotionRequestActive AND (Inputs.MotionDirection = -1) THEN
                 ImmersionTimerAcc := T#0ms;
@@ -213,7 +213,7 @@ ELSE
             Lifecycle.Busy := TRUE;
             Outputs.DescendPermit := DescentActive;
             Outputs.KoboldContactorCmd := DescentActive;
-            Outputs.OperatorActionId := 258;
+            Outputs.OperatorActionId := 16#0102;
             Outputs.OperatorAction := 'Maintenir la descente : recherche immersion Kobold.';
             IF Inputs.CurrentSpeedStep > 4 THEN
                 IF NOT StepAtFaultCaptured THEN
@@ -250,7 +250,7 @@ ELSE
             Lifecycle.Busy := TRUE;
             Outputs.DescendPermit := DescentActive;
             Outputs.KoboldContactorCmd := DescentActive;
-            Outputs.OperatorActionId := 259;
+            Outputs.OperatorActionId := 16#0103;
             Outputs.OperatorAction := 'Maintenir la descente : immersion validee, recherche du fond.';
             IF Inputs.CurrentSpeedStep > 4 THEN
                 IF NOT StepAtFaultCaptured THEN
@@ -269,7 +269,7 @@ ELSE
         E_DiveSearchState.BOTTOM_CONFIRMED:
             Lifecycle.Done := TRUE;
             Outputs.KoboldContactorCmd := FALSE;
-            Outputs.OperatorActionId := 260;
+            Outputs.OperatorActionId := 16#0104;
             Outputs.OperatorAction := 'Fond detecte : demander la fermeture ou extraction.';
 
         E_DiveSearchState.ERROR_HOLD:

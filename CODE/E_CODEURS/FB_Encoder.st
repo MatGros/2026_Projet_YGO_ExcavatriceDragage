@@ -88,9 +88,9 @@ IF NOT Enable THEN
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
-    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 16#0000;
+    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 0;
     Measurement.HomingLifecycle.Busy := FALSE; Measurement.HomingLifecycle.Done := FALSE;
-    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 16#0000;
+    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 0;
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
     // Frontiere HW sortie : aucun ordre preset publie hors autorisation

@@ -1,0 +1,66 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T201 Phase D : Promouvoir CST_ABORT_* en GVL + consommateur
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T201-D_CST_ABORT_GVL
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Promouvoir les constantes CST_ABORT_* de la portée locale du FB producteur vers
+    une GVL partagée, et faire utiliser les constantes nommées par le consommateur
+    FB_Hmi_BannerFormatter au lieu des littéraux hex.
+
+  acceptance:
+    - id: AC1
+      statement: "CST_ABORT_* sont déclarées dans une GVL partagée (plus en local du FB)."
+      verified_by: "grep 'CST_ABORT' CODE/**/*.st"
+    - id: AC2
+      statement: "Le producteur FB_Safety_EmergencyManagement et le consommateur FB_Hmi_BannerFormatter référencent la GVL."
+      verified_by: "grep 'CST_ABORT' CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st"
+    - id: AC3
+      statement: "Aucun littéral hex 16#0001..16#0080 dans FB_Hmi_BannerFormatter.st:356,382-418."
+      verified_by: "grep '16#00' CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st"
+    - id: AC4
+      statement: "Messages IHM d'abandon AU identiques (valeurs inchangées)."
+      verified_by: "diff sémantique : chaque 16#00xx remplacé par la constante de même valeur"
+    - id: AC5
+      statement: "Compilation valide (pas de collision de nom)."
+      verified_by: "generate_codesys_bundle.py + run_all_gates.py = PASS"
+    - id: AC6
+      statement: "Liaison intacte."
+      verified_by: "G200_check_linkage.py --report = PASS"
+
+  scope:
+    allowed:
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/J_SUPERVISION/GVL_IHM.st (ou nouvelle GVL dédiée)
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    Refactor transversal (GVL + producteur + consommateur) — doit atterrir
+    atomiquement. Tout problème (collision de nom, valeur modifiée) est remonté
+    immédiatement à l'orchestrateur.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: ""

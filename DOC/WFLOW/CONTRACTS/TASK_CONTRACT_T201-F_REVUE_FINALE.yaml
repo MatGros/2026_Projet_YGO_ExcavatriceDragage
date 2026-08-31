@@ -1,0 +1,71 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T201 Phase F : Revue finale diff + non-régression (R1→R7)
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T201-F_REVUE_FINALE
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Revue finale indépendante du lot T201 (phases A/B/C/D) : vérifier le diff
+    complet et la non-régression (R1→R7). Agent différent des implémenteurs.
+
+  acceptance:
+    - id: AC1
+      statement: "R1 : 0 ancien identifiant (grep des anciens noms)."
+      verified_by: "grep"
+    - id: AC2
+      statement: "R2 : liaison G200 PASS (0 erreur)."
+      verified_by: "G200_check_linkage.py --report"
+    - id: AC3
+      statement: "R3 : bundle frais."
+      verified_by: "generate_codesys_bundle.py"
+    - id: AC4
+      statement: "R4 : gates CI PASS."
+      verified_by: "run_all_gates.py"
+    - id: AC5
+      statement: "R5 : renommage pur (aucun changement de valeur)."
+      verified_by: "diff sémantique"
+    - id: AC6
+      statement: "R6 : cohérence AF."
+      verified_by: "lecture spec AF"
+    - id: AC7
+      statement: "R7 : liaison inter-lots (A/B/C/D cohérents entre eux)."
+      verified_by: "revue croisée"
+
+  scope:
+    allowed:                 # revue read-only : fichiers lus, AUCUNE modification
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/G_CYCLE/FB_DiveSearch.st
+      - CODE/E_CODEURS/FB_Encoder_Abs.st
+      - CODE/E_CODEURS/FB_Encoder.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - DOC/STDS/NAMING_CONVENTION.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    Revue read-only. Tout problème (régression, valeur modifiée, liaison cassée)
+    est remonté immédiatement à l'orchestrateur avec fichier:ligne.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: ""

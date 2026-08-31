@@ -1,0 +1,52 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T201 Phase A : Règle NC-120 (préférer INT à HEX)
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T201-A_NC120
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Ajouter dans NAMING_CONVENTION.md la règle NC-120 « préférer INT à HEX,
+    sauf exception client/technique » pour encadrer les usages hexadécimaux.
+
+  acceptance:
+    - id: AC1
+      statement: "La règle NC-120 est présente dans NAMING_CONVENTION.md, numérotée, dans le tableau Points de validation."
+      verified_by: "grep 'NC-120' DOC/STDS/NAMING_CONVENTION.md"
+    - id: AC2
+      statement: "La règle exclut explicitement les masques de bits, codes bit-codés WORD (OperatorActionId), registres PDO (0x3100), constantes de diagnostic."
+      verified_by: "lecture de la section NC-120"
+    - id: AC3
+      statement: "La règle précise les cas à écrire en INT décimal (valeurs simples, CASE labels, remises à zéro)."
+      verified_by: "lecture de la section NC-120"
+
+  scope:
+    allowed:
+      - DOC/STDS/NAMING_CONVENTION.md
+    forbidden:
+      - CODE/**
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  evidence_required:
+    - grep NC-120
+
+  alert_duty: >
+    Tout problème constaté (conflit avec gate G347, masques de bits) est remonté
+    immédiatement à l'orchestrateur.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: ""

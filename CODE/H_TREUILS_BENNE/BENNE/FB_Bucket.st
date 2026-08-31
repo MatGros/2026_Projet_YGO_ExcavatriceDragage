@@ -391,7 +391,7 @@ END_IF;
 
 ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND NOT BucketState.StateIncoherent
-                     AND (Fault.ErrorId = 16#0000)
+                     AND (Fault.ErrorId = 0)
                      AND (MachineHomed OR (BucketState.IsOpen XOR BucketState.IsClosed))
                      AND NOT MachineHomingActive;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;

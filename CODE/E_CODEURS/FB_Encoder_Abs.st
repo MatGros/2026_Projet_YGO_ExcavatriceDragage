@@ -96,7 +96,7 @@ EncoderAvailable := NOT instCauses[0].Active;
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
     Ready := FALSE;
-    PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
+    PresetTriggerCmd := 0; CodeSeqTriggerCmd := 0; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetCompleted := FALSE;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
@@ -127,7 +127,7 @@ END_IF;
 // fonction n'est pas confirmée. Ne jamais lui donner une valeur arbitraire.
 PresetReqEdge(CLK := PresetRequest);
 PresetCompleted := FALSE;
-CodeSeqTriggerCmd := 16#0000;           // non piloté — rôle inconnu, voir note ci-dessus
+CodeSeqTriggerCmd := 0;                 // non piloté — rôle inconnu, voir note ci-dessus
 CASE PresetSeqStep OF
     0: // IDLE
         PresetTriggerCmd := 0;
