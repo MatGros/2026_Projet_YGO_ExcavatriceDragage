@@ -3866,3 +3866,90 @@ tasks:
   bloque_par:
   - T188-C
   - T188-E
+- id: T191
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: DOCUMENTATION
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Refactor documentation AF en fonction du code implémenté
+  contexte: 'Mise à jour des specs AF pour refléter le code implémenté : FB d''arbitrage (M1/M2/M3/Benne), structs Data, palier au joystick, source unique WinchBothIntent, consolidation bus PRG_02.'
+  description: 'Gros refactor documentaire. Utiliser les templates standard (AF_SPEC_TEMPLATE.md, AF_FICHE_PRG_TEMPLATE.md, FB_SPEC_TEMPLATE.md, AF_ARCHITECTURE_PROGRAMME_TEMPLATE.md) + GUIDE_EDITION_AF_v1.0.md. 11 AF parties + 1 contrat concernés : AF-02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12/14, INTERPRG_CONTRACT_PRG03_MODES_CYCLE. ⚠️ Documenter d''abord le concept de « FB d''arbitrage non-mouvement » (pas de SafeStop/StartStop sécurité) dans AF_Partie-03.'
+  objectifs:
+  - Documenter les FB d'arbitrage non-mouvement (FB_WinchCmdArbitrationM1/M2, FB_TranslationCmdArbitrationM3, FB_BucketCmdArbitration) dans AF-03
+  - Mettre à jour AF-08 (palier au joystick, StepTgt), AF-10 (FB_Winch/SpeedStep/arbitrage benne), AF-11 (arbitrage M3)
+  - Mettre à jour AF-04 (FB_Cycle palier + production ST_Program*Request, DiveSearch/ExtractionAssist), AF-09 (MachineHomingCycle)
+  - Mettre à jour AF-02/05/06/07/12/14 (structs Data, source unique, consolidation bus, permis assistants)
+  - Utiliser les templates standard + GUIDE_EDITION_AF pour chaque spec
+  - Validation humaine + gates documentaires
+  contrat: ''
+  bloque_par: []
+- id: T192
+  parent_id: ''
+  statut: ⬜
+  criticite: C1
+  domaine: SÉCURITÉ
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Corrections safety cycles — défaut latché et reprise consciente (audit cycles)
+  contexte: 'Constats S1+S2 des audits CYCLES_AUDIT_A/B_20260831 : contournement du redémarrage après défaut latché + reprise sans geste conscient.'
+  description: '🔴 S1 : FB_Cycle:324 teste NOT Fault.Error au lieu de NOT Fault.Latched → Abort+Start contourne le redémarrage après défaut latché non acquitté. Correctif : gater la transition X0→X1 sur NOT Fault.Latched. 🔴 S2 : WaitingResume code mort (FB_Cycle:269-272) → reprise sans geste conscient après bascule de mode ; AF-04 §4.1 non tenue. Correctif : reprise consciente BtnStart.'
+  objectifs:
+  - FB_Cycle gate X0→X1 sur NOT Fault.Latched (plus de redémarrage après défaut non acquitté)
+  - Reprise de cycle après bascule de mode exige un geste conscient (BtnStart)
+  - G200 liaison PASS + tests
+  contrat: ''
+  bloque_par: []
+- id: T193
+  parent_id: ''
+  statut: ⬜
+  criticite: C1
+  domaine: SÉCURITÉ
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Corrections safety interfaces + PRG06 — permis fail-safe, ArmingPulse, RateInterlock (audits)
+  contexte: 'Constats S3+S4+S5 des audits INTERFACES/PRG06/PRG0405 : fail-safe des permis, diagnostic réarmement AU aveugle, garde-fou vitesse hors service.'
+  description: '🔴 S3 : DescendPermit/AscentPermit := TRUE par défaut dans FB_Winch (contraire au fail-safe NC-100) → passer à FALSE. 🟠 S4 : EmergencyArmingPulseActive jamais affectée dans PRG_06 → l''IHM n''affiche jamais l''impulsion de réarmement ; correctif := instSafetyEmergencyManagement.ArmPulse_RQ. 🟠 S5 : FB_WinchRateInterlock (T181-01) inexistant dans CODE/ mais SpeedGuardEnable := FALSE justifié par lui → trancher (créer/re-mapper/acter).'
+  objectifs:
+  - FB_Winch DescendPermit/AscentPermit défaut FALSE (fail-safe)
+  - PRG_06 EmergencyArmingPulseActive affecté (= ArmPulse_RQ)
+  - Trancher la dette FB_WinchRateInterlock
+  - G200 liaison PASS + tests
+  contrat: ''
+  bloque_par: []
+- id: T194
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: H_TREUILS_BENNE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Optimisations interfaces — paramètres morts et homogénéité FB (audit interfaces)
+  contexte: 'Constats O1-O5 du rapport INTERFACES_AUDIT_A/B_20260831 : paramètres morts, interfaces hétérogènes.'
+  description: '🟠 O1 : SpeedStepTable morte sur FB_WinchCmdArbitrationM1/M2 → retirer. 🟠 O2 : Mode morte sur FB_Translation → retirer. 🟠 O3 : FB_WinchOutputInterlock (défaut plat) vs FB_TranslationOutputInterlock (Fault:ST_Fault) → homogénéiser vers ST_Fault. 🟠 O4 : FB_Winch struct Cfg vs FB_Translation ~13 scalaires [CFG] → regrouper. 🟠 O5 : ST_fbModes_Autorisations viole NC-110 (bus multi-consommateurs) → renommer ST_Modes_Autorisations.'
+  objectifs:
+  - Retirer les paramètres morts (SpeedStepTable, Mode)
+  - Homogénéiser les interfaces de défaut (Fault:ST_Fault)
+  - Regrouper la config FB_Translation en Cfg struct
+  - Corriger ST_fbModes_Autorisations (NC-110)
+  - G200 liaison PASS + tests
+  contrat: ''
+  bloque_par: []
+- id: T195
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: H_TREUILS_BENNE
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Optimisations PRG04/05 — alléger la vue code et débogage terrain (audit)
+  contexte: 'Constats O6+O7+O8 des audits PRG0405_AUDIT_A/B : PRG04 chargé, manque de diagnostic terrain, polarité Kobold.'
+  description: '🟠 O6 : PRG04 ~200 l de logique métier inline + ~230 l de projection → extraire en FB (ex. FB_WinchStateProjection, FB_WinchPermitCoupler). 🟠 O7 : créer AxisBlockReason (cause de blocage hiérarchisée) pour le débogage sur site. 🟠 O8 : polarité Kobold contradictoire (FB_Cycle niveau haut = contact fond vs FB_DiveSearch front descendant = fond) sur le même signal → trancher au schéma électrique.'
+  objectifs:
+  - Extraire les blocs lourds de PRG04 en FB (bit-identique)
+  - Créer AxisBlockReason (cause de blocage publiée)
+  - Trancher la polarité Kobold (FB_Cycle vs FB_DiveSearch)
+  - G200 liaison PASS + tests + revue humaine
+  contrat: ''
+  bloque_par: []
