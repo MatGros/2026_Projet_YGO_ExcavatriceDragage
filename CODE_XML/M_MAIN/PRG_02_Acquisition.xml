@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T06:51:18.152559" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T06:51:18.152559">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T07:49:37.490296" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T07:49:37.490296">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -286,6 +286,52 @@
    🎯 Rôle : Regroupe l'etat de homing d'un axe (M1 ou M2) consomme par
              FB_MachineHomingCycle pour piloter le guide et la transaction.
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbMachineHomingCycle_Cfg">
+        <baseType>
+          <struct>
+            <variable name="CfgTopHomingTarget_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible haute configurée M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgOffsetOpen_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart géométrique benne ouverte (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgOffsetClose_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart géométrique benne fermée (m)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9864af20-d1ca-5866-b87e-61641e2f5961</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbMachineHomingCycle_Cfg — Réglages de FB_MachineHomingCycle
+   ───────────────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les réglages géométriques du référencement machine
+             (cible haute M1 + écarts benne ouverte/fermée).
+   🔒 Ownership : produit par le call-site PRG_02_Acquisition depuis
+             _WinchM1CfgPersist et _BucketCfgPersist (GVL_PERSISTENT).
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -2586,6 +2632,46 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Arret mecanique conjoint M1/M2 confirme</xhtml>
               </documentation>
             </variable>
+            <variable name="MachineHomingCfg">
+              <type>
+                <derived name="ST_fbMachineHomingCycle_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Reglages geometriques referencement (cible M1 + ecarts benne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketReferenceOpenEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front confirmation benne ouverte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketReferenceCloseEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front confirmation benne fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketReferenceRequested">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Homing materiel M2 requis par confirmation benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketReferenceTargetM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible M2 calculee depuis la position M1</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchInputSourceSimulated">
               <type>
                 <BOOL />
@@ -3086,6 +3172,23 @@ MachineHomingMechanicalStopOk := HwIn.Winch.M1_ContactorsReleased_DI AND NOT HwI
                                  AND (ABS(Data.EncoderM1.Measurement.Speed_Mps) &lt; 0.02)
                                  AND HwIn.Winch.M2_ContactorsReleased_DI AND NOT HwIn.Winch.M2_BrakeIsOpen_DI
                                  AND (ABS(Data.EncoderM2.Measurement.Speed_Mps) &lt; 0.02);
+
+// Les confirmations benne restent des commandes IHM N2 dédiées : elles
+// homent matériellement M2 sur la géométrie observée, sans ré-homer M1.
+BucketReferenceOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
+BucketReferenceCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
+BucketReferenceRequested := (BucketReferenceOpenEdge.Q XOR BucketReferenceCloseEdge.Q)
+                          AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                          AND MachineHomingMechanicalStopOk;
+IF BucketReferenceOpenEdge.Q THEN
+    BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM;
+ELSIF BucketReferenceCloseEdge.Q THEN
+    BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
+END_IF;
+
+MachineHomingCfg.CfgTopHomingTarget_M := _WinchM1CfgPersist.CfgTopSensorPos_M;
+MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
+MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 instMachineHomingCycle(
     Enable                     := TRUE,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -3095,11 +3198,11 @@ instMachineHomingCycle(
     M1Status                   := MachineHomingM1Status,
     M2Status                   := MachineHomingM2Status,
     BucketOffsetValid          := PRG_04_Treuils_Benne.Data.BucketState.MechState.ActiveOffsetValid,
-    ConfirmOpenPosition        := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
-    ConfirmClosePosition       := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos,
-    CfgTopHomingTargetM        := _WinchM1CfgPersist.CfgTopSensorPos_M,
-    CfgOffsetOpenM             := _BucketCfgPersist.Config.OffsetOpenM,
-    CfgOffsetCloseM            := _BucketCfgPersist.Config.OffsetCloseM
+    // Les fronts IHM benne sont consommes par la route materielle M2 ci-dessus.
+    // Le cycle reste producteur du guide/qualification, sans les rediriger vers M1.
+    ConfirmOpenPosition        := FALSE,
+    ConfirmClosePosition       := FALSE,
+    Cfg                        := MachineHomingCfg
 );
 Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
 Data.MachineHoming.SetPosBucketOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
@@ -3122,14 +3225,17 @@ instEncoderM1(
                                AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
                                                                        AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
                               OR instMachineHomingCycle.M1Demand.HomeReq),
-    HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR instMachineHomingCycle.M1Demand.HomeReq,
+    HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome
+                             OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
+                             OR instMachineHomingCycle.M1Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
-    CfgHomingTargetM      := _WinchM1CfgPersist.CfgHomingTarget_M,
+    CfgHomingTargetM      := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
+                                 _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
     CfgTopSensorPosM      := _WinchM1CfgPersist.CfgTopSensorPos_M,
     UseDynamicTarget      := FALSE,
     DynamicHomingTargetM  := 0.0,
-    TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
+    TopPositionSensor     := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     HwIn                  := HwInM1,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
     CableM_PerRev         := WINCH_CABLE_M_PER_REV,
@@ -3169,14 +3275,19 @@ instEncoderM2(
                                AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
                                                                        AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
                               OR instMachineHomingCycle.M2Demand.HomeReq),
-    HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR instMachineHomingCycle.M2Demand.HomeReq,
+    HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome
+                             OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
+                             OR BucketReferenceRequested
+                             OR instMachineHomingCycle.M2Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
-    CfgHomingTargetM      := _WinchM2CfgPersist.CfgHomingTarget_M,
+    CfgHomingTargetM      := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
+                                 _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
     CfgTopSensorPosM      := _WinchM2CfgPersist.CfgTopSensorPos_M,
-    UseDynamicTarget      := instMachineHomingCycle.M2Demand.UseDynamicTarget,
-    DynamicHomingTargetM  := instMachineHomingCycle.M2Demand.DynamicTarget_M,
-    TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
+    UseDynamicTarget      := BucketReferenceRequested OR instMachineHomingCycle.M2Demand.UseDynamicTarget,
+    DynamicHomingTargetM  := SEL(BucketReferenceRequested,
+                                 instMachineHomingCycle.M2Demand.DynamicTarget_M, BucketReferenceTargetM),
+    TopPositionSensor     := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     HwIn                  := HwInM2,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
     CableM_PerRev         := WINCH_CABLE_M_PER_REV,
@@ -5035,29 +5146,13 @@ NeutralYAct := NeutralYMem;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Confirmation visuelle "benne fermee" (niveau, front interne)</xhtml>
               </documentation>
             </variable>
-            <variable name="CfgTopHomingTargetM">
+            <variable name="Cfg">
               <type>
-                <REAL />
+                <derived name="ST_fbMachineHomingCycle_Cfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES &amp; CONFIGURATION ===
---&gt; [CFG] Cible haute configuree M1 (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgOffsetOpenM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Ecart geometrique benne ouverte (m)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CfgOffsetCloseM">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Ecart geometrique benne fermee (m)</xhtml>
+--&gt; [CFG] Reglages geometriques referencement (cible M1 + ecarts benne)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -5363,7 +5458,7 @@ NeutralYAct := NeutralYMem;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Qualification hors Fault (detection de perte, evite la circularite)</xhtml>
               </documentation>
             </variable>
-            <variable name="CAUSE_HOMING_LOST_IN_MOTION">
+            <variable name="CST_CAUSE_HOMING_LOST_IN_MOTION">
               <type>
                 <INT />
               </type>
@@ -5375,7 +5470,7 @@ NeutralYAct := NeutralYMem;
 Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
               </documentation>
             </variable>
-            <variable name="CAUSE_TX_ABORT_TOP_LOST">
+            <variable name="CST_CAUSE_TX_ABORT_TOP_LOST">
               <type>
                 <INT />
               </type>
@@ -5386,7 +5481,7 @@ Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur haut perdu pendant la transaction (Latching)</xhtml>
               </documentation>
             </variable>
-            <variable name="CAUSE_TX_ABORT_MOTION">
+            <variable name="CST_CAUSE_TX_ABORT_MOTION">
               <type>
                 <INT />
               </type>
@@ -5397,7 +5492,7 @@ Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Mouvement detecte pendant la transaction (Latching)</xhtml>
               </documentation>
             </variable>
-            <variable name="CAUSE_HOMING_ERROR_M1">
+            <variable name="CST_CAUSE_HOMING_ERROR_M1">
               <type>
                 <INT />
               </type>
@@ -5408,7 +5503,7 @@ Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Encoder M1 signale une erreur de homing (Latching)</xhtml>
               </documentation>
             </variable>
-            <variable name="CAUSE_HOMING_ERROR_M2">
+            <variable name="CST_CAUSE_HOMING_ERROR_M2">
               <type>
                 <INT />
               </type>
@@ -5419,7 +5514,7 @@ Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Encoder M2 signale une erreur de homing (Latching)</xhtml>
               </documentation>
             </variable>
-            <variable name="CAUSE_DOUBLE_CONFIRM">
+            <variable name="CST_CAUSE_DOUBLE_CONFIRM">
               <type>
                 <INT />
               </type>
@@ -5430,7 +5525,7 @@ Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">ConfirmOpen ET ConfirmClose au meme scan (Latching) — C-2</xhtml>
               </documentation>
             </variable>
-            <variable name="CAUSE_CONFIRM_WHILE_HOMING">
+            <variable name="CST_CAUSE_CONFIRM_WHILE_HOMING">
               <type>
                 <INT />
               </type>
@@ -5477,9 +5572,9 @@ BucketCommit.CommitClose := FALSE;
 // Cible dynamique M2 : recalculee chaque scan (jamais une position M1 live).
 M2Demand.UseDynamicTarget := PendingOpen OR PendingClose OR HomingStarted;
 IF PendingClose THEN
-    M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetCloseM;
+    M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
 ELSE
-    M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetOpenM;
+    M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
 END_IF;
 M1Demand.UseDynamicTarget := FALSE;
 
@@ -5536,35 +5631,35 @@ IF HomingLossLatched AND NOT ReHomingAckRequired THEN
 END_IF;
 
 // Table des causes (toutes Latching : acquittables au front Reset).
-instCauses[CAUSE_HOMING_LOST_IN_MOTION].Active   := HomingLossLatched OR ReHomingAckRequired;
-instCauses[CAUSE_HOMING_LOST_IN_MOTION].Latching := TRUE;
-instCauses[CAUSE_HOMING_LOST_IN_MOTION].Texte    := 'Perte de datum machine en mouvement : re-referencer';
+instCauses[CST_CAUSE_HOMING_LOST_IN_MOTION].Active   := HomingLossLatched OR ReHomingAckRequired;
+instCauses[CST_CAUSE_HOMING_LOST_IN_MOTION].Latching := TRUE;
+instCauses[CST_CAUSE_HOMING_LOST_IN_MOTION].Texte    := 'Perte de datum machine en mouvement : re-referencer';
 
-instCauses[CAUSE_TX_ABORT_TOP_LOST].Active   := HomingStarted AND NOT TopPositionActive;
-instCauses[CAUSE_TX_ABORT_TOP_LOST].Latching := TRUE;
-instCauses[CAUSE_TX_ABORT_TOP_LOST].Texte    := 'Capteur haut perdu pendant le referencement conjoint';
+instCauses[CST_CAUSE_TX_ABORT_TOP_LOST].Active   := HomingStarted AND NOT TopPositionActive;
+instCauses[CST_CAUSE_TX_ABORT_TOP_LOST].Latching := TRUE;
+instCauses[CST_CAUSE_TX_ABORT_TOP_LOST].Texte    := 'Capteur haut perdu pendant le referencement conjoint';
 
-instCauses[CAUSE_TX_ABORT_MOTION].Active   := HomingStarted AND NOT WinchesMechanicallyStopped;
-instCauses[CAUSE_TX_ABORT_MOTION].Latching := TRUE;
-instCauses[CAUSE_TX_ABORT_MOTION].Texte    := 'Mouvement detecte pendant le referencement conjoint';
+instCauses[CST_CAUSE_TX_ABORT_MOTION].Active   := HomingStarted AND NOT WinchesMechanicallyStopped;
+instCauses[CST_CAUSE_TX_ABORT_MOTION].Latching := TRUE;
+instCauses[CST_CAUSE_TX_ABORT_MOTION].Texte    := 'Mouvement detecte pendant le referencement conjoint';
 
-instCauses[CAUSE_HOMING_ERROR_M1].Active   := HomingStarted AND M1Status.HomingError;
-instCauses[CAUSE_HOMING_ERROR_M1].Latching := TRUE;
-instCauses[CAUSE_HOMING_ERROR_M1].Texte    := 'Erreur de homing codeur M1 pendant le referencement conjoint';
+instCauses[CST_CAUSE_HOMING_ERROR_M1].Active   := HomingStarted AND M1Status.HomingError;
+instCauses[CST_CAUSE_HOMING_ERROR_M1].Latching := TRUE;
+instCauses[CST_CAUSE_HOMING_ERROR_M1].Texte    := 'Erreur de homing codeur M1 pendant le referencement conjoint';
 
-instCauses[CAUSE_HOMING_ERROR_M2].Active   := HomingStarted AND M2Status.HomingError;
-instCauses[CAUSE_HOMING_ERROR_M2].Latching := TRUE;
-instCauses[CAUSE_HOMING_ERROR_M2].Texte    := 'Erreur de homing codeur M2 pendant le referencement conjoint';
+instCauses[CST_CAUSE_HOMING_ERROR_M2].Active   := HomingStarted AND M2Status.HomingError;
+instCauses[CST_CAUSE_HOMING_ERROR_M2].Latching := TRUE;
+instCauses[CST_CAUSE_HOMING_ERROR_M2].Texte    := 'Erreur de homing codeur M2 pendant le referencement conjoint';
 
 (* C : confirmation Ouverte ET Fermee au meme scan = rejet total, cause a acquitter. *)
-instCauses[CAUSE_DOUBLE_CONFIRM].Active   := DoubleConfirmRequested;
-instCauses[CAUSE_DOUBLE_CONFIRM].Latching := TRUE;
-instCauses[CAUSE_DOUBLE_CONFIRM].Texte    := 'Confirmation benne Ouverte et Fermee simultanee : refusee';
+instCauses[CST_CAUSE_DOUBLE_CONFIRM].Active   := DoubleConfirmRequested;
+instCauses[CST_CAUSE_DOUBLE_CONFIRM].Latching := TRUE;
+instCauses[CST_CAUSE_DOUBLE_CONFIRM].Texte    := 'Confirmation benne Ouverte et Fermee simultanee : refusee';
 
 (* C : confirmation recue pendant un homing d'axe deja en cours = ignoree. *)
-instCauses[CAUSE_CONFIRM_WHILE_HOMING].Active   := ConfirmWhileHoming;
-instCauses[CAUSE_CONFIRM_WHILE_HOMING].Latching := TRUE;
-instCauses[CAUSE_CONFIRM_WHILE_HOMING].Texte    := 'Confirmation benne pendant un homing codeur en cours : ignoree';
+instCauses[CST_CAUSE_CONFIRM_WHILE_HOMING].Active   := ConfirmWhileHoming;
+instCauses[CST_CAUSE_CONFIRM_WHILE_HOMING].Latching := TRUE;
+instCauses[CST_CAUSE_CONFIRM_WHILE_HOMING].Texte    := 'Confirmation benne pendant un homing codeur en cours : ignoree';
 
 // Socle defaut : appele AVANT la gate NOT Enable (Reset jamais conditionne, std 9).
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -5616,9 +5711,9 @@ IF SingleConfirm AND NOT HomingStarted AND NOT DoubleConfirmRequested AND NOT Co
     M2Demand.HomeReq          := TRUE;
     M2Demand.UseDynamicTarget := TRUE;
     IF PendingClose THEN
-        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetCloseM;
+        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
     ELSE
-        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetOpenM;
+        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
     END_IF;
 END_IF;
 {endregion}
@@ -5628,9 +5723,9 @@ END_IF;
 IF HomingStarted THEN
     M2Demand.UseDynamicTarget := TRUE;
     IF PendingClose THEN
-        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetCloseM;
+        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
     ELSE
-        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetOpenM;
+        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
     END_IF;
 
     TransactionAbort := (NOT TopPositionActive) OR (NOT WinchesMechanicallyStopped)
@@ -10229,6 +10324,7 @@ TimeLast := TimeCurrent;
           <Object Name="FB_MachineHomingCycle" ObjectId="107b39d9-e311-549c-ac0a-91b020a05df9" />
           <Folder Name="_TYPES">
             <Object Name="ST_fbMachineHomingCycle_AxisHomingStatus" ObjectId="796b0dad-a243-58d0-a47d-362338c07aeb" />
+            <Object Name="ST_fbMachineHomingCycle_Cfg" ObjectId="9864af20-d1ca-5866-b87e-61641e2f5961" />
             <Object Name="E_MachineHomingStep" ObjectId="91b3da89-8226-5d1f-92ee-cf29483801dd" />
             <Object Name="ST_fbMachineHomingCycle_BucketCommit" ObjectId="8bbe6b1c-b915-5c25-90f5-ca9c8b430b97" />
             <Object Name="ST_fbMachineHomingCycle_HomingDemand" ObjectId="a0819120-1e85-5b22-8a6d-414f9c7d9a11" />

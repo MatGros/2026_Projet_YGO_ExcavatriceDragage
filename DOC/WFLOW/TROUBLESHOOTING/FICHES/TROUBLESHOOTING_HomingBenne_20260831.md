@@ -85,3 +85,52 @@ Confirmation IHM
   pas l'état qualifié.
 - Validation CODESYS humaine requise : compiler puis actionner les deux boutons
   avec les treuils immobiles en maintenance.
+
+## 8. ⚠️ Défaut distinct — boutons de homing codeur
+
+- `BtnHome` pouvait atteindre le chemin unitaire et sélectionner
+  `CfgHomingTarget_M` (0 m par défaut) lorsque le capteur haut n'était pas
+  actif.
+- `BtnHomingAtZero` sélectionnait 0 m, mais n'était pas raccordé à la demande
+  de homing : seul, il ne pouvait pas créer de front.
+- Correctif T198 : dans `PRG_02_Acquisition`, les deux boutons déclenchent le
+  homing. La cible libre transmise est 8,5 m (cote capteur configurée) pour
+  `BtnHome`, et 0 m uniquement pour `BtnHomingAtZero`.
+- Preuve hors CODESYS : `FB_Encoder` **40/40 PASS**, dont `T198-001` (8,5 m)
+  et `T198-002` (0 m).
+
+## 9. 🚨 Audit de régression systémique T184/T185
+
+L'analyse Git a comparé le comportement historique de `7f2c12af` au
+remaniement `d94c2c58` / `10cbc399`.
+
+| Route IHM historique | Régression introduite | Fait vérifié |
+|---|---|---|
+| `BtnConfirmOpenPos/ClosePos` | Détournés vers `FB_MachineHomingCycle` | le commit `d94c2c58` remplace le recalage dynamique M2 par un homing conjoint M1+M2, conditionné par capteur haut et arrêt |
+| Même boutons benne | `FB_Bucket` les marque « legacy ignorés » | les fronts locaux `R_TRIG` sont retirés dans `d94c2c58` |
+| `BtnHomingAtZero` | N'est plus relié à `HomingAtTargetM` | `10cbc399` retire le `OR BtnHomingAtZero`; le bit ne sélectionne qu'une cible, sans déclenchement |
+| `BtnHome` au capteur physique | Peut prendre la cible unitaire | `FB_Encoder_Homing` attend `TopPositionSensor=TRUE`, mais PRG_02 lui transmet `TopPositionFree_DI` sans inversion |
+
+Le contrat historique explicite de `7f2c12af` est : les boutons benne
+confirment l'état visuel **et** recalibrent uniquement M2 à partir de M1
+(ouvert : M1 ; fermé : M1 + offset fermé). Ils ne doivent pas lancer un
+référencement global M1/M2.
+
+Les correctifs T196/T198 actuellement dans le répertoire de travail sont
+**suspendus, non compilés pour ce diagnostic**. Ils réparent des symptômes
+isolés mais ne constituent pas encore le retour complet au contrat historique.
+
+## 10. 🔎 Audit étendu des routes IHM
+
+- Les diffs `d94c2c58`, `10cbc399` et `c006b68f` ne montrent aucun autre
+  bouton IHM retiré ou redirigé dans les PRG métier, hors les routes
+  M1/M2/benne listées en §9.
+- `BtnHome` M1/M2 est aussi lu par `PRG_03 → FB_Cycle.HomingRequest` depuis le
+  2026-08-15, donc antérieur à T184/T185 : double consommateur à documenter,
+  mais pas une régression introduite par ces commits.
+- Le sous-agent Ollama a été challengé : sa première réponse a inventé un
+  paramètre absent, sa seconde n'a produit qu'un plan. Aucun de ses verdicts
+  non recoupés n'a été retenu.
+- Validation bloquée : un autre agent a ajouté `ST_fbMachineHomingCycle_Cfg`
+  à `FB_MachineHomingCycle` sans fournir le type au runner STruCpp. Le test du
+  cycle ne compile donc plus, indépendamment des routes IHM corrigées ici.

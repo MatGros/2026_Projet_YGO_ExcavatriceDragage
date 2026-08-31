@@ -1,0 +1,66 @@
+contract:
+  task_id: T199_BUCKET_HARDWARE_REFERENCE_ROUTE
+  criticality: C2
+  strategy: patch
+  objective: >
+    Restaurer en MAINT_N2 les confirmations benne comme homing matériel M2
+    relatif à M1, sans déclencher un homing global M1/M2.
+  acceptance:
+    - id: AC1
+      statement: "BtnConfirmOpenPos déclenche un homing M2 à la position M1 courante."
+      verified_by: "Inspection PRG_02 : front Open, cible instEncoderM1.Measurement.CablePosM et UseDynamicTarget."
+    - id: AC2
+      statement: "BtnConfirmClosePos déclenche un homing M2 à M1 + OffsetCloseM."
+      verified_by: "Inspection PRG_02 : front Close et cible calculée avec Config.OffsetCloseM."
+    - id: AC3
+      statement: "Les confirmations benne sont disponibles uniquement en MAINT_N2 et treuils mécaniquement arrêtés."
+      verified_by: "Test STruCpp FB_Bucket et condition MachineHomingMechanicalStopOk dans PRG_02."
+    - id: AC4
+      statement: "Le cycle de référencement machine reste actif comme guide et qualification, sans consommer les fronts de confirmation benne."
+      verified_by: "Inspection PRG_02 : entrées Confirm du cycle à FALSE ; FB_MachineHomingCycle STruCpp."
+    - id: AC5
+      statement: "Le nom de fichier est égal au nom de POU CODESYS PRG_02_Acquisition et le suffixe est égal au langage Structured Text du bundle."
+      verified_by: "Contrôle structurel du contrat et compilation CODESYS humaine."
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_bucket.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T199_BUCKET_HARDWARE_REFERENCE_ROUTE.yaml
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_HomingBenne_20260831.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "Le cycle MachineHomingCycle conserve son guide et sa qualification MachineHomed."
+      - "BtnHome et BtnHomingAtZero gardent leur route codeur individuelle."
+      - "Le preset EtherCAT reste vérifié par FB_Encoder_Homing avant qualification codeur."
+    dropped_on_purpose:
+      - "Le détournement des fronts Confirm benne vers un homing global M1/M2."
+  evidence_required:
+    - strucpp_fb_bucket_tests
+    - strucpp_fb_machinehomingcycle_tests
+    - codesys_human_compile
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute confirmation benne qui rehome M1, ou toute cible M2 non dérivée de
+    M1 et de l'état ouvert/fermé choisi, impose l'arrêt de la livraison.
+
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex / root"
+  completed_at: "2026-08-31T09:46:00+02:00"
+  status: COMPLETED
+  summary: >
+    Route historique Confirm benne rétablie vers le homing matériel dynamique
+    de M2; le cycle garde le guide sans consommer les fronts IHM.
+  evidence_submitted:
+    - "FB_Bucket : STruCpp 24/24 PASS."
+    - "FB_Encoder : STruCpp 40/40 PASS."
+    - "FB_MachineHomingCycle : runner bloqué par type ST_fbMachineHomingCycle_Cfg manquant, modification concurrente."
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Compilation et essai CODESYS humain requis."

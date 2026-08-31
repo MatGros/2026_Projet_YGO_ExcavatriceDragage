@@ -40,6 +40,11 @@ VAR
     MachineHomingM1Status    : ST_fbMachineHomingCycle_AxisHomingStatus; // . [LOC] Statut homing M1
     MachineHomingM2Status    : ST_fbMachineHomingCycle_AxisHomingStatus; // . [LOC] Statut homing M2
     MachineHomingMechanicalStopOk : BOOL; // . [LOC] Arret mecanique conjoint M1/M2 confirme
+    MachineHomingCfg          : ST_fbMachineHomingCycle_Cfg; // . [LOC] Reglages geometriques referencement (cible M1 + ecarts benne)
+    BucketReferenceOpenEdge  : R_TRIG; // . [LOC] Front confirmation benne ouverte
+    BucketReferenceCloseEdge : R_TRIG; // . [LOC] Front confirmation benne fermee
+    BucketReferenceRequested : BOOL;   // . [LOC] Homing materiel M2 requis par confirmation benne
+    BucketReferenceTargetM   : REAL;   // . [LOC] Cible M2 calculee depuis la position M1
 
     WinchInputSourceSimulated         : BOOL; // . [LOC] Source Winch simulee active
     TranslationInputSourceSimulated   : BOOL; // . [LOC] Source Translation simulee active
@@ -403,6 +408,23 @@ MachineHomingMechanicalStopOk := HwIn.Winch.M1_ContactorsReleased_DI AND NOT HwI
                                  AND (ABS(Data.EncoderM1.Measurement.Speed_Mps) < 0.02)
                                  AND HwIn.Winch.M2_ContactorsReleased_DI AND NOT HwIn.Winch.M2_BrakeIsOpen_DI
                                  AND (ABS(Data.EncoderM2.Measurement.Speed_Mps) < 0.02);
+
+// Les confirmations benne restent des commandes IHM N2 dédiées : elles
+// homent matériellement M2 sur la géométrie observée, sans ré-homer M1.
+BucketReferenceOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
+BucketReferenceCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
+BucketReferenceRequested := (BucketReferenceOpenEdge.Q XOR BucketReferenceCloseEdge.Q)
+                          AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                          AND MachineHomingMechanicalStopOk;
+IF BucketReferenceOpenEdge.Q THEN
+    BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM;
+ELSIF BucketReferenceCloseEdge.Q THEN
+    BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
+END_IF;
+
+MachineHomingCfg.CfgTopHomingTarget_M := _WinchM1CfgPersist.CfgTopSensorPos_M;
+MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
+MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 instMachineHomingCycle(
     Enable                     := TRUE,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -412,11 +434,11 @@ instMachineHomingCycle(
     M1Status                   := MachineHomingM1Status,
     M2Status                   := MachineHomingM2Status,
     BucketOffsetValid          := PRG_04_Treuils_Benne.Data.BucketState.MechState.ActiveOffsetValid,
-    ConfirmOpenPosition        := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
-    ConfirmClosePosition       := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos,
-    CfgTopHomingTargetM        := _WinchM1CfgPersist.CfgTopSensorPos_M,
-    CfgOffsetOpenM             := _BucketCfgPersist.Config.OffsetOpenM,
-    CfgOffsetCloseM            := _BucketCfgPersist.Config.OffsetCloseM
+    // Les fronts IHM benne sont consommes par la route materielle M2 ci-dessus.
+    // Le cycle reste producteur du guide/qualification, sans les rediriger vers M1.
+    ConfirmOpenPosition        := FALSE,
+    ConfirmClosePosition       := FALSE,
+    Cfg                        := MachineHomingCfg
 );
 Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
 Data.MachineHoming.SetPosBucketOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
@@ -439,14 +461,17 @@ instEncoderM1(
                                AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
                                                                        AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
                               OR instMachineHomingCycle.M1Demand.HomeReq),
-    HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR instMachineHomingCycle.M1Demand.HomeReq,
+    HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome
+                             OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
+                             OR instMachineHomingCycle.M1Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
-    CfgHomingTargetM      := _WinchM1CfgPersist.CfgHomingTarget_M,
+    CfgHomingTargetM      := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
+                                 _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
     CfgTopSensorPosM      := _WinchM1CfgPersist.CfgTopSensorPos_M,
     UseDynamicTarget      := FALSE,
     DynamicHomingTargetM  := 0.0,
-    TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
+    TopPositionSensor     := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     HwIn                  := HwInM1,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
     CableM_PerRev         := WINCH_CABLE_M_PER_REV,
@@ -486,14 +511,19 @@ instEncoderM2(
                                AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
                                                                        AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
                               OR instMachineHomingCycle.M2Demand.HomeReq),
-    HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome OR instMachineHomingCycle.M2Demand.HomeReq,
+    HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome
+                             OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
+                             OR BucketReferenceRequested
+                             OR instMachineHomingCycle.M2Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
-    CfgHomingTargetM      := _WinchM2CfgPersist.CfgHomingTarget_M,
+    CfgHomingTargetM      := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
+                                 _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
     CfgTopSensorPosM      := _WinchM2CfgPersist.CfgTopSensorPos_M,
-    UseDynamicTarget      := instMachineHomingCycle.M2Demand.UseDynamicTarget,
-    DynamicHomingTargetM  := instMachineHomingCycle.M2Demand.DynamicTarget_M,
-    TopPositionSensor     := HwIn.Winch.M1M2_TopPositionFree_DI,
+    UseDynamicTarget      := BucketReferenceRequested OR instMachineHomingCycle.M2Demand.UseDynamicTarget,
+    DynamicHomingTargetM  := SEL(BucketReferenceRequested,
+                                 instMachineHomingCycle.M2Demand.DynamicTarget_M, BucketReferenceTargetM),
+    TopPositionSensor     := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     HwIn                  := HwInM2,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
     CableM_PerRev         := WINCH_CABLE_M_PER_REV,

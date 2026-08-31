@@ -1,0 +1,60 @@
+contract:
+  task_id: T198_ENCODER_HOMING_BUTTONS
+  criticality: C2
+  strategy: patch
+  objective: >
+    Rétablir les boutons de référencement codeur : BtnHome référence à la cote
+    capteur haut configurée et BtnHomingAtZero référence à 0 m.
+  acceptance:
+    - id: AC1
+      statement: "BtnHome ne peut jamais sélectionner la cible libre 0 m."
+      verified_by: "Test STruCpp FB_Encoder : cible 8.5 m sans capteur haut."
+    - id: AC2
+      statement: "BtnHomingAtZero déclenche seul un preset vers 0 m."
+      verified_by: "Test STruCpp FB_Encoder : front homing et position 0 m."
+    - id: AC3
+      statement: "Le référencement dynamique de la transaction machine M2 reste prioritaire."
+      verified_by: "Tests existants FB_Encoder de cible dynamique."
+    - id: AC4
+      statement: "Le nom de fichier est égal au nom de POU CODESYS PRG_02_Acquisition et le suffixe est égal au langage Structured Text du bundle."
+      verified_by: "Contrôle structurel du contrat et compilation CODESYS humaine."
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/E_CODEURS/tests/test_fb_encoder.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T198_ENCODER_HOMING_BUTTONS.yaml
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_HomingBenne_20260831.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "BtnHomingAtZero reste la seule commande IHM qui sélectionne 0 m."
+      - "Le preset EtherCAT et sa vérification de lecture restent inchangés."
+      - "UseDynamicTarget de M2 garde priorité sur les commandes IHM pendant une transaction machine."
+    dropped_on_purpose:
+      - "Le fallback de BtnHome vers CfgHomingTarget_M est supprimé dans PRG_02."
+  evidence_required:
+    - strucpp_fb_encoder_tests
+    - codesys_human_compile
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute cible de preset différente de la cote explicitement choisie par
+    l'opérateur est un risque de positionnement et impose l'arrêt du lot.
+
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex / root"
+  completed_at: "2026-08-31T09:00:00+02:00"
+  status: COMPLETED
+  summary: >
+    PRG_02 transmet désormais BtnHome et BtnHomingAtZero comme demandes de
+    homing explicites, avec cibles respectives cote capteur haut et zéro.
+  evidence_submitted:
+    - "FB_Encoder : STruCpp 40/40 PASS."
+    - "T198-001 : cible 8.5 m PASS ; T198-002 : cible 0 m PASS."
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation CODESYS humaine requise après compilation."

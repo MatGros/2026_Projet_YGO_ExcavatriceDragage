@@ -1,0 +1,108 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T185-A : Refactor interface FB_MachineHomingCycle
+# (Cfg regroupé + renommage _M + constantes CST_)
+# ═══════════════════════════════════════════════════════════════════════════
+# Sous-lot de T185 (FB_MachineHomingCycle). Point qualité 2026-08-31 :
+#   - NC-110 : 3 réglages à plat (CfgTopHomingTargetM, CfgOffsetOpenM, CfgOffsetCloseM)
+#     à regrouper en `Cfg : ST_fbMachineHomingCycle_Cfg`.
+#   - NC-030 : suffixes d'unité sans underscore (`CfgTopHomingTargetM` → `_M`).
+#   - NAMING §Constantes : constantes `CAUSE_*` sans préfixe `CST_`.
+# Stratégie PATCH : zéro changement de comportement fonctionnel.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T185-A_REFACTOR_INTERFACE_FB_MACHINEHOMINGCYCLE
+  criticality: C2            # refactor d'interface touchant call-site + consommateurs
+  strategy: patch            # aucun changement de logique métier
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Mettre l'interface de FB_MachineHomingCycle en conformité standards sans
+    changer le comportement machine : regrouper les 3 réglages en un DUT
+    `Cfg : ST_fbMachineHomingCycle_Cfg` (NC-110), corriger les suffixes d'unité
+    `_M` (NC-030) et préfixer les constantes d'indices de causes en `CST_`
+    (NAMING §Constantes). Aucun changement de séquence, de sécurité ni de sortie.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Les 3 réglages CfgTopHomingTargetM, CfgOffsetOpenM, CfgOffsetCloseM sont retirés de VAR_INPUT et regroupés dans un DUT `Cfg : ST_fbMachineHomingCycle_Cfg` (NC-110)."
+      verified_by: "Lecture FB_MachineHomingCycle.st : plus aucun réglage à plat ; DUT ST_fbMachineHomingCycle_Cfg créé dans CODE/G_CYCLE/_TYPES/."
+    - id: AC2
+      statement: "Les suffixes d'unité sont conformes NC-030 : CfgTopHomingTarget_M, CfgOffsetOpen_M, CfgOffsetClose_M (underscore avant _M)."
+      verified_by: "Grep des noms dans FB_MachineHomingCycle.st et le DUT Cfg."
+    - id: AC3
+      statement: "Les constantes d'indices de causes sont préfixées CST_ (CST_CAUSE_HOMING_LOST_IN_MOTION, etc.) conformes NAMING §Constantes."
+      verified_by: "Lecture du bloc VAR CONSTANT de FB_MachineHomingCycle.st."
+    - id: AC4
+      statement: "Le call-site PRG_02_Acquisition passe le DUT Cfg (depuis _WinchM1CfgPersist et _BucketCfgPersist) ; plus aucune liaison aux anciens noms à plat."
+      verified_by: "Lecture PRG_02_Acquisition.st lignes ~406-420 ; G200_check_linkage.py --report PASS."
+    - id: AC5
+      statement: "Aucun changement de comportement fonctionnel : la séquence, les sorties, les causes et les textes guide sont identiques (patch pur)."
+      verified_by: "Tests CI FB_MachineHomingCycle (TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE) : 100% PASS, aucun TC vert régressé."
+    - id: AC6
+      statement: "G200, bundle et gates palier C sont verts."
+      verified_by: "generate_codesys_bundle.py, G200_check_linkage.py --report, run_all_gates.py --palier C."
+    - id: AC7
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU ; aucun suffixe de langage _CFC/_LD n'est ajouté et le suffixe reste identique au langage généré dans le bundle."
+      verified_by: "G310 structure + génération bundle PLCopenXML."
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_MachineHomingCycle.st
+      - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_Cfg.st        # nouveau DUT
+      - CODE/M_MAIN/PRG_02_Acquisition.st                          # call-site (lignes ~406-420)
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_machinehomingcycle.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - CODE/G_CYCLE/FB_MachineHomingCycle.st (logique §1-§6)      # ne pas toucher à la séquence
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st                    # hors périmètre interface cycle
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "La séquence de transaction (ouverture → homing conjoint → commit atomique) à l'identique."
+      - "Les 7 sorties MachineHoming* et les DUT M1Demand/M2Demand/BucketCommit inchangés."
+      - "Les 7 causes de défaut et leurs textes IHM inchangés."
+      - "Le comportement de sécurité (perte de datum → SafeStop, Reset conscient, aucun redémarrage auto)."
+    dropped_on_purpose:
+      - "Aucun (patch pur, zéro abandon fonctionnel)."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison"
+    - run_all_gates          # resultat des gates
+    - bundle                 # CODE/CODE_Bundle.xml regenere
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "deepseek-v4-flash:cloud"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ──────────────────────────────────────────────────
+  alert_duty: >
+    Tout problème constaté en cours de route (incohérence de spec, collision de
+    nom, consommateur oublié du Cfg, régression de séquence) est remonté
+    IMMÉDIATEMENT à l'orchestrateur, pas à la fin et jamais silencieusement.
+    Signaler n'est pas élargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING | IN_PROGRESS | COMPLETED | VALIDATED
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

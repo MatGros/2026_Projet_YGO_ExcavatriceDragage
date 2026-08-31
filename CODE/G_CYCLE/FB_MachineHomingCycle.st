@@ -39,9 +39,7 @@ VAR_INPUT
     ConfirmClosePosition        : BOOL;                                      // --> [CMD] Confirmation visuelle "benne fermee" (niveau, front interne)
 
     // === REGLAGES & CONFIGURATION ===
-    CfgTopHomingTargetM         : REAL;                                      // --> [CFG] Cible haute configuree M1 (m)
-    CfgOffsetOpenM              : REAL;                                      // --> [CFG] Ecart geometrique benne ouverte (m)
-    CfgOffsetCloseM             : REAL;                                      // --> [CFG] Ecart geometrique benne fermee (m)
+    Cfg                         : ST_fbMachineHomingCycle_Cfg;              // --> [CFG] Reglages geometriques referencement (cible M1 + ecarts benne)
 END_VAR
 VAR_OUTPUT
     // === CONTRAT STANDARD (Ready + Fault) ===
@@ -98,13 +96,13 @@ VAR
 END_VAR
 VAR CONSTANT
     // === INDICES DE CAUSES (instCauses[]) ===
-    CAUSE_HOMING_LOST_IN_MOTION : INT := 0;                                 // Perte d'un datum valide pendant un mouvement (Latching)
-    CAUSE_TX_ABORT_TOP_LOST     : INT := 1;                                 // Capteur haut perdu pendant la transaction (Latching)
-    CAUSE_TX_ABORT_MOTION       : INT := 2;                                 // Mouvement detecte pendant la transaction (Latching)
-    CAUSE_HOMING_ERROR_M1       : INT := 3;                                 // FB_Encoder M1 signale une erreur de homing (Latching)
-    CAUSE_HOMING_ERROR_M2       : INT := 4;                                 // FB_Encoder M2 signale une erreur de homing (Latching)
-    CAUSE_DOUBLE_CONFIRM        : INT := 5;                                 // ConfirmOpen ET ConfirmClose au meme scan (Latching) — C-2
-    CAUSE_CONFIRM_WHILE_HOMING  : INT := 6;                                 // Confirmation pendant un homing d'axe en cours (Latching) — C-4.3
+    CST_CAUSE_HOMING_LOST_IN_MOTION : INT := 0;                             // Perte d'un datum valide pendant un mouvement (Latching)
+    CST_CAUSE_TX_ABORT_TOP_LOST     : INT := 1;                             // Capteur haut perdu pendant la transaction (Latching)
+    CST_CAUSE_TX_ABORT_MOTION       : INT := 2;                             // Mouvement detecte pendant la transaction (Latching)
+    CST_CAUSE_HOMING_ERROR_M1       : INT := 3;                             // FB_Encoder M1 signale une erreur de homing (Latching)
+    CST_CAUSE_HOMING_ERROR_M2       : INT := 4;                             // FB_Encoder M2 signale une erreur de homing (Latching)
+    CST_CAUSE_DOUBLE_CONFIRM        : INT := 5;                             // ConfirmOpen ET ConfirmClose au meme scan (Latching) — C-2
+    CST_CAUSE_CONFIRM_WHILE_HOMING  : INT := 6;                             // Confirmation pendant un homing d'axe en cours (Latching) — C-4.3
 END_VAR
 
 // === 🔑 §1 FRONTS, CIBLE DYNAMIQUE, CAUSES ET SOCLE DEFAUT ===
@@ -119,9 +117,9 @@ BucketCommit.CommitClose := FALSE;
 // Cible dynamique M2 : recalculee chaque scan (jamais une position M1 live).
 M2Demand.UseDynamicTarget := PendingOpen OR PendingClose OR HomingStarted;
 IF PendingClose THEN
-    M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetCloseM;
+    M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
 ELSE
-    M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetOpenM;
+    M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
 END_IF;
 M1Demand.UseDynamicTarget := FALSE;
 
@@ -178,35 +176,35 @@ IF HomingLossLatched AND NOT ReHomingAckRequired THEN
 END_IF;
 
 // Table des causes (toutes Latching : acquittables au front Reset).
-instCauses[CAUSE_HOMING_LOST_IN_MOTION].Active   := HomingLossLatched OR ReHomingAckRequired;
-instCauses[CAUSE_HOMING_LOST_IN_MOTION].Latching := TRUE;
-instCauses[CAUSE_HOMING_LOST_IN_MOTION].Texte    := 'Perte de datum machine en mouvement : re-referencer';
+instCauses[CST_CAUSE_HOMING_LOST_IN_MOTION].Active   := HomingLossLatched OR ReHomingAckRequired;
+instCauses[CST_CAUSE_HOMING_LOST_IN_MOTION].Latching := TRUE;
+instCauses[CST_CAUSE_HOMING_LOST_IN_MOTION].Texte    := 'Perte de datum machine en mouvement : re-referencer';
 
-instCauses[CAUSE_TX_ABORT_TOP_LOST].Active   := HomingStarted AND NOT TopPositionActive;
-instCauses[CAUSE_TX_ABORT_TOP_LOST].Latching := TRUE;
-instCauses[CAUSE_TX_ABORT_TOP_LOST].Texte    := 'Capteur haut perdu pendant le referencement conjoint';
+instCauses[CST_CAUSE_TX_ABORT_TOP_LOST].Active   := HomingStarted AND NOT TopPositionActive;
+instCauses[CST_CAUSE_TX_ABORT_TOP_LOST].Latching := TRUE;
+instCauses[CST_CAUSE_TX_ABORT_TOP_LOST].Texte    := 'Capteur haut perdu pendant le referencement conjoint';
 
-instCauses[CAUSE_TX_ABORT_MOTION].Active   := HomingStarted AND NOT WinchesMechanicallyStopped;
-instCauses[CAUSE_TX_ABORT_MOTION].Latching := TRUE;
-instCauses[CAUSE_TX_ABORT_MOTION].Texte    := 'Mouvement detecte pendant le referencement conjoint';
+instCauses[CST_CAUSE_TX_ABORT_MOTION].Active   := HomingStarted AND NOT WinchesMechanicallyStopped;
+instCauses[CST_CAUSE_TX_ABORT_MOTION].Latching := TRUE;
+instCauses[CST_CAUSE_TX_ABORT_MOTION].Texte    := 'Mouvement detecte pendant le referencement conjoint';
 
-instCauses[CAUSE_HOMING_ERROR_M1].Active   := HomingStarted AND M1Status.HomingError;
-instCauses[CAUSE_HOMING_ERROR_M1].Latching := TRUE;
-instCauses[CAUSE_HOMING_ERROR_M1].Texte    := 'Erreur de homing codeur M1 pendant le referencement conjoint';
+instCauses[CST_CAUSE_HOMING_ERROR_M1].Active   := HomingStarted AND M1Status.HomingError;
+instCauses[CST_CAUSE_HOMING_ERROR_M1].Latching := TRUE;
+instCauses[CST_CAUSE_HOMING_ERROR_M1].Texte    := 'Erreur de homing codeur M1 pendant le referencement conjoint';
 
-instCauses[CAUSE_HOMING_ERROR_M2].Active   := HomingStarted AND M2Status.HomingError;
-instCauses[CAUSE_HOMING_ERROR_M2].Latching := TRUE;
-instCauses[CAUSE_HOMING_ERROR_M2].Texte    := 'Erreur de homing codeur M2 pendant le referencement conjoint';
+instCauses[CST_CAUSE_HOMING_ERROR_M2].Active   := HomingStarted AND M2Status.HomingError;
+instCauses[CST_CAUSE_HOMING_ERROR_M2].Latching := TRUE;
+instCauses[CST_CAUSE_HOMING_ERROR_M2].Texte    := 'Erreur de homing codeur M2 pendant le referencement conjoint';
 
 (* C : confirmation Ouverte ET Fermee au meme scan = rejet total, cause a acquitter. *)
-instCauses[CAUSE_DOUBLE_CONFIRM].Active   := DoubleConfirmRequested;
-instCauses[CAUSE_DOUBLE_CONFIRM].Latching := TRUE;
-instCauses[CAUSE_DOUBLE_CONFIRM].Texte    := 'Confirmation benne Ouverte et Fermee simultanee : refusee';
+instCauses[CST_CAUSE_DOUBLE_CONFIRM].Active   := DoubleConfirmRequested;
+instCauses[CST_CAUSE_DOUBLE_CONFIRM].Latching := TRUE;
+instCauses[CST_CAUSE_DOUBLE_CONFIRM].Texte    := 'Confirmation benne Ouverte et Fermee simultanee : refusee';
 
 (* C : confirmation recue pendant un homing d'axe deja en cours = ignoree. *)
-instCauses[CAUSE_CONFIRM_WHILE_HOMING].Active   := ConfirmWhileHoming;
-instCauses[CAUSE_CONFIRM_WHILE_HOMING].Latching := TRUE;
-instCauses[CAUSE_CONFIRM_WHILE_HOMING].Texte    := 'Confirmation benne pendant un homing codeur en cours : ignoree';
+instCauses[CST_CAUSE_CONFIRM_WHILE_HOMING].Active   := ConfirmWhileHoming;
+instCauses[CST_CAUSE_CONFIRM_WHILE_HOMING].Latching := TRUE;
+instCauses[CST_CAUSE_CONFIRM_WHILE_HOMING].Texte    := 'Confirmation benne pendant un homing codeur en cours : ignoree';
 
 // Socle defaut : appele AVANT la gate NOT Enable (Reset jamais conditionne, std 9).
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -258,9 +256,9 @@ IF SingleConfirm AND NOT HomingStarted AND NOT DoubleConfirmRequested AND NOT Co
     M2Demand.HomeReq          := TRUE;
     M2Demand.UseDynamicTarget := TRUE;
     IF PendingClose THEN
-        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetCloseM;
+        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
     ELSE
-        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetOpenM;
+        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
     END_IF;
 END_IF;
 {endregion}
@@ -270,9 +268,9 @@ END_IF;
 IF HomingStarted THEN
     M2Demand.UseDynamicTarget := TRUE;
     IF PendingClose THEN
-        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetCloseM;
+        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
     ELSE
-        M2Demand.DynamicTarget_M := CfgTopHomingTargetM + CfgOffsetOpenM;
+        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
     END_IF;
 
     TransactionAbort := (NOT TopPositionActive) OR (NOT WinchesMechanicallyStopped)

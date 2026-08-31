@@ -496,16 +496,16 @@ TEST 'TC-P10-030 ConfirmOpen/ClosePosition reference directement la benne en mai
        Config := Config, BucketState := BucketState);
     BucketState := FB.BucketState;
 
-    (* Scan 2 : front MAINT_N1, ConfirmOpenPosition -> IsOpen=TRUE. *)
+    (* Scan 2 : front MAINT_N1, confirmation benne non autorisee. *)
     ADVANCE_TIME(10000000);
     FB(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, PowerContactorEngaged := TRUE,
        ConfirmOpenPosition := TRUE, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     BucketState := FB.BucketState;
-    ASSERT_TRUE(BucketState.IsOpen, 'MAINT_N1 + ConfirmOpen -> IsOpen=TRUE');
+    ASSERT_FALSE(BucketState.IsOpen, 'MAINT_N1 + ConfirmOpen -> IsOpen reste FALSE');
     ASSERT_FALSE(BucketState.IsClosed, 'MAINT_N1 + ConfirmOpen -> IsClosed=FALSE');
-    ASSERT_FALSE(BucketState.StateIncoherent, 'Confirmation visuelle -> etat coherent');
+    ASSERT_TRUE(BucketState.StateIncoherent, 'MAINT_N1 : etat non qualifie conserve');
 
     (* Scan 3 : relâche la confirmation ouverture. *)
     ADVANCE_TIME(10000000);

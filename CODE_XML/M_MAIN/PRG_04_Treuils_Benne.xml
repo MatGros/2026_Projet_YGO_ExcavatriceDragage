@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T07:24:38.991592" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T07:24:38.991592">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T07:59:36.179506" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T07:59:36.179506">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -5268,6 +5268,10 @@ instBucket(
     HomedM2             := PRG_02_Acquisition.Data.EncoderM2.Homed,
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
     M2_Busy             := (instWinchM2.StepNumber &gt; 0),
+    // Confirmations visuelles N2 : publication et offset benne. Le preset
+    // materiel M2 associe est produit independamment dans PRG_02.
+    ConfirmOpenPosition  := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
+    ConfirmClosePosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos,
     MachineHomingCommitOpen  := PRG_02_Acquisition.Data.MachineHoming.SetPosBucketOpen,
     MachineHomingCommitClose := PRG_02_Acquisition.Data.MachineHoming.SetPosBucketClose,
     MachineHomed := PRG_02_Acquisition.Data.MachineHoming.Homed,
@@ -6945,8 +6949,8 @@ END_IF;
 // en maintenance : un front qualifie l'observation visuelle opérateur.
 ConfirmOpenEdge(CLK := ConfirmOpenPosition);
 IF ConfirmOpenEdge.Q
-   AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
-   AND NOT Lifecycle.Busy THEN
+   AND (Mode = E_Mode.MAINT_N2)
+   AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketState.IsOpen := TRUE;
     BucketState.IsClosed := FALSE;
     BucketState.LastPosM2Open := CablePosM2;
@@ -6955,8 +6959,8 @@ END_IF;
 
 ConfirmCloseEdge(CLK := ConfirmClosePosition);
 IF ConfirmCloseEdge.Q
-   AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
-   AND NOT Lifecycle.Busy THEN
+   AND (Mode = E_Mode.MAINT_N2)
+   AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
     BucketState.IsOpen := FALSE;
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;

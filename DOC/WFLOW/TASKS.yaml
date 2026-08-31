@@ -4200,6 +4200,33 @@ tasks:
   - test_fb_machinehomingcycle.st couvre AC1..AC9 + C-1/C-2/C-4 (16 tests) ; G200
     L1-L7=100, bundle + gates palier C PASS ; aucun TC vert existant régressé
   bloque_par: []
+- id: T185-A
+  parent_id: T185
+  statut: ⬜
+  criticite: C2
+  domaine: CYCLE / STANDARDS
+  agent: DSH (DeepSeek)
+  date: '2026-08-31T02:00:00'
+  titre: Refactor interface FB_MachineHomingCycle (Cfg regroupé + renommage _M + constantes CST_)
+  contexte: 'Point qualité 2026-08-31 (sous-agent) : FB_MachineHomingCycle a 3 réglages
+    à plat (CfgTopHomingTargetM, CfgOffsetOpenM, CfgOffsetCloseM) à regrouper en
+    `Cfg : ST_fbMachineHomingCycle_Cfg` (NC-110) ; suffixes d''unité sans underscore
+    (NC-030) ; constantes CAUSE_* sans préfixe CST_ (NAMING §Constantes). Patch pur,
+    zéro changement de comportement. L''appel interne des FB aux (FB_Encoder/Bucket/Modes)
+    est un anti-pattern écarté (ordre d''appel PRG_02 + producteur unique) — non retenu.'
+  description: 'Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T185-A_INTERFACE_CFG.yaml.
+    Créer ST_fbMachineHomingCycle_Cfg (3 champs _M), remplacer les 3 entrées à plat
+    par Cfg, renommer _M, préfixer CST_CAUSE_*, mettre à jour le call-site PRG_02_Acquisition
+    (lignes ~406-420). Aucune modification de la logique §1-§6 ni des sorties.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T185-A_INTERFACE_CFG.yaml
+  objectifs:
+  - Regrouper les 3 réglages en Cfg : ST_fbMachineHomingCycle_Cfg (NC-110)
+  - Corriger les suffixes d'unité _M (NC-030)
+  - Préfixer les constantes d'indices de causes en CST_ (NAMING §Constantes)
+  - Mettre à jour le call-site PRG_02_Acquisition sans régression
+  - G200, bundle et gates palier C verts ; aucun TC vert régressé
+  bloque_par:
+  - T185
 - id: T186
   parent_id: T169-A
   statut: ✅

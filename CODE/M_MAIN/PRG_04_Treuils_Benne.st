@@ -294,6 +294,10 @@ instBucket(
     HomedM2             := PRG_02_Acquisition.Data.EncoderM2.Homed,
     M1_Busy             := (instWinchM1.StepNumber > 0),
     M2_Busy             := (instWinchM2.StepNumber > 0),
+    // Confirmations visuelles N2 : publication et offset benne. Le preset
+    // materiel M2 associe est produit independamment dans PRG_02.
+    ConfirmOpenPosition  := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos,
+    ConfirmClosePosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos,
     MachineHomingCommitOpen  := PRG_02_Acquisition.Data.MachineHoming.SetPosBucketOpen,
     MachineHomingCommitClose := PRG_02_Acquisition.Data.MachineHoming.SetPosBucketClose,
     MachineHomed := PRG_02_Acquisition.Data.MachineHoming.Homed,
