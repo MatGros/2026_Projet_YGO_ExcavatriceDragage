@@ -4656,3 +4656,220 @@ tasks:
   - G200 liaison PASS + bundle + gates palier C PASS
   contrat: ''
   bloque_par: []
+- id: T198
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: STANDARDS
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Audit gestion des constantes (VAR CONSTANT) dans le projet
+  contexte: 'Demande utilisateur 2026-08-31 : « je veux pas de constante dans le projet
+    — au pire ce sont des inputs non câblés avec valeur par défaut ». 223 occurrences
+    de VAR CONSTANT dans CODE/. Deux types : (1) temporisations/paramètres réglables
+    (CST_TestDuration, CST_MaxCycleDeltaMs, CST_HomingVerifyToleranceM, CST_BannerHoldTime,
+    etc.) → candidats à VAR_INPUT avec défaut ; (2) constantes logiques internes
+    (CST_CAUSE_* indices, CST_ST_* états enum, CST_AxeCount/CST_PalierCount dimensions)
+    → à conserver. Audit à faire avant toute conversion.'
+  description: 'Auditer toutes les occurrences de VAR CONSTANT dans CODE/ : inventorier
+    chaque bloc, classer chaque constante (réglable vs logique interne), vérifier
+    l''usage réel (où elle est lue), et produire un rapport de recommandation : quelles
+    constantes convertir en VAR_INPUT avec défaut, lesquelles conserver, et l''impact
+    (interface FB, câblage, tests). Aucune modification de code — audit read-only.'
+  objectifs:
+  - Inventaire exhaustif des VAR CONSTANT dans CODE/ (fichier:ligne)
+  - Classification de chaque constante (réglable vs logique interne)
+  - Vérification de l'usage réel de chaque constante
+  - Rapport de recommandation (convertir / conserver) + impact
+  contrat: ''
+  bloque_par: []
+- id: T199
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: SÉCURITÉ
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Challenge lisibilité FB_Safety_EmergencyManagement (refactoré, chargé)
+  contexte: 'Retour utilisateur 2026-08-31 : le FB refactoré FB_Safety_EmergencyManagement
+    (fusion de 3 FB en 1, 428 lignes) est « pas facile à lire, c''est chargé, on comprend
+    pas bien le flux ». Challenge de lisibilité + proposition de restructuration pour
+    clarifier le flux, sans changer la logique de sécurité.'
+  description: 'Challenger la lisibilité de FB_Safety_EmergencyManagement.st : analyser
+    la structure actuelle (régions, séquence, flux), identifier ce qui rend la lecture
+    difficile, proposer une restructuration (extraction de régions/FB, clarification
+    du flux, commentaires) SANS modifier la logique de sécurité. Challenge read-only
+    d''abord, puis plan d''implémentation après validation.'
+  objectifs:
+  - Analyse de la lisibilité actuelle (fichier:ligne, points bloquants)
+  - Proposition de restructuration (flux clarifié, régions, extraction)
+  - Zéro changement de logique de sécurité
+  - Plan d'implémentation + contrat testable
+  contrat: ''
+  bloque_par: []
+- id: T200
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: SÉCURITÉ
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Revue technique coding FB_Safety_EmergencyManagement — mapping, code mort, refactor
+  contexte: 'Demande utilisateur 2026-08-31 : revue technique coding du FB_Safety_EmergencyManagement
+    pour vérifier que tout est bien mappé (interfaces, câblage), détecter le code mort,
+    et proposer un refactor plus efficace et lisible. Suite au constat que OperatorMessage
+    est produit mais jamais consommé dans CODE/ (non câblé à l''IHM).'
+  description: 'Revue technique coding read-only de FB_Safety_EmergencyManagement.st
+    et de son écosystème (DUT, PRG_06/07, consommateurs) : vérifier le mapping complet
+    des interfaces (chaque sortie produite est-elle consommée ? chaque entrée est-elle
+    alimentée ?), détecter le code mort (variables, DUT, branches inatteignables),
+    identifier les opportunités de refactor (efficacité, lisibilité, encapsulation),
+    et produire un rapport de recommandation. Aucune modification de code — revue
+    read-only.'
+  objectifs:
+  - Vérifier le mapping complet des interfaces (sorties consommées, entrées alimentées)
+  - Détecter le code mort (variables, DUT, branches inatteignables)
+  - Identifier les opportunités de refactor (efficacité, lisibilité, encapsulation)
+  - Rapport de recommandation + plan d'implémentation
+  contrat: ''
+  bloque_par: []
+- id: T201
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: STANDARDS
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: Audit usages HEXA (16#xxxx) dans CODE/ + refactor INT + règle convention
+  contexte: 'Demande utilisateur 2026-08-31 : grep tout le code pour trouver les occurrences
+    utilisant l''HEXA (16#xxxx), voir si on peut refactorer en INT, et intégrer dans
+    la convention standard projet la règle « préférer INT à HEX sauf exception client
+    ou technique ». Suite à la conversion CST_ABORT_* de WORD hex vers INT décimal.'
+  description: 'Audit read-only des usages HEXA (16#xxxx, 0x) dans CODE/ : inventorier
+    chaque occurrence (fichier:ligne), classifier (bitfield légitime vs valeur simple
+    refactorable en INT), proposer le refactor en INT pour les cas refactorables,
+    et rédiger la règle de convention « préférer INT à HEX sauf exception client/technique »
+    à intégrer dans NAMING_CONVENTION.md. Aucune modification de code — audit read-only.'
+  objectifs:
+  - Inventaire exhaustif des usages HEXA (16#xxxx) dans CODE/ (fichier:ligne)
+  - Classification (bitfield légitime vs refactorable en INT)
+  - Proposition de refactor en INT pour les cas refactorables
+  - Rédaction de la règle convention « préférer INT à HEX sauf exception »
+  contrat: ''
+  bloque_par: []
+- id: T201-A
+  parent_id: T201
+  statut: ⬜
+  criticite: C3
+  domaine: STANDARDS
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: 'T201 Phase A — Règle NC-120 (préférer INT à HEX sauf exception) dans NAMING_CONVENTION'
+  contexte: 'Plan phasé T201 (challenge b9022e53) : Phase A = documentation. Règle NC-120
+    « préférer INT à HEX, sauf exception client/technique (masques de bits, codes
+    bit-codés WORD, registres PDO) » à intégrer dans NAMING_CONVENTION.md. Multi-agent
+    possible (doc unique).'
+  description: 'Ajouter la règle NC-120 dans DOC/STDS/NAMING_CONVENTION.md (table NC-xxx
+    + section dédiée) : préférer INT à HEX, sauf masques de bits, codes bit-codés
+    WORD (OperatorActionId), registres PDO (0x3100), constantes de diagnostic. Exclure
+    explicitement les masques de bits (conflit avec gate G347).'
+  objectifs:
+  - Règle NC-120 présente dans NAMING_CONVENTION.md, numérotée, avec exception explicite
+  - grep "NC-120" DOC/STDS/NAMING_CONVENTION.md
+  contrat: ''
+  bloque_par:
+  - T201
+- id: T201-B
+  parent_id: T201
+  statut: ⬜
+  criticite: C3
+  domaine: STANDARDS
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: 'T201 Phase B — Aligner FB_DiveSearch OperatorActionId en hex (représentation)'
+  contexte: 'Plan phasé T201 (challenge b9022e53) : Phase B = aligner la base bit-codée.
+    FB_DiveSearch utilise du décimal (256..384) alors que FB_Cycle/FB_ExtractionAssist
+    utilisent l''hex. Gate G347 impose WORD. Correctif = représentation hex, pas type.
+    Multi-agent possible (fichier unique).'
+  description: 'Convertir les littéraux décimaux de FB_DiveSearch.st (lignes 188,197,205,216,253,272)
+    en hex : 256→16#0100, 257→16#0101, 258→16#0102, 259→16#0103, 260→16#0104, 384→16#0180.
+    Type WORD conservé (gate G347). Aucun changement de valeur → zéro impact IHM.'
+  objectifs:
+  - FB_DiveSearch.st : plus aucun littéral décimal 256..384, tous en 16#0100..16#0180
+  - Type WORD conservé (gate G347 PASS)
+  - Aucune valeur numérique modifiée (mapping 1:1)
+  contrat: ''
+  bloque_par:
+  - T201
+- id: T201-C
+  parent_id: T201
+  statut: ⬜
+  criticite: C3
+  domaine: STANDARDS
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: 'T201 Phase C — Remises à zéro 16#0000 → 0'
+  contexte: 'Plan phasé T201 (challenge b9022e53) : Phase C = remises à zéro. Remplacer
+    les 16#0000 par 0 (lisibilité, cohérence avec les 0 INT voisins). Multi-agent possible
+    (3 fichiers disjoints).'
+  description: 'Remplacer les remises à zéro 16#0000 par 0 dans FB_Encoder_Abs.st:99,
+    FB_Encoder.st:91,93, FB_Bucket.st:394. Aucun changement de valeur.'
+  objectifs:
+  - Aucun 16#0000 résiduel dans les 3 fichiers
+  - Bundle + gates PASS
+  contrat: ''
+  bloque_par:
+  - T201
+- id: T201-D
+  parent_id: T201
+  statut: ⬜
+  criticite: C3
+  domaine: STANDARDS
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: 'T201 Phase D — Promouvoir CST_ABORT_* en GVL + consommateur FB_Hmi_BannerFormatter'
+  contexte: 'Plan phasé T201 (challenge b9022e53) : Phase D = promotion CST_ABORT_*.
+    Les constantes sont locales au FB producteur → promouvoir en GVL partagée, puis
+    mettre à jour producteur + consommateur FB_Hmi_BannerFormatter (littéraux hex →
+    constantes nommées). Refactor transversal → séquentiel, mono-agent.'
+  description: 'Promouvoir CST_ABORT_* de VAR CONSTANT local (FB_Safety_EmergencyManagement.st:114-122)
+    vers une GVL partagée. Mettre à jour le producteur (références) et le consommateur
+    FB_Hmi_BannerFormatter.st:356,382-418 (CASE + test latch) pour utiliser les constantes
+    nommées au lieu des littéraux hex. Atomique (sinon compilation cassée).'
+  objectifs:
+  - CST_ABORT_* déclarées dans une GVL partagée (plus en local du FB)
+  - Producteur + consommateur référencent la GVL
+  - Aucun littéral hex 16#0001..16#0080 dans FB_Hmi_BannerFormatter.st:356,382-418
+  - Messages IHM identiques (valeurs inchangées)
+  - Compilation valide (pas de collision de nom)
+  contrat: ''
+  bloque_par:
+  - T201
+- id: T201-F
+  parent_id: T201
+  statut: ⬜
+  criticite: C3
+  domaine: STANDARDS
+  agent: —
+  date: '2026-08-31T00:00:00'
+  titre: 'T201 Phase F — Revue finale diff + non-régression (R1→R7)'
+  contexte: 'Plan phasé T201 (challenge b9022e53) : Phase F = revue finale indépendante.
+    Vérifier le diff complet + non-régression après les phases A/B/C/D. Agent différent
+    des implémenteurs.'
+  description: 'Revue finale indépendante (R1→R7) : 0 ancien identifiant, liaison G200
+    PASS, bundle frais, gates CI, renommage pur (aucun changement de valeur), cohérence
+    AF, liaison inter-lots. L''orchestrateur lit le git diff réel.'
+  objectifs:
+  - R1: 0 ancien identifiant (grep)
+  - R2: G200 PASS (0 erreur)
+  - R3: bundle frais
+  - R4: gates CI PASS
+  - R5: renommage pur (aucun changement de valeur)
+  - R6: cohérence AF
+  - R7: liaison inter-lots
+  contrat: ''
+  bloque_par:
+  - T201-A
+  - T201-B
+  - T201-C
+  - T201-D
