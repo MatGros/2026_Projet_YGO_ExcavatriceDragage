@@ -4,7 +4,7 @@ import sys
 SCRIPTS = Path(__file__).parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
-from G450_check_af_ci_coverage import assess, ids_from_test_titles, registry_test_ids
+from G450_check_af_ci_coverage import assess, assess_component, ids_from_test_titles, registry_test_ids
 
 
 def test_compact_test_title_expands_two_ids_and_ignores_asserts():
@@ -36,3 +36,20 @@ def test_registry_missing_test_path_is_reported(tmp_path):
     assert tested == set()
     assert ignored == {"TC-P99-001": {"FB_Demo"}}
     assert missing_paths == ["missing/test.st"]
+
+
+def test_component_assessment_supports_scenarios_and_reports_orphans():
+    result = assess_component(
+        {"F01.01": {"tc_couvrants": ["TC-P01-001", "TC-P01-SCEN-NOM"]}},
+        {"TC-P01-001": {"type": "AUTO"}, "TC-P01-SCEN-NOM": {"type": "AUTO"}, "TC-P01-SCEN-DYN": {"type": "AUTO"}},
+        {"TC-P01-001", "TC-P01-SCEN-NOM", "TC-P03-001"}, [],
+    )
+    assert result["catalog_tc_without_function"] == ["TC-P01-SCEN-DYN"]
+    assert result["auto_tc_missing_test"] == ["TC-P01-SCEN-DYN"]
+    assert result["test_tc_missing_catalog"] == []
+
+
+def test_component_assessment_makes_legacy_ignore_visible():
+    result = assess_component({"F01.01": {"tc_couvrants": ["TC-P01-001"]}}, {"TC-P01-001": {"type": "AUTO"}}, set(), ["TC-P01-001"])
+    assert result["auto_tc_missing_test"] == []
+    assert result["ignore_warnings"] == ["TC-P01-001 (raison/scope manquants)"]

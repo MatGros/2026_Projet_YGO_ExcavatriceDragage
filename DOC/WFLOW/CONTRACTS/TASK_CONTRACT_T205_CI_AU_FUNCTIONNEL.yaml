@@ -1,0 +1,78 @@
+contract:
+  task_id: T205_CI_AU_FUNCTIONNEL
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Rationaliser la fiche CI de FB_Safety_EmergencyManagement pour qu'elle ne
+    présente aujourd'hui que le contrat IEC de base Ready et les preuves directement
+    rattachées aux fonctions F01.01 à F01.08, sans supprimer les essais détaillés
+    de causes qui seront repris ultérieurement dans un socle de contrat générique.
+
+  acceptance:
+    - id: AC1
+      statement: "Le rapport CI AU identifie explicitement TC-P03-001 comme contrat de base Enable/Ready et ne le présente pas comme une fonction F01."
+      verified_by: "lecture du rapport HTML/JSON régénéré et de son catalogue de tests"
+    - id: AC2
+      statement: "Chaque TC P01 présenté comme preuve fonctionnelle est rattaché à au moins une fonction F01.01 à F01.08 dans une matrice AF lisible et vérifiable mécaniquement."
+      verified_by: "contrôle AF↔fonctions↔TC avec liste vide de TC fonctionnel orphelin"
+    - id: AC3
+      statement: "Les essais de causes, latches, ErrorId, messages et LastAbortCause ne sont ni supprimés ni assimilés à de nouvelles fonctions métier ; ils sont inventoriés comme dette du futur socle de contrat FB."
+      verified_by: "registre de migration listant chaque essai concerné, son statut conservé et sa cible de migration"
+    - id: AC4
+      statement: "La couverture fonctionnelle minimale F01.01 à F01.08 et les scénarios TC-P01-SCEN-NOM/DYN restent exécutés et PASS ; aucun comportement safety n'est retiré du code ST."
+      verified_by: "run_tests.py --fb FB_Safety_EmergencyManagement + revue du diff limitée aux AF/outillage/tests"
+    - id: AC5
+      statement: "Aucune assertion de cause d'abandon conservée ou créée dans le périmètre fonctionnel n'emploie de littéral hexadécimal ou numérique magique ; la migration vers les constantes symboliques est documentée pour le socle ultérieur."
+      verified_by: "rg '16#|LASTABORTCAUSE, [0-9]' dans le périmètre fonctionnel + revue de la matrice"
+
+  scope:
+    allowed:
+      - DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/
+      - DOC/WFLOW/CONTRACTS/
+      - DOC/WFLOW/TASKS.yaml
+      - TOOLS/AGENT_WORKFLOW/scripts/G450_check_af_ci_coverage.py
+      - TOOLS/AGENT_WORKFLOW/scripts/generate_af_viewer.py
+      - TOOLS/AGENT_WORKFLOW/config/af_traceability_matrix.yaml
+      - TOOLS/AGENT_WORKFLOW/config/fb_cartouche_sync.json
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/contract_deferred/
+      - TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/test_fb_safety_emergency.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/reports/
+      - DOC/WFLOW/AF_VIEWER.html
+    forbidden:
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
+      - CODE/B_AU_SECURITE/GVL_Safety_Emergency.st
+      - PRJ_CODESYS/**/Device.export
+
+  conservation:
+    must_survive:
+      - "Tous les tests de causes déjà écrits restent conservés dans le dépôt jusqu'à validation humaine du socle de contrat générique."
+      - "Les TC-P01-SCEN-NOM et TC-P01-SCEN-DYN conservent leurs IDs standardisés et leurs preuves intégrées."
+      - "Les huit fonctions F01.01 à F01.08 restent couvertes par au moins une preuve CI ou SITE explicitement déclarée."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    STOP et alerte si un test détaillé de cause est la seule preuve d'une fonction
+    F01, si la séparation contrat/fonction exige de modifier le code safety, ou si
+    le catalogue AF ne permet pas un rattachement non ambigu. La décision de
+    supprimer ou déplacer physiquement des tests reste humaine.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: "Plan à valider avant toute réorganisation des tests CI safety."

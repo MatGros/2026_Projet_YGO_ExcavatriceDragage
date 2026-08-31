@@ -38,7 +38,7 @@ except ImportError:  # pragma: no cover
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 # Reutilise l'extracteur de TC des titres TEST (meme dossier scripts/).
-from G450_check_af_ci_coverage import ids_from_test_titles, TC_RE  # noqa: E402
+from G450_check_af_ci_coverage import expand_tc_ids, ids_from_test_titles  # noqa: E402
 
 if sys.platform == "win32":
     try:
@@ -56,12 +56,7 @@ FB_TOKEN_RE = re.compile(r"FB_[A-Za-z0-9_]+")
 
 def _canonical_tc_ids(text: str) -> list[str]:
     """Etend 'TC-P01-004/009', 'TC-P10-001-010'... en identifiants canoniques ordonnes."""
-    out: list[str] = []
-    for part, first, second in TC_RE.findall(str(text)):
-        for cid in (f"TC-P{part}-{first}", f"TC-P{part}-{second}" if second else None):
-            if cid and cid not in out:
-                out.append(cid)
-    return out
+    return sorted(expand_tc_ids(str(text)))
 
 
 def _vp_lookup(vpoints: dict[str, Any]) -> dict[str, dict[str, str]]:
@@ -132,6 +127,7 @@ def _traceability(matrix: dict[str, Any], root: Path) -> dict[str, Any]:
     rows: list[dict] = []
     fn_no_tc: list[dict] = []
     tc_orphan: list[dict] = []
+    contract_tc: list[dict] = []
     tc_no_ci: list[dict] = []
     n_func = n_pass = n_gap = 0
 
@@ -197,12 +193,14 @@ def _traceability(matrix: dict[str, Any], root: Path) -> dict[str, Any]:
                     continue
                 seen.add(cid)
                 if cid not in af_cited:
-                    tc_orphan.append({"af": af, "tc": cid, "intention": str(val.get("intention", ""))})
+                    target = contract_tc if af == "AF-03" else tc_orphan
+                    target.append({"af": af, "tc": cid, "intention": str(val.get("intention", ""))})
 
     return {
         "rows": rows,
         "fn_no_tc": fn_no_tc,
         "tc_orphan": tc_orphan,
+        "contract_tc": contract_tc,
         "tc_no_ci": tc_no_ci,
         "counts": {
             "functions": n_func,
@@ -739,6 +737,9 @@ makeTable("t-sy","f-sy","c-sy",SY,[
     return '<li><span class="mono">'+esc(x.af+" "+x.fid)+'</span> \\u2014 '+esc(x.fonction)+'</li>';
   }});
   g+=gapList("TC orphelins \\u2014 aucune fonction ne les revendique",TR.tc_orphan,function(x){{
+    return '<li><span class="mono">'+esc(x.af+" "+x.tc)+'</span>'+(x.intention?' \\u2014 '+esc(x.intention):"")+'</li>';
+  }});
+  g+=gapList("Contrats socle AF-03 \\u2014 hors fonctions métier",TR.contract_tc,function(x){{
     return '<li><span class="mono">'+esc(x.af+" "+x.tc)+'</span>'+(x.intention?' \\u2014 '+esc(x.intention):"")+'</li>';
   }});
   g+=gapList("TC AUTO sans titre TEST",TR.tc_no_ci,function(x){{

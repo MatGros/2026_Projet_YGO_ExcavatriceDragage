@@ -1904,6 +1904,23 @@ TRUE = Défaut sécurité actif</xhtml>
 🟢 Translation réellement autorisée à se déplacer</xhtml>
               </documentation>
             </variable>
+            <variable name="TremiePermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
+🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+              </documentation>
+            </variable>
             <variable name="HeightInterlockBlocking">
               <type>
                 <BOOL />
@@ -2968,6 +2985,23 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Masque brut complet (latch cause) — source d'arbitrage PowerCutOff</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx318_TremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels M3 (source unique : FB_Safety_Translation) — TRUE = autorisé, fail-safe
+1 = Translation vers Trémie autorisée | 0 = SENS TRÉMIE BLOQUÉ</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx319_MaintenancePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Translation vers Maintenance autorisée | 0 = SENS MAINTENANCE BLOQUÉ</xhtml>
               </documentation>
             </variable>
           </struct>

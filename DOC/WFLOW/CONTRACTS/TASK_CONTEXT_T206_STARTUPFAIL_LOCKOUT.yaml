@@ -1,0 +1,12 @@
+task_context:
+  task_id: T206
+  contract: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T206_STARTUPFAIL_LOCKOUT.yaml
+  register: DOC/WFLOW/CONTRACTS/REGISTRE_ACTIONS_T206_STARTUPFAIL_LOCKOUT.md
+  test_design: DOC/WFLOW/CONTRACTS/TEST_DESIGN_T206_STARTUPFAIL_LOCKOUT.md
+  safety_decision:
+    source: "Utilisateur, 2026-08-31"
+    rule: "Le verrouillage démarre à StartupFail. Reset précoce ne l'écourte pas ; Reset après expiration permet Armable si les préconditions sont saines."
+  scope:
+    code: CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
+    test: TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/test_fb_safety_emergency.st
+  status: PENDING_HUMAN_REVIEW_COMPLETED_BY_USER

@@ -1,0 +1,73 @@
+contract:
+  task_id: T206_STARTUPFAIL_LOCKOUT
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Après un échec de l'autotest de démarrage AU, interdire tout réarmement pendant
+    la durée de verrouillage configurée, mesurée depuis la détection de l'échec, sans
+    que le Reset puisse raccourcir cette durée.
+
+  acceptance:
+    - id: AC1
+      statement: "Un StartupFail démarre un verrouillage de CST_ArmingLockout dès le scan de détection ; Status.State.Armable est FALSE pendant toute cette durée."
+      verified_by: "test CI chronométré : StartupFail puis chaîne refermée et Reset précoce ; Armable reste FALSE avant expiration"
+    - id: AC2
+      statement: "Un front Reset acquitte StartupFail selon le contrat Cause/Ack mais ne remet jamais à zéro ni ne court-circuite le verrouillage démarré par StartupFail."
+      verified_by: "test CI : Reset à t<5s, mesure du temps jusqu'à Armable=TRUE"
+    - id: AC3
+      statement: "Si Reset intervient après l'expiration du verrouillage et que chaîne, coupures IHM/métier, étape et contacteur sont sains, Armable devient TRUE sans délai supplémentaire."
+      verified_by: "test CI : Reset à t>5s puis assertion Armable=TRUE au scan suivant"
+    - id: AC4
+      statement: "Aucun front ArmRequest ne lance la séquence tant que StartupFail ou son verrouillage temporel bloque le réarmement."
+      verified_by: "test CI : ArmRequest pendant verrouillage ; Step reste IDLE et ArmPulse_Cmd reste FALSE"
+    - id: AC5
+      statement: "Les autres causes de lockout et les fonctions F01.01 à F01.08 conservent leur comportement validé ; bundle frais, G200 et suite des gates passent."
+      verified_by: "run_tests.py --fb FB_Safety_EmergencyManagement + generate_codesys_bundle.py + G200_check_linkage.py --report + run_all_gates.py"
+
+  scope:
+    allowed:
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
+      - CODE/B_AU_SECURITE/GVL_Safety_Emergency.st
+      - DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/
+      - TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/test_fb_safety_emergency.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/reports/
+      - DOC/WFLOW/CONTRACTS/
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - PRJ_CODESYS/**/Device.export
+      - CODE/M_MAIN/**
+
+  conservation:
+    must_survive:
+      - "Reset reste un front conscient et ne relance jamais seul une séquence de réarmement."
+      - "Enable=FALSE conserve sa neutralisation fail-safe des sorties physiques."
+      - "Le lockout d'échec contacteur et les causes PowerCutOff/IHM gardent leurs règles propres ; aucun effet de bord par réemploi non distingué du timer StartupFail."
+      - "Status.Ready reste FALSE tant que StartupFail est présent ; Armable ne devient TRUE qu'après Reset et expiration du verrouillage de démarrage."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    Ne pas réutiliser silencieusement EmergencyArmingLockoutActive si son Reset actuel
+    permet de court-circuiter le verrouillage StartupFail. Proposer un état ou une
+    origine de verrouillage explicitement séparé(e), puis attendre la validation humaine
+    du plan C4 avant toute écriture ST.
+
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: "Décision métier utilisateur du 2026-08-31 à intégrer après validation du plan safety."

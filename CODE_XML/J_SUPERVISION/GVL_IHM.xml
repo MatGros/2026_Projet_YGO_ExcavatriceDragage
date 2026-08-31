@@ -3157,7 +3157,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenancePermit">
@@ -3165,7 +3165,7 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
               </documentation>
             </variable>
             <variable name="BlockedBySafety">

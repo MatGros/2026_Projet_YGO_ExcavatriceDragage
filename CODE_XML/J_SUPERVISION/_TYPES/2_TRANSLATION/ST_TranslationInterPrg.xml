@@ -236,7 +236,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
               </documentation>
             </variable>
             <variable name="MaintenancePermit">
@@ -244,7 +244,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
               </documentation>
             </variable>
             <variable name="BlockedBySafety">
@@ -296,6 +296,23 @@
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis de mouvement effectif (agrégat diagnostic : toutes les barrières levées)
 🟢 Translation réellement autorisée à se déplacer</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TremiePermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
+🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenancePermitEffective">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
               </documentation>
             </variable>
             <variable name="HeightInterlockBlocking">
