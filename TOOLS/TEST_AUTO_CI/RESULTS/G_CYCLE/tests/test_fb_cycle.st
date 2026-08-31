@@ -416,3 +416,99 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> ST
     ASSERT_FALSE(FB.BucketCmd.ReqKoboldMeasureEnable, 'Reset efface Kobold contacteur (T186)');
 END_TEST
 
+TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pas de redemarrage) (T192-A S1)'
+    SampleCount := 0;
+    // Scan 1 : Demarrage (front StartCycle) -> X0 vers X1
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
+       StartCycle := TRUE, AbortCycle := FALSE, WinchSyncError := FALSE, Reset := FALSE,
+       HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
+       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := FALSE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    // Scan 2 : StartCycle relache -> etablissement X1_HOMING
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, AbortCycle := FALSE, WinchSyncError := FALSE, Reset := FALSE,
+       HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
+       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := FALSE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X1_HOMING, 'Etablissement a X1_HOMING');
+    // Scan 3 : Injection defaut synchronisme -> STABILIZING + Fault.Latched=TRUE
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, AbortCycle := FALSE, WinchSyncError := TRUE, Reset := FALSE,
+       HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
+       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := FALSE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.STABILIZING, 'Bascule en STABILIZING sur defaut');
+    ASSERT_TRUE(FB.Fault.Latched, 'Defaut latche actif');
+    // Scan 4 : Cause disparue (Error retombe) mais Latch persiste (pas de Reset)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, AbortCycle := FALSE, WinchSyncError := FALSE, Reset := FALSE,
+       HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
+       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := FALSE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.Fault.Latched, 'Latch persiste sans Reset');
+    // Scan 5 : AbortCycle -> retour X0 (mais Latch toujours actif)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, AbortCycle := TRUE, WinchSyncError := FALSE, Reset := FALSE,
+       HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
+       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := FALSE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X0_PREPARATION, 'Abort -> retour X0');
+    // Scan 6 : StartCycle avec Fault.Latched actif -> RESTE EN X0 (gate NOT Fault.Latched)
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
+       StartCycle := TRUE, AbortCycle := FALSE, WinchSyncError := FALSE, Reset := FALSE,
+       HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
+       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := FALSE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X0_PREPARATION, 'Reste en X0 : Start bloque par Fault.Latched (S1)');
+    // Scan 7 : StartCycle relache -> confirme X0, pas de redemarrage
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, CycleMotionPermit := TRUE, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, AbortCycle := FALSE, WinchSyncError := FALSE, Reset := FALSE,
+       HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
+       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := FALSE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X0_PREPARATION, 'Confirme X0 apres Start relache');
+    ASSERT_FALSE(FB.Lifecycle.Busy, 'Pas de cycle en cours (Busy=FALSE)');
+END_TEST
+
