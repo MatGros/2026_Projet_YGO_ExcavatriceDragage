@@ -316,6 +316,8 @@ EmergencyArming_RQ           := EmergencyArmingCmd;
 Data.PowerKeepAliveACmd    := PowerKeepAliveACmd;
 Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
 Data.EmergencyArmingCmd    := EmergencyArmingCmd;
+Data.TestCutActive         := instSafetyEmergencyManagement.Cmd.TestCutActive;
+Data.PowerCutOffRequest    := PowerCutOffReq;
 
 // ── Diagnostics chaîne AU (DUT structurés State/Diag, source unique) ──
 EmergencyState := instSafetyEmergencyManagement.Status.State;

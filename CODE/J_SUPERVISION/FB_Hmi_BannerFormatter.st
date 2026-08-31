@@ -718,23 +718,22 @@ IF TranslationSafety.ErrorSensorIncoherent AND Vh0808Valid AND (AlarmCount < CST
 END_IF;
 
 // 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)
+//    Mapping = index cause FB_Bucket (FB_FaultCore : bit i = cause i) :
+//    bit0 config géométrie · bit1 écart max · bit2 timeout · bit3 glissement M1 · bit4 codeurs non référencés
 IF ((BucketErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] timeout mouvement'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] configuration geometrie invalide'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0002) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] inversion commandes'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] depassement ecart max autorise'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0004) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] ecart position M1/M2'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] timeout commande deplacement'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] defaut configuration'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] glissement treuil M1'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0010) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] capteur fond defectueux'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF ((BucketErrorId AND 16#0020) <> 16#0000) AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] derive cable M2 pendant maintien'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] codeurs treuils non references'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5e. Collecte — synchro M1/M2 (FB_WinchSync.ErrorId)

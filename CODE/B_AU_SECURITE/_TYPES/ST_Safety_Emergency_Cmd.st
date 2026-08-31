@@ -16,5 +16,6 @@ STRUCT
     MaintainA_Cmd   : BOOL; // <-- [ACT]  Sortie pilotage canal A (TRUE = voie maintenue)
     MaintainB_Cmd   : BOOL; // <-- [ACT]  Sortie pilotage canal B (TRUE = voie maintenue)
     ArmPulse_Cmd    : BOOL; // <-- [ACT]  Impulsion rearmement physique (1s)
+    TestCutActive   : BOOL; // <-- [ACT]  Test de redondance en cours (canal A ou B coupe) — consommé par la simulation
 END_STRUCT
 END_TYPE

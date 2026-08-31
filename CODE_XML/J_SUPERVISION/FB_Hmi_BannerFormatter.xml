@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T13:43:27.193709" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T13:43:27.193709">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T14:32:32.332460" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T14:32:32.332460">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2780,23 +2780,22 @@ IF TranslationSafety.ErrorSensorIncoherent AND Vh0808Valid AND (AlarmCount &lt; 
 END_IF;
 
 // 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)
+//    Mapping = index cause FB_Bucket (FB_FaultCore : bit i = cause i) :
+//    bit0 config géométrie · bit1 écart max · bit2 timeout · bit3 glissement M1 · bit4 codeurs non référencés
 IF ((BucketErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] timeout mouvement'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] configuration geometrie invalide'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] inversion commandes'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] depassement ecart max autorise'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0004) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] ecart position M1/M2'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] timeout commande deplacement'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0008) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] defaut configuration'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] glissement treuil M1'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF ((BucketErrorId AND 16#0010) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] capteur fond defectueux'; AlarmCount := AlarmCount + 1;
-END_IF;
-IF ((BucketErrorId AND 16#0020) &lt;&gt; 16#0000) AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[BENNE] derive cable M2 pendant maintien'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[BENNE] codeurs treuils non references'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5e. Collecte — synchro M1/M2 (FB_WinchSync.ErrorId)

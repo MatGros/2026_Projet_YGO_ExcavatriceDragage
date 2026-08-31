@@ -390,6 +390,10 @@ MaintainB_NoBlock := Maintain_NoCutOff AND MaintainB_NoFault;
 Cmd.MaintainA_Cmd := Enable AND Maintain_ChainOk AND MaintainA_NoBlock;
 Cmd.MaintainB_Cmd := Enable AND Maintain_ChainOk AND MaintainB_NoBlock;
 Cmd.ArmPulse_Cmd  := Enable AND (ArmingSeqStep = CST_STEP_PULSE) AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+// 🧪 TestCutActive : signale à la simulation qu'un canal est coupé pour le test de
+// redondance A/B (ForceTestA/B). La simulation ouvre alors la boucle AU (SimChainOk=FALSE)
+// pour que le test valide la chute de chaîne — sans dépendre de PowerCutOff_A/B (cercle cassé).
+Cmd.TestCutActive := Enable AND (ForceTestA OR ForceTestB);
 
 // 🚦 Bus d'état public
 Status.State.ChainOk     := Enable AND EmergencyChainClosed;

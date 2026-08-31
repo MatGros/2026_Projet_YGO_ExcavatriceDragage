@@ -52,4 +52,8 @@ VAR_GLOBAL
 
     // 🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
     SimKoboldContactValue       : BOOL := FALSE; // TRUE = Kobold détecte un contact fond simulé
+    // 🧪 Contrôle granulaire de la chaîne AU : TRUE = simuler la chaîne fermée (on peut armer) ;
+    //    FALSE = chaîne ouverte (on ne peut pas armer). Défaut FALSE → à la ré-entrée en simu,
+    //    la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).
+    SimChainOk                  : BOOL := FALSE;
 END_VAR

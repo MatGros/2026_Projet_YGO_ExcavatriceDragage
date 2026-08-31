@@ -1,234 +1,89 @@
-Error compiling source files:
-
-FB_Safety_EmergencyManagement.st:120:22: error: Undeclared variable 'CST_STEP_IDLE'
- 120 |     ArmingSeqStep := CST_STEP_IDLE;
-     |                      ^
-
-FB_Safety_EmergencyManagement.st:131:22: error: Undeclared variable 'CST_STEP_IDLE'
- 131 |     LastAbortStep := CST_STEP_IDLE;
-     |                      ^
-
-FB_Safety_EmergencyManagement.st:132:35: error: Undeclared variable 'CST_ABORT_NONE'
- 132 |     LastAbortCause := INT_TO_WORD(CST_ABORT_NONE);
-     |                                   ^
-
-FB_Safety_EmergencyManagement.st:161:48: error: Undeclared variable 'CST_STEP_IDLE'
- 161 |                           AND (ArmingSeqStep = CST_STEP_IDLE); // 4. Pas de séquence résiduelle
-     |                                                ^
-
-FB_Safety_EmergencyManagement.st:187:25: error: Undeclared variable 'CST_STEP_IDLE'
- 187 |     IF ArmingSeqStep <> CST_STEP_IDLE THEN
-     |                         ^
-
-FB_Safety_EmergencyManagement.st:191:43: error: Undeclared variable 'CST_ABORT_CUT_IHM'
- 191 |             LastAbortCause := INT_TO_WORD(CST_ABORT_CUT_IHM);
-     |                                           ^
-
-FB_Safety_EmergencyManagement.st:192:30: error: Undeclared variable 'CST_STEP_IDLE'
- 192 |             ArmingSeqStep := CST_STEP_IDLE;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:199:43: error: Undeclared variable 'CST_ABORT_POWER_CUTOFF'
- 199 |             LastAbortCause := INT_TO_WORD(CST_ABORT_POWER_CUTOFF);
-     |                                           ^
-
-FB_Safety_EmergencyManagement.st:200:30: error: Undeclared variable 'CST_STEP_IDLE'
- 200 |             ArmingSeqStep := CST_STEP_IDLE;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:201:32: error: Undeclared variable 'CST_STEP_PULSE'
- 201 |         ELSIF (ArmingSeqStep = CST_STEP_PULSE OR ArmingSeqStep = CST_STEP_CONFIRM) AND NOT EmergencyChainClosed THEN
-     |                                ^
-
-FB_Safety_EmergencyManagement.st:201:66: error: Undeclared variable 'CST_STEP_CONFIRM'
- 201 |         ELSIF (ArmingSeqStep = CST_STEP_PULSE OR ArmingSeqStep = CST_STEP_CONFIRM) AND NOT EmergencyChainClosed THEN
-     |                                                                  ^
-
-FB_Safety_EmergencyManagement.st:206:43: error: Undeclared variable 'CST_ABORT_CHAIN_DROP'
- 206 |             LastAbortCause := INT_TO_WORD(CST_ABORT_CHAIN_DROP);
-     |                                           ^
-
-FB_Safety_EmergencyManagement.st:207:30: error: Undeclared variable 'CST_STEP_IDLE'
- 207 |             ArmingSeqStep := CST_STEP_IDLE;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:221:38: error: Undeclared variable 'CST_STEP_IDLE'
- 221 |     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
-     |                                      ^
-
-FB_Safety_EmergencyManagement.st:225:26: error: Undeclared variable 'CST_STEP_TEST_A'
- 225 |         ArmingSeqStep := CST_STEP_TEST_A;
-     |                          ^
-
-FB_Safety_EmergencyManagement.st:231:37: error: Undeclared variable 'CST_STEP_TEST_A'
- 231 |     TonTestA(IN := (ArmingSeqStep = CST_STEP_TEST_A), PT := CST_TestDuration);
-     |                                     ^
-
-FB_Safety_EmergencyManagement.st:232:24: error: Undeclared variable 'CST_STEP_TEST_A'
- 232 |     IF ArmingSeqStep = CST_STEP_TEST_A THEN
-     |                        ^
-
-FB_Safety_EmergencyManagement.st:238:34: error: Undeclared variable 'CST_STEP_TEST_A'
- 238 |                 LastAbortStep := CST_STEP_TEST_A;
-     |                                  ^
-
-FB_Safety_EmergencyManagement.st:239:47: error: Undeclared variable 'CST_ABORT_REDUNDANCY_A'
- 239 |                 LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_A);
-     |                                               ^
-
-FB_Safety_EmergencyManagement.st:240:34: error: Undeclared variable 'CST_STEP_IDLE'
- 240 |                 ArmingSeqStep := CST_STEP_IDLE;
-     |                                  ^
-
-FB_Safety_EmergencyManagement.st:242:34: error: Undeclared variable 'CST_STEP_RESTORE_A'
- 242 |                 ArmingSeqStep := CST_STEP_RESTORE_A;
-     |                                  ^
-
-FB_Safety_EmergencyManagement.st:250:40: error: Undeclared variable 'CST_STEP_RESTORE_A'
- 250 |     TonRestoreA(IN := (ArmingSeqStep = CST_STEP_RESTORE_A), PT := CST_TestDuration);
-     |                                        ^
-
-FB_Safety_EmergencyManagement.st:251:25: error: Undeclared variable 'CST_STEP_RESTORE_A'
- 251 |     IF (ArmingSeqStep = CST_STEP_RESTORE_A) AND TonRestoreA.Q THEN
-     |                         ^
-
-FB_Safety_EmergencyManagement.st:253:30: error: Undeclared variable 'CST_STEP_TEST_B'
- 253 |             ArmingSeqStep := CST_STEP_TEST_B;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:255:30: error: Undeclared variable 'CST_STEP_RESTORE_A'
- 255 |             LastAbortStep := CST_STEP_RESTORE_A;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:256:43: error: Undeclared variable 'CST_ABORT_TIMEOUT_RESTORE_A'
- 256 |             LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A);
-     |                                           ^
-
-FB_Safety_EmergencyManagement.st:257:30: error: Undeclared variable 'CST_STEP_IDLE'
- 257 |             ArmingSeqStep := CST_STEP_IDLE;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:262:37: error: Undeclared variable 'CST_STEP_TEST_B'
- 262 |     TonTestB(IN := (ArmingSeqStep = CST_STEP_TEST_B), PT := CST_TestDuration);
-     |                                     ^
-
-FB_Safety_EmergencyManagement.st:263:24: error: Undeclared variable 'CST_STEP_TEST_B'
- 263 |     IF ArmingSeqStep = CST_STEP_TEST_B THEN
-     |                        ^
-
-FB_Safety_EmergencyManagement.st:269:34: error: Undeclared variable 'CST_STEP_TEST_B'
- 269 |                 LastAbortStep := CST_STEP_TEST_B;
-     |                                  ^
-
-FB_Safety_EmergencyManagement.st:270:47: error: Undeclared variable 'CST_ABORT_REDUNDANCY_B'
- 270 |                 LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_B);
-     |                                               ^
-
-FB_Safety_EmergencyManagement.st:271:34: error: Undeclared variable 'CST_STEP_IDLE'
- 271 |                 ArmingSeqStep := CST_STEP_IDLE;
-     |                                  ^
-
-FB_Safety_EmergencyManagement.st:273:34: error: Undeclared variable 'CST_STEP_RESTORE_B'
- 273 |                 ArmingSeqStep := CST_STEP_RESTORE_B;
-     |                                  ^
-
-FB_Safety_EmergencyManagement.st:281:40: error: Undeclared variable 'CST_STEP_RESTORE_B'
- 281 |     TonRestoreB(IN := (ArmingSeqStep = CST_STEP_RESTORE_B), PT := CST_TestDuration);
-     |                                        ^
-
-FB_Safety_EmergencyManagement.st:282:25: error: Undeclared variable 'CST_STEP_RESTORE_B'
- 282 |     IF (ArmingSeqStep = CST_STEP_RESTORE_B) AND TonRestoreB.Q THEN
-     |                         ^
-
-FB_Safety_EmergencyManagement.st:284:30: error: Undeclared variable 'CST_STEP_PULSE'
- 284 |             ArmingSeqStep := CST_STEP_PULSE;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:286:30: error: Undeclared variable 'CST_STEP_RESTORE_B'
- 286 |             LastAbortStep := CST_STEP_RESTORE_B;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:287:43: error: Undeclared variable 'CST_ABORT_TIMEOUT_RESTORE_B'
- 287 |             LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B);
-     |                                           ^
-
-FB_Safety_EmergencyManagement.st:288:30: error: Undeclared variable 'CST_STEP_IDLE'
- 288 |             ArmingSeqStep := CST_STEP_IDLE;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:293:43: error: Undeclared variable 'CST_STEP_PULSE'
- 293 |     TonArmingPulse(IN := (ArmingSeqStep = CST_STEP_PULSE), PT := CST_ArmingPulseDuration);
-     |                                           ^
-
-FB_Safety_EmergencyManagement.st:294:25: error: Undeclared variable 'CST_STEP_PULSE'
- 294 |     IF (ArmingSeqStep = CST_STEP_PULSE) AND TonArmingPulse.Q THEN
-     |                         ^
-
-FB_Safety_EmergencyManagement.st:295:26: error: Undeclared variable 'CST_STEP_CONFIRM'
- 295 |         ArmingSeqStep := CST_STEP_CONFIRM;
-     |                          ^
-
-FB_Safety_EmergencyManagement.st:299:45: error: Undeclared variable 'CST_STEP_CONFIRM'
- 299 |     TonArmingConfirm(IN := (ArmingSeqStep = CST_STEP_CONFIRM), PT := CST_ArmingConfirmTimeout);
-     |                                             ^
-
-FB_Safety_EmergencyManagement.st:300:24: error: Undeclared variable 'CST_STEP_CONFIRM'
- 300 |     IF ArmingSeqStep = CST_STEP_CONFIRM THEN
-     |                        ^
-
-FB_Safety_EmergencyManagement.st:302:30: error: Undeclared variable 'CST_STEP_IDLE'
- 302 |             ArmingSeqStep := CST_STEP_IDLE;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:307:30: error: Undeclared variable 'CST_STEP_CONFIRM'
- 307 |             LastAbortStep := CST_STEP_CONFIRM;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:308:43: error: Undeclared variable 'CST_ABORT_TIMEOUT_CONTACTOR'
- 308 |             LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR);
-     |                                           ^
-
-FB_Safety_EmergencyManagement.st:309:30: error: Undeclared variable 'CST_STEP_IDLE'
- 309 |             ArmingSeqStep := CST_STEP_IDLE;
-     |                              ^
-
-FB_Safety_EmergencyManagement.st:341:37: error: Undeclared variable 'CST_STEP_IDLE'
- 341 |     ArmingBusy := (ArmingSeqStep <> CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
-     |                                     ^
-
-FB_Safety_EmergencyManagement.st:384:64: error: Undeclared variable 'CST_STEP_IDLE'
- 384 | Maintain_ChainOk := (EmergencyChainClosed OR (ArmingSeqStep <> CST_STEP_IDLE));
-     |                                                                ^
-
-FB_Safety_EmergencyManagement.st:392:50: error: Undeclared variable 'CST_STEP_PULSE'
- 392 | Cmd.ArmPulse_Cmd  := Enable AND (ArmingSeqStep = CST_STEP_PULSE) AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
-     |                                                  ^
-
-FB_Safety_EmergencyManagement.st:437:9: error: Undeclared variable 'CST_STEP_IDLE'
- 437 |         CST_STEP_IDLE:      Status.OperatorMessage := 'AU: repos - pret a rearmer';
-     |         ^
-
-FB_Safety_EmergencyManagement.st:438:9: error: Undeclared variable 'CST_STEP_TEST_A'
- 438 |         CST_STEP_TEST_A:    Status.OperatorMessage := 'AU: autotest canal A en cours';
-     |         ^
-
-FB_Safety_EmergencyManagement.st:439:9: error: Undeclared variable 'CST_STEP_RESTORE_A'
- 439 |         CST_STEP_RESTORE_A: Status.OperatorMessage := 'AU: restauration canal A';
-     |         ^
-
-FB_Safety_EmergencyManagement.st:440:9: error: Undeclared variable 'CST_STEP_TEST_B'
- 440 |         CST_STEP_TEST_B:    Status.OperatorMessage := 'AU: autotest canal B en cours';
-     |         ^
-
-FB_Safety_EmergencyManagement.st:441:9: error: Undeclared variable 'CST_STEP_RESTORE_B'
- 441 |         CST_STEP_RESTORE_B: Status.OperatorMessage := 'AU: restauration canal B';
-     |         ^
-
-FB_Safety_EmergencyManagement.st:442:9: error: Undeclared variable 'CST_STEP_PULSE'
- 442 |         CST_STEP_PULSE:     Status.OperatorMessage := 'AU: impulsion rearmement contacteur';
-     |         ^
-
-FB_Safety_EmergencyManagement.st:443:9: error: Undeclared variable 'CST_STEP_CONFIRM'
- 443 |         CST_STEP_CONFIRM:   Status.OperatorMessage := 'AU: attente confirmation contacteur';
-     |         ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp: In member function 'void strucpp::FB_SAFETY_EMERGENCYMANAGEMENT::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12855:18: error: the value of 'strucpp::CST_STEP_IDLE' is not usable in a constant expression
+12855 |             case CST_STEP_IDLE:
+      |                  ^~~~~~~~~~~~~
+In file included from C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:4:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:117:22: note: 'strucpp::CST_STEP_IDLE' was not declared 'constexpr'
+  117 | const inline IEC_INT CST_STEP_IDLE = 0;
+      |                      ^~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12855:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
+12855 |             case CST_STEP_IDLE:
+      |                  ^~~~~~~~~~~~~
+In file included from C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:7:
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
+  212 |     operator T() const noexcept {
+      |     ^~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12858:18: error: the value of 'strucpp::CST_STEP_TEST_A' is not usable in a constant expression
+12858 |             case CST_STEP_TEST_A:
+      |                  ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:118:22: note: 'strucpp::CST_STEP_TEST_A' was not declared 'constexpr'
+  118 | const inline IEC_INT CST_STEP_TEST_A = 1;
+      |                      ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12858:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
+12858 |             case CST_STEP_TEST_A:
+      |                  ^~~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
+  212 |     operator T() const noexcept {
+      |     ^~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12861:18: error: the value of 'strucpp::CST_STEP_RESTORE_A' is not usable in a constant expression
+12861 |             case CST_STEP_RESTORE_A:
+      |                  ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:119:22: note: 'strucpp::CST_STEP_RESTORE_A' was not declared 'constexpr'
+  119 | const inline IEC_INT CST_STEP_RESTORE_A = 2;
+      |                      ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12861:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
+12861 |             case CST_STEP_RESTORE_A:
+      |                  ^~~~~~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
+  212 |     operator T() const noexcept {
+      |     ^~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12864:18: error: the value of 'strucpp::CST_STEP_TEST_B' is not usable in a constant expression
+12864 |             case CST_STEP_TEST_B:
+      |                  ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:120:22: note: 'strucpp::CST_STEP_TEST_B' was not declared 'constexpr'
+  120 | const inline IEC_INT CST_STEP_TEST_B = 3;
+      |                      ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12864:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
+12864 |             case CST_STEP_TEST_B:
+      |                  ^~~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
+  212 |     operator T() const noexcept {
+      |     ^~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12867:18: error: the value of 'strucpp::CST_STEP_RESTORE_B' is not usable in a constant expression
+12867 |             case CST_STEP_RESTORE_B:
+      |                  ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:121:22: note: 'strucpp::CST_STEP_RESTORE_B' was not declared 'constexpr'
+  121 | const inline IEC_INT CST_STEP_RESTORE_B = 4;
+      |                      ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12867:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
+12867 |             case CST_STEP_RESTORE_B:
+      |                  ^~~~~~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
+  212 |     operator T() const noexcept {
+      |     ^~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12870:18: error: the value of 'strucpp::CST_STEP_PULSE' is not usable in a constant expression
+12870 |             case CST_STEP_PULSE:
+      |                  ^~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:122:22: note: 'strucpp::CST_STEP_PULSE' was not declared 'constexpr'
+  122 | const inline IEC_INT CST_STEP_PULSE = 5;
+      |                      ^~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12870:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
+12870 |             case CST_STEP_PULSE:
+      |                  ^~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
+  212 |     operator T() const noexcept {
+      |     ^~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12873:18: error: the value of 'strucpp::CST_STEP_CONFIRM' is not usable in a constant expression
+12873 |             case CST_STEP_CONFIRM:
+      |                  ^~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.hpp:123:22: note: 'strucpp::CST_STEP_CONFIRM' was not declared 'constexpr'
+  123 | const inline IEC_INT CST_STEP_CONFIRM = 6;
+      |                      ^~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_EmergencyManagement_5h41vmh5\strucpp-test-KMbHeQ\generated.cpp:12873:18: error: call to non-'constexpr' function 'strucpp::IECVar<T>::operator T() const [with T = short int]'
+12873 |             case CST_STEP_CONFIRM:
+      |                  ^~~~~~~~~~~~~~~~
+C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\COMPILER_ST2C_STruCpp\bin\win32-x64\runtime\include/iec_var.hpp:212:5: note: 'strucpp::IECVar<T>::operator T() const [with T = short int]' declared here
+  212 |     operator T() const noexcept {
+      |     ^~~~~~~~
 

@@ -122,6 +122,8 @@ FB_Safety_EmergencyManagement:
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Status.st
     - CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Cmd.st
+    # GVL requise : CST_STEP_*/CST_ABORT_* référencees par le FB (sorties du VAR CONSTANT local au refactor T197/T199, erreur C0218 sinon)
+    - CODE/B_AU_SECURITE/GVL_Safety_Emergency.st
     - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/B_AU_SECURITE/tests/test_fb_safety_emergency.st
 

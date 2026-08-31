@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T06:51:18.151560" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T06:51:18.151560">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T14:23:51.966428" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T14:23:51.966428">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -698,6 +698,30 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Impulsion de réarmement puissance</xhtml>
               </documentation>
             </variable>
+            <variable name="TestCutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Test de redondance AU en cours (canal A ou B coupé)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requête coupure métier (TRUE = arrêt d'urgence)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimChainOkBit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimEncoderSpeedFactor">
               <type>
                 <REAL />
@@ -1359,11 +1383,14 @@ Operator.JOY1_DeviceState := DEVICE_STATE.RUNNING; // État device RUNNING
 {region "§5 Simulation securite et image machine"}
 // ── 4. MODÈLE SÉCURITÉ &amp; COMMUNS MACHINE ─────────────────────────────────────
 instSimSafety(
-    Enable           := TRUE,
-    PowerCutOff_A    := PowerKeepAlive_A,
-    PowerCutOff_B    := PowerKeepAlive_B,
-    EmergencyArming  := EmergencyArming_RQ,
-    BtnEmergencyStop := BtnEmergencyStop
+    Enable            := TRUE,
+    SimChainOkBit     := SimChainOkBit,
+    PowerCutOff_A     := PowerKeepAlive_A,
+    PowerCutOff_B     := PowerKeepAlive_B,
+    PowerCutOffRequest:= PowerCutOffRequest,
+    EmergencyArming   := EmergencyArming_RQ,
+    BtnEmergencyStop  := BtnEmergencyStop,
+    TestCutActive     := TestCutActive
 );
 
 Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
@@ -2277,6 +2304,14 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Activation de la simulation</xhtml>
               </documentation>
             </variable>
+            <variable name="SimChainOkBit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Bit opérateur : TRUE = simuler chaîne AU fermée</xhtml>
+              </documentation>
+            </variable>
             <variable name="PowerCutOff_A">
               <type>
                 <BOOL />
@@ -2293,6 +2328,14 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Commande coupure canal B (TRUE = OK/fermé)</xhtml>
               </documentation>
             </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Requête coupure métier (TRUE = arrêt d'urgence)</xhtml>
+              </documentation>
+            </variable>
             <variable name="EmergencyArming">
               <type>
                 <BOOL />
@@ -2307,6 +2350,14 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Force l'ouverture de la boucle (TRUE = bouton appuyé/défaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestCutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Test de redondance en cours (canal A ou B coupé par le FB AU)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -2337,24 +2388,147 @@ ReturningActive := (State = CST_ST_FALL) OR (State = CST_ST_OVERSHOOT);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémorisation de l'auto-maintien du contacteur</xhtml>
               </documentation>
             </variable>
+            <variable name="ChainOpenReq">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande brute d'ouverture de la chaîne (bit off / coup-de-poing / test / coupure)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ChainOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] État latche de la chaîne (TRUE = ouverte)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorEngageReq">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande d'engagement du contacteur (pulse ET chaîne saine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonChainOpen">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation d'ouverture de la chaîne (retombée relais)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonChainClose">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de fermeture de la chaîne (retombée relais)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonContactorEngage">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation d'engagement du contacteur (temps de collage bobine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonContactorDrop">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation de retombée du contacteur (temps de décollage bobine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ChainOpenDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPORISATIONS PHYSIQUES SIMULÉES (compatibles séquence FB AU) ===
+⚠️ Doivent rester &lt; durées de la séquence FB AU (CST_TestDuration=200ms, CST_ArmingPulseDuration=1s,
+CST_ArmingConfirmTimeout=2s) pour que le test de redondance et la confirmation contacteur
+restent validés : ouverture/fermeture chaîne &lt; 200ms, engagement contacteur &lt; 1s.
+Temps de retombée relais AU (ouverture chaîne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ChainCloseDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de retombée relais AU (fermeture chaîne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ContactorEngageDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de collage bobine contacteur (engagement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ContactorDropDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de décollage bobine contacteur (retombée)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 FB_Sim_Safety — Simulation de la chaîne d'AU et du contacteur de puissance
    ───────────────────────────────────────────────────────────────
-   📥 Enable          : activation de la simulation (SimulationModeActive AND NOT SensorEmergencyStopChainIsReal)
-   📥 PowerCutOff_A   : demande de coupure PLC canal A (maintenu à TRUE en marche normale)
-   📥 PowerCutOff_B   : demande de coupure PLC canal B (maintenu à TRUE en marche normale)
-   📥 EmergencyArming : impulsion de réarmement (EmergencyArming_RQ)
-   
-   📤 SimChainOk      : simulation de la boucle AU (boutons relâchés et coupures PLC inactives)
-   📤 SimContactorOk  : simulation du contacteur engagé (PowerContactorEngaged)
-   
-   ⚙️ Logique physique :
-      - La chaîne d'AU (SimChainOk) est saine si les deux relais PLC de coupure sont maintenus fermés (TRUE).
-      - Le contacteur s'engage (SimContactorOk) lors d'une impulsion de réarmement (EmergencyArming) 
-        et s'auto-maintient tant que la chaîne reste saine (SimChainOk).
-      - Toute coupure de la chaîne (SimChainOk = FALSE) fait retomber immédiatement le contacteur.
+   📥 Enable            : activation de la simulation (SimulationModeActive AND NOT SensorEmergencyStopChainIsReal)
+   📥 SimChainOkBit     : bit opérateur — TRUE = simuler la chaîne AU fermée ; FALSE = chaîne ouverte (non simulée)
+   📥 PowerCutOff_A     : demande de coupure PLC canal A (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
+   📥 PowerCutOff_B     : demande de coupure PLC canal B (TRUE = OK/fermé) — conservé pour interface, non utilisé par SimChainOk
+   📥 PowerCutOffRequest: requête de coupure métier (PowerCutOffRequest du FB AU) — TRUE = arrêt d'urgence (chaîne ouverte)
+   📥 EmergencyArming   : impulsion de réarmement (EmergencyArming_RQ)
+   📥 BtnEmergencyStop   : appui coup-de-poing AU (TRUE = boucle ouverte)
+   📥 TestCutActive     : test de redondance en cours (canal A ou B coupé par le FB AU)
+
+   📤 SimChainOk        : simulation de la boucle AU (fermée si SimChainOkBit, ouverte sur coup-de-poing/test/coupure)
+   📤 SimContactorOk    : simulation du contacteur engagé (PowerContactorEngaged)
+
+   ⚙️ MÉCANISME GRANULAIRE (contrôle opérateur de la chaîne AU) :
+      - `SimChainOkBit` pilote la chaîne : FALSE → chaîne OUVERTE (on ne peut pas armer) ;
+        TRUE → chaîne FERMÉE (le bouton Armable s'active, on arme, la séquence teste les sorties).
+      - Pendant le test de redondance (TestCutActive), la chaîne CLIGNOTE (s'ouvre pendant TEST_A/B,
+        se referme pendant RESTORE_A/B) puis revient à 1 — comme en réel.
+      - `PowerCutOffRequest` (coupure métier) ouvre la chaîne → ARRÊT D'URGENCE.
+      - `BtnEmergencyStop` (coup-de-poing) ouvre la chaîne.
+      - Le contacteur ne s'engage QUE pendant l'impulsion d'armement (EmergencyArming), avec une
+        temporisation d'engagement (CST_ContactorEngageDelay), puis s'auto-maintient tant que la
+        chaîne est saine ; il retombe (CST_ContactorDropDelay) dès que la chaîne s'ouvre.
+      - À la ré-entrée en simulation (Enable FALSE→TRUE), SimChainOkBit = FALSE → chaîne OUVERTE et
+        contacteur NON engagé (on n'a pas armé) — pas de faux « OK » immédiat.
+
+   🔒 NON-RÉGRESSION ARMEMENT (dépendance circulaire) :
+      - La chaîne n'est PAS fermée par défaut : elle est fermée UNIQUEMENT si l'opérateur pose
+        `SimChainOkBit`. Elle ne dépend PAS de PowerCutOff_A/B (qui sont dans le cercle) : le
+        réarmement après échec de test de redondance (RedundancyTestFailedCause laté → PowerCutOff_A=FALSE)
+        reste possible car la chaîne est maintenue fermée par le bit opérateur, pas par le PLC.
+      - L'ouverture « PLC coupe un canal » est représentée par TestCutActive (test redondance) et
+        PowerCutOffRequest (coupure métier) — jamais par PowerCutOff_A/B seuls.
    ═══════════════════════════════════════════════════════════════
    📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md</xhtml>
           </documentation>
@@ -2369,35 +2543,77 @@ IF NOT Enable THEN
     SimChainOk     := FALSE;
     SimContactorOk := FALSE;
     ContactorLatch := FALSE;
+    ChainOpen      := TRUE; // Chaîne ouverte par défaut à la ré-entrée (on n'a pas armé)
+    ChainOpenReq   := FALSE;
+    ContactorEngageReq := FALSE;
+    TonChainOpen(IN := FALSE);
+    TonChainClose(IN := FALSE);
+    TonContactorEngage(IN := FALSE);
+    TonContactorDrop(IN := FALSE);
     RETURN;
 END_IF;
 {endregion}
 
-{region "§2 Chaîne AU"}
-// 1. La chaîne AU est saine si le PLC maintient les deux relais de coupure de puissance
-// AND if no emergency stop button is pressed (BtnEmergencyStop is FALSE).
-// 🔧 DEADLOCK SIMULATION (corrigé) : sur machine réelle, la boucle AU se ferme
-// physiquement au relâchement du coup-de-poing (indépendant du PLC). En simulation,
-// l'ancien modèle exigeait le maintien actif du PLC (PowerCutOff_A/B) pour fermer la
-// chaîne, or ce maintien dépend lui-même de la chaîne fermée à l'IDLE
-// (Maintain_ChainOk = EmergencyChainClosed, FB_Safety_EmergencyManagement.st:385)
-// → dépendance circulaire : SimChainOk reste FALSE, l'AU ne peut jamais s'armer.
-// Correction : chaîne « fermée par défaut » en simulation (défaut = TRUE, coup-de-poing
-// relâché), qui retombe dès qu'un canal est coupé (test redondance A/B) ou que le
-// coup-de-poing est appuyé. Hors simulation (Enable=FALSE), la chaîne reste pilotée par
-// le matériel via le repli HwReal (PRG_02 §1/§2) — aucune régression sécurité réelle.
-SimChainOk := TRUE; // 🔧 Chaîne fermée par défaut en simulation (coup-de-poing relâché)
-IF NOT PowerCutOff_A OR NOT PowerCutOff_B OR BtnEmergencyStop THEN
-    SimChainOk := FALSE; // Coupure canal (test redondance) ou appui coup-de-poing → boucle ouverte
+{region "§2 Chaîne AU (contrôle granulaire + dynamique)"}
+// 1. La chaîne AU est saine si l'opérateur la simule fermée (SimChainOkBit = TRUE) ET si aucun
+//    événement ne l'ouvre : coup-de-poing (BtnEmergencyStop), test de redondance (TestCutActive),
+//    coupure métier (PowerCutOffRequest).
+// 🔧 DEADLOCK SIMULATION (corrigé) : la chaîne n'est PAS fermée par défaut ni dépendante de
+//    PowerCutOff_A/B (qui sont dans le cercle). Elle est fermée UNIQUEMENT par le bit opérateur
+//    `SimChainOkBit`. Le réarmement après échec de test de redondance (RedundancyTestFailedCause laté
+//    → PowerCutOff_A=FALSE) reste possible car la chaîne est maintenue fermée par le bit, pas par
+//    le PLC. Hors simulation (Enable=FALSE), la chaîne reste pilotée par le matériel via le repli
+//    HwReal (PRG_02 §1/§2) — aucune régression sécurité réelle.
+// 🆕 DYNAMIQUE : l'ouverture/fermeture suit une temporisation (CST_ChainOpenDelay / CST_ChainCloseDelay)
+//    qui simule le temps de retombée des relais AU, tout en restant &lt; 200ms (CST_TestDuration) pour
+//    ne pas fausser le test de redondance. Pendant le test, la chaîne clignote (s'ouvre en TEST_A/B,
+//    se referme en RESTORE_A/B) puis revient à 1.
+ChainOpenReq := (NOT SimChainOkBit) OR BtnEmergencyStop OR TestCutActive OR PowerCutOffRequest;
+
+// Temporisation d'ouverture : la chaîne s'ouvre après CST_ChainOpenDelay de demande soutenue
+TonChainOpen(IN := ChainOpenReq, PT := CST_ChainOpenDelay);
+// Temporisation de fermeture : la chaîne se ferme après CST_ChainCloseDelay d'absence de demande
+TonChainClose(IN := NOT ChainOpenReq, PT := CST_ChainCloseDelay);
+
+// Latch de la chaîne avec temporisations (défaut = ouverte à la ré-entrée)
+IF ChainOpenReq THEN
+    IF TonChainOpen.Q THEN
+        ChainOpen := TRUE;
+    END_IF;
+ELSE
+    IF TonChainClose.Q THEN
+        ChainOpen := FALSE;
+    END_IF;
 END_IF;
+
+SimChainOk := NOT ChainOpen;
 {endregion}
 
-{region "§3 Auto-maintien contacteur"}
-// 2. Logique d'auto-maintien (latch) du contacteur avec priorité à la coupure
+{region "§3 Auto-maintien contacteur (dynamique réaliste)"}
+// 2. Logique d'auto-maintien (latch) du contacteur avec priorité à la coupure.
+// 🆕 DYNAMIQUE : le contacteur ne s'engage QUE pendant l'impulsion d'armement (EmergencyArming)
+//    tant que la chaîne est saine, après CST_ContactorEngageDelay (temps de collage bobine), puis
+//    s'auto-maintient. Il retombe après CST_ContactorDropDelay (temps de décollage bobine) dès que
+//    la chaîne s'ouvre — comme une bobine réelle qui décolle sans alimentation. Ces temporisations
+//    restent &lt; CST_ArmingPulseDuration (1s) et CST_ArmingConfirmTimeout (2s) pour que la
+//    confirmation contacteur reste validée. À la ré-entrée en simulation, le contacteur est NON
+//    engagé (on n'a pas armé).
+ContactorEngageReq := EmergencyArming AND SimChainOk;
+
+// Temporisation d'engagement : le contacteur se colle après CST_ContactorEngageDelay de pulse soutenu
+TonContactorEngage(IN := ContactorEngageReq, PT := CST_ContactorEngageDelay);
+// Temporisation de retombée : le contacteur décolle après CST_ContactorDropDelay de chaîne ouverte
+TonContactorDrop(IN := NOT SimChainOk, PT := CST_ContactorDropDelay);
+
+// Latch du contacteur avec priorité à la coupure (retombée &gt; engagement)
 IF NOT SimChainOk THEN
-    ContactorLatch := FALSE;
-ELSIF EmergencyArming THEN
-    ContactorLatch := TRUE;
+    IF TonContactorDrop.Q THEN
+        ContactorLatch := FALSE;
+    END_IF;
+ELSIF ContactorEngageReq THEN
+    IF TonContactorEngage.Q THEN
+        ContactorLatch := TRUE;
+    END_IF;
 END_IF;
 
 // Recopie vers la sortie

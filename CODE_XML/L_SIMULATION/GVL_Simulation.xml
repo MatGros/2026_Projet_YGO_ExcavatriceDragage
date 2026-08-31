@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:53:37.069782" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:53:37.069782">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T14:23:59.434166" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T14:23:59.434166">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -293,6 +293,19 @@ Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
 TRUE = Kobold détecte un contact fond simulé</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimChainOk">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Contrôle granulaire de la chaîne AU : TRUE = simuler la chaîne fermée (on peut armer) ;
+FALSE = chaîne ouverte (on ne peut pas armer). Défaut FALSE → à la ré-entrée en simu,
+la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
           </documentation>
         </variable>
         <addData>

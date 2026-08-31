@@ -101,6 +101,7 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimJoystickBagotement_Active := FALSE;
     GVL_Simulation.SimEncoderSpeedFactor := 1.0;
     GVL_Simulation.SimTopPositionActive := FALSE;
+    GVL_Simulation.SimChainOk := FALSE; // Chaîne AU ouverte à la ré-entrée (on n'a pas armé)
     GVL_Simulation.SimSyncDeviationInjectM1 := FALSE;
     GVL_Simulation.SimSyncDeviationInjectM2 := FALSE;
     GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
@@ -272,6 +273,13 @@ instSimBench(
     // inter-POU ArmPulse est observée avec un cycle de retard dans la tâche.
     EmergencyArming_RQ       := PRG_06_Outputs.Data.EmergencyArmingCmd
                                  OR (PRG_06_Outputs.EmergencyState.Step = 5),
+    // 🧪 Test de redondance AU : la simulation ouvre la boucle (SimChainOk=FALSE) pendant
+    // le test A/B pour que le FB AU valide la chute de chaîne (cercle cassé, voir FB_Sim_Safety).
+    TestCutActive            := PRG_06_Outputs.Data.TestCutActive,
+    // 🛑 Coupure métier : la simulation ouvre la chaîne AU (arrêt d'urgence) sur PowerCutOffRequest.
+    PowerCutOffRequest       := PRG_06_Outputs.Data.PowerCutOffRequest,
+    // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
+    SimChainOkBit            := GVL_Simulation.SimChainOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
     CfgTopSensorRawPos       := REAL_TO_UDINT(_WinchM1CfgPersist.CfgTopSensorPos_M
                                  * (UDINT_TO_REAL(ENCODER_POINTS_PER_REV) / WINCH_CABLE_M_PER_REV)),
