@@ -69,7 +69,7 @@ VAR
     M3_ConfirmedMoving   : BOOL;
 
     // 🕵️ Trace de blocage terrain (publiée via Data.TranslationTrace, consommée FB_TroubleshootingView)
-    TraceTranslation           : ST_TraceTranslation;        // . [LOC] Trace blocage translation M3
+    TranslationTrace           : ST_TraceTranslation;        // . [LOC] Trace blocage translation M3
     TraceTranslation_PrevReason : E_TranslationTraceBlockReason; // . [LOC] Cause précédente M3 (détection de changement)
 END_VAR
 

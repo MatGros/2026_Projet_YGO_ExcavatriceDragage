@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:22:14.245502" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:22:14.245502">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:21:55.870521" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:21:55.870521">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1661,6 +1661,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Echec rearmement contacteur AU (lisee -&gt; message explicite)</xhtml>
               </documentation>
             </variable>
+            <variable name="LastAbortCause">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Cause du dernier abandon de sequence AU (T173 : message explicite cause+action)</xhtml>
+              </documentation>
+            </variable>
             <variable name="AlarmHoldTime">
               <type>
                 <TIME />
@@ -1802,6 +1810,38 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] §4 Action opérateur (critique → direct, warning → maintenu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastAbortEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant LastAbortCause (T173 : nouvel abandon AU)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonAbortHold">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien du message d'abandon AU (T173)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbortMsgActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Message d'abandon AU affiché (fenêtre de maintien)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AbortMsgText">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Texte cause+action du dernier abandon AU</xhtml>
               </documentation>
             </variable>
             <variable name="TonAlarmBanner">
@@ -2044,6 +2084,17 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-clignotement warnings/états (AF-07 §5.3)</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_AbortHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#5s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien message d'abandon AU (T173)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_NbMaxAlarmes">
               <type>
                 <INT />
@@ -2266,6 +2317,35 @@ END_IF;
 DirectionBlocked := (CurrentDirection &lt; 0 AND NOT DescendPermit)
                 OR (CurrentDirection &gt; 0 AND NOT AscentPermit);
 
+// 🩹 T173 : signaler la cause du dernier abandon de séquence AU (message cause+action),
+// sans modifier le comportement de l'AU. Front sur LastAbortCause -&gt; message maintenu 5s.
+LastAbortEdge(CLK := LastAbortCause);
+IF LastAbortEdge.Q THEN
+    AbortMsgActive := TRUE;
+    TonAbortHold(IN := FALSE);
+END_IF;
+IF AbortMsgActive THEN
+    TonAbortHold(IN := TRUE, PT := CST_AbortHoldTime);
+    IF TonAbortHold.Q THEN
+        AbortMsgActive := FALSE;
+        TonAbortHold(IN := FALSE);
+    END_IF;
+END_IF;
+IF AbortMsgActive THEN
+    CASE LastAbortCause OF
+        16#0001: AbortMsgText := '[AU] Coupure volontaire IHM - relacher le bouton puis rearmer';
+        16#0002: AbortMsgText := '[AU] Chute boucle urgence pendant test - relacher coup-de-poing puis rearmer';
+        16#0004: AbortMsgText := '[AU] Chaine non remontee apres test A (200ms) - verifier boucle puis rearmer';
+        16#0008: AbortMsgText := '[AU] Chaine non remontee apres test B (200ms) - verifier boucle puis rearmer';
+        16#0010: AbortMsgText := '[AU] Coupure securite metier active - lever la cause puis rearmer';
+        16#0020: AbortMsgText := '[AU] Defaut redondance canal A - verifier contacteur puis Reset';
+        16#0040: AbortMsgText := '[AU] Defaut redondance canal B - verifier contacteur puis Reset';
+        16#0080: AbortMsgText := '[AU] Contacteur non engage sous 2s - verifier puis rearmer';
+    ELSE
+        AbortMsgText := '[AU] Rearmement interrompu - verifier et rearmer';
+    END_CASE;
+END_IF;
+
 IF NOT EmergencyChainClosed THEN
     OperatorActionCandidate := '[PUPITRE] Boucle urgence ouverte - réarmer';
 ELSIF NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid THEN
@@ -2286,6 +2366,9 @@ ELSIF RedundancyTestFailed THEN
     OperatorActionCandidate := '[AU] Défaut redondance contacteurs - réarmer (Reset)';
 ELSIF EmergencyArmingFailed THEN
     OperatorActionCandidate := '[AU] Échec réarmement contacteur - réarmer';
+ELSIF AbortMsgActive THEN
+    // 🩹 T173 : cause du dernier abandon de séquence AU (message explicite cause+action)
+    OperatorActionCandidate := AbortMsgText;
 ELSIF NOT PowerContactorEngaged THEN
     OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN

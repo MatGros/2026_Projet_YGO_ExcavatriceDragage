@@ -22,6 +22,43 @@ def load_variable_list(path):
 BATCH_SIZE = 100  # nombre de variables par appel read_values() groupe
 
 
+def read_batch_with_fallback(online_app, batch):
+    """Lit un lot puis isole les chemins fautifs si l'appel groupe echoue.
+
+    L'API scripting CODESYS rejette le lot entier lorsqu'une seule expression est
+    introuvable. L'ancien code recopiait alors la meme erreur sur toutes les lignes,
+    ce qui produisait de faux KO massifs (ex. 100 erreurs pour 1 chemin perime).
+    Le repli conserve l'optimisation par lots pour le cas nominal et relit chaque
+    variable uniquement lorsque cela est necessaire.
+
+    Retourne ``(values, used_fallback)`` avec exactement une valeur par variable.
+    """
+    try:
+        values = list(online_app.read_values(tuple(batch)))
+        if len(values) != len(batch):
+            raise RuntimeError(
+                "read_values a retourne {} valeur(s) pour {} variable(s)".format(
+                    len(values), len(batch)
+                )
+            )
+        return values, False
+    except Exception:
+        values = []
+        for variable in batch:
+            try:
+                single_values = list(online_app.read_values((variable,)))
+                if len(single_values) != 1:
+                    raise RuntimeError(
+                        "read_values a retourne {} valeur(s) pour 1 variable".format(
+                            len(single_values)
+                        )
+                    )
+                values.append(single_values[0])
+            except Exception as variable_error:
+                values.append("ERREUR: " + str(variable_error))
+        return values, True
+
+
 def take_snapshot():
     app = projects.primary.active_application
     online_app = online.create_online_application(app)
@@ -29,16 +66,18 @@ def take_snapshot():
 
     rows = []
     read_time_total = 0.0
+    fallback_batch_count = 0
+    fallback_variable_count = 0
     with online_app:
         if not online_app.is_logged_in:
             online_app.login(OnlineChangeOption.Try, False)
         for i in range(0, len(variables), BATCH_SIZE):
             batch = variables[i:i + BATCH_SIZE]
             t0 = time.time()
-            try:
-                values = online_app.read_values(tuple(batch))
-            except Exception as e:
-                values = ["ERREUR: " + str(e)] * len(batch)
+            values, used_fallback = read_batch_with_fallback(online_app, batch)
+            if used_fallback:
+                fallback_batch_count += 1
+                fallback_variable_count += len(batch)
             read_time_total += time.time() - t0
             rows.extend(zip(batch, values))
 
@@ -68,9 +107,13 @@ def take_snapshot():
     print("📊 Variables lues   : {} / {}".format(len(rows) - error_count, len(rows)))
     if error_count:
         print("⚠️ Variables en KO  : {} (chemins périmés ou non trouvés dans CODESYS)".format(error_count))
-        print("💡 Action requise   : Recompiler le projet CODESYS (Clean & Rebuild) puis ré-exécuter")
+        print("💡 Action requise   : vérifier les chemins KO après Clean & Rebuild CODESYS")
     else:
         print("✨ Intégrité        : 100% des variables lues avec succès")
+    if fallback_batch_count:
+        print("🔎 Repli individuel : {} lot(s), {} variable(s) réévaluée(s)".format(
+            fallback_batch_count, fallback_variable_count
+        ))
     print("⏱️ Temps total      : {:.3f} s (Lecture: {:.3f}s, Écriture: {:.3f}s)".format(
         read_time_total + write_time_total, read_time_total, write_time_total
     ))

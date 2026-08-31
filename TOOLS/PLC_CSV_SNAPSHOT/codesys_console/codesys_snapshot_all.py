@@ -22,19 +22,39 @@ def load_variable_list(path):
         return [line.strip() for line in f if line.strip()]
 
 
+def read_batch_with_fallback(online_app, batch):
+    """Retourne une valeur par chemin, meme si un lot contient un chemin invalide."""
+    try:
+        values = list(online_app.read_values(tuple(batch)))
+        if len(values) != len(batch):
+            raise RuntimeError("nombre de valeurs retourne different du lot")
+        return values, False
+    except Exception:
+        values = []
+        for variable in batch:
+            try:
+                single_values = list(online_app.read_values((variable,)))
+                if len(single_values) != 1:
+                    raise RuntimeError("nombre de valeurs retourne different de 1")
+                values.append(single_values[0])
+            except Exception as variable_error:
+                values.append("ERREUR: " + str(variable_error))
+        return values, True
+
+
 def read_all(online_app, variables):
     rows = []
     read_time = 0.0
+    fallback_batches = 0
     for i in range(0, len(variables), BATCH_SIZE):
         batch = variables[i:i + BATCH_SIZE]
         t0 = time.time()
-        try:
-            values = online_app.read_values(tuple(batch))
-        except Exception as e:
-            values = ["ERREUR: " + str(e)] * len(batch)
+        values, used_fallback = read_batch_with_fallback(online_app, batch)
+        if used_fallback:
+            fallback_batches += 1
         read_time += time.time() - t0
         rows.extend(zip(batch, values))
-    return rows, read_time
+    return rows, read_time, fallback_batches
 
 
 def write_csv(path, rows):
@@ -66,7 +86,7 @@ def take_all_snapshots():
 
         for label, list_file in SNAPSHOTS:
             variables = load_variable_list(list_file)
-            rows, read_time = read_all(online_app, variables)
+            rows, read_time, fallback_batches = read_all(online_app, variables)
             output_path = os.path.join(OUTPUT_DIR, "Snapshot_" + label + "_" + timestamp + ".csv")
             write_time = write_csv(output_path, rows)
 
@@ -76,6 +96,8 @@ def take_all_snapshots():
             outputs.append(output_path)
 
             print(label + " : " + str(len(rows)) + " variables, lecture {:.3f} s, ecriture {:.3f} s".format(read_time, write_time))
+            if fallback_batches:
+                print("  Repli individuel : " + str(fallback_batches) + " lot(s)")
             print("  -> " + output_path)
 
     print("---")

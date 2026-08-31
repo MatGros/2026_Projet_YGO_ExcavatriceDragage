@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:40:17.549439" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:40:17.549439">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:21:30.190569" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:21:30.190569">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2137,7 +2137,7 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="TraceTranslation">
+            <variable name="TranslationTrace">
               <type>
                 <derived name="ST_TraceTranslation" />
               </type>

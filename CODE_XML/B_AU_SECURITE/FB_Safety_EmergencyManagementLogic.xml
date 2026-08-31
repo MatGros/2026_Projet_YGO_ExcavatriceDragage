@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T10:23:33.712893" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T10:23:33.712893">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:19:27.159074" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:19:27.159074">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -227,7 +227,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bitfield cause abandon (16#0001=Cut, 16#0002=Chute chaine pulse/confirm, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=Startup front)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Bitfield cause abandon (16#0001=Cut, 16#0002=Chute chaine pulse/confirm, 16#0004=Timeout A, 16#0008=Timeout B, 16#0010=PowerCutOff, 16#0020=Redondance A, 16#0040=Redondance B, 16#0080=Timeout contacteur)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -697,16 +697,6 @@ IF ArmingSeqStep = 6 THEN
         LastAbortCause := 16#0080; // Defaut confirmation contacteur
         ArmingSeqStep := 0;
     END_IF;
-END_IF;
-
-// 🛑 Reset immédiat des TON si séquence retombée à 0 (évite le piège IEC des timers qui restent Q=TRUE)
-IF ArmingSeqStep = 0 THEN
-    TonTestA(IN := FALSE);
-    TonRestoreA(IN := FALSE);
-    TonTestB(IN := FALSE);
-    TonRestoreB(IN := FALSE);
-    TonArmingPulse(IN := FALSE);
-    TonArmingConfirm(IN := FALSE);
 END_IF;
 
 // ⏱️ Séquence de verrouillage temporel (5s)

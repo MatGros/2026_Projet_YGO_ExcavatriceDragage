@@ -23,14 +23,31 @@ def load_variable_list(path):
         return [line.strip() for line in f if line.strip()]
 
 
+def read_batch_with_fallback(online_app, batch):
+    """Isole les chemins CODESYS invalides au lieu d'empoisonner tout le lot."""
+    try:
+        values = list(online_app.read_values(tuple(batch)))
+        if len(values) != len(batch):
+            raise RuntimeError("nombre de valeurs retourne different du lot")
+        return values
+    except Exception:
+        values = []
+        for variable in batch:
+            try:
+                single_values = list(online_app.read_values((variable,)))
+                if len(single_values) != 1:
+                    raise RuntimeError("nombre de valeurs retourne different de 1")
+                values.append(single_values[0])
+            except Exception as variable_error:
+                values.append("ERREUR: " + str(variable_error))
+        return values
+
+
 def read_all(online_app, variables):
     values = []
     for i in range(0, len(variables), BATCH_SIZE):
         batch = variables[i:i + BATCH_SIZE]
-        try:
-            values.extend(online_app.read_values(tuple(batch)))
-        except Exception as e:
-            values.extend(["ERREUR: " + str(e)] * len(batch))
+        values.extend(read_batch_with_fallback(online_app, batch))
     return values
 
 
