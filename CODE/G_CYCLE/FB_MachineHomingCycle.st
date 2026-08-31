@@ -9,7 +9,7 @@
                  uniquement (aucun redemarrage automatique).
    🔌 Interface : contrat standard (Enable/Reset, Ready/Fault/Lifecycle).
                   Producteur UNIQUE de la qualification machine — ne relit
-                  jamais un ActiveOffsetValid aval (T185 C-3).
+                  jamais un ActiveOffsetValid aval (C).
    📄 Doc metier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
                    + DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
    🧩 Dependances : FB_FaultCore, FB_Encoder (M1/M2), FB_Bucket, FB_Modes
@@ -171,7 +171,7 @@ IF HomingLossLatched AND WinchesMechanicallyStopped THEN
     HomingLossLatched := FALSE;
 END_IF;
 
-(* T185 C-1 : pas de redemarrage automatique. Une perte de datum en mouvement exige un
+(* C : pas de redemarrage automatique. Une perte de datum en mouvement exige un
    acquittement conscient (front Reset) avant que MachineHomed puisse revenir. *)
 IF HomingLossLatched AND NOT ReHomingAckRequired THEN
     ReHomingAckRequired := TRUE;
@@ -198,12 +198,12 @@ instCauses[CAUSE_HOMING_ERROR_M2].Active   := HomingStarted AND M2Status.HomingE
 instCauses[CAUSE_HOMING_ERROR_M2].Latching := TRUE;
 instCauses[CAUSE_HOMING_ERROR_M2].Texte    := 'Erreur de homing codeur M2 pendant le referencement conjoint';
 
-(* T185 C-2 : confirmation Ouverte ET Fermee au meme scan = rejet total, cause a acquitter. *)
+(* C : confirmation Ouverte ET Fermee au meme scan = rejet total, cause a acquitter. *)
 instCauses[CAUSE_DOUBLE_CONFIRM].Active   := DoubleConfirmRequested;
 instCauses[CAUSE_DOUBLE_CONFIRM].Latching := TRUE;
 instCauses[CAUSE_DOUBLE_CONFIRM].Texte    := 'Confirmation benne Ouverte et Fermee simultanee : refusee';
 
-(* T185 C-4.3 : confirmation recue pendant un homing d'axe deja en cours = ignoree. *)
+(* C : confirmation recue pendant un homing d'axe deja en cours = ignoree. *)
 instCauses[CAUSE_CONFIRM_WHILE_HOMING].Active   := ConfirmWhileHoming;
 instCauses[CAUSE_CONFIRM_WHILE_HOMING].Latching := TRUE;
 instCauses[CAUSE_CONFIRM_WHILE_HOMING].Texte    := 'Confirmation benne pendant un homing codeur en cours : ignoree';
@@ -243,7 +243,7 @@ END_IF;
 
 // === 🔑 §4 OUVERTURE DE LA TRANSACTION DE REFERENCEMENT CONJOINT ===
 {region "§4 Ouverture transaction"}
-(* T185 C-4.1 : jamais "au vol" par-dessus un homing d'axe deja en cours.
+(* C : jamais "au vol" par-dessus un homing d'axe deja en cours.
    Demande acceptee uniquement dans la fenetre mecanique sure, front unique, hors double. *)
 IF SingleConfirm AND NOT HomingStarted AND NOT DoubleConfirmRequested AND NOT ConfirmWhileHoming
    AND WindowSafe

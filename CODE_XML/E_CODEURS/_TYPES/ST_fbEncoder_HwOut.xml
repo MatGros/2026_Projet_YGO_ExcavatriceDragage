@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T18:17:05.586294" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T18:17:05.586294">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T03:09:58.965827" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T03:09:58.965827">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -66,7 +66,7 @@
       EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
    🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
       vers le device.
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
         </documentation>
       </dataType>

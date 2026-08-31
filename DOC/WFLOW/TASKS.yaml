@@ -3035,7 +3035,7 @@ tasks:
   - Fiche FB_FaultCore citations alignées (test_fb_faultcore.st) ✅
   bloque_par: []
 - id: T175
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: TREUILS
   agent: Codex — copy-out STruCpp déjà checkpointé ; validation finale à faire
@@ -3059,7 +3059,7 @@ tasks:
   bloque_par: []
 - id: T175-01
   parent_id: T175
-  statut: ⏸️
+  statut: ⛔
   criticite: C0
   domaine: TREUILS
   agent: 'Codex — rework cadrage : bits ErrorId saturés / classe arrêt à trancher'
@@ -3078,10 +3078,11 @@ tasks:
   - Mouvement M2 commandé de la benne sans faux défaut
   - G200, bundle et gates palier C PASS avant clôture
   bloque_par:
-  - visas V3/V5/V6 et essai terrain V7 — voir DECISIONS_T175_C0_VISA_HUMAIN.md
+  - 'C0: visas humains requis (definition glissement M2, doctrine Busy, gate boot,
+    CoherenceLimitM)'
 - id: T175-02
   parent_id: T175
-  statut: ⏸️
+  statut: ⛔
   criticite: C0
   domaine: TREUILS
   agent: 'Codex — challenge C0 : correctif possible après visas précis'
@@ -3100,7 +3101,8 @@ tasks:
   - Mouvement M2 nominal de benne conservé sans faux défaut
   - G200, bundle et gates palier C PASS avant clôture
   bloque_par:
-  - visas V1/V2/V4/V6/V7 — voir DECISIONS_T175_C0_VISA_HUMAIN.md
+  - 'C0: visas humains requis (definition glissement M2, doctrine Busy, gate boot,
+    CoherenceLimitM)'
 - id: T176
   statut: ⏳
   criticite: C4
@@ -3121,7 +3123,7 @@ tasks:
   - TC-P08-020.1/.2 exécutables après fix
   bloque_par: []
 - id: T177
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: TREUILS
   agent: ''
@@ -3142,7 +3144,7 @@ tasks:
   - Fiche FB_Winch alignée au code (note 🆕 activation par défaut)
   bloque_par: []
 - id: T178
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: TREUILS
   agent: Agent externe — implémentation livrée, réception Codex OK ; checkpoint humain
@@ -3808,7 +3810,7 @@ tasks:
   - T181-12
 - id: T181-14
   parent_id: T181
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: MODES
   agent: Agent externe D — implémentation livrée ; bundle et arbitrages A1/A7 en attente
@@ -3871,7 +3873,7 @@ tasks:
   - T181-05
 - id: T181-16
   parent_id: T181
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: TREUILS
   agent: 'Codex — gel audit : apprentissage multi-scan non prouvé par harnais actuel'
@@ -3937,7 +3939,7 @@ tasks:
   bloque_par: []
 - id: T181-18
   parent_id: T181
-  statut: ⬜
+  statut: ✅
   criticite: C1
   domaine: TEST_AUTO_CI
   agent: ''
@@ -4036,7 +4038,7 @@ tasks:
   bloque_par: []
 - id: T181-22
   parent_id: T181
-  statut: ⬜
+  statut: ✅
   criticite: C1
   domaine: DOCUMENTATION
   agent: ''
@@ -4399,7 +4401,7 @@ tasks:
   - T188-E
 - id: T191
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: DOCUMENTATION
   agent: —
@@ -4499,7 +4501,7 @@ tasks:
   bloque_par: []
 - id: T195
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: H_TREUILS_BENNE
   agent: —

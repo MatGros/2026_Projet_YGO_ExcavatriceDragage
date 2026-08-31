@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:33:41.303016" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:33:41.303016">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T03:23:07.823523" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T03:23:07.823523">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -842,7 +842,7 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
        FB_Safety_Winch / FB_Winch.
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔒 Bit-identique à l'ancien PRG_04 §3 (refactor POO).
-   🪜 T190-B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
+   🪜 -B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
        pourcentage. En SEMI_AUTO, passthrough de ReqWinch.StepTgt ; en manuel,
        le joystick est le producteur UNIQUE du palier (passthrough de
        Joystick.AxisY.StepTgt), boutons/both = palier 5 (pleine vitesse).

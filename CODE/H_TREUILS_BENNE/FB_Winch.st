@@ -60,7 +60,7 @@ VAR_OUTPUT
     DirectionChangeDelayElapsed     : TIME;                           // <-- [DIAG] Ecoule delai changement de sens
     DirectionChangePending          : BOOL;                           // <-- [DIAG] Changement de sens en attente
 
-    // === INTENTION DE MAINTIEN DU CONTACTEUR DE SENS (§3bis / T181-01) ===
+    // === INTENTION DE MAINTIEN DU CONTACTEUR DE SENS (§3bis) ===
     SenseHoldRequest                : BOOL;                           // <-- [ACT] Demande a la barriere finale de TENIR le contacteur de sens apres chute de palier a 0 (inertie moteur), bornee par T_hold_internal
 END_VAR
 VAR
@@ -81,7 +81,7 @@ VAR
     ActiveMaxStep                   : INT;                            // . [LOC] Plafond palier actif dynamique
     EffectiveStepRampDelay          : TIME;                           // . [LOC] Cadence palier selon sens, distincte interlock
 
-    // === MAINTIEN DU CONTACTEUR DE SENS (§3bis / T181-01) ===
+    // === MAINTIEN DU CONTACTEUR DE SENS (§3bis) ===
     SenseHoldTimer                  : TON;                            // . [LOC] Garde interne T_hold_internal (< MaxSenseHoldTime barriere)
     SenseHoldActiveInt              : BOOL;                           // . [LOC] Maintien de sens interne en cours
     PrevStepNumber                  : INT;                            // . [LOC] Palier temporise du scan precedent (detection chute a 0)
@@ -116,7 +116,7 @@ END_IF;
 // mais ne produit plus ce defaut.
 instCauses[1].Active   := FALSE;
 instCauses[1].Latching := TRUE;
-instCauses[1].Texte    := 'Contacteur colle gere par FB_Safety_Winch (T181-08)';
+instCauses[1].Texte    := 'Contacteur colle gere par FB_Safety_Winch ';
 
 instCauses[2].Active   := SpeedStepConfigFaultLatched;
 instCauses[2].Latching := TRUE;
@@ -200,7 +200,7 @@ DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
 {region "§5 Paliers vitesse et contacteurs"}
-// T190-B : la consigne est désormais un PALIER discret (DriveRequest.SpeedStepReq,
+// -B : la consigne est désormais un PALIER discret (DriveRequest.SpeedStepReq,
 // 1..5, 0 = arrêt) produit par l'arbitrage. Plus de décodage %→palier ici.
 IF DirectionChangePending OR (DriveRequest.Direction = 0) OR EffectiveSafeStop OR NOT DriveRequest.StartStop THEN
     RampTargetStep := 0;
@@ -307,7 +307,7 @@ IF Fault.Error THEN
 END_IF;
 {endregion}
 
-{region "§5bis Intention de maintien du contacteur de sens (§3bis / T181-01)"}
+{region "§5bis Intention de maintien du contacteur de sens (§3bis)"}
 // Quand le palier temporise StepNumber vient de retomber a 0 alors qu'un sens etait
 // commande, FB_Winch DEMANDE a la barriere finale (FB_WinchOutputInterlock) de TENIR
 // le contacteur de sens le temps que le moteur ralentisse (inertie). Borne par

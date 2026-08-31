@@ -52,7 +52,7 @@ VAR_INPUT
     MeasuredSpeedMps                : REAL;                           // --> [CFG] Mesure absolue vitesse (m/s)
     MeasuredSpeedSignedMps          : REAL;                           // --> [CFG] Mesure signee vitesse (m/s)
     MeasuredSpeedValid              : BOOL;                           // --> [CFG] Mesure vitesse valide
-    SpeedBandMaxMps                 : REAL;                           // --> [CFG] Seuil survitesse (max bande apprise T181-15, m/s)
+    SpeedBandMaxMps                 : REAL;                           // --> [CFG] Seuil survitesse (max bande apprise , m/s)
     OppositeDirectionTimeout        : TIME := T#500ms;                // --> [CFG] Delai confirmation sens oppose
     NoMovementTimeout               : TIME := T#3s;                   // --> [CFG] Delai confirmation absence mouvement
 
@@ -127,7 +127,7 @@ VAR
     MecaEEscaladeFaultLatched       : BOOL;
     OppositeDirectionFaultLatched   : BOOL;
     NoMovementFaultLatched          : BOOL;
-    OverspeedFaultLatched           : BOOL;                           // . [LOC] Latch survitesse (hors bitfield, T181-16)
+    OverspeedFaultLatched           : BOOL;                           // . [LOC] Latch survitesse (hors bitfield)
 
     // Socle défaut
     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
@@ -332,8 +332,8 @@ IF NOT BypassGlobal THEN
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
 
-    // Survitesse (latch dédié hors bitfield — T181-16, alternative validée).
-    // Seuil = max bande apprise T181-15 (SpeedBandMaxMps). Latché jusqu'au Reset.
+    // Survitesse (latch dédié hors bitfield —, alternative validée).
+    // Seuil = max bande apprise  (SpeedBandMaxMps). Latché jusqu'au Reset.
     // ⚠️ N'alimente PAS PowerCutOff : couper la puissance en survitesse peut
     // provoquer une chute libre de la charge — décision à trancher (ISO 13849).
     IF NOT BypassProcess AND MeasuredSpeedValid AND (ABS(MeasuredSpeedMps) > SpeedBandMaxMps) THEN
