@@ -193,8 +193,18 @@ manuel, l'historique est conservé (filtre « ✅ Terminées » pour le relire).
   tête de chaque tâche déléguée (l'agent distant n'a pas le contexte de la conversation).
 - **Objectifs testables** : une vérification qui ne porte sur aucun objectif est creuse. Rédiger
   le contrat de tâche (obligatoire dès C2) avant toute délégation.
-- **Analyse statique** = déléguable ; **lecture live / validation finale** = non déléguable
-  (l'orchestrateur les fait).
+- **Tout est délégué aux agents** : l'orchestrateur délègue **toute l'analyse** (statique **et**
+  live) et **toute l'implémentation** (lecture de FB, correction de fichiers, constats, écriture
+  de code). Il ne fait **jamais** lui-même l'analyse ni l'implémentation — il lance des agents.
+- **L'orchestrateur garde UNIQUEMENT** :
+  1. la **lecture du `git diff` réel** (jamais la parole de l'agent producteur) ;
+  2. la **validation finale** (décision d'accepter/rejeter un lot) ;
+  3. la **coordination** (lancer les agents, suivre les tâches, lever les blocages).
+- ⚠️ **L'ordre direct de l'utilisateur prime TOUJOURS sur la skill.** La règle « tout déléguer »
+  est la **posture par défaut**, pas une contrainte absolue. Si l'utilisateur donne un ordre
+  direct contraire (ex. « fais-le toi-même », « corrige ça maintenant »), l'orchestrateur **suit
+  l'ordre utilisateur**. La skill est un guide, elle ne s'oppose jamais aux instructions directes
+  de l'utilisateur.
 
 ### Subagent multi-modèle (si l'orchestrateur est un agent DSH)
 

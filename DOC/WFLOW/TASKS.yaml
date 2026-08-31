@@ -4508,10 +4508,10 @@ tasks:
   bloque_par: []
 - id: T192-A
   parent_id: T192
-  statut: ⬜
+  statut: ✅
   criticite: C1
   domaine: TEST_AUTO_CI
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T02:45:00+02:00'
   titre: TC S1 manquant — Abort+Start avec Fault.Latched actif → reste en X0
   contexte: 'Trou de couverture TC détecté par le challenge T192 (651f7bca) : aucun
@@ -4629,7 +4629,7 @@ tasks:
   bloque_par: []
 - id: T197
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: IHM / SUPERVISION
   agent: DSH (DeepSeek)
@@ -4658,10 +4658,10 @@ tasks:
   bloque_par: []
 - id: T198
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: STANDARDS
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
   titre: Audit gestion des constantes (VAR CONSTANT) dans le projet
   contexte: 'Demande utilisateur 2026-08-31 : « je veux pas de constante dans le projet
@@ -4685,10 +4685,10 @@ tasks:
   bloque_par: []
 - id: T199
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: SÉCURITÉ
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
   titre: Challenge lisibilité FB_Safety_EmergencyManagement (refactoré, chargé)
   contexte: 'Retour utilisateur 2026-08-31 : le FB refactoré FB_Safety_EmergencyManagement
@@ -4709,10 +4709,10 @@ tasks:
   bloque_par: []
 - id: T200
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: SÉCURITÉ
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
   titre: Revue technique coding FB_Safety_EmergencyManagement — mapping, code mort, refactor
   contexte: 'Demande utilisateur 2026-08-31 : revue technique coding du FB_Safety_EmergencyManagement
@@ -4735,10 +4735,10 @@ tasks:
   bloque_par: []
 - id: T201
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: STANDARDS
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
   titre: Audit usages HEXA (16#xxxx) dans CODE/ + refactor INT + règle convention
   contexte: 'Demande utilisateur 2026-08-31 : grep tout le code pour trouver les occurrences
@@ -4759,10 +4759,10 @@ tasks:
   bloque_par: []
 - id: T201-A
   parent_id: T201
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: STANDARDS
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
   titre: 'T201 Phase A — Règle NC-120 (préférer INT à HEX sauf exception) dans NAMING_CONVENTION'
   contexte: 'Plan phasé T201 (challenge b9022e53) : Phase A = documentation. Règle NC-120
@@ -4781,10 +4781,10 @@ tasks:
   - T201
 - id: T201-B
   parent_id: T201
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: STANDARDS
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
   titre: 'T201 Phase B — Aligner FB_DiveSearch OperatorActionId en hex (représentation)'
   contexte: 'Plan phasé T201 (challenge b9022e53) : Phase B = aligner la base bit-codée.
@@ -4803,10 +4803,10 @@ tasks:
   - T201
 - id: T201-C
   parent_id: T201
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: STANDARDS
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
   titre: 'T201 Phase C — Remises à zéro 16#0000 → 0'
   contexte: 'Plan phasé T201 (challenge b9022e53) : Phase C = remises à zéro. Remplacer
@@ -4822,10 +4822,10 @@ tasks:
   - T201
 - id: T201-D
   parent_id: T201
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: STANDARDS
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
   titre: 'T201 Phase D — Promouvoir CST_ABORT_* en GVL + consommateur FB_Hmi_BannerFormatter'
   contexte: 'Plan phasé T201 (challenge b9022e53) : Phase D = promotion CST_ABORT_*.
@@ -4847,10 +4847,10 @@ tasks:
   - T201
 - id: T201-F
   parent_id: T201
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: STANDARDS
-  agent: —
+  agent: DSH (DeepSeek)
   date: '2026-08-31T00:00:00'
   titre: 'T201 Phase F — Revue finale diff + non-régression (R1→R7)'
   contexte: 'Plan phasé T201 (challenge b9022e53) : Phase F = revue finale indépendante.

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T12:32:39.163825" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T12:32:39.163825">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T12:42:33.487154" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T12:42:33.487154">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -30,7 +30,7 @@
   </instances>
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
-      <globalVars name="GVL_Safety_Emergency_Constants" constant="true">
+      <globalVars name="GVL_Safety_Emergency" constant="true">
         <variable name="CST_STEP_IDLE">
           <type>
             <INT />
@@ -213,12 +213,12 @@ Aucun abandon</xhtml>
         </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>4a06a006-d4b4-5486-9390-2bd7d17e0c27</ObjectId>
+            <ObjectId>4c1d6ed9-e9d0-5144-9983-81c9c43bae47</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🛡️ GVL_Safety_Emergency_Constants — Constantes globales chaîne AU
+   🛡️ GVL_Safety_Emergency — Constantes globales chaîne AU
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Constantes symboliques de la séquence de réarmement AU —
       étapes CST_STEP_* et causes d'abandon CST_ABORT_* — partagées
@@ -237,7 +237,7 @@ Aucun abandon</xhtml>
     <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
       <ProjectStructure>
         <Folder Name="B_AU_SECURITE">
-          <Object Name="GVL_Safety_Emergency_Constants" ObjectId="4a06a006-d4b4-5486-9390-2bd7d17e0c27" />
+          <Object Name="GVL_Safety_Emergency" ObjectId="4c1d6ed9-e9d0-5144-9983-81c9c43bae47" />
         </Folder>
       </ProjectStructure>
     </data>

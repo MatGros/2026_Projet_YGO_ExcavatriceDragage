@@ -57,7 +57,7 @@ VAR
     EmergencyArmingLockoutActive : BOOL; // . [LOC] Verrouillage temporel 5s entre essais
     RedundancyTestFailed      : BOOL; // . [LOC] Defaut auto-test affiche (Cause lissee OR NOT Ack)
     EmergencyArmingFailed     : BOOL; // . [LOC] Defaut rearmement affiche (Cause lissee OR NOT Ack)
-    Armable                   : BOOL; // . [LOC] Rearmement possible actuellement
+    Armable                   : BOOL; // . [LOC] Rearmement possible actuellement (= ArmRequestAllowed, aligne IHM/armement)
     ArmingBusy                : BOOL; // . [LOC] Sequence ou lockout en cours
     LastAbortStep             : INT;  // . [LOC] Etape sequence lors du dernier abandon (0 a 6)
     LastAbortCause            : WORD; // . [LOC] Bitfield cause abandon (voir constantes CST_ABORT_*)
@@ -68,7 +68,7 @@ VAR
     ArmRequestAllowed         : BOOL; // . [LOC] Rearmement autorise (front ArmRequest + preconditions)
     Armable_ChainOk           : BOOL; // . [LOC] Boucle fermee + pas de coupure IHM/metier
     Armable_Idle              : BOOL; // . [LOC] Sequence au repos
-    Armable_NoBlock           : BOOL; // . [LOC] Pas de lockout, pas de cause redondance, contacteur au repos
+    Armable_NoBlock           : BOOL; // . [LOC] Pas de lockout, contacteur au repos (aligne sur ArmRequestAllowed)
     Maintain_ChainOk          : BOOL; // . [LOC] Boucle fermee OU sequence en cours (maintien A/B)
     Maintain_NoCutOff         : BOOL; // . [LOC] Pas de coupure metier ni IHM (maintien A/B)
     MaintainA_NoFault         : BOOL; // . [LOC] Pas de forcage A ni cause redondance
@@ -101,7 +101,7 @@ VAR CONSTANT
 
     // === ETAPES SEQUENCE & CAUSES D'ABANDON ===
     // ⚠️ CST_STEP_* (0..6) et CST_ABORT_* (bitfield) sont déclarées en
-    //    VAR_GLOBAL CONSTANT dans GVL_Safety_Emergency_Constants (conformité IEC :
+    //    VAR_GLOBAL CONSTANT dans GVL_Safety_Emergency (conformité IEC :
     //    CODESYS refuse les constantes locales d'un FUNCTION_BLOCK comme étiquettes
     //    de CASE — erreur C0218). Références symboliques inchangées ci-dessous.
 END_VAR
@@ -336,7 +336,12 @@ END_IF;
 IF Enable THEN
     Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
-    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT RedundancyTestFailedCause AND NOT PowerContactorEngaged;
+    // ⚠️ Armable_NoBlock SANS `NOT RedundancyTestFailedCause` : aligné sur ArmRequestAllowed (§5).
+    //    La cause de redondance est latée mais la séquence d'armement la re-teste (§5 étape 1/3) :
+    //    l'armement reste donc réellement possible (et sûr) tant que les autres préconditions
+    //    sont réunies. Afficher le bouton « Armable » sur cette cause seule bloquait le réarmement
+    //    après acquittement (Reset ne purge pas la Cause, cf. §4) alors que l'armement était permis.
+    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
     Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
 
     ArmingBusy := (ArmingSeqStep <> CST_STEP_IDLE) OR EmergencyArmingLockoutActive;

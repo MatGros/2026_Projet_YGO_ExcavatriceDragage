@@ -1,5 +1,5 @@
 (* ═══════════════════════════════════════════════════════════════
-   🛡️ GVL_Safety_Emergency_Constants — Constantes globales chaîne AU
+   🛡️ GVL_Safety_Emergency — Constantes globales chaîne AU
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Constantes symboliques de la séquence de réarmement AU —
       étapes CST_STEP_* et causes d'abandon CST_ABORT_* — partagées

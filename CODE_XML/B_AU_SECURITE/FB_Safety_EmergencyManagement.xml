@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T12:31:33.274426" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T12:31:33.274426">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T13:03:57.419185" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T13:03:57.419185">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -376,7 +376,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant : chain OK, step=0, pas de lockout, pas de defaut redondance</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Rearmement possible maintenant (= ArmRequestAllowed) : chain OK, step=0, pas de lockout</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -648,7 +648,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rearmement possible actuellement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Rearmement possible actuellement (= ArmRequestAllowed, aligne IHM/armement)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingBusy">
@@ -721,7 +721,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de lockout, pas de cause redondance, contacteur au repos</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pas de lockout, contacteur au repos (aligne sur ArmRequestAllowed)</xhtml>
               </documentation>
             </variable>
             <variable name="Maintain_ChainOk">
@@ -1173,7 +1173,12 @@ END_IF;
 IF Enable THEN
     Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
-    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT RedundancyTestFailedCause AND NOT PowerContactorEngaged;
+    // ⚠️ Armable_NoBlock SANS `NOT RedundancyTestFailedCause` : aligné sur ArmRequestAllowed (§5).
+    //    La cause de redondance est latée mais la séquence d'armement la re-teste (§5 étape 1/3) :
+    //    l'armement reste donc réellement possible (et sûr) tant que les autres préconditions
+    //    sont réunies. Afficher le bouton « Armable » sur cette cause seule bloquait le réarmement
+    //    après acquittement (Reset ne purge pas la Cause, cf. §4) alors que l'armement était permis.
+    Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
     Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
 
     ArmingBusy := (ArmingSeqStep &lt;&gt; CST_STEP_IDLE) OR EmergencyArmingLockoutActive;
