@@ -52,6 +52,7 @@ VAR_INPUT
     MeasuredSpeedMps                : REAL;                           // --> [CFG] Mesure absolue vitesse (m/s)
     MeasuredSpeedSignedMps          : REAL;                           // --> [CFG] Mesure signee vitesse (m/s)
     MeasuredSpeedValid              : BOOL;                           // --> [CFG] Mesure vitesse valide
+    SpeedBandMaxMps                 : REAL;                           // --> [CFG] Seuil survitesse (max bande apprise T181-15, m/s)
     OppositeDirectionTimeout        : TIME := T#500ms;                // --> [CFG] Delai confirmation sens oppose
     NoMovementTimeout               : TIME := T#3s;                   // --> [CFG] Delai confirmation absence mouvement
 
@@ -91,6 +92,7 @@ VAR_OUTPUT
     MecaCDriftM                     : REAL;                           // <-- [DIAG] Derive mesuree Meca C (m)
     MecaBElapsedTime                : TIME;                           // <-- [DIAG] Ecoule confirmation contacteurs/frein
     ContactorStuck                  : BOOL;                           // <-- [DIAG] Contacteur colle (proprietaire unique, re-alimente IHM/Troubleshooting a la phase suivante)
+    OverspeedFault                  : BOOL;                           // <-- [DIAG] Survitesse latchée (acquittée au Reset)
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
@@ -125,6 +127,7 @@ VAR
     MecaEEscaladeFaultLatched       : BOOL;
     OppositeDirectionFaultLatched   : BOOL;
     NoMovementFaultLatched          : BOOL;
+    OverspeedFaultLatched           : BOOL;                           // . [LOC] Latch survitesse (hors bitfield, T181-16)
 
     // Socle défaut
     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
@@ -150,6 +153,7 @@ IF ResetEdge.Q OR BypassGlobal THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    OverspeedFaultLatched         := FALSE;
 END_IF;
 
 IF NOT FirstScanDone THEN
@@ -166,6 +170,7 @@ IF NOT FirstScanDone THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    OverspeedFaultLatched         := FALSE;
 END_IF;
 
 IF NOT BypassGlobal THEN
@@ -327,6 +332,14 @@ IF NOT BypassGlobal THEN
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
 
+    // Survitesse (latch dédié hors bitfield — T181-16, alternative validée).
+    // Seuil = max bande apprise T181-15 (SpeedBandMaxMps). Latché jusqu'au Reset.
+    // ⚠️ N'alimente PAS PowerCutOff : couper la puissance en survitesse peut
+    // provoquer une chute libre de la charge — décision à trancher (ISO 13849).
+    IF NOT BypassProcess AND MeasuredSpeedValid AND (ABS(MeasuredSpeedMps) > SpeedBandMaxMps) THEN
+        OverspeedFaultLatched := TRUE;
+    END_IF;
+
 ELSE
     TonMecaB(IN := FALSE);
     TonMecaD(IN := FALSE);
@@ -340,6 +353,7 @@ END_IF;
 // collage persiste. Le champ ContactorsCheck.StuckClosed de FB_Winch est force a
 // FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
 ContactorStuck := MecaBFaultLatched;
+OverspeedFault := OverspeedFaultLatched;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -372,9 +386,9 @@ Ready := Enable AND NOT Fault.Latched;
 IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
-    SafeStop := (Fault.ErrorId AND 16#FF97) <> 16#0000;
+    SafeStop := ((Fault.ErrorId AND 16#FF97) <> 16#0000) OR OverspeedFaultLatched;
 ELSE
-    SafeStop := (Fault.ErrorId AND 16#FF9F) <> 16#0000;
+    SafeStop := ((Fault.ErrorId AND 16#FF9F) <> 16#0000) OR OverspeedFaultLatched;
 END_IF;
 
 DescendPermit := NOT (

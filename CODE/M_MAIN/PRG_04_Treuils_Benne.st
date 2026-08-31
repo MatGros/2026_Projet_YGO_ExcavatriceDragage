@@ -693,6 +693,7 @@ instSafetyWinchM1(
     MeasuredSpeedMps       := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.EncoderM1.Measurement.SignedSpeed_Mps,
     MeasuredSpeedValid     := PRG_02_Acquisition.Data.EncoderM1.Measurement.SpeedValid,
+    SpeedBandMaxMps        := _WinchSpeedConfig.SpeedBandMaxMps[5],
     // Matrice AF-05 §4bis : TOUT bypass transmis est gaté par (Mode = MAINT_N2).
     // Le bypass commun reste en OR avec l'individuel (pilotage "both"), le gate s'applique
     // ensuite à l'ensemble — la philosophie du câblage d'origine est inchangée.
@@ -753,6 +754,7 @@ instSafetyWinchM2(
     MeasuredSpeedMps       := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps,
     MeasuredSpeedSignedMps := PRG_02_Acquisition.Data.EncoderM2.Measurement.SignedSpeed_Mps,
     MeasuredSpeedValid     := PRG_02_Acquisition.Data.EncoderM2.Measurement.SpeedValid,
+    SpeedBandMaxMps        := _WinchSpeedConfig.SpeedBandMaxMps[5],
     // Matrice AF-05 §4bis (identique à M1 ci-dessus)
     BypassGlobal           := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Global,
     BypassSafety           := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.Safety,

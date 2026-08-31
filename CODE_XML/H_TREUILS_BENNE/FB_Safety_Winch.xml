@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:08:11.970117" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:08:11.970117">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T02:49:13.991330" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T02:49:13.991330">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -522,6 +522,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Mesure vitesse valide</xhtml>
               </documentation>
             </variable>
+            <variable name="SpeedBandMaxMps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil survitesse (max bande apprise T181-15, m/s)</xhtml>
+              </documentation>
+            </variable>
             <variable name="OppositeDirectionTimeout">
               <type>
                 <TIME />
@@ -814,6 +822,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Contacteur colle (proprietaire unique, re-alimente IHM/Troubleshooting a la phase suivante)</xhtml>
               </documentation>
             </variable>
+            <variable name="OverspeedFault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Survitesse latchée (acquittée au Reset)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="DriftGuardA">
@@ -986,6 +1002,14 @@
                 <BOOL />
               </type>
             </variable>
+            <variable name="OverspeedFaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch survitesse (hors bitfield, T181-16)</xhtml>
+              </documentation>
+            </variable>
             <variable name="instFault">
               <type>
                 <derived name="FB_FaultCore" />
@@ -1042,6 +1066,7 @@ IF ResetEdge.Q OR BypassGlobal THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    OverspeedFaultLatched         := FALSE;
 END_IF;
 
 IF NOT FirstScanDone THEN
@@ -1058,6 +1083,7 @@ IF NOT FirstScanDone THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    OverspeedFaultLatched         := FALSE;
 END_IF;
 
 IF NOT BypassGlobal THEN
@@ -1219,6 +1245,14 @@ IF NOT BypassGlobal THEN
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
 
+    // Survitesse (latch dédié hors bitfield — T181-16, alternative validée).
+    // Seuil = max bande apprise T181-15 (SpeedBandMaxMps). Latché jusqu'au Reset.
+    // ⚠️ N'alimente PAS PowerCutOff : couper la puissance en survitesse peut
+    // provoquer une chute libre de la charge — décision à trancher (ISO 13849).
+    IF NOT BypassProcess AND MeasuredSpeedValid AND (ABS(MeasuredSpeedMps) &gt; SpeedBandMaxMps) THEN
+        OverspeedFaultLatched := TRUE;
+    END_IF;
+
 ELSE
     TonMecaB(IN := FALSE);
     TonMecaD(IN := FALSE);
@@ -1232,6 +1266,7 @@ END_IF;
 // collage persiste. Le champ ContactorsCheck.StuckClosed de FB_Winch est force a
 // FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
 ContactorStuck := MecaBFaultLatched;
+OverspeedFault := OverspeedFaultLatched;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -1264,9 +1299,9 @@ Ready := Enable AND NOT Fault.Latched;
 IF NOT PowerContactorEngaged THEN
     SafeStop := TRUE;
 ELSIF NOT SyncEnable THEN
-    SafeStop := (Fault.ErrorId AND 16#FF97) &lt;&gt; 16#0000;
+    SafeStop := ((Fault.ErrorId AND 16#FF97) &lt;&gt; 16#0000) OR OverspeedFaultLatched;
 ELSE
-    SafeStop := (Fault.ErrorId AND 16#FF9F) &lt;&gt; 16#0000;
+    SafeStop := ((Fault.ErrorId AND 16#FF9F) &lt;&gt; 16#0000) OR OverspeedFaultLatched;
 END_IF;
 
 DescendPermit := NOT (
