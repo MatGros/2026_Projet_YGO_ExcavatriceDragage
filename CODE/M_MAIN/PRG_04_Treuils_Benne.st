@@ -247,7 +247,7 @@ MaintN2 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
 // Séquence d'extraction active (mode MAINT + toggle) : gate le permis de montée assistée (§5).
 // Le permis lui-même (AscentPermit) est produit par FB_ExtractionAssist et consommé via le contrat benne.
 ExtractionAssistActive := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                          AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence;
+                          AND GVL_IHM.CycleExtraction.Cmd.TglEnableExtractionSequence;
 
 // Règle absolue en pilotage both normal --
 // descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
@@ -441,8 +441,8 @@ IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
     ControlAscentStartM2PosM := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 END_IF;
 IF ExtractionControlActive THEN
-    IF (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - ControlAscentStartM1PosM) >= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M)
-       AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - ControlAscentStartM2PosM) >= GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M) THEN
+    IF (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - ControlAscentStartM1PosM) >= GVL_IHM.CycleExtraction.Cfg.ExtractionControlDistance_M)
+       AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - ControlAscentStartM2PosM) >= GVL_IHM.CycleExtraction.Cfg.ExtractionControlDistance_M) THEN
         ExtractionControlActive := FALSE;         // Distance de contrôle parcourue : paliers normaux
     ELSIF NOT (WinchBothMotionActive AND (WinchBothMotionDirection = 1)) THEN
         ExtractionControlActive := FALSE;         // Ascending relâchée/interrompue : annule la phase
@@ -553,10 +553,10 @@ IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
    AND (WinchBothMotionDirection = -1)
    AND _BucketState.IsOpen
    AND KoboldAutoStopRiseEdge.Q THEN
-    IF (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM <= _DredgingAssistCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM >= _DredgingAssistCfgPersist.ImmersionLower_M)
-       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM <= _DredgingAssistCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM >= _DredgingAssistCfgPersist.ImmersionLower_M) THEN
+    IF (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM <= _CycleDiveSearchCfgPersist.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM >= _CycleDiveSearchCfgPersist.ImmersionLower_M)
+       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM <= _CycleDiveSearchCfgPersist.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM >= _CycleDiveSearchCfgPersist.ImmersionLower_M) THEN
         KoboldImmersionConfirmed := TRUE;
     END_IF;
 END_IF;

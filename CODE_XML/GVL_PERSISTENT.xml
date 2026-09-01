@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.648128" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.648128">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T01:00:16.208645" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T01:00:16.208645">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -209,6 +209,67 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_CycleAssistToggles">
+        <baseType>
+          <struct>
+            <variable name="TglEnableDiveSearch">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance plongée mémorisé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableExtractionSequence">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance extraction mémorisé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableDumpAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance vidage trémie mémorisé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b8d5367f-703e-50e4-b308-00377a6188b7</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎛️ ST_CycleAssistToggles — Toggles assistance mémorisés au boot
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_CycleCfg">
         <baseType>
           <struct>
@@ -259,7 +320,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_DredgingAssistCfg">
+      <dataType name="ST_CycleDiveSearchCfg">
         <baseType>
           <struct>
             <variable name="DiveStartMin_M">
@@ -295,6 +356,61 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse fenêtre front immersion</xhtml>
               </documentation>
             </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>42ebb53a-45c2-5353-807e-c73f913cfb78</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_CycleDiveSearchCfg — Réglages persistants cycle plongée (DiveSearch)
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleDumpAtTremieCfg">
+        <baseType>
+          <struct>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b2ec5a9c-7e18-56a8-be1d-202932b2b8c1</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_CycleDumpAtTremieCfg — Réglages persistants cycle vidage trémie (legacy)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleExtractionCfg">
+        <baseType>
+          <struct>
             <variable name="ExtractionControlDistance_M">
               <type>
                 <REAL />
@@ -306,39 +422,6 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 avant accélération</xhtml>
               </documentation>
             </variable>
-            <variable name="TglEnableDiveSearch">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance plongée mémorisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableExtractionSequence">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance extraction mémorisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableDumpAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance vidage trémie mémorisé</xhtml>
-              </documentation>
-            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -347,19 +430,19 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pont persistance/IHM initialisé</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
               </documentation>
             </variable>
           </struct>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>87619634-4f54-54d8-88b9-0cd7f0921c36</ObjectId>
+            <ObjectId>4c14feb8-ddba-5e35-a2e4-6711b9795a14</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
+   ⚙️ ST_CycleExtractionCfg — Réglages persistants cycle extraction
    📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
@@ -1601,11 +1684,14 @@ palier : 1..5</xhtml>
               <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
               <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
             </Folder>
+            <Folder Name="5_ASSISTANCE_DRAGAGE">
+              <Object Name="ST_CycleAssistToggles" ObjectId="b8d5367f-703e-50e4-b308-00377a6188b7" />
+              <Object Name="ST_CycleDiveSearchCfg" ObjectId="42ebb53a-45c2-5353-807e-c73f913cfb78" />
+              <Object Name="ST_CycleDumpAtTremieCfg" ObjectId="b2ec5a9c-7e18-56a8-be1d-202932b2b8c1" />
+              <Object Name="ST_CycleExtractionCfg" ObjectId="4c14feb8-ddba-5e35-a2e4-6711b9795a14" />
+            </Folder>
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
-            </Folder>
-            <Folder Name="5_ASSISTANCE_DRAGAGE">
-              <Object Name="ST_DredgingAssistCfg" ObjectId="87619634-4f54-54d8-88b9-0cd7f0921c36" />
             </Folder>
             <Folder Name="2_TRANSLATION">
               <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />

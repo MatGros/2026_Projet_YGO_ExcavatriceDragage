@@ -59,7 +59,9 @@ VAR_INPUT
     Translation              : ST_TranslationHMI;(* --> [HW] GVL_IHM.TranslationM3 *)
     Commun                   : ST_CommunHMI;     (* --> [HW] GVL_IHM.Commun *)
     Network                  : ST_NetworkDiagHMI;(* --> [HW] GVL_IHM.Network *)
-    DredgingAssist           : ST_DredgingAssistHMI; (* --> [HW] GVL_IHM.DredgingAssist *)
+    CycleDiveSearch          : ST_CycleDiveSearchHMI;   (* --> [HW] GVL_IHM.CycleDiveSearch *)
+    CycleExtraction          : ST_CycleExtractionHMI;   (* --> [HW] GVL_IHM.CycleExtraction *)
+    CycleDumpAtTremie        : ST_CycleDumpAtTremieHMI; (* --> [HW] GVL_IHM.CycleDumpAtTremie *)
     JoystickHMI              : ST_JoystickHMI;   (* --> [HW] GVL_IHM.JOY1Joystick *)
 
     (* 🛡️ Sorties publiques AU produites par PRG_06_Outputs *)
@@ -345,38 +347,38 @@ GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // T
 
 {region "§4 Assistance dragage"}
 // === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist ===
-GVL_Troubleshooting.M_AssistanceDragage.Idx101_EnableDiveSearch         := DredgingAssist.Cmd.TglEnableDiveSearch;
-GVL_Troubleshooting.M_AssistanceDragage.Idx102_EnableExtractionSequence := DredgingAssist.Cmd.TglEnableExtractionSequence;
-GVL_Troubleshooting.M_AssistanceDragage.Idx103_EnableDumpAtTremie       := DredgingAssist.Cmd.TglEnableDumpAtTremie;
+GVL_Troubleshooting.M_AssistanceDragage.Idx101_EnableDiveSearch         := CycleDiveSearch.Cmd.TglEnableDiveSearch;
+GVL_Troubleshooting.M_AssistanceDragage.Idx102_EnableExtractionSequence := CycleExtraction.Cmd.TglEnableExtractionSequence;
+GVL_Troubleshooting.M_AssistanceDragage.Idx103_EnableDumpAtTremie       := CycleDumpAtTremie.Cmd.TglEnableDumpAtTremie;
 
-GVL_Troubleshooting.M_AssistanceDragage.Idx201_DiveReady               := DredgingAssist.State.DiveReady;
-GVL_Troubleshooting.M_AssistanceDragage.Idx202_DiveBusy                := DredgingAssist.State.DiveBusy;
-GVL_Troubleshooting.M_AssistanceDragage.Idx203_DiveDone                := DredgingAssist.State.DiveDone;
-GVL_Troubleshooting.M_AssistanceDragage.Idx204_DiveState                := DredgingAssist.State.DiveState;
-GVL_Troubleshooting.M_AssistanceDragage.Idx205_DiveError                := DredgingAssist.State.DiveError;
-GVL_Troubleshooting.M_AssistanceDragage.Idx206_DiveErrorId              := DredgingAssist.State.DiveErrorId;
-GVL_Troubleshooting.M_AssistanceDragage.Idx207_BottomTouchConfirmed    := DredgingAssist.State.BottomTouchConfirmed;
-GVL_Troubleshooting.M_AssistanceDragage.Idx208_DiveStepAtFault          := DredgingAssist.State.DiveStepAtFault;
+GVL_Troubleshooting.M_AssistanceDragage.Idx201_DiveReady               := CycleDiveSearch.State.DiveReady;
+GVL_Troubleshooting.M_AssistanceDragage.Idx202_DiveBusy                := CycleDiveSearch.State.DiveBusy;
+GVL_Troubleshooting.M_AssistanceDragage.Idx203_DiveDone                := CycleDiveSearch.State.DiveDone;
+GVL_Troubleshooting.M_AssistanceDragage.Idx204_DiveState                := CycleDiveSearch.State.DiveState;
+GVL_Troubleshooting.M_AssistanceDragage.Idx205_DiveError                := CycleDiveSearch.State.DiveError;
+GVL_Troubleshooting.M_AssistanceDragage.Idx206_DiveErrorId              := CycleDiveSearch.State.DiveErrorId;
+GVL_Troubleshooting.M_AssistanceDragage.Idx207_BottomTouchConfirmed    := CycleDiveSearch.State.BottomTouchConfirmed;
+GVL_Troubleshooting.M_AssistanceDragage.Idx208_DiveStepAtFault          := CycleDiveSearch.State.DiveStepAtFault;
 
-GVL_Troubleshooting.M_AssistanceDragage.Idx301_ExtractionReady          := DredgingAssist.State.ExtractionReady;
-GVL_Troubleshooting.M_AssistanceDragage.Idx302_ExtractionBusy           := DredgingAssist.State.ExtractionBusy;
-GVL_Troubleshooting.M_AssistanceDragage.Idx303_ExtractionDone           := DredgingAssist.State.ExtractionDone;
-GVL_Troubleshooting.M_AssistanceDragage.Idx304_ExtractionState          := DredgingAssist.State.ExtractionState;
-GVL_Troubleshooting.M_AssistanceDragage.Idx305_ExtractionError          := DredgingAssist.State.ExtractionError;
-GVL_Troubleshooting.M_AssistanceDragage.Idx306_ExtractionErrorId        := DredgingAssist.State.ExtractionErrorId;
-GVL_Troubleshooting.M_AssistanceDragage.Idx307_ExtractionStepAtFault    := DredgingAssist.State.ExtractionStepAtFault;
+GVL_Troubleshooting.M_AssistanceDragage.Idx301_ExtractionReady          := CycleExtraction.State.ExtractionReady;
+GVL_Troubleshooting.M_AssistanceDragage.Idx302_ExtractionBusy           := CycleExtraction.State.ExtractionBusy;
+GVL_Troubleshooting.M_AssistanceDragage.Idx303_ExtractionDone           := CycleExtraction.State.ExtractionDone;
+GVL_Troubleshooting.M_AssistanceDragage.Idx304_ExtractionState          := CycleExtraction.State.ExtractionState;
+GVL_Troubleshooting.M_AssistanceDragage.Idx305_ExtractionError          := CycleExtraction.State.ExtractionError;
+GVL_Troubleshooting.M_AssistanceDragage.Idx306_ExtractionErrorId        := CycleExtraction.State.ExtractionErrorId;
+GVL_Troubleshooting.M_AssistanceDragage.Idx307_ExtractionStepAtFault    := CycleExtraction.State.ExtractionStepAtFault;
 
-GVL_Troubleshooting.M_AssistanceDragage.Idx401_OperatorActionId        := DredgingAssist.State.OperatorActionId;
-GVL_Troubleshooting.M_AssistanceDragage.Idx402_OperatorAction          := DredgingAssist.State.OperatorAction;
+GVL_Troubleshooting.M_AssistanceDragage.Idx401_OperatorActionId        := CycleDiveSearch.State.OperatorActionId;
+GVL_Troubleshooting.M_AssistanceDragage.Idx402_OperatorAction          := CycleDiveSearch.State.OperatorAction;
 
-GVL_Troubleshooting.M_AssistanceDragage.Idx501_DumpAtTremieArmed          := DredgingAssist.State.DumpAtTremieArmed;
-GVL_Troubleshooting.M_AssistanceDragage.Idx502_DumpAtTremieAssistActive   := DredgingAssist.State.DumpAtTremieAssistActive;
-GVL_Troubleshooting.M_AssistanceDragage.Idx503_DumpAtTremieAtTremie       := DredgingAssist.State.DumpAtTremieAtTremie;
-GVL_Troubleshooting.M_AssistanceDragage.Idx504_DumpAtTremieBucketOpenArmed := DredgingAssist.State.DumpAtTremieBucketOpenArmed;
-GVL_Troubleshooting.M_AssistanceDragage.Idx505_DumpAtTremieDescentLocked := DredgingAssist.State.DumpAtTremieDescentLocked;
+GVL_Troubleshooting.M_AssistanceDragage.Idx501_DumpAtTremieArmed          := CycleDumpAtTremie.State.DumpAtTremieArmed;
+GVL_Troubleshooting.M_AssistanceDragage.Idx502_DumpAtTremieAssistActive   := CycleDumpAtTremie.State.DumpAtTremieAssistActive;
+GVL_Troubleshooting.M_AssistanceDragage.Idx503_DumpAtTremieAtTremie       := CycleDumpAtTremie.State.DumpAtTremieAtTremie;
+GVL_Troubleshooting.M_AssistanceDragage.Idx504_DumpAtTremieBucketOpenArmed := CycleDumpAtTremie.State.DumpAtTremieBucketOpenArmed;
+GVL_Troubleshooting.M_AssistanceDragage.Idx505_DumpAtTremieDescentLocked := CycleDumpAtTremie.State.DumpAtTremieDescentLocked;
 
-GVL_Troubleshooting.M_AssistanceDragage.Idx601_BypassDiveActive          := DredgingAssist.State.BypassDiveActive;
-GVL_Troubleshooting.M_AssistanceDragage.Idx602_BypassKoboldBottomTouched := DredgingAssist.State.BypassKoboldBottomTouched;
+GVL_Troubleshooting.M_AssistanceDragage.Idx601_BypassDiveActive          := CycleDiveSearch.State.BypassDiveActive;
+GVL_Troubleshooting.M_AssistanceDragage.Idx602_BypassKoboldBottomTouched := CycleDiveSearch.State.BypassKoboldBottomTouched;
 
 {endregion}
 

@@ -1,10 +1,10 @@
 (* ═══════════════════════════════════════════════════════════════
-   🪨 ST_DredgingAssistHMI — Échange IHM assistants prélèvement
+   🎮 ST_CycleDiveSearchCmd — Sélections IHM cycle plongée (DiveSearch)
    ═══════════════════════════════════════════════════════════════ *)
-TYPE ST_DredgingAssistHMI :
+TYPE ST_CycleDiveSearchCmd :
 STRUCT
-    Cmd   : ST_DredgingAssistCmd;
-    Cfg   : ST_DredgingAssistCfg;
-    State : ST_DredgingAssistState;
+    TglEnableDiveSearch         : BOOL := FALSE; (* Assistance plongée active *)
+    TglBypassDiveSearchSequence : BOOL := FALSE; (* Bypass séquence DiveSearch *)
+    TglBucketAtBottomConfirmed  : BOOL := FALSE; (* Attestation manuelle fond *)
 END_STRUCT
 END_TYPE

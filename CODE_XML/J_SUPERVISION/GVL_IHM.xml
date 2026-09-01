@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:06:45.258069" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:06:45.258069">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T00:58:51.337622" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T00:58:51.337622">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -250,6 +250,99 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_CycleDiveSearchHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_CycleDiveSearchCmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_CycleDiveSearchState" />
+              </type>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_CycleDiveSearchCfg" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f71b4459-210c-5e4b-970e-b20dee0f8d37</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🪨 ST_CycleDiveSearchHMI — Échange IHM cycle plongée (DiveSearch)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleDumpAtTremieHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_CycleDumpAtTremieCmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_CycleDumpAtTremieState" />
+              </type>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_CycleDumpAtTremieCfg" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c0587c83-3078-56cd-86a5-3e7ffbe0c663</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🪨 ST_CycleDumpAtTremieHMI — Échange IHM cycle vidage trémie (legacy)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleExtractionHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_CycleExtractionCmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_CycleExtractionState" />
+              </type>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_CycleExtractionCfg" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>98302889-117c-5dc5-ac5b-a8da53553282</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🪨 ST_CycleExtractionHMI — Échange IHM cycle extraction
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_CycleHMI">
         <baseType>
           <struct>
@@ -281,37 +374,6 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    ───────────────────────────────────────────────────────────────
    📄 Structuration en Cmd / State / Cfg / Test , homogène avec ST_WinchHMI.
    Cfg protégé par persistance GVL_PERSISTENT
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_DredgingAssistHMI">
-        <baseType>
-          <struct>
-            <variable name="Cmd">
-              <type>
-                <derived name="ST_DredgingAssistCmd" />
-              </type>
-            </variable>
-            <variable name="Cfg">
-              <type>
-                <derived name="ST_DredgingAssistCfg" />
-              </type>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="ST_DredgingAssistState" />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>2165844b-2b77-5f87-808e-1dbe0ee8505b</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🪨 ST_DredgingAssistHMI — Échange IHM assistants prélèvement
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1182,6 +1244,431 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_CycleDiveSearchCfg">
+        <baseType>
+          <struct>
+            <variable name="DiveStartMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position mini M1/M2 avant plongée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionUpper_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute fenêtre front immersion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionLower_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse fenêtre front immersion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>42ebb53a-45c2-5353-807e-c73f913cfb78</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_CycleDiveSearchCfg — Réglages persistants cycle plongée (DiveSearch)
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleDiveSearchCmd">
+        <baseType>
+          <struct>
+            <variable name="TglEnableDiveSearch">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance plongée active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglBypassDiveSearchSequence">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass séquence DiveSearch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglBucketAtBottomConfirmed">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Attestation manuelle fond</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>539dd136-1eb8-5d15-aa53-4b386fa9db25</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_CycleDiveSearchCmd — Sélections IHM cycle plongée (DiveSearch)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleDiveSearchState">
+        <baseType>
+          <struct>
+            <variable name="DiveReady">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DiveBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DiveDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DiveError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DiveErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="DiveState">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+            </variable>
+            <variable name="DiveStepAtFault">
+              <type>
+                <derived name="E_DiveSearchState" />
+              </type>
+            </variable>
+            <variable name="BottomTouchConfirmed">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BypassDiveActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassKoboldBottomTouched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirmé par le bypass (front montant Kobold en descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorActionId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Une seule consigne conduite, arbitré en PRG_03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OperatorAction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte de secours ; IHM peut mapper l'identifiant</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b30ad366-6fd5-5713-9050-b1453c43c4d4</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚦 ST_CycleDiveSearchState — États publics cycle plongée (DiveSearch)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleDumpAtTremieCfg">
+        <baseType>
+          <struct>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b2ec5a9c-7e18-56a8-be1d-202932b2b8c1</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_CycleDumpAtTremieCfg — Réglages persistants cycle vidage trémie (legacy)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleDumpAtTremieCmd">
+        <baseType>
+          <struct>
+            <variable name="TglEnableDumpAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode vidage à la trémie — RESTREINT des mouvements dès le boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>8fac4fdd-32e8-5449-81b4-b99cc55e1ec1</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_CycleDumpAtTremieCmd — Sélections IHM cycle vidage trémie (legacy)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleDumpAtTremieState">
+        <baseType>
+          <struct>
+            <variable name="DumpAtTremieArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TglEnableDumpAtTremie (bit IHM brut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieAssistActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Armé ET Mode MAINT_N1/N2 (mode réellement actif)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M3_AtTremieStable</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieBucketOpenArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CmdOpen_IHM déclenché par ce mode</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DumpAtTremieDescentLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">DescendPermit M1/M2 forcé par ce mode (hors P1/Maintenance)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>c03dda17-2edb-57d1-b08b-ac95d74ba904</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚦 ST_CycleDumpAtTremieState — États publics cycle vidage trémie (legacy)
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleExtractionCfg">
+        <baseType>
+          <struct>
+            <variable name="ExtractionControlDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 avant accélération</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>4c14feb8-ddba-5e35-a2e4-6711b9795a14</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_CycleExtractionCfg — Réglages persistants cycle extraction
+   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleExtractionCmd">
+        <baseType>
+          <struct>
+            <variable name="TglEnableExtractionSequence">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction active</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>29dd1311-31ec-5709-92c5-68797776d6cb</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_CycleExtractionCmd — Sélections IHM cycle extraction
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleExtractionState">
+        <baseType>
+          <struct>
+            <variable name="ExtractionReady">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ExtractionBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ExtractionDone">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ExtractionError">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ExtractionErrorId">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="ExtractionState">
+              <type>
+                <derived name="E_ExtractionAssistState" />
+              </type>
+            </variable>
+            <variable name="ExtractionStepAtFault">
+              <type>
+                <derived name="E_ExtractionAssistState" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1b6c66ac-378b-5183-a476-1f29ec042a66</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🚦 ST_CycleExtractionState — États publics cycle extraction
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_CycleCfg">
         <baseType>
           <struct>
@@ -1477,352 +1964,6 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🚦 ST_CycleState — États et diagnostics IHM du cycle semi-automatique
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_DredgingAssistCfg">
-        <baseType>
-          <struct>
-            <variable name="DiveStartMin_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position mini M1/M2 avant plongée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionUpper_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute fenêtre front immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionLower_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="-0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse fenêtre front immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ExtractionControlDistance_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 avant accélération</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableDiveSearch">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance plongée mémorisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableExtractionSequence">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance extraction mémorisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableDumpAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance vidage trémie mémorisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Pont persistance/IHM initialisé</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>87619634-4f54-54d8-88b9-0cd7f0921c36</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ST_DredgingAssistCfg — Réglages persistants assistants prélèvement
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_DredgingAssistCmd">
-        <baseType>
-          <struct>
-            <variable name="TglEnableDiveSearch">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance plongée active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableExtractionSequence">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglBucketAtBottomConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Attestation manuelle temporaire du fond</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglBypassDiveSearchSequence">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simplifié de la séquence FB_DiveSearch complète (préconditions
-strictes -- benne ouverte, DiveStartMin_M, fenêtre immersion). Si TRUE, un front MONTANT
-Kobold pendant une descente confirme directement le fond, sans passer par l'état-machine
-FB_DiveSearch (qui continue de tourner en parallèle, inchangée -- utile pour
-KoboldMeasureEnable). Défaut FALSE : comportement identique à avant (séquence complète
-seule source de confirmation).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableDumpAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mode vidage à la trémie —</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>582697cf-4ebf-5168-aca8-afd5b4dc75f9</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎮 ST_DredgingAssistCmd — Sélections IHM assistance prélèvement
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_DredgingAssistState">
-        <baseType>
-          <struct>
-            <variable name="DiveReady">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DiveBusy">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DiveDone">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DiveError">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DiveErrorId">
-              <type>
-                <WORD />
-              </type>
-            </variable>
-            <variable name="DiveState">
-              <type>
-                <derived name="E_DiveSearchState" />
-              </type>
-            </variable>
-            <variable name="DiveStepAtFault">
-              <type>
-                <derived name="E_DiveSearchState" />
-              </type>
-            </variable>
-            <variable name="BottomTouchConfirmed">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ExtractionReady">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ExtractionBusy">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ExtractionDone">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ExtractionError">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ExtractionErrorId">
-              <type>
-                <WORD />
-              </type>
-            </variable>
-            <variable name="ExtractionState">
-              <type>
-                <derived name="E_ExtractionAssistState" />
-              </type>
-            </variable>
-            <variable name="ExtractionStepAtFault">
-              <type>
-                <derived name="E_ExtractionAssistState" />
-              </type>
-            </variable>
-            <variable name="OperatorActionId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Une seule consigne conduite, arbitré en PRG_09</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OperatorAction">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte de secours ; IHM peut mapper l'identifiant</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DumpAtTremieArmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mode vidage à la trémie (pas de FB dédié, logique combinatoire PRG_04)
-TglEnableDumpAtTremie (bit IHM brut)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DumpAtTremieAssistActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Armé ET Mode MAINT_N1/N2 (mode réellement actif)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DumpAtTremieAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">M3_AtTremieStable</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DumpAtTremieBucketOpenArmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">CmdOpen_IHM déclenché par ce mode</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DumpAtTremieDescentLocked">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">DescendPermit M1/M2 forcé par ce mode (hors P1/Maintenance)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassDiveActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic bypass séquence DiveSearch
-TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassKoboldBottomTouched">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirmé par le bypass (front montant Kobold en descente)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>4230b7ec-508c-5fc4-9124-31b8ff9632ea</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🚦 ST_DredgingAssistState — États publics assistance prélèvement
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4792,127 +4933,6 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
           </data>
         </addData>
       </dataType>
-      <dataType name="E_CycleStep">
-        <baseType>
-          <enum>
-            <values>
-              <value name="X0_PREPARATION" value="0" />
-              <value name="X1_HOMING" value="1" />
-              <value name="X2_WORK_POS_SELECT" value="2" />
-              <value name="X3_OPEN_BUCKET" value="3" />
-              <value name="X4_DESCEND_OPEN" value="4" />
-              <value name="X5_BOTTOM_CONFIRMED" value="5" />
-              <value name="X6_CLOSE_BUCKET" value="6" />
-              <value name="X7_CTRL_ASCENT" value="7" />
-              <value name="X8_ASCENT_LOADED" value="8" />
-              <value name="X9_DRAIN_PAUSE" value="9" />
-              <value name="X10_TRANSLATE_DUMP" value="10" />
-              <value name="X11_OPEN_DUMP" value="11" />
-              <value name="X13_DONE_SYNC" value="13" />
-              <value name="STABILIZING" value="14" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>X0_PREPARATION</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X1_HOMING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesses lentes pour chercher capteur top + référencement</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X2_WORK_POS_SELECT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X3_OPEN_BUCKET</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si déjà ouverte -&gt; passe vite)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X4_DESCEND_OPEN</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X5_BOTTOM_CONFIRMED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X6_CLOSE_BUCKET</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne — tolérance « à peu près fermé »</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X7_CTRL_ASCENT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 de contrôle</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X8_ASCENT_LOADED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée nominale jusqu'à limite haute</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X9_DRAIN_PAUSE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — temps affiché IHM</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X10_TRANSLATE_DUMP</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie + avertissements IHM</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X11_OPEN_DUMP</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>X13_DONE_SYNC</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STABILIZING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6cb965ad-bf44-5119-9acc-50ecd5c9f87b</ObjectId>
-          </data>
-        </addData>
-      </dataType>
       <dataType name="E_DiveSearchState">
         <baseType>
           <enum>
@@ -5040,6 +5060,127 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>52924d25-cfcc-5dc2-a673-d7581dfb2d37</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_CycleStep">
+        <baseType>
+          <enum>
+            <values>
+              <value name="X0_PREPARATION" value="0" />
+              <value name="X1_HOMING" value="1" />
+              <value name="X2_WORK_POS_SELECT" value="2" />
+              <value name="X3_OPEN_BUCKET" value="3" />
+              <value name="X4_DESCEND_OPEN" value="4" />
+              <value name="X5_BOTTOM_CONFIRMED" value="5" />
+              <value name="X6_CLOSE_BUCKET" value="6" />
+              <value name="X7_CTRL_ASCENT" value="7" />
+              <value name="X8_ASCENT_LOADED" value="8" />
+              <value name="X9_DRAIN_PAUSE" value="9" />
+              <value name="X10_TRANSLATE_DUMP" value="10" />
+              <value name="X11_OPEN_DUMP" value="11" />
+              <value name="X13_DONE_SYNC" value="13" />
+              <value name="STABILIZING" value="14" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>X0_PREPARATION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X1_HOMING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesses lentes pour chercher capteur top + référencement</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X2_WORK_POS_SELECT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X3_OPEN_BUCKET</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si déjà ouverte -&gt; passe vite)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X4_DESCEND_OPEN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X5_BOTTOM_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X6_CLOSE_BUCKET</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne — tolérance « à peu près fermé »</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X7_CTRL_ASCENT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 de contrôle</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X8_ASCENT_LOADED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée nominale jusqu'à limite haute</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X9_DRAIN_PAUSE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — temps affiché IHM</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X10_TRANSLATE_DUMP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie + avertissements IHM</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X11_OPEN_DUMP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X13_DONE_SYNC</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STABILIZING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6cb965ad-bf44-5119-9acc-50ecd5c9f87b</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -6802,12 +6943,28 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Commandes, états et diagnostic cycle semi-automatique</xhtml>
           </documentation>
         </variable>
-        <variable name="DredgingAssist">
+        <variable name="CycleDiveSearch">
           <type>
-            <derived name="ST_DredgingAssistHMI" />
+            <derived name="ST_CycleDiveSearchHMI" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪨 Assistance plongée/extraction MAINT_N1/N2</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🤿 Assistance plongée (DiveSearch) MAINT_N1/N2</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CycleExtraction">
+          <type>
+            <derived name="ST_CycleExtractionHMI" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⛏️ Assistance extraction MAINT_N1/N2</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CycleDumpAtTremie">
+          <type>
+            <derived name="ST_CycleDumpAtTremieHMI" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🚚 Vidage à la trémie (legacy)</xhtml>
           </documentation>
         </variable>
         <variable name="Banner">
@@ -6873,6 +7030,20 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <Object Name="ST_SyncCmd" ObjectId="c4516adb-d5c4-5442-aed3-fe5c7a9333fa" />
               <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
             </Folder>
+            <Folder Name="5_ASSISTANCE_DRAGAGE">
+              <Object Name="ST_CycleDiveSearchHMI" ObjectId="f71b4459-210c-5e4b-970e-b20dee0f8d37" />
+              <Object Name="ST_CycleDumpAtTremieHMI" ObjectId="c0587c83-3078-56cd-86a5-3e7ffbe0c663" />
+              <Object Name="ST_CycleExtractionHMI" ObjectId="98302889-117c-5dc5-ac5b-a8da53553282" />
+              <Object Name="ST_CycleDiveSearchCfg" ObjectId="42ebb53a-45c2-5353-807e-c73f913cfb78" />
+              <Object Name="ST_CycleDiveSearchCmd" ObjectId="539dd136-1eb8-5d15-aa53-4b386fa9db25" />
+              <Object Name="ST_CycleDiveSearchState" ObjectId="b30ad366-6fd5-5713-9050-b1453c43c4d4" />
+              <Object Name="ST_CycleDumpAtTremieCfg" ObjectId="b2ec5a9c-7e18-56a8-be1d-202932b2b8c1" />
+              <Object Name="ST_CycleDumpAtTremieCmd" ObjectId="8fac4fdd-32e8-5449-81b4-b99cc55e1ec1" />
+              <Object Name="ST_CycleDumpAtTremieState" ObjectId="c03dda17-2edb-57d1-b08b-ac95d74ba904" />
+              <Object Name="ST_CycleExtractionCfg" ObjectId="4c14feb8-ddba-5e35-a2e4-6711b9795a14" />
+              <Object Name="ST_CycleExtractionCmd" ObjectId="29dd1311-31ec-5709-92c5-68797776d6cb" />
+              <Object Name="ST_CycleExtractionState" ObjectId="1b6c66ac-378b-5183-a476-1f29ec042a66" />
+            </Folder>
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
               <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
@@ -6881,12 +7052,6 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
               <Object Name="ST_ModesCmd" ObjectId="edbd07e7-72fc-5cee-a795-a49979bf9667" />
               <Object Name="ST_ModesState" ObjectId="607d2d07-1efc-59e2-9ca9-53d413d7cf77" />
-            </Folder>
-            <Folder Name="5_ASSISTANCE_DRAGAGE">
-              <Object Name="ST_DredgingAssistHMI" ObjectId="2165844b-2b77-5f87-808e-1dbe0ee8505b" />
-              <Object Name="ST_DredgingAssistCfg" ObjectId="87619634-4f54-54d8-88b9-0cd7f0921c36" />
-              <Object Name="ST_DredgingAssistCmd" ObjectId="582697cf-4ebf-5168-aca8-afd5b4dc75f9" />
-              <Object Name="ST_DredgingAssistState" ObjectId="4230b7ec-508c-5fc4-9124-31b8ff9632ea" />
             </Folder>
             <Folder Name="6_DIAG_ET_CHAINES">
               <Object Name="ST_EmergencyHMI" ObjectId="8d226a50-93cb-57af-8292-b85b6476b70d" />
@@ -6949,9 +7114,9 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
         </Folder>
         <Folder Name="G_CYCLE">
           <Folder Name="_TYPES">
-            <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
             <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
             <Object Name="E_ExtractionAssistState" ObjectId="52924d25-cfcc-5dc2-a673-d7581dfb2d37" />
+            <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
           </Folder>
         </Folder>
         <Folder Name="A_COMMUN">

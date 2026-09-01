@@ -10,7 +10,7 @@
 # ═══════════════════════════════════════════════════════════════════════════
 
 contract:
-  task_id: T212_REFACTOR_GVL_IHM_DREDGING
+  task_id: T215_REFACTOR_GVL_IHM_DREDGING
   criticality: C2
   strategy: patch            # refactor minimal, pas de rebuild
 
@@ -20,7 +20,10 @@ contract:
     DumpAtTremie + Bypass) en 3 sous-structures homogènes Cmd/State/Cfg
     (CycleDiveSearch, CycleExtraction, CycleDumpAtTremie), en réutilisant les
     champs existants, pour homogénéiser la structuration IHM et éliminer les
-    doublons Cmd/Cfg. Aucun changement de comportement machine.
+    doublons Cmd/Cfg. Les configs (DiveStartMin_M, ImmersionUpper_M,
+    ImmersionLower_M, ExtractionControlDistance_M) et les toggles d'activation
+    restent PERSISTÉS (GVL_PERSISTENT). Aucun changement de comportement machine.
+    Refactor par étapes avec points de comparaison (baseline + diff de sortie nul).
 
   # ── 2. Criteres testables ─────────────────────────────────────────────────
   acceptance:
@@ -31,8 +34,8 @@ contract:
       statement: "Aucun champ existant n'est perdu ni renommé sémantiquement : chaque champ de ST_DredgingAssistCmd/Cfg/State est retrouvé dans une des 3 nouvelles structures."
       verified_by: "comparaison champ-à-champ des structures source et cible"
     - id: AC3
-      statement: "Les toggles TglEnableDiveSearch/TglEnableExtractionSequence/TglEnableDumpAtTremie n'existent plus en double dans Cfg (restent uniquement en Cmd)."
-      verified_by: "grep des 3 toggles dans les structures Cfg = 0"
+      statement: "Les toggles TglEnableDiveSearch/TglEnableExtractionSequence/TglEnableDumpAtTremie n'existent plus en double dans Cfg (restent uniquement en Cmd), mais restent PERSISTÉS via GVL_PERSISTENT (pas de perte du mode mémorisé au boot)."
+      verified_by: "grep des 3 toggles dans les structures Cfg = 0 + persistance GVL_PERSISTENT vérifiée"
     - id: AC4
       statement: "Le commentaire TglEnableDumpAtTremie est corrigé (ne dit plus 'TRUE par défaut' alors que la valeur est FALSE)."
       verified_by: "lecture du commentaire dans la structure cible"
@@ -40,11 +43,17 @@ contract:
       statement: "Tous les consommateurs (PRG_03, PRG_04, PRG_07, FB_TroubleshootingView, GVL_PERSISTENT, bridge) sont recâblés vers les nouveaux chemins, sans oubli."
       verified_by: "G200_check_linkage.py --report = PASS (0 erreur) + grep exhaustif"
     - id: AC6
-      statement: "Aucun changement de logique : le comportement machine est identique avant/après (pur renommage de chemins)."
+      statement: "Aucun changement de logique : le comportement machine est identique avant/après (pur renommage de chemins), prouvé par diff de sortie nul à chaque étape."
       verified_by: "bundle frais + G200 PASS + gates palier C PASS + diff de sortie nul"
     - id: AC7
       statement: "Les POU de CODE/M_MAIN (PRG_03_Modes_Cycle, PRG_04_Treuils_Benne, PRG_07_Supervision) conservent un nom de fichier identique au nom de POU et un suffixe de langage identique au langage généré dans le bundle."
       verified_by: "bundle PLCopenXML généré : nom de POU = nom de fichier, suffixe ST cohérent"
+    - id: AC8
+      statement: "L'interface FB_TroubleshootingView est adaptée (1 struct → 3 entrées) et sa projection (Idx101..602) reste complète et cohérente."
+      verified_by: "bundle + G200 PASS + projection troubleshooting vérifiée champ-à-champ"
+    - id: AC9
+      statement: "L'outillage est mis à jour : G330_check_type_safety.py, registry.yaml, snapshots IHM régénérés — tous les gates verts."
+      verified_by: "run_all_gates.py = PASS (tous) + tests CI PASS"
 
   # ── 3. Perimetre ──────────────────────────────────────────────────────────
   scope:
@@ -61,6 +70,9 @@ contract:
       - CODE/M_MAIN/PRG_07_Supervision.st
       - CODE/J_SUPERVISION/FB_TroubleshootingView.st
       - CODE/GVL_PERSISTENT.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G330_check_type_safety.py
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - PLC_CSV_SNAPSHOT/variable_lists/ihm_variables.txt
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - CODE/G_CYCLE/FB_Cycle.st
@@ -72,11 +84,12 @@ contract:
   conservation:
     must_survive:
       - "Tous les champs IHM existants (Cmd/State/Cfg) de DredgingAssist, retrouvés dans les 3 nouvelles structures"
-      - "La persistance _DredgingAssistCfgPersist et le pont FB_CfgPersistBridge_DredgingAssistCfg"
+      - "La persistance _DredgingAssistCfgPersist et le pont FB_CfgPersistBridge_DredgingAssistCfg (configs + toggles persistés)"
       - "La projection troubleshooting ST_ChainDredgingAssist (Idx101..602)"
       - "Aucun changement de logique métier (plongée, extraction, vidage trémie)"
+      - "Le mode mémorisé au boot (toggles persistés) — pas de perte de réglage"
     dropped_on_purpose:
-      - "Doublons Cmd/Cfg des toggles d'activation (TglEnableDiveSearch/Extraction/DumpAtTremie) — restent en Cmd uniquement"
+      - "Doublons Cmd/Cfg des toggles d'activation (TglEnableDiveSearch/Extraction/DumpAtTremie) — restent en Cmd uniquement, persistés via GVL_PERSISTENT"
 
   # ── 5. Preuves attendues en restitution ───────────────────────────────────
   evidence_required:

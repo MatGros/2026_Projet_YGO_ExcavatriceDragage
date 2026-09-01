@@ -94,13 +94,12 @@ def check_type_safety() -> list[str]:
         return True, curr_type, ""
 
     # 4. Parcourir tous les fichiers .st pour valider les chaînes d'accès (ex: GVL_IHM.xxx.yyy.zzz ou WinchM2.Bucket.State.xxx)
-    chain_pattern = re.compile(r"\b(?P<root>GVL_\w+|ST_\w+|WinchM2|WinchM1|DredgingAssist|instBucket|instWinchM1|instWinchM2)\.(?P<chain>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)\b")
+    chain_pattern = re.compile(r"\b(?P<root>GVL_\w+|ST_\w+|WinchM2|WinchM1|instBucket|instWinchM1|instWinchM2)\.(?P<chain>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)\b")
 
     # Mappages connus des racines d'instances vers leur type STRUCT
     root_types: dict[str, str] = {
         "WinchM2": "ST_WinchBenneHMI",
         "WinchM1": "ST_WinchHMI",
-        "DredgingAssist": "ST_DredgingAssistHMI",
         "instBucket": "FB_Bucket",
     }
 
