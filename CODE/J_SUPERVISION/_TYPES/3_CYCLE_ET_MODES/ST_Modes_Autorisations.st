@@ -28,6 +28,7 @@ STRUCT
     ModeChangePendingBlocked    : BOOL;       // Demande de changement de mode REFUSEE : les treuils
                                               //   ne sont pas a l'arret mecanique confirme (contacteurs
                                               //   retombes ET frein serre ET |v| < seuil). Mode courant maintenu.
+    ModeChangeBlockReason       : STRING(40); // Motif du blocage de bascule (texte IHM court, ex. "Chgt mode refuse : contacteur M1")
     HomingRequiredM1            : BOOL;       // M1 : re-homing obligatoire avant tout retour SEMI_AUTO
     HomingRequiredM2            : BOOL;       // M2 : idem
 END_STRUCT

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:05:44.584185" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:05:44.584185">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T01:41:44.003488" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T01:41:44.003488">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -48,6 +48,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Changement de mode refusé : treuils non à l'arrêt confirmé (contacteurs retombés + frein serré + |v| &lt; seuil)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangeBlockReason">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Motif du blocage de bascule (texte court, ex. "Chgt mode refuse : contacteur M1")</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRequiredM1">

@@ -149,6 +149,14 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Changement de mode refusé : treuils non à l'arrêt confirmé (contacteurs retombés + frein serré + |v| &lt; seuil)</xhtml>
               </documentation>
             </variable>
+            <variable name="ModeChangeBlockReason">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Motif du blocage de bascule (texte court, ex. "Chgt mode refuse : contacteur M1")</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingRequiredM1">
               <type>
                 <BOOL />

@@ -13,7 +13,7 @@ VAR_INPUT
     Enable                  : BOOL;         // --> [CMD] Activation generale du sequenceur
     Reset                   : BOOL;         // --> [CMD] Acquittement defaut (front)
     PowerContactorEngaged   : BOOL;         // --> [SAFE] Chaine de securite OK
-    EncoderFaultPresent     : BOOL;         // --> [SAFE] Defaut codeur agrege (cycle non autorise, T207)
+    EncoderFaultPresent     : BOOL;         // --> [SAFE] Defaut codeur agrege (cycle non autorise)
     Mode                    : E_Mode;       // --> [CMD] Mode arbitre (SEMI_AUTO pour instance cycle)
     JoystickDeflected       : BOOL;         // --> [CMD] Manche deflecte (non centre)
     DeadmanArmed            : BOOL;         // --> [CMD] Appui homme-mort (fenetre 3 s)
@@ -211,7 +211,7 @@ ErrorEdge(CLK := Fault.Error);
 
 {region "§2 Gate securite & Bascule Mode"}
 // 🛑 2. GATES DE SÉCURITÉ ET NEUTRALISATION
-// T207 : le mode SEMI_AUTO peut être sélectionné sous AU/défaut (FB_Modes), mais le cycle
+// Le mode SEMI_AUTO peut être sélectionné sous AU/défaut (FB_Modes), mais le cycle
 // ne tourne JAMAIS sans puissance (PowerContactorEngaged) ni avec un codeur défaillant
 // (EncoderFaultPresent) — les données de position invalides rendraient le Grafcet erroné.
 IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN

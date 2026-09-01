@@ -265,6 +265,9 @@ T175 AC4 : *« FB_Bucket confirme/ouvre sous MAINT_N1 ET N2 comme décrit (TC-P1
 | `JoystickWinchSelectArbitrated` | 0=M1+M2 couplés nominal, 1=M1, 2=M2 (unitaires MAINT_N2 uniquement) |
 | `HomingApproachEnable` | Dépassement butée haut (N2) |
 | `MaintenanceM3TargetEnable` | Cible Translation Maintenance — (N1 **OU** N2) **ET** bit IHM dédié `SelMaintenanceZoneAccess` (🆕 2026-08-06, autorisation consciente, le mode seul ne suffit jamais ; vérifié `FB_Modes.st` ligne 165, correction 2026-08-26 : le nom réel diffère de `TglMaintenanceZoneAccess` cité dans une version antérieure de ce document) |
+| `ModeChangePendingBlocked` | Bascule de mode refusée (treuils non à l'arrêt mécanique confirmé) — mode courant maintenu |
+| `ModeChangeBlockReason` | Motif du blocage de bascule (texte IHM court, ex. « Chgt mode refuse : contacteur M1 ») — première condition échouée, ordre M1 puis M2 |
+| `HomingRequiredM1/M2` | Re-homing obligatoire avant retour SEMI_AUTO (par axe) |
 
 Ce bus est consommé par Cycle, Safety, Treuils, Translation, Supervision, Acquisition.
 
@@ -302,6 +305,7 @@ La chaine AU, `PowerKeepAlive` et le rearmement sont proprietaires de la Partie 
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.3 | 2026-08-31 | Ajout diagnostic IHM `ModeChangeBlockReason` (motif du blocage de bascule, texte court) dans le bus `Auth` (§5) et `ST_ModesState`. Le motif indique la première condition échouée (contacteur/frein/vitesse, M1 puis M2) quand `ModeChangePendingBlocked=TRUE`. |
 | v2.2 | 2026-08-29 | T181-11 : ajout §4bis « Matrice de bypass maintenance — treuils M1/M2 » (25 bascules mode-gated N2, override FDC N1 momentané 7,5/8,5 m, règle de bascule contacteurs retombés + frein serré, re-homing obligatoire, alignement T175 AC4 = N1 ET N2). Sommaire et TBD mis à jour. |
 | v2.1 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié, section `🎯 Rôle et périmètre` explicite, section « Bus d'autorisations » intégrée à la numérotation (§5, était orpheline), Suivi historique ajouté, renumérotation complète + réfs `§N` cascadées. Correctif de fond (review sous-agent expert automatisme, vérifié contre `FB_Modes.st`) : §5 citait `TglMaintenanceZoneAccess`, nom inexistant dans le code — corrigé en `SelMaintenanceZoneAccess` (variable réelle, ligne 165). Struct `ST_Modes_Autorisations`, `E_Mode`, logique booléenne `MaintenanceM3TargetEnable`, absence de garde mot de passe PLC (§4) et propriété `FB_Safety_Winch` de la limite légale (§6) tous vérifiés conformes au code |
 | v2.0 | — | Version precedente (voir `ARCHIVES/Doc/`) |

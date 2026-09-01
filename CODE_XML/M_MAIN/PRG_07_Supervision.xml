@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T01:07:39.529412" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T01:07:39.529412">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T01:42:23.059577" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T01:42:23.059577">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2233,14 +2233,22 @@ restent vrais meme quand le FB est neutralise par Enable=FALSE (etat persistant)
 Demande de changement de mode REFUSEE : les treuils</xhtml>
               </documentation>
             </variable>
+            <variable name="ModeChangeBlockReason">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas a l'arret mecanique confirme (contacteurs
+retombes ET frein serre ET |v| &lt; seuil). Mode courant maintenu.
+Motif du blocage de bascule (texte IHM court, ex. "Chgt mode refuse : contacteur M1")</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingRequiredM1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas a l'arret mecanique confirme (contacteurs
-retombes ET frein serre ET |v| &lt; seuil). Mode courant maintenu.
-M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRequiredM2">
@@ -8076,6 +8084,7 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
                                       OR GVL_IHM.JOY1Joystick.State.Error;
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
 GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;
+GVL_IHM.Modes.State.ModeChangeBlockReason := PRG_03_Modes_Cycle.Data.Auth.ModeChangeBlockReason;
 GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;
 GVL_IHM.Modes.State.HomingRequiredM2 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM2;
 

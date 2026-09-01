@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:52:17.659877" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:52:17.659877">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T01:41:43.986513" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T01:41:43.986513">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -93,14 +93,22 @@ restent vrais meme quand le FB est neutralise par Enable=FALSE (etat persistant)
 Demande de changement de mode REFUSEE : les treuils</xhtml>
               </documentation>
             </variable>
+            <variable name="ModeChangeBlockReason">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas a l'arret mecanique confirme (contacteurs
+retombes ET frein serre ET |v| &lt; seuil). Mode courant maintenu.
+Motif du blocage de bascule (texte IHM court, ex. "Chgt mode refuse : contacteur M1")</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingRequiredM1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas a l'arret mecanique confirme (contacteurs
-retombes ET frein serre ET |v| &lt; seuil). Mode courant maintenu.
-M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRequiredM2">
