@@ -108,8 +108,13 @@ VAR
     TonOppositeDirection            : TON;                            // . [LOC] Delai confirmation sens oppose
     TonNoMovement                   : TON;                            // . [LOC] Delai confirmation absence mouvement
     TonStartupWarmup                : TON;                            // . [LOC] Inhibition transitoire boot (3s)
+    TonRefSettle                    : TON;                            // . [LOC] Garde de stabilisation apres referencement/benne (saut de position codeur)
 
     // === VARIABLES LOCALES CALCULÉES ===
+    RefWindowActive                 : BOOL;                           // . [LOC] Fenetre de reference active : gardes derive/synchro re-basees (preset codeur = saut CablePosM)
+    PosStepDetected                 : BOOL;                           // . [LOC] Saut de position non physique detecte ce scan (preset codeur, ce treuil ou l'autre)
+    CablePosMPrev                   : REAL;                           // . [LOC] CablePosM scan precedent (detection de saut)
+    ExpectedOtherWinchPosMPrev      : REAL;                           // . [LOC] ExpectedOtherWinchPosM scan precedent (detection de saut de l'autre treuil)
     UncommandedActiveB              : BOOL;                           // . [LOC] Condition active Meca B
     UncommandedActiveD              : BOOL;                           // . [LOC] Condition active Meca D
     OppositeDirectionActive         : BOOL;                           // . [LOC] Condition active sens oppose
@@ -155,6 +160,9 @@ VAR
     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
     instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
 END_VAR
+VAR CONSTANT
+    CST_RefPosStepM                 : REAL := 0.5;                    // Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur) — la course reelle d'un treuil par scan 10ms reste sous ~0.01 m
+END_VAR
 
 // === IMPLEMENTATION ===
 
@@ -180,6 +188,8 @@ END_IF;
 
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
+    CablePosMPrev                 := CablePosM;
+    ExpectedOtherWinchPosMPrev   := ExpectedOtherWinchPosM;
     EncoderFaultLatched           := FALSE;
     MotorThermalFaultLatched      := FALSE;
     PhaseRotationFaultLatched     := FALSE;
@@ -197,6 +207,27 @@ END_IF;
 
 IF NOT BypassGlobal THEN
     TonStartupWarmup(IN := Enable, PT := T#3s);
+
+    // 🛡️ Fenetre de reference : le preset SDO du codeur (homing, y compris reference benne fermee)
+    // fait sauter CablePosM d'un bloc. Sans garde, DriftGuardA voit une derive non commandee (Meca A)
+    // et l'ecart M1/M2 depasse la tolerance (Meca E). Le Busy homing seul est trop court (~500ms) :
+    // il retombe avant l'application reelle du preset et la reconvergence M1/M2. On maintient donc
+    // l'inhibition pendant homing + cycle benne + saut de position detecte + 2s de stabilisation,
+    // et on RAZ les latches parasites poses dans le meme scan. Le saut sur ExpectedOtherWinchPosM
+    // couvre le cas ou c'est l'AUTRE treuil qui est reference (ce treuil n'est pas en homing).
+    // Les autres protections (limites, contacteurs, chaine) restent actives (AF_Partie-09 §13 :
+    // le treuil ne passe pas en mode securite degrade, le homing exige l'arret confirme des treuils).
+    PosStepDetected := (ABS(CablePosM - CablePosMPrev) > CST_RefPosStepM)
+                    OR (ABS(ExpectedOtherWinchPosM - ExpectedOtherWinchPosMPrev) > CST_RefPosStepM);
+    CablePosMPrev := CablePosM;
+    ExpectedOtherWinchPosMPrev := ExpectedOtherWinchPosM;
+    TonRefSettle(IN := NOT (InReferencingMode OR BenneBusy OR PosStepDetected), PT := T#2s);
+    RefWindowActive := InReferencingMode OR BenneBusy OR PosStepDetected OR NOT TonRefSettle.Q;
+    IF RefWindowActive THEN
+        MecaAFaultLatched         := FALSE;
+        MecaEFaultLatched         := FALSE;
+        MecaEEscaladeFaultLatched := FALSE;
+    END_IF;
 
     // Cause 0 : Perte com opérateur (live)
     IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
@@ -260,7 +291,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 7 : Méca A dérive à l'arrêt (latched)
     DriftGuardA(
-        Arm        := NOT (BypassSafety OR BypassMecaA) AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT BenneHoldStillActive,
+        Arm        := NOT (BypassSafety OR BypassMecaA) AND FwdRevSpeedFeedbackOff AND NOT BrakeFeedback AND NOT BenneHoldStillActive AND NOT RefWindowActive,
         PositionM  := CablePosM,
         ToleranceM := UncommandedDriftToleranceM
     );
@@ -316,7 +347,7 @@ IF NOT BypassGlobal THEN
     instCauses[11].Texte    := 'Escalade fin de course haut (Meca D)';
 
     // Cause 12 & 13 : Méca E écart critique synchro & escalade (latched)
-    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT BenneBusy AND NOT InReferencingMode AND NOT OtherWinchInhibited
+    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT RefWindowActive AND NOT OtherWinchInhibited
        AND (ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM) THEN
         MecaEFaultLatched := TRUE;
     END_IF;
@@ -325,7 +356,7 @@ IF NOT BypassGlobal THEN
     instCauses[12].Texte    := 'Ecart critique synchronisation treuil (Meca E)';
 
     TonMecaE(
-        IN := NOT (BypassSafety OR BypassMecaE) AND MecaEFaultLatched AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback),
+        IN := NOT (BypassSafety OR BypassMecaE) AND NOT RefWindowActive AND MecaEFaultLatched AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback),
         PT := PostRampTimeout
     );
     IF TonMecaE.Q THEN MecaEEscaladeFaultLatched := TRUE; END_IF;
@@ -358,7 +389,7 @@ IF NOT BypassGlobal THEN
     // Seuil = max bande apprise  (SpeedBandMaxMps). Latché jusqu'au Reset.
     // ⚠️ N'alimente PAS PowerCutOff : couper la puissance en survitesse peut
     // provoquer une chute libre de la charge — décision à trancher (ISO 13849).
-    IF NOT BypassProcess AND MeasuredSpeedValid AND (ABS(MeasuredSpeedMps) > SpeedBandMaxMps) THEN
+    IF NOT BypassProcess AND NOT RefWindowActive AND MeasuredSpeedValid AND (ABS(MeasuredSpeedMps) > SpeedBandMaxMps) THEN
         OverspeedFaultLatched := TRUE;
     END_IF;
 
@@ -368,6 +399,11 @@ ELSE
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
+    TonRefSettle(IN := FALSE);
+    RefWindowActive := FALSE;
+    PosStepDetected := FALSE;
+    CablePosMPrev := CablePosM;
+    ExpectedOtherWinchPosMPrev := ExpectedOtherWinchPosM;
 END_IF;
 
 // ContactorStuck : proprietaire UNIQUE de la detection contacteur colle.

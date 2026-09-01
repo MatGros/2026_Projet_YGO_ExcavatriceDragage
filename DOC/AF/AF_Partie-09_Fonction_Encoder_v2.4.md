@@ -675,6 +675,25 @@ référence soit committée. Les protections du pipeline treuil restent actives 
 cette phase (le treuil ne passe pas en mode de référencement de sécurité : la demande
 de homing exige déjà l'arrêt confirmé des treuils, `HomingPermit` + treuils non busy).
 
+> 🔧 **Fenêtre de référence côté `FB_Safety_Winch` (correctif T183, 2026-09-01)** : le saut
+> de `CablePosM` au preset déclenchait de faux défauts mécaniques — `Meca A` (dérive non
+> commandée, `DriftGuardA` re-capturait l'ancienne référence puis voyait le saut) et
+> `Meca E` (écart critique synchro M1/M2, y compris sur l'**autre** treuil quand seul M2
+> est référencé). Le `Busy` homing seul (~500 ms) retombe avant l'application réelle du
+> preset et la reconvergence M1/M2. `FB_Safety_Winch` calcule donc `RefWindowActive` =
+> `InReferencingMode OR BenneBusy OR saut de position détecté (> 0,5 m/scan sur `CablePosM`
+> ou `ExpectedOtherWinchPosM`) OR 2 s de stabilisation` ; pendant cette fenêtre, `Meca A`,
+> `Meca E` (cause + escalade) et la survitesse sont inhibées et leurs latches remis à zéro.
+> Les autres protections (limites câble/haute, contacteurs, chaîne, thermiques, sens opposé,
+> absence mouvement) restent actives. Détection de saut = garde locale, sans nouvelle entrée
+> (harnais `FB_Safety_Winch` gelé). Seuil `CST_RefPosStepM = 0,5 m/scan` et garde `T#2s` à
+> confirmer au banc.
+>
+> 🖥️ **Affichage IHM** : `PRG_07_Supervision` fige `M*TreuilRetenue/Benne.State.Position_M`,
+> `M2TreuilBenne.Bucket.State.M2PositionCorrected` et `Cycle.State.M*Position_M` sur leur
+> dernière valeur saine tant que `HomingBusy + 2 s` — anti-clignotement, aucune décision
+> machine.
+
 ---
 
 ## 14 · 🧩 Brique défaut façade `Fault : ST_Fault` (T164-4D)
