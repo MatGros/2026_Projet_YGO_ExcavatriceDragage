@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.624977" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.624977">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T04:57:54.517007" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T04:57:54.517007">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1341,11 +1341,13 @@ END_IF;
 // 🤿 Plancher palier descente -- plongee Kobold.
 // Injecte MinStepDown sur la CIBLE (RequestedStep, consommee par le shaper ci-dessous),
 // JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
+// ET NON bloquee par un arret/permis (NOT EffectiveSafeStop) : un permis descente FALSE
+// doit interdire physiquement le mouvement, sans re-atterrissage du plancher.
 // (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -&gt; aucun plancher,
 // l'arret franc RequestedStep=0 / RampTargetStep=0 est preserve.
 // Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
 // ActiveMaxStep (ex. SlowdownMaxStep -&gt; palier 1 en bordure basse), on borne au plafond.
-IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown &gt; 0) THEN
+IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown &gt; 0) AND NOT EffectiveSafeStop THEN
     IF RequestedStep &lt; DriveRequest.MinStepDown THEN
         RequestedStep := DriveRequest.MinStepDown;
     END_IF;

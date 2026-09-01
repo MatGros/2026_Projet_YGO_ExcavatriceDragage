@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T14:24:05.691200" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T14:24:05.691200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T04:59:24.145466" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T04:59:24.145466">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -904,30 +904,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] M3 bloque par securite (PowerCutOff OU SafeStop)</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_DriveControlWord">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les noms Device bruts (*_DQ / *_RQ) ne sont pas declares ici : les declarer
-creerait une collision avec la globale homonyme du mapping E/S.
-&lt;-- [ACT] Mot commande variateur M3 (0x3101) — cible mapping E/S</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3_DriveFreqCmdWord">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Consigne frequence M3 (0x3100, x100) — cible mapping E/S</xhtml>
-              </documentation>
-            </variable>
             <variable name="KoboldContactorCmd">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre alimentation contacteur capteur fond Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les noms Device bruts (*_DQ / *_RQ) ne sont pas declares ici : les declarer
+creerait une collision avec la globale homonyme du mapping E/S.
+&lt;-- [ACT] Ordre alimentation contacteur capteur fond Kobold</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -1321,11 +1305,11 @@ instTranslationOutputInterlockM3(
 );
 
 TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
-M3_DriveControlWord := instTranslationOutputInterlockM3.DriveControlWord;
-M3_DriveFreqCmdWord := instTranslationOutputInterlockM3.DriveFreqCmdWord;
 
 // ── Sorties physiques M3 ──
 M3_BrakeRelease_RQ           := TranslationBrakeCmd;
+M3_CommandWord               := instTranslationOutputInterlockM3.DriveControlWord;
+M3_SetpointFrequencyHz       := instTranslationOutputInterlockM3.DriveFreqCmdWord;
 
 // ── Bus inter-PRG M3 ──
 Data.TranslationBrakeCmd   := TranslationBrakeCmd;

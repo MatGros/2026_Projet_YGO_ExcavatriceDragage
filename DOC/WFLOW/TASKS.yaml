@@ -4802,3 +4802,18 @@ tasks:
   - 'Zéro changement de logique : diff de sortie nul à chaque étape'
   - 'Mettre à jour l''outillage (G330, registry, snapshots) — tous les gates verts'
   bloque_par: []
+- id: T217
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: SORTIES PRG_06 / STANDARDS
+  agent: DSH-02
+  date: '2026-09-01T00:00:00'
+  titre: "Mise en conformité PRG_06_Outputs §3bis — sorties variateur M3 ne doivent PAS être déclarées en VAR_OUTPUT homonyme d'un point matériel"
+  objectifs:
+  - "Bilan qualité complet PRG_06_Outputs (agent QC) : toutes violations §3bis (nom point matériel déclaré en VAR_OUTPUT/VAR local d'un PROGRAM, sauf PRG_02_Acquisition), M3_DriveControlWord / M3_DriveFreqCmdWord homonymes des globals mapping variateur M3"
+  - "Implémenter la correction conforme §3bis : PRG_06 écrit directement dans les globals mapping variateur M3 (M3_CommandWord / M3_SetpointFrequencyHz), sans déclaration locale homonyme; garder le nom non-collisionnant si besoin"
+  - "Zéro régression : sortie variateur M3 identique, mapping EtherCAT inchangé, G350 check_hw_name_collision PASS"
+  - "Revue large post-implémentation : ne rien oublier (chaîne AU, treuils M1/M2 même pattern, bus inter-PRG, tests)"
+  - "Auto-vérification : bundle frais + G200 liaison PASS + gates PASS + G350 PASS"
+  bloque_par: []
