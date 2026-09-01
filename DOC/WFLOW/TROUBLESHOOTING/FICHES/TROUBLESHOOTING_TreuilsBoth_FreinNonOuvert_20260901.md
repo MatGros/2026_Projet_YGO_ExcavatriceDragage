@@ -1,7 +1,15 @@
 # 🕵️ Session de Troubleshooting — Recherche de Blocage et de Panne — Treuils Both descente : frein non ouvert / aucun contacteur de puissance
 
 > 📌 `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_TreuilsBoth_FreinNonOuvert_20260901.md`
-> 📅 Date : 2026-09-01 · 🧊 Situation : [SIMULATION BANC] (SimulationEnabled=TRUE, SimSafetyActive=TRUE) · 📄 Statut : [EN COURS]
+> 📅 Date : 2026-09-01 · 🧊 Situation : [SIMULATION BANC] (SimulationEnabled=TRUE, SimSafetyActive=TRUE) · 📄 Statut : CAUSE RACINE PROUVÉE — correction P0 validée mais GELÉE (attente fin agent + état des lieux)
+
+> ⚠️ **Base de code mouvante** : le snapshot et les lectures Watch (`CommandedDirection`,
+> `DeadTimeArmed`, `LastDirection`, `M1DriveRequest.Direction`) proviennent du **runtime AVANT
+> refactor**. Le working tree en cours (agent) a déjà migré `FB_WinchDirectionInterlock` vers des
+> booléens explicites : `WinchRequest.ReqAscent` / `ReqDescend` / `RunRequest`,
+> `DirectionInterlock.CommandedAscent` / `CommandedDescend` / `RequestConflict`. Les numéros de
+> ligne et noms de champs cités plus bas sont **pré-refactor** — à réconcilier avec le code final
+> lors de l'état des lieux. Le **mécanisme** (inversion en attente + palier mini forcé) reste valide.
 
 ## 1. 🧊 Contexte figé (horodaté)
 
@@ -131,10 +139,20 @@ BrakeCmd = RelayFwd OR RelayRev = FALSE   ❌  frein fermé, aucun contacteur, m
 - Snapshot 09:13:40 : chaîne permis/arbitrage 100 % verte jusqu'à `RelayRev`, qui reste FALSE avec `StepNumber=1`.
 - Reset défaut → mouvement repart : cohérent avec purge de `DeadTimeArmed` (FB_WinchDirectionInterlock §Front Reset, lignes 37-43) et des latches barrière finale.
 
-### Points à confirmer (variables NON capturées aujourd'hui)
-`FB_WinchDirectionInterlock` internes non exposés dans `GVL_Troubleshooting` :
-`CommandedDirection`, `DirectionChangePending`, `DeadTimeArmed`, `DirectionChangeDelay.ET`,
-et `M1DriveRequest.Direction` / `.StartStop` en entrée FB_Winch.
+### Lecture live 2 (2026-09-01, Watch) — confirme la cause
+`CommandedDirection=0`, `DirectionChangePending=TRUE`, `DeadTimeArmed=FALSE`,
+`DirectionChangeDelay.ET=0ms`, `LastDirection=1`, `M1DriveRequest.Direction=-1`,
+`StartStop=TRUE`, `SpeedStepReq=1`, `RampTargetStep=1`.
+→ `DeadTimeArmed=FALSE` : hypothèse « latch DeadTimeArmed » **abandonnée**.
+→ `ET=0` avec `ContactorsReleased_DI=TRUE` ⟹ `StepNumber ≠ 0` ⟹ `Interlock.Enable=FALSE` ⟹ temps mort gelé.
+→ `RampTargetStep=1` malgré pending : injecté par le plancher `MinStepDown` (`FB_Winch:244`).
+
+### Trace amont du plancher `MinStepDown`
+`FB_DiveSearch:280-284` — `MinStepDown := CfgDiveFloorStep (≈4)` UNIQUEMENT si `DescentActive`
+ET état ∈ {SEARCHING_IMMERSION, SEARCHING_BOTTOM} ; sinon `0`.
+`PRG_03:365` relaie tel quel ; `PRG_03:450` (défaut) = `0`.
+➡️ **L'amont est correct** : `0` hors diving, `4` en recherche de fond.
+Seul `PRG_04:927` `MAX(1, …)` casse ça (→ `1` en permanence hors diving).
 
 ## 7. 🏁 Conclusion
 
@@ -156,41 +174,61 @@ et `M1DriveRequest.Direction` / `.StartStop` en entrée FB_Winch.
   pas la cause : le blocage se reproduit avec un vrai appui descente maintenu après une montée.
 - **Non concerné** : FDC logiciel haut (bloque la montée seule, `DescendPermit` = TRUE), permis,
   puissance, barrière finale, arbitrage, défauts.
-- **Statut** : cause racine **prouvée** ; corrections à valider.
+- **Statut** : cause racine **prouvée** ; correction **NON implémentée** — attente fin de travail
+  de l'agent en cours, puis état des lieux global avant d'implémenter (décision utilisateur 2026-09-01).
 
-## 8. 🛠️ Proposition de correction
+## 7bis. 📖 Spec cible du palier mini / ralentissements (arbitrée avec l'utilisateur, 2026-09-01)
 
-- **Option 1 (immédiat, sans code)** :
-  `Reset` défaut machine → repart (remet `LastDirection := 0`). Palliatif : la panne revient à
-  chaque descente qui suit une montée (reprise sens opposé). Ramener aussi le joystick Y à un vrai
-  neutre / vérifier l'étalonnage de `JoyYRaw_ANA2` (lit 0, attendu ≈ 5000).
-  — Impact : nul sur le code ; ne corrige pas la cause.
+> Deux mécanismes **distincts** à ne pas confondre :
+> - **Plancher** (`MinStepDown`) = force `RequestedStep` vers le **haut** (remplace la demande joystick si plus basse). `FB_Winch:244-246`.
+> - **Plafond de ralentissement** (`SlowdownMaxStep`) = borne `ActiveMaxStep` vers le **bas** en zone de fin de course. `FB_Winch:165-184`. C'est un `MIN`, pas un plancher.
 
-- **Option 2 (définitif, code — validation requise)** — `fix:` + `guard:` :
-  1. **`fix:` `PRG_04_Treuils_Benne.st:927`** — rétablir un plancher **conditionnel** :
-     `CommonMinStepDown := MAX(0, ReqBucket.MinStepDown);` (le plancher ne s'applique que si la
-     plongée / `FB_DiveSearch` le demande réellement). Objectif testable : hors plongée,
-     `M1DriveRequest.MinStepDown = 0` → `FB_Winch:244` inactif → `RequestedStep` suit `RampTargetStep`.
-  2. **`guard:` `FB_Winch.st:244`** — garder le plancher descente contre l'interlock direction :
-     ajouter `AND NOT DirectionChangePending AND (CommandedDirection = -1)` à la condition,
-     pour qu'aucun plancher ne puisse injecter un palier avant l'adoption du sens.
-  3. **`guard:` (durcissement) `FB_WinchDirectionInterlock`** — donner une voie d'adoption du
-     sens opposé depuis le neutre indépendante de `Enable` (compter `DirectionChangeDelay` sur
-     `ReqDirection <> CommandedDirection` avec treuil arrêté au sens `RelayFwd/Rev` retombés, sans
-     exiger `StepNumber = 0`), OU repli explicite. Empêche tout futur `StepNumber>0` parasite de
-     re-verrouiller la reprise.
-  4. **`guard:` joystick Y** — détection fil coupé / hors plage sur `JoyYRaw_ANA2`
-     (≈ 0 ou saturé) → `ErrorOperatorComm` + `Deflection := 0` au lieu de `-100 %`.
-  5. **`guard:` observabilité** — exposer dans `GVL_Troubleshooting` (`FB_TroubleshootingView`) :
-     `DirectionInterlock.CommandedDirection` / `DirectionChangePending` / `DeadTimeArmed`,
-     `DriveRequest.Direction` et `DriveRequest.MinStepDown` (M1 & M2) ; régénérer
-     `troubleshooting_variables.txt`.
-  6. **Test CI ad hoc `_TROUBLESHOOTING/`** : « après une montée (`LastDirection = 1`), commande
-     descente maintenue hors plongée ⇒ `RequestedStep = 0` tant que `DirectionChangePending`,
-     puis `CommandedDirection = -1` après `ChangeDelayDescent`, puis `RelayRev = TRUE`,
-     `BrakeCmd = TRUE` ».
-  — Impact : `PRG_04` + FB de mouvement C3/C4 → contrat de tâche + G200/G310 + 21 gates +
-     validation humaine avant application.
+| Cas | Attendu | Mécanisme | État |
+|---|---|---|---|
+| Hors mode de fonctionnement | **aucun plancher** (`MinStepDown = 0`) | `FB_DiveSearch`→`PRG_03` | ✅ amont OK — ❌ cassé par `PRG_04:927 MAX(1,…)` |
+| Descente, ~1 m avant FDC bas logiciel | ralentir à **palier 1** (petite vitesse) | plafond `InBottomSlowdownZone` | ✅ garder |
+| **Montée**, approche FDC haut logiciel | **PAS de ralentissement** (le moteur cale). Garder la fonction mais **distance haut = 0 m** | plafond `InTopSlowdownZone` (agit seulement en montée) | 🔵 **hors P0** — évolution métier à spécifier : scinder `SlowdownDistance_M` haut/bas (haut=0, bas=1 m) |
+| Benne : approche FDC ouvert / fermé | ralentir à **palier 1** ; entre les deux, **jusqu'au palier 5** | plafond M2 `M2_BucketJogLimit` | ✅ garder |
+| **Diving descente** (Kobold) | **imposer palier 4** (`CfgDiveFloorStep`) — le Kobold a besoin du débit ; ne doit pas gêner la manœuvre | plancher `MinStepDown` (dive actif seulement) | ✅ intention OK ; l'intégration doit garder « sens descente adopté + pas d'inversion en attente » |
+
+**Note comportement plancher** : quand il s'applique, le dosage joystick sous la valeur plancher
+est **perdu** (petit coup de joystick ⇒ cible = palier plancher). Le StepShaper rampe quand même
+`0→…→plancher` à 500 ms/palier (contacteurs commutés un à un), l'interlock de sens garde ses tempos.
+C'est acceptable en diving ; c'est le **caractère inconditionnel** (hors diving) qui est le défaut.
+
+## 8. 🛠️ Correction — P0 VALIDÉE, IMPLÉMENTATION GELÉE
+
+> ⏸️ Geler jusqu'à la fin du travail agent + état des lieux. Périmètre **restreint** au strict P0
+> (revue 2026-09-01). « Petit patch, mauvaise intégration du palier mini » — pas de refactor.
+
+**Palliatif immédiat (sans code)** : `Reset` défaut machine → repart. La panne revient à chaque
+descente qui suit une montée (inversion en attente + palier mini forcé).
+
+### Périmètre P0 (validé)
+
+| # | Fichier | Change | Objectif testable |
+|---|---|---|---|
+| 1 | `PRG_04` (agrég. `CommonMinStepDown`) | Remplacer le plancher global `MAX(1, …)` par un plancher **autorisant 0** (`MAX(0, ReqBucket.MinStepDown)` / `LIMIT(0,…,5)`). | Hors diving : `WinchRequest.MinStepDown = 0`. |
+| 2 | `FB_Winch` (injection `MinStepDown`) | N'appliquer `MinStepDown` **que si** : descente demandée (`ReqDescend AND NOT ReqAscent`) **ET** permis effectif descente valide **ET** aucune inversion en attente (`NOT DirectionChangePending`) **ET** sens descente **réellement adopté** (`CommandedDescend`). | Pendant `DirectionChangePending` : `RequestedStep` suit `RampTargetStep` (=0), pas de palier forcé. |
+| 3 | — | **Ne pas** contourner ni réinitialiser artificiellement le délai d'inversion (`DirectionChangeDelay`). | Le temps mort d'inversion s'écoule normalement, treuil à l'arrêt. |
+| 4 | Fiche (ce doc) | Réviser les libellés : `M1DriveRequest.Direction` **obsolète** post-refactor. Utiliser : bits explicites `ReqAscent` / `ReqDescend`, `RunRequest`, `DirectionChangePending`, sens adopté (`CommandedAscent` / `CommandedDescend`), palier demandé (`SpeedStepReq`). | Fiche alignée sur le code final. |
+
+Résultat P0 : `StepNumber` reste 0 tant que l'inversion est en attente → l'interlock de sens n'est
+plus gelé → `CommandedDescend` s'adopte après le temps mort → relais descente + frein → mouvement.
+Diving inchangé (`MinStepDown = 4` s'applique **après** adoption du sens descente).
+
+### HORS périmètre de ce patch (à traiter séparément)
+
+- **Séparation ralentissement haut / bas** (`SlowdownDistance_M` commun → distance haut = 0 pour
+  éviter le calage moteur en approche FDC haut) : **évolution métier**, à spécifier à part.
+- **Joystick brut `JoyYRaw_ANA2 = 0` → `-100 %`** : à **investiguer côté acquisition** (échelle,
+  offset, détection hors plage) **avant** de conclure à une rupture de fil. Bug indépendant, n'est
+  pas la cause du blocage.
+- **Tests CI** (`_TROUBLESHOOTING/` : montée puis descente maintenue hors diving ⇒ pas de palier
+  pendant l'attente d'inversion, puis adoption + relais + frein ; variante diving palier 4) :
+  **après** le correctif.
+- **Observabilité** `GVL_Troubleshooting` (bits de sens explicites, `DirectionChangePending`,
+  `MinStepDown`) : souhaitable, non bloquant P0.
 
 - **⚠️ Validation requise** : [humaine] — aucun code modifié / variable forcée sans accord explicite.
 

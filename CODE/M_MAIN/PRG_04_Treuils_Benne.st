@@ -96,9 +96,11 @@ VAR
     ControlAscentStartM1PosM       : REAL;
     ControlAscentStartM2PosM       : REAL;
 
-    // === ACTION BENNE M2 (dérivée de instBucket.M2_Direction, câblée au FB d'arbitrage) ===
-    BucketM2Open  : BOOL;  // . [LOC] Ouverture benne active (instBucket.M2_Direction = 1)
-    BucketM2Close : BOOL;  // . [LOC] Fermeture benne active (instBucket.M2_Direction = -1)
+    // === ACTION BENNE M2 (bits directionnels, câblés au FB d'arbitrage) ===
+    BucketM2ReqAscent  : BOOL;
+    BucketM2ReqDescend : BOOL;
+    M2AscentPermitApplied : BOOL;
+    M2DescendPermitApplied : BOOL;
 
     // === STRUCTS D'ARBITRAGE (remplis champ par champ, CODESYS refuse l'init anonyme en appel) ===
     ArbIHM     : ST_fbWinchCmdArbitration_IHM;      // . [LOC] Entrées IHM FB d'arbitrage (partagé M1/M2)
@@ -380,8 +382,8 @@ END_IF;
 
 // ── Arbitrage M1/M2 (FB_WinchCmdArbitrationM1/M2) ──
 // Dérivation des bits d'action benne M2 (consommés par les 2 FB d'arbitrage)
-BucketM2Open  := instBucket.M2_ReqAscent;
-BucketM2Close := instBucket.M2_ReqDescend;
+BucketM2ReqAscent  := instBucket.M2_ReqAscent;
+BucketM2ReqDescend := instBucket.M2_ReqDescend;
 
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
 ArbIHM.BtnAscentM1           := GVL_IHM.M1TreuilRetenue.Cmd.BtnAscent;
@@ -393,8 +395,8 @@ ArbIHM.BtnWinchBothDescent  := GVL_IHM.Commun.BtnWinchBothDescent;
 
 ArbContext.BucketBusy                     := instBucket.Lifecycle.Busy;
 ArbContext.BucketM2RunRequest             := instBucket.M2_RunRequest;
-ArbContext.BucketM2Open                   := BucketM2Open;
-ArbContext.BucketM2Close                  := BucketM2Close;
+ArbContext.BucketM2ReqAscent              := BucketM2ReqAscent;
+ArbContext.BucketM2ReqDescend             := BucketM2ReqDescend;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
 ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
 ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
@@ -879,13 +881,20 @@ EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND NOT SafeStopM2
 EffectivePermitBucket_Open := EffectivePermitM2_Descend
     AND PRG_02_Acquisition.Data.EncoderM1.Homed
     AND PRG_02_Acquisition.Data.EncoderM2.Homed
-    AND NOT _BucketState.IsOpen
+    AND (instBucket.Lifecycle.Busy OR NOT _BucketState.IsOpen)
     AND NOT instBucket.Fault.Error;
 EffectivePermitBucket_Close := EffectivePermitM2_Ascent
     AND PRG_02_Acquisition.Data.EncoderM1.Homed
     AND PRG_02_Acquisition.Data.EncoderM2.Homed
-    AND NOT _BucketState.IsClosed
+    AND (instBucket.Lifecycle.Busy OR NOT _BucketState.IsClosed)
     AND NOT instBucket.Fault.Error;
+
+// Défense en profondeur benne : le permis directionnel benne est appliqué au
+// même scan aux deux niveaux M2, uniquement lorsque FB_Bucket est producteur.
+M2AscentPermitApplied := EffectivePermitM2_Ascent
+    AND (NOT instBucket.M2_RunRequest OR EffectivePermitBucket_Close);
+M2DescendPermitApplied := EffectivePermitM2_Descend
+    AND (NOT instBucket.M2_RunRequest OR EffectivePermitBucket_Open);
 
 // 🔗 Agrégats Both : permis communs consommés par la commande both.
 // = AND des 4 permits effectifs. Chaque axe garde sa vérité propre
@@ -937,12 +946,15 @@ IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ExtractionControlActive OR Extra
     CommonMaxStepAscent := 1;
 END_IF;
 
-// Planchers communs : 1 (neutre) en montée ; en descente, MAX(1, plancher plongée FB_DiveSearch).
+// Planchers communs : 1 (neutre) en montée ; en descente, 0 hors plongée.
+// MinStepDown=0 signifie explicitement « aucun plancher » : seul FB_DiveSearch
+// peut imposer un palier de plongée. Ne jamais réintroduire un minimum à 1 ici,
+// sinon une inversion de sens ne peut plus atteindre StepNumber=0.
 // Règle de l'agrégateur : plancher = MAX des sources plancher ; si plancher > plafond,
 // LE PLAFOND GAGNE — le clamp final (consommation FB_Winch, lot aval) borne au plafond,
 // on ne force donc jamais ici un palier au-delà de CommonMaxStepDescent.
 CommonMinStepUp   := 1;
-CommonMinStepDown := MAX(1, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStepDown);
+CommonMinStepDown := MAX(0, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStepDown);
 
 // --- M2-propre (jamais vu par M1) ---
 M2MaxStepUp   := CommonMaxStepAscent;
@@ -1090,8 +1102,8 @@ instWinchM2(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     SafeStop                := SafeStopM2_Active,
-    DescendPermit           := EffectivePermitM2_Descend,
-    AscentPermit            := EffectivePermitM2_Ascent,
+    DescendPermit           := M2DescendPermitApplied,
+    AscentPermit            := M2AscentPermitApplied,
     WinchRequest            := ReqM2Winch,
     Sensors                 := M2WinchSensors,
     Config                  := M2WinchCfg,
@@ -1184,8 +1196,8 @@ WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
 WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
-WinchM2FinalInterlockRequest.AscentPermit := EffectivePermitM2_Ascent;
-WinchM2FinalInterlockRequest.DescendPermit := EffectivePermitM2_Descend;
+WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitApplied;
+WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitApplied;
 
 {endregion}
 
@@ -1358,8 +1370,8 @@ TraceM1_PrevReason := TraceM1.BlockReason;
 // --- M2 ---
 TraceM2.DescendPermitEffective := EffectivePermitM2_Descend;
 TraceM2.AscentPermitEffective  := EffectivePermitM2_Ascent;
-TraceM2.AscentPermitApplied     := EffectivePermitM2_Ascent;
-TraceM2.DescendPermitApplied    := EffectivePermitM2_Descend;
+TraceM2.AscentPermitApplied     := M2AscentPermitApplied;
+TraceM2.DescendPermitApplied    := M2DescendPermitApplied;
 TraceM2.FinalPermitBlocked      := (ReqM2Winch.RunRequest AND ReqM2Winch.ReqAscent AND NOT EffectivePermitM2_Ascent)
                                OR (ReqM2Winch.RunRequest AND ReqM2Winch.ReqDescend AND NOT EffectivePermitM2_Descend);
 TraceM2.SafeStopActive         := SafeStopM2_Active;

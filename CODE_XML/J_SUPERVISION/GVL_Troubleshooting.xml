@@ -1777,16 +1777,6 @@ TRUE = Pas de SafeStop ni AU actif sur cet axe</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="BothAscentPermit">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BothDescendPermit">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
             <variable name="BothBlocked">
               <type>
                 <BOOL />

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:24:00.321341" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:24:00.321341">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:27:17.884932" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:27:17.884932">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2430,16 +2430,6 @@ M1 : contacteurs retombés</xhtml>
               </type>
             </variable>
             <variable name="BothActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BothAscentPermit">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BothDescendPermit">
               <type>
                 <BOOL />
               </type>
@@ -8300,8 +8290,8 @@ instWinchSymmetry(
     Reset           := GVL_IHM.Commun.WinchSymmetry.BtnReset,
     M1CommandActive := PRG_04_Treuils_Benne.Data.WinchM1State.Busy,
     M2CommandActive := PRG_04_Treuils_Benne.Data.WinchM2State.Busy,
-    M1Direction     := PRG_04_Treuils_Benne.Data.WinchM1State.CommandedDirection,
-    M2Direction     := PRG_04_Treuils_Benne.Data.WinchM2State.CommandedDirection,
+    M1Direction     := SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedAscent, SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedDescend, 0, -1), 1),
+    M2Direction     := SEL(PRG_04_Treuils_Benne.Data.WinchM2State.CommandedAscent, SEL(PRG_04_Treuils_Benne.Data.WinchM2State.CommandedDescend, 0, -1), 1),
     M1BrakeCmd      := PRG_04_Treuils_Benne.Data.WinchM1State.BrakeCmd,
     M2BrakeCmd      := PRG_04_Treuils_Benne.Data.WinchM2State.BrakeCmd,
     M1BrakeApplied  := NOT PRG_04_Treuils_Benne.Data.WinchM1State.BrakeCommandOpenConfirmed,
@@ -8513,10 +8503,10 @@ instHmiBannerFormatter(
     BucketIsClosed              := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     DiveActive                  := GVL_IHM.CycleDiveSearch.State.DiveBusy,
     TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent OR GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
-    WinchBothMotionDirection := PRG_04_Treuils_Benne.WinchBothMotionDirection,
-    M1LogicRequestDirection     := PRG_04_Treuils_Benne.M1LogicRequestDirection,
-    M2LogicRequestDirection     := PRG_04_Treuils_Benne.M2LogicRequestDirection,
-    CycleRequestDirection       := PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDirection,
+    WinchBothMotionDirection := SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqAscent, SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend, 0, -1), 1),
+    M1LogicRequestDirection := SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedAscent, SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedDescend, 0, -1), 1),
+    M2LogicRequestDirection := SEL(PRG_04_Treuils_Benne.Data.WinchM2State.CommandedAscent, SEL(PRG_04_Treuils_Benne.Data.WinchM2State.CommandedDescend, 0, -1), 1),
+    CycleRequestDirection := SEL(PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqAscent, SEL(PRG_03_Modes_Cycle.Data.ReqProgram.ReqWinchM1.ReqDescend, 0, -1), 1),
     DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
@@ -8578,8 +8568,6 @@ GVL_IHM.Permits.AppliedPermitM2_Ascent := PRG_04_Treuils_Benne.Data.TraceM2.Asce
 GVL_IHM.Permits.AppliedPermitM2_Descend := PRG_04_Treuils_Benne.Data.TraceM2.DescendPermitApplied;
 GVL_IHM.Permits.M2FinalPermitBlocked := PRG_04_Treuils_Benne.Data.TraceM2.FinalPermitBlocked;
 GVL_IHM.Permits.BothActive := PRG_04_Treuils_Benne.Data.BothActive;
-GVL_IHM.Permits.BothAscentPermit := PRG_04_Treuils_Benne.Data.BothAscentPermit;
-GVL_IHM.Permits.BothDescendPermit := PRG_04_Treuils_Benne.Data.BothDescendPermit;
 GVL_IHM.Permits.BothBlocked := PRG_04_Treuils_Benne.Data.BothBlocked;
 GVL_IHM.Permits.BothBlockReason := PRG_04_Treuils_Benne.Data.BothBlockReason;
 GVL_IHM.Permits.EffectivePermitM3_Tremie := PRG_05_Translation.Data.TranslationTrace.EffectivePermitM3_Tremie;
@@ -8604,10 +8592,10 @@ instTroubleshootingView(
     Vh0808EtpOk          := PRG_02_Acquisition.Data.InputModules.Vh0808EtpOk,
     Auth                 := PRG_03_Modes_Cycle.Data.Auth,
     M1LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M1LogicRequestSpeedCmd_Pct,
-    M1LogicRequestDirection := PRG_04_Treuils_Benne.M1LogicRequestDirection,
+    M1LogicRequestDirection := SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedAscent, SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedDescend, 0, -1), 1),
     M2LogicRequestSpeedCmd_Pct := PRG_04_Treuils_Benne.Data.M2LogicRequestSpeedCmd_Pct,
-    M2LogicRequestDirection := PRG_04_Treuils_Benne.M2LogicRequestDirection,
-    WinchBothMotionDirection := PRG_04_Treuils_Benne.WinchBothMotionDirection,
+    M2LogicRequestDirection := SEL(PRG_04_Treuils_Benne.Data.WinchM2State.CommandedAscent, SEL(PRG_04_Treuils_Benne.Data.WinchM2State.CommandedDescend, 0, -1), 1),
+    WinchBothMotionDirection := SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqAscent, SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend, 0, -1), 1),
     WinchBothMotionActive := PRG_04_Treuils_Benne.WinchBothMotionActive,
     CycleAutoBusy := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
     CycleM1SpeedTgt_Pct := CycleM1SpeedTgt_Pct,

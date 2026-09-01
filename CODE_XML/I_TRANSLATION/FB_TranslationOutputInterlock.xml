@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T19:46:21.323234" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T19:46:21.323234">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:36:51.422735" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:36:51.422735">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -193,6 +193,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chaine AU rearmee et puissance OK</xhtml>
               </documentation>
             </variable>
+            <variable name="EffectivePermitM3_Tremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis Tremie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitM3_Maintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis Maintenance</xhtml>
+              </documentation>
+            </variable>
             <variable name="BrakeReleaseRequest">
               <type>
                 <BOOL />
@@ -340,6 +356,14 @@
 . [LOC] Demande de mouvement active</xhtml>
               </documentation>
             </variable>
+            <variable name="PermitFinalBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Veto directionnel final</xhtml>
+              </documentation>
+            </variable>
             <variable name="NeutralRequestSeen">
               <type>
                 <BOOL />
@@ -452,6 +476,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 MovementRequested := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWord = 2);
+PermitFinalBlocked := ((RequestedDriveControlWord = 1) AND NOT EffectivePermitM3_Tremie)
+                   OR ((RequestedDriveControlWord = 2) AND NOT EffectivePermitM3_Maintenance);
 
 // ── 2. Watchdog : exclusivement après ordre effectif de desserrage ──────
 BrakeTimeout(
@@ -511,7 +537,7 @@ ELSIF RequestedDriveControlWord = 7 THEN
     DriveControlWord := 7;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
-ELSIF MovementRequested THEN
+ELSIF MovementRequested AND NOT PermitFinalBlocked THEN
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
         DriveFreqCmd_Hz := MAX(0.0, RequestedDriveFreqHz);

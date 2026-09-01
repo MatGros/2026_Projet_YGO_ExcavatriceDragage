@@ -5069,12 +5069,15 @@ END_IF;
 // JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
 // ET NON bloquee par un arret/permis (NOT EffectiveSafeStop) : un permis descente FALSE
 // doit interdire physiquement le mouvement, sans re-atterrissage du plancher.
+// Le sens doit aussi etre deja adopte : pendant DirectionChangePending, le
+// StepNumber doit rester a 0 afin que le temps mort d'inversion puisse s'ecouler.
 // (RunRequest AND ReqDescend) : relache joystick (RunRequest=FALSE) -&gt; aucun plancher,
 // l'arret franc RequestedStep=0 / RampTargetStep=0 est preserve.
 // Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
 // ActiveMaxStep (ex. SlowdownMaxStep -&gt; palier 1 en bordure basse), on borne au plafond.
 IF WinchRequest.RunRequest AND WinchRequest.ReqDescend AND NOT WinchRequest.ReqAscent
-   AND (WinchRequest.MinStepDown &gt; 0) AND NOT EffectiveSafeStop THEN
+   AND (WinchRequest.MinStepDown &gt; 0) AND NOT EffectiveSafeStop
+   AND NOT DirectionChangePending AND CommandedDescend THEN
     IF RequestedStep &lt; WinchRequest.MinStepDown THEN
         RequestedStep := WinchRequest.MinStepDown;
     END_IF;

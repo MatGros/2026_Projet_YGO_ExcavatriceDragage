@@ -259,6 +259,8 @@ instTranslationOutputInterlockM3(
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop,
+    EffectivePermitM3_Tremie   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie,
+    EffectivePermitM3_Maintenance := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance,
     BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest,
     BrakeCommandOpenConfirmed  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
     RequestedDriveControlWord  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord,

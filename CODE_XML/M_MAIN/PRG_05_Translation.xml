@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:09:39.227588" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:09:39.227588">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:36:51.423736" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:36:51.423736">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -410,6 +410,16 @@
               </type>
             </variable>
             <variable name="SafeStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectivePermitM3_Tremie">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
@@ -2552,6 +2562,8 @@ TranslationFinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_I
 TranslationFinalInterlockRequest.PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 TranslationFinalInterlockRequest.SafeStop := M3_SafeStop_Aggregate;
 TranslationFinalInterlockRequest.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
+TranslationFinalInterlockRequest.EffectivePermitM3_Tremie := EffectivePermitM3_Tremie;
+TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance := EffectivePermitM3_Maintenance;
 TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeReleaseRequest;
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;

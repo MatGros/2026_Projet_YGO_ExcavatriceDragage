@@ -14,6 +14,8 @@ VAR_INPUT
     Reset                        : BOOL;   // --> [CMD] Acquittement defaut sur front
     SafeStop                     : BOOL;   // --> [SAFE] Entree securite pour interface standard
     PowerContactorEngaged        : BOOL;   // --> [SAFE] Chaine AU rearmee et puissance OK
+    EffectivePermitM3_Tremie     : BOOL;   // --> [SAFE] Permis Tremie
+    EffectivePermitM3_Maintenance: BOOL;   // --> [SAFE] Permis Maintenance
 
     // === DEMANDES DE COMMANDE AMONT ===
     BrakeReleaseRequest          : BOOL;   // --> [CMD] Demande de desserrage frein
@@ -48,6 +50,7 @@ VAR
 
     // === VARIABLES LOCALES INTERNES ===
     MovementRequested            : BOOL;   // . [LOC] Demande de mouvement active
+    PermitFinalBlocked           : BOOL;   // . [LOC] Veto directionnel final
     NeutralRequestSeen           : BOOL;   // . [LOC] Demande neutre (mot 0) observee
     ResetRequired                : BOOL;   // . [LOC] Front Reset obligatoire avant nouvelle marche
     BrakeTimeoutCause            : BOOL;   // . [LOC] Cause brute timeout desserrage frein
@@ -79,6 +82,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 MovementRequested := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWord = 2);
+PermitFinalBlocked := ((RequestedDriveControlWord = 1) AND NOT EffectivePermitM3_Tremie)
+                   OR ((RequestedDriveControlWord = 2) AND NOT EffectivePermitM3_Maintenance);
 
 // ── 2. Watchdog : exclusivement après ordre effectif de desserrage ──────
 BrakeTimeout(
@@ -138,7 +143,7 @@ ELSIF RequestedDriveControlWord = 7 THEN
     DriveControlWord := 7;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
-ELSIF MovementRequested THEN
+ELSIF MovementRequested AND NOT PermitFinalBlocked THEN
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
         DriveFreqCmd_Hz := MAX(0.0, RequestedDriveFreqHz);

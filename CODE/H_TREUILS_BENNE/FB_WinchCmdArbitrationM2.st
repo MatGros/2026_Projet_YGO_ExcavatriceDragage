@@ -56,8 +56,8 @@ ELSE
     // ── Chemin benne : M2 piloté par l'action benne (override) ──
     IF Context.BucketBusy AND Context.BucketM2RunRequest THEN
         RunRequest := Context.BucketM2RunRequest;
-        ReqAscent  := Context.BucketM2Open;
-        ReqDescend := Context.BucketM2Close;
+        ReqAscent  := Context.BucketM2ReqAscent;
+        ReqDescend := Context.BucketM2ReqDescend;
         StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
