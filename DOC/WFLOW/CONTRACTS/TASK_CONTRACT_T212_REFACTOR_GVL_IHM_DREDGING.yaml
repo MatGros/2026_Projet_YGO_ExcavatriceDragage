@@ -1,0 +1,118 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Refactor MINIMAL de GVL_IHM.DredgingAssist en sous-structures homogènes.
+# Règle d'or : réutilisation stricte des champs existants, zéro nouveau champ,
+# zéro changement de logique — pur renommage/regroupement de chemins.
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T212_REFACTOR_GVL_IHM_DREDGING
+  criticality: C2
+  strategy: patch            # refactor minimal, pas de rebuild
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Découper le bloc IHM mélangé GVL_IHM.DredgingAssist (Dive + Extraction +
+    DumpAtTremie + Bypass) en 3 sous-structures homogènes Cmd/State/Cfg
+    (CycleDiveSearch, CycleExtraction, CycleDumpAtTremie), en réutilisant les
+    champs existants, pour homogénéiser la structuration IHM et éliminer les
+    doublons Cmd/Cfg. Aucun changement de comportement machine.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "GVL_IHM.DredgingAssist est remplacé par GVL_IHM.CycleDiveSearch, GVL_IHM.CycleExtraction et GVL_IHM.CycleDumpAtTremie, chacun avec Cmd/State/Cfg."
+      verified_by: "grep 'DredgingAssist' dans CODE/ = 0 occurrence (hors commentaires/archives)"
+    - id: AC2
+      statement: "Aucun champ existant n'est perdu ni renommé sémantiquement : chaque champ de ST_DredgingAssistCmd/Cfg/State est retrouvé dans une des 3 nouvelles structures."
+      verified_by: "comparaison champ-à-champ des structures source et cible"
+    - id: AC3
+      statement: "Les toggles TglEnableDiveSearch/TglEnableExtractionSequence/TglEnableDumpAtTremie n'existent plus en double dans Cfg (restent uniquement en Cmd)."
+      verified_by: "grep des 3 toggles dans les structures Cfg = 0"
+    - id: AC4
+      statement: "Le commentaire TglEnableDumpAtTremie est corrigé (ne dit plus 'TRUE par défaut' alors que la valeur est FALSE)."
+      verified_by: "lecture du commentaire dans la structure cible"
+    - id: AC5
+      statement: "Tous les consommateurs (PRG_03, PRG_04, PRG_07, FB_TroubleshootingView, GVL_PERSISTENT, bridge) sont recâblés vers les nouveaux chemins, sans oubli."
+      verified_by: "G200_check_linkage.py --report = PASS (0 erreur) + grep exhaustif"
+    - id: AC6
+      statement: "Aucun changement de logique : le comportement machine est identique avant/après (pur renommage de chemins)."
+      verified_by: "bundle frais + G200 PASS + gates palier C PASS + diff de sortie nul"
+    - id: AC7
+      statement: "Les POU de CODE/M_MAIN (PRG_03_Modes_Cycle, PRG_04_Treuils_Benne, PRG_07_Supervision) conservent un nom de fichier identique au nom de POU et un suffixe de langage identique au langage généré dans le bundle."
+      verified_by: "bundle PLCopenXML généré : nom de POU = nom de fichier, suffixe ST cohérent"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistHMI.st
+      - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCmd.st
+      - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistCfg.st
+      - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_DredgingAssistState.st
+      - CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st
+      - CODE/J_SUPERVISION/_BRIDGES/FB_CfgPersistBridge_DredgingAssistCfg.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/GVL_PERSISTENT.st
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/G_CYCLE/FB_DiveSearch.st
+      - CODE/G_CYCLE/FB_ExtractionAssist.st
+      - DOC/NAMING_CONVENTION.md
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Tous les champs IHM existants (Cmd/State/Cfg) de DredgingAssist, retrouvés dans les 3 nouvelles structures"
+      - "La persistance _DredgingAssistCfgPersist et le pont FB_CfgPersistBridge_DredgingAssistCfg"
+      - "La projection troubleshooting ST_ChainDredgingAssist (Idx101..602)"
+      - "Aucun changement de logique métier (plongée, extraction, vidage trémie)"
+    dropped_on_purpose:
+      - "Doublons Cmd/Cfg des toggles d'activation (TglEnableDiveSearch/Extraction/DumpAtTremie) — restent en Cmd uniquement"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison"
+    - run_all_gates          # resultat des gates
+    - bundle                 # CODE/CODE_Bundle.xml regenere
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route (incoherence de spec, bug
+    preexistant, risque hors scope) est remonte IMMEDIATEMENT a l'orchestrateur,
+    pas a la fin et jamais silencieusement. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    En attente de validation humaine du plan avant implémentation.
+  evidence_submitted: []
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    En attente de validation humaine du plan complet avant toute écriture.
