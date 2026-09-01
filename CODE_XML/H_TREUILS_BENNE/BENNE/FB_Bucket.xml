@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T10:52:29.459582" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T10:52:29.459582">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T17:18:38.664574" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T17:18:38.664574">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -908,47 +908,6 @@
                 <BOOL />
               </type>
             </variable>
-            <variable name="BucketRefWindowActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FENETRE DE REFERENCEMENT (preset codeur = saut de CablePosM1/M2) ===
-. [LOC] Homing / preset codeur en cours : causes geometrie &amp; reference re-basees</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketPosStepDetected">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Saut de position non physique ce scan (M1 ou M2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM1Prev">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CablePosM1 scan precedent (detection de saut)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM2Prev">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CablePosM2 scan precedent (detection de saut)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonRefSettleBucket">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde de stabilisation apres homing / saut de position</xhtml>
-              </documentation>
-            </variable>
             <variable name="instFault">
               <type>
                 <derived name="FB_FaultCore" />
@@ -969,17 +928,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_RefPosStepM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -1013,27 +961,6 @@ IF ResetEdge.Q OR BypassGlobal THEN
 END_IF;
 
 IF NOT BypassGlobal THEN
-    // 🛡️ Fenetre de referencement : le preset SDO du codeur (homing M1, M2 ou
-    // conjoint) fait sauter CablePosM1/M2 d'un bloc et fait retomber HomedMx a
-    // FALSE pendant la transaction. Sans garde, la cause 1 (CablePosM2 &lt; CablePosM1
-    // transitoire) et la cause 4 (HomedMx FALSE transitoire) se latchent et
-    // restent. On inhibe ces 2 causes pendant homing conjoint + saut de position
-    // detecte + 2s de stabilisation, et on RAZ leurs latches parasites.
-    IF FirstCycle THEN
-        CablePosM1Prev := CablePosM1;
-        CablePosM2Prev := CablePosM2;
-    END_IF;
-    BucketPosStepDetected := (ABS(CablePosM1 - CablePosM1Prev) &gt; CST_RefPosStepM)
-                          OR (ABS(CablePosM2 - CablePosM2Prev) &gt; CST_RefPosStepM);
-    CablePosM1Prev := CablePosM1;
-    CablePosM2Prev := CablePosM2;
-    TonRefSettleBucket(IN := NOT (MachineHomingActive OR BucketPosStepDetected), PT := T#2s);
-    BucketRefWindowActive := MachineHomingActive OR BucketPosStepDetected OR NOT TonRefSettleBucket.Q;
-    IF BucketRefWindowActive THEN
-        OffsetMaxFaultLatched := FALSE;
-        HomingFaultLatched    := FALSE;
-    END_IF;
-
     // Cause 0 : Configuration géométrie benne
     IF (Config.OffsetOpenM &gt;= Config.OffsetCloseM)
        OR (Config.OffsetOpenM &lt; 0.0) THEN
@@ -1045,8 +972,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 1 : Dépassement écart max
     MaxAllowedOffset := Config.OffsetCloseM + 2.0;
-    IF NOT BucketRefWindowActive
-       AND ((CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset)) OR (CablePosM2 &lt; CablePosM1)) THEN
+    IF (CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset)) OR (CablePosM2 &lt; CablePosM1) THEN
         OffsetMaxFaultLatched := TRUE;
     END_IF;
     instCauses[1].Active   := OffsetMaxFaultLatched;
@@ -1072,7 +998,7 @@ IF NOT BypassGlobal THEN
     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
 
     // Cause 4 : Non référencé
-    IF NOT BucketRefWindowActive AND (NOT HomedM1 OR NOT HomedM2) THEN
+    IF NOT HomedM1 OR NOT HomedM2 THEN
         HomingFaultLatched := TRUE;
     END_IF;
     instCauses[4].Active   := HomingFaultLatched;
@@ -1080,11 +1006,6 @@ IF NOT BypassGlobal THEN
     instCauses[4].Texte    := 'Codeurs treuils non references pour sequence benne';
 ELSE
     TonTimeout(IN := FALSE);
-    TonRefSettleBucket(IN := FALSE);
-    BucketRefWindowActive := FALSE;
-    BucketPosStepDetected := FALSE;
-    CablePosM1Prev := CablePosM1;
-    CablePosM2Prev := CablePosM2;
     M1SlipDetected := FALSE;
     instCauses[0].Active := FALSE;
     instCauses[1].Active := FALSE;
