@@ -4595,27 +4595,24 @@ tasks:
   criticite: C2
   domaine: TREUILS / SÉCURITÉ
   agent: DSH-02
-  date: '2026-08-31T00:00:00'
-  titre: Cohérence ActiveOffsetM / état benne — cause racine du faux défaut MecaE
-  contexte: 'Intitulé complet : Analyser la mise à jour de ActiveOffsetM et de l''état benne (IsOpen/IsClosed) — cause racine
-    du faux défaut MecaE (offset 15m incohérent avec la position physique).'
-  description: 'Diagnostic 2026-08-31 : le faux défaut MecaE (meca synchron) vient d''un ActiveOffsetM incohérent. Valeurs
-    observées : CablePosM(M1)=1.31m, ExpectedOtherWinchPosM=-13.7m (donc ActiveOffsetM=15m = OffsetCloseM benne fermée), alors
-    que les 2 treuils sont référencés à 1.31m (benne ouverte, offset devrait être 0m). ActiveOffsetM dépend de l''état benne
-    mémorisé (IsOpen/IsClosed), pas de la position physique mesurée. Si l''état benne est incohérent (cycle interrompu, jog
-    manuel, état non mis à jour), ActiveOffsetM est faux → ABS(M1-M2+ActiveOffsetM) > 2.5m → faux MecaE. Objectif : comprendre
-    pourquoi ActiveOffsetM reste à 15m alors que la benne est ouverte, et proposer une correction (mise à jour d''état benne,
-    garde-fou StateIncoherent).'
-  contrat: ''
+  date: '2026-09-01T00:00:00'
+  titre: Cohérence ActiveOffsetM / état benne — correction validée (2 challenges MAJOR)
+  contexte: 'Intitulé complet : Corriger la cohérence ActiveOffsetM / état benne (IsOpen/IsClosed) — cause racine du faux
+    défaut MecaE (offset 15m incohérent avec la position physique). Design corrigé validé par 2 challenges experts MAJOR.'
+  description: 'Design corrigé validé par 2 challenges experts (automatisme/sécurité + qualité/homing) : NE PAS réconcilier
+    IsOpen/IsClosed depuis DeltaPosition_M (raisonnement circulaire = masque une vraie désynchro). Détecter la contradiction
+    état<->position -> StateIncoherent, sortie dédiée BucketStateCoherent := NOT StateIncoherent, gate sur la COMMANDE (StartStop,
+    PAS SafeStop), geler plutôt que forcer ActiveOffsetM, re-qualification opérateur. Points bloquants doc à traiter AVANT code :
+    mapping ErrorId AF_Partie-10 FAUX, CoherenceLimitM 3 valeurs (viser 1.0, visa V2), boot RETAIN périmé (F08).'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T208.yaml
   objectifs:
-  - Comprendre pourquoi ActiveOffsetM reste à 15m (OffsetCloseM) alors que la benne est physiquement ouverte (2 treuils à
-    la même position)
-  - Identifier le mécanisme de mise à jour de l'état benne (IsOpen/IsClosed) et les cas où il devient incohérent (cycle interrompu,
-    jog manuel, état non mis à jour)
-  - 'Proposer une correction : mise à jour d''état benne fiable, ou garde-fou StateIncoherent (forcer ActiveOffsetM sûr /
-    inhiber MecaE si état incohérent)'
-  - Vérifier que la correction ne casse pas la synchro ni le cycle benne
-  - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS'
+  - "Détecter la contradiction état benne <-> position physique -> StateIncoherent (ne JAMAIS réécrire IsOpen/IsClosed depuis DeltaPosition_M)"
+  - "Sortie dédiée BucketStateCoherent := NOT StateIncoherent, gate sur StartStop (PAS SafeStop), MecaE reste armé"
+  - "Gate sur HomedM1 AND HomedM2 + traiter le cas hors fenêtres + boot RETAIN périmé (F08)"
+  - "Gater M2_LimitShift et FB_Cycle X3/X6 sur BucketStateCoherent (risque mécanique butée haute M2 + cycle)"
+  - "Message IHM StateIncoherent + action re-confirmation → corriger AF_Partie-10 (mapping ErrorId, CoherenceLimitM) + AF_Partie-14"
+  - "Viser CoherenceLimitM=1.0 unique (visa V2) ; ne pas casser synchro/cycle benne/M2PositionCorrected"
+  - 'Auto-vérification : contrat PASS + bundle frais + G200 liaison PASS + gates palier C PASS'
   bloque_par: []
 - id: T209
   parent_id: ''
