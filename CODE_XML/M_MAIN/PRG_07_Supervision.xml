@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T03:35:25.095781" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T03:35:25.095781">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T03:57:57.289361" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T03:57:57.289361">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2241,6 +2241,55 @@ Demande de changement de mode REFUSEE : les treuils</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas a l'arret mecanique confirme (contacteurs
 retombes ET frein serre ET |v| &lt; seuil). Mode courant maintenu.
 Motif du blocage de bascule (texte IHM court, ex. "Chgt mode refuse : contacteur M1")</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détail des 6 sous-conditions de ModeChangeAllowed (diagnostic IHM) — TRUE = condition satisfaite.
+M1 : contacteurs retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : frein serré (NOT M1BrakeIsOpen)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedLow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : vitesse sous seuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : contacteurs retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : frein serré (NOT M2BrakeIsOpen)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedLow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : vitesse sous seuil</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRequiredM1">
@@ -8085,6 +8134,12 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
 GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;
 GVL_IHM.Modes.State.ModeChangeBlockReason := PRG_03_Modes_Cycle.Data.Auth.ModeChangeBlockReason;
+GVL_IHM.Modes.State.M1ContactorsReleased := PRG_03_Modes_Cycle.Data.Auth.M1ContactorsReleased;
+GVL_IHM.Modes.State.M1BrakeApplied := PRG_03_Modes_Cycle.Data.Auth.M1BrakeApplied;
+GVL_IHM.Modes.State.M1SpeedLow := PRG_03_Modes_Cycle.Data.Auth.M1SpeedLow;
+GVL_IHM.Modes.State.M2ContactorsReleased := PRG_03_Modes_Cycle.Data.Auth.M2ContactorsReleased;
+GVL_IHM.Modes.State.M2BrakeApplied := PRG_03_Modes_Cycle.Data.Auth.M2BrakeApplied;
+GVL_IHM.Modes.State.M2SpeedLow := PRG_03_Modes_Cycle.Data.Auth.M2SpeedLow;
 GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;
 GVL_IHM.Modes.State.HomingRequiredM2 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM2;
 

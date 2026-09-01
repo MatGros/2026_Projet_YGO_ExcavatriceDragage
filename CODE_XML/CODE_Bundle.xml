@@ -8196,6 +8196,55 @@ un interlock qu'on ne voit pas est un interlock qu'on contourne.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Motif du blocage de bascule (texte court, ex. "Chgt mode refuse : contacteur M1")</xhtml>
               </documentation>
             </variable>
+            <variable name="M1ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détail des 6 sous-conditions de ModeChangeAllowed (diagnostic IHM) — TRUE = condition satisfaite
+M1 : contacteurs retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : frein serré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedLow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : vitesse sous seuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : contacteurs retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : frein serré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedLow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : vitesse sous seuil</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingRequiredM1">
               <type>
                 <BOOL />
@@ -8303,6 +8352,55 @@ Demande de changement de mode REFUSEE : les treuils</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas a l'arret mecanique confirme (contacteurs
 retombes ET frein serre ET |v| &lt; seuil). Mode courant maintenu.
 Motif du blocage de bascule (texte IHM court, ex. "Chgt mode refuse : contacteur M1")</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détail des 6 sous-conditions de ModeChangeAllowed (diagnostic IHM) — TRUE = condition satisfaite.
+M1 : contacteurs retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : frein serré (NOT M1BrakeIsOpen)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedLow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : vitesse sous seuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : contacteurs retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : frein serré (NOT M2BrakeIsOpen)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedLow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : vitesse sous seuil</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRequiredM1">
@@ -28035,6 +28133,15 @@ ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
                      AND (ABS(M1SpeedAbsMps) &lt; MovementSpeedThresholdMps)
                      AND M2ContactorsReleased AND NOT M2BrakeIsOpen
                      AND (ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps);
+
+// Détail des 6 sous-conditions (diagnostic IHM) — TRUE = condition satisfaite.
+// Permet à l'opérateur de voir EXACTEMENT ce qui bloque la bascule de mode.
+Auth.M1ContactorsReleased := M1ContactorsReleased;
+Auth.M1BrakeApplied       := NOT M1BrakeIsOpen;
+Auth.M1SpeedLow           := ABS(M1SpeedAbsMps) &lt; MovementSpeedThresholdMps;
+Auth.M2ContactorsReleased := M2ContactorsReleased;
+Auth.M2BrakeApplied       := NOT M2BrakeIsOpen;
+Auth.M2SpeedLow           := ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps;
 
 // 3.2 ARBITRAGE — le mode suit la sélection IHM (découplé de l'AU/défaut)
 // La sélection de mode n'est JAMAIS bloquée par l'AU, l'arrêt d'urgence ou un défaut :
@@ -48020,6 +48127,12 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
 GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;
 GVL_IHM.Modes.State.ModeChangeBlockReason := PRG_03_Modes_Cycle.Data.Auth.ModeChangeBlockReason;
+GVL_IHM.Modes.State.M1ContactorsReleased := PRG_03_Modes_Cycle.Data.Auth.M1ContactorsReleased;
+GVL_IHM.Modes.State.M1BrakeApplied := PRG_03_Modes_Cycle.Data.Auth.M1BrakeApplied;
+GVL_IHM.Modes.State.M1SpeedLow := PRG_03_Modes_Cycle.Data.Auth.M1SpeedLow;
+GVL_IHM.Modes.State.M2ContactorsReleased := PRG_03_Modes_Cycle.Data.Auth.M2ContactorsReleased;
+GVL_IHM.Modes.State.M2BrakeApplied := PRG_03_Modes_Cycle.Data.Auth.M2BrakeApplied;
+GVL_IHM.Modes.State.M2SpeedLow := PRG_03_Modes_Cycle.Data.Auth.M2SpeedLow;
 GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;
 GVL_IHM.Modes.State.HomingRequiredM2 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM2;
 

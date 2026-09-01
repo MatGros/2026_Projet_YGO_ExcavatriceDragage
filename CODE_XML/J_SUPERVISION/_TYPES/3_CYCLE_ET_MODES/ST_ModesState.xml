@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T01:41:44.003488" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T01:41:44.003488">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T03:57:40.594822" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T03:57:40.594822">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -56,6 +56,55 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Motif du blocage de bascule (texte court, ex. "Chgt mode refuse : contacteur M1")</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détail des 6 sous-conditions de ModeChangeAllowed (diagnostic IHM) — TRUE = condition satisfaite
+M1 : contacteurs retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : frein serré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedLow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : vitesse sous seuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : contacteurs retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : frein serré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedLow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : vitesse sous seuil</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRequiredM1">
