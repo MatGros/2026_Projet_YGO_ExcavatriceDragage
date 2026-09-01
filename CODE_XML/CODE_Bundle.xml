@@ -43650,6 +43650,14 @@ PreviousQualified := Qualified;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur initialisation source Machine</xhtml>
               </documentation>
             </variable>
+            <variable name="SimulationModeRise">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant activation simulation</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimulationModeFall">
               <type>
                 <derived name="F_TRIG" />
@@ -43702,21 +43710,27 @@ PreviousQualified := Qualified;
 // === 🧪 §0 SIMULATION &amp; SÉLECTION DE SOURCE ===
 // 🎯 Producteur unique des aiguillages Reel/Simu par domaine (HwReal vs HwSim -&gt; HwIn).
 
+SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
 SimulationModeFall(CLK := GVL_Simulation.SimulationModeActive);
 
-// 🧪 Activation par domaine = NIVEAU (pas front) : Sim*Active suivent directement
-// SimulationModeActive. Robustesse : la chaîne d'urgence est fermée (routage HwSim)
-// dès que SimulationModeActive=TRUE, même si le front montant n'est pas observé
-// (ex. SimulationModeActive déjà TRUE au boot ou réglé hors front).
-// Hors simulation (SimulationModeActive=FALSE) → Sim*Active=FALSE → repli HwReal
-// (sécurité réelle intacte). Cohérent pour les 4 domaines (Winch/Translation/Operator/Safety).
-GVL_Simulation.SimWinchActive       := GVL_Simulation.SimulationModeActive;
-GVL_Simulation.SimTranslationActive := GVL_Simulation.SimulationModeActive;
-GVL_Simulation.SimOperatorActive    := GVL_Simulation.SimulationModeActive;
-GVL_Simulation.SimSafetyActive      := GVL_Simulation.SimulationModeActive;
+// 🧪 Activation par domaine = SUR FRONT UNIQUEMENT : Sim*Active bascule au front montant
+// (TRUE) et au front descendant (FALSE) de SimulationModeActive, jamais en niveau chaque scan.
+// ⚠️ Si SimulationModeActive est déjà TRUE au boot (aucun front observé), Sim*Active reste
+// FALSE → routage HwReal. Activer la simulation par un vrai front OFF→ON après démarrage.
+// Cohérent pour les 4 domaines (Winch/Translation/Operator/Safety).
+IF SimulationModeRise.Q THEN
+    GVL_Simulation.SimWinchActive       := TRUE;
+    GVL_Simulation.SimTranslationActive := TRUE;
+    GVL_Simulation.SimOperatorActive    := TRUE;
+    GVL_Simulation.SimSafetyActive      := TRUE;
+END_IF;
 
 IF SimulationModeFall.Q THEN
-    // 🧪 Reset des stimuli de simulation sur désactivation (front descendant)
+    // 🧪 Desactivation des aiguillages + reset des stimuli de simulation (front descendant)
+    GVL_Simulation.SimWinchActive       := FALSE;
+    GVL_Simulation.SimTranslationActive := FALSE;
+    GVL_Simulation.SimOperatorActive    := FALSE;
+    GVL_Simulation.SimSafetyActive      := FALSE;
     GVL_Simulation.SimM3SensorsWordOverrideActive := FALSE;
     GVL_Simulation.SimM3SensorsWord := 16#07;
     GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active := FALSE;
@@ -48852,6 +48866,14 @@ PowerCutOffActive := PowerCutOffReq;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass SlackCable IHM&lt;-&gt;RETAIN</xhtml>
               </documentation>
             </variable>
+            <variable name="instMirrorBypassNetwork">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass Reseau (bus + 5 modules E/S) IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
             <variable name="PrevTranslationBypass">
               <type>
                 <BOOL />
@@ -48931,6 +48953,14 @@ PowerCutOffActive := PowerCutOffReq;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass mou de cable (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevNetworkBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass reseau global (sync bidirectionnel)</xhtml>
               </documentation>
             </variable>
             <variable name="SimBypassRise">
@@ -49249,6 +49279,17 @@ IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
     GVL_IHM.Commun.Bypass.Initialized := TRUE;
 END_IF;
 
+// Restauration boot du bypass reseau global (RETAIN), meme pattern que les autres domaines.
+// GVL_IHM.Network.Bypass.Global neutralise les diagnostics bus + 5 modules E/S dans
+// PRG_02_Acquisition (VH_0008ER, CANopen, EtherCAT). Sans ce relais, BypassNetworkGlobal
+// etait orphelin (jamais rejoue vers l'IHM).
+IF NOT GVL_IHM.Network.Bypass.Initialized THEN
+    IF BypassNetworkGlobal THEN
+        GVL_IHM.Network.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.Network.Bypass.Initialized := TRUE;
+END_IF;
+
 // ---------- §2c. Synchronisation bidirectionnelle IHM ↔ RETAIN ----------
 // 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne), factorisé dans FB_MirrorBypassRetain
 // (CODE/A_COMMUN) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
@@ -49262,6 +49303,7 @@ instMirrorBypassTopLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.TopLimitSwitch, Reta
 instMirrorBypassTopLimitSoftware(Hmi := GVL_IHM.Commun.Bypass.TopLimitSoftware, RetainVal := BypassTopLimitSoftware, Prev := PrevTopLimitSoftware);
 instMirrorBypassCableLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.CableLimitSwitch, RetainVal := BypassCableLimitSwitch, Prev := PrevCableLimitSwitch);
 instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, RetainVal := BypassSlackCable, Prev := PrevSlackCable);
+instMirrorBypassNetwork(Hmi := GVL_IHM.Network.Bypass.Global, RetainVal := BypassNetworkGlobal, Prev := PrevNetworkBypass);
 
 // ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)

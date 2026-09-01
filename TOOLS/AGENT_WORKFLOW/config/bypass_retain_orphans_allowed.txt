@@ -1,0 +1,7 @@
+# Bypass RETAIN (GVL_BypassRetain.st) tolérés sans relais dans PRG_07_Supervision.
+# Un nom par ligne. Justification obligatoire. Vise à retomber à zéro (câbler le relais).
+# Contrôle : G491_check_bypass_retain_relayed.py
+
+# Orphelin connu au 2026-09-02 : jamais relayé vers GVL_IHM.M2TreuilBenne.Bucket.Bypass.
+# À câbler (boot-restore + instMirrorBypassBucket) — hors périmètre du lot BypassNetworkGlobal.
+BypassBucketGlobal

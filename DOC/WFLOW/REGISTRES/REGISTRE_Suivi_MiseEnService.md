@@ -26,6 +26,48 @@
 ## 2. 📝 Entrées de Séances
 
 
+### 🎯 Objectif de séance — 2026-09-01 — 🚀 Début mise en service de septembre
+- **Cible** : reprise des essais terrain — campagne MES septembre.
+- **Contexte version** : suite `v0.6.00` (voir MES-029).
+
+---
+
+### MES-031 — 🟡 Boot codeurs + benne non référencés → référencement manuel M2 à 7,5 m
+- 📅 **Date** : 2026-09-01 | 📍 **Lieu** : Terrain | 🏷️ **Version** : MES septembre (à préciser au commit)
+- 🎯 **Périmètre** : Codeurs M1/M2, benne (M2), `FB_Encoder_Homing` / référencement
+- 🚦 **Statut** : 🟡 **À surveiller** — fonctionne, valeur de préset à confirmer
+- 🔍 **Constat / Essai** :
+  - Boot machine avec **codeur et benne non référencés**.
+  - Le **référencement (homing) semble fonctionner** au boot.
+  - Position réelle **plus basse que le capteur haut** → préset manuel de la position M2 à **7,5 m** (valeur choisie par l'opérateur car sous le capteur).
+- 🛠️ **Solution / Décision** : préset manuel M2 = 7,5 m pour démarrer la campagne. À valider par une mesure physique du câble/benne au boot.
+- 📌 **Action différée** : confirmer la cohérence du préset 7,5 m (butée logicielle haute 7,5 m — cf. `DIAG-DEFAUT-MECA-BUTEE-LOGICIELLE`) ; vérifier qu'un boot benne fermée non référencé ne génère pas de défaut Meca au-dessus de la butée (lien `T183`, `T175`, homing M2 benne fermée). Réf `Txx` à ouvrir si comportement anormal.
+
+---
+
+### MES-032 — 🔴 Bandeau d'alarme VIDE malgré AnyFault + M1/M2 SafetyFault + coupure puissance active
+- 📅 **Date** : 2026-09-01 | 📍 **Lieu** : Terrain (début MES septembre) | 🏷️ **Version** : suite `v0.6.00`
+- 🎯 **Périmètre** : Bandeau alarme IHM (Supervision), chaîne PowerKeepAlive / PowerCutOff, safety M1/M2
+- 🚦 **Statut** : 🔴 **Bloquant** — sécurité qui n'affiche rien ; diagnostic en cours
+- 🔍 **Constat / Essai** (AU déjà réarmé physiquement, pas par PLC) :
+  - `PowerKeepAlive_A_RQ` = TRUE · `PowerKeepAlive_B_RQ` = 0 (opérateur : sorties shuntées, jugé normal — **à confirmer**)
+  - Message IHM : « [SÉCURITÉ] Coupure puissance active - acquitter défaut treuil/pont »
+  - `AnyFault` = TRUE, M1 SafetyFault = TRUE, M2 SafetyFault = TRUE
+  - **Bandeau d'alarme VIDE** — aucun message affiché
+  - 📸 Snapshot état des lieux : `TOOLS/PLC_CSV_SNAPSHOT/RESULTS/snapshot/Snapshot_Troubleshooting_20260901_195122.csv` (540/540 vars)
+- 🛠️ **Diagnostic (retour 2026-09-01 19:5x, snapshot exploité)** — **cause racine unique mesurée** : `M1_M2_M3_BrakeThermalOk_DI = FALSE` (entrée TOR *thermique frein commun M1/M2/M3*). Seul bit de sécurité actif sur toute la machine ; `Idx318_ErrorBrakeThermal = TRUE` sur M1, M2 **et** M3. Tous les autres bits (MecaA-E, Encoder, PhaseRotation, ArmingFailed, RedundancyTest…) = FALSE. Codeurs + benne **référencés** dans ce snapshot (`HomingHomed = TRUE`).
+  - **Axe A** : `ErrorBrakeThermal` → `PowerCutOff` sur les 3 FB safety → `PowerCutOffReq = TRUE` (`PRG_06_Outputs.st:347`) → `FB_Safety_EmergencyManagement` §10 : `MaintainA_Cmd` **et** `MaintainB_Cmd` = FALSE (formules identiques hors séquence de test). Donc `PowerKeepAliveACmd = PowerKeepAliveBCmd = FALSE`. `PowerKeepAlive_A_RQ = 1` observé = **shunt câblage voie A** (pas d'asymétrie logicielle) ; `B_RQ = 0` = état logique réel. **L'acquit ne passe pas** car l'entrée thermique est *vivante* (pas un latch applicatif) : Reset ré-acquitte puis `PowerCutOffRequest` repart TRUE au cycle suivant → réarmement PLC impossible par conception dans cet état.
+  - **Axe B** : bandeau vide car `FB_Hmi_BannerFormatter.st §5` (l.617-706) construit le carrousel à partir de **bits décodés spécifiques** (MecaA-E, Encoder…) — `ErrorBrakeThermal` **n'est pas collecté** et est explicitement classé « warning exclu » (commentaire §5a l.621, décision 2026-09-01). Aucune **branche de repli** quand `Safety.Error = TRUE` sans bit bloquant décodé → `AlarmCount = 0` → `HasAlarm = FALSE`. Motif identique au REX 2026-07-29 (défaut invisible qui franchit tous les contrôles).
+  - Message `[SÉCURITÉ] … acquitter défaut treuil/pont` (§4 l.461) = texte générique, **ne nomme jamais la surchauffe frein** ; le décodage précis `[M1] Surchauffe frein` existe mais uniquement sur abandon de séquence de réarmement (jamais déclenché ici car shunt au lieu de séquence).
+- 🚦 **Statut post-diag** : 🔴 Bloquant — **cause = terrain (câblage/polarité contact thermique frein)** + 2 défauts logiciels à corriger (diag M1/M2 incomplet, bandeau non exhaustif).
+- 📌 **Actions** :
+  1. **Terrain (prioritaire)** : vérifier raccordement + polarité du contact thermique frein `M1_M2_M3_BrakeThermalOk_DI` (probable NO au lieu de NC, ou non raccordé pour la séance). Si volontairement ouvert → utiliser **bypass `Bypass.Safety` (N2) tracé**, **jamais** un shunt sur la sortie keep-alive (contourne la barrière AU + auto-test redondance voie A).
+  2. **Retirer le shunt voie A** avant exploitation.
+  3. **Soft (à cadrer, pas encore codé)** : (a) ajouter `ErrorBrakeThermal` aux agrégats `M1/M2PowerCutOffSafetyInfo` (`PRG_06:103-109 / 159-165` — M3 déjà correct) ; (b) collecter `ErrorBrakeThermal` dans `FB_Hmi_BannerFormatter §5` + **branche de repli exhaustive** si `Safety.Error` sans ligne carrousel ; guards CI associés (symétrie keep-alive A/B, couverture bandeau vs bits `Error*`).
+- 📌 Suivi : `DIAG-BANDEAU-VIDE-POWERCUT-MES0901` (`TASKS_ORCHESTRATOR.yaml`). Liens : `C1-ANYFAULTACTIVE-EXHAUSTIF`, `DESIGN-BANDEAU-IHM`, `BANDEAU-TRI-HISTO-*`. `Txx` soft à ouvrir après validation humaine du cadrage.
+
+---
+
 ### 🎯 Objectif de séance — 2026-08-07
 - **Cible** : réaliser un **cycle complet** (descente → contact Kobold → remontée → vidage trémie) **sans sécurité particulière, ou à sécurité limitée** — validation mécanique/mouvement avant la mise en place des protections finales.
 - ⚠️ **Risque noté (devoir d'alerte)** : cycle réel sur machine sans les sécurités complètes → **uniquement avec bypass explicites** (`Bypass.Global`/ciblés), **homme-mort** maintenu, vigilance opérateur, **aucun redémarrage auto après défaut**, personnes écartées de la zone.

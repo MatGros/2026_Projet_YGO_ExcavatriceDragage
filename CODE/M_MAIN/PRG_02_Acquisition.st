@@ -60,6 +60,7 @@ VAR
     PreviousMachineInputSourceSimulated      : BOOL; // . [LOC] Memoire cycle precedent source Machine
     MachineInputSourceInitialized            : BOOL; // . [LOC] Indicateur initialisation source Machine
 
+    SimulationModeRise                : R_TRIG; // . [LOC] Front montant activation simulation
     SimulationModeFall                : F_TRIG; // . [LOC] Front descendant desactivation simulation
 END_VAR
 
@@ -73,21 +74,27 @@ END_VAR
 // === 🧪 §0 SIMULATION & SÉLECTION DE SOURCE ===
 // 🎯 Producteur unique des aiguillages Reel/Simu par domaine (HwReal vs HwSim -> HwIn).
 
+SimulationModeRise(CLK := GVL_Simulation.SimulationModeActive);
 SimulationModeFall(CLK := GVL_Simulation.SimulationModeActive);
 
-// 🧪 Activation par domaine = NIVEAU (pas front) : Sim*Active suivent directement
-// SimulationModeActive. Robustesse : la chaîne d'urgence est fermée (routage HwSim)
-// dès que SimulationModeActive=TRUE, même si le front montant n'est pas observé
-// (ex. SimulationModeActive déjà TRUE au boot ou réglé hors front).
-// Hors simulation (SimulationModeActive=FALSE) → Sim*Active=FALSE → repli HwReal
-// (sécurité réelle intacte). Cohérent pour les 4 domaines (Winch/Translation/Operator/Safety).
-GVL_Simulation.SimWinchActive       := GVL_Simulation.SimulationModeActive;
-GVL_Simulation.SimTranslationActive := GVL_Simulation.SimulationModeActive;
-GVL_Simulation.SimOperatorActive    := GVL_Simulation.SimulationModeActive;
-GVL_Simulation.SimSafetyActive      := GVL_Simulation.SimulationModeActive;
+// 🧪 Activation par domaine = SUR FRONT UNIQUEMENT : Sim*Active bascule au front montant
+// (TRUE) et au front descendant (FALSE) de SimulationModeActive, jamais en niveau chaque scan.
+// ⚠️ Si SimulationModeActive est déjà TRUE au boot (aucun front observé), Sim*Active reste
+// FALSE → routage HwReal. Activer la simulation par un vrai front OFF→ON après démarrage.
+// Cohérent pour les 4 domaines (Winch/Translation/Operator/Safety).
+IF SimulationModeRise.Q THEN
+    GVL_Simulation.SimWinchActive       := TRUE;
+    GVL_Simulation.SimTranslationActive := TRUE;
+    GVL_Simulation.SimOperatorActive    := TRUE;
+    GVL_Simulation.SimSafetyActive      := TRUE;
+END_IF;
 
 IF SimulationModeFall.Q THEN
-    // 🧪 Reset des stimuli de simulation sur désactivation (front descendant)
+    // 🧪 Desactivation des aiguillages + reset des stimuli de simulation (front descendant)
+    GVL_Simulation.SimWinchActive       := FALSE;
+    GVL_Simulation.SimTranslationActive := FALSE;
+    GVL_Simulation.SimOperatorActive    := FALSE;
+    GVL_Simulation.SimSafetyActive      := FALSE;
     GVL_Simulation.SimM3SensorsWordOverrideActive := FALSE;
     GVL_Simulation.SimM3SensorsWord := 16#07;
     GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active := FALSE;
