@@ -1,0 +1,57 @@
+contract:
+  task_id: T217_LIAISON_SORTIES_VARIATEUR_M3
+  criticality: C2
+  strategy: patch
+  objective: >
+    Mettre en conformité l'intégralité des sorties de PRG_06 avec le référentiel
+    matériel : M1, M2, M3, Kobold et chaîne AU, sans sortie locale non raccordée.
+  acceptance:
+    - id: AC1
+      statement: "PRG_06 écrit M3_CommandWord depuis DriveControlWord et M3_SetpointFrequencyHz depuis DriveFreqCmdWord."
+      verified_by: "lecture PRG_06 et grep des deux affectations"
+    - id: AC2
+      statement: "PRG_06 ne déclare plus M3_DriveControlWord ni M3_DriveFreqCmdWord en variable locale ou sortie."
+      verified_by: "rg M3_DriveControlWord|M3_DriveFreqCmdWord CODE/M_MAIN/PRG_06_Outputs.st retourne 0 occurrence"
+    - id: AC3
+      statement: "Chaque point matériel écrit par PRG_06 est présent dans le référentiel Device_IO ; toute sortie locale qui commande un actionneur possède une route matérielle prouvée."
+      verified_by: "audit exhaustif PRG_06 -> Device_IO + G200 et G350 après bundle"
+    - id: AC4
+      statement: "Les sorties M1/M2, le frein M3, Kobold, l'AU et le bus Data restent fonctionnellement inchangés hors correction de liaison prouvée."
+      verified_by: "revue de matrice avant/après et essais ciblés par famille de sortie"
+    - id: AC5
+      statement: "Le nom du fichier est identique au nom du POU ; le suffixe est égal au langage ST du bundle PLCopenXML."
+      verified_by: "inspection POU et bundle généré"
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - TOOLS/AGENT_WORKFLOW/config/Device_IO_20260831.csv
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - TOOLS/TEST_AUTO_CI/
+      - DOC/WFLOW/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/H_TREUILS_BENNE/
+      - CODE/I_TRANSLATION/
+  conservation:
+    must_survive:
+      - "Mapping EtherCAT et noms matériels validés par l'utilisateur : M3_CommandWord et M3_SetpointFrequencyHz."
+      - "AU, PowerKeepAlive, EmergencyArming, sorties M1/M2 et frein M3 inchangés."
+      - "Aucun redémarrage automatique ajouté."
+    dropped_on_purpose:
+      - "Les deux variables locales non raccordées M3_DriveControlWord et M3_DriveFreqCmdWord."
+  evidence_required:
+    - check_task_contract
+    - bundle
+    - check_linkage
+    - run_all_gates
+  alert_duty: "Toute divergence entre le mapping validé et le bundle est bloquante."
+status: IN_PROGRESS
+execution:
+  executed_by: Codex
+  status: IN_PROGRESS
+  summary: "Correctif liaison AC600 M3 validé par utilisateur."
+  evidence_submitted: []
+validation:
+  status: APPROVED
+  notes: "Utilisateur confirme M3_CommandWord et M3_SetpointFrequencyHz comme convention matérielle projet."

@@ -2,6 +2,11 @@ contract:
   task_id: T216_PERMITS_DIRECTIONNELS_UNIQUES
   criticality: C4
   strategy: rebuild
+  related_tasks_preserved:
+    - "T176 : producteur ArmingPermit légitime et test anti-câblage littéral"
+    - "T202-C : un seul permis homme-mort cycle et neutralisation centralisée"
+    - "T204 : permis M3 appliqué à la commande"
+    - "T184 : nomenclature M3 et projection IHM"
   objective: >
     Rendre chaque autorisation de mouvement M1, M2 et M3 unique, directionnelle,
     traçable et effectivement appliquée, avec atomicité stricte de la commande Both M1/M2.
@@ -39,6 +44,9 @@ contract:
     - id: AC7
       statement: "Le nom du fichier est identique au nom du POU ; le suffixe est égal au langage ST du bundle PLCopenXML."
       verified_by: "inspection des déclarations POU et bundle généré"
+    - id: AC8
+      statement: "Le cycle ne conserve qu'un permis humain commun et neutralise ses demandes en un site ; les limites propres de benne restent des causes directionnelles distinctes."
+      verified_by: "lecture FB_Cycle et matrice benne : aucune limite Open/Close supprimée ou masquée"
 
   scope:
     allowed:

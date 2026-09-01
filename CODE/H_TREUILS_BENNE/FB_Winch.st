@@ -235,11 +235,13 @@ END_IF;
 // 🤿 Plancher palier descente -- plongee Kobold.
 // Injecte MinStepDown sur la CIBLE (RequestedStep, consommee par le shaper ci-dessous),
 // JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
+// ET NON bloquee par un arret/permis (NOT EffectiveSafeStop) : un permis descente FALSE
+// doit interdire physiquement le mouvement, sans re-atterrissage du plancher.
 // (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -> aucun plancher,
 // l'arret franc RequestedStep=0 / RampTargetStep=0 est preserve.
 // Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
 // ActiveMaxStep (ex. SlowdownMaxStep -> palier 1 en bordure basse), on borne au plafond.
-IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown > 0) THEN
+IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown > 0) AND NOT EffectiveSafeStop THEN
     IF RequestedStep < DriveRequest.MinStepDown THEN
         RequestedStep := DriveRequest.MinStepDown;
     END_IF;
