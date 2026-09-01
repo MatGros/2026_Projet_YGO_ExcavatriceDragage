@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🧪 GVL_Simulation — Variables et stimuli de simulation (Banc d'essai)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
    🎯 Polarité positive : TRUE = simulé/stimulus actif ; FALSE = réel/repos.
    🔒 Consommée à la frontière PRG_02_Acquisition, par le banc, et par PRG_04_Treuils_Benne
    🔒 (SimulationBypassActive : n'arme les bypass de sécurité QUE si SimulationModeActive
@@ -43,6 +43,12 @@ VAR_GLOBAL
     SimJoystickRawButton               : BOOL := FALSE; // Homme-mort brut : TRUE = bouton joystick appuyé
     SimJoystickOvershoot_Active        : BOOL := FALSE; // TRUE = dépassement de montée au-delà de 100% (défaut capteur hors plage)
     SimJoystickBagotement_Active       : BOOL := FALSE; // TRUE = bagotement au relâchement (petit balancement autour du neutre)
+
+    // 🎛️ STIMULI BOUTONS IHM M3 — simulation des boutons IHM Translation M3 (Trémie/Maintenance).
+    // Pilotent GVL_IHM.TranslationM3.Cmd.BtnTremie/BtnMaintenance UNIQUEMENT en mode simulation
+    // ET quand JoyMaster est inactif (le joystick prime sinon). Défaut FALSE = bouton relâché.
+    SimBtnTremie         : BOOL := FALSE; // TRUE = bouton IHM "vers Trémie" simulé appuyé
+    SimBtnMaintenance    : BOOL := FALSE; // TRUE = bouton IHM "vers Maintenance" simulé appuyé
 
     // 🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
     SimEncoderSpeedFactor       : REAL := 1.0;  // Multiplicateur vitesse codeurs simulés ; 1.0 = nominal

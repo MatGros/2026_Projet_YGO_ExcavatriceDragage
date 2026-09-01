@@ -42,6 +42,7 @@ VAR
     M3_SpeedCmd_Active      : REAL;
     M3_PositioningActive    : BOOL;
     M3_PositionSensorTarget : BOOL;
+    SimBtnIHM_Active        : BOOL; // . [LOC] Stimuli boutons IHM M3 actifs (simulation ET JoyMaster inactif)
 
     SelTarget       : INT;
 
@@ -177,8 +178,11 @@ END_IF;
 
 // ── Arbitrage M3 (FB_TranslationCmdArbitrationM3) ──
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
-ArbM3_IHM.BtnTremie         := GVL_IHM.TranslationM3.Cmd.BtnTremie;
-ArbM3_IHM.BtnMaintenance    := GVL_IHM.TranslationM3.Cmd.BtnMaintenance;
+// 🎛️ Stimuli boutons IHM M3 : en simulation ET JoyMaster inactif, les stimuli pilotent les
+// boutons IHM (SEL) ; sinon la valeur IHM réelle est conservée (jamais écrasée, producteur unique).
+SimBtnIHM_Active := GVL_Simulation.SimulationModeActive AND NOT GVL_IHM.Modes.Cmd.TglJoystickMaster;
+ArbM3_IHM.BtnTremie         := SEL(SimBtnIHM_Active, GVL_IHM.TranslationM3.Cmd.BtnTremie, GVL_Simulation.SimBtnTremie);
+ArbM3_IHM.BtnMaintenance    := SEL(SimBtnIHM_Active, GVL_IHM.TranslationM3.Cmd.BtnMaintenance, GVL_Simulation.SimBtnMaintenance);
 ArbM3_IHM.SelPositioning    := GVL_IHM.TranslationM3.Cmd.SelPositioning;
 ArbM3_IHM.SetFreq_Hz        := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
 ArbM3_IHM.BypassGlobal      := GVL_IHM.TranslationM3.Bypass.Global;
