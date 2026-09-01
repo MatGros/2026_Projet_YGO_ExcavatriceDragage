@@ -4817,3 +4817,63 @@ tasks:
   - "Revue large post-implémentation : ne rien oublier (chaîne AU, treuils M1/M2 même pattern, bus inter-PRG, tests)"
   - "Auto-vérification : bundle frais + G200 liaison PASS + gates PASS + G350 PASS"
   bloque_par: []
+- id: T218
+  parent_id: ''
+  statut: ⬜
+  criticite: C4
+  domaine: MODES / SÉCURITÉ
+  agent: ''
+  date: '2026-09-01T00:00:00'
+  titre: "Résoudre le blocage de mode (déverrouiller la bascule quand le retour contacteur n'est pas câblé)"
+  contexte: >
+    L'opérateur est bloqué dans un mode quand le retour contacteur M1/M2_ContactorsReleased_DI
+    n'est pas câblé (=0) : ModeChangeAllowed reste 0, la bascule est refusée. Diagnostic IHM
+    fait (motif + 6 sous-conditions) mais cause non résolue. Décision de conception requise.
+  objectifs:
+  - "Décision validée entre (A) retirer ModeChangeAllowed, (B) garder vitesse+frein seul, (C) câbler le retour contacteur"
+  - "Déverrouiller la bascule N1/N2/SEMI_AUTO sans jamais autoriser de mouvement sous AU"
+  - "Aucun redémarrage auto du cycle, interlocks physiques et permits M3 inchangés"
+  - "Diagnostic IHM conservé (ModeChangeBlockReason + 6 sous-conditions)"
+  - "Bundle frais + G200 PASS + gates PASS + CI FB_Modes PASS"
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T218_BLOCAGE_MODE.yaml
+  bloque_par: []
+- id: T219
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: IHM / DIAGNOSTIC
+  agent: ''
+  date: '2026-09-01T00:00:00'
+  titre: "Historique d'alarmes (buffer borné + horodatage), en complément du bandeau d'alarmes actives"
+  contexte: >
+    Le bandeau d'alarmes actives ne montre que l'état courant. Besoin d'un historique
+    (buffer FIFO borné, horodatage, acquittement) pour comprendre les incidents passés,
+    notamment la raison d'un blocage.
+  objectifs:
+  - "Buffer borné (ex. 50) d'alarmes passées avec horodatage levée/retour/acquittement"
+  - "Coexiste sans écraser le bandeau d'alarmes actives"
+  - "Lecture par l'IHM (binding buffer)"
+  - "Note de design préalable : taille, source horodatage, interaction bandeau"
+  - "Bundle frais + G200 PASS + gates PASS"
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T219_HISTORIQUE_ALARMES.yaml
+  bloque_par: []
+- id: T220
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: IHM / BANDEAU
+  agent: ''
+  date: '2026-09-01T00:00:00'
+  titre: "Enrichir le bandeau IHM (maximum d'infos : défauts actifs, état AU, homing, blocage de mode)"
+  contexte: >
+    Donner à l'opérateur le maximum d'infos utiles au bandeau : défauts actifs (codeur,
+    synchro, benne, translation), état AU/urgence, état homing, motif du blocage de mode —
+    sans surcharger l'affichage.
+  objectifs:
+  - "Afficher état AU/urgence (EmergencyChainClosed, PowerContactorEngaged, PowerCutOff)"
+  - "Afficher les défauts actifs (codeur, synchro, benne, translation) en texte court"
+  - "Conserver motif du blocage + 6 sous-conditions (déjà exposés)"
+  - "Chaque message rentre dans le champ (G406 PASS)"
+  - "Bundle frais + G200 PASS + gates PASS + compilation 0 avertissement"
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T220_ENRICHIR_BANDEAU.yaml
+  bloque_par: []
