@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T23:22:54.395846" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T23:22:54.395846">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T01:43:45.954624" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T01:43:45.954624">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -254,14 +254,22 @@ restent vrais meme quand le FB est neutralise par Enable=FALSE (etat persistant)
 Demande de changement de mode REFUSEE : les treuils</xhtml>
               </documentation>
             </variable>
+            <variable name="ModeChangeBlockReason">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas a l'arret mecanique confirme (contacteurs
+retombes ET frein serre ET |v| &lt; seuil). Mode courant maintenu.
+Motif du blocage de bascule (texte IHM court, ex. "Chgt mode refuse : contacteur M1")</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingRequiredM1">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">ne sont pas a l'arret mecanique confirme (contacteurs
-retombes ET frein serre ET |v| &lt; seuil). Mode courant maintenu.
-M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
               </documentation>
             </variable>
             <variable name="HomingRequiredM2">
@@ -630,6 +638,14 @@ ET frein serré, redondés par la mesure de vitesse.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Treuils à l'arrêt mécanique confirmé (condition de bascule)</xhtml>
               </documentation>
             </variable>
+            <variable name="ModeChangeBlockReason">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Motif du blocage de bascule (texte IHM court)</xhtml>
+              </documentation>
+            </variable>
             <variable name="MaintHomingRequiredM1">
               <type>
                 <BOOL />
@@ -684,7 +700,7 @@ ET frein serré, redondés par la mesure de vitesse.
    ⚙️ FB_Modes — Arbitrage du mode machine
    ───────────────────────────────────────────────────────────────
     🎯 Rôle : Source unique du mode arbitré et calcul du bus d'autorisations
-    🔒 Sécurité : La sélection de mode est découplée de l'autorisation de mouvement (T207) :
+    🔒 Sécurité : La sélection de mode est découplée de l'autorisation de mouvement :
                   le mode suit la sélection IHM même sous AU, arrêt d'urgence ou défaut ; le
                   mouvement est coupé en aval par la chaîne AU physique (PowerContactorEngaged)
                   et les interlocks (FB_Cycle, FB_Safety_Winch, FB_Winch). Bascule N1/N2/SEMI_AUTO
@@ -719,7 +735,7 @@ END_IF;
 //   1. pas de fenêtre d'un scan où le re-homing serait perdu malgré un override effectif ;
 //   2. pas de perte de l'obligation sur coupure / download pendant la maintenance
 //      (la valeur est écrite dans le miroir PERSISTENT dès le scan courant, pas à la sortie).
-// Le re-homing ne bloque PAS la sélection SEMI_AUTO (T207) : il est publié à l'IHM
+// Le re-homing ne bloque PAS la sélection SEMI_AUTO : il est publié à l'IHM
 // (Auth.HomingRequiredM1/M2) et le cycle ne progresse pas tant qu'il n'est pas levé.
 IF M1PositionLimitOverridden THEN
     MaintHomingRequiredM1 := TRUE;
@@ -736,7 +752,7 @@ IF MaintHomingRequiredM2 AND M2HomingDone AND M2Homed AND NOT M2HomingSuspect TH
     MaintHomingRequiredM2 := FALSE;
 END_IF;
 
-// Diagnostic « cycle non prêt » — le mode SEMI_AUTO reste sélectionnable (T207) mais le
+// Diagnostic « cycle non prêt » — le mode SEMI_AUTO reste sélectionnable mais le
 // cycle ne tournera pas tant que ces conditions ne sont pas saines. Info NON-bloquante :
 // la sélection n'est pas refusée, le mouvement est coupé en aval (FB_Cycle/FB_Safety_Winch).
 // Une cause = un fait (AF03 §4) : défaut codeur, re-homing et référencement sont distincts.
@@ -785,6 +801,7 @@ IF NOT Enable THEN
     // qu'un re-homing est requis tant que la machine n'est pas réarmée). Aucune autorisation
     // n'est accordée ici : Auth.Mode := DISABLE verrouille tout le reste.
     Auth.ModeChangePendingBlocked := FALSE;
+    Auth.ModeChangeBlockReason := '';
     Auth.HomingRequiredM1 := MaintHomingRequiredM1;
     Auth.HomingRequiredM2 := MaintHomingRequiredM2;
     PrevArbitratedMode := Auth.Mode;
@@ -808,7 +825,7 @@ ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
                      AND M2ContactorsReleased AND NOT M2BrakeIsOpen
                      AND (ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps);
 
-// 3.2 ARBITRAGE — le mode suit la sélection IHM (découplé de l'AU/défaut, T207)
+// 3.2 ARBITRAGE — le mode suit la sélection IHM (découplé de l'AU/défaut)
 // La sélection de mode n'est JAMAIS bloquée par l'AU, l'arrêt d'urgence ou un défaut :
 // le mode est un état de sélection, le mouvement est coupé en aval (FB_Cycle, FB_Safety_Winch,
 // FB_Winch) par PowerContactorEngaged et les interlocks. Seule la bascule N1/N2/SEMI_AUTO
@@ -821,9 +838,27 @@ IF (SelMode &lt;&gt; PrevArbitratedMode)
     // JAMAIS bloquée — sortir d'un mode maintenance ne doit jamais dépendre d'un treuil à l'arrêt.
     Auth.Mode := PrevArbitratedMode;
     Auth.ModeChangePendingBlocked := TRUE;
+    // Motif du blocage (texte IHM court) — première condition échouée, ordre M1 puis M2.
+    IF NOT M1ContactorsReleased THEN
+        ModeChangeBlockReason := 'Chgt mode refuse : contacteur M1';
+    ELSIF M1BrakeIsOpen THEN
+        ModeChangeBlockReason := 'Chgt mode refuse : frein M1';
+    ELSIF ABS(M1SpeedAbsMps) &gt;= MovementSpeedThresholdMps THEN
+        ModeChangeBlockReason := 'Chgt mode refuse : M1 en mvt';
+    ELSIF NOT M2ContactorsReleased THEN
+        ModeChangeBlockReason := 'Chgt mode refuse : contacteur M2';
+    ELSIF M2BrakeIsOpen THEN
+        ModeChangeBlockReason := 'Chgt mode refuse : frein M2';
+    ELSIF ABS(M2SpeedAbsMps) &gt;= MovementSpeedThresholdMps THEN
+        ModeChangeBlockReason := 'Chgt mode refuse : M2 en mvt';
+    ELSE
+        ModeChangeBlockReason := '';
+    END_IF;
+    Auth.ModeChangeBlockReason := ModeChangeBlockReason;
 ELSE
     Auth.Mode := SelMode;
     Auth.ModeChangePendingBlocked := FALSE;
+    Auth.ModeChangeBlockReason := '';
 END_IF;
 
 PrevArbitratedMode := Auth.Mode;

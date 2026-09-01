@@ -41,6 +41,7 @@ PRG04 = ROOT / "CODE" / "M_MAIN" / "PRG_04_Treuils_Benne.st"
 PRG03 = ROOT / "CODE" / "M_MAIN" / "PRG_03_Modes_Cycle.st"
 PRG07 = ROOT / "CODE" / "M_MAIN" / "PRG_07_Supervision.st"
 FB_MODES = ROOT / "CODE" / "F_MODES" / "FB_Modes.st"
+FB_CYCLE = ROOT / "CODE" / "G_CYCLE" / "FB_Cycle.st"
 GVL_PERSISTENT = ROOT / "CODE" / "GVL_PERSISTENT.st"
 ST_WINCH_CMD = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "1_TREUILS_BENNE" / "ST_WinchCmd.st"
 ST_BYPASS_WINCH = ROOT / "CODE" / "J_SUPERVISION" / "_TYPES" / "1_TREUILS_BENNE" / "ST_BypassWinch.st"
@@ -212,14 +213,9 @@ def check_fb_modes(text: str) -> list[str]:
         "AC7 levée homing M2": (
             r"IF\s+MaintHomingRequiredM2\s+AND\s+M2HomingDone\s+AND\s+M2Homed\s+AND\s+NOT\s+M2HomingSuspect\s+THEN"
         ),
-        "AC8 refus SEMI_AUTO défaut codeur": (
-            r"IF\s*\(\s*SelMode\s*=\s*E_Mode\.SEMI_AUTO\s*\)\s+AND\s+EncoderFaultPresent\s+THEN"
+        "AC8 SEMI_AUTO sélectionnable (mode suit SelMode, pas de repli)": (
+            r"Auth\.Mode\s*:=\s*SelMode"
         ),
-        "AC8 refus SEMI_AUTO re-homing (cause distincte)": (
-            r"IF\s*\(\s*SelMode\s*=\s*E_Mode\.SEMI_AUTO\s*\)\s+AND\s*\(\s*MaintHomingRequiredM1"
-            r"\s+OR\s+MaintHomingRequiredM2\s*\)\s+THEN\s+SemiAutoRefusedHoming\s*:=\s*TRUE"
-        ),
-        "AC8 arbres de cause distincts": r"instCauses\[2\]\.Active\s*:=\s*SemiAutoRefusedHoming",
         "AC5 publication du défaut": r"Auth\.HomingRequiredM1\s*:=\s*MaintHomingRequiredM1",
     }
     for label, pattern in required.items():
@@ -228,9 +224,22 @@ def check_fb_modes(text: str) -> list[str]:
 
     # AC6 — l'armement doit précéder l'arbitrage de mode (pas de fenêtre d'un scan).
     arm_pos = body.find("IF M1PositionLimitOverridden THEN")
-    arb_pos = body.find("IF (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent")
+    arb_pos = body.find("IF (SelMode <> PrevArbitratedMode)")
     if arm_pos < 0 or arb_pos < 0 or arm_pos > arb_pos:
         errors.append("AC6 l'armement du re-homing doit précéder l'arbitrage de mode §3")
+    return errors
+
+
+def check_cycle_encoder_gate(text: str) -> list[str]:
+    """AC8 — le cycle ne tourne jamais avec un codeur défaillant : FB_Cycle gate sur
+    EncoderFaultPresent (barrière primaire du cycle, le mode SEMI_AUTO restant sélectionnable)."""
+    errors: list[str] = []
+    body = compact(strip_comments(text))
+    if not re.search(
+        r"IF\s+NOT\s+Enable\s+OR\s+NOT\s+PowerContactorEngaged\s+OR\s+EncoderFaultPresent\s+THEN",
+        body,
+    ):
+        errors.append("AC8 FB_Cycle ne gate pas sur EncoderFaultPresent (cycle autorisé avec codeur défaillant)")
     return errors
 
 
@@ -307,6 +316,7 @@ def main() -> int:
     errors += check_gate_origin(prg04)
     errors += check_top_limit(prg04)
     errors += check_fb_modes(strip_comments(read(FB_MODES)))
+    errors += check_cycle_encoder_gate(read(FB_CYCLE))
     errors += check_interprg_wiring(
         strip_comments(read(PRG03)), prg04, strip_comments(read(PRG07)), read(ST_MODES_INTERPRG)
     )
