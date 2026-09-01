@@ -1,0 +1,83 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T220 ENRICHIR LE BANDEAU D'INFOS
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T220_ENRICHIR_BANDEAU
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Étoffer le bandeau IHM pour donner à l'opérateur le MAXIMUM d'informations
+    utiles : défauts actifs (codeur, synchro, benne, translation), état AU/urgence,
+    état homing, et motif du blocage de mode — sans surcharger ni rendre illisible
+    l'affichage.
+
+  acceptance:
+    - id: AC1
+      statement: "Le bandeau affiche l'état AU/urgence (EmergencyChainClosed, PowerContactorEngaged, PowerCutOff) de façon lisible."
+      verified_by: "champs IHM + binding + review"
+    - id: AC2
+      statement: "Le bandeau indique les défauts actifs (codeur, synchro, benne, translation M3) quand présents (texte court)."
+      verified_by: "champs IHM + test CI FB_Hmi_BannerFormatter"
+    - id: AC3
+      statement: "Le motif du blocage de mode (ModeChangeBlockReason) et les 6 sous-conditions restent affichés/exposés."
+      verified_by: "champs IHM déjà ajoutés + binding"
+    - id: AC4
+      statement: "Chaque message rentre dans le champ (G406 longueur STRING PASS)."
+      verified_by: "G406_check_st_string_length.py PASS"
+    - id: AC5
+      statement: "Bundle frais, G200 liaison, gates PASS, compilation CODESYS 0 avertissement."
+      verified_by: "generate_codesys_bundle.py + run_all_gates.py + compilation CODESYS"
+    - id: AC6
+      statement: "Le nom de fichier est égal au nom du POU (FB_Hmi_BannerFormatter) et son suffixe est égal au langage Structured Text généré dans le bundle."
+      verified_by: "check_task_contract.py puis G310_check_code_structure.py sur bundle frais"
+
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/AF/AF_Partie-07_*
+      - Doc/WFLOW/CONTRACTS/
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/I_TRANSLATION/**
+      - CODE/H_TREUILS_BENNE/**
+      - PRJ_CODESYS/**/Device.export
+
+  conservation:
+    must_survive:
+      - "Le bandeau reste lisible et priorise la sécurité (défauts AU/puissance/SafeStop d'abord)."
+      - "Les messages contractés (G406) et le style bandeau existant."
+      - "Aucun message critique masqué par une info secondaire."
+    dropped_on_purpose:
+      - "Aucun — ajout d'informations sans retrait des messages existants."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    STOP si l'ajout d'infos masque ou retarde une alarme de sécurité, si le bandeau
+    devient illisible, ou si un message dépasse la taille du champ (G406). Le format
+    et la priorité d'affichage doivent être validés par l'utilisateur.
+
+status: PENDING
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Lot d'enrichissement (Phase 3). Dépend des champs déjà ajoutés (motif + 6
+    sous-conditions). Le choix des infos à afficher et leur priorité doit être
+    validé par l'utilisateur (le max d'infos sans illisibilité).

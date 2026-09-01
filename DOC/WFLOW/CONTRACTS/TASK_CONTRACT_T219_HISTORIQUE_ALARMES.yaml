@@ -1,0 +1,83 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T219 HISTORIQUE D'ALARMES (HISTO)
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T219_HISTORIQUE_ALARMES
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Mémoriser un historique (buffer borné) des alarmes passées avec horodatage,
+    en complément du bandeau d'alarmes ACTIVES (qui ne montre que l'état courant).
+    L'opérateur peut consulter les alarmes survenues (date/heure, acquittement,
+    disparition) pour comprendre un incident — notamment la raison d'un blocage.
+
+  acceptance:
+    - id: AC1
+      statement: "Un buffer borné (ex. 50 entrées) enregistre la levée de chaque alarme avec horodatage (source temps cycle)."
+      verified_by: "test CI FB_AlarmHistory : ajout d'entrées, dépassement de capacité (FIFO)"
+    - id: AC2
+      statement: "Chaque entrée porte : id alarme, texte, timestamp levée, timestamp retour normal (si revenu), état acquittement."
+      verified_by: "struct ST_AlarmHistoryEntry vérifiée + test CI remplissage"
+    - id: AC3
+      statement: "L'IHM peut consulter l'historique (lecture buffer) ; les alarmes actives restent dans le bandeau existant."
+      verified_by: "binding IHM lecture buffer + bandeau alarme actives inchangé"
+    - id: AC4
+      statement: "Aucune alarme active n'est perdue : l'historique coexiste sans écraser le bandeau d'alarmes actives."
+      verified_by: "revue de flux + test intégration bandeau"
+    - id: AC5
+      statement: "Bundle frais, G200 liaison, gates PASS."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py + run_all_gates.py"
+    - id: AC6
+      statement: "Le nom de fichier est égal au nom du POU ajouté (FB_AlarmHistory ou équivalent) et son suffixe est égal au langage Structured Text généré dans le bundle."
+      verified_by: "check_task_contract.py puis G310_check_code_structure.py sur bundle frais"
+
+  scope:
+    allowed:
+      - CODE/A_COMMUN/_TYPES/
+      - CODE/J_SUPERVISION/_TYPES/
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/AF/AF_Partie-07_*  
+      - DOC/WFLOW/CONTRACTS/
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/I_TRANSLATION/**
+      - CODE/H_TREUILS_BENNE/**
+      - PRJ_CODESYS/**/Device.export
+
+  conservation:
+    must_survive:
+      - "Le bandeau d'alarmes ACTIVES continue de montrer les alarmes courantes."
+      - "Les chemins de diagnostic existants (GVL_Troubleshooting) restent fonctionnels."
+      - "Aucun défaut sécurité n'est masqué ni retardé par l'historique."
+    dropped_on_purpose:
+      - "Aucun — ajout purement additionnel (buffer en parallèle du bandeau actif)."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    STOP si le buffer d'alarmes retarde ou masque une alarme active, s'il consomme
+    trop de mémoire PLC (taille à borner), ou s'il interfère avec le bandeau
+    d'alarmes actives. Le format de l'horodatage devra être validé (T#time vs RTC).
+
+status: PENDING
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Lot additionnel (Phase 2). Doit être précédé d'une note de design : buffer FIFO,
+    taille bornée, source horodatage, interaction avec le bandeau actif.

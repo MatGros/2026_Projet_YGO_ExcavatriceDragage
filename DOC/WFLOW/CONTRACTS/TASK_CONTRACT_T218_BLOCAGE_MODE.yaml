@@ -1,0 +1,86 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T218 BLOCAGE DE MODE (déverrouillage bascule)
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T218_BLOCAGE_MODE
+  criticality: C4            # machine bloquée en réel -> priorité
+  strategy: patch
+
+  objective: >
+    Déverrouiller la bascule de mode machine quand le retour contacteur
+    (M1/M2_ContactorsReleased_DI) n'est pas câblé ou ne confirme pas l'arrêt
+    mécanique, sans jamais autoriser un mouvement sous AU. L'opérateur doit
+    pouvoir sortir du mode courant (notamment hors simulation) sans être bloqué.
+
+  acceptance:
+    - id: AC1
+      statement: "Sous AU armé, la bascule N1/N2/SEMI_AUTO est possible même si le retour contacteur n'est pas câblé (M1/M2_ContactorsReleased_DI=0)."
+      verified_by: "test CI FB_Modes : bascule de mode avec contacteurs non retombés, AU armé -> mode suit SelMode"
+    - id: AC2
+      statement: "La bascule de mode n'est JAMAIS bloquée par l'absence du retour contacteur ; la décision repose sur un critère robuste (vitesse/frein ou choix validé)."
+      verified_by: "revue de conception + test CI table de bascule"
+    - id: AC3
+      statement: "Aucun mouvement n'est autorisé sous AU non armé, quel que soit le mode : défense en profondeur conservée."
+      verified_by: "tests CI FB_Winch/FB_Safety_Winch : PowerContactorEngaged=FALSE -> aucun mouvement"
+    - id: AC4
+      statement: "Le diagnostic IHM expose la raison du blocage (ModeChangeBlockReason + 6 sous-conditions) si une bascule est encore refusée."
+      verified_by: "champs IHM présents + binding"
+    - id: AC5
+      statement: "Bundle frais, G200 liaison, gates PASS, CI FB_Modes PASS ; aucune régression sur les tests mouvements/safety."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py + run_all_gates.py + run_tests.py FB_Modes"
+    - id: AC6
+      statement: "Le nom de fichier est égal au nom du POU (FB_Modes) et son suffixe est égal au langage Structured Text généré dans le bundle."
+      verified_by: "check_task_contract.py puis G310_check_code_structure.py sur bundle frais"
+
+  scope:
+    allowed:
+      - CODE/F_MODES/FB_Modes.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/F_MODES/_TYPES/
+      - DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+      - DOC/WFLOW/CONTRACTS/
+      - DOC/WFLOW/TASKS.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/F_MODES/tests/
+    forbidden:
+      - CODE/I_TRANSLATION/**
+      - CODE/H_TREUILS_BENNE/**
+      - PRJ_CODESYS/**/Device.export
+
+  conservation:
+    must_survive:
+      - "AU, PowerCutOff et les défauts conservent leur coupure physique et leurs interlocks actionneurs."
+      - "Le mouvement est toujours coupé en aval (FB_Winch, FB_Safety_Winch, FB_Translation, FB_Bucket par PowerContactorEngaged)."
+      - "Aucun cycle ne redémarre automatiquement après réarmement (StartCycle conscient requis)."
+      - "Le re-homing obligatoire et sa publication Auth.HomingRequiredM1/M2."
+    dropped_on_purpose:
+      - "La dépendance de la bascule de mode au retour contacteur M1/M2_ContactorsReleased_DI (non câblé en réel)."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    STOP si lever la condition contacteur permettait un mouvement unsafe, si le
+    cycle pouvait progresser sous AU non armé, ou si la modification imposait de
+    toucher aux fichiers Translation M3 en cours par un autre agent. Signaler
+    immédiatement toute option demandant un choix de conception (A/B/C).
+
+status: PENDING
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Décision de conception requise (options) AVANT implementation : (A) retirer le
+    gate ModeChangeAllowed, (B) ne garder que vitesse+frein, (C) câbler le retour
+    contacteur. Ce contrat est prêt pour l'agent d'implémentation.
