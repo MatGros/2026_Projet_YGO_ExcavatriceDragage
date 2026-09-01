@@ -130,17 +130,14 @@ def check_top_limit(text: str) -> list[str]:
     body = compact(text)
     required = {
         "AC2 plafond borné M1": (
-            r"TopLimitM1_M\s*:=\s*MIN\s*\(\s*SEL\s*\(\s*OverrideTopSoftwareN1M1\s+OR\s+BypassM1TopLimitSoftwareEff\s*,"
+            r"TopLimitM1_M\s*:=\s*SEL\s*\(\s*OverrideTopSoftwareN1M1\s+OR\s+BypassM1TopLimitSoftwareEff\s*,"
             r"\s*_CommunCfgPersist\.CfgCableLimitAscent_M\s*,"
-            r"\s*_WinchM1CfgPersist\.CfgTopSensorPos_M\s*\)\s*,"
-            r"\s*_CommunCfgPersist\.CfgCableLimitAscent_M\s*\+\s*_CommunCfgPersist\.WinchSlowdownDistance_M\s*\)"
+            r"\s*_WinchM1CfgPersist\.CfgTopSensorPos_M\s*\)"
         ),
         "AC2 plafond borné M2": (
-            r"TopLimitM2_M\s*:=\s*MIN\s*\(\s*SEL\s*\(\s*OverrideTopSoftwareN1M2\s+OR\s+BypassM2TopLimitSoftwareEff\s*,"
+            r"TopLimitM2_M\s*:=\s*SEL\s*\(\s*OverrideTopSoftwareN1M2\s+OR\s+BypassM2TopLimitSoftwareEff\s*,"
             r"\s*_CommunCfgPersist\.CfgCableLimitAscent_M\s*\+\s*M2_LimitShift\s*,"
-            r"\s*_WinchM2CfgPersist\.CfgTopSensorPos_M\s*\+\s*M2_LimitShift\s*\)\s*,"
-            r"\s*_CommunCfgPersist\.CfgCableLimitAscent_M\s*\+\s*M2_LimitShift"
-            r"\s*\+\s*_CommunCfgPersist\.WinchSlowdownDistance_M\s*\)"
+            r"\s*_WinchM2CfgPersist\.CfgTopSensorPos_M\s*\+\s*M2_LimitShift\s*\)"
         ),
         "AC3 FDC capteur jamais ouvert par l'override": r"BypassTopLimitSwitch\s*:=\s*BypassM[12]TopLimitSwitchEff",
     }
@@ -291,6 +288,18 @@ def check_legal_limit_bypass(text: str) -> list[str]:
     return errors
 
 
+def check_lower_software_limit(text: str) -> list[str]:
+    """Toute cote basse configuree est active : aucune valeur ne desactive implicitement la limite."""
+    errors: list[str] = []
+    body = compact(strip_comments(text))
+    required = (r"CablePosM\s*<=\s*CfgCableLimitDescentM",)
+    if len(re.findall(required[0], body)) != 2:
+        errors.append("T221: la limite basse cable doit comparer CablePosM <= CfgCableLimitDescentM dans la cause et DescendPermit")
+    if re.search(r"CfgCableLimitDescentM\s*[<>]=?\s*0\.0", body):
+        errors.append("T221: garde de signe retrouvee : une cote configuree pourrait redevenir une limite basse muette")
+    return errors
+
+
 def check_simulation_bypass_gate(text: str) -> list[str]:
     """T197: le bypass banc ne s'arme que dans le domaine simulation treuil."""
     errors: list[str] = []
@@ -322,6 +331,7 @@ def main() -> int:
     )
     errors += check_dut(read(ST_WINCH_CMD), read(ST_BYPASS_WINCH))
     errors += check_legal_limit_bypass(read(FB_SAFETY_WINCH))
+    errors += check_lower_software_limit(read(FB_SAFETY_WINCH))
     errors += check_simulation_bypass_gate(read(PRG07))
 
     if errors:

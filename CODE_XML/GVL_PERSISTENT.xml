@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T09:01:11.990048" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T09:01:11.990048">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T09:05:25.777597" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T09:05:25.777597">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -126,7 +126,18 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Limitation palier vitesse en montée (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
-            <variable name="WinchSlowdownDistance_M">
+            <variable name="WinchSlowdownDistanceTop_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite haute : 0 = arrêt au seuil (m), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSlowdownDistanceBottom_M">
               <type>
                 <REAL />
               </type>
@@ -134,7 +145,7 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite pour enclencher le ralentissement (m), commun M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite basse pour ralentir (m), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="WinchSlowdownMaxStep">
