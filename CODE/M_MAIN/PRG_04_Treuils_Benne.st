@@ -1408,6 +1408,13 @@ Data.BucketBusy                   := instBucket.Lifecycle.Busy;
 Data.BucketDone                   := instBucket.Lifecycle.Done;
 Data.BucketError                  := instBucket.Fault.Error;
 Data.ArmingPermit                 := ArmingPermit;
+Data.ProcessPermitM1_Ascent       := ProcessPermitM1_Ascent;
+Data.ProcessPermitM1_Descend      := ProcessPermitM1_Descend;
+Data.ProcessPermitM2_Ascent       := ProcessPermitM2_Ascent;
+Data.ProcessPermitM2_Descend      := ProcessPermitM2_Descend;
+Data.DescendPermitDiveBucketOpen  := DescendPermitDiveBucketOpen;
+Data.ExtractionAssistActive       := ExtractionAssistActive;
+Data.ExtractionAscentPermit       := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit;
 // Usage effectif d'un override/bypass de position (consommé PRG_03 → FB_Modes)
 Data.PositionLimitOverriddenM1    := PositionLimitOverriddenM1;
 Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;

@@ -1,0 +1,140 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# T212 — Sécurité Kobold hors cycle : interlock anti-surchauffe
+#   (durée max de pilotage + temps de repos + fenêtre cumulée)
+#
+# Contexte : Demande utilisateur 2026-09-01 — ne pas pouvoir piloter le
+#   contacteur Kobold trop longtemps HORS cycle (manuel/maintenance). Le
+#   Kobold est un usage épisodique et raisonné : imposer un repos et/ou un
+#   temps cumulé maximal. Le pilotage hors cycle transite par le graphe
+#   Kobold = FB_DiveSearch (MAINT_N1/N2) + branche bypass de PRG_03
+#   (TglBypassDiveSearchSequence AND WinchBothMotionActive AND dir=-1), puis
+#   l'arbitrage FB_BucketCmdArbitration et la sortie physique PRG_06
+#   (KoboldContactorCmd → M1_M2_KoboldMeasureEnable_DQ).
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T212
+  criticality: C2            # C0 | C1 | C2 | C3 | C4 — sécurité / robustesse, repli défaut
+  strategy: patch            # patch | rebuild  (interlock ajouté sans refonte du graphe Kobold)
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Déclencher une sécurité anti-surchauffe dédiée au pilotage du contacteur
+    Kobold HORS cycle (manuel/maintenance MAINT_N1 et MAINT_N2) : interdire
+    tout pilotage prolongé, imposer un temps de repos entre deux activations
+    et limiter le temps cumulé d'activation sur une fenêtre glissante, en
+    coupant KoboldContactorCmd et en affichant un message opérateur IHM,
+    sans altérer le fonctionnement nominal en cycle (descente assistée
+    FB_DiveSearch et cycle SEMI_AUTO FB_Cycle).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "En mode MAINT_N1 ou MAINT_N2, un maintien continu de la demande de descente (MotionRequestActive avec direction -1) qui atteint la durée configurée KoboldMaxOnDuration fait chuter KoboldContactorCmd et ReqKoboldMeasureEnable à FALSE au scan suivant, et affiche le message opérateur dédié « Repos Kobold requis »."
+      verified_by: "TC_P212_01 (harnais FB_DiveSearch/PRG_03, CycleTime 200 ms) : assert KoboldContactorCmd=FALSE au seuil + assertion du texte OperatorAction"
+    - id: AC2
+      statement: "Après une coupure par anti-surchauffe, une re-demande immédiate de descente ne réarme pas le contacteur : KoboldContactorCmd reste FALSE tant que KoboldMinRestTime n'est pas écoulé, même quand DescentActive repasse à TRUE."
+      verified_by: "TC_P212_02 (chronogramme re-demande à t+1s puis à t supérieur au repos) : assert KoboldContactorCmd=False puis =DescentActive après repos"
+    - id: AC3
+      statement: "L'accumulateur sur fenêtre glissante limite la somme des activations du contacteur à KoboldMaxCumulativeOn sur la durée KoboldTrackingWindow : un dépassement coupe KoboldContactorCmd à FALSE et rejette les nouvelles demandes avec le message « Fenêtre Kobold dépassée »."
+      verified_by: "TC_P212_03 (série d'activations courtes espacées de moins d'une fenêtre) : assert blocage dès que la somme cumulée atteint le seuil"
+    - id: AC4
+      statement: "Un pilotage nominal qui reste en dessous des seuils configurés voit KoboldContactorCmd identique à l'état antérieur à T212 (aucune coupure nouvelle) ; le contact fond continue de couper le contacteur et la séquence nominale reste inchangée."
+      verified_by: "Exécution CI FB_DiveSearch TC-P04-010..016 et FB_Cycle TC-P04-020/021 inchangées : run_tests.py --fb FB_DiveSearch et --fb FB_Cycle"
+    - id: AC5
+      statement: "Les quatre seuils anti-surchauffe (KoboldMaxOnDuration, KoboldMinRestTime, KoboldMaxCumulativeOn, KoboldTrackingWindow) sont déclarés en configuration IHM dans ST_CommunCfg avec des défauts non nuls (20 s / 60 s / 40 s / 300 s), lus par l'interlock à chaque scan."
+      verified_by: "Lecture de la déclaration ST_CommunCfg.st + grep du câblage de chaque seuil vers l'interlock"
+    - id: AC6
+      statement: "Le dépassement d'un seuil déclenche un état bloquant (KoboldContactorCmd=FALSE) qui persiste sans réarmement automatique ; seul un Reset sur front, avec Kobold au repos et demande relâchée, redonne le pilotage, et un Reset maintenu à TRUE sans front ne réarme pas."
+      verified_by: "TC_P212_04 (chronogramme) : pas de retour spontané du contacteur ; Reset maintenu≠réarmement, front requis"
+    - id: AC7
+      statement: "Un garde-fou CI vérifie que tout chemin de génération de KoboldContactorCmd hors cycle passe par l'interlock : la réintroduction d'un bypass direct du contrôle fait échouer le test (ROUGE avant le fix, VERT après)."
+      verified_by: "Exécution du script garde-fou TOOLS/AGENT_WORKFLOW/scripts/ + run_tests.py --fb FB_DiveSearch / --fb PRG_03 avant/après"
+    - id: AC8
+      statement: "Le nom de POU de l'objet édité correspond au nom du fichier source, et le langage du POU correspond au suffixe associé au bundle PLCopenXML."
+      verified_by: "G310 structure + TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py puis inspection visuelle du POU correspondant dans CODE_XML/CODE_Bundle.xml"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:                 # fichiers que la tache PEUT modifier (implémentation + garde-fou)
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/G_CYCLE/FB_DiveSearch.st
+      - CODE/H_TREUILS_BENNE/FB_BucketCmdArbitration.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+      - DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T212*.yaml
+      - DOC/WFLOW/AUDITS/DESIGN/PLAN_T212*.md
+      - DOC/VERSION_HISTORY.md
+      - TOOLS/TEST_AUTO_CI/**
+      - TOOLS/AGENT_WORKFLOW/scripts/**
+    forbidden:               # explicitement hors scope — ne pas y toucher
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - CODE/G_CYCLE/FB_Cycle.st                 # graphe nominal SEMI_AUTO intouché (garantie non-dégradation)
+      - CODE/H_TREUILS_BENNE/FB_Winch.st         # treuils et leurs sécurités, hors périmètre T212
+
+  # ── 4. Contrat de conservation (patch : garde-fous explicites) ────────────
+  conservation:
+    must_survive:
+      - "Le fonctionnement nominal en cycle : descente assistée FB_DiveSearch (contact fond → coupure Kobold) et cycle SEMI_AUTO FB_Cycle restent inchangés et sans nouvelle coupure tant que les seuils configurés ne sont pas atteints."
+      - "La coupure même-scan H1 anti-chauffe sur relâchement de demande (KoboldContactorCmd conditionné à DescentActive)."
+      - "Le message opérateur et les états de séquence existants de FB_DiveSearch (OperatorActionId/OperatorAction)."
+      - "La compatibilité CI existante : test_fb_divesearch.st (TC-P04-010..016), test_fb_cycle.st (TC-P04-020/021), test_prg_03_modes_cycle.st, run_all_gates."
+    dropped_on_purpose:
+      - "La possibilité de tenir le contacteur Kobold aussi longtemps que voulu hors cycle (comportement cible du bug utilisateur) : remplacée par l'interlock anti-surchauffe."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage            # bloc "Auto-verification liaison" G200
+    - run_all_gates            # resultat des gates (palier C)
+    - bundle                   # CODE_XML/CODE_Bundle.xml regenere
+    - run_tests                # run_tests.py --fb FB_DiveSearch / --fb PRG_03 / --fb FB_Cycle
+    - check_task_contract      # python .../check_task_contract.py (ce fichier)
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "deepseek"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Toute incohérence (spec vs code, autre faille de pilotage Kobold, seuil
+    trop permissif vis-à-vis du moteur réel, régression nominale inattendue)
+    est remontée IMMEDIATEMENT à l'orchestrateur, pas à la fin et jamais
+    silencieusement. L'implémentation reste RESTREINTE au périmètre allowed ;
+    signaler n'est pas élargir le scope. Aucun redémarrage automatique après
+    défaut ni réarmement non-front.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING             # PENDING | IN_PROGRESS | COMPLETED | VALIDATED
+                            # (PENDING : cadrage rédigé, implémentation non lancée)
+
+execution:
+  executed_by: "DSH (DeepSeek) — cadrage"   # qui a exécuté (à compléter à l'implémentation)
+  completed_at: "2026-09-01T00:00:00+02:00" # TODO: horodater à la restitution d'implémentation
+  status: PENDING             # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Livrable de cadrage T212 : contrat de tâche + plan techniques rédigés.
+    Le code interlock n'est PAS encore implémenté (phases P2/P3 du plan).
+    Graph Kobold identifié : FB_DiveSearch (MAINT) + bypass PRG_03 + arbitrage
+    FB_BucketCmdArbitration + sortie PRG_06. Seuils proposés à valider humain
+    C4 : durée max 20 s, repos 60 s, cumul 40 s sur fenêtre 300 s.
+  evidence_submitted: []     # Preuves clés (à renseigner à l'implémentation)
+
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: "..."        # Ex: Claude Code (Orchestrateur) / humain
+  validated_at: "..."        # Timestamp ISO
+  notes: >
+    À statuer : validation des seuils anti-surchauffe (C4), choix du point
+    d'intégration (FB_DiveSearch / gate PRG_03 / sink arbitrage), recettage
+    humain en conditions réelles.

@@ -1,0 +1,164 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# T192 — Corrections safety cycles — défaut latché et reprise consciente
+#       (RESTE : documentation / validation, lot non-code)
+#
+# Contexte : S1 (gate X0→X1 sur NOT Fault.Latched) et S2 (reprise consciente
+# WaitingResume + StartEdge) DÉJÀ IMPLÉMENTÉS (commit 877f48ac). La sous-tâche
+# T192-A (TC S1) est close (✅). Il ne reste QUE la revue indépendante R1-R7,
+# la mise à jour/confirmation d'AF-04 §4.1 (décision utilisateur « garder
+# BtnStart seul ») et la validation du renommage non commité Ascending→Ascent.
+# Aucun fichier CODE/ ne doit être MODIFIÉ de contenu par ce lot (lecture seule).
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T192
+  criticality: C1            # C0 | C1 | C2 | C3 | C4
+  strategy: patch            # patch | rebuild
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  # Ce que la MACHINE doit faire de plus ou de different, en une phrase.
+  objective: >
+    Clôturer la correction safety S1+S2 déjà implémentée (gate de départ X0→X1 sur
+    NOT Fault.Latched + reprise consciente par BtnStart) par une revue indépendante
+    R1-R7, l'alignement documentaire d'AF-04 §4.1 sur la décision « BtnStart seul »
+    et l'acte du renommage Ascending→Ascent — sans modifier le contenu d'aucun
+    fichier CODE/.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >-
+        Le fichier DOC/WFLOW/AUDITS/REVUE_T192_<AAAAMMJJ>.md livre un verdict
+        explicite (VALIDÉ / ÉCART) pour chacun des 7 points de revue R1-R7 couvrant
+        la correction S1 (gate X0→X1) et S2 (reprise consciente).
+      verified_by: >-
+        grep -E '^\| *R[1-7]' DOC/WFLOW/AUDITS/REVUE_T192_*.md → 7 lignes, chacune
+        avec verdict VALIDÉ ou ÉCART dans le tableau de synthèse
+    - id: AC2
+      statement: >-
+        Dans CODE/G_CYCLE/FB_Cycle.st, la transition X0→X1 de départ de cycle est
+        gatée sur NOT Fault.Latched, donc un défaut latché non acquitté empêche tout
+        départ du cycle (le contournement Abort+Start est fermé).
+      verified_by: >-
+        grep -n 'Fault.Latched' CODE/G_CYCLE/FB_Cycle.st → ligne ~360 « IF (StartEdge.Q
+        OR DeadmanArmedEdge.Q) AND NOT Fault.Latched THEN » et ligne ~262
+        « Ready := Enable AND NOT Fault.Latched »
+    - id: AC3
+      statement: >-
+        Dans CODE/G_CYCLE/FB_Cycle.st, la reprise après bascule de mode n'est
+        possible que par un front StartCycle : le sémaphore WaitingResume ne sort
+        que sur StartEdge.Q et le séquenceur reste gelé en pause tant qu'il est actif.
+      verified_by: >-
+        grep -n 'StartEdge.Q' CODE/G_CYCLE/FB_Cycle.st → ligne ~282 (sortie de
+        WaitingResume) ; lecture du bloc IF WaitingResume (FB_Cycle.st:278-303) et
+        du gate `IF NOT WaitingResume` (FB_Cycle.st:338)
+    - id: AC4
+      statement: >-
+        La section 4.1 d'AF_Partie-04 stipule que la reprise du cycle après bascule
+        de mode exige un geste conscient BtnStart seul (l'armement homme-mort
+        n'est pas un geste de reprise), conforme à la décision utilisateur et au
+        code S2.
+      verified_by: >-
+        grep -n 'BtnStart' DOC/AF/AF_Partie-04_*
+        → au moins une occurrence du motif exigeant un appui BtnStart pour la reprise
+        figure dans §4.1 ; si la phrase y est déjà présente (conforme), la tâche
+        confirme « aucun diff nécessaire »
+    - id: AC5
+      statement: >-
+        Le point R7 de la revue acte le renommage Ascending→Ascent : FB_Cycle.st
+        ne référence plus aucun symbole « Ascending » pour les permis, remplacé par
+        les formes Ascent (ex. ProcessPermitM1_Ascent), et la cohérence est notée.
+      verified_by: >-
+        grep -ni 'Ascending' CODE/G_CYCLE/FB_Cycle.st → aucun résultat hors le
+        commentaire sémantique ; grep -n 'ProcessPermitM1_Ascent' →
+        occurrences cohérentes (déclaration :108 + consommations)
+    - id: AC6
+      statement: >-
+        Le lot documentaire (revue + mise à jour AF-04 §4.1 + acte du renommage)
+        n'introduit aucun changement de contenu dans CODE/ : le diff du lot
+        n'affiche que des fichiers DOC/ et TOOLS/.
+      verified_by: >-
+        git diff --name-only -- CODE/G_CYCLE/FB_Cycle.st → vide (le contenu du FB
+        n'est pas retouché par ce lot) ; les fichiers du lot sont sous DOC/** et
+        TOOLS/**
+    - id: AC7
+      statement: >-
+        La tâche T192 passe à statut ✅ dans DOC/WFLOW/TASKS.yaml (completed_at
+        horodaté ISO), et son unique sous-tâche T192-A est déjà ✅ (aucun enfant
+        T192 ouvert au moment de la clôture).
+      verified_by: >-
+        grep -n 'id: T192$' DOC/WFLOW/TASKS.yaml puis lecture du `statut: ✅` et du
+        `completed_at` ; grep -A6 'id: T192-A' DOC/WFLOW/TASKS.yaml → statut ✅ et
+        parent_id: T192
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:                 # fichiers que la tache PEUT modifier (lot non-code)
+      - DOC/WFLOW/AUDITS/REVUE_T192_*.md          # revue indépendante produite
+      - DOC/WFLOW/AUDITS/DESIGN/PLAN_T192corrections_safety_cycles_reste.md
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md   # §4.1 (si écart constaté)
+      - DOC/WFLOW/TASKS.yaml                       # clôture T192 (statut + completed_at)
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T192.yaml
+    forbidden:               # explicitement hors scope — ne pas y toucher
+      - CODE/                 # aucun fichier CODE/ (lecture seule)
+      - CODE_XML/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+      - ARCHIVES/
+      - .claude/worktrees/*
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  # sans objet : strategy = patch, aucun lien coupé par ce lot non-code.
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - revue_T192           # DOC/WFLOW/AUDITS/REVUE_T192_<date>.md (7 points R1-R7, verdicts)
+    - grep_S1_gate         # commande AC2 : NOT Fault.Latched sur X0→X1 (FB_Cycle)
+    - grep_S2_reprise      # commande AC3 : sortie WaitingResume sur StartEdge.Q
+    - AF04_S4.1_aligned    # commande AC4 : §4.1 = BtnStart seul
+    - no_CODE_diff         # commande AC6 : aucun diff de contenu CODE/
+    - clôture_T192         # commande AC7 : statut ✅ + completed_at dans TASKS.yaml
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout écart constaté entre le code implémenté (FB_Cycle) et la spec AF-04 §4.1,
+    toute ambiguïté sur le renommage Ascending→Ascent mal propagé, ou toute
+    nécessité de toucher un fichier CODE/ est remonté IMMÉDIATEMENT à l'orchestrateur.
+    La revue R1-R7 doit signaler — jamais passer sous silence — un ÉCART même mineur
+    (signaler n'est pas élargir le scope : ce lot reste NON-CODE).
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING | IN_PROGRESS | COMPLETED | VALIDATED
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    À remplir par l'agent d'exécution : verdicts de la revue R1-R7, confirmation
+    AF-04 §4.1 (BtnStart seul), acte du renommage Ascending→Ascent, sortie des
+    commandes AC2-AC6 et clôture T192.
+  evidence_submitted: []
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Recettage humain : lecture de la revue REVUE_T192, confirmation du choix
+    BtnStart seul dans AF-04 §4.1, visa de clôture T192.

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T00:58:51.337622" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T00:58:51.337622">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T07:23:19.349556" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T07:23:19.349556">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -659,6 +659,191 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des diagnostics CANopen et EtherCAT.
    ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_PermitVisibilityHMI">
+        <baseType>
+          <struct>
+            <variable name="ArmingPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1SafetyAscentPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1SafetyDescendPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1ProcessAscentPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1ProcessDescendPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectivePermitM1_Ascent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectivePermitM1_Descend">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AppliedPermitM1_Ascent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AppliedPermitM1_Descend">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1FinalPermitBlocked">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2SafetyAscentPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2SafetyDescendPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2ProcessAscentPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2ProcessDescendPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectivePermitM2_Ascent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectivePermitM2_Descend">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AppliedPermitM2_Ascent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AppliedPermitM2_Descend">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2FinalPermitBlocked">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BothActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BothAscentPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BothDescendPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BothBlocked">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BothBlockReason">
+              <type>
+                <derived name="E_WinchTraceBlockReason" />
+              </type>
+            </variable>
+            <variable name="EffectivePermitM3_Tremie">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectivePermitM3_Maintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Droit directionnel zone Maintenance, distinct de l'acces P1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3MotionPermitEffective">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DiveDescendPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ExtractionAscentPermit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ExtractionAssistActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BucketOpenRequestActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne : pas de bit Permit canonique a ce stade ; publication des faits consommes.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketCloseRequestActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="BucketMotionBlocked">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>43f321e3-3f35-5f43-a010-3ff934ced971</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">Tableau public, lecture seule, des permis canoniques. Producteur : PRG_07.</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_SyncHMI">
@@ -2895,6 +3080,99 @@ M1 : contacteurs retombés</xhtml>
    🔗 Producteur : PRG_02_Acquisition (3 appels GetDeviceState()).
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="E_WinchTraceBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="POWER_CUTOFF" value="1" />
+              <value name="AXIS_DISABLED" value="2" />
+              <value name="SAFESTOP" value="3" />
+              <value name="SAFETY_FAULT" value="4" />
+              <value name="SAFETY_PERMIT_MISSING" value="5" />
+              <value name="PROCESS_PERMIT_MISSING" value="6" />
+              <value name="COUPLING_BLOCKED" value="7" />
+              <value name="WINCH_FAULT" value="8" />
+              <value name="FINAL_INTERLOCK_BLOCKED" value="9" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage - au moins un sens effectivement permis</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont (instSafetyWinch.PowerCutOff) - priorite max</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AXIS_DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Axe neutralise (Mode=DISABLE ou InhibitMx -&gt; Enable FALSE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFESTOP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop effectif (rampe rapide demandee)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut safety latched (FB_Safety_Winch.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SAFETY_PERMIT_MISSING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun sens ne delivre de permit safety (limite / mou de cable / homing)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>PROCESS_PERMIT_MISSING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Permit process absent (benne / fond Kobold / limite legale / extraction)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>COUPLING_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Couplage synchro anti-telescopage (l'autre axe bloque)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>WINCH_FAULT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut treuil latched (FB_Winch.Fault.Error)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>FINAL_INTERLOCK_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Barriere finale en defaut (frein / redemarrage)</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>96d04ade-707d-5249-90f0-8daa4cdfac0f</ObjectId>
+          </data>
+        </addData>
       </dataType>
       <dataType name="ST_BypassSync">
         <baseType>
@@ -6471,99 +6749,6 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
           </data>
         </addData>
       </dataType>
-      <dataType name="E_WinchTraceBlockReason">
-        <baseType>
-          <enum>
-            <values>
-              <value name="NONE" value="0" />
-              <value name="POWER_CUTOFF" value="1" />
-              <value name="AXIS_DISABLED" value="2" />
-              <value name="SAFESTOP" value="3" />
-              <value name="SAFETY_FAULT" value="4" />
-              <value name="SAFETY_PERMIT_MISSING" value="5" />
-              <value name="PROCESS_PERMIT_MISSING" value="6" />
-              <value name="COUPLING_BLOCKED" value="7" />
-              <value name="WINCH_FAULT" value="8" />
-              <value name="FINAL_INTERLOCK_BLOCKED" value="9" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>NONE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun blocage - au moins un sens effectivement permis</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>POWER_CUTOFF</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont (instSafetyWinch.PowerCutOff) - priorite max</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>AXIS_DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Axe neutralise (Mode=DISABLE ou InhibitMx -&gt; Enable FALSE)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SAFESTOP</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">SafeStop effectif (rampe rapide demandee)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SAFETY_FAULT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut safety latched (FB_Safety_Winch.Fault.Error)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SAFETY_PERMIT_MISSING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucun sens ne delivre de permit safety (limite / mou de cable / homing)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>PROCESS_PERMIT_MISSING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Permit process absent (benne / fond Kobold / limite legale / extraction)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>COUPLING_BLOCKED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Couplage synchro anti-telescopage (l'autre axe bloque)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>WINCH_FAULT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Defaut treuil latched (FB_Winch.Fault.Error)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>FINAL_INTERLOCK_BLOCKED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Barriere finale en defaut (frein / redemarrage)</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>96d04ade-707d-5249-90f0-8daa4cdfac0f</ObjectId>
-          </data>
-        </addData>
-      </dataType>
       <dataType name="ST_ContactorCheck">
         <baseType>
           <struct>
@@ -7056,6 +7241,14 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🚩 Indicateur d'initialisation IHM depuis PERSISTENT</xhtml>
           </documentation>
         </variable>
+        <variable name="Permits">
+          <type>
+            <derived name="ST_PermitVisibilityHMI" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Tableau lecture seule des permis canoniques, produit par PRG_07</xhtml>
+          </documentation>
+        </variable>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>978cfa54-3431-5207-985f-5b2fcc137a7b</ObjectId>
@@ -7119,6 +7312,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
             </Folder>
             <Folder Name="8_BANDEAU_ET_IHM">
               <Object Name="ST_HmiBanner" ObjectId="b1f57cf5-2e15-510f-acf6-8dd4b570c447" />
+              <Object Name="ST_PermitVisibilityHMI" ObjectId="43f321e3-3f35-5f43-a010-3ff934ced971" />
               <Object Name="ST_PreflightHMI" ObjectId="92d0a9ce-c2c2-58b4-a581-46eda63b86d7" />
               <Object Name="ST_AlarmBanner" ObjectId="51a442bb-120a-5a1f-856e-eba247651394" />
             </Folder>
@@ -7141,6 +7335,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <Object Name="ST_WinchBenneHMI" ObjectId="734a14b6-6b4b-50b8-8bce-737b6c3fa07b" />
               <Object Name="ST_WinchHMI" ObjectId="69c9434c-20aa-55ce-8395-0acc03dd2089" />
               <Object Name="ST_WinchSymmetryHMI" ObjectId="53f9b377-a390-54de-9b7c-d1db8711e403" />
+              <Object Name="E_WinchTraceBlockReason" ObjectId="96d04ade-707d-5249-90f0-8daa4cdfac0f" />
               <Object Name="ST_BucketHMI" ObjectId="e003b81c-fc6d-5cd1-ad20-f66aa3e150a5" />
               <Object Name="ST_BypassWinch" ObjectId="2c2d0565-ffeb-5269-a8f4-ff798a09891d" />
               <Object Name="ST_SafetyWinch" ObjectId="3a43f912-4348-5c66-b0c2-9405e5e3ae59" />
@@ -7151,7 +7346,6 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               <Object Name="ST_BucketCmd" ObjectId="758915ca-bb53-5f1a-ae3f-b495527bc5f4" />
               <Object Name="ST_BucketHMIState" ObjectId="ea0b3689-7d29-5817-9b66-52896d468768" />
               <Object Name="ST_BypassBucket" ObjectId="77e7b77e-4a14-5220-93aa-7bb27ede6733" />
-              <Object Name="E_WinchTraceBlockReason" ObjectId="96d04ade-707d-5249-90f0-8daa4cdfac0f" />
             </Folder>
           </Folder>
         </Folder>

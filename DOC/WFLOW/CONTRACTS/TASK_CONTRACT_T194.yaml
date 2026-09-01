@@ -1,0 +1,149 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T194 Optimisations interfaces treuils/benne (audit)
+# projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# Source : DOC/WFLOW/TASKS.yaml (T194, C2, H_TREUILS_BENNE) · audit
+#   DOC/WFLOW/AUDITS/INTERFACES_AUDIT_A_20260831.md (O1/O3/O4/S2) et
+#   DOC/WFLOW/AUDITS/INTERFACES_AUDIT_B_20260831.md (O1/O3/O5).
+# ⚠️ REBASELINE PRÉALABLE OBLIGATOIRE : l'arbre main courant porte déjà
+#   l'essentiel de O1/O3/O4/O5 (cf. Phase 0 du plan). Ne jamais réimplémenter
+#   un constat déjà appliqué sans rebaseline fraîche et visa humain.
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T194
+  criticality: C2            # C0 | C1 | C2 | C3 | C4
+  strategy: patch            # patch | rebuild   (retrait de params morts + struct = patch)
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Assainir l'interface des FB treuils/benne (arbitrage, mouvement, barrière
+    finale, bus d'autorisations) en supprimant les paramètres morts
+    (SpeedStepTable sur FB_WinchCmdArbitrationM1/M2, Mode sur FB_Translation),
+    en homogénéisant le contrat de défaut des barrières finales sur Fault:ST_Fault,
+    en regroupant la configuration plate de FB_Translation dans une struct Cfg
+    (pattern NC-110/G380 comme FB_Winch) et en renommant le bus multi-consommateurs
+    ST_fbModes_Autorisations en ST_Modes_Autorisations (NC-110), sans aucun
+    changement de comportement machine (patch bit-identique).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_WinchCmdArbitrationM1 et FB_WinchCmdArbitrationM2 ne déclarent aucune entrée SpeedStepTable : la chaîne 'SpeedStepTable' a 0 occurrence dans chacun des 2 fichiers .st."
+      verified_by: "grep 'SpeedStepTable' CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM2.st → 0 résultat."
+    - id: AC2
+      statement: "FB_Translation ne déclare plus l'entrée Mode : la chaîne 'Mode' n'apparaît que de façon résiduelle nulle dans FB_Translation.st, et PRG_05 ne câble plus 'Mode' sur instTranslationM3."
+      verified_by: "grep 'Mode' CODE/I_TRANSLATION/FB_Translation.st → 0 ; grep 'Mode' CODE/M_MAIN/PRG_05_Translation.st → 0 ligne de câblage instTranslationM3 ; plus G200_check_linkage.py → PASS."
+    - id: AC3
+      statement: "FB_WinchOutputInterlock expose la sortie Fault : ST_Fault pilotée par une instance FB_FaultCore, forme cible identique à FB_TranslationOutputInterlock (contrat de défaut homogène entre les deux barrières)."
+      verified_by: "grep 'Fault : ST_Fault' CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st → présent ; grep 'FB_FaultCore' → présent ; diff de forme vs CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st."
+    - id: AC4
+      statement: "FB_Translation regroupe sa configuration dans Cfg : ST_fbTranslation_Cfg (source unique, PRG_05 assemble depuis GVL_PERSISTENT) ; 0 scalaire [CFG] plat restant en VAR_INPUT de FB_Translation."
+      verified_by: "grep 'Cfg : ST_fbTranslation_Cfg' CODE/I_TRANSLATION/FB_Translation.st → présent ; revue du bloc VAR_INPUT : aucun champ commenté [CFG]."
+    - id: AC5
+      statement: "Le bus multi-consommateurs est nommé ST_Modes_Autorisations dans tout CODE ; grep de l'ancien ST_fbModes_Autorisations retourne 0."
+      verified_by: "grep 'ST_fbModes_Autorisations|fbModes_Autorisations' CODE/ → 0 résultat ; grep 'ST_Modes_Autorisations' CODE/ → présent sur les consommateurs (Cycle, Safety, Treuils, Translation, Supervision, Acquisition)."
+    - id: AC6
+      statement: "La liaison inter-PRG reste intacte après chaque lot (PRG_04 puis PRG_05)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report → PASS (0 erreur)."
+    - id: AC7
+      statement: "Tous les gates mecaniques passent en fin de lot."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py → 100% PASS (palier C à chaque lot, complet en fin de T194)."
+    - id: AC8
+      statement: "Le bundle PLCopenXML est régénéré et valide après chaque lot."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . → CODE/CODE_Bundle.xml régénéré, bandeau \u00abBUNDLE EXPORTÉ\u00bb."
+    - id: AC9
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU (PRG_05_Translation.st -> PRG_05_Translation)."
+      verified_by: "comparaison basename sans extension vs identifiant apres PROGRAM pour chaque fichier du scope CODE/M_MAIN."
+    - id: AC10
+      statement: "Critère structurel (scope CODE/M_MAIN) : aucun suffixe de langage (_CFC/_LD) n'est apposé ; le suffixe reste identique au langage genere dans le bundle, c'est-a-dire du ST pur."
+      verified_by: "grep basename *_CFC/_LD absent + inspection CODE_Bundle.xml : POU concernes en ST."
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:                 # fichiers que la tache PEUT modifier
+      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st
+      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM2.st
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/I_TRANSLATION/_TYPES/ST_fbTranslation_Cfg.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st          # O1/O4 : câblage arbitrage & Cfg
+      - CODE/M_MAIN/PRG_05_Translation.st            # O2/O4 : retrait Mode, pont Cfg
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+      - DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md
+      - DOC/WFLOW/AUDITS/INTERFACES_AUDIT_A_20260831.md
+      - DOC/WFLOW/AUDITS/INTERFACES_AUDIT_B_20260831.md
+      - TOOLS/TEST_AUTO_CI/scripts/                  # tests/non-régression
+    forbidden:               # explicitement hors scope — ne pas y toucher
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+      - ARCHIVES/
+      - CODE/H_TREUILS_BENNE/FB_Winch.st             # interface métier treuil intacte
+      - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  # Optional ici (strategy = patch), renseigné par prudence pour tracer ce qui
+  # doit survivre à un éventuel lot de nettoyage plus large.
+  conservation:
+    must_survive:
+      - "Comportement d'arbitrage bit-identique de FB_WinchCmdArbitrationM1/M2 (StartStop/Direction/StepTgt) pour chaque mode"
+      - "Chaîne de vitesse treuil via _WinchSpeedStepTable consommée par FB_Winch (Config.SpeedStepTable) — seul l'entrée morte des arbitrages est retirée"
+      - "La sélection de mode reste effectuée en amont par l'arbitrage (retrait de Mode sur FB_Translation n'altère pas le pont SEMI_AUTO/manuel)"
+      - "Contrat de défaut homogène Fault:ST_Fault sur les 2 barrières finales (logique d'interlock strictement inchangée)"
+      - "Bus ST_Modes_Autorisations : producteur unique FB_Modes (PRG_03), mêmes champs"
+    dropped_on_purpose:
+      - "Entrée SpeedStepTable morte sur FB_WinchCmdArbitrationM1/M2 (non lue dans le corps)"
+      - "Entrée Mode morte sur FB_Translation (non lue dans le corps, sélection déjà amont)"
+      - "Préfixe ST_fb* devenu faux sur le bus multi-consommateurs (NC-110)"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage            # bloc "Auto-verification liaison" (G200)
+    - run_all_gates            # resultat des gates
+    - bundle                   # CODE/CODE_Bundle.xml regenere
+    - grep_dead_params         # AC1/AC2/AC5 : 0 occurrence (SpeedStepTable, Mode, ST_fbModes)
+    - rebaseline_phase0        # note de rebaseline O1-O5 vs arbre courant (voir plan)
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout ecart constate en cours de route (parametre mort reapparu, contrat de
+    defaut encore heterogene, constat deja applique dans l'arbre courant, ecart
+    entre spec AF et code, danger de regression liaison) est remonte
+    IMMEDIATEMENT a l'orchestrateur, pas a la fin et jamais silencieusement.
+    En particulier : la Phase 0 doit confirmer quels constats O1-O5 sont deja
+    appliques dans le main courant AVANT toute modification (eviter toute
+    reimplementation superflue). Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "..."         # Ex: sonnet-5 (antigravity)
+  completed_at: "..."        # Timestamp ISO (ex: 2026-08-12T06:27:00+02:00)
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Résumé succinct du travail réalisé par l'agent et résultats des vérifications.
+  evidence_submitted: []     # Preuves clés (ex: "run_all_gates: PASS", "linkage: PASS")
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: "..."        # Ex: Claude Code (Orchestrateur)
+  validated_at: "..."        # Timestamp ISO
+  notes: >
+    Remarques de validation de l'orchestrateur et/ou recettage humain.

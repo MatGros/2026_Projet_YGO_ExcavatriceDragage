@@ -1,0 +1,183 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# T213 — Refactorer le troubleshooting — ajouter les variables de homing M2
+#         (cible dynamique, offset benne) dans GVL_Troubleshooting.
+# Bug terrain visé : homing M2 « benne fermée » — M2 reste à 8.5 m au lieu de
+# prendre la cible. Le snapshot troubleshooting actuel n'expose pas les
+# variables détaillées du homing (cible dynamique, offset) permettant ce
+# diagnostic.
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T213_REFACTOR_TROUBLESHOOTING_HOMING_M2
+  criticality: C2
+  strategy: patch            # ajout de variables de diagnostic, pas de rebuild
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Rendre le snapshot troubleshooting capable de diagnostiquer le bug de
+    homing M2 « benne fermée » (M2 reste a 8.5 m au lieu de prendre la cible
+    dynamique) en exposant dans GVL_Troubleshooting toutes les variables
+    detaillees du homing M2 : MachineHomingMechanicalStopOk,
+    BucketReferenceRequested, UseDynamicTarget, DynamicHomingTargetM,
+    M2Demand (HomeReq / UseDynamicTarget / DynamicTarget_M),
+    CfgTopHomingTarget_M, CfgOffsetClose_M et l'etat du FB_MachineHomingCycle.
+    Ces faits sont publies par PRG_02_Acquisition, projettes par
+    FB_TroubleshootingView et regeneres dans troubleshooting_variables.txt.
+    Aucun changement de comportement machine (pur ajout de diagnostic).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        GVL_Troubleshooting.F_HomingM2 (ST_HomingChecklist) expose les champs
+        de detail homing M2 suivants, tous alimentes depuis la source reelle :
+        MechanicalStopOk, BucketReferenceRequested, UseDynamicTarget,
+        DynamicHomingTargetM, M2DemandHomeReq, M2DemandUseDynamicTarget,
+        M2DemandDynamicTarget_M, CfgTopHomingTarget_M, CfgOffsetClose_M et
+        l'etat du FB_MachineHomingCycle (MachineHomed / Active / Step / Failed).
+      verified_by: >
+        Bundle PLCopenXML genere puis grep des chemins
+        GVL_Troubleshooting.F_HomingM2.<champ> dans le bundle et dans
+        troubleshooting_variables.txt (chaque feuille attendue presente).
+
+    - id: AC2
+      statement: >
+        Chaque champ homing M2 expose reflete le producteur unique reelle :
+        MechanicalStopOk = calcul PRG_02_Acquisition.MachineHomingMechanicalStopOk,
+        UseDynamicTarget = instEncoderM2.UseDynamicTarget,
+        DynamicHomingTargetM = instEncoderM2.DynamicHomingTargetM,
+        M2Demand.* = instMachineHomingCycle.M2Demand.*,
+        Cfg*. = MachineHomingCfg.* de PRG_02_Acquisition.
+      verified_by: >
+        G200_check_linkage.py --report = PASS (0 erreur) sur le bundle +
+        revue du cablage FB_TroubleshootingView → GVL_Troubleshooting.
+
+    - id: AC3
+      statement: >
+        troubleshooting_variables.txt est regenere depuis CODE et contient
+        toutes les nouvelles feuilles homing M2 sans divergence avec les
+        structures source (regeneration reproductible).
+      verified_by: >
+        python TOOLS/PLC_CSV_SNAPSHOT/variable_lists/generate_variable_list_from_code.py
+        puis comparaison sans difference avec troubleshooting_variables.txt.
+
+    - id: AC4
+      statement: >
+        Le cablage FB_TroubleshootingView → GVL_Troubleshooting reste en
+        lecture seule stricte : aucune commande, aucun calcul metier, aucune
+        source autre que PRG_02/Data et GVL_IHM deja publies.
+      verified_by: >
+        Revue du diff FB_TroubleshootingView.st : seules des affectations
+        GVL_Troubleshooting.* depuis des entrees VAR_INPUT ajoutees.
+
+    - id: AC5
+      statement: >
+        Aucun changement de comportement machine : la logique homing
+        (FB_MachineHomingCycle, PRG_02_Acquisition §4, instEncoderM1/M2)
+        reste intacte, le refactor porte exclusivement sur des ajouts de
+        diagnostic.
+      verified_by: >
+        Bundle frais + G200 PASS + gates palier C PASS ; git diff de
+        FB_MachineHomingCycle.st = vide.
+
+    - id: AC6
+      statement: >
+        Les POU de CODE/M_MAIN modifies (PRG_02_Acquisition.st,
+        PRG_07_Supervision.st) conservent un nom de fichier identique au nom
+        de POU et un suffixe de langage (ST) identique au langage genere dans
+        le bundle ; toute nouvelle variable respecte NAMING_CONVENTION.
+      verified_by: >
+        Bundle PLCopenXML genere : nom de POU = nom de fichier, suffixe ST
+        coherent ; audit nommage conforme NC-xxx.
+
+    - id: AC7
+      statement: >
+        Le diagnostic du bug homing M2 « benne fermee » est possible : lorsque
+        une confirmation benne fermee est demandee (BtnConfirmClosePos,
+        MAINT_N2, arret mecanique OK), le snapshot montre UseDynamicTarget actif
+        et DynamicHomingTargetM egal a CfgTopHomingTarget_M + CfgOffsetClose_M.
+      verified_by: >
+        Snapshot troubleshooting reel ou simule (Clean & Rebuild) dans la
+        fenetre de homing M2 benne fermee, observation des nouvelles colonnes.
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:                 # fichiers que la tache PEUT modifier
+      - CODE/J_SUPERVISION/GVL_Troubleshooting.st
+      - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/G_CYCLE/_TYPES/ST_MachineHoming.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st     # publier les faits homing M2 sur le bus Data
+      - CODE/M_MAIN/PRG_07_Supervision.st     # cabler les nouvelles entrees FB_TroubleshootingView
+      - TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt
+      - TOOLS/PLC_CSV_SNAPSHOT/variable_lists/generate_variable_list_from_code.py
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T213.yaml
+    forbidden:               # explicitement hors scope — ne pas y toucher
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_MachineHomingCycle.st  # logique homing immuable — hors refactor
+      - CODE/G_CYCLE/FB_Encoder.st
+      - DOC/NAMING_CONVENTION.md
+      - ARCHIVES/**
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:            # comportements/donnees a preserver imperativement
+      - "La logique homing conjoint M1/M2/benne (FB_MachineHomingCycle, PRG_02_Acquisition §4, instEncoderM1/M2) — aucun changement de comportement"
+      - "Le producteur unique des faits de diagnostic reste PRG_02_Acquisition (via son bus Data) et GVL_IHM"
+      - "FB_TroubleshootingView reste en lecture seule stricte (pure recopie, pas de calcul metier)"
+      - "Les feuilles deja exposees de GVL_Troubleshooting (E_HomingM1, F_HomingM2 existants) restent presentes et non renommees"
+      - "Le format de troubleshooting_variables.txt (un chemin par ligne, derive des structures source)"
+    dropped_on_purpose:      # abandonne sciemment — decision humaine, tracee
+      - "Aucun champ existant n'est abandonne ; la tache est purement additive (diagnostic homing M2)."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison" (G200 PASS)
+    - run_all_gates          # resultat des gates (palier C)
+    - bundle                 # CODE/CODE_Bundle.xml regenere
+    - generated_variable_list_comparison   # regeneration troubleshooting_variables.txt + diff nul
+    - diff_review            # FB_MachineHomingCycle immuable + lecture seule respectee
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout probleme constate en cours de route est remonte IMMEDIATEMENT a
+    l'orchestrateur, pas a la fin et jamais silencieusement : incoherence entre
+    la source des variables homing et le cablage projete, chemin snapshot rejete
+    par CODESYS apres Clean & Rebuild, ou risque de changement de comportement
+    homing hors scope. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Contrat et Plan rediges (travail pre-code). Implementer apres validation
+    humaine du plan (ARRET VALIDATION requis avant toute ecriture CODE/).
+  evidence_submitted: []
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Validation humaine du plan obligatoire avant toute modification de
+    CODE/ (criticite C2, machine reelle).

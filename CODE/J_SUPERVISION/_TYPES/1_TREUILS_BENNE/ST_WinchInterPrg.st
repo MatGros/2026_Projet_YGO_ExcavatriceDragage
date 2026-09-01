@@ -41,6 +41,13 @@ STRUCT
 
     // === 🛡️ Permission d'armement homme-mort (Option B — combiné interlock benne) ===
     ArmingPermit                 : BOOL;               // 🛡️ Permission d'armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)
+    ProcessPermitM1_Ascent       : BOOL;
+    ProcessPermitM1_Descend      : BOOL;
+    ProcessPermitM2_Ascent       : BOOL;
+    ProcessPermitM2_Descend      : BOOL;
+    DescendPermitDiveBucketOpen  : BOOL;
+    ExtractionAssistActive       : BOOL;
+    ExtractionAscentPermit       : BOOL;
 
     // === Usage effectif d'un override/bypass de POSITION (consommé PRG_03 → FB_Modes) ===
     // Producteur unique : PRG_04_Treuils_Benne §5. Lecteur : PRG_03_Modes_Cycle (lag 1 scan assumé,

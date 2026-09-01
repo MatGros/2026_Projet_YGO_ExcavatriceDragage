@@ -1,0 +1,132 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# T204 — Enforcement des permits directionnels M3 (TremiePermit/MaintenancePermit)
+#        en gate de commande, à l'unisson des treuils M1/M2.
+# Complément de T184 (qui a crée + projeté les permits M3 SANS les enforceer).
+# Exécution : sur la base MAIN (hors worktree). Travail non-code par défaut ;
+#   pose d'un gate dans FB_Translation → contrat liste les fichiers CODE exacts.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T204_ENFORCEMENT_PERMITS_DIRECTIONNELS_M3
+  criticality: C2
+  strategy: patch            # patch : gate local dans FB_Translation, aucun rebuild de FB
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Bloquer réellement le mouvement de la translation M3 vers un sens non
+    autorisé par les permits directionnels effectifs (TremiePermit vers Trémie /
+    MaintenancePermit vers Maintenance), en application comme gate interne au
+    FB_Translation — même modèle que FB_Winch.st:163 (EffectiveSafeStop) — sans
+    toucher aux interlocks de sécurité M3 existants ni à l'accès au point P1.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "FB_Translation.EffectiveSafeStop passe à TRUE dès que Direction = +1 ET TremiePermit = FALSE, forçant RampTargetPct à 0.0 (§5 gate de rampe) sans modifier Direction ni les verrous bistables M3_LimitSwitch*Stable, l'estimateur de position ou la sélection PositionSensorTarget."
+      verified_by: "Stimulus unitaire FB_Translation (python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_Translation) Direction=+1/TremiePermit=FALSE → RampTargetPct=0 ; lecture §4bis/§5"
+    - id: AC2
+      statement: "FB_Translation.EffectiveSafeStop passe à TRUE dès que Direction = -1 ET MaintenancePermit = FALSE ET la requête n'est pas un transit vers la cible P1 ; le mouvement dirigé vers P1 (zone SlowdownSensorP1) n'est jamais bloqué par le seul MaintenancePermit."
+      verified_by: "Simulation 2 requêtes sous MaintenanceM3TargetEnable=FALSE : cible P1 atteinte (StepNumber/réalisation), cible Maintenance bloquée (RampTargetPct=0)"
+    - id: AC3
+      statement: "AC2 est réalisé sans supprimer ni atténuer les protections terminales existantes du segment P1→Maintenance (coupure dure M3_LimitSwitchMaintenanceEffective, PRG_05:128-130, et ralentissement SlowdownSensorMaintenance) qui restent actives."
+      verified_by: "Lecture PRG_05 §0/§2 + gate G200 (liaison inchangée) + TC-P11-003/004/013 toujours verts"
+    - id: AC4
+      statement: "Le changement de code est confiné à FB_Translation et aux fils de liaison nécessaires ; FB_Safety_Translation.st, FB_TranslationCmdArbitrationM3.st (si non retenu comme point d'insertion), PRG_04_Treuils_Benne.st et FB_Winch.st ne contiennent aucune ligne modifiée."
+      verified_by: "git diff --stat restreint au scope.allowed + G310_check_code_structure.py + relecture"
+    - id: AC5
+      statement: "Le point d'insertion retenu (FB_Translation §4bis/§5 ou FB_TranslationCmdArbitrationM3) est documenté dans AF_Partie-11 §3ter avec justification : c'est le site où les permits effectifs et la rampe physique se rencontrent, aligné sur FB_Winch.st:163 ; la résolution du conflit P1 (AC2) y est explicitée."
+      verified_by: "Section §3ter relue + G340_check_doc_links.py PASS"
+    - id: AC6
+      statement: "Aucun bit IHM directionnel M3 n'est supprimé ni renommé : GVL_IHM.TranslationM3.Safety.TremiePermit et .MaintenancePermit restent alimentés par PRG_05 §1ter (EffectivePermitM3_*) et restent cohérents avec le gate (quand EffectiveSafeStop bloque un sens, le permit effectif IHM de ce sens est déjà FALSE)."
+      verified_by: "grep GVL_IHM.TranslationM3.Safety dans PRG_07 + test simulation gate vs bits IHM"
+    - id: AC7
+      statement: "Aucun interlock de sécurité M3 existant (Méca A/B, LimitSwitch, SensorIncoherent, PowerCutOff, SafeStop) ne voit son comportement modifié ; seul EffectiveSafeStop (uniquement alimenté par les permits effectifs) est ajouté/alimenté comme terme de gate de rampe."
+      verified_by: "Diff FB_Translation restreint + gates palier C (run_all_gates.py --palier C) + TC-P11-002/010/011/014 inchangés"
+    - id: AC8
+      statement: "Critère structurel CODE/M_MAIN : PRG_05_Translation.st garde un nom de fichier identique au nom du POU et un suffixe identique au langage généré dans le bundle (ST pur en '.st', aucun _CFC/_LD ajouté)."
+      verified_by: "G310_check_code_structure.py + inspection du bundle PLCopenXML (objets de langage ST)"
+    - id: AC9
+      statement: "Gates mécaniques : bundle régénéré (CODE_XML/CODE_Bundle.xml), G200_check_linkage.py --report PASS (0 erreur), run_all_gates.py --palier C 100% PASS ; tests CI FB_Translation (I_TRANSLATION/test_unitaires.py) et registre TC-P11 enrichis selon AC1/AC2."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py . + G200_check_linkage.py --report + run_all_gates.py --palier C"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/I_TRANSLATION/FB_Translation.st            # gate EffectiveSafeStop (§4bis/§5) — point d'insertion cible
+      - CODE/I_TRANSLATION/FB_TranslationCmdArbitrationM3.st  # SEULEMENT si retenu comme point d'insertion (décision T204)
+      - CODE/M_MAIN/PRG_05_Translation.st               # fils de liaison des permits seulement si nécessaire
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md (+ fiches FB_Translation*, FB_TranslationCmdArbitrationM3*)
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T204_*.yaml
+      - DOC/WFLOW/AUDITS/DESIGN/PLAN_T204enforcement_permits_M3.md
+      - TOOLS/TEST_AUTO_CI/**  # tests CI FB_Translation / I_TRANSLATION
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export   # jamais une référence de contrôle
+      - DOC/STDS/NAMING_CONVENTION.md   # pas de convention de nommage modifiée sans validation humaine
+      - CODE/H_TREUILS_BENNE/FB_Winch.st         # comportement M1/M2 intouché (modèle, pas de modification)
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st  # interlocks treuils intouchés
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st      # verrou descente / treuil
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st  # interlocks sécurité M3 (producteur des permits) INTACT
+      - ARCHIVES/
+      - Tout fichier hors scope.allowed
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Interlocks de sécurité M3 : Méca A/B, LimitSwitch, SensorIncoherent, PowerCutOff, SafeStop (FB_Safety_Translation)."
+      - "Accès au point P1 : le transit dirigé vers P1 demeure possible même si MaintenanceM3TargetEnable=FALSE (AC2) — aucune régression fonctionnelle du positionnement SEMI_AUTO sur P1."
+      - "Comportement des treuils M1/M2 (permits + interlocks + EffectiveSafeStop) strictement inchangé."
+      - "Producteur unique des permits = FB_Safety_Translation (instSafetyTranslationM3), pas de nouveau producteur."
+    dropped_on_purpose: []
+    # Aucun abandon : T204 est purement additif (patch). Le point d'insertion retenu est
+    # documenté, la décision de NON-gate du transit P1 est une décision de conception tracée (AC5).
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage            # bloc "Auto-verification liaison" (G200 --report)
+    - run_all_gates            # résultat des gates palier C
+    - bundle                   # CODE_XML/CODE_Bundle.xml regenere
+    - check_task_contract      # python .../check_task_contract.py (ce fichier)
+    - diff_scope               # git diff --stat borné au scope.allowed (preuve de confinement)
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "deepseek"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Toute divergence constatée (spec AF§3ter vs comportement réel FB_Translation, sémantique
+    réelle d'un permit directionnel, conflit d'insertion FB_Translation vs
+    FB_TranslationCmdArbitrationM3, ou régression d'accès P1 observée en simulation) est remontée
+    IMMEDIATEMENT à l'orchestrateur, pas à la fin et jamais silencieusement. Le gate M3 ne DOIT
+    PAS bloquer l'accès au point P1 : toute formulation d'AC2 qui irait contre doit être signalée
+    avant implémentation. Signaler n'est pas élargir le scope. Aucune modification des interlocks
+    sécurité M3 existants (FB_Safety_Translation) n'est autorisée, même à titre d'essai.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING                # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+execution:
+  executed_by: "DSH (DeepSeek)"   # qui a exécuté (à remplir en fin)
+  completed_at: ""                # Timestamp ISO
+  status: PENDING                 # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Contrat rédigé hors code : objectif d'enforcement des permits directionnels M3
+    en gate interne FB_Translation (modèle FB_Winch.st:163), avec résolution explicite
+    du conflit P1/Maintenance (AC2). Rédaction du plan associé.
+  evidence_submitted: []
+
+validation:
+  status: PENDING                # PENDING | APPROVED | REJECTED
+  validated_by: ""               # visa orchestrateur / recettage humain
+  validated_at: ""               # Timestamp ISO
+  notes: >
+    Visa humain obligatoire avant toute implémentation (C2). Le point d'insertion
+    (AC5) et la règle de non-blocage P1 (AC2) doivent être approuvés explicitement.
