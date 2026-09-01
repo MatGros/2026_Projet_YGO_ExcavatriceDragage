@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T04:59:24.145466" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T04:59:24.145466">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T05:41:34.956711" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T05:41:34.956711">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1129,7 +1129,8 @@ creerait une collision avec la globale homonyme du mapping E/S.
 //   - M1InterlockEnable      : gate finale (Enable ET pas de PowerCutOff)
 //   - M1PowerCutOffSafetyInfo: défauts qui COUPENT la puissance
 //   - M1SafeStopSafetyInfo   : défauts qui font SafeStop (rampe rapide)
-//   - M1BlockedBySafetyInfo  : synthèse (PowerCutOff OU SafeStop)
+//   - AscentPermit/DescendPermit : permis directionnels reconsommes par la barriere finale
+//   - M1BlockedBySafetyInfo  : synthese (PowerCutOff OU SafeStop)
 // Sources : PRG_04 (WinchM1FinalInterlockRequest / WinchM1Safety).
 
 M1InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.Enable
@@ -1158,6 +1159,8 @@ instWinchOutputInterlockM1(
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.SafeStop,
+    AscentPermit               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.AscentPermit,
+    DescendPermit              := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.DescendPermit,
     BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.BrakeFeedback,
     FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
     RequestedRelayFwd          := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayFwd,
@@ -1231,6 +1234,8 @@ instWinchOutputInterlockM2(
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.SafeStop,
+    AscentPermit               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.AscentPermit,
+    DescendPermit              := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.DescendPermit,
     BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.BrakeFeedback,
     FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
     RequestedRelayFwd          := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayFwd,
@@ -2684,6 +2689,22 @@ DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz)
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Entree securite pour interface standard</xhtml>
               </documentation>
             </variable>
+            <variable name="AscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis final sens montee (TRUE = autorise)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis final sens descente (TRUE = autorise)</xhtml>
+              </documentation>
+            </variable>
             <variable name="PowerContactorEngaged">
               <type>
                 <BOOL />
@@ -3028,6 +3049,14 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
             </variable>
           </outputVars>
           <localVars>
+            <variable name="PermitFinalBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande directionnelle refusee au dernier niveau</xhtml>
+              </documentation>
+            </variable>
             <variable name="ResetEdge">
               <type>
                 <derived name="R_TRIG" />
@@ -3352,6 +3381,11 @@ RequestedStepClamped := LIMIT(0, RequestedStep, 5);
 // sont coupés indépendamment de FB_Winch. Enable reste actif (≠ neutralisation) ;
 // SafeStop n'est pas un défaut (pas de FAULT, pas de latch, pas de Reset requis).
 MotorRequest := (RequestedStepClamped &gt; 0) AND (RequestedRelayFwd XOR RequestedRelayRev);
+// Defense en profondeur : le meme permis directionnel que celui applique en amont
+// doit encore autoriser la sortie finale. Aucun latch ni defaut n'est cree ici :
+// la demande est simplement neutralisee tant que le permis est FALSE.
+PermitFinalBlocked := (RequestedRelayFwd AND NOT AscentPermit)
+                   OR (RequestedRelayRev AND NOT DescendPermit);
 
 // ── 2bis. Arbitrage Error/ErrorId AVANT §3/§5 ────────────────────────────
 // ErrorId bit0 (défaut frein) est mis à jour en FIN de scan (§6bis, après BrakeCmd) —
@@ -3538,7 +3572,7 @@ ELSIF ContactorStuckLatched THEN
     AuthorizedStep := 0;
     Reason := E_WinchFinalInterlockReason.SENSE_DROP_TIMEOUT;
     State := E_WinchFinalInterlockState.FAULT;
-ELSIF ReleaseOrderActive THEN
+ELSIF ReleaseOrderActive AND NOT PermitFinalBlocked THEN
     // Ordre de relâchement : vitesse relâchée immédiatement, direction tenue
     // jusqu'à ReleaseOrderDelay, puis direction relâchée (AC1/AC2).
     StepDelay(IN := FALSE, PT := T#1s250ms);
@@ -3557,10 +3591,10 @@ ELSIF ReleaseOrderActive THEN
     END_IF;
     State := E_WinchFinalInterlockState.READY;
     Busy := TRUE;
-ELSIF SafeStop THEN
-    // 🛡️ SafeStop : coupure dure indépendante de FB_Winch (défense en profondeur).
+ELSIF SafeStop OR PermitFinalBlocked THEN
+    // 🛡️ SafeStop ou permis directionnel refusé : coupure dure indépendante de FB_Winch.
     // SafeStop n'est PAS un défaut : pas de FAULT, pas de latch, pas de Reset requis.
-    // Les sorties sont coupées tant que SafeStop=TRUE ; retour nominal dès sa retombée.
+    // Les sorties sont coupées tant que l'une des causes est TRUE ; retour nominal dès sa retombée.
     // BrakeCmd (= RelayFwd OR RelayRev, §6) retombe à FALSE automatiquement.
     StepDelay(IN := FALSE, PT := T#1s250ms);
     StepDelayElapsed := StepDelay.ET;

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:50:15.335040" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:50:15.335040">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T05:36:02.767908" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T05:36:02.767908">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -41,6 +41,30 @@ Descente effectivement permise (EffectivePermit*_Descend)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee effectivement permise (EffectivePermit*_Ascent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AscentPermitApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis effectivement transmis a la barriere finale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermitApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis effectivement transmis a la barriere finale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalPermitBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande presente mais refusee par le permis final</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStopActive">

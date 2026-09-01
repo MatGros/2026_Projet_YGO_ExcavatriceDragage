@@ -14,6 +14,8 @@ VAR_INPUT
     Enable                          : BOOL;                           // --> [CMD] Autorisation generale FB (TRUE=Autorise)
     Reset                           : BOOL;                           // --> [CMD] Acquittement defaut sur front
     SafeStop                        : BOOL;                           // --> [SAFE] Entree securite pour interface standard
+    AscentPermit                    : BOOL;                           // --> [SAFE] Permis final sens montee (TRUE = autorise)
+    DescendPermit                   : BOOL;                           // --> [SAFE] Permis final sens descente (TRUE = autorise)
 
     // === HARDWARE ET FEEDBACKS ===
     PowerContactorEngaged           : BOOL;                           // --> [SAFE] Chaine AU rearmee et puissance OK
@@ -79,6 +81,7 @@ VAR_OUTPUT
     ReleaseOrderElapsed             : TIME;                           // <-- [DIAG] Ecoule temporisation ordre de relachement
 END_VAR
 VAR
+    PermitFinalBlocked              : BOOL;                           // . [LOC] Demande directionnelle refusee au dernier niveau
     // === DETECTEURS ET TIMERS INTERNES ===
     ResetEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Reset
     ErrorEdge                       : R_TRIG;                         // . [LOC] Detecteur front montant Erreur
@@ -166,6 +169,11 @@ RequestedStepClamped := LIMIT(0, RequestedStep, 5);
 // sont coupés indépendamment de FB_Winch. Enable reste actif (≠ neutralisation) ;
 // SafeStop n'est pas un défaut (pas de FAULT, pas de latch, pas de Reset requis).
 MotorRequest := (RequestedStepClamped > 0) AND (RequestedRelayFwd XOR RequestedRelayRev);
+// Defense en profondeur : le meme permis directionnel que celui applique en amont
+// doit encore autoriser la sortie finale. Aucun latch ni defaut n'est cree ici :
+// la demande est simplement neutralisee tant que le permis est FALSE.
+PermitFinalBlocked := (RequestedRelayFwd AND NOT AscentPermit)
+                   OR (RequestedRelayRev AND NOT DescendPermit);
 
 // ── 2bis. Arbitrage Error/ErrorId AVANT §3/§5 ────────────────────────────
 // ErrorId bit0 (défaut frein) est mis à jour en FIN de scan (§6bis, après BrakeCmd) —
@@ -352,7 +360,7 @@ ELSIF ContactorStuckLatched THEN
     AuthorizedStep := 0;
     Reason := E_WinchFinalInterlockReason.SENSE_DROP_TIMEOUT;
     State := E_WinchFinalInterlockState.FAULT;
-ELSIF ReleaseOrderActive THEN
+ELSIF ReleaseOrderActive AND NOT PermitFinalBlocked THEN
     // Ordre de relâchement : vitesse relâchée immédiatement, direction tenue
     // jusqu'à ReleaseOrderDelay, puis direction relâchée (AC1/AC2).
     StepDelay(IN := FALSE, PT := T#1s250ms);
@@ -371,10 +379,10 @@ ELSIF ReleaseOrderActive THEN
     END_IF;
     State := E_WinchFinalInterlockState.READY;
     Busy := TRUE;
-ELSIF SafeStop THEN
-    // 🛡️ SafeStop : coupure dure indépendante de FB_Winch (défense en profondeur).
+ELSIF SafeStop OR PermitFinalBlocked THEN
+    // 🛡️ SafeStop ou permis directionnel refusé : coupure dure indépendante de FB_Winch.
     // SafeStop n'est PAS un défaut : pas de FAULT, pas de latch, pas de Reset requis.
-    // Les sorties sont coupées tant que SafeStop=TRUE ; retour nominal dès sa retombée.
+    // Les sorties sont coupées tant que l'une des causes est TRUE ; retour nominal dès sa retombée.
     // BrakeCmd (= RelayFwd OR RelayRev, §6) retombe à FALSE automatiquement.
     StepDelay(IN := FALSE, PT := T#1s250ms);
     StepDelayElapsed := StepDelay.ET;

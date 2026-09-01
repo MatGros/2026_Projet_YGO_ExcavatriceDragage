@@ -35,6 +35,7 @@ VAR_OUTPUT
 END_VAR
 VAR
     BenneBusyFallEdge : F_TRIG;  // . [LOC] Front descendant action benne (arrêt forcé)
+    BothDirectionAuthorized : BOOL; // . [LOC] Atomicité Both : permit agrégé du sens demandé délivré
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -99,11 +100,17 @@ ELSE
 
             // Gating StartStop (bit-identique PRG_04 §3) — synchro INVERSÉE vs M1,
             // homme-mort qualifié en joystick
+            // 🔗 Atomicité Both : cf. M1 — en both, la commande ne consomme QUE le
+            // permit agrégé du sens demandé. Départ jamais isolé entre les 2 treuils.
+            BothDirectionAuthorized := (NOT BothIntent.Active)
+                OR ((Direction = 1) AND Context.BothAscentPermit)
+                OR ((Direction = -1) AND Context.BothDescendPermit);
             StartStop := (Direction <> 0)
                       AND NOT Context.WinchBothMotionBlockedByBucket
                       AND NOT ((Context.SyncBlocksAscent   AND (Direction = -1))
                             OR (Context.SyncBlocksDescent AND (Direction = 1)))
-                      AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed);
+                      AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
+                      AND BothDirectionAuthorized;
         END_IF;
     END_IF;
 

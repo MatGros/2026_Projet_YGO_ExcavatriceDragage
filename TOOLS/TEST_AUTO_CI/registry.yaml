@@ -338,6 +338,9 @@ FB_WinchOutputInterlock:
   domain: H_TREUILS_BENNE
   af_doc: DOC/AF/AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md
   sources:
+    - CODE/A_COMMUN/_TYPES/ST_Fault.st
+    - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
+    - CODE/A_COMMUN/FB_FaultCore.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
     - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
     - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st

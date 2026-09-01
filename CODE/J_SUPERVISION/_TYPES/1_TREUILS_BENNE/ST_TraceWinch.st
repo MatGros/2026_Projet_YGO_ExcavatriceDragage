@@ -17,6 +17,9 @@ STRUCT
     // Permis effectifs par sens (reflet exact des permis appliques au mouvement)
     DescendPermitEffective  : BOOL;   // Descente effectivement permise (EffectivePermit*_Descend)
     AscentPermitEffective   : BOOL;   // Montee effectivement permise (EffectivePermit*_Ascent)
+    AscentPermitApplied      : BOOL;   // Permis effectivement transmis a la barriere finale
+    DescendPermitApplied     : BOOL;   // Permis effectivement transmis a la barriere finale
+    FinalPermitBlocked       : BOOL;   // Demande presente mais refusee par le permis final
 
     // Source de SafeStop / coupure - pour distinguer l'origine du blocage
     SafeStopActive          : BOOL;   // SafeStop effectif applique (SafeStop*_Active)

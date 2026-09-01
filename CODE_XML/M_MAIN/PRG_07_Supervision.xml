@@ -2652,6 +2652,30 @@ Descente effectivement permise (EffectivePermit*_Descend)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee effectivement permise (EffectivePermit*_Ascent)</xhtml>
               </documentation>
             </variable>
+            <variable name="AscentPermitApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis effectivement transmis a la barriere finale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermitApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis effectivement transmis a la barriere finale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalPermitBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande presente mais refusee par le permis final</xhtml>
+              </documentation>
+            </variable>
             <variable name="SafeStopActive">
               <type>
                 <BOOL />
