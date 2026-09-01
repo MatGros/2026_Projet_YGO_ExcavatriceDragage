@@ -24544,6 +24544,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite légale atteinte</xhtml>
               </documentation>
             </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Bascule de mode refusée (treuils non à l'arrêt)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangeBlockReason">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Motif du blocage de bascule (ex. "Chgt mode refuse : contacteur M1")</xhtml>
+              </documentation>
+            </variable>
             <variable name="EmergencyChainClosed">
               <type>
                 <BOOL />
@@ -25461,7 +25477,10 @@ AnyBypassActive := BypassGlobalActive
                 OR BypassWinchM2Active
                 OR BypassTranslation
                 OR BypassSyncActive;
-IF AnyBypassActive THEN
+IF ModeChangePendingBlocked AND ModeChangeBlockReason &lt;&gt; '' THEN
+    // Bascule de mode refusée : motif prioritaire (info opérateur, ex. "Chgt mode refuse : contacteur M1").
+    SpecialConditionCandidate := ModeChangeBlockReason;
+ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN
     SpecialConditionCandidate := 'ATTENTION: Synchro bridée';
@@ -48119,6 +48138,8 @@ instHmiBannerFormatter(
     BypassSyncActive      := GVL_IHM.M1M2Sync.Bypass.Global,
     SyncDegradedActive    := PRG_04_Treuils_Benne.Data.SyncState.SyncDeviationWarn,
     LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
+    ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked,
+    ModeChangeBlockReason    := PRG_03_Modes_Cycle.Data.Auth.ModeChangeBlockReason,
     EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     PowerCutOffActiveAny        := PRG_06_Outputs.PowerCutOffActive,

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T01:42:23.059577" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T01:42:23.059577">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T03:35:25.095781" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T03:35:25.095781">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -8203,6 +8203,8 @@ instHmiBannerFormatter(
     BypassSyncActive      := GVL_IHM.M1M2Sync.Bypass.Global,
     SyncDegradedActive    := PRG_04_Treuils_Benne.Data.SyncState.SyncDeviationWarn,
     LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
+    ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked,
+    ModeChangeBlockReason    := PRG_03_Modes_Cycle.Data.Auth.ModeChangeBlockReason,
     EmergencyChainClosed  := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     PowerCutOffActiveAny        := PRG_06_Outputs.PowerCutOffActive,
@@ -9757,6 +9759,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite légale atteinte</xhtml>
               </documentation>
             </variable>
+            <variable name="ModeChangePendingBlocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Bascule de mode refusée (treuils non à l'arrêt)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ModeChangeBlockReason">
+              <type>
+                <string length="40" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Motif du blocage de bascule (ex. "Chgt mode refuse : contacteur M1")</xhtml>
+              </documentation>
+            </variable>
             <variable name="EmergencyChainClosed">
               <type>
                 <BOOL />
@@ -10674,7 +10692,10 @@ AnyBypassActive := BypassGlobalActive
                 OR BypassWinchM2Active
                 OR BypassTranslation
                 OR BypassSyncActive;
-IF AnyBypassActive THEN
+IF ModeChangePendingBlocked AND ModeChangeBlockReason &lt;&gt; '' THEN
+    // Bascule de mode refusée : motif prioritaire (info opérateur, ex. "Chgt mode refuse : contacteur M1").
+    SpecialConditionCandidate := ModeChangeBlockReason;
+ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN
     SpecialConditionCandidate := 'ATTENTION: Synchro bridée';
