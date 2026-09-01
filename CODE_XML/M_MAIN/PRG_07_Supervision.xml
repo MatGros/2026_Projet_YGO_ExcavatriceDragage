@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T10:18:02.699040" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T10:18:02.699040">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T10:56:28.200149" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T10:56:28.200149">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -8429,6 +8429,26 @@ ELSE
     M2PosCorrectedHmiHeld_M := GVL_IHM.M2TreuilBenne.Bucket.State.M2PositionCorrected;
 END_IF;
 GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
+
+// ---------- §3e-ter. Voyants sorties treuils = ordre PHYSIQUE reel ----------
+// WinchM*State (projete par PRG_04) porte la DEMANDE de FB_Winch : avant la
+// barriere finale (DeadTime/SenseHold) ET avant le bloc concordance §2ter de
+// PRG_06. PRG_07 tourne apres PRG_06 -&gt; on ecrase par la sortie reelle du meme
+// scan pour que le voyant IHM colle au contacteur/frein physique.
+GVL_IHM.M1TreuilRetenue.State.RelayFwd    := PRG_06_Outputs.Data.M1RelayFwd;
+GVL_IHM.M1TreuilRetenue.State.RelayRev    := PRG_06_Outputs.Data.M1RelayRev;
+GVL_IHM.M1TreuilRetenue.State.BrakeCmd    := PRG_06_Outputs.Data.M1BrakeCmd;
+GVL_IHM.M1TreuilRetenue.State.Contactor1  := PRG_06_Outputs.Data.M1SpeedContactor1;
+GVL_IHM.M1TreuilRetenue.State.Contactor2  := PRG_06_Outputs.Data.M1SpeedContactor2;
+GVL_IHM.M1TreuilRetenue.State.Contactor3  := PRG_06_Outputs.Data.M1SpeedContactor3;
+GVL_IHM.M1TreuilRetenue.State.Contactor4  := PRG_06_Outputs.Data.M1SpeedContactor4;
+GVL_IHM.M2TreuilBenne.State.RelayFwd      := PRG_06_Outputs.Data.M2RelayFwd;
+GVL_IHM.M2TreuilBenne.State.RelayRev      := PRG_06_Outputs.Data.M2RelayRev;
+GVL_IHM.M2TreuilBenne.State.BrakeCmd      := PRG_06_Outputs.Data.M2BrakeCmd;
+GVL_IHM.M2TreuilBenne.State.Contactor1    := PRG_06_Outputs.Data.M2SpeedContactor1;
+GVL_IHM.M2TreuilBenne.State.Contactor2    := PRG_06_Outputs.Data.M2SpeedContactor2;
+GVL_IHM.M2TreuilBenne.State.Contactor3    := PRG_06_Outputs.Data.M2SpeedContactor3;
+GVL_IHM.M2TreuilBenne.State.Contactor4    := PRG_06_Outputs.Data.M2SpeedContactor4;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Data.Auth.Mode;
 // — Chaîne AU / sécurité : sortie de Modes.State vers GVL_IHM.Emergency —

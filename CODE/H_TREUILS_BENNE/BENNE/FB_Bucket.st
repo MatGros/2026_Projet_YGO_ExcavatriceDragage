@@ -99,9 +99,19 @@ VAR
     M1SlipFaultLatched              : BOOL;
     HomingFaultLatched              : BOOL;
 
+    // === FENETRE DE REFERENCEMENT (preset codeur = saut de CablePosM1/M2) ===
+    BucketRefWindowActive           : BOOL;                           // . [LOC] Homing / preset codeur en cours : causes geometrie & reference re-basees
+    BucketPosStepDetected           : BOOL;                           // . [LOC] Saut de position non physique ce scan (M1 ou M2)
+    CablePosM1Prev                  : REAL;                           // . [LOC] CablePosM1 scan precedent (detection de saut)
+    CablePosM2Prev                  : REAL;                           // . [LOC] CablePosM2 scan precedent (detection de saut)
+    TonRefSettleBucket              : TON;                            // . [LOC] Garde de stabilisation apres homing / saut de position
+
     // Socle défaut
     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
     instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
+END_VAR
+VAR CONSTANT
+    CST_RefPosStepM                 : REAL := 0.5;                    // Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -119,6 +129,27 @@ IF ResetEdge.Q OR BypassGlobal THEN
 END_IF;
 
 IF NOT BypassGlobal THEN
+    // 🛡️ Fenetre de referencement : le preset SDO du codeur (homing M1, M2 ou
+    // conjoint) fait sauter CablePosM1/M2 d'un bloc et fait retomber HomedMx a
+    // FALSE pendant la transaction. Sans garde, la cause 1 (CablePosM2 < CablePosM1
+    // transitoire) et la cause 4 (HomedMx FALSE transitoire) se latchent et
+    // restent. On inhibe ces 2 causes pendant homing conjoint + saut de position
+    // detecte + 2s de stabilisation, et on RAZ leurs latches parasites.
+    IF FirstCycle THEN
+        CablePosM1Prev := CablePosM1;
+        CablePosM2Prev := CablePosM2;
+    END_IF;
+    BucketPosStepDetected := (ABS(CablePosM1 - CablePosM1Prev) > CST_RefPosStepM)
+                          OR (ABS(CablePosM2 - CablePosM2Prev) > CST_RefPosStepM);
+    CablePosM1Prev := CablePosM1;
+    CablePosM2Prev := CablePosM2;
+    TonRefSettleBucket(IN := NOT (MachineHomingActive OR BucketPosStepDetected), PT := T#2s);
+    BucketRefWindowActive := MachineHomingActive OR BucketPosStepDetected OR NOT TonRefSettleBucket.Q;
+    IF BucketRefWindowActive THEN
+        OffsetMaxFaultLatched := FALSE;
+        HomingFaultLatched    := FALSE;
+    END_IF;
+
     // Cause 0 : Configuration géométrie benne
     IF (Config.OffsetOpenM >= Config.OffsetCloseM)
        OR (Config.OffsetOpenM < 0.0) THEN
@@ -130,7 +161,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 1 : Dépassement écart max
     MaxAllowedOffset := Config.OffsetCloseM + 2.0;
-    IF (CablePosM2 > (CablePosM1 + MaxAllowedOffset)) OR (CablePosM2 < CablePosM1) THEN
+    IF NOT BucketRefWindowActive
+       AND ((CablePosM2 > (CablePosM1 + MaxAllowedOffset)) OR (CablePosM2 < CablePosM1)) THEN
         OffsetMaxFaultLatched := TRUE;
     END_IF;
     instCauses[1].Active   := OffsetMaxFaultLatched;
@@ -156,7 +188,7 @@ IF NOT BypassGlobal THEN
     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
 
     // Cause 4 : Non référencé
-    IF NOT HomedM1 OR NOT HomedM2 THEN
+    IF NOT BucketRefWindowActive AND (NOT HomedM1 OR NOT HomedM2) THEN
         HomingFaultLatched := TRUE;
     END_IF;
     instCauses[4].Active   := HomingFaultLatched;
@@ -164,6 +196,11 @@ IF NOT BypassGlobal THEN
     instCauses[4].Texte    := 'Codeurs treuils non references pour sequence benne';
 ELSE
     TonTimeout(IN := FALSE);
+    TonRefSettleBucket(IN := FALSE);
+    BucketRefWindowActive := FALSE;
+    BucketPosStepDetected := FALSE;
+    CablePosM1Prev := CablePosM1;
+    CablePosM2Prev := CablePosM2;
     M1SlipDetected := FALSE;
     instCauses[0].Active := FALSE;
     instCauses[1].Active := FALSE;
