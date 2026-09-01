@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T17:18:38.666685" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T17:18:38.666685">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T22:01:48.577758" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T22:01:48.577758">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -7858,6 +7858,14 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass SlackCable IHM&lt;-&gt;RETAIN</xhtml>
               </documentation>
             </variable>
+            <variable name="instMirrorBypassNetwork">
+              <type>
+                <derived name="FB_MirrorBypassRetain" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Miroir bypass Reseau (bus + 5 modules E/S) IHM&lt;-&gt;RETAIN</xhtml>
+              </documentation>
+            </variable>
             <variable name="PrevTranslationBypass">
               <type>
                 <BOOL />
@@ -7937,6 +7945,14 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass mou de cable (sync bidirectionnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevNetworkBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Memoire bypass reseau global (sync bidirectionnel)</xhtml>
               </documentation>
             </variable>
             <variable name="SimBypassRise">
@@ -8255,6 +8271,17 @@ IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
     GVL_IHM.Commun.Bypass.Initialized := TRUE;
 END_IF;
 
+// Restauration boot du bypass reseau global (RETAIN), meme pattern que les autres domaines.
+// GVL_IHM.Network.Bypass.Global neutralise les diagnostics bus + 5 modules E/S dans
+// PRG_02_Acquisition (VH_0008ER, CANopen, EtherCAT). Sans ce relais, BypassNetworkGlobal
+// etait orphelin (jamais rejoue vers l'IHM).
+IF NOT GVL_IHM.Network.Bypass.Initialized THEN
+    IF BypassNetworkGlobal THEN
+        GVL_IHM.Network.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.Network.Bypass.Initialized := TRUE;
+END_IF;
+
 // ---------- §2c. Synchronisation bidirectionnelle IHM ↔ RETAIN ----------
 // 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne), factorisé dans FB_MirrorBypassRetain
 // (CODE/A_COMMUN) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
@@ -8268,6 +8295,7 @@ instMirrorBypassTopLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.TopLimitSwitch, Reta
 instMirrorBypassTopLimitSoftware(Hmi := GVL_IHM.Commun.Bypass.TopLimitSoftware, RetainVal := BypassTopLimitSoftware, Prev := PrevTopLimitSoftware);
 instMirrorBypassCableLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.CableLimitSwitch, RetainVal := BypassCableLimitSwitch, Prev := PrevCableLimitSwitch);
 instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, RetainVal := BypassSlackCable, Prev := PrevSlackCable);
+instMirrorBypassNetwork(Hmi := GVL_IHM.Network.Bypass.Global, RetainVal := BypassNetworkGlobal, Prev := PrevNetworkBypass);
 
 // ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)

@@ -51,6 +51,7 @@ VAR
     instMirrorBypassTopLimitSoftware : FB_MirrorBypassRetain; // * [INST] Miroir bypass TopLimitSoftware IHM<->RETAIN
     instMirrorBypassCableLimitSwitch : FB_MirrorBypassRetain; // * [INST] Miroir bypass CableLimitSwitch IHM<->RETAIN
     instMirrorBypassSlackCable       : FB_MirrorBypassRetain; // * [INST] Miroir bypass SlackCable IHM<->RETAIN
+    instMirrorBypassNetwork          : FB_MirrorBypassRetain; // * [INST] Miroir bypass Reseau (bus + 5 modules E/S) IHM<->RETAIN
 
     // === 🚦 MÉMOIRE SYNC BYPASS BIDIRECTIONNEL (RETAIN ↔ IHM) ===
     PrevTranslationBypass   : BOOL; // . [LOC] Memoire bypass Translation (sync bidirectionnel)
@@ -63,6 +64,7 @@ VAR
     PrevTopLimitSoftware    : BOOL; // . [LOC] Memoire bypass fin de course haut logiciel (sync bidirectionnel)
     PrevCableLimitSwitch    : BOOL; // . [LOC] Memoire bypass limite cable (sync bidirectionnel)
     PrevSlackCable          : BOOL; // . [LOC] Memoire bypass mou de cable (sync bidirectionnel)
+    PrevNetworkBypass       : BOOL; // . [LOC] Memoire bypass reseau global (sync bidirectionnel)
 
     // === 🧪 DÉTECTEURS FRONT SIMULATION BYPASS (pilotage bypass IHM) ===
     SimBypassRise           : R_TRIG; // . [LOC] Front montant SimulationBypassActive
@@ -284,6 +286,17 @@ IF NOT GVL_IHM.Commun.Bypass.Initialized THEN
     GVL_IHM.Commun.Bypass.Initialized := TRUE;
 END_IF;
 
+// Restauration boot du bypass reseau global (RETAIN), meme pattern que les autres domaines.
+// GVL_IHM.Network.Bypass.Global neutralise les diagnostics bus + 5 modules E/S dans
+// PRG_02_Acquisition (VH_0008ER, CANopen, EtherCAT). Sans ce relais, BypassNetworkGlobal
+// etait orphelin (jamais rejoue vers l'IHM).
+IF NOT GVL_IHM.Network.Bypass.Initialized THEN
+    IF BypassNetworkGlobal THEN
+        GVL_IHM.Network.Bypass.Global := TRUE;
+    END_IF;
+    GVL_IHM.Network.Bypass.Initialized := TRUE;
+END_IF;
+
 // ---------- §2c. Synchronisation bidirectionnelle IHM ↔ RETAIN ----------
 // 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne), factorisé dans FB_MirrorBypassRetain
 // (CODE/A_COMMUN) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
@@ -297,6 +310,7 @@ instMirrorBypassTopLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.TopLimitSwitch, Reta
 instMirrorBypassTopLimitSoftware(Hmi := GVL_IHM.Commun.Bypass.TopLimitSoftware, RetainVal := BypassTopLimitSoftware, Prev := PrevTopLimitSoftware);
 instMirrorBypassCableLimitSwitch(Hmi := GVL_IHM.Commun.Bypass.CableLimitSwitch, RetainVal := BypassCableLimitSwitch, Prev := PrevCableLimitSwitch);
 instMirrorBypassSlackCable(Hmi := GVL_IHM.Commun.Bypass.SlackCable, RetainVal := BypassSlackCable, Prev := PrevSlackCable);
+instMirrorBypassNetwork(Hmi := GVL_IHM.Network.Bypass.Global, RetainVal := BypassNetworkGlobal, Prev := PrevNetworkBypass);
 
 // ---------- §2d. Pilotage des bypass par simulation ----------
 // 🧪 PILOTAGE BYPASS IHM PAR SIMULATION (front montant/descendant)
