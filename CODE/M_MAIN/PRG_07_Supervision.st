@@ -455,6 +455,12 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
 GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;
 GVL_IHM.Modes.State.ModeChangeBlockReason := PRG_03_Modes_Cycle.Data.Auth.ModeChangeBlockReason;
+GVL_IHM.Modes.State.M1ContactorsReleased := PRG_03_Modes_Cycle.Data.Auth.M1ContactorsReleased;
+GVL_IHM.Modes.State.M1BrakeApplied := PRG_03_Modes_Cycle.Data.Auth.M1BrakeApplied;
+GVL_IHM.Modes.State.M1SpeedLow := PRG_03_Modes_Cycle.Data.Auth.M1SpeedLow;
+GVL_IHM.Modes.State.M2ContactorsReleased := PRG_03_Modes_Cycle.Data.Auth.M2ContactorsReleased;
+GVL_IHM.Modes.State.M2BrakeApplied := PRG_03_Modes_Cycle.Data.Auth.M2BrakeApplied;
+GVL_IHM.Modes.State.M2SpeedLow := PRG_03_Modes_Cycle.Data.Auth.M2SpeedLow;
 GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;
 GVL_IHM.Modes.State.HomingRequiredM2 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM2;
 

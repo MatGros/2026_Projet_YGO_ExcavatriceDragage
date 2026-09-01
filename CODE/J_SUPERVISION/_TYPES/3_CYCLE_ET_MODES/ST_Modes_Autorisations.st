@@ -29,6 +29,13 @@ STRUCT
                                               //   ne sont pas a l'arret mecanique confirme (contacteurs
                                               //   retombes ET frein serre ET |v| < seuil). Mode courant maintenu.
     ModeChangeBlockReason       : STRING(40); // Motif du blocage de bascule (texte IHM court, ex. "Chgt mode refuse : contacteur M1")
+    // Détail des 6 sous-conditions de ModeChangeAllowed (diagnostic IHM) — TRUE = condition satisfaite.
+    M1ContactorsReleased        : BOOL;       // M1 : contacteurs retombés
+    M1BrakeApplied              : BOOL;       // M1 : frein serré (NOT M1BrakeIsOpen)
+    M1SpeedLow                  : BOOL;       // M1 : vitesse sous seuil
+    M2ContactorsReleased        : BOOL;       // M2 : contacteurs retombés
+    M2BrakeApplied              : BOOL;       // M2 : frein serré (NOT M2BrakeIsOpen)
+    M2SpeedLow                  : BOOL;       // M2 : vitesse sous seuil
     HomingRequiredM1            : BOOL;       // M1 : re-homing obligatoire avant tout retour SEMI_AUTO
     HomingRequiredM2            : BOOL;       // M2 : idem
 END_STRUCT

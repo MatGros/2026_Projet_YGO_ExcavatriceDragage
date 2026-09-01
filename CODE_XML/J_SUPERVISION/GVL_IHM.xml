@@ -2571,6 +2571,55 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Motif du blocage de bascule (texte court, ex. "Chgt mode refuse : contacteur M1")</xhtml>
               </documentation>
             </variable>
+            <variable name="M1ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détail des 6 sous-conditions de ModeChangeAllowed (diagnostic IHM) — TRUE = condition satisfaite
+M1 : contacteurs retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : frein serré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedLow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M1 : vitesse sous seuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : contacteurs retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : frein serré</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedLow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 : vitesse sous seuil</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingRequiredM1">
               <type>
                 <BOOL />

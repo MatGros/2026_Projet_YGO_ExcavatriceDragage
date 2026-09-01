@@ -199,6 +199,15 @@ ModeChangeAllowed := M1ContactorsReleased AND NOT M1BrakeIsOpen
                      AND M2ContactorsReleased AND NOT M2BrakeIsOpen
                      AND (ABS(M2SpeedAbsMps) < MovementSpeedThresholdMps);
 
+// Détail des 6 sous-conditions (diagnostic IHM) — TRUE = condition satisfaite.
+// Permet à l'opérateur de voir EXACTEMENT ce qui bloque la bascule de mode.
+Auth.M1ContactorsReleased := M1ContactorsReleased;
+Auth.M1BrakeApplied       := NOT M1BrakeIsOpen;
+Auth.M1SpeedLow           := ABS(M1SpeedAbsMps) < MovementSpeedThresholdMps;
+Auth.M2ContactorsReleased := M2ContactorsReleased;
+Auth.M2BrakeApplied       := NOT M2BrakeIsOpen;
+Auth.M2SpeedLow           := ABS(M2SpeedAbsMps) < MovementSpeedThresholdMps;
+
 // 3.2 ARBITRAGE — le mode suit la sélection IHM (découplé de l'AU/défaut)
 // La sélection de mode n'est JAMAIS bloquée par l'AU, l'arrêt d'urgence ou un défaut :
 // le mode est un état de sélection, le mouvement est coupé en aval (FB_Cycle, FB_Safety_Winch,
