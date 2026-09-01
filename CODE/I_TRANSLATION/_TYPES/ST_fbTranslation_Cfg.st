@@ -30,7 +30,7 @@ STRUCT
     // === COMMUN / FREIN ===
     CaptorDebounce              : TIME := T#100ms; // --> [CFG] Filtrage capteur position cible
     BrakeDelayContactClose      : TIME := T#100ms; // --> [CFG] Voir FB_Brake
-    BrakeDelayMagnetise         : TIME := T#300ms; // --> [CFG] Voir FB_Brake
+    BrakeDelayMagnetise         : TIME := T#100ms; // --> [CFG] Voir FB_Brake
     BrakeDelayMotorDecel        : TIME := T#500ms; // --> [CFG] Voir FB_Brake
     BrakeFeedbackTimeout        : TIME := T#300ms; // --> [CFG] Strictement sous watchdog final 500 ms
 END_STRUCT

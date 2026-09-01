@@ -4783,14 +4783,15 @@ tasks:
   bloque_par: []
 - id: T215
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: IHM
   agent: DSH (orchestrateur)
   date: '2026-09-01T00:00:00+02:00'
+  completed_at: '2026-09-01T03:20:00+02:00'
   titre: 'Refactor GVL_IHM.DredgingAssist en 3 sous-structures (CycleDiveSearch/CycleExtraction/CycleDumpAtTremie)'
   contexte: 'Découper le bloc IHM mélangé GVL_IHM.DredgingAssist (Dive + Extraction + DumpAtTremie + Bypass) en 3 sous-structures homogènes Cmd/State/Cfg. Configs + toggles persistés (GVL_PERSISTENT). Refactor par étapes avec points de comparaison (baseline + diff de sortie nul). Option B validée par l''utilisateur.'
-  description: 'Refactor minimal par étapes (Phase 0 baseline → Phase 6 outillage), chaque étape avec bundle + G200 + gates + diff de sortie nul. Changement d''interface FB_TroubleshootingView (1 struct → 3 entrées) + refonte pont persistance. Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T215_REFACTOR_GVL_IHM_DREDGING.yaml.'
+  description: '✅ **Refactor terminé (2026-09-01)** : 12 types créés + ST_CycleAssistToggles, GVL_IHM déclare 3 membres, 4 structures source supprimées, persistance (4 persistants + 4 bridges), consommateurs PRG_03/04/07 recâblés (pur renommage), FB_TroubleshootingView interface 1→3 entrées, outillage (G330 + registry) mis à jour. G200 PASS (0 erreur), bundle frais, gates = baseline (5 échecs pré-existants, aucune nouvelle régression). Commit 9ba2fe63. Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T215_REFACTOR_GVL_IHM_DREDGING.yaml.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T215_REFACTOR_GVL_IHM_DREDGING.yaml
   objectifs:
   - 'Découper GVL_IHM.DredgingAssist en CycleDiveSearch/CycleExtraction/CycleDumpAtTremie (Cmd/State/Cfg)'

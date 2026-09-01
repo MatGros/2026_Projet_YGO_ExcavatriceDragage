@@ -1429,6 +1429,18 @@
   decision: "Orchestrateur des cycles actif — garant qualité & non-régression. En attente des tâches utilisateur sur les cycles."
   note: "Gap identifié: AF-04 §4.2 X5 'fond validé (FB_DiveSearch)' vs FB_Cycle transite sur DI brut (KoboldContactFond) — porté par T202-E. T211 ajoutée au catalogue."
 
+- id: "T215-REFACTOR-GVL-IHM"
+  date: "2026-09-01"
+  type: "tache"
+  priorite: "haute"
+  agent_id: "DSH (orchestrateur) + sous-agents"
+  sujet: "Refactor GVL_IHM.DredgingAssist en 3 sous-structures (CycleDiveSearch/CycleExtraction/CycleDumpAtTremie)"
+  statut: "terminé"
+  livrable: "12 types + ST_CycleAssistToggles + 4 bridges + recâblage PRG_03/04/07 + FB_TroubleshootingView + G330/registry"
+  verdict: "G200 PASS (0 erreur), bundle frais, gates = baseline (5 échecs pré-existants, aucune nouvelle régression). Commit 9ba2fe63."
+  decision: "Option B validée. Configs + toggles persistés (GVL_PERSISTENT). OperatorActionId/Action placés dans CycleDiveSearch.State (champs Commun, choix pragmatique)."
+  note: "Refactor par étapes (Phase 0 baseline → Phase 6 outillage) avec points de comparaison. Contrat T215 COMPLETED. En attente validation humaine finale."
+
 - id: "BANDEAU-TRI-HISTO-CODE"
   date: "2026-09-01"
   type: "tache"
