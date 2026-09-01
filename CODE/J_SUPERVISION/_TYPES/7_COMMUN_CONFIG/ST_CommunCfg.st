@@ -11,9 +11,10 @@ STRUCT
     LimitLegalDepthMinAllowed_M : REAL := -999.0; (* 📐 Cote min de dragage autorisée (m, négatif) *)
     LimitLegalEnabled           : BOOL; (* 🟢 Activation de la limite légale *)
     SelHomingApproachEnable     : BOOL; (* 🔌 Case IHM : autorise le dépassement butée haute pour homing (si MAINT_N2) *)
-    WinchMaxStepDescent      : INT := 3;     (* 🛑 Limitation palier vitesse en descending (1..5), commun M1/M2 *)
+    WinchMaxStepDescent      : INT := 5;     (* 🚀 Plafond palier descente nominal (1..5), commun M1/M2 *)
     WinchMaxStepAscent          : INT := 5;     (* 🚀 Limitation palier vitesse en montée (1..5), commun M1/M2 *)
-    WinchSlowdownDistance_M     : REAL := 1.0;  (* 📏 Distance avant limite pour enclencher le ralentissement (m), commun M1/M2 *)
+    WinchSlowdownDistanceTop_M     : REAL := 0.0;  (* 📏 Distance avant limite haute : 0 = arrêt au seuil (m), commun M1/M2 *)
+    WinchSlowdownDistanceBottom_M  : REAL := 1.0;  (* 📏 Distance avant limite basse pour ralentir (m), commun M1/M2 *)
     // : WinchSlowSpeed_Pct (%) retiré — un treuil ne connaît que des paliers (1..5),
     // pas une vitesse continue.
     WinchSlowdownMaxStep        : INT := 1;     (* : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2 *)

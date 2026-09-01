@@ -21,9 +21,9 @@ STRUCT
     HydraulicThermalFault     : BOOL; (* 🌡️ Défaut/perte thermique centrale hydraulique
                                           (PRG_02_Acquisition, diagnostic seul — aucune commande PLC) *)
 
-    (* 🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur *)
-    SimTopSensorBypassActive  : BOOL; (* 🩺 Capteur haut ignoré car simulation active *)
-    SimSlackCableBypassActive : BOOL; (* 🩺 Mou de câble ignoré car simulation active *)
+    (* 🩺 Indicateurs diagnostic bypass — PLC→IHM, état réellement consommé *)
+    SimTopSensorBypassActive  : BOOL; (* 🩺 1 = Bypass.TopLimitSwitch réellement actif *)
+    SimSlackCableBypassActive : BOOL; (* 🩺 1 = Bypass.SlackCable réellement actif *)
     WinchInputSourceChanged   : BOOL; (* 🔀 PLC→IHM : source Winch a basculé (réel/simu) ce cycle *)
 
     (* 💓 Heartbeat IHM↔PLC — IHM inverse TglHeartbeatIhm toutes les 500 ms. *)

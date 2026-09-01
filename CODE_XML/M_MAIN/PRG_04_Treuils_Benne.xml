@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:43:51.946177" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:43:51.946177">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T09:01:11.990048" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T09:01:11.990048">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -5654,7 +5654,7 @@ ELSE
 END_IF;
 
 IF _CommunCfgPersist.WinchMaxStepDescent &lt;= 0 THEN
-    EffectiveMaxStepDescent := 3;
+    EffectiveMaxStepDescent := 5;
 ELSE
     EffectiveMaxStepDescent := _CommunCfgPersist.WinchMaxStepDescent;
 END_IF;

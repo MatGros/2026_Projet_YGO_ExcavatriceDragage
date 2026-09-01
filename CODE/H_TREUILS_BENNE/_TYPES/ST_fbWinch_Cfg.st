@@ -28,12 +28,12 @@ STRUCT
     ContactorFeedbackTimeout        : TIME := T#500ms;   // Delai d'attente retombee des contacteurs
 
     // === RALENTISSEMENT BORDURE ===
-    SlowdownDistance_M              : REAL := 1.0;   // Distance d'approche avant limite pour ralentir (m)
+    SlowdownDistanceTop_M           : REAL := 0.0;   // Distance avant limite haute pour ralentir (m) : 0 = arrêt au seuil
+    SlowdownDistanceBottom_M        : REAL := 1.0;   // Distance avant limite basse pour ralentir (m)
     SlowdownMaxStep                 : INT := 1;      // Plafond palier dans zone de ralentissement (1..5)
 
     // === DÉCODAGE %→PALIER (conservé) ===
     SpeedStepHystMargin             : REAL := 2.0;   // [08a] Marge d'hysteresis palier (%)
 END_STRUCT
 END_TYPE
-
 

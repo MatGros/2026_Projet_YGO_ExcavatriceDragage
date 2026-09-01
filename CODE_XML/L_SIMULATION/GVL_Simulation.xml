@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T00:06:07.384453" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T00:06:07.384453">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:51:40.299347" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:51:40.299347">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -51,8 +51,9 @@
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 Master Bypass Essais Banc — arme les bypass Meca (Safety/Process) en mode MAINT
-(inopérant sur machine réelle). ❗ N'arme PLUS les limites réelles (TopLimitSwitch /
-TopLimitSoftware / LimitLegal) : la protection de montée/descente reste active au banc.
+(inopérant sur machine réelle). Arme aussi les limites banc TopLimitSwitch,
+TopLimitSoftware et CableLimitSwitch, exclusivement sous le triple gate
+SimulationModeActive AND SimWinchActive AND SimulationBypassActive.
 Défaut TRUE : pré-arme le bypass banc dès le boot (n'agit que si SimulationModeActive AND SimWinchActive).
 Permet de travailler en banc sans faux blocage Meca au homing sans mouvement.</xhtml>
           </documentation>

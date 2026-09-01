@@ -170,8 +170,8 @@ EffectiveSafeStop := SafeStop OR DirectionConflict
                      OR (WinchRequest.ReqAscent AND NOT AscentPermit)
                      OR (WinchRequest.ReqDescend AND NOT DescendPermit);
 
-InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM >= (WinchRequest.TopLimitM - Config.SlowdownDistance_M));
-InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM <= (WinchRequest.BottomLimitM + Config.SlowdownDistance_M));
+InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM >= (WinchRequest.TopLimitM - Config.SlowdownDistanceTop_M));
+InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM <= (WinchRequest.BottomLimitM + Config.SlowdownDistanceBottom_M));
 
 IF WinchRequest.ReqAscent AND NOT WinchRequest.ReqDescend THEN
     ActiveMaxStep := WinchRequest.MaxStepUp;

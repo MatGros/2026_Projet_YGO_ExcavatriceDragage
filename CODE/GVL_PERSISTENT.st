@@ -141,9 +141,10 @@ VAR_GLOBAL PERSISTENT RETAIN
         LimitLegalDepthMinAllowed_M := -15.0,
         LimitLegalEnabled := TRUE,
         SelHomingApproachEnable := FALSE,
-        WinchMaxStepDescent := 3,
+        WinchMaxStepDescent := 5,
         WinchMaxStepAscent := 5,
-        WinchSlowdownDistance_M := 1.0,
+        WinchSlowdownDistanceTop_M := 0.0,
+        WinchSlowdownDistanceBottom_M := 1.0,
         WinchSlowdownMaxStep := 1,
         CfgCableLimitAscent_M := 7.5
     ); // 🌉 Pont FB_CfgPersistBridge_CommunCfg
