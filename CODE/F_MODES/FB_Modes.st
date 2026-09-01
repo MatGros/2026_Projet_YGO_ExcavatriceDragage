@@ -140,11 +140,11 @@ instCauses[0].Texte    := 'Mode Semi-Auto selectionne mais cycle non pret : defa
 
 instCauses[2].Active   := SemiAutoCycleNotReadyHoming;
 instCauses[2].Latching := FALSE;
-instCauses[2].Texte    := 'Mode Semi-Auto selectionne mais cycle non pret : re-homing obligatoire (depassement limite position)';
+instCauses[2].Texte    := 'Semi-Auto selectionne : re-homing obligatoire';
 
 instCauses[3].Active   := SemiAutoCycleNotReadyMachineHoming;
 instCauses[3].Latching := FALSE;
-instCauses[3].Texte    := 'Mode Semi-Auto selectionne mais cycle non pret : referencement M1/M2/benne incomplet';
+instCauses[3].Texte    := 'Semi-Auto selectionne : referencement incomplet';
 
 // Cause 1 — changement de mode refusé : treuils non à l'arrêt mécanique confirmé.
 // Non latchée (live) : l'information disparaît dès que la condition redevient vraie, sans
