@@ -1,0 +1,74 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T202-E : Qualification du fond Kobold en SEMI_AUTO
+# ═══════════════════════════════════════════════════════════════════════════
+# Statut : ⏳ EN ATTENTE DE DÉCISION (note DESIGN_T202E) — ne pas implémenter
+# avant la décision humain Option 1 / Option 2.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T202E_QUALIFICATION_FOND_SEMIAUTO
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Aligner la validation du fond Kobold en SEMI_AUTO sur l'intention AF-04 §4.2 :
+    soit (Option 1) FB_Cycle X4->X5 consomme la sortie qualifiée BottomTouchConfirmed
+    de FB_DiveSearch (immersion validée), soit (Option 2) documenter la non-qualification
+    dans l'AF. Décision en note DESIGN_T202E v0.1.
+
+  acceptance:
+    - id: AC1
+      statement: "La décision Option 1 ou Option 2 est tranchée et tracée dans la note de décision DESIGN_T202E."
+      verified_by: "lecture de la note DESIGN_T202E v0.1 (décision cochée)"
+    - id: AC2
+      statement: "Selon Option 1 : FB_Cycle X4→X5 utilise BottomTouchConfirmed de FB_DiveSearch (qualification immersion), aligné sur le chemin MAINT."
+      verified_by: "grep X4_DESCEND_OPEN dans FB_Cycle + liaison G200 + tests CI"
+    - id: AC3
+      statement: "Selon Option 2 : AF-04 §4.2 corrigé pour documenter que le SEMI_AUTO ne qualifie pas l'immersion."
+      verified_by: "lecture AF-04 §4.2 mis à jour"
+    - id: AC4
+      statement: "Aucune régression du repli STABILIZING, de la reprise consciente et de l'interdiction Palier 5."
+      verified_by: "tests CI FB_Cycle + G200 PASS"
+    - id: AC5
+      statement: "Le POU de CODE/M_MAIN (PRG_03_Modes_Cycle) conserve un nom de fichier identique au nom de POU et un suffixe de langage identique au langage généré dans le bundle."
+      verified_by: "bundle PLCopenXML généré : nom de POU = nom de fichier, suffixe ST cohérent"
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_DiveSearch.st   # FB durci, ne pas re-implementer
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    Tout probleme constate (incoherence spec, risque hors scope) est remonte
+    immediatement a l'orchestrateur. La decision Option 1/2 doit etre humaine.
+
+status: PENDING               # PENDING | IN_PROGRESS | COMPLETED | VALIDATED
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    En attente de la decision humaine Option 1/2 (note DESIGN_T202E).
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    Ne pas implementer avant la decision Option 1/2.
