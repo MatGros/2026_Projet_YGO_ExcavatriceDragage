@@ -17328,47 +17328,6 @@ END_IF;
                 <BOOL />
               </type>
             </variable>
-            <variable name="BucketRefWindowActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FENETRE DE REFERENCEMENT (preset codeur = saut de CablePosM1/M2) ===
-. [LOC] Homing / preset codeur en cours : causes geometrie &amp; reference re-basees</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BucketPosStepDetected">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Saut de position non physique ce scan (M1 ou M2)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM1Prev">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CablePosM1 scan precedent (detection de saut)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CablePosM2Prev">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CablePosM2 scan precedent (detection de saut)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonRefSettleBucket">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde de stabilisation apres homing / saut de position</xhtml>
-              </documentation>
-            </variable>
             <variable name="instFault">
               <type>
                 <derived name="FB_FaultCore" />
@@ -17389,17 +17348,6 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_RefPosStepM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur)</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -17433,27 +17381,6 @@ IF ResetEdge.Q OR BypassGlobal THEN
 END_IF;
 
 IF NOT BypassGlobal THEN
-    // 🛡️ Fenetre de referencement : le preset SDO du codeur (homing M1, M2 ou
-    // conjoint) fait sauter CablePosM1/M2 d'un bloc et fait retomber HomedMx a
-    // FALSE pendant la transaction. Sans garde, la cause 1 (CablePosM2 &lt; CablePosM1
-    // transitoire) et la cause 4 (HomedMx FALSE transitoire) se latchent et
-    // restent. On inhibe ces 2 causes pendant homing conjoint + saut de position
-    // detecte + 2s de stabilisation, et on RAZ leurs latches parasites.
-    IF FirstCycle THEN
-        CablePosM1Prev := CablePosM1;
-        CablePosM2Prev := CablePosM2;
-    END_IF;
-    BucketPosStepDetected := (ABS(CablePosM1 - CablePosM1Prev) &gt; CST_RefPosStepM)
-                          OR (ABS(CablePosM2 - CablePosM2Prev) &gt; CST_RefPosStepM);
-    CablePosM1Prev := CablePosM1;
-    CablePosM2Prev := CablePosM2;
-    TonRefSettleBucket(IN := NOT (MachineHomingActive OR BucketPosStepDetected), PT := T#2s);
-    BucketRefWindowActive := MachineHomingActive OR BucketPosStepDetected OR NOT TonRefSettleBucket.Q;
-    IF BucketRefWindowActive THEN
-        OffsetMaxFaultLatched := FALSE;
-        HomingFaultLatched    := FALSE;
-    END_IF;
-
     // Cause 0 : Configuration géométrie benne
     IF (Config.OffsetOpenM &gt;= Config.OffsetCloseM)
        OR (Config.OffsetOpenM &lt; 0.0) THEN
@@ -17465,8 +17392,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 1 : Dépassement écart max
     MaxAllowedOffset := Config.OffsetCloseM + 2.0;
-    IF NOT BucketRefWindowActive
-       AND ((CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset)) OR (CablePosM2 &lt; CablePosM1)) THEN
+    IF (CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset)) OR (CablePosM2 &lt; CablePosM1) THEN
         OffsetMaxFaultLatched := TRUE;
     END_IF;
     instCauses[1].Active   := OffsetMaxFaultLatched;
@@ -17492,7 +17418,7 @@ IF NOT BypassGlobal THEN
     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
 
     // Cause 4 : Non référencé
-    IF NOT BucketRefWindowActive AND (NOT HomedM1 OR NOT HomedM2) THEN
+    IF NOT HomedM1 OR NOT HomedM2 THEN
         HomingFaultLatched := TRUE;
     END_IF;
     instCauses[4].Active   := HomingFaultLatched;
@@ -17500,11 +17426,6 @@ IF NOT BypassGlobal THEN
     instCauses[4].Texte    := 'Codeurs treuils non references pour sequence benne';
 ELSE
     TonTimeout(IN := FALSE);
-    TonRefSettleBucket(IN := FALSE);
-    BucketRefWindowActive := FALSE;
-    BucketPosStepDetected := FALSE;
-    CablePosM1Prev := CablePosM1;
-    CablePosM2Prev := CablePosM2;
     M1SlipDetected := FALSE;
     instCauses[0].Active := FALSE;
     instCauses[1].Active := FALSE;
@@ -48339,7 +48260,7 @@ creerait une collision avec la globale homonyme du mapping E/S.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecart de commande M1/M2 detecte en couple (diag ; l'action est la fusion AND terme a terme)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Ecart de commande M1/M2 en couple : aucune sortie treuil pilotee</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -48485,20 +48406,14 @@ M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 // Les 2 barrieres finales (instWinchOutputInterlockM1/M2) resolvent chacune
 // leur commande via des temporisations INDEPENDANTES (RestartDelay, SenseHold,
 // ReleaseOrder, DeadTime) : rien ne garantit des vecteurs de sortie identiques
-// le meme scan.
-//
-// 🛡️ Couplage EFFECTIF = select JOY couple (=0) ET (synchro active OU intention
-// both). En select 1 (M1 seul) ou 2 (M2 / benne seule) il n'y a AUCUN couplage :
-// chaque axe pilote seul ses fins de course (sinon la benne en select=2 etait
-// zeroee par la concordance -&gt; "benne marche pas du tout").
-//
-// En couple, si les vecteurs de sortie M1/M2 different (timers de barriere
-// independants) : aucune sortie treuil n'est ecrite tant que les 2 barrieres ne
-// sont pas realignees.
+// le meme scan. En couple (synchro OU both), un contacteur de sens ou de vitesse
+// asymetrique = les 2 treuils tirent le meme cable de facon desynchronisee.
+// 🛡️ Regle : au moindre ecart M1/M2 pendant le couplage (hors BypassGlobal),
+// AUCUNE sortie treuil n'est ecrite (M1 ET M2), le frein se referme. Reprise
+// par la chaine defaut existante (Reset conscient) une fois les 2 barrieres realignees.
 
-WinchOutputCoupled := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
-                      AND (PRG_04_Treuils_Benne.Data.SyncState.SyncActive
-                           OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active);
+WinchOutputCoupled := PRG_04_Treuils_Benne.Data.SyncState.SyncActive
+                      OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active;
 WinchOutputConcordanceBypass := GVL_IHM.M1M2Sync.Bypass.Global;
 
 WinchDirectionRelaysMatch := (M1RelayFwd = M2RelayFwd) AND (M1RelayRev = M2RelayRev);
@@ -48508,13 +48423,11 @@ WinchSpeedContactorsMatch := (M1SpeedContactor1 = M2SpeedContactor1)
                           AND (M1SpeedContactor3 = M2SpeedContactor3)
                           AND (M1SpeedContactor4 = M2SpeedContactor4);
 WinchOutputsConcordant := WinchDirectionRelaysMatch AND WinchSpeedContactorsMatch;
+
 WinchOutputSyncMismatch := WinchOutputCoupled
                         AND NOT WinchOutputConcordanceBypass
                         AND NOT WinchOutputsConcordant;
 
-// En couple, au moindre ecart de vecteur M1/M2 (timers de barriere independants) :
-// AUCUNE sortie treuil n'est ecrite (M1 ET M2), le frein se referme. Reprise par
-// la chaine defaut existante une fois les 2 barrieres realignees.
 IF WinchOutputSyncMismatch THEN
     M1RelayFwd := FALSE; M1RelayRev := FALSE;
     M1SpeedContactor1 := FALSE; M1SpeedContactor2 := FALSE;
@@ -48524,21 +48437,7 @@ IF WinchOutputSyncMismatch THEN
     M2SpeedContactor3 := FALSE; M2SpeedContactor4 := FALSE;
 END_IF;
 
-// 🛡️ Invariant intra-axe (TOUJOURS) : un contacteur de vitesse ne vit jamais sans
-// un contacteur de sens sur le meme axe. Ferme la fenetre "vitesse enclenchee /
-// frein ferme" sur inversion rapide (le DeadTime directionnel lache le sens
-// pendant qu'un palier de vitesse peut encore etre tenu un scan).
-IF NOT (M1RelayFwd OR M1RelayRev) THEN
-    M1SpeedContactor1 := FALSE; M1SpeedContactor2 := FALSE;
-    M1SpeedContactor3 := FALSE; M1SpeedContactor4 := FALSE;
-END_IF;
-IF NOT (M2RelayFwd OR M2RelayRev) THEN
-    M2SpeedContactor1 := FALSE; M2SpeedContactor2 := FALSE;
-    M2SpeedContactor3 := FALSE; M2SpeedContactor4 := FALSE;
-END_IF;
-
-// Frein = OR des relais de sens (jamais desserre sans un sens valide). Sur : apres
-// l'invariant ci-dessus aucun contacteur de vitesse orphelin ne subsiste.
+// Frein = OR des relais de sens GATES (jamais desserre sans un sens valide).
 M1BrakeCmd := M1RelayFwd OR M1RelayRev;
 M2BrakeCmd := M2RelayFwd OR M2RelayRev;
 
@@ -49524,26 +49423,6 @@ ELSE
     M2PosCorrectedHmiHeld_M := GVL_IHM.M2TreuilBenne.Bucket.State.M2PositionCorrected;
 END_IF;
 GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
-
-// ---------- §3e-ter. Voyants sorties treuils = ordre PHYSIQUE reel ----------
-// WinchM*State (projete par PRG_04) porte la DEMANDE de FB_Winch : avant la
-// barriere finale (DeadTime/SenseHold) ET avant le bloc concordance §2ter de
-// PRG_06. PRG_07 tourne apres PRG_06 -&gt; on ecrase par la sortie reelle du meme
-// scan pour que le voyant IHM colle au contacteur/frein physique.
-GVL_IHM.M1TreuilRetenue.State.RelayFwd    := PRG_06_Outputs.Data.M1RelayFwd;
-GVL_IHM.M1TreuilRetenue.State.RelayRev    := PRG_06_Outputs.Data.M1RelayRev;
-GVL_IHM.M1TreuilRetenue.State.BrakeCmd    := PRG_06_Outputs.Data.M1BrakeCmd;
-GVL_IHM.M1TreuilRetenue.State.Contactor1  := PRG_06_Outputs.Data.M1SpeedContactor1;
-GVL_IHM.M1TreuilRetenue.State.Contactor2  := PRG_06_Outputs.Data.M1SpeedContactor2;
-GVL_IHM.M1TreuilRetenue.State.Contactor3  := PRG_06_Outputs.Data.M1SpeedContactor3;
-GVL_IHM.M1TreuilRetenue.State.Contactor4  := PRG_06_Outputs.Data.M1SpeedContactor4;
-GVL_IHM.M2TreuilBenne.State.RelayFwd      := PRG_06_Outputs.Data.M2RelayFwd;
-GVL_IHM.M2TreuilBenne.State.RelayRev      := PRG_06_Outputs.Data.M2RelayRev;
-GVL_IHM.M2TreuilBenne.State.BrakeCmd      := PRG_06_Outputs.Data.M2BrakeCmd;
-GVL_IHM.M2TreuilBenne.State.Contactor1    := PRG_06_Outputs.Data.M2SpeedContactor1;
-GVL_IHM.M2TreuilBenne.State.Contactor2    := PRG_06_Outputs.Data.M2SpeedContactor2;
-GVL_IHM.M2TreuilBenne.State.Contactor3    := PRG_06_Outputs.Data.M2SpeedContactor3;
-GVL_IHM.M2TreuilBenne.State.Contactor4    := PRG_06_Outputs.Data.M2SpeedContactor4;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Data.Auth.Mode;
 // — Chaîne AU / sécurité : sortie de Modes.State vers GVL_IHM.Emergency —
