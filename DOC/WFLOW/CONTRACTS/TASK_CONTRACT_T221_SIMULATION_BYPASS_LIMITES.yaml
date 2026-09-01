@@ -1,0 +1,47 @@
+contract:
+  task_id: T221_SIMULATION_BYPASS_LIMITES
+  criticality: C3
+  strategy: patch
+  objective: >
+    En simulation treuil explicitement armée, appliquer les trois bypasss communs
+    de limites demandés ; les retirer automatiquement dès que ce contexte disparaît.
+  acceptance:
+    - id: AC1
+      statement: "SimulationModeActive AND SimWinchActive AND SimulationBypassActive positionnent TopLimitSwitch, TopLimitSoftware et CableLimitSwitch à TRUE."
+      verified_by: "lecture PRG_07 et Watch CODESYS des trois bits IHM"
+    - id: AC2
+      statement: "La chute de l'une des trois conditions simulation remet les trois bits IHM à FALSE."
+      verified_by: "Watch CODESYS après désactivation de SimulationBypassActive, SimWinchActive puis SimulationModeActive"
+    - id: AC3
+      statement: "Aucun bypass de limite n'est posé par SimulationBypassActive sur machine réelle ou hors domaine treuil simulé."
+      verified_by: "lecture du triple gate et Watch avec SimulationModeActive=FALSE"
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T221_SIMULATION_BYPASS_LIMITES.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/
+  conservation:
+    must_survive:
+      - "Les bypasss manuels hors simulation restent gérés par leur miroir IHM/RETAIN."
+      - "Les limites restent actives par défaut et sur machine réelle."
+    dropped_on_purpose: []
+  evidence_required:
+    - bundle
+    - check_linkage
+    - human_codesys_watch
+  alert_duty: >
+    Toute persistance d'un bypass de simulation après sortie de simulation est un défaut
+    sécurité à signaler immédiatement.
+
+status: IN_PROGRESS
+execution:
+  executed_by: Codex
+  status: IN_PROGRESS
+  summary: "Patch en cours : activation et purge explicites sous triple gate simulation."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  notes: "Validation humaine CODESYS requise."
