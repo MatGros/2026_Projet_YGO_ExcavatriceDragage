@@ -115,6 +115,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "390", "G390 â€” Fraicheur bundle",                         [sys.executable, f"{S}/G390_check_bundle_freshness.py", "."]),
     ("C", "400", "G400 â€” Syntaxe ST du bundle (no terminator)",     [sys.executable, f"{S}/G400_check_bundle_st_syntax.py", "."]),
     ("C", "405", "G405 â€” LittÃ©raux STRING ASCII (REX 2026-08-17)",   [sys.executable, f"{S}/G405_check_st_string_ascii.py", "."]),
+    ("C", "406", "G406 â€” Longueur littÃ©raux STRING (REX 2026-08-31)", [sys.executable, f"{S}/G406_check_st_string_length.py", "."]),
     ("C", "420", "G420 â€” PyTest (gates + convertisseur)",           [str(_py313()), "-m", "pytest",
                                                                      "TOOLS/CONVERTER_ST2XML_PLCopenXML/tests",
                                                                      "TOOLS/AGENT_WORKFLOW/tests", "-q"]),
