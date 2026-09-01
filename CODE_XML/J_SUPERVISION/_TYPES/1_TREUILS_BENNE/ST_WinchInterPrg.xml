@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T07:23:44.967572" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T07:23:44.967572">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:23:43.955321" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:23:43.955321">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -165,6 +165,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur sous-systeme benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitBucket_Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis effectif ouverture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitBucket_Close">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis effectif fermeture benne</xhtml>
               </documentation>
             </variable>
             <variable name="ArmingPermit">
@@ -435,20 +451,28 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Offset actif injecté dans la synchro</xhtml>
               </documentation>
             </variable>
-            <variable name="M2StartStop">
+            <variable name="M2RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande Start/Stop forcée vers M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande marche forcée vers M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2Direction">
+            <variable name="M2ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande direction forcée vers M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée forcée vers M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente forcée vers M2</xhtml>
               </documentation>
             </variable>
             <variable name="M2BucketJogLimit">
@@ -1614,13 +1638,21 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Palier plafonné à 1 : approche limite basse (câble ou légale)</xhtml>
               </documentation>
             </variable>
-            <variable name="CommandedDirection">
+            <variable name="CommandedAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic délai ressenti à la remontée
-🩺 Sens interne mémorisé FB_Winch (-1/0/+1)</xhtml>
+🩺 Sens interne mémorisé FB_Winch : montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandedDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Sens interne mémorisé FB_Winch : descente</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionChangeDelayElapsed">

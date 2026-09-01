@@ -12,7 +12,8 @@ VAR_INPUT
     Enable               : BOOL;   (* --> [CMD] Active le calcul *)
     Reset                : BOOL;   (* --> [CMD] Front d'acquittement / réinitialisation *)
     DriveActualFreqHz    : REAL;   (* --> [HW] Fréquence réelle variateur en Hz (ex: 5.0 Hz) *)
-    Direction            : INT;    (* --> [CMD] Sens effectif : +1 = Fwd (vers Trémie), -1 = Rev (vers Maint), 0 = Arrêt *)
+    ReqTremie            : BOOL;   (* --> [CMD] Demande explicite vers Trémie *)
+    ReqMaintenance       : BOOL;   (* --> [CMD] Demande explicite vers Maintenance *)
     
     (* 5 Capteurs de position fixes *)
     SensorMaintenance    : BOOL;   (* --> [HW] Capteur Maintenance (30.0 m) *)
@@ -128,10 +129,14 @@ IF NOT Initialized THEN
 END_IF;
 
 // 4. Intégration temporelle continue (Odométrie cycle par cycle)
-// dX = -Direction * (FreqHz * Gain) * dt — convention 0 m=Trémie, 30 m=Maintenance :
-// le sens +1 (vers Trémie) DÉCROÎT la position vers 0 m, le sens -1 (vers Maintenance) la CROÎT vers 30 m.
-IF Direction <> 0 AND DriveActualFreqHz > 0.1 THEN
-    PositionEstimatedM := PositionEstimatedM - (INT_TO_REAL(Direction) * DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+// Les bits explicites portent le sens sémantique. Une demande contradictoire est
+// neutralisée : aucun déplacement estimé ne doit être inventé.
+IF DriveActualFreqHz > 0.1 THEN
+    IF ReqTremie AND NOT ReqMaintenance THEN
+        PositionEstimatedM := PositionEstimatedM - (DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+    ELSIF ReqMaintenance AND NOT ReqTremie THEN
+        PositionEstimatedM := PositionEstimatedM + (DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+    END_IF;
 END_IF;
 {endregion}
 

@@ -13,7 +13,8 @@ VAR_INPUT
     Reset                           : BOOL;                           // --> [CMD] Front acquittement defauts
     Mode                            : E_Mode;                         // --> [CMD] Mode d'exploitation actif
     SyncEnable                      : BOOL;                           // --> [CMD] Validation synchronisation treuils
-    Direction                       : INT;                            // --> [CMD] Consigne active de direction (-1/0/+1)
+    ReqAscent                       : BOOL;                           // --> [CMD] Commande active montée
+    ReqDescend                      : BOOL;                           // --> [CMD] Commande active descente
     MovementCommanded               : BOOL;                           // --> [CMD] Au moins un contacteur de sens commande
 
     // === ETATS SECOURS ET HARDWARE ===
@@ -334,8 +335,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 14 : Sens opposé (latched)
     OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
-        AND (((Direction > 0) AND (MeasuredSpeedSignedMps < -MovementSpeedThresholdMps))
-          OR ((Direction < 0) AND (MeasuredSpeedSignedMps > MovementSpeedThresholdMps))));
+        AND ((ReqAscent AND (MeasuredSpeedSignedMps < -MovementSpeedThresholdMps))
+          OR (ReqDescend AND (MeasuredSpeedSignedMps > MovementSpeedThresholdMps))));
     TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
     IF TonOppositeDirection.Q THEN OppositeDirectionFaultLatched := TRUE; END_IF;
     instCauses[14].Active   := OppositeDirectionFaultLatched;

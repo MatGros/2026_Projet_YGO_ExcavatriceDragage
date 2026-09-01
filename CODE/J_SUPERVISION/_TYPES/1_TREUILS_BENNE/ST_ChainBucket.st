@@ -37,6 +37,8 @@ STRUCT
     Idx304_KoboldImmersionConfirmed    : BOOL; // : 1 = Immersion confirmée (front Kobold dans la fenêtre)
     Idx305_KoboldBottomTouchLatched    : BOOL; // : 1 = Fond détecté, descente bloquée (ProcessPermitM1/M2_Descend)
     Idx306_ErrorIdRaw             : WORD; // : bitfield brut FB_Bucket (bit0 configuration, bit1 écart M2/M1, bit2 timeout, bit3 glissement M1, bit4 codeurs non référencés)
+    Idx307_EffectivePermit_Open    : BOOL; // 1 = ouverture benne physiquement autorisée
+    Idx308_EffectivePermit_Close   : BOOL; // 1 = fermeture benne physiquement autorisée
 
     Idx401_BucketBusy            : BOOL; // 1 = Mouvement Mâchoires en cours | 0 = Repos
     Idx402_BucketDone            : BOOL; // 1 = Position Cible Atteinte | 0 = En cours

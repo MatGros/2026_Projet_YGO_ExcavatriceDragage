@@ -28,13 +28,15 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     Ready     : BOOL;  // <-- [STAT] FB prêt à arbitrer (Enable)
-    StartStop : BOOL;  // <-- [CMD] Commande marche/arrêt arbitrée
-    Direction : INT;   // <-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)
+    RunRequest : BOOL; // <-- [CMD] Demande marche arbitrée
+    ReqAscent  : BOOL; // <-- [CMD] Demande montée arbitrée
+    ReqDescend : BOOL; // <-- [CMD] Demande descente arbitrée
     StepTgt   : INT;   // <-- [CMD] Palier de vitesse arbitré (1..5, 0 = arrêt)
 END_VAR
 VAR
     BenneBusyFallEdge : F_TRIG;  // . [LOC] Front descendant action benne (arrêt forcé)
-    BothDirectionAuthorized : BOOL; // . [LOC] Atomicité Both : permit agrégé du sens demandé délivré
+    BothDirectionAuthorized : BOOL; // . [LOC] Atomicité Both : deux axes autorisés dans le même sens
+    RequestConflict         : BOOL; // . [LOC] Double demande de sens refusée
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -45,14 +47,16 @@ Ready := Enable;
 BenneBusyFallEdge(CLK := Context.BucketBusy);
 
 IF NOT Enable THEN
-    StartStop := FALSE;
-    Direction := 0;
+    RunRequest := FALSE;
+    ReqAscent  := FALSE;
+    ReqDescend := FALSE;
     StepTgt   := 0;
 ELSE
     // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
-        StartStop := ReqWinch.ReqStartStop;
-        Direction := ReqWinch.ReqDirection;
+        RunRequest := ReqWinch.RunRequest;
+        ReqAscent  := ReqWinch.ReqAscent;
+        ReqDescend := ReqWinch.ReqDescend;
         StepTgt   := ReqWinch.StepTgt;
     ELSE
         // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
@@ -64,29 +68,36 @@ ELSE
             // Mode Boutons IHM
             IF BothIntent.Active THEN
                 // Both (BtnWinchBothAscent/Descent) — source unique PRG_03, plus de re-dérivation
-                Direction := BothIntent.Direction;
+                ReqAscent  := BothIntent.ReqAscent;
+                ReqDescend := BothIntent.ReqDescend;
                 StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
             ELSIF IHM.BtnAscentM1 THEN
-                Direction := 1;
+                ReqAscent  := TRUE;
+                ReqDescend := FALSE;
                 StepTgt   := Cfg.BtnStepTgt;
             ELSIF IHM.BtnDescentM1 THEN
-                Direction := -1;
+                ReqAscent  := FALSE;
+                ReqDescend := TRUE;
                 StepTgt   := Cfg.BtnStepTgt;
             ELSE
-                Direction := 0;
+                ReqAscent  := FALSE;
+                ReqDescend := FALSE;
                 StepTgt   := 0;
             END_IF;
         ELSE
             // Mode Joystick Maître — M1 unitaire si Select = 1, both si Select = 0
             IF Auth.JoystickWinchSelectArbitrated = 1 THEN
-                Direction := Joystick.AxisY.Direction;
+                ReqAscent  := Joystick.AxisY.Direction > 0;
+                ReqDescend := Joystick.AxisY.Direction < 0;
                 StepTgt   := Joystick.AxisY.StepTgt;
             ELSIF BothIntent.Active THEN
                 // Both (Select=0) — source unique PRG_03, plus de re-dérivation
-                Direction := BothIntent.Direction;
+                ReqAscent  := BothIntent.ReqAscent;
+                ReqDescend := BothIntent.ReqDescend;
                 StepTgt   := Joystick.AxisY.StepTgt;
             ELSE
-                Direction := 0;
+                ReqAscent  := FALSE;
+                ReqDescend := FALSE;
                 StepTgt   := 0;
             END_IF;
         END_IF;
@@ -97,21 +108,22 @@ ELSE
         // un permit individuel. Si l'un des 2 treuils n'a pas son permit effectif,
         // AUCUN des deux ne part (départ jamais isolé). En unitaire (BothIntent inactif),
         // le gate est neutre.
+        RequestConflict := ReqAscent AND ReqDescend;
         BothDirectionAuthorized := (NOT BothIntent.Active)
-            OR ((Direction = 1) AND Context.BothAscentPermit)
-            OR ((Direction = -1) AND Context.BothDescendPermit);
-        StartStop := (Direction <> 0)
+            OR ((ReqAscent AND NOT ReqDescend) AND Context.M1AscentAllowed AND Context.M2AscentAllowed)
+            OR ((ReqDescend AND NOT ReqAscent) AND Context.M1DescendAllowed AND Context.M2DescendAllowed);
+        RunRequest := (ReqAscent OR ReqDescend) AND NOT RequestConflict
                   AND NOT Context.BucketBusy
                   AND NOT Context.WinchBothMotionBlockedByBucket
-                  AND NOT ((Context.SyncBlocksAscent   AND (Direction = 1))
-                        OR (Context.SyncBlocksDescent AND (Direction = -1)))
+                  AND NOT ((Context.SyncBlocksAscent   AND ReqAscent)
+                        OR (Context.SyncBlocksDescent AND ReqDescend))
                   AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
                   AND BothDirectionAuthorized;
     END_IF;
 
     // Front de fin d'action benne : arrêt forcé sauf mouvement both actif
-    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.Direction <> 0)) THEN
-        StartStop := FALSE;
+    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.ReqAscent OR BothIntent.ReqDescend)) THEN
+        RunRequest := FALSE;
     END_IF;
 END_IF;
 

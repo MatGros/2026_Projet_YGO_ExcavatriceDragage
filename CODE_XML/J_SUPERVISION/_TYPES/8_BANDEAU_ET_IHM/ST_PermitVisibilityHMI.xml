@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T07:22:49.351913" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T07:22:49.351913">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:23:44.315555" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:23:44.315555">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -179,12 +179,22 @@
                 <BOOL />
               </type>
             </variable>
+            <variable name="EffectivePermitBucket_Open">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectivePermitBucket_Close">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="BucketOpenRequestActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne : pas de bit Permit canonique a ce stade ; publication des faits consommes.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne : demandes et diagnostic d'execution, distincts des permis canoniques.</xhtml>
               </documentation>
             </variable>
             <variable name="BucketCloseRequestActive">

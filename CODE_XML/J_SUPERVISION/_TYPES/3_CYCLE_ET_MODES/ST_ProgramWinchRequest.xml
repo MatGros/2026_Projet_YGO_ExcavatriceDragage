@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:09:09.719214" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:09:09.719214">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:05:37.362036" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:05:37.362036">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -26,20 +26,28 @@
       <dataType name="ST_ProgramWinchRequest">
         <baseType>
           <struct>
-            <variable name="ReqStartStop">
+            <variable name="RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arrêt demandé par le programme (TRUE=Marche)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche demandé par le programme</xhtml>
               </documentation>
             </variable>
-            <variable name="ReqDirection">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande descente</xhtml>
               </documentation>
             </variable>
             <variable name="StepTgt">

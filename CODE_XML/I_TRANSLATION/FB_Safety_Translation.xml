@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T18:25:42.814746" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T18:25:42.814746">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:09:33.192348" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:09:33.192348">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -310,12 +310,28 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Commande frein</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="RunRequest">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction commandée (-1: vers Maintenance, 0: Stop, 1: vers Trémie)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de marche maintenue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchTremie">
@@ -332,14 +348,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintenanceM3TargetEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation cible Maintenance (Auth.MaintenanceM3TargetEnable)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorWordIncoherent">
@@ -570,20 +578,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incohérence mot capteurs position (bit7)</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermit">
+            <variable name="TremieLimitClear">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel SAFETY vers Trémie (TRUE = autorisé, fail-safe). Niveau SAFETY (pur directionnel : fin de course). Le permit EFFECTIF « pouvoir bouger » est calculé en PRG_05 §1ter (AND NOT SafeStop AND NOT PowerCutOff).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fin de course Trémie libre (condition interne du permis M3)</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermit">
+            <variable name="MaintenanceLimitClear">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel SAFETY vers Maintenance (TRUE = autorisé, fail-safe). Niveau SAFETY (pur directionnel : autorisation cible + fin de course). Le permit EFFECTIF « pouvoir bouger » est calculé en PRG_05 §1ter (AND NOT SafeStop AND NOT PowerCutOff).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fin de course Maintenance/P1 libre (condition interne du permis M3)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -817,7 +825,7 @@ IF NOT BypassGlobal THEN
     IF NOT (BypassSafety OR BypassMecaB) THEN
         IF NOT HeartbeatIhmOk THEN
             UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
-        ELSIF (Direction = 0) AND NOT BrakeCmd THEN
+        ELSIF NOT RunRequest AND NOT BrakeCmd THEN
             UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
         ELSE
             UncommandedActiveB := FALSE;
@@ -833,7 +841,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 5 : Méca A (latched)
     IF NOT (BypassSafety OR BypassMecaA) THEN
-        IF (Direction = 0) AND NOT BrakeCmd THEN
+        IF NOT RunRequest AND NOT BrakeCmd THEN
             UncommandedActiveA := ABS(DriveActualFreqHz) &gt; 0.5;
         ELSE
             UncommandedActiveA := FALSE;
@@ -849,8 +857,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 6 : Limite extrême escalade (live)
     IF NOT (BypassSafety OR BypassLimitSwitch) THEN
-        OverrunCondition := (LimitSwitchTremie AND (Direction = 1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
-                         OR (LimitSwitchMaintenance AND (Direction = -1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
+        OverrunCondition := (LimitSwitchTremie AND ReqTremie AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchMaintenance AND ReqMaintenance AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
         instCauses[6].Active := TonLimitSwitchOverrun.Q;
     ELSE
@@ -892,8 +900,8 @@ IF NOT Enable THEN
     ErrorMecaA := FALSE;
     ErrorLimitSwitch := FALSE;
     ErrorSensorIncoherent := FALSE;
-    TremiePermit := FALSE;
-    MaintenancePermit := FALSE;
+    TremieLimitClear := FALSE;
+    MaintenanceLimitClear := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
@@ -927,14 +935,12 @@ ErrorSensorIncoherent := instCauses[7].Active;
 // PRG_05_Translation §1ter : Safety directionnel AND NOT M3_SafeStop_Aggregate AND NOT
 // PowerCutOff. C'est LUI qui reflète la sémantique « pouvoir bouger » : quand l'axe est en
 // défaut (SafeStop/PowerCutOff), TOUS les sens sont bloqués ; au retour en condition, un sens
-// peut être permis et pas l'autre (ex. Maintenance interdite -&gt; MaintenancePermit=FALSE,
-// TremiePermit=TRUE). Ces sorties SAFETY alimentent aussi le gate de FB_Translation
-// (EffectiveSafeStop).
-// TremiePermit : autorisé vers Trémie tant que la fin de course Trémie n'est pas atteinte.
-TremiePermit := NOT LimitSwitchTremie;
-// MaintenancePermit : autorisé vers Maintenance uniquement si la cible Maintenance est
-// autorisée (Auth.MaintenanceM3TargetEnable) ET la fin de course Maintenance non atteinte.
-MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
+// La décision des huit permis est produite en PRG_05. Ce FB ne produit que les faits
+// de sécurité nécessaires à cette décision : les deux fins de course sont-elles libres ?
+// Le droit d'accès à la zone Maintenance (MaintenanceM3TargetEnable) est volontairement
+// séparé : il ne doit pas empêcher le déplacement légal jusqu'à P1.
+TremieLimitClear := NOT LimitSwitchTremie;
+MaintenanceLimitClear := NOT LimitSwitchMaintenance;
 {endregion}
 </xhtml>
           </ST>

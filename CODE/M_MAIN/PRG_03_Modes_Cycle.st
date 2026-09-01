@@ -264,7 +264,8 @@ Data.ModesFault := instModes.Fault;
 
 // 1bis. Intention both continue opérateur (inconditionnelle, TOUS modes) — source unique
 Data.WinchBothIntent.Active    := WinchBothMotionActive;
-Data.WinchBothIntent.Direction := WinchBothMotionDirection;
+Data.WinchBothIntent.ReqAscent  := WinchBothMotionDirection > 0;
+Data.WinchBothIntent.ReqDescend := WinchBothMotionDirection < 0;
 
 // 2. Demandes programme et état public de séquence
 IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -332,12 +333,14 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
 
 ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2) THEN
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
-    Data.ReqProgram.ReqWinchM1.ReqStartStop := FALSE;
-    Data.ReqProgram.ReqWinchM1.ReqDirection := 0;
+    Data.ReqProgram.ReqWinchM1.RunRequest := FALSE;
+    Data.ReqProgram.ReqWinchM1.ReqAscent := FALSE;
+    Data.ReqProgram.ReqWinchM1.ReqDescend := FALSE;
     Data.ReqProgram.ReqWinchM1.StepTgt  := 0;
 
-    Data.ReqProgram.ReqWinchM2.ReqStartStop := FALSE;
-    Data.ReqProgram.ReqWinchM2.ReqDirection := 0;
+    Data.ReqProgram.ReqWinchM2.RunRequest := FALSE;
+    Data.ReqProgram.ReqWinchM2.ReqAscent := FALSE;
+    Data.ReqProgram.ReqWinchM2.ReqDescend := FALSE;
     Data.ReqProgram.ReqWinchM2.StepTgt  := 0;
 
     Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
@@ -429,12 +432,14 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
 
 ELSE
     // Neutralisation déterministe (DISABLE)
-    Data.ReqProgram.ReqWinchM1.ReqStartStop := FALSE;
-    Data.ReqProgram.ReqWinchM1.ReqDirection := 0;
+    Data.ReqProgram.ReqWinchM1.RunRequest := FALSE;
+    Data.ReqProgram.ReqWinchM1.ReqAscent := FALSE;
+    Data.ReqProgram.ReqWinchM1.ReqDescend := FALSE;
     Data.ReqProgram.ReqWinchM1.StepTgt  := 0;
 
-    Data.ReqProgram.ReqWinchM2.ReqStartStop := FALSE;
-    Data.ReqProgram.ReqWinchM2.ReqDirection := 0;
+    Data.ReqProgram.ReqWinchM2.RunRequest := FALSE;
+    Data.ReqProgram.ReqWinchM2.ReqAscent := FALSE;
+    Data.ReqProgram.ReqWinchM2.ReqDescend := FALSE;
     Data.ReqProgram.ReqWinchM2.StepTgt  := 0;
 
     Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;

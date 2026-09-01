@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T00:05:20.999805" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T00:05:20.999805">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:09:39.227588" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:09:39.227588">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -209,20 +209,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermit">
+            <variable name="EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Trémie, TRUE = autorisé</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermit">
+            <variable name="EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Maintenance/P1, TRUE = autorisé</xhtml>
               </documentation>
             </variable>
             <variable name="BlockedBySafety">
@@ -276,21 +276,21 @@
 🟢 Translation réellement autorisée à se déplacer</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermitEffective">
+            <variable name="EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
-🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+🟢 Permis canonique M3 vers Trémie (reflet lecture seule)</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermitEffective">
+            <variable name="EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Maintenance/P1 (reflet lecture seule)</xhtml>
               </documentation>
             </variable>
             <variable name="HeightInterlockBlocking">
@@ -695,12 +695,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Commande fréquence réellement appliquée</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveDirection">
+            <variable name="ActiveTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Commande active vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Commande active vers Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedCmd_Pct">
@@ -2014,14 +2022,24 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Diagnostic et securites translation M3</xhtml>
               </documentation>
             </variable>
-            <variable name="M3_StartStop_Active">
+            <variable name="M3_RunRequest_Active">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="M3_Direction_Active">
+            <variable name="M3_ReqTremie_Active">
               <type>
-                <INT />
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_ReqMaintenance_Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_CommandConflict">
+              <type>
+                <BOOL />
               </type>
             </variable>
             <variable name="M3_SpeedCmd_Active">
@@ -2076,8 +2094,8 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnels M3 EFFECTIFS (D1 — Phase 3) : information de POSSIBILITÉ de
 mouvement dans une direction, donnée AVANT l'ordre. Reflète les conditions physiques/
 logiques (fins de course, défauts, autorisation cible) — PAS la commande (homme-mort).
-Pour M3, les conditions physiques sont déjà dans FB_Safety_Translation (TremiePermit/
-MaintenancePermit) ; pas de Process supplémentaire (pas de benne/Kobold comme les treuils).
+Pour M3, les conditions physiques sont calculées ici à partir des faits Safety ;
+pas de permis secondaire (pas de benne/Kobold comme les treuils).
 🟢 Permis effectif M3 vers Trémie (Safety)</xhtml>
               </documentation>
             </variable>
@@ -2253,13 +2271,13 @@ M3_LimitSwitchMaintenanceEffective := SEL(PRG_03_Modes_Cycle.Data.Auth.Maintenan
 // Se libère uniquement sur un mouvement effectif dans le SENS INVERSE (dégagement).
 IF instPosDecoderM3.LimitSwitchTremie THEN
     M3_LimitSwitchTremieStable := TRUE;
-ELSIF M3_Direction_Active = -1 THEN
+ELSIF M3_ReqMaintenance_Active THEN
     M3_LimitSwitchTremieStable := FALSE;
 END_IF;
 
 IF M3_LimitSwitchMaintenanceEffective THEN
     M3_LimitSwitchMaintenanceStable := TRUE;
-ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchMaintenance) THEN
+ELSIF M3_ReqTremie_Active OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchMaintenance) THEN
     M3_LimitSwitchMaintenanceStable := FALSE;
 END_IF;
 
@@ -2320,12 +2338,14 @@ instArbM3(
 );
 M3_PositioningActive := instArbM3.PositioningActive;
 SelTarget := instArbM3.SelTarget;
-M3_StartStop_Active := instArbM3.StartStop;
-M3_Direction_Active := instArbM3.Direction;
+M3_RunRequest_Active := instArbM3.RunRequest;
+M3_ReqTremie_Active := instArbM3.ReqTremie;
+M3_ReqMaintenance_Active := instArbM3.ReqMaintenance;
+M3_CommandConflict := instArbM3.CommandConflict;
 M3_SpeedCmd_Active := instArbM3.SpeedPct;
 
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
-// de commande variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
+// de commande variateur en sortie — les bits ReqTremie/ReqMaintenance restent le sens sémantique réel.
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
@@ -2341,10 +2361,10 @@ CASE SelTarget OF
     3: M3_PositionSensorTarget := M3_AtP1Stable;
     4: M3_PositionSensorTarget := M3_AtMaintenanceStable;
 ELSE
-    IF M3_Direction_Active = 1 THEN
+    IF M3_ReqTremie_Active THEN
         // En Marche Avant (+1 vers Trémie) : seule Trémie est le point d'arrêt automatique
         M3_PositionSensorTarget := M3_AtTremieStable;
-    ELSIF M3_Direction_Active = -1 THEN
+    ELSIF M3_ReqMaintenance_Active THEN
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -&gt; arrêt sur Maintenance
         // - Si Maintenance interdite -&gt; arrêt sur P1
@@ -2383,10 +2403,11 @@ instSafetyTranslationM3(
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BrakeCmd                := instTranslationM3.BrakeReleaseRequest,
-    Direction               := M3_Direction_Active,
+    RunRequest              := M3_RunRequest_Active,
+    ReqTremie               := M3_ReqTremie_Active,
+    ReqMaintenance          := M3_ReqMaintenance_Active,
     LimitSwitchTremie       := M3_LimitSwitchTremieStable,
     LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
-    MaintenanceM3TargetEnable := PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
     SensorWordIncoherent    := instPosDecoderM3.Incoherent,
     BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
@@ -2416,31 +2437,27 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 // autorisation cible). Il ne reflète PAS la commande (homme-mort) : l'homme-mort est une
 // condition de COMMANDE (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle), pas de
 // possibilité — il n'entre donc PAS dans le permit exposé.
-// Pour M3, le Safety (FB_Safety_Translation) fournit :
-//   - TremiePermit = NOT LimitSwitchTremie (direction possible vers Trémie)
-//   - MaintenancePermit = MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance
+// Pour M3, le Safety (FB_Safety_Translation) fournit les faits de sécurité :
+//   - TremieLimitClear = NOT LimitSwitchTremie (direction possible vers Trémie)
+//   - MaintenanceLimitClear = NOT LimitSwitchMaintenance (direction possible jusqu'à P1)
 //   - SafeStop / PowerCutOff = défauts (thermique, Méca A/B, incohérence, comm, phases...)
-// Le permit effectif = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff
+// Le permis effectif = fait de limite libre AND NOT SafeStop AND NOT PowerCutOff
 // (prêt à fonctionner), aligné sur le modèle treuils où le Safety produit déjà des
-// permits gatés par les défauts. Pas de Process supplémentaire (pas de benne/Kobold).
+// permis gatés par les défauts. Pas de Process supplémentaire (pas de benne/Kobold).
 // ⚠️ Le verrou « descente treuil interdite tant que M3 pas à P1 » (DumpAtTremieDescentLocked)
 // est côté TREUIL (PRG_04 §5, lignes 802-805), pas dans le permit M3 : le permit M3 reste une
 // information de possibilité de mouvement de la translation, indépendante de l'état de la trémie.
 // ⚠️ Le permit M3 est un permit EFFECTIF « pouvoir bouger » (prêt à fonctionner), PAS un pur
 // directionnel. Quand l'axe est en défaut (SafeStop/PowerCutOff), TOUS les sens sont bloqués ;
-// au retour en condition, un sens peut être permis et pas l'autre (ex. Maintenance interdite -&gt;
-// MaintenancePermit=FALSE, TremiePermit=TRUE). Ce niveau effectif est exposé à l'IHM.
-// ⚠️ Ces permis effectifs sont des valeurs de DIAGNOSTIC/IHM (lecture seule) : la commande
-// réelle reste gatée par M3_SafeStop_Aggregate (PRG_05:343, superset incluant InputModuleFault)
-// et l'homme-mort (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle). Aucun impact sur la
-// chaîne de sécurité. Le gate (FB_Translation, EffectiveSafeStop) consomme les permits
-// directionnels SAFETY (instSafetyTranslationM3.TremiePermit/MaintenancePermit), pas ce niveau effectif.
-EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremiePermit
+// au retour en condition, un sens peut être permis et pas l'autre. L'interdiction d'accès à la
+// zone Maintenance ne retire PAS le permis de rejoindre P1 : elle agit sur la cible et la
+// coupure dure M3_LimitSwitchMaintenanceEffective.
+EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremieLimitClear
                                AND NOT M3_SafeStop_Aggregate
                                AND NOT instSafetyTranslationM3.PowerCutOff;
-EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenancePermit
-                                 AND NOT M3_SafeStop_Aggregate
-                                 AND NOT instSafetyTranslationM3.PowerCutOff;
+EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenanceLimitClear
+                                  AND NOT M3_SafeStop_Aggregate
+                                  AND NOT instSafetyTranslationM3.PowerCutOff;
 
 {endregion}
 
@@ -2467,9 +2484,10 @@ instTranslationM3(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
-    StartStop               := M3_StartStop_Active,
+    RunRequest              := M3_RunRequest_Active,
     SafeStop                := M3_SafeStop_Aggregate,
-    Direction               := M3_Direction_Active,
+    ReqTremie               := M3_ReqTremie_Active,
+    ReqMaintenance          := M3_ReqMaintenance_Active,
     InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
     SpeedTgt_Pct            := M3_SpeedCmd_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
@@ -2488,8 +2506,8 @@ instTranslationM3(
     LimitSwitchTremie       := M3_LimitSwitchTremieStable,
     LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
     // 🛡️ Permis directionnels SAFETY (source unique instSafetyTranslationM3) — gate de sens FB_Translation
-    TremiePermit            := instSafetyTranslationM3.TremiePermit,
-    MaintenancePermit       := instSafetyTranslationM3.MaintenancePermit,
+    EffectivePermitM3_Tremie := EffectivePermitM3_Tremie,
+    EffectivePermitM3_Maintenance := EffectivePermitM3_Maintenance,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     Cfg                     := TranslationCfg,
@@ -2503,7 +2521,8 @@ instPosEstimatorM3(
     Enable               := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE),
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
     DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
-    Direction            := M3_Direction_Active,
+    ReqTremie            := M3_ReqTremie_Active,
+    ReqMaintenance       := M3_ReqMaintenance_Active,
     SensorMaintenance    := instPosDecoderM3.TranslationPosMaintenance,
     SensorP1             := instPosDecoderM3.TranslationPosP1,
     SensorP2             := instPosDecoderM3.TranslationPosP2,
@@ -2561,11 +2580,12 @@ TranslationState.BrakeFeedback := PRG_02_Acquisition.HwIn.Translation.M3_BrakeIs
 TranslationState.PositionReached := instTranslationM3.TargetReached;
 TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationState.DriveFreqCmd_Hz := instTranslationM3.RequestedDriveFreqHz;
-// 🎯 Cohérence sim : ActiveDirection/SpeedCmd_Pct n'affichent la
+// 🎯 Cohérence sim : les bits actifs/SpeedCmd_Pct n'affichent la
 // consigne QUE si la commande variateur est réellement émise (RequestedDriveControlWord &lt;&gt; 0).
 // Sinon, un interlock bloquant (hauteur, SafeStop…) laisserait l'IHM suggérer un mouvement
 // qui n'a pas lieu ("je bouge mais ça bouge pas"). Affiche 0 quand c'est bloqué.
-TranslationState.ActiveDirection := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_Direction_Active, 0);
+TranslationState.ActiveTremie := instTranslationM3.RequestedDriveControlWord = 1;
+TranslationState.ActiveMaintenance := instTranslationM3.RequestedDriveControlWord = 2;
 TranslationState.SpeedCmd_Pct := SEL(instTranslationM3.RequestedDriveControlWord &lt;&gt; 0, M3_SpeedCmd_Active, 0.0);
 TranslationState.PositionTremie := instPosDecoderM3.TranslationPosTremie;
 TranslationState.PositionPV := instPosDecoderM3.TranslationPosPV;
@@ -2622,8 +2642,8 @@ TranslationSafety.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
 // 🟢 Permis directionnels M3 EFFECTIFS (D1 — Safety AND Process, §1ter) — projetés vers l'IHM
 // (source safety : FB_Safety_Translation ; fusion Process en local, modèle treuils PRG_04 §5)
-TranslationSafety.TremiePermit := EffectivePermitM3_Tremie;
-TranslationSafety.MaintenancePermit := EffectivePermitM3_Maintenance;
+TranslationSafety.EffectivePermitM3_Tremie := EffectivePermitM3_Tremie;
+TranslationSafety.EffectivePermitM3_Maintenance := EffectivePermitM3_Maintenance;
 TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
@@ -2642,8 +2662,8 @@ TranslationTrace.HeightInterlockBlocking  := NOT M3_HeightInterlockOk;
 TranslationTrace.DriveOperational         := PRG_02_Acquisition.Data.Network.DriveM3.Operational;
 TranslationTrace.FinalInterlockError      := TranslationState.FinalInterlockError;
 // 🟢 Permis directionnels par sens EFFECTIFS (D1 — Safety AND Process, §1ter) — reflet exact des permis appliqués
-TranslationTrace.TremiePermitEffective    := EffectivePermitM3_Tremie;
-TranslationTrace.MaintenancePermitEffective := EffectivePermitM3_Maintenance;
+TranslationTrace.EffectivePermitM3_Tremie      := EffectivePermitM3_Tremie;
+TranslationTrace.EffectivePermitM3_Maintenance := EffectivePermitM3_Maintenance;
 
 // Permis de mouvement effectif = toutes les barrières levées (agrégat diagnostic)
 TranslationTrace.MotionPermitEffective := NOT M3_SafeStop_Aggregate
@@ -2826,12 +2846,28 @@ Data.TranslationTrace                 := TranslationTrace;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Commande frein</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="RunRequest">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Direction commandée (-1: vers Maintenance, 0: Stop, 1: vers Trémie)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de marche maintenue</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="LimitSwitchTremie">
@@ -2848,14 +2884,6 @@ Data.TranslationTrace                 := TranslationTrace;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MaintenanceM3TargetEnable">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation cible Maintenance (Auth.MaintenanceM3TargetEnable)</xhtml>
               </documentation>
             </variable>
             <variable name="SensorWordIncoherent">
@@ -3086,20 +3114,20 @@ Data.TranslationTrace                 := TranslationTrace;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incohérence mot capteurs position (bit7)</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermit">
+            <variable name="TremieLimitClear">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel SAFETY vers Trémie (TRUE = autorisé, fail-safe). Niveau SAFETY (pur directionnel : fin de course). Le permit EFFECTIF « pouvoir bouger » est calculé en PRG_05 §1ter (AND NOT SafeStop AND NOT PowerCutOff).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fin de course Trémie libre (condition interne du permis M3)</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermit">
+            <variable name="MaintenanceLimitClear">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Permis directionnel SAFETY vers Maintenance (TRUE = autorisé, fail-safe). Niveau SAFETY (pur directionnel : autorisation cible + fin de course). Le permit EFFECTIF « pouvoir bouger » est calculé en PRG_05 §1ter (AND NOT SafeStop AND NOT PowerCutOff).</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fin de course Maintenance/P1 libre (condition interne du permis M3)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -3333,7 +3361,7 @@ IF NOT BypassGlobal THEN
     IF NOT (BypassSafety OR BypassMecaB) THEN
         IF NOT HeartbeatIhmOk THEN
             UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
-        ELSIF (Direction = 0) AND NOT BrakeCmd THEN
+        ELSIF NOT RunRequest AND NOT BrakeCmd THEN
             UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
         ELSE
             UncommandedActiveB := FALSE;
@@ -3349,7 +3377,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 5 : Méca A (latched)
     IF NOT (BypassSafety OR BypassMecaA) THEN
-        IF (Direction = 0) AND NOT BrakeCmd THEN
+        IF NOT RunRequest AND NOT BrakeCmd THEN
             UncommandedActiveA := ABS(DriveActualFreqHz) &gt; 0.5;
         ELSE
             UncommandedActiveA := FALSE;
@@ -3365,8 +3393,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 6 : Limite extrême escalade (live)
     IF NOT (BypassSafety OR BypassLimitSwitch) THEN
-        OverrunCondition := (LimitSwitchTremie AND (Direction = 1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
-                         OR (LimitSwitchMaintenance AND (Direction = -1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
+        OverrunCondition := (LimitSwitchTremie AND ReqTremie AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchMaintenance AND ReqMaintenance AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
         instCauses[6].Active := TonLimitSwitchOverrun.Q;
     ELSE
@@ -3408,8 +3436,8 @@ IF NOT Enable THEN
     ErrorMecaA := FALSE;
     ErrorLimitSwitch := FALSE;
     ErrorSensorIncoherent := FALSE;
-    TremiePermit := FALSE;
-    MaintenancePermit := FALSE;
+    TremieLimitClear := FALSE;
+    MaintenanceLimitClear := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
@@ -3443,14 +3471,12 @@ ErrorSensorIncoherent := instCauses[7].Active;
 // PRG_05_Translation §1ter : Safety directionnel AND NOT M3_SafeStop_Aggregate AND NOT
 // PowerCutOff. C'est LUI qui reflète la sémantique « pouvoir bouger » : quand l'axe est en
 // défaut (SafeStop/PowerCutOff), TOUS les sens sont bloqués ; au retour en condition, un sens
-// peut être permis et pas l'autre (ex. Maintenance interdite -&gt; MaintenancePermit=FALSE,
-// TremiePermit=TRUE). Ces sorties SAFETY alimentent aussi le gate de FB_Translation
-// (EffectiveSafeStop).
-// TremiePermit : autorisé vers Trémie tant que la fin de course Trémie n'est pas atteinte.
-TremiePermit := NOT LimitSwitchTremie;
-// MaintenancePermit : autorisé vers Maintenance uniquement si la cible Maintenance est
-// autorisée (Auth.MaintenanceM3TargetEnable) ET la fin de course Maintenance non atteinte.
-MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
+// La décision des huit permis est produite en PRG_05. Ce FB ne produit que les faits
+// de sécurité nécessaires à cette décision : les deux fins de course sont-elles libres ?
+// Le droit d'accès à la zone Maintenance (MaintenanceM3TargetEnable) est volontairement
+// séparé : il ne doit pas empêcher le déplacement légal jusqu'à P1.
+TremieLimitClear := NOT LimitSwitchTremie;
+MaintenanceLimitClear := NOT LimitSwitchMaintenance;
 {endregion}
 </xhtml>
           </ST>
@@ -3496,12 +3522,12 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode courant</xhtml>
               </documentation>
             </variable>
-            <variable name="StartStop">
+            <variable name="RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = rampe accélération, FALSE = rampe décélération NORMALE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de marche maintenue (FALSE = décélération/arrêt)</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -3512,12 +3538,20 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = vers Maintenance, 0 = Neutre, +1 = vers Trémie (source d'autorité du sens)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedTgt_Pct">
@@ -3576,7 +3610,7 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermit">
+            <variable name="EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
@@ -3584,11 +3618,11 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Permis directionnels SAFETY (source FB_Safety_Translation) — gate de sens
---&gt; [SAFE] Permis directionnel SAFETY vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Permis directionnels canoniques M3 — gate de sens (TRUE = autorisé)
+--&gt; [SAFE] Permis effectif vers Trémie</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermit">
+            <variable name="EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
@@ -3596,7 +3630,7 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis directionnel SAFETY vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis effectif vers Maintenance/P1</xhtml>
               </documentation>
             </variable>
             <variable name="DriveStatusWord">
@@ -3762,12 +3796,20 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Interlock changement de sens</xhtml>
               </documentation>
             </variable>
-            <variable name="CommandedDirection">
+            <variable name="CommandedTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens réellement appliqué</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens Trémie réellement appliqué</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandedMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens Maintenance réellement appliqué</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionChangePending">
@@ -3778,12 +3820,20 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Force la rampe à 0 pendant une inversion de sens en attente</xhtml>
               </documentation>
             </variable>
-            <variable name="PhysicalDriveDirection">
+            <variable name="PhysicalTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CommandedDirection compensé câblage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens physique Trémie après inversion câblage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhysicalMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens physique Maintenance après inversion câblage</xhtml>
               </documentation>
             </variable>
             <variable name="RampTargetPct">
@@ -3810,9 +3860,17 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front arrivée sur capteur</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionAtArrival">
+            <variable name="ArrivalWasTremie">
               <type>
-                <INT />
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens d'arrivée mémorisé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArrivalWasMaintenance">
+              <type>
+                <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens d'arrivée mémorisé</xhtml>
@@ -3891,7 +3949,7 @@ MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
    ⚙️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
-   🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
+   🔌 FB DE MOUVEMENT : porte RunRequest + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
    🔧 Interface plate → structs : configuration regroupée en `Cfg : ST_fbTranslation_Cfg`
@@ -3930,7 +3988,7 @@ instCauses[3].Active   := DriveFaultLatching;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Defaut variateur translation AC600';
 
-IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchTremie) OR (CommandedDirection = -1 AND LimitSwitchMaintenance)) THEN
+IF NOT BypassLimitSwitch AND ((CommandedTremie AND LimitSwitchTremie) OR (CommandedMaintenance AND LimitSwitchMaintenance)) THEN
     instCauses[6].Active := TRUE;
 ELSE
     instCauses[6].Active := FALSE;
@@ -3954,9 +4012,12 @@ IF NOT Enable THEN
     BrakeCommandOpenConfirmed := FALSE;
     BrakeContactorCheck.Command := FALSE;
     BrakeContactorCheck.Feedback := BrakeFeedback;
-    CommandedDirection := 0;
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
     ArrivalLock := FALSE;
+    ArrivalWasTremie := FALSE;
+    ArrivalWasMaintenance := FALSE;
     TargetReached := FALSE;
     DirectionChangeDelay(IN := FALSE);
     CaptorDebounceTon(IN := FALSE);
@@ -3971,7 +4032,8 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Premier scan et temps de cycle"}
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    CommandedDirection := Direction;
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
 END_IF;
 
 CycleTimeCalc();
@@ -3984,52 +4046,60 @@ ArrivalEdge(CLK := TargetReached);
 
 IF ArrivalEdge.Q THEN
     ArrivalLock := TRUE;
-    DirectionAtArrival := CommandedDirection;
+    ArrivalWasTremie := CommandedTremie;
+    ArrivalWasMaintenance := CommandedMaintenance;
 END_IF;
 
-IF ArrivalLock AND (Direction &lt;&gt; 0) AND (Direction &lt;&gt; DirectionAtArrival) THEN
+IF ArrivalLock AND ((ReqTremie AND NOT ArrivalWasTremie) OR (ReqMaintenance AND NOT ArrivalWasMaintenance)) THEN
     ArrivalLock := FALSE;
 END_IF;
 
 DirectionChangeDelay(
-    IN := (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) AND (ABS(SpeedRamp.Current) &lt;= 0.1) AND (ABS(DriveActualFreqHz) &lt;= 0.5),
+    IN := (ReqTremie OR ReqMaintenance)
+          AND ((ReqTremie AND NOT CommandedTremie) OR (ReqMaintenance AND NOT CommandedMaintenance))
+          AND (ABS(SpeedRamp.Current) &lt;= 0.1)
+          AND (ABS(DriveActualFreqHz) &lt;= 0.5),
     PT := Cfg.DirectionInterlockDelay
 );
 
-IF (CommandedDirection = 0) AND (Direction &lt;&gt; 0) THEN
-    CommandedDirection := Direction;
+IF NOT (CommandedTremie OR CommandedMaintenance) AND (ReqTremie OR ReqMaintenance) THEN
+    CommandedTremie := ReqTremie;
+    CommandedMaintenance := ReqMaintenance;
     DirectionChangePending := FALSE;
 ELSIF DirectionChangeDelay.Q THEN
-    CommandedDirection := Direction;
+    CommandedTremie := ReqTremie;
+    CommandedMaintenance := ReqMaintenance;
     DirectionChangePending := FALSE;
-ELSIF (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) THEN
+ELSIF (ReqTremie OR ReqMaintenance)
+      AND ((ReqTremie AND NOT CommandedTremie) OR (ReqMaintenance AND NOT CommandedMaintenance)) THEN
     DirectionChangePending := TRUE;
 ELSE
     DirectionChangePending := FALSE;
 END_IF;
 
-IF Direction = 0 THEN
-    CommandedDirection := 0;
+IF NOT (ReqTremie OR ReqMaintenance) THEN
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
 END_IF;
 {endregion}
 
 {region "§4bis Permis directionnels et EffectiveSafeStop"}
 // 🛡️ 4bis. GATE DE SENS (permis directionnels SAFETY) — modèle treuils FB_Winch
-// EffectiveSafeStop = SafeStop OR (Direction&gt;0 ET Trémie non permise). Bloque la RAMPE
-// (arrêt réel) vers un sens non autorisé SANS toucher à Direction : l'estimateur de position,
-// les verrous bistables et la sélection PositionSensorTarget (PRG_05) restent informés.
+// RampStopActive = SafeStop OR demande vers un sens non permis. Bloque la RAMPE
+// (arrêt réel) vers un sens non autorisé sans fabriquer de sens numérique.
 // Consommé dans la gate de rampe (§5) et le choix de décélération.
-// ⚠️ Le sens Maintenance (−1) n'est PAS gaté ici : le segment P1→Maintenance est déjà protégé
-// par la coupure dure M3_LimitSwitchMaintenanceEffective (PRG_05:128-130) et les ralentissements.
-// Gater −1 sur MaintenancePermit bloquerait l'accès à P1 quand Maintenance n'est pas autorisée
-// (régression fonctionnelle). Le gate ne bloque que +1 (Trémie).
+// Le permis Maintenance représente la possibilité de rejoindre P1/maintenance physique ;
+// l'interdiction d'accès à la zone Maintenance est gérée séparément par la cible P1 et sa
+// coupure dure, sans couper le déplacement légal jusqu'à P1.
 EffectiveSafeStop := SafeStop
-                      OR (Direction &gt; 0 AND NOT TremiePermit);
+                      OR (ReqTremie AND NOT EffectivePermitM3_Tremie)
+                      OR (ReqMaintenance AND NOT EffectivePermitM3_Maintenance)
+                      OR (ReqTremie AND ReqMaintenance);
 {endregion}
 
 {region "§5 Consigne et rampe de vitesse"}
-IF DirectionChangePending OR (Direction = 0) OR ArrivalLock OR EffectiveSafeStop OR NOT StartStop THEN
+IF DirectionChangePending OR NOT (ReqTremie OR ReqMaintenance) OR ArrivalLock OR EffectiveSafeStop OR NOT RunRequest THEN
     RampTargetPct := 0.0;
 ELSE
     RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
@@ -4068,15 +4138,16 @@ BrakeReleaseRequest := Brake.BrakeCmd;
 BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
 BrakeContactorCheck := Brake.ContactorCheck;
 
+PhysicalTremie := CommandedTremie;
+PhysicalMaintenance := CommandedMaintenance;
 IF InvertDriveDirection THEN
-    PhysicalDriveDirection := -CommandedDirection;
-ELSE
-    PhysicalDriveDirection := CommandedDirection;
+    PhysicalTremie := CommandedMaintenance;
+    PhysicalMaintenance := CommandedTremie;
 END_IF;
 
-IF (PhysicalDriveDirection = 1) AND Brake.BrakeCmd THEN
+IF PhysicalTremie AND Brake.BrakeCmd THEN
     RequestedDriveControlWord := 1; // FWD
-ELSIF (PhysicalDriveDirection = -1) AND Brake.BrakeCmd THEN
+ELSIF PhysicalMaintenance AND Brake.BrakeCmd THEN
     RequestedDriveControlWord := 2; // REV
 ELSE
     RequestedDriveControlWord := 0;
@@ -4085,11 +4156,11 @@ END_IF;
 RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * Cfg.DriveFreqScaleMaxHz;
 
 // Ralentissements d'approche
-IF (CommandedDirection = 1) AND SlowdownSensorTremie THEN
+IF CommandedTremie AND SlowdownSensorTremie THEN
     RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedTremieHz);
-ELSIF (CommandedDirection = -1) AND SlowdownSensorMaintenance THEN
+ELSIF CommandedMaintenance AND SlowdownSensorMaintenance THEN
     RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedMaintenanceHz);
-ELSIF (CommandedDirection = -1) AND SlowdownSensorP1 THEN
+ELSIF CommandedMaintenance AND SlowdownSensorP1 THEN
     RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedP1Hz);
 END_IF;
 
@@ -4185,20 +4256,36 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt à arbitrer (Enable)</xhtml>
               </documentation>
             </variable>
-            <variable name="StartStop">
+            <variable name="RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande marche/arrêt arbitrée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande de marche maintenue (FALSE = décélération/arrêt)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: vers Maintenance, 0: Stop, 1: vers Trémie)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande explicite vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande explicite vers Maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Deux sens demandés simultanément</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedPct">
@@ -4242,7 +4329,7 @@ END_IF;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Arbitrer la source de commande M3 (joystick jog / boutons IHM /
        demande cycle selon le mode) et produire la commande arbitrée.
-   🔌 FB d'arbitrage (non-mouvement) : ne porte ni SafeStop ni StartStop
+   🔌 FB d'arbitrage (non-mouvement) : ne porte ni SafeStop ni arrêt de sécurité
        de sécurité — il produit la commande logique, la safety reste dans
        FB_Safety_Translation / FB_Translation.
    📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
@@ -4260,9 +4347,18 @@ END_IF;
 
 Ready := Enable;
 
+// Les deux bits de sens sont reconstruits à chaque cycle : aucune demande ne doit
+// rester mémorisée lors d'un changement de source (IHM/joystick/cycle).
+RunRequest      := FALSE;
+ReqTremie       := FALSE;
+ReqMaintenance  := FALSE;
+CommandConflict := FALSE;
+
 IF NOT Enable THEN
-    StartStop         := FALSE;
-    Direction         := 0;
+    RunRequest        := FALSE;
+    ReqTremie         := FALSE;
+    ReqMaintenance    := FALSE;
+    CommandConflict   := FALSE;
     SpeedPct          := 0.0;
     PositioningActive := FALSE;
     SelTarget         := 0;
@@ -4271,17 +4367,16 @@ ELSE
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         PositioningActive := TRUE;
         SelTarget := ReqTranslation.PositionTgt;
-        StartStop := ReqTranslation.ReqStart AND Context.HeightInterlockOk;
-        IF StartStop THEN
+        RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk;
+        IF RunRequest THEN
             SpeedPct := 100.0;
             IF SelTarget = 1 THEN
-                Direction := 1;
+                ReqTremie := TRUE;
             ELSE
-                Direction := -1;
+                ReqMaintenance := TRUE;
             END_IF;
         ELSE
             SpeedPct := 0.0;
-            Direction := 0;
         END_IF;
     ELSIF (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2) THEN
         // ── Mode maintenance : jog joystick ou boutons IHM ──
@@ -4289,18 +4384,17 @@ ELSE
         SelTarget := 0;
 
         IF NOT TglJoystickMaster AND IHM.BtnTremie THEN
-            Direction := 1;
+            ReqTremie := TRUE;
         ELSIF NOT TglJoystickMaster AND IHM.BtnMaintenance THEN
-            Direction := -1;
+            ReqMaintenance := TRUE;
         ELSIF TglJoystickMaster THEN
-            Direction := Joystick.AxisX.Direction;
-        ELSE
-            Direction := 0;
+            ReqTremie := Joystick.AxisX.DirectionPositive;
+            ReqMaintenance := Joystick.AxisX.DirectionNegative;
         END_IF;
 
         // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2.
         // ⚠️ Tautologie conservée bit-identique : (BypassGlobal OR NOT Tgl OR Tgl) = toujours TRUE.
-        StartStop := (Direction &lt;&gt; 0)
+        RunRequest := (ReqTremie OR ReqMaintenance)
                      AND (IHM.BypassGlobal OR NOT TglJoystickMaster OR TglJoystickMaster)
                      AND Joystick.DeadmanArmed
                      AND Context.HeightInterlockOk;
@@ -4316,10 +4410,17 @@ ELSE
         // ── Autres modes : neutralisé ──
         PositioningActive := FALSE;
         SelTarget := 0;
-        StartStop := FALSE;
-        Direction := 0;
+        RunRequest := FALSE;
         SpeedPct  := 0.0;
     END_IF;
+END_IF;
+
+// Une demande contradictoire est toujours neutralisée. RunRequest reste vrai afin de
+// conserver la sémantique de décélération de FB_Translation ; aucune direction n'est choisie.
+CommandConflict := ReqTremie AND ReqMaintenance;
+IF CommandConflict THEN
+    ReqTremie := FALSE;
+    ReqMaintenance := FALSE;
 END_IF;
 
 // Clamp consigne (bit-identique PRG_05 §1)
@@ -4698,12 +4799,20 @@ TranslationAtMaintenance := EdgeDnMaintenance.Q;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fréquence réelle variateur en Hz (ex: 5.0 Hz)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens effectif : +1 = Fwd (vers Trémie), -1 = Rev (vers Maint), 0 = Arrêt</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="SensorMaintenance">
@@ -5034,10 +5143,14 @@ IF NOT Initialized THEN
 END_IF;
 
 // 4. Intégration temporelle continue (Odométrie cycle par cycle)
-// dX = -Direction * (FreqHz * Gain) * dt — convention 0 m=Trémie, 30 m=Maintenance :
-// le sens +1 (vers Trémie) DÉCROÎT la position vers 0 m, le sens -1 (vers Maintenance) la CROÎT vers 30 m.
-IF Direction &lt;&gt; 0 AND DriveActualFreqHz &gt; 0.1 THEN
-    PositionEstimatedM := PositionEstimatedM - (INT_TO_REAL(Direction) * DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+// Les bits explicites portent le sens sémantique. Une demande contradictoire est
+// neutralisée : aucun déplacement estimé ne doit être inventé.
+IF DriveActualFreqHz &gt; 0.1 THEN
+    IF ReqTremie AND NOT ReqMaintenance THEN
+        PositionEstimatedM := PositionEstimatedM - (DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+    ELSIF ReqMaintenance AND NOT ReqTremie THEN
+        PositionEstimatedM := PositionEstimatedM + (DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+    END_IF;
 END_IF;
 {endregion}
 

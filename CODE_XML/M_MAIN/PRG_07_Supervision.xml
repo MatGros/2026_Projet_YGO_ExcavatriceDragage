@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T07:24:21.617371" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T07:24:21.617371">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:24:00.321341" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:24:00.321341">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1392,20 +1392,20 @@ fournie par la configuration persistante de l'appelant.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermit">
+            <variable name="EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Trémie, TRUE = autorisé</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermit">
+            <variable name="EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Maintenance/P1, TRUE = autorisé</xhtml>
               </documentation>
             </variable>
             <variable name="BlockedBySafety">
@@ -2487,12 +2487,22 @@ M1 : contacteurs retombés</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="EffectivePermitBucket_Open">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectivePermitBucket_Close">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="BucketOpenRequestActive">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne : pas de bit Permit canonique a ce stade ; publication des faits consommes.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne : demandes et diagnostic d'execution, distincts des permis canoniques.</xhtml>
               </documentation>
             </variable>
             <variable name="BucketCloseRequestActive">
@@ -2702,21 +2712,21 @@ M1 : contacteurs retombés</xhtml>
 🟢 Translation réellement autorisée à se déplacer</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermitEffective">
+            <variable name="EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
-🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+🟢 Permis canonique M3 vers Trémie (reflet lecture seule)</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermitEffective">
+            <variable name="EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Maintenance/P1 (reflet lecture seule)</xhtml>
               </documentation>
             </variable>
             <variable name="HeightInterlockBlocking">
@@ -5660,12 +5670,20 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Commande fréquence réellement appliquée</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveDirection">
+            <variable name="ActiveTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Commande active vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Commande active vers Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedCmd_Pct">
@@ -6550,13 +6568,21 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Palier plafonné à 1 : approche limite basse (câble ou légale)</xhtml>
               </documentation>
             </variable>
-            <variable name="CommandedDirection">
+            <variable name="CommandedAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic délai ressenti à la remontée
-🩺 Sens interne mémorisé FB_Winch (-1/0/+1)</xhtml>
+🩺 Sens interne mémorisé FB_Winch : montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandedDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Sens interne mémorisé FB_Winch : descente</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionChangeDelayElapsed">
@@ -6943,20 +6969,28 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Offset actif injecté dans la synchro</xhtml>
               </documentation>
             </variable>
-            <variable name="M2StartStop">
+            <variable name="M2RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande Start/Stop forcée vers M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande marche forcée vers M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2Direction">
+            <variable name="M2ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande direction forcée vers M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée forcée vers M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente forcée vers M2</xhtml>
               </documentation>
             </variable>
             <variable name="M2BucketJogLimit">
@@ -8548,8 +8582,8 @@ GVL_IHM.Permits.BothAscentPermit := PRG_04_Treuils_Benne.Data.BothAscentPermit;
 GVL_IHM.Permits.BothDescendPermit := PRG_04_Treuils_Benne.Data.BothDescendPermit;
 GVL_IHM.Permits.BothBlocked := PRG_04_Treuils_Benne.Data.BothBlocked;
 GVL_IHM.Permits.BothBlockReason := PRG_04_Treuils_Benne.Data.BothBlockReason;
-GVL_IHM.Permits.EffectivePermitM3_Tremie := PRG_05_Translation.Data.TranslationTrace.TremiePermitEffective;
-GVL_IHM.Permits.EffectivePermitM3_Maintenance := PRG_05_Translation.Data.TranslationTrace.MaintenancePermitEffective;
+GVL_IHM.Permits.EffectivePermitM3_Tremie := PRG_05_Translation.Data.TranslationTrace.EffectivePermitM3_Tremie;
+GVL_IHM.Permits.EffectivePermitM3_Maintenance := PRG_05_Translation.Data.TranslationTrace.EffectivePermitM3_Maintenance;
 GVL_IHM.Permits.M3MotionPermitEffective := PRG_05_Translation.Data.TranslationTrace.MotionPermitEffective;
 GVL_IHM.Permits.DiveDescendPermit := PRG_04_Treuils_Benne.Data.DescendPermitDiveBucketOpen;
 GVL_IHM.Permits.ExtractionAscentPermit := PRG_04_Treuils_Benne.Data.ExtractionAscentPermit;
@@ -8557,6 +8591,8 @@ GVL_IHM.Permits.ExtractionAssistActive := PRG_04_Treuils_Benne.Data.ExtractionAs
 GVL_IHM.Permits.BucketOpenRequestActive := PRG_04_Treuils_Benne.Data.BucketState.OpenActive;
 GVL_IHM.Permits.BucketCloseRequestActive := PRG_04_Treuils_Benne.Data.BucketState.CloseActive;
 GVL_IHM.Permits.BucketMotionBlocked := PRG_04_Treuils_Benne.Data.BucketState.CoupledMotionBlockedByBucket;
+GVL_IHM.Permits.EffectivePermitBucket_Open := PRG_04_Treuils_Benne.Data.EffectivePermitBucket_Open;
+GVL_IHM.Permits.EffectivePermitBucket_Close := PRG_04_Treuils_Benne.Data.EffectivePermitBucket_Close;
 
 instTroubleshootingView(
     Enable               := TRUE,
@@ -12551,6 +12587,8 @@ GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx303_KoboldAutoStopEnabled := Co
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx304_KoboldImmersionConfirmed := Commun.KoboldImmersionConfirmed;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx305_KoboldBottomTouchLatched := Commun.KoboldBottomTouchLatched;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx306_ErrorIdRaw := WinchM2.Bucket.State.ErrorId;
+GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx307_EffectivePermit_Open := Permits.EffectivePermitBucket_Open;
+GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx308_EffectivePermit_Close := Permits.EffectivePermitBucket_Close;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx403_ExtractionControlActive := WinchM2.Bucket.State.ExtractionControlActive;
@@ -12634,8 +12672,8 @@ GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx314_ErrorMecaA        := T
 GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx315_ErrorLimitSwitch  := Translation.Safety.ErrorLimitSwitch;
 GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent := Translation.Safety.ErrorSensorIncoherent;
 GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx317_ErrorId := Translation.Safety.ErrorId; // Masque brut complet (latch cause, source d'arbitrage PowerCutOff)
-GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx318_TremiePermit := Translation.Safety.TremiePermit; // 🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)
-GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx319_MaintenancePermit := Translation.Safety.MaintenancePermit; // 🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)
+GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx318_EffectivePermitM3_Tremie := Translation.Safety.EffectivePermitM3_Tremie; // 🟢 Permis canonique vers Trémie
+GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx319_EffectivePermitM3_Maintenance := Translation.Safety.EffectivePermitM3_Maintenance; // 🟢 Permis canonique vers Maintenance/P1
 
 GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
 GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqCmd_Hz;
@@ -12858,10 +12896,13 @@ GVL_Troubleshooting.P_MotionM3.Cmd_BrakeRelease         := Translation.State.Bra
 GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
 GVL_Troubleshooting.P_MotionM3.Step3_NotBusyOtherTask   := TRUE; // Aucune tâche exclusive connue bloquant M3 (pas de homing translation)
 GVL_Troubleshooting.P_MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.SpeedCmd_Pct &gt; 0.0);
-GVL_Troubleshooting.P_MotionM3.RequestedDirection       := Translation.State.ActiveDirection;
+// Conversion locale uniquement pour compatibilité de l'index diagnostic historique :
+// les contrats M3 et les commandes utilisent les deux bits explicites.
+GVL_Troubleshooting.P_MotionM3.RequestedDirection       := SEL(Translation.State.ActiveTremie,
+                                                               SEL(Translation.State.ActiveMaintenance, -1, 0), 1);
 GVL_Troubleshooting.P_MotionM3.RequestedSpeedPct        := Translation.State.SpeedCmd_Pct;
 GVL_Troubleshooting.P_MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
-GVL_Troubleshooting.P_MotionM3.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.P_MotionM3.RequestedDirection = 1, Translation.Safety.MaintenancePermit, Translation.Safety.TremiePermit); // Permis directionnels M3 (Direction=+1 → Trémie, -1 → Maintenance) — HeightInterlockBlocking reste un blocage séparé (non directionnel)
+GVL_Troubleshooting.P_MotionM3.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.P_MotionM3.RequestedDirection = 1, Translation.Safety.EffectivePermitM3_Maintenance, Translation.Safety.EffectivePermitM3_Tremie); // Permis canoniques M3 — HeightInterlockBlocking reste un blocage séparé
 GVL_Troubleshooting.P_MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.P_MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
 
@@ -12876,8 +12917,8 @@ GVL_Troubleshooting.P_MotionM3.AllConditionsMet := GVL_Troubleshooting.P_MotionM
 
 // 🔌 M3 piloté par variateur AC600 (pas de relais/contacteur de palier comme M1/M2) : ces
 // champs restent des indicateurs de sens actif, pas des retours relais physiques réels.
-GVL_Troubleshooting.P_MotionM3.RelayFwdActive        := (Translation.State.ActiveDirection = 1) AND Translation.State.Busy;
-GVL_Troubleshooting.P_MotionM3.RelayRevActive        := (Translation.State.ActiveDirection = -1) AND Translation.State.Busy;
+GVL_Troubleshooting.P_MotionM3.RelayFwdActive        := Translation.State.ActiveTremie AND Translation.State.Busy;
+GVL_Troubleshooting.P_MotionM3.RelayRevActive        := Translation.State.ActiveMaintenance AND Translation.State.Busy;
 GVL_Troubleshooting.P_MotionM3.SpeedContactor1Active := FALSE; // Non applicable — M3 n'a pas de contacteur de vitesse par palier
 
 {endregion}

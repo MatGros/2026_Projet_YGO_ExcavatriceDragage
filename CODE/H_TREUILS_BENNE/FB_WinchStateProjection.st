@@ -138,7 +138,8 @@ WinchM1State.InhibitActive := Auth.InhibitM1;
 WinchM1State.BottomLimitActiveM := BottomLimitM1_Active;
 WinchM1State.InTopSlowdownZone := WinchM1Ref.InTopSlowdownZone;
 WinchM1State.InBottomSlowdownZone := WinchM1Ref.InBottomSlowdownZone;
-WinchM1State.CommandedDirection := WinchM1Ref.CommandedDirection;
+WinchM1State.CommandedAscent := WinchM1Ref.CommandedAscent;
+WinchM1State.CommandedDescend := WinchM1Ref.CommandedDescend;
 WinchM1State.DirectionChangeDelayElapsed := WinchM1Ref.DirectionChangeDelayElapsed;
 WinchM1State.DirectionChangePending := WinchM1Ref.DirectionChangePending;
 
@@ -201,7 +202,8 @@ WinchM2State.InhibitActive := Auth.InhibitM2;
 WinchM2State.BottomLimitActiveM := BottomLimitM2_Active;
 WinchM2State.InTopSlowdownZone := WinchM2Ref.InTopSlowdownZone;
 WinchM2State.InBottomSlowdownZone := WinchM2Ref.InBottomSlowdownZone;
-WinchM2State.CommandedDirection := WinchM2Ref.CommandedDirection;
+WinchM2State.CommandedAscent := WinchM2Ref.CommandedAscent;
+WinchM2State.CommandedDescend := WinchM2Ref.CommandedDescend;
 WinchM2State.DirectionChangeDelayElapsed := WinchM2Ref.DirectionChangeDelayElapsed;
 WinchM2State.DirectionChangePending := WinchM2Ref.DirectionChangePending;
 

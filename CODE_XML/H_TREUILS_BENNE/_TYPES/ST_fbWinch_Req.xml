@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:03:40.747965" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:03:40.747965">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_fbWinch_Req">
+        <baseType>
+          <struct>
+            <variable name="RunRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRE DE MOUVEMENT ===
+TRUE = mouvement demandé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = demande montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = demande descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepReq">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[cible] Palier demandé (1..5, 0 = arrêt) — consommé par FB_Winch</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepUp">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BORNES DE CLAMP (agrégées PRG_04) ===
+[cible] Plancher palier montée (usage aval)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepUp">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier montée (1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher palier descente (0 = aucun) -- plongee Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier descente (1..5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopLimitM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== LIMITES EFFECTIVES DU CYCLE ===
+Position limite haute active (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomLimitM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-20" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position limite basse active (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncCoupled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTIC (jamais lu par la logique FB_Winch) ===
+[diag] Couplage synchro actif (garde de revue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingApproachActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CHAMPS CONSERVÉS (clamp interne FB_Winch) ===
+[08a] Vitesse limitée au palier 1 (approche homing)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b39f29e4-3d63-5b36-bc90-351b85641c13</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪝 ST_fbWinch_Req — Requête d'axe treuil (producteur PRG_04)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Demande de mouvement, palier et bornes de clamp d'un treuil
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   📤 Producteur : PRG_04_Treuils_Benne (une par treuil M1/M2)
+   📥 Consommateur : FB_Winch
+   🔒 Structs cibles + champs conservés pour garder le décodage %→palier
+      et le clamp DANS FB_Winch (comportement bit-identique).
+      SpeedStepReq est consommé par FB_Winch (§5) ; MinStepUp est déclaré
+      mais non consommé (usage aval).
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="H_TREUILS_BENNE">
+          <Folder Name="_TYPES">
+            <Object Name="ST_fbWinch_Req" ObjectId="b39f29e4-3d63-5b36-bc90-351b85641c13" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

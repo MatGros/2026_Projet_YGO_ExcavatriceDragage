@@ -50,7 +50,8 @@ VAR_INPUT
     M2_PresetValueOut          : UDINT;   (* --> [CFG] Valeur preset M2 *)
     M2_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M2 *)
 
-    M3_Direction               : INT;              (* --> [CMD] 1 = Avant, -1 = Arrière, 0 = Arrêt *)
+    M3_ReqTremie               : BOOL;             (* --> [CMD] Demande explicite vers Trémie *)
+    M3_ReqMaintenance          : BOOL;             (* --> [CMD] Demande explicite vers Maintenance *)
     M3_SpeedCmd_Pct            : REAL;   (* --> [CMD] Consigne vitesse M3 *)
     M3_BrakeCmd                : BOOL;             (* --> [CMD] TRUE = commande desserrage frein M3 *)
 
@@ -233,12 +234,13 @@ Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
 
 {region "§3 Simulation translation M3"}
 // ── 2. MODÈLE TRANSLATION M3 (AC600) ─────────────────────────────────────────
-M3_RelayFwd := (M3_Direction = 1);
-M3_RelayRev := (M3_Direction = -1);
+M3_RelayFwd := M3_ReqTremie AND NOT M3_ReqMaintenance;
+M3_RelayRev := M3_ReqMaintenance AND NOT M3_ReqTremie;
 
 instSimTranslation(
     Enable          := TRUE,
-    Direction       := M3_Direction,
+    ReqTremie       := M3_RelayFwd,
+    ReqMaintenance  := M3_RelayRev,
     SpeedTgt_Pct    := M3_SpeedCmd_Pct,
     FullTravelTimeS := CST_M3FullTravelTimeS
 );
@@ -271,7 +273,7 @@ Translation.M3_ThermalOK_DI      := TRUE;
 // un Bit0 forcé à 1 en continu à l'arrêt déclencherait un PowerCutOff simulé permanent après 3s.
 // DrivePowerReady (diagnostic IHM seul, non consommé par un interlock) est le seul autre lecteur,
 // aucune régression de mouvement possible.
-IF (M3_Direction <> 0) THEN
+IF M3_RelayFwd OR M3_RelayRev THEN
     M3_StatusWordSim := 16#0087; // + Operating/Running
     M3_ActualFreqHz  := REAL_TO_UINT(M3_SpeedCmd_Pct * 50.0); // 50.0 Hz à 100% (x100 -> 5000)
 ELSE

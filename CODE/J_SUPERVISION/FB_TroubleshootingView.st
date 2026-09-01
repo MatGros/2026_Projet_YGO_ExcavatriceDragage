@@ -339,6 +339,8 @@ GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx303_KoboldAutoStopEnabled := Co
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx304_KoboldImmersionConfirmed := Commun.KoboldImmersionConfirmed;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx305_KoboldBottomTouchLatched := Commun.KoboldBottomTouchLatched;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx306_ErrorIdRaw := WinchM2.Bucket.State.ErrorId;
+GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx307_EffectivePermit_Open := Permits.EffectivePermitBucket_Open;
+GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx308_EffectivePermit_Close := Permits.EffectivePermitBucket_Close;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx401_BucketBusy := WinchM2.Bucket.State.Busy;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx402_BucketDone := WinchM2.Bucket.State.Done;
 GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx403_ExtractionControlActive := WinchM2.Bucket.State.ExtractionControlActive;
@@ -422,8 +424,8 @@ GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx314_ErrorMecaA        := T
 GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx315_ErrorLimitSwitch  := Translation.Safety.ErrorLimitSwitch;
 GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx316_ErrorSensorIncoherent := Translation.Safety.ErrorSensorIncoherent;
 GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx317_ErrorId := Translation.Safety.ErrorId; // Masque brut complet (latch cause, source d'arbitrage PowerCutOff)
-GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx318_TremiePermit := Translation.Safety.TremiePermit; // 🟢 Permis directionnel vers Trémie (TRUE = autorisé, fail-safe)
-GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx319_MaintenancePermit := Translation.Safety.MaintenancePermit; // 🟢 Permis directionnel vers Maintenance (TRUE = autorisé, fail-safe)
+GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx318_EffectivePermitM3_Tremie := Translation.Safety.EffectivePermitM3_Tremie; // 🟢 Permis canonique vers Trémie
+GVL_Troubleshooting.L_TranslationPontM3.Safety_300.Idx319_EffectivePermitM3_Maintenance := Translation.Safety.EffectivePermitM3_Maintenance; // 🟢 Permis canonique vers Maintenance/P1
 
 GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx401_MotionAllowed := Translation.State.Ready;
 GVL_Troubleshooting.L_TranslationPontM3.Control_400.Idx402_SetpointFreq_Hz := Translation.State.DriveFreqCmd_Hz;
@@ -646,10 +648,13 @@ GVL_Troubleshooting.P_MotionM3.Cmd_BrakeRelease         := Translation.State.Bra
 GVL_Troubleshooting.P_MotionM3.Step2_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1 OR Auth.Mode = E_Mode.MAINT_N2);
 GVL_Troubleshooting.P_MotionM3.Step3_NotBusyOtherTask   := TRUE; // Aucune tâche exclusive connue bloquant M3 (pas de homing translation)
 GVL_Troubleshooting.P_MotionM3.Step4_MotionRequested    := Translation.State.Busy OR (Translation.State.SpeedCmd_Pct > 0.0);
-GVL_Troubleshooting.P_MotionM3.RequestedDirection       := Translation.State.ActiveDirection;
+// Conversion locale uniquement pour compatibilité de l'index diagnostic historique :
+// les contrats M3 et les commandes utilisent les deux bits explicites.
+GVL_Troubleshooting.P_MotionM3.RequestedDirection       := SEL(Translation.State.ActiveTremie,
+                                                               SEL(Translation.State.ActiveMaintenance, -1, 0), 1);
 GVL_Troubleshooting.P_MotionM3.RequestedSpeedPct        := Translation.State.SpeedCmd_Pct;
 GVL_Troubleshooting.P_MotionM3.Step5_NoSafetyFault      := NOT Translation.Safety.SafeStop AND NOT Translation.State.Error;
-GVL_Troubleshooting.P_MotionM3.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.P_MotionM3.RequestedDirection = 1, Translation.Safety.MaintenancePermit, Translation.Safety.TremiePermit); // Permis directionnels M3 (Direction=+1 → Trémie, -1 → Maintenance) — HeightInterlockBlocking reste un blocage séparé (non directionnel)
+GVL_Troubleshooting.P_MotionM3.Step6_DirectionAllowed   := SEL(GVL_Troubleshooting.P_MotionM3.RequestedDirection = 1, Translation.Safety.EffectivePermitM3_Maintenance, Translation.Safety.EffectivePermitM3_Tremie); // Permis canoniques M3 — HeightInterlockBlocking reste un blocage séparé
 GVL_Troubleshooting.P_MotionM3.Step7_BrakeReleased      := Translation.State.BrakeCmd AND Translation.State.BrakeCommandOpenConfirmed;
 GVL_Troubleshooting.P_MotionM3.Step8_OutputInterlockOk  := NOT Translation.State.FinalInterlockError;
 
@@ -664,8 +669,8 @@ GVL_Troubleshooting.P_MotionM3.AllConditionsMet := GVL_Troubleshooting.P_MotionM
 
 // 🔌 M3 piloté par variateur AC600 (pas de relais/contacteur de palier comme M1/M2) : ces
 // champs restent des indicateurs de sens actif, pas des retours relais physiques réels.
-GVL_Troubleshooting.P_MotionM3.RelayFwdActive        := (Translation.State.ActiveDirection = 1) AND Translation.State.Busy;
-GVL_Troubleshooting.P_MotionM3.RelayRevActive        := (Translation.State.ActiveDirection = -1) AND Translation.State.Busy;
+GVL_Troubleshooting.P_MotionM3.RelayFwdActive        := Translation.State.ActiveTremie AND Translation.State.Busy;
+GVL_Troubleshooting.P_MotionM3.RelayRevActive        := Translation.State.ActiveMaintenance AND Translation.State.Busy;
 GVL_Troubleshooting.P_MotionM3.SpeedContactor1Active := FALSE; // Non applicable — M3 n'a pas de contacteur de vitesse par palier
 
 {endregion}

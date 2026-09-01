@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T07:23:54.689078" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T07:23:54.689078">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:23:59.980347" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:23:59.980347">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -143,20 +143,28 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Offset actif injecté dans la synchro</xhtml>
               </documentation>
             </variable>
-            <variable name="M2StartStop">
+            <variable name="M2RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande Start/Stop forcée vers M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande marche forcée vers M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2Direction">
+            <variable name="M2ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande direction forcée vers M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée forcée vers M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente forcée vers M2</xhtml>
               </documentation>
             </variable>
             <variable name="M2BucketJogLimit">
@@ -1106,6 +1114,22 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Defaut sur sous-systeme benne</xhtml>
               </documentation>
             </variable>
+            <variable name="EffectivePermitBucket_Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis effectif ouverture benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitBucket_Close">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis effectif fermeture benne</xhtml>
+              </documentation>
+            </variable>
             <variable name="ArmingPermit">
               <type>
                 <BOOL />
@@ -1614,13 +1638,21 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Palier plafonné à 1 : approche limite basse (câble ou légale)</xhtml>
               </documentation>
             </variable>
-            <variable name="CommandedDirection">
+            <variable name="CommandedAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic délai ressenti à la remontée
-🩺 Sens interne mémorisé FB_Winch (-1/0/+1)</xhtml>
+🩺 Sens interne mémorisé FB_Winch : montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandedDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Sens interne mémorisé FB_Winch : descente</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionChangeDelayElapsed">
@@ -1812,12 +1844,12 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Action benne en cours (instBucket.Lifecycle.Busy)</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketM2StartStop">
+            <variable name="BucketM2RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande M2 par la benne active (instBucket.M2_StartStop)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande M2 par la benne active</xhtml>
               </documentation>
             </variable>
             <variable name="BucketM2Open">
@@ -1825,7 +1857,7 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ouverture benne (instBucket.M2_Direction = 1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ouverture benne</xhtml>
               </documentation>
             </variable>
             <variable name="BucketM2Close">
@@ -1833,7 +1865,7 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Fermeture benne (instBucket.M2_Direction = -1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Fermeture benne</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothMotionBlockedByBucket">
@@ -1860,7 +1892,7 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)</xhtml>
               </documentation>
             </variable>
-            <variable name="BothAscentPermit">
+            <variable name="M1AscentAllowed">
               <type>
                 <BOOL />
               </type>
@@ -1869,15 +1901,31 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
 PRG_04 calcule BothAscentPermit/BothDescendPermit = AND des 4 permits effectifs.
 En commande both, la commande ne consomme QUE ces agrégats (jamais les permits
 individuels directement) : les 2 treuils partent ensemble ou aucun (NC-100).
---&gt; [SAFE] Permit montée Both (EffectivePermitM1_Ascent AND EffectivePermitM2_Ascent)</xhtml>
+--&gt; [SAFE] Fait EffectivePermitM1_Ascent</xhtml>
               </documentation>
             </variable>
-            <variable name="BothDescendPermit">
+            <variable name="M1DescendAllowed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permit descente Both (EffectivePermitM1_Descend AND EffectivePermitM2_Descend)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fait EffectivePermitM1_Descend</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2AscentAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fait EffectivePermitM2_Ascent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2DescendAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fait EffectivePermitM2_Descend</xhtml>
               </documentation>
             </variable>
             <variable name="BothBlock">
@@ -2118,10 +2166,10 @@ Distance d'approche avant limite pour ralentir (m)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_fbWinch_DriveRequest">
+      <dataType name="ST_fbWinch_Req">
         <baseType>
           <struct>
-            <variable name="StartStop">
+            <variable name="RunRequest">
               <type>
                 <BOOL />
               </type>
@@ -2130,12 +2178,20 @@ Distance d'approche avant limite pour ralentir (m)</xhtml>
 TRUE = mouvement demandé</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">-1: Descending, 0: Stop, 1: Ascending</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = demande montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = demande descente</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedStepReq">
@@ -2233,12 +2289,12 @@ Position limite haute active (m)</xhtml>
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>45e51157-f25e-5b78-83e7-e1b47077800c</ObjectId>
+            <ObjectId>b39f29e4-3d63-5b36-bc90-351b85641c13</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🪝 ST_fbWinch_DriveRequest — Requête d'axe treuil (producteur PRG_04)
+   🪝 ST_fbWinch_Req — Requête d'axe treuil (producteur PRG_04)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Demande de mouvement, palier et bornes de clamp d'un treuil
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
@@ -3107,20 +3163,28 @@ M1 : contacteurs retombés</xhtml>
       <dataType name="ST_ProgramWinchRequest">
         <baseType>
           <struct>
-            <variable name="ReqStartStop">
+            <variable name="RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arrêt demandé par le programme (TRUE=Marche)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche demandé par le programme</xhtml>
               </documentation>
             </variable>
-            <variable name="ReqDirection">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande descente</xhtml>
               </documentation>
             </variable>
             <variable name="StepTgt">
@@ -3158,12 +3222,20 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention both active (homme-mort qualifié + Select=0 OU boutons BothUp/BothDown)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descending, 0: Neutre, +1: Ascending)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention both montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention both descente</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -4598,23 +4670,23 @@ STRICTEMENT PASSIFS : aucune commande moteur, aucune surveillance survitesse.</x
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Arbitrage commande benne (POO §5)</xhtml>
               </documentation>
             </variable>
-            <variable name="M1DriveRequest">
+            <variable name="ReqM1Winch">
               <type>
-                <derived name="ST_fbWinch_DriveRequest" />
+                <derived name="ST_fbWinch_Req" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REQUETES D'AXE ASSEMBLEES AVANT APPEL FB_WINCH ===
 CODESYS n'accepte pas l'initialiseur de struct anonyme en parametre d'appel :
-les structs DriveRequest / Sensors / Config sont remplies champ par champ ici.
-. [LOC] Requete axe M1 (ordre, palier, bornes)</xhtml>
+les structs WinchRequest / Sensors / Config sont remplies champ par champ ici.
+. [LOC] Requête axe M1 (ordre, palier, bornes)</xhtml>
               </documentation>
             </variable>
-            <variable name="M2DriveRequest">
+            <variable name="ReqM2Winch">
               <type>
-                <derived name="ST_fbWinch_DriveRequest" />
+                <derived name="ST_fbWinch_Req" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Requete axe M2 (ordre, palier, bornes)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Requête axe M2 (ordre, palier, bornes)</xhtml>
               </documentation>
             </variable>
             <variable name="M1WinchSensors">
@@ -4743,9 +4815,14 @@ les structs DriveRequest / Sensors / Config sont remplies champ par champ ici.
                 <BOOL />
               </type>
             </variable>
-            <variable name="WinchBothMotionDirection">
+            <variable name="WinchBothReqAscent">
               <type>
-                <INT />
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="WinchBothReqDescend">
+              <type>
+                <BOOL />
               </type>
             </variable>
             <variable name="ManualBottomPositionConfirmed">
@@ -4902,14 +4979,19 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Contexte gating FB d'arbitrage benne</xhtml>
               </documentation>
             </variable>
-            <variable name="M1LogicRequestStartStop">
+            <variable name="M1LogicRunRequest">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="M1LogicRequestDirection">
+            <variable name="M1LogicReqAscent">
               <type>
-                <INT />
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1LogicReqDescend">
+              <type>
+                <BOOL />
               </type>
             </variable>
             <variable name="M1LogicRequestStepTgt">
@@ -4928,14 +5010,19 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic % M1 (palier→%, IHM / simu)</xhtml>
               </documentation>
             </variable>
-            <variable name="M2LogicRequestStartStop">
+            <variable name="M2LogicRunRequest">
               <type>
                 <BOOL />
               </type>
             </variable>
-            <variable name="M2LogicRequestDirection">
+            <variable name="M2LogicReqAscent">
               <type>
-                <INT />
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2LogicReqDescend">
+              <type>
+                <BOOL />
               </type>
             </variable>
             <variable name="M2LogicRequestStepTgt">
@@ -5078,6 +5165,16 @@ ProcessAndSafetyPermit (= Safety AND Process), EffectivePermit (= couplage synch
                 <BOOL />
               </type>
             </variable>
+            <variable name="EffectivePermitBucket_Open">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EffectivePermitBucket_Close">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
             <variable name="CoupledBoth">
               <type>
                 <BOOL />
@@ -5090,20 +5187,6 @@ synchro classique (anti-télescopage) OU dès qu'un mouvement both est demandé
 treuil bloque alors l'autre : départ jamais isolé.</xhtml>
               </documentation>
             </variable>
-            <variable name="BothAscentPermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis agrégés consommés par la commande both : AND des 4 permits effectifs.
-Les permits individuels EffectivePermitM*_* restent la vérité propre de chaque axe.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BothDescendPermit">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
             <variable name="BothBlocked">
               <type>
                 <BOOL />
@@ -5115,29 +5198,6 @@ Les permits individuels EffectivePermitM*_* restent la vérité propre de chaque
             <variable name="BothBlockReason">
               <type>
                 <derived name="E_WinchTraceBlockReason" />
-              </type>
-            </variable>
-            <variable name="M1AscentPermitUse">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis effectifs routés vers les FB_Winch (both = agrégat, unitaire = individuel).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1DescendPermitUse">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2AscentPermitUse">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="M2DescendPermitUse">
-              <type>
-                <BOOL />
               </type>
             </variable>
             <variable name="BenneBusyFallEdge">
@@ -5478,7 +5538,8 @@ l'armement du re-homing obligatoire publié vers PRG_03 (PositionLimitOverridden
 
 // Consommation de l'intention both continue opérateur (source unique PRG_03, tous modes)
 WinchBothMotionActive    := PRG_03_Modes_Cycle.Data.WinchBothIntent.Active;
-WinchBothMotionDirection := PRG_03_Modes_Cycle.Data.WinchBothIntent.Direction;
+WinchBothReqAscent  := PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqAscent;
+WinchBothReqDescend := PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend;
 
 // Récupération de l'état fond synthétisé par PRG_03
 BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
@@ -5502,7 +5563,8 @@ ArbBucketIHM.BtnClose := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
 
 ArbBucketContext.TglEnableCoupledBucketSequencing := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing;
 ArbBucketContext.MotionActive   := WinchBothMotionActive;
-ArbBucketContext.MotionDirection := WinchBothMotionDirection;
+ArbBucketContext.ReqAscent      := WinchBothReqAscent;
+ArbBucketContext.ReqDescend     := WinchBothReqDescend;
 ArbBucketContext.BucketIsOpen   := _BucketState.IsOpen;
 ArbBucketContext.BucketIsClosed := _BucketState.IsClosed;
 
@@ -5531,7 +5593,10 @@ instBucket(
     CmdOpen_IHM         := instArbBucket.CmdOpen_IHM,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
     MotionRequestActive := WinchBothMotionActive,
-    MotionDirection     := WinchBothMotionDirection,
+    ReqAscent           := WinchBothReqAscent,
+    ReqDescend          := WinchBothReqDescend,
+    EffectivePermitBucket_Open := EffectivePermitBucket_Open,
+    EffectivePermitBucket_Close := EffectivePermitBucket_Close,
     CablePosM1          := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
     CablePosM2          := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
     HomedM1             := PRG_02_Acquisition.Data.EncoderM1.Homed,
@@ -5563,7 +5628,7 @@ instBucket(
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
 WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
-BucketNotClosedAscentStep1 := (M1LogicRequestDirection = 1 OR M2LogicRequestDirection = 1) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
+BucketNotClosedAscentStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
@@ -5605,8 +5670,8 @@ END_IF;
 
 // ── Arbitrage M1/M2 (FB_WinchCmdArbitrationM1/M2) ──
 // Dérivation des bits d'action benne M2 (consommés par les 2 FB d'arbitrage)
-BucketM2Open  := (instBucket.M2_Direction = 1);
-BucketM2Close := (instBucket.M2_Direction = -1);
+BucketM2Open  := instBucket.M2_ReqAscent;
+BucketM2Close := instBucket.M2_ReqDescend;
 
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
 ArbIHM.BtnAscentM1           := GVL_IHM.M1TreuilRetenue.Cmd.BtnAscent;
@@ -5617,7 +5682,7 @@ ArbIHM.BtnWinchBothAscent    := GVL_IHM.Commun.BtnWinchBothAscent;
 ArbIHM.BtnWinchBothDescent  := GVL_IHM.Commun.BtnWinchBothDescent;
 
 ArbContext.BucketBusy                     := instBucket.Lifecycle.Busy;
-ArbContext.BucketM2StartStop              := instBucket.M2_StartStop;
+ArbContext.BucketM2RunRequest             := instBucket.M2_RunRequest;
 ArbContext.BucketM2Open                   := BucketM2Open;
 ArbContext.BucketM2Close                  := BucketM2Close;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
@@ -5627,8 +5692,10 @@ ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
 // Both*Permit APRÈS §3 → lag 1 scan assumé au gate d'arbitre, documenté comme les
 // autres gates lag-1 de PRG_04 ; l'enforcement même-scan est assuré par le routage
 // §6 vers FB_Winch).
-ArbContext.BothAscentPermit  := BothAscentPermit;
-ArbContext.BothDescendPermit := BothDescendPermit;
+ArbContext.M1AscentAllowed  := EffectivePermitM1_Ascent;
+ArbContext.M1DescendAllowed := EffectivePermitM1_Descend;
+ArbContext.M2AscentAllowed  := EffectivePermitM2_Ascent;
+ArbContext.M2DescendAllowed := EffectivePermitM2_Descend;
 ArbContext.BothBlock         := BothBlocked;
 
 ArbM1Cfg.BtnStepTgt := 5;
@@ -5647,8 +5714,9 @@ instArbM1(
     Context    := ArbContext,
     Cfg        := ArbM1Cfg
 );
-M1LogicRequestStartStop := instArbM1.StartStop;
-M1LogicRequestDirection := instArbM1.Direction;
+M1LogicRunRequest := instArbM1.RunRequest;
+M1LogicReqAscent  := instArbM1.ReqAscent;
+M1LogicReqDescend := instArbM1.ReqDescend;
 M1LogicRequestStepTgt := instArbM1.StepTgt;
 // Diagnostic % (palier→%) pour IHM / simu — borne haute du palier arbitré.
 IF (M1LogicRequestStepTgt &gt;= 1) AND (M1LogicRequestStepTgt &lt;= 5) THEN
@@ -5669,8 +5737,9 @@ instArbM2(
     Context    := ArbContext,
     Cfg        := ArbM2Cfg
 );
-M2LogicRequestStartStop := instArbM2.StartStop;
-M2LogicRequestDirection := instArbM2.Direction;
+M2LogicRunRequest := instArbM2.RunRequest;
+M2LogicReqAscent  := instArbM2.ReqAscent;
+M2LogicReqDescend := instArbM2.ReqDescend;
 M2LogicRequestStepTgt := instArbM2.StepTgt;
 // Diagnostic % (palier→%) pour IHM / simu — borne haute du palier arbitré.
 IF (M2LogicRequestStepTgt &gt;= 1) AND (M2LogicRequestStepTgt &lt;= 5) THEN
@@ -5700,7 +5769,7 @@ IF ExtractionControlActive THEN
     IF (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - ControlAscentStartM1PosM) &gt;= GVL_IHM.CycleExtraction.Cfg.ExtractionControlDistance_M)
        AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - ControlAscentStartM2PosM) &gt;= GVL_IHM.CycleExtraction.Cfg.ExtractionControlDistance_M) THEN
         ExtractionControlActive := FALSE;         // Distance de contrôle parcourue : paliers normaux
-    ELSIF NOT (WinchBothMotionActive AND (WinchBothMotionDirection = 1)) THEN
+    ELSIF NOT (WinchBothMotionActive AND WinchBothReqAscent) THEN
         ExtractionControlActive := FALSE;         // Ascending relâchée/interrompue : annule la phase
     END_IF;
 END_IF;
@@ -5806,7 +5875,7 @@ END_IF;
 // Qualification immersion : front montant Kobold dans la fenêtre [ImmersionLower_M..ImmersionUpper_M]
 IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
    AND WinchBothMotionActive
-   AND (WinchBothMotionDirection = -1)
+   AND WinchBothReqDescend
    AND _BucketState.IsOpen
    AND KoboldAutoStopRiseEdge.Q THEN
     IF (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &lt;= _CycleDiveSearchCfgPersist.ImmersionUpper_M)
@@ -5951,7 +6020,8 @@ instSafetyWinchM1(
     CablePosM              := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
-    Direction              := M1LogicRequestDirection,
+    ReqAscent              := M1LogicReqAscent,
+    ReqDescend             := M1LogicReqDescend,
     MovementCommanded      := instWinchM1.RelayFwd OR instWinchM1.RelayRev,
     Homed                  := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomingSuspect          := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
@@ -6012,7 +6082,8 @@ instSafetyWinchM2(
     CablePosM              := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
-    Direction              := M2LogicRequestDirection,
+    ReqAscent              := M2LogicReqAscent,
+    ReqDescend             := M2LogicReqDescend,
     MovementCommanded      := instWinchM2.RelayFwd OR instWinchM2.RelayRev,
     Homed                  := PRG_02_Acquisition.Data.EncoderM2.Homed,
     HomingSuspect          := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
@@ -6093,12 +6164,23 @@ EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND NOT SafeStopM2
 EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND NOT SafeStopM1_Active AND (NOT CoupledBoth OR ProcessAndSafetyPermitM2_Ascent);
 EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND NOT SafeStopM2_Active AND (NOT CoupledBoth OR ProcessAndSafetyPermitM1_Ascent);
 
+// Permis canoniques benne : ouverture = M2 vers le bas, fermeture = M2 vers le haut.
+// Les fins de course benne restent des faits fonctionnels distincts des limites treuil.
+EffectivePermitBucket_Open := EffectivePermitM2_Descend
+    AND PRG_02_Acquisition.Data.EncoderM1.Homed
+    AND PRG_02_Acquisition.Data.EncoderM2.Homed
+    AND NOT _BucketState.IsOpen
+    AND NOT instBucket.Fault.Error;
+EffectivePermitBucket_Close := EffectivePermitM2_Ascent
+    AND PRG_02_Acquisition.Data.EncoderM1.Homed
+    AND PRG_02_Acquisition.Data.EncoderM2.Homed
+    AND NOT _BucketState.IsClosed
+    AND NOT instBucket.Fault.Error;
+
 // 🔗 Agrégats Both : permis communs consommés par la commande both.
 // = AND des 4 permits effectifs. Chaque axe garde sa vérité propre
 // (EffectivePermitM*_*) ; en commande both, seul l'agrégat est consommé (§6),
 // garantissant "les 2 treuils partent ensemble, ou aucun".
-BothAscentPermit  := EffectivePermitM1_Ascent  AND EffectivePermitM2_Ascent;
-BothDescendPermit := EffectivePermitM1_Descend AND EffectivePermitM2_Descend;
 
 // 📉 Diagnostic IHM — cause priorisée du blocage Both (lecture seule, NC-100).
 // N'a AUCUN effet de conduite : l'arrêt est porté par Both*Permit (§6, consommé par les
@@ -6107,7 +6189,8 @@ BothDescendPermit := EffectivePermitM1_Descend AND EffectivePermitM2_Descend;
 IF NOT WinchBothMotionActive THEN
     BothBlocked             := FALSE;
     BothBlockReason         := E_WinchTraceBlockReason.NONE;
-ELSIF NOT (BothAscentPermit OR BothDescendPermit) THEN
+ELSIF NOT ((WinchBothReqAscent AND EffectivePermitM1_Ascent AND EffectivePermitM2_Ascent)
+        OR (WinchBothReqDescend AND EffectivePermitM1_Descend AND EffectivePermitM2_Descend)) THEN
     BothBlocked             := TRUE;
     BothBlockReason         := E_WinchTraceBlockReason.COUPLING_BLOCKED;
 ELSE
@@ -6197,27 +6280,24 @@ instWinchLoadEstimatorM2(
 
 // --- M1 : assemblage des structs (CODESYS refuse l'initialiseur inline en appel) ---
 // 🔗 Routage permit both : en commande both (WinchBothMotionActive=TRUE), les
-// 2 treuils consomment le permit AGRÉGÉ commun (BothAscentPermit/BothDescendPermit) —
+// Chaque treuil consomme directement son permis directionnel canonique ; Both est
+// validé par l'AND des deux axes dans l'arbitrage.
 // jamais les permits individuels directement. En unitaire (M1 seul / M2 seul / benne M2),
 // chacun consomme son permit effectif propre (comportement inchangé). SEL(a, b, c) := a ? c : b.
-M1AscentPermitUse  := SEL(WinchBothMotionActive, EffectivePermitM1_Ascent,  BothAscentPermit);
-M1DescendPermitUse := SEL(WinchBothMotionActive, EffectivePermitM1_Descend, BothDescendPermit);
-M2AscentPermitUse  := SEL(WinchBothMotionActive, EffectivePermitM2_Ascent,  BothAscentPermit);
-M2DescendPermitUse := SEL(WinchBothMotionActive, EffectivePermitM2_Descend, BothDescendPermit);
-
-M1DriveRequest.StartStop            := M1LogicRequestStartStop;
-M1DriveRequest.Direction            := M1LogicRequestDirection;
-M1DriveRequest.SpeedStepReq         := M1LogicRequestStepTgt;
-M1DriveRequest.MaxStepUp            := CommonMaxStepAscent;
-M1DriveRequest.MaxStepDown          := CommonMaxStepDescent;
+ReqM1Winch.RunRequest               := M1LogicRunRequest;
+ReqM1Winch.ReqAscent                := M1LogicReqAscent;
+ReqM1Winch.ReqDescend               := M1LogicReqDescend;
+ReqM1Winch.SpeedStepReq             := M1LogicRequestStepTgt;
+ReqM1Winch.MaxStepUp                := CommonMaxStepAscent;
+ReqM1Winch.MaxStepDown              := CommonMaxStepDescent;
 // Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
 // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
-M1DriveRequest.MinStepDown          := CommonMinStepDown;
-M1DriveRequest.HomingApproachActive := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable;
+ReqM1Winch.MinStepDown              := CommonMinStepDown;
+ReqM1Winch.HomingApproachActive     := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable;
 // Même limite haute active que FB_Safety_Winch (7,5 m / 8,5 m sous override).
-M1DriveRequest.TopLimitM            := TopLimitM1_M;
-M1DriveRequest.BottomLimitM         := BottomLimitM1_Active;
-M1DriveRequest.SyncCoupled          := instWinchSync.SyncActive;
+ReqM1Winch.TopLimitM                := TopLimitM1_M;
+ReqM1Winch.BottomLimitM             := BottomLimitM1_Active;
+ReqM1Winch.SyncCoupled              := instWinchSync.SyncActive;
 
 M1WinchSensors.CablePosM          := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
 M1WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM1.Homed;
@@ -6251,9 +6331,9 @@ instWinchM1(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     SafeStop                := SafeStopM1_Active,
-    DescendPermit           := M1DescendPermitUse,
-    AscentPermit            := M1AscentPermitUse,
-    DriveRequest            := M1DriveRequest,
+    DescendPermit           := EffectivePermitM1_Descend,
+    AscentPermit            := EffectivePermitM1_Ascent,
+    WinchRequest            := ReqM1Winch,
     Sensors                 := M1WinchSensors,
     Config                  := M1WinchCfg,
     // ContactorFeedback (n°3 de la matrice) et Global, gatés MAINT_N2.
@@ -6262,24 +6342,25 @@ instWinchM1(
 );
 
 // --- M2 : assemblage des structs ---
-M2DriveRequest.StartStop            := M2LogicRequestStartStop;
-M2DriveRequest.Direction            := M2LogicRequestDirection;
-M2DriveRequest.SpeedStepReq         := M2LogicRequestStepTgt;
+ReqM2Winch.RunRequest               := M2LogicRunRequest;
+ReqM2Winch.ReqAscent                := M2LogicReqAscent;
+ReqM2Winch.ReqDescend               := M2LogicReqDescend;
+ReqM2Winch.SpeedStepReq             := M2LogicRequestStepTgt;
 // Clamp de palier agrégé en §5ter : bornes communes M1=M2 (CommonMaxStep*) puis
 // M2-propre (M2MaxStep*) — M2_BucketJogLimit, ManualBucketLimitsActive,
 // BucketNotClosedAscentStep1, SlackCableAscentStep1 ne réduisent jamais M1.
 // D13 : reconstruction de table M2 supprimée — le clamp M2MaxStep* := 1 suffit
 // (StepNumber ≤ 1 → seuls les états P1 sont commandés).
-M2DriveRequest.MaxStepUp            := M2MaxStepUp;
-M2DriveRequest.MaxStepDown          := M2MaxStepDown;
+ReqM2Winch.MaxStepUp                := M2MaxStepUp;
+ReqM2Winch.MaxStepDown              := M2MaxStepDown;
 // Plancher palier descente plongée Kobold : plancher M2-propre agrégé en §5ter, injecté
 // sur la cible (jamais sur StepNumber). Aucun effet si StartStop=FALSE.
-M2DriveRequest.MinStepDown          := M2MinStepDown;
-M2DriveRequest.HomingApproachActive := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable;
+ReqM2Winch.MinStepDown              := M2MinStepDown;
+ReqM2Winch.HomingApproachActive     := PRG_03_Modes_Cycle.Data.Auth.HomingApproachEnable;
 // Même limite haute active que FB_Safety_Winch (M2_LimitShift conservé).
-M2DriveRequest.TopLimitM            := TopLimitM2_M;
-M2DriveRequest.BottomLimitM         := BottomLimitM2_Active;
-M2DriveRequest.SyncCoupled          := instWinchSync.SyncActive;
+ReqM2Winch.TopLimitM                := TopLimitM2_M;
+ReqM2Winch.BottomLimitM             := BottomLimitM2_Active;
+ReqM2Winch.SyncCoupled              := instWinchSync.SyncActive;
 
 M2WinchSensors.CablePosM          := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 M2WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM2.Homed;
@@ -6299,9 +6380,9 @@ instWinchM2(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     SafeStop                := SafeStopM2_Active,
-    DescendPermit           := M2DescendPermitUse,
-    AscentPermit            := M2AscentPermitUse,
-    DriveRequest            := M2DriveRequest,
+    DescendPermit           := EffectivePermitM2_Descend,
+    AscentPermit            := EffectivePermitM2_Ascent,
+    WinchRequest            := ReqM2Winch,
     Sensors                 := M2WinchSensors,
     Config                  := M2WinchCfg,
     // Idem M1 ci-dessus
@@ -6326,7 +6407,8 @@ instWinchSpeedLearningM1(
     Enable              := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     LearnStart          := GVL_IHM.M1TreuilRetenue.Cmd.BtnLearnSpeed,
     WinchId             := 1,
-    Direction           := M1LogicRequestDirection,
+    ReqAscent          := M1LogicReqAscent,
+    ReqDescend         := M1LogicReqDescend,
     StepNumber          := instWinchM1.StepNumber,
     MeasuredSpeedMps    := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps,
     MeasuredSpeedValid  := PRG_02_Acquisition.Data.EncoderM1.Measurement.SpeedValid,
@@ -6340,7 +6422,8 @@ instWinchSpeedLearningM2(
     Enable              := (PRG_03_Modes_Cycle.Data.Auth.Mode &lt;&gt; E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     LearnStart          := GVL_IHM.M2TreuilBenne.Cmd.BtnLearnSpeed,
     WinchId             := 2,
-    Direction           := M2LogicRequestDirection,
+    ReqAscent          := M2LogicReqAscent,
+    ReqDescend         := M2LogicReqDescend,
     StepNumber          := instWinchM2.StepNumber,
     MeasuredSpeedMps    := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps,
     MeasuredSpeedValid  := PRG_02_Acquisition.Data.EncoderM2.Measurement.SpeedValid,
@@ -6374,8 +6457,8 @@ WinchM1FinalInterlockRequest.RequestedContactor3 := instWinchM1.Contactor3;
 WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
 WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
 WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff;
-WinchM1FinalInterlockRequest.AscentPermit := M1AscentPermitUse;
-WinchM1FinalInterlockRequest.DescendPermit := M1DescendPermitUse;
+WinchM1FinalInterlockRequest.AscentPermit := EffectivePermitM1_Ascent;
+WinchM1FinalInterlockRequest.DescendPermit := EffectivePermitM1_Descend;
 
 WinchM2FinalInterlockRequest.Enable := TRUE;
 WinchM2FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
@@ -6391,8 +6474,8 @@ WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
 WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
-WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitUse;
-WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitUse;
+WinchM2FinalInterlockRequest.AscentPermit := EffectivePermitM2_Ascent;
+WinchM2FinalInterlockRequest.DescendPermit := EffectivePermitM2_Descend;
 
 {endregion}
 
@@ -6471,8 +6554,9 @@ ELSE
     BucketState.FBState := E_State.READY;
 END_IF;
 BucketState.ActiveOffset_M := instBucket.ActiveOffsetM;
-BucketState.M2StartStop := instBucket.M2_StartStop;
-BucketState.M2Direction := instBucket.M2_Direction;
+BucketState.M2RunRequest := instBucket.M2_RunRequest;
+BucketState.M2ReqAscent := instBucket.M2_ReqAscent;
+BucketState.M2ReqDescend := instBucket.M2_ReqDescend;
 BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
 BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
@@ -6517,10 +6601,10 @@ Benne_IsRoughlyClosed := _BucketState.IsClosed
 // --- M1 ---
 TraceM1.DescendPermitEffective := EffectivePermitM1_Descend;
 TraceM1.AscentPermitEffective  := EffectivePermitM1_Ascent;
-TraceM1.AscentPermitApplied     := M1AscentPermitUse;
-TraceM1.DescendPermitApplied    := M1DescendPermitUse;
-TraceM1.FinalPermitBlocked      := (M1DriveRequest.StartStop AND (M1DriveRequest.Direction = 1) AND NOT M1AscentPermitUse)
-                               OR (M1DriveRequest.StartStop AND (M1DriveRequest.Direction = -1) AND NOT M1DescendPermitUse);
+TraceM1.AscentPermitApplied     := EffectivePermitM1_Ascent;
+TraceM1.DescendPermitApplied    := EffectivePermitM1_Descend;
+TraceM1.FinalPermitBlocked      := (ReqM1Winch.RunRequest AND ReqM1Winch.ReqAscent AND NOT EffectivePermitM1_Ascent)
+                               OR (ReqM1Winch.RunRequest AND ReqM1Winch.ReqDescend AND NOT EffectivePermitM1_Descend);
 TraceM1.SafeStopActive         := SafeStopM1_Active;
 TraceM1.SafeStopSourceSafety   := instSafetyWinchM1.SafeStop;
 TraceM1.SafeStopSourceInput    := PRG_02_Acquisition.Data.InputModules.Fault
@@ -6564,10 +6648,10 @@ TraceM1_PrevReason := TraceM1.BlockReason;
 // --- M2 ---
 TraceM2.DescendPermitEffective := EffectivePermitM2_Descend;
 TraceM2.AscentPermitEffective  := EffectivePermitM2_Ascent;
-TraceM2.AscentPermitApplied     := M2AscentPermitUse;
-TraceM2.DescendPermitApplied    := M2DescendPermitUse;
-TraceM2.FinalPermitBlocked      := (M2DriveRequest.StartStop AND (M2DriveRequest.Direction = 1) AND NOT M2AscentPermitUse)
-                               OR (M2DriveRequest.StartStop AND (M2DriveRequest.Direction = -1) AND NOT M2DescendPermitUse);
+TraceM2.AscentPermitApplied     := EffectivePermitM2_Ascent;
+TraceM2.DescendPermitApplied    := EffectivePermitM2_Descend;
+TraceM2.FinalPermitBlocked      := (ReqM2Winch.RunRequest AND ReqM2Winch.ReqAscent AND NOT EffectivePermitM2_Ascent)
+                               OR (ReqM2Winch.RunRequest AND ReqM2Winch.ReqDescend AND NOT EffectivePermitM2_Descend);
 TraceM2.SafeStopActive         := SafeStopM2_Active;
 TraceM2.SafeStopSourceSafety   := instSafetyWinchM2.SafeStop;
 TraceM2.SafeStopSourceInput    := PRG_02_Acquisition.Data.InputModules.Fault
@@ -6632,6 +6716,8 @@ Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
 Data.BucketBusy                   := instBucket.Lifecycle.Busy;
 Data.BucketDone                   := instBucket.Lifecycle.Done;
 Data.BucketError                  := instBucket.Fault.Error;
+Data.EffectivePermitBucket_Open   := EffectivePermitBucket_Open;
+Data.EffectivePermitBucket_Close  := EffectivePermitBucket_Close;
 Data.ArmingPermit                 := ArmingPermit;
 Data.ProcessPermitM1_Ascent       := ProcessPermitM1_Ascent;
 Data.ProcessPermitM1_Descend      := ProcessPermitM1_Descend;
@@ -6648,8 +6734,6 @@ Data.TraceM1                      := TraceM1;
 Data.TraceM2                      := TraceM2;
 // 🔗 ATOMICITÉ BOTH : diagnostic IHM lecture seule
 Data.BothActive                   := WinchBothMotionActive;
-Data.BothAscentPermit             := BothAscentPermit;
-Data.BothDescendPermit            := BothDescendPermit;
 Data.BothBlocked                  := BothBlocked;
 Data.BothBlockReason              := BothBlockReason;
 
@@ -6707,20 +6791,36 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande fermeture depuis IHM</xhtml>
               </documentation>
             </variable>
-            <variable name="MotionRequestActive">
+            <variable name="ReqAscent">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention mouvement arbitree</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande montee arbitree</xhtml>
               </documentation>
             </variable>
-            <variable name="MotionDirection">
+            <variable name="ReqDescend">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens arbitre (1: montee, -1: descente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande descente arbitree</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitBucket_Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Ouverture benne autorisee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitBucket_Close">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fermeture benne autorisee</xhtml>
               </documentation>
             </variable>
             <variable name="MachineHomingCommitOpen">
@@ -6936,20 +7036,28 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Demande d'ouverture memorisee</xhtml>
               </documentation>
             </variable>
-            <variable name="M2_StartStop">
+            <variable name="M2_RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre StartStop vers Winch M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre marche vers Winch M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2_Direction">
+            <variable name="M2_ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre Direction vers Winch M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre montee vers Winch M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre descente vers Winch M2</xhtml>
               </documentation>
             </variable>
             <variable name="M2_BucketJogLimit">
@@ -7123,6 +7231,22 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart reel mémorise (gel en position intermediaire)</xhtml>
               </documentation>
             </variable>
+            <variable name="MotionRequestActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande valide : un seul sens</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionRequestConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Deux sens = arrêt sûr</xhtml>
+              </documentation>
+            </variable>
             <variable name="CfgFaultLatched">
               <type>
                 <BOOL />
@@ -7275,8 +7399,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RemainingTravelM := 0.0;
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
-    M2_StartStop := FALSE;
-    M2_Direction := 0;
+    M2_RunRequest := FALSE;
+    M2_ReqAscent := FALSE;
+    M2_ReqDescend := FALSE;
     M2_BucketJogLimit := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
@@ -7337,10 +7462,13 @@ END_IF;
 
 {region "§4 Séquencement mouvement benne"}
 SevereError := Fault.Error;
+MotionRequestConflict := ReqAscent AND ReqDescend;
+MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
 
 IF SevereError THEN
-    M2_StartStop := FALSE;
-    M2_Direction := 0;
+    M2_RunRequest := FALSE;
+    M2_ReqAscent := FALSE;
+    M2_ReqDescend := FALSE;
     M2_BucketJogLimit := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
@@ -7373,32 +7501,39 @@ ELSE
         IF CloseReq THEN
             RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
             M2_BucketJogLimit := TRUE;
-            IF MotionRequestActive AND (MotionDirection = 1) THEN
-                M2_StartStop := TRUE;
-                M2_Direction := 1;
-            ELSIF MotionRequestActive AND (MotionDirection = -1) THEN
-                M2_StartStop := TRUE;
-                M2_Direction := -1;
+            IF MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close THEN
+                M2_RunRequest := TRUE;
+                M2_ReqAscent := TRUE;
+                M2_ReqDescend := FALSE;
+            ELSIF MotionRequestActive AND ReqDescend AND EffectivePermitBucket_Open THEN
+                M2_RunRequest := TRUE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := TRUE;
             ELSE
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
             END_IF;
         ELSIF OpenReq THEN
             RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
             M2_BucketJogLimit := TRUE;
-            IF MotionRequestActive AND (MotionDirection = -1) THEN
-                M2_StartStop := TRUE;
-                M2_Direction := -1;
-            ELSIF MotionRequestActive AND (MotionDirection = 1) THEN
-                M2_StartStop := TRUE;
-                M2_Direction := 1;
+            IF MotionRequestActive AND ReqDescend AND EffectivePermitBucket_Open THEN
+                M2_RunRequest := TRUE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := TRUE;
+            ELSIF MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close THEN
+                M2_RunRequest := TRUE;
+                M2_ReqAscent := TRUE;
+                M2_ReqDescend := FALSE;
             ELSE
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
             END_IF;
         ELSE
-            M2_StartStop := FALSE;
-            M2_Direction := 0;
+            M2_RunRequest := FALSE;
+            M2_ReqAscent := FALSE;
+            M2_ReqDescend := FALSE;
             M2_BucketJogLimit := FALSE;
         END_IF;
 
@@ -7409,8 +7544,9 @@ ELSE
         // Arrêt fermeture
         IF CloseReq THEN
             IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
                 BucketState.IsOpen := FALSE;
                 BucketState.IsClosed := TRUE;
                 BucketState.LastPosM2Close := CablePosM2;
@@ -7419,8 +7555,9 @@ ELSE
                 Lifecycle.Busy := FALSE;
                 Lifecycle.Done := TRUE;
             ELSIF LeftStartSinceArm AND (CablePosM2 &lt;= M2StartPosM) THEN
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
                 BucketState.IsOpen := WasOpenAtStart;
                 BucketState.IsClosed := WasClosedAtStart;
                 CloseReq := FALSE;
@@ -7432,8 +7569,9 @@ ELSE
         // Arrêt ouverture
         IF OpenReq THEN
             IF CablePosM2 &lt;= (CablePosM1 + Config.OffsetOpenM + Config.OpenAnticipationM) THEN
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
                 BucketState.IsOpen := TRUE;
                 BucketState.IsClosed := FALSE;
                 BucketState.LastPosM2Open := CablePosM2;
@@ -7442,8 +7580,9 @@ ELSE
                 Lifecycle.Busy := FALSE;
                 Lifecycle.Done := TRUE;
             ELSIF LeftStartSinceArm AND (CablePosM2 &gt;= M2StartPosM) THEN
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
                 BucketState.IsOpen := WasOpenAtStart;
                 BucketState.IsClosed := WasClosedAtStart;
                 OpenReq := FALSE;
@@ -7452,8 +7591,9 @@ ELSE
             END_IF;
         END_IF;
     ELSIF Lifecycle.Done THEN
-        M2_StartStop := FALSE;
-        M2_Direction := 0;
+        M2_RunRequest := FALSE;
+        M2_ReqAscent := FALSE;
+        M2_ReqDescend := FALSE;
         M2_BucketJogLimit := FALSE;
         RemainingTravelM := 0.0;
         IF NOT MotionRequestActive THEN
@@ -7693,12 +7833,20 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation synchronisation treuils</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne active de direction (-1/0/+1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande active montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande active descente</xhtml>
               </documentation>
             </variable>
             <variable name="MovementCommanded">
@@ -8843,8 +8991,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 14 : Sens opposé (latched)
     OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
-        AND (((Direction &gt; 0) AND (MeasuredSpeedSignedMps &lt; -MovementSpeedThresholdMps))
-          OR ((Direction &lt; 0) AND (MeasuredSpeedSignedMps &gt; MovementSpeedThresholdMps))));
+        AND ((ReqAscent AND (MeasuredSpeedSignedMps &lt; -MovementSpeedThresholdMps))
+          OR (ReqDescend AND (MeasuredSpeedSignedMps &gt; MovementSpeedThresholdMps))));
     TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
     IF TonOppositeDirection.Q THEN OppositeDirectionFaultLatched := TRUE; END_IF;
     instCauses[14].Active   := OppositeDirectionFaultLatched;
@@ -9021,13 +9169,13 @@ PowerCutOff := CausesPowerCutOffActive;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Statut contacteur de ligne / puissance</xhtml>
               </documentation>
             </variable>
-            <variable name="DriveRequest">
+            <variable name="WinchRequest">
               <type>
-                <derived name="ST_fbWinch_DriveRequest" />
+                <derived name="ST_fbWinch_Req" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REQUÊTE D'AXE (struct) ===
---&gt; [REQ] Ordre, palier, bornes et limites effectives</xhtml>
+--&gt; [REQ] RunRequest + 2 bits de sens, palier et limites</xhtml>
               </documentation>
             </variable>
             <variable name="Sensors">
@@ -9221,12 +9369,28 @@ PowerCutOff := CausesPowerCutOffActive;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Zone de ralentissement bas active</xhtml>
               </documentation>
             </variable>
-            <variable name="CommandedDirection">
+            <variable name="CommandedAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Sens interne memorise</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Sens interne mémorisé : montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandedDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Sens interne mémorisé : descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Double demande de sens détectée</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionChangeDelayElapsed">
@@ -9331,6 +9495,14 @@ PowerCutOff := CausesPowerCutOffActive;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] SafeStop effectif incluant permis</xhtml>
               </documentation>
             </variable>
+            <variable name="DirectionConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Les deux demandes de sens sont actives</xhtml>
+              </documentation>
+            </variable>
             <variable name="ActiveMaxStep">
               <type>
                 <INT />
@@ -9417,9 +9589,9 @@ PowerCutOff := CausesPowerCutOffActive;
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage d'un treuil individuel (contacteurs de sens et de vitesse)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop via DriveRequest)
+   🔌 Interface : FB de mouvement (Enable, SafeStop, RunRequest via WinchRequest)
    🔒 Sécurité : Interlock inversion de sens et gestion des autorisations
-   🔧 Interface plate → structs (DriveRequest / Sensors / Config),
+   🔧 Interface plate → structs (WinchRequest / Sensors / Config),
       logique interne conservée (comportement bit-identique).
    =======================================================================</xhtml>
           </documentation>
@@ -9464,7 +9636,7 @@ Fault := instFault.Fault;
 // 🛑 2. GATE
 IF NOT Enable THEN
     SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := Config.SpeedStepTable);
-    DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqDirection := 0,
+    DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqAscent := FALSE, ReqDescend := FALSE,
                        ChangeDelayAscent := Config.DirectionInterlockDelayAscent,
                        ChangeDelayDescent := Config.DirectionInterlockDelayDescent);
     StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := Config.StepRampDelayAscent);
@@ -9473,7 +9645,9 @@ IF NOT Enable THEN
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     RequestedStep := 0;
     StepNumber := StepShaper.ShapedStep;
-    CommandedDirection := DirectionInterlock.CommandedDirection;
+    CommandedAscent := DirectionInterlock.CommandedAscent;
+    CommandedDescend := DirectionInterlock.CommandedDescend;
+    RequestConflict := DirectionInterlock.RequestConflict;
     DirectionChangePending := DirectionInterlock.DirectionChangePending;
     TonContactorsDropped(IN := FALSE);
     ContactorsCheck.Command := FALSE;
@@ -9493,26 +9667,29 @@ Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region "§3 Permis et zones de ralentissement"}
-EffectiveSafeStop := SafeStop OR (DriveRequest.Direction &gt; 0 AND NOT AscentPermit) OR (DriveRequest.Direction &lt; 0 AND NOT DescendPermit);
+DirectionConflict := WinchRequest.ReqAscent AND WinchRequest.ReqDescend;
+EffectiveSafeStop := SafeStop OR DirectionConflict
+                     OR (WinchRequest.ReqAscent AND NOT AscentPermit)
+                     OR (WinchRequest.ReqDescend AND NOT DescendPermit);
 
-InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &gt;= (DriveRequest.TopLimitM - Config.SlowdownDistance_M));
-InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &lt;= (DriveRequest.BottomLimitM + Config.SlowdownDistance_M));
+InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &gt;= (WinchRequest.TopLimitM - Config.SlowdownDistance_M));
+InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &lt;= (WinchRequest.BottomLimitM + Config.SlowdownDistance_M));
 
-IF DriveRequest.Direction &gt; 0 THEN
-    ActiveMaxStep := DriveRequest.MaxStepUp;
+IF WinchRequest.ReqAscent AND NOT WinchRequest.ReqDescend THEN
+    ActiveMaxStep := WinchRequest.MaxStepUp;
     IF InTopSlowdownZone THEN
         ActiveMaxStep := MIN(ActiveMaxStep, Config.SlowdownMaxStep);
     END_IF;
-ELSIF DriveRequest.Direction &lt; 0 THEN
-    ActiveMaxStep := DriveRequest.MaxStepDown;
+ELSIF WinchRequest.ReqDescend AND NOT WinchRequest.ReqAscent THEN
+    ActiveMaxStep := WinchRequest.MaxStepDown;
     IF InBottomSlowdownZone THEN
         ActiveMaxStep := MIN(ActiveMaxStep, Config.SlowdownMaxStep);
     END_IF;
 ELSE
-    ActiveMaxStep := DriveRequest.MaxStepUp;
+    ActiveMaxStep := WinchRequest.MaxStepUp;
 END_IF;
 
-IF DriveRequest.HomingApproachActive THEN
+IF WinchRequest.HomingApproachActive THEN
     ActiveMaxStep := 1;
 END_IF;
 {endregion}
@@ -9523,22 +9700,25 @@ DirectionInterlock(
     Enable := (StepNumber = 0) AND Sensors.ContactorsAllOff,
     EnableRising := EnableRisingEdge.Q,
     Reset := Reset,
-    ReqDirection := DriveRequest.Direction,
+    ReqAscent := WinchRequest.ReqAscent,
+    ReqDescend := WinchRequest.ReqDescend,
     ChangeDelayAscent := Config.DirectionInterlockDelayAscent,
     ChangeDelayDescent := Config.DirectionInterlockDelayDescent
 );
-CommandedDirection := DirectionInterlock.CommandedDirection;
+CommandedAscent := DirectionInterlock.CommandedAscent;
+CommandedDescend := DirectionInterlock.CommandedDescend;
+RequestConflict := DirectionInterlock.RequestConflict;
 DirectionChangePending := DirectionInterlock.DirectionChangePending;
 DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
 {region "§5 Paliers vitesse et contacteurs"}
-// -B : la consigne est désormais un PALIER discret (DriveRequest.SpeedStepReq,
+// -B : la consigne est désormais un PALIER discret (WinchRequest.SpeedStepReq,
 // 1..5, 0 = arrêt) produit par l'arbitrage. Plus de décodage %→palier ici.
-IF DirectionChangePending OR (DriveRequest.Direction = 0) OR EffectiveSafeStop OR NOT DriveRequest.StartStop THEN
+IF DirectionChangePending OR NOT (WinchRequest.ReqAscent OR WinchRequest.ReqDescend) OR EffectiveSafeStop OR NOT WinchRequest.RunRequest THEN
     RampTargetStep := 0;
 ELSE
-    RampTargetStep := DriveRequest.SpeedStepReq;
+    RampTargetStep := WinchRequest.SpeedStepReq;
 END_IF;
 
 SpeedStep(
@@ -9570,13 +9750,14 @@ END_IF;
 // JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
 // ET NON bloquee par un arret/permis (NOT EffectiveSafeStop) : un permis descente FALSE
 // doit interdire physiquement le mouvement, sans re-atterrissage du plancher.
-// (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -&gt; aucun plancher,
+// (RunRequest AND ReqDescend) : relache joystick (RunRequest=FALSE) -&gt; aucun plancher,
 // l'arret franc RequestedStep=0 / RampTargetStep=0 est preserve.
 // Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
 // ActiveMaxStep (ex. SlowdownMaxStep -&gt; palier 1 en bordure basse), on borne au plafond.
-IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown &gt; 0) AND NOT EffectiveSafeStop THEN
-    IF RequestedStep &lt; DriveRequest.MinStepDown THEN
-        RequestedStep := DriveRequest.MinStepDown;
+IF WinchRequest.RunRequest AND WinchRequest.ReqDescend AND NOT WinchRequest.ReqAscent
+   AND (WinchRequest.MinStepDown &gt; 0) AND NOT EffectiveSafeStop THEN
+    IF RequestedStep &lt; WinchRequest.MinStepDown THEN
+        RequestedStep := WinchRequest.MinStepDown;
     END_IF;
     IF RequestedStep &gt; ActiveMaxStep THEN
         RequestedStep := ActiveMaxStep;
@@ -9586,7 +9767,7 @@ END_IF;
 // ⚙️ Cadencement de palier (extrait dans FB_WinchStepShaper, D10).
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
-IF CommandedDirection = -1 THEN
+IF CommandedDescend THEN
     EffectiveStepRampDelay := Config.StepRampDelayDescent;
 ELSE
     EffectiveStepRampDelay := Config.StepRampDelayAscent;
@@ -9599,10 +9780,10 @@ StepShaper(
 StepNumber := StepShaper.ShapedStep;
 BusinessStepDelayElapsed := StepShaper.StepDelayElapsed;
 
-IF StepNumber &gt; 0 AND CommandedDirection = 1 THEN
+IF StepNumber &gt; 0 AND CommandedAscent THEN
     RelayFwd := TRUE;
     RelayRev := FALSE;
-ELSIF StepNumber &gt; 0 AND CommandedDirection = -1 THEN
+ELSIF StepNumber &gt; 0 AND CommandedDescend THEN
     RelayFwd := FALSE;
     RelayRev := TRUE;
 ELSE
@@ -9653,7 +9834,7 @@ SenseHoldHardCut := (NOT PowerContactorEngaged) OR EffectiveSafeStop OR Fault.Er
 
 IF SenseHoldHardCut THEN
     SenseHoldActiveInt := FALSE;
-ELSIF (PrevStepNumber &gt; 0) AND (StepNumber = 0) AND (CommandedDirection &lt;&gt; 0) THEN
+ELSIF (PrevStepNumber &gt; 0) AND (StepNumber = 0) AND (CommandedAscent OR CommandedDescend) THEN
     SenseHoldActiveInt := TRUE;   // front de chute de palier a 0 avec sens encore actif
 END_IF;
 
@@ -9761,20 +9942,28 @@ PrevStepNumber := StepNumber;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt à arbitrer (Enable)</xhtml>
               </documentation>
             </variable>
-            <variable name="StartStop">
+            <variable name="RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande marche/arrêt arbitrée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande marche arbitrée</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande montée arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande descente arbitrée</xhtml>
               </documentation>
             </variable>
             <variable name="StepTgt">
@@ -9800,7 +9989,15 @@ PrevStepNumber := StepNumber;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Atomicité Both : permit agrégé du sens demandé délivré</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Atomicité Both : deux axes autorisés dans le même sens</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Double demande de sens refusée</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -9834,14 +10031,16 @@ Ready := Enable;
 BenneBusyFallEdge(CLK := Context.BucketBusy);
 
 IF NOT Enable THEN
-    StartStop := FALSE;
-    Direction := 0;
+    RunRequest := FALSE;
+    ReqAscent  := FALSE;
+    ReqDescend := FALSE;
     StepTgt   := 0;
 ELSE
     // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
-        StartStop := ReqWinch.ReqStartStop;
-        Direction := ReqWinch.ReqDirection;
+        RunRequest := ReqWinch.RunRequest;
+        ReqAscent  := ReqWinch.ReqAscent;
+        ReqDescend := ReqWinch.ReqDescend;
         StepTgt   := ReqWinch.StepTgt;
     ELSE
         // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
@@ -9853,29 +10052,36 @@ ELSE
             // Mode Boutons IHM
             IF BothIntent.Active THEN
                 // Both (BtnWinchBothAscent/Descent) — source unique PRG_03, plus de re-dérivation
-                Direction := BothIntent.Direction;
+                ReqAscent  := BothIntent.ReqAscent;
+                ReqDescend := BothIntent.ReqDescend;
                 StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
             ELSIF IHM.BtnAscentM1 THEN
-                Direction := 1;
+                ReqAscent  := TRUE;
+                ReqDescend := FALSE;
                 StepTgt   := Cfg.BtnStepTgt;
             ELSIF IHM.BtnDescentM1 THEN
-                Direction := -1;
+                ReqAscent  := FALSE;
+                ReqDescend := TRUE;
                 StepTgt   := Cfg.BtnStepTgt;
             ELSE
-                Direction := 0;
+                ReqAscent  := FALSE;
+                ReqDescend := FALSE;
                 StepTgt   := 0;
             END_IF;
         ELSE
             // Mode Joystick Maître — M1 unitaire si Select = 1, both si Select = 0
             IF Auth.JoystickWinchSelectArbitrated = 1 THEN
-                Direction := Joystick.AxisY.Direction;
+                ReqAscent  := Joystick.AxisY.Direction &gt; 0;
+                ReqDescend := Joystick.AxisY.Direction &lt; 0;
                 StepTgt   := Joystick.AxisY.StepTgt;
             ELSIF BothIntent.Active THEN
                 // Both (Select=0) — source unique PRG_03, plus de re-dérivation
-                Direction := BothIntent.Direction;
+                ReqAscent  := BothIntent.ReqAscent;
+                ReqDescend := BothIntent.ReqDescend;
                 StepTgt   := Joystick.AxisY.StepTgt;
             ELSE
-                Direction := 0;
+                ReqAscent  := FALSE;
+                ReqDescend := FALSE;
                 StepTgt   := 0;
             END_IF;
         END_IF;
@@ -9886,21 +10092,22 @@ ELSE
         // un permit individuel. Si l'un des 2 treuils n'a pas son permit effectif,
         // AUCUN des deux ne part (départ jamais isolé). En unitaire (BothIntent inactif),
         // le gate est neutre.
+        RequestConflict := ReqAscent AND ReqDescend;
         BothDirectionAuthorized := (NOT BothIntent.Active)
-            OR ((Direction = 1) AND Context.BothAscentPermit)
-            OR ((Direction = -1) AND Context.BothDescendPermit);
-        StartStop := (Direction &lt;&gt; 0)
+            OR ((ReqAscent AND NOT ReqDescend) AND Context.M1AscentAllowed AND Context.M2AscentAllowed)
+            OR ((ReqDescend AND NOT ReqAscent) AND Context.M1DescendAllowed AND Context.M2DescendAllowed);
+        RunRequest := (ReqAscent OR ReqDescend) AND NOT RequestConflict
                   AND NOT Context.BucketBusy
                   AND NOT Context.WinchBothMotionBlockedByBucket
-                  AND NOT ((Context.SyncBlocksAscent   AND (Direction = 1))
-                        OR (Context.SyncBlocksDescent AND (Direction = -1)))
+                  AND NOT ((Context.SyncBlocksAscent   AND ReqAscent)
+                        OR (Context.SyncBlocksDescent AND ReqDescend))
                   AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
                   AND BothDirectionAuthorized;
     END_IF;
 
     // Front de fin d'action benne : arrêt forcé sauf mouvement both actif
-    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.Direction &lt;&gt; 0)) THEN
-        StartStop := FALSE;
+    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.ReqAscent OR BothIntent.ReqDescend)) THEN
+        RunRequest := FALSE;
     END_IF;
 END_IF;
 </xhtml>
@@ -9997,20 +10204,28 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt à arbitrer (Enable)</xhtml>
               </documentation>
             </variable>
-            <variable name="StartStop">
+            <variable name="RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande marche/arrêt arbitrée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande marche arbitrée</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande montée arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande descente arbitrée</xhtml>
               </documentation>
             </variable>
             <variable name="StepTgt">
@@ -10036,7 +10251,15 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Atomicité Both : permit agrégé du sens demandé délivré</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Atomicité Both : deux axes autorisés dans le même sens</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Double demande de sens refusée</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -10071,20 +10294,23 @@ Ready := Enable;
 BenneBusyFallEdge(CLK := Context.BucketBusy);
 
 IF NOT Enable THEN
-    StartStop := FALSE;
-    Direction := 0;
+    RunRequest := FALSE;
+    ReqAscent  := FALSE;
+    ReqDescend := FALSE;
     StepTgt   := 0;
 ELSE
     // ── Chemin benne : M2 piloté par l'action benne (override) ──
-    IF Context.BucketBusy AND Context.BucketM2StartStop THEN
-        StartStop := Context.BucketM2StartStop;
-        Direction := SEL(Context.BucketM2Open, -1, 1);  // Open → +1, Close → -1
+    IF Context.BucketBusy AND Context.BucketM2RunRequest THEN
+        RunRequest := Context.BucketM2RunRequest;
+        ReqAscent  := Context.BucketM2Open;
+        ReqDescend := Context.BucketM2Close;
         StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN
-            StartStop := ReqWinch.ReqStartStop;
-            Direction := ReqWinch.ReqDirection;
+            RunRequest := ReqWinch.RunRequest;
+            ReqAscent  := ReqWinch.ReqAscent;
+            ReqDescend := ReqWinch.ReqDescend;
             StepTgt   := ReqWinch.StepTgt;
         ELSE
             // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
@@ -10096,29 +10322,36 @@ ELSE
                 // Mode Boutons IHM
                 IF BothIntent.Active THEN
                     // Both (BtnWinchBothAscent/Descent) — source unique PRG_03, plus de re-dérivation
-                    Direction := BothIntent.Direction;
+                    ReqAscent  := BothIntent.ReqAscent;
+                    ReqDescend := BothIntent.ReqDescend;
                     StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
                 ELSIF IHM.BtnAscentM2 THEN
-                    Direction := 1;
+                    ReqAscent  := TRUE;
+                    ReqDescend := FALSE;
                     StepTgt   := Cfg.BtnStepTgt;
                 ELSIF IHM.BtnDescentM2 THEN
-                    Direction := -1;
+                    ReqAscent  := FALSE;
+                    ReqDescend := TRUE;
                     StepTgt   := Cfg.BtnStepTgt;
                 ELSE
-                    Direction := 0;
+                    ReqAscent  := FALSE;
+                    ReqDescend := FALSE;
                     StepTgt   := 0;
                 END_IF;
             ELSE
                 // Mode Joystick Maître — M2 unitaire si Select = 2, both si Select = 0
                 IF Auth.JoystickWinchSelectArbitrated = 2 THEN
-                    Direction := Joystick.AxisY.Direction;
+                    ReqAscent  := Joystick.AxisY.Direction &gt; 0;
+                    ReqDescend := Joystick.AxisY.Direction &lt; 0;
                     StepTgt   := Joystick.AxisY.StepTgt;
                 ELSIF BothIntent.Active THEN
                     // Both (Select=0) — source unique PRG_03, plus de re-dérivation
-                    Direction := BothIntent.Direction;
+                    ReqAscent  := BothIntent.ReqAscent;
+                    ReqDescend := BothIntent.ReqDescend;
                     StepTgt   := Joystick.AxisY.StepTgt;
                 ELSE
-                    Direction := 0;
+                    ReqAscent  := FALSE;
+                    ReqDescend := FALSE;
                     StepTgt   := 0;
                 END_IF;
             END_IF;
@@ -10127,21 +10360,22 @@ ELSE
             // homme-mort qualifié en joystick
             // 🔗 Atomicité Both : cf. M1 — en both, la commande ne consomme QUE le
             // permit agrégé du sens demandé. Départ jamais isolé entre les 2 treuils.
+            RequestConflict := ReqAscent AND ReqDescend;
             BothDirectionAuthorized := (NOT BothIntent.Active)
-                OR ((Direction = 1) AND Context.BothAscentPermit)
-                OR ((Direction = -1) AND Context.BothDescendPermit);
-            StartStop := (Direction &lt;&gt; 0)
+                OR ((ReqAscent AND NOT ReqDescend) AND Context.M1AscentAllowed AND Context.M2AscentAllowed)
+                OR ((ReqDescend AND NOT ReqAscent) AND Context.M1DescendAllowed AND Context.M2DescendAllowed);
+            RunRequest := (ReqAscent OR ReqDescend) AND NOT RequestConflict
                       AND NOT Context.WinchBothMotionBlockedByBucket
-                      AND NOT ((Context.SyncBlocksAscent   AND (Direction = -1))
-                            OR (Context.SyncBlocksDescent AND (Direction = 1)))
+                      AND NOT ((Context.SyncBlocksAscent   AND ReqDescend)
+                            OR (Context.SyncBlocksDescent AND ReqAscent))
                       AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
                       AND BothDirectionAuthorized;
         END_IF;
     END_IF;
 
     // Front de fin d'action benne : arrêt forcé sauf mouvement both actif
-    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.Direction &lt;&gt; 0)) THEN
-        StartStop := FALSE;
+    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.ReqAscent OR BothIntent.ReqDescend)) THEN
+        RunRequest := FALSE;
     END_IF;
 END_IF;
 </xhtml>
@@ -10501,12 +10735,20 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Axe cible (1=M1, 2=M2)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens mesure (-1 descente, 0 stop, +1 montee)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mesure active montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mesure active descente</xhtml>
               </documentation>
             </variable>
             <variable name="StepNumber">
@@ -10645,7 +10887,15 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens non nul</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Un seul sens actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Deux sens actifs : collecte interdite</xhtml>
               </documentation>
             </variable>
             <variable name="StepInRange">
@@ -10855,7 +11105,8 @@ LampLearn := FALSE;
 // Conditions de collecte scindees (lisibilite Watch, &lt;=3 termes par predicat)
 LearnRequested := Enable AND LearnStart;
 MeasureUsable := MeasuredSpeedValid AND StableForLearn;
-SensActive := (Direction &lt;&gt; 0);
+SensConflict := ReqAscent AND ReqDescend;
+SensActive := (ReqAscent OR ReqDescend) AND NOT SensConflict;
 StepInRange := (StepNumber &gt;= 1) AND (StepNumber &lt;= CST_PalierCount);
 AxeInRange := (WinchId &gt;= 1) AND (WinchId &lt;= CST_AxeCount);
 ContextValid := SensActive AND StepInRange AND AxeInRange;
@@ -10865,7 +11116,7 @@ CollectAllowed := LearnRequested AND MeasureUsable AND ContextValid;
 {region "§2 Collecte passive"}
 IF CollectAllowed THEN
     // Index sens et charge
-    IF Direction &gt; 0 THEN SensIdx := CST_IdxAscent; ELSE SensIdx := CST_IdxDescent; END_IF;
+    IF ReqAscent THEN SensIdx := CST_IdxAscent; ELSE SensIdx := CST_IdxDescent; END_IF;
     IF LoadPresent THEN ChargeIdx := CST_IdxCharge; ELSE ChargeIdx := CST_IdxVide; END_IF;
 
     // Plausibilite : vitesse dans l'enveloppe du palier (borne min/max)
@@ -11349,7 +11600,8 @@ WinchM1State.InhibitActive := Auth.InhibitM1;
 WinchM1State.BottomLimitActiveM := BottomLimitM1_Active;
 WinchM1State.InTopSlowdownZone := WinchM1Ref.InTopSlowdownZone;
 WinchM1State.InBottomSlowdownZone := WinchM1Ref.InBottomSlowdownZone;
-WinchM1State.CommandedDirection := WinchM1Ref.CommandedDirection;
+WinchM1State.CommandedAscent := WinchM1Ref.CommandedAscent;
+WinchM1State.CommandedDescend := WinchM1Ref.CommandedDescend;
 WinchM1State.DirectionChangeDelayElapsed := WinchM1Ref.DirectionChangeDelayElapsed;
 WinchM1State.DirectionChangePending := WinchM1Ref.DirectionChangePending;
 
@@ -11412,7 +11664,8 @@ WinchM2State.InhibitActive := Auth.InhibitM2;
 WinchM2State.BottomLimitActiveM := BottomLimitM2_Active;
 WinchM2State.InTopSlowdownZone := WinchM2Ref.InTopSlowdownZone;
 WinchM2State.InBottomSlowdownZone := WinchM2Ref.InBottomSlowdownZone;
-WinchM2State.CommandedDirection := WinchM2Ref.CommandedDirection;
+WinchM2State.CommandedAscent := WinchM2Ref.CommandedAscent;
+WinchM2State.CommandedDescend := WinchM2Ref.CommandedDescend;
 WinchM2State.DirectionChangeDelayElapsed := WinchM2Ref.DirectionChangeDelayElapsed;
 WinchM2State.DirectionChangePending := WinchM2Ref.DirectionChangePending;
 
@@ -12439,12 +12692,20 @@ END_CASE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Acquittement defaut (front) : purge la memoire de direction</xhtml>
               </documentation>
             </variable>
-            <variable name="ReqDirection">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens demande (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande descente</xhtml>
               </documentation>
             </variable>
             <variable name="ChangeDelayAscent">
@@ -12465,12 +12726,28 @@ END_CASE;
             </variable>
           </inputVars>
           <outputVars>
-            <variable name="CommandedDirection">
+            <variable name="CommandedAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Sens interne memorise</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Sens interne mémorisé : montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandedDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Sens interne mémorisé : descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Double demande refusée</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionChangePending">
@@ -12515,12 +12792,36 @@ END_CASE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps mort D18 arme (front Enable)</xhtml>
               </documentation>
             </variable>
-            <variable name="LastDirection">
+            <variable name="LastAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens non nul memorise (interlock apres neutre)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens adopté : montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens adopté : descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Une seule demande de sens active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirectionChanged">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande différente du sens commandé</xhtml>
               </documentation>
             </variable>
             <variable name="ResetEdge">
@@ -12554,37 +12855,48 @@ END_CASE;
 // l'historique, une reprise apres Reset est un depart propre, pas une inversion).
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    LastDirection := 0;
-    CommandedDirection := 0;
+    LastAscent := FALSE;
+    LastDescend := FALSE;
+    CommandedAscent := FALSE;
+    CommandedDescend := FALSE;
     DeadTimeArmed := FALSE;
     DirectionChangePending := FALSE;
 END_IF;
 
-// Delai effectif selon le sens demande
-IF ReqDirection &gt; 0 THEN
+RequestConflict := ReqAscent AND ReqDescend;
+RequestActive := (ReqAscent OR ReqDescend) AND NOT RequestConflict;
+
+// Délai effectif selon le sens demandé
+IF ReqAscent AND NOT ReqDescend THEN
     EffectiveDelay := ChangeDelayAscent;
 ELSE
     EffectiveDelay := ChangeDelayDescent;
 END_IF;
 
+DirectionChanged := (ReqAscent AND NOT CommandedAscent)
+                 OR (ReqDescend AND NOT CommandedDescend)
+                 OR (CommandedAscent AND NOT ReqAscent)
+                 OR (CommandedDescend AND NOT ReqDescend);
+
 // D18 : au front montant Enable avec sens maintenu, armer le temps mort
 // (ne pas re-adopter le sens immediatement — pas de redemarrage inrush).
-IF EnableRising AND (ReqDirection &lt;&gt; 0) THEN
+IF EnableRising AND RequestActive THEN
     DeadTimeArmed := TRUE;
 END_IF;
 
 // Temporisation : compte quand un changement de sens est demande et treuil arrete
 DirectionChangeDelay(
-    IN := Enable AND (ReqDirection &lt;&gt; 0) AND (ReqDirection &lt;&gt; CommandedDirection),
+    IN := Enable AND RequestActive AND DirectionChanged,
     PT := EffectiveDelay
 );
 DelayElapsed := DirectionChangeDelay.ET;
 
 // Adoption du sens
-IF ReqDirection = 0 THEN
-    // Neutre : CommandedDirection := 0 (relais/diagnostic neutres). La memoire du
-    // dernier sens non nul (LastDirection) est conservee pour l'interlock de reprise.
-    CommandedDirection := 0;
+IF NOT RequestActive THEN
+    // Neutre ou double demande : aucun sens commandé. Une double demande est
+    // explicitement refusée, sans priorité implicite.
+    CommandedAscent := FALSE;
+    CommandedDescend := FALSE;
     DirectionChangePending := FALSE;
     DeadTimeArmed := FALSE;
 ELSIF DeadTimeArmed THEN
@@ -12592,19 +12904,23 @@ ELSIF DeadTimeArmed THEN
     DirectionChangePending := TRUE;
 ELSIF DirectionChangeDelay.Q THEN
     // Temps mort ecoule : adoption du sens
-    CommandedDirection := ReqDirection;
+    CommandedAscent := ReqAscent;
+    CommandedDescend := ReqDescend;
     DirectionChangePending := FALSE;
     DeadTimeArmed := FALSE;
-ELSIF (CommandedDirection = 0) AND (ReqDirection &lt;&gt; 0) THEN
+ELSIF NOT (CommandedAscent OR CommandedDescend) THEN
     // Depuis le neutre : depart immediat si reprise du MEME sens (ou premier sens),
     // sinon (sens oppose) pending + delai dedie obligatoire.
-    IF (LastDirection = 0) OR (ReqDirection = LastDirection) THEN
-        CommandedDirection := ReqDirection;
+    IF (NOT (LastAscent OR LastDescend))
+       OR (ReqAscent AND LastAscent)
+       OR (ReqDescend AND LastDescend) THEN
+        CommandedAscent := ReqAscent;
+        CommandedDescend := ReqDescend;
         DirectionChangePending := FALSE;
     ELSE
         DirectionChangePending := TRUE;
     END_IF;
-ELSIF (ReqDirection &lt;&gt; 0) AND (ReqDirection &lt;&gt; CommandedDirection) THEN
+ELSIF DirectionChanged THEN
     // Inversion directe (sans passage au neutre) : pending + delai
     DirectionChangePending := TRUE;
 ELSE
@@ -12613,8 +12929,9 @@ END_IF;
 
 // Memorise le dernier sens non nul ADOPTE (pas la simple demande) : c'est ce sens qui
 // sert de reference pour detecter une reprise opposee apres passage au neutre.
-IF CommandedDirection &lt;&gt; 0 THEN
-    LastDirection := CommandedDirection;
+IF CommandedAscent OR CommandedDescend THEN
+    LastAscent := CommandedAscent;
+    LastDescend := CommandedDescend;
 END_IF;
 </xhtml>
           </ST>
@@ -14385,7 +14702,7 @@ END_IF;
             <Object Name="ST_fbWinchCmdArbitration_Context" ObjectId="58dd8b92-25cb-5b24-b149-4d148f2014bb" />
             <Object Name="ST_fbWinchCmdArbitration_IHM" ObjectId="b2c6293b-40b7-50ed-85f4-51c0c572dd06" />
             <Object Name="ST_fbWinch_Cfg" ObjectId="6e031a4e-ea7c-5444-b4f1-495452dd1ae8" />
-            <Object Name="ST_fbWinch_DriveRequest" ObjectId="45e51157-f25e-5b78-83e7-e1b47077800c" />
+            <Object Name="ST_fbWinch_Req" ObjectId="b39f29e4-3d63-5b36-bc90-351b85641c13" />
             <Object Name="ST_fbWinch_Sensors" ObjectId="ba625d91-b679-557f-bae8-bd35a0a8e716" />
             <Object Name="ST_fbWinchLoadEstimator_SpeedCfg" ObjectId="6a16b928-26ae-52c7-b420-4064d7e5d0dc" />
             <Object Name="ST_fbWinchLoadEstimator_Table" ObjectId="ac09a372-08ec-5811-90f7-baec46ade641" />

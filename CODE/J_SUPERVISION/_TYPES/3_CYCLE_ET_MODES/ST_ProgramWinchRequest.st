@@ -6,8 +6,9 @@
    ======================================================================= *)
 TYPE ST_ProgramWinchRequest :
 STRUCT
-    ReqStartStop : BOOL; // Ordre marche/arrêt demandé par le programme (TRUE=Marche)
-    ReqDirection : INT;  // Sens demandé (-1: Descending, 0: Stop, 1: Ascending)
+    RunRequest   : BOOL; // Ordre marche demandé par le programme
+    ReqAscent    : BOOL; // Demande montée
+    ReqDescend   : BOOL; // Demande descente
     StepTgt      : INT;  // Palier de vitesse cible demandé (1 à 5, 0 = arrêt)
 END_STRUCT
 END_TYPE

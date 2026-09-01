@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T18:34:18.563531" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T18:34:18.563531">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:04:07.878280" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:04:07.878280">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -445,12 +445,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Mode courant</xhtml>
               </documentation>
             </variable>
-            <variable name="StartStop">
+            <variable name="RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = rampe accélération, FALSE = rampe décélération NORMALE</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de marche maintenue (FALSE = décélération/arrêt)</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStop">
@@ -461,12 +461,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] -1 = vers Maintenance, 0 = Neutre, +1 = vers Trémie (source d'autorité du sens)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedTgt_Pct">
@@ -525,7 +533,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermit">
+            <variable name="EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
@@ -533,11 +541,11 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Permis directionnels SAFETY (source FB_Safety_Translation) — gate de sens
---&gt; [SAFE] Permis directionnel SAFETY vers Trémie (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Permis directionnels canoniques M3 — gate de sens (TRUE = autorisé)
+--&gt; [SAFE] Permis effectif vers Trémie</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermit">
+            <variable name="EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
@@ -545,7 +553,7 @@
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis directionnel SAFETY vers Maintenance (TRUE = autorisé, fail-safe)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permis effectif vers Maintenance/P1</xhtml>
               </documentation>
             </variable>
             <variable name="DriveStatusWord">
@@ -711,12 +719,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Interlock changement de sens</xhtml>
               </documentation>
             </variable>
-            <variable name="CommandedDirection">
+            <variable name="CommandedTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens réellement appliqué</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens Trémie réellement appliqué</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandedMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens Maintenance réellement appliqué</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionChangePending">
@@ -727,12 +743,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Force la rampe à 0 pendant une inversion de sens en attente</xhtml>
               </documentation>
             </variable>
-            <variable name="PhysicalDriveDirection">
+            <variable name="PhysicalTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CommandedDirection compensé câblage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens physique Trémie après inversion câblage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhysicalMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens physique Maintenance après inversion câblage</xhtml>
               </documentation>
             </variable>
             <variable name="RampTargetPct">
@@ -759,9 +783,17 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front arrivée sur capteur</xhtml>
               </documentation>
             </variable>
-            <variable name="DirectionAtArrival">
+            <variable name="ArrivalWasTremie">
               <type>
-                <INT />
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens d'arrivée mémorisé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArrivalWasMaintenance">
+              <type>
+                <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens d'arrivée mémorisé</xhtml>
@@ -840,7 +872,7 @@
    ⚙️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
-   🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
+   🔌 FB DE MOUVEMENT : porte RunRequest + SafeStop en plus de l'interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
    🔧 Interface plate → structs : configuration regroupée en `Cfg : ST_fbTranslation_Cfg`
@@ -879,7 +911,7 @@ instCauses[3].Active   := DriveFaultLatching;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Defaut variateur translation AC600';
 
-IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchTremie) OR (CommandedDirection = -1 AND LimitSwitchMaintenance)) THEN
+IF NOT BypassLimitSwitch AND ((CommandedTremie AND LimitSwitchTremie) OR (CommandedMaintenance AND LimitSwitchMaintenance)) THEN
     instCauses[6].Active := TRUE;
 ELSE
     instCauses[6].Active := FALSE;
@@ -903,9 +935,12 @@ IF NOT Enable THEN
     BrakeCommandOpenConfirmed := FALSE;
     BrakeContactorCheck.Command := FALSE;
     BrakeContactorCheck.Feedback := BrakeFeedback;
-    CommandedDirection := 0;
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
     ArrivalLock := FALSE;
+    ArrivalWasTremie := FALSE;
+    ArrivalWasMaintenance := FALSE;
     TargetReached := FALSE;
     DirectionChangeDelay(IN := FALSE);
     CaptorDebounceTon(IN := FALSE);
@@ -920,7 +955,8 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Premier scan et temps de cycle"}
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    CommandedDirection := Direction;
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
 END_IF;
 
 CycleTimeCalc();
@@ -933,52 +969,60 @@ ArrivalEdge(CLK := TargetReached);
 
 IF ArrivalEdge.Q THEN
     ArrivalLock := TRUE;
-    DirectionAtArrival := CommandedDirection;
+    ArrivalWasTremie := CommandedTremie;
+    ArrivalWasMaintenance := CommandedMaintenance;
 END_IF;
 
-IF ArrivalLock AND (Direction &lt;&gt; 0) AND (Direction &lt;&gt; DirectionAtArrival) THEN
+IF ArrivalLock AND ((ReqTremie AND NOT ArrivalWasTremie) OR (ReqMaintenance AND NOT ArrivalWasMaintenance)) THEN
     ArrivalLock := FALSE;
 END_IF;
 
 DirectionChangeDelay(
-    IN := (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) AND (ABS(SpeedRamp.Current) &lt;= 0.1) AND (ABS(DriveActualFreqHz) &lt;= 0.5),
+    IN := (ReqTremie OR ReqMaintenance)
+          AND ((ReqTremie AND NOT CommandedTremie) OR (ReqMaintenance AND NOT CommandedMaintenance))
+          AND (ABS(SpeedRamp.Current) &lt;= 0.1)
+          AND (ABS(DriveActualFreqHz) &lt;= 0.5),
     PT := Cfg.DirectionInterlockDelay
 );
 
-IF (CommandedDirection = 0) AND (Direction &lt;&gt; 0) THEN
-    CommandedDirection := Direction;
+IF NOT (CommandedTremie OR CommandedMaintenance) AND (ReqTremie OR ReqMaintenance) THEN
+    CommandedTremie := ReqTremie;
+    CommandedMaintenance := ReqMaintenance;
     DirectionChangePending := FALSE;
 ELSIF DirectionChangeDelay.Q THEN
-    CommandedDirection := Direction;
+    CommandedTremie := ReqTremie;
+    CommandedMaintenance := ReqMaintenance;
     DirectionChangePending := FALSE;
-ELSIF (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) THEN
+ELSIF (ReqTremie OR ReqMaintenance)
+      AND ((ReqTremie AND NOT CommandedTremie) OR (ReqMaintenance AND NOT CommandedMaintenance)) THEN
     DirectionChangePending := TRUE;
 ELSE
     DirectionChangePending := FALSE;
 END_IF;
 
-IF Direction = 0 THEN
-    CommandedDirection := 0;
+IF NOT (ReqTremie OR ReqMaintenance) THEN
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
 END_IF;
 {endregion}
 
 {region "§4bis Permis directionnels et EffectiveSafeStop"}
 // 🛡️ 4bis. GATE DE SENS (permis directionnels SAFETY) — modèle treuils FB_Winch
-// EffectiveSafeStop = SafeStop OR (Direction&gt;0 ET Trémie non permise). Bloque la RAMPE
-// (arrêt réel) vers un sens non autorisé SANS toucher à Direction : l'estimateur de position,
-// les verrous bistables et la sélection PositionSensorTarget (PRG_05) restent informés.
+// RampStopActive = SafeStop OR demande vers un sens non permis. Bloque la RAMPE
+// (arrêt réel) vers un sens non autorisé sans fabriquer de sens numérique.
 // Consommé dans la gate de rampe (§5) et le choix de décélération.
-// ⚠️ Le sens Maintenance (−1) n'est PAS gaté ici : le segment P1→Maintenance est déjà protégé
-// par la coupure dure M3_LimitSwitchMaintenanceEffective (PRG_05:128-130) et les ralentissements.
-// Gater −1 sur MaintenancePermit bloquerait l'accès à P1 quand Maintenance n'est pas autorisée
-// (régression fonctionnelle). Le gate ne bloque que +1 (Trémie).
+// Le permis Maintenance représente la possibilité de rejoindre P1/maintenance physique ;
+// l'interdiction d'accès à la zone Maintenance est gérée séparément par la cible P1 et sa
+// coupure dure, sans couper le déplacement légal jusqu'à P1.
 EffectiveSafeStop := SafeStop
-                      OR (Direction &gt; 0 AND NOT TremiePermit);
+                      OR (ReqTremie AND NOT EffectivePermitM3_Tremie)
+                      OR (ReqMaintenance AND NOT EffectivePermitM3_Maintenance)
+                      OR (ReqTremie AND ReqMaintenance);
 {endregion}
 
 {region "§5 Consigne et rampe de vitesse"}
-IF DirectionChangePending OR (Direction = 0) OR ArrivalLock OR EffectiveSafeStop OR NOT StartStop THEN
+IF DirectionChangePending OR NOT (ReqTremie OR ReqMaintenance) OR ArrivalLock OR EffectiveSafeStop OR NOT RunRequest THEN
     RampTargetPct := 0.0;
 ELSE
     RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
@@ -1017,15 +1061,16 @@ BrakeReleaseRequest := Brake.BrakeCmd;
 BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
 BrakeContactorCheck := Brake.ContactorCheck;
 
+PhysicalTremie := CommandedTremie;
+PhysicalMaintenance := CommandedMaintenance;
 IF InvertDriveDirection THEN
-    PhysicalDriveDirection := -CommandedDirection;
-ELSE
-    PhysicalDriveDirection := CommandedDirection;
+    PhysicalTremie := CommandedMaintenance;
+    PhysicalMaintenance := CommandedTremie;
 END_IF;
 
-IF (PhysicalDriveDirection = 1) AND Brake.BrakeCmd THEN
+IF PhysicalTremie AND Brake.BrakeCmd THEN
     RequestedDriveControlWord := 1; // FWD
-ELSIF (PhysicalDriveDirection = -1) AND Brake.BrakeCmd THEN
+ELSIF PhysicalMaintenance AND Brake.BrakeCmd THEN
     RequestedDriveControlWord := 2; // REV
 ELSE
     RequestedDriveControlWord := 0;
@@ -1034,11 +1079,11 @@ END_IF;
 RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * Cfg.DriveFreqScaleMaxHz;
 
 // Ralentissements d'approche
-IF (CommandedDirection = 1) AND SlowdownSensorTremie THEN
+IF CommandedTremie AND SlowdownSensorTremie THEN
     RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedTremieHz);
-ELSIF (CommandedDirection = -1) AND SlowdownSensorMaintenance THEN
+ELSIF CommandedMaintenance AND SlowdownSensorMaintenance THEN
     RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedMaintenanceHz);
-ELSIF (CommandedDirection = -1) AND SlowdownSensorP1 THEN
+ELSIF CommandedMaintenance AND SlowdownSensorP1 THEN
     RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedP1Hz);
 END_IF;
 

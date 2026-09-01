@@ -29,13 +29,15 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     Ready     : BOOL;  // <-- [STAT] FB prêt à arbitrer (Enable)
-    StartStop : BOOL;  // <-- [CMD] Commande marche/arrêt arbitrée
-    Direction : INT;   // <-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)
+    RunRequest : BOOL; // <-- [CMD] Demande marche arbitrée
+    ReqAscent  : BOOL; // <-- [CMD] Demande montée arbitrée
+    ReqDescend : BOOL; // <-- [CMD] Demande descente arbitrée
     StepTgt   : INT;   // <-- [CMD] Palier de vitesse arbitré (1..5, 0 = arrêt)
 END_VAR
 VAR
     BenneBusyFallEdge : F_TRIG;  // . [LOC] Front descendant action benne (arrêt forcé)
-    BothDirectionAuthorized : BOOL; // . [LOC] Atomicité Both : permit agrégé du sens demandé délivré
+    BothDirectionAuthorized : BOOL; // . [LOC] Atomicité Both : deux axes autorisés dans le même sens
+    RequestConflict         : BOOL; // . [LOC] Double demande de sens refusée
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -46,20 +48,23 @@ Ready := Enable;
 BenneBusyFallEdge(CLK := Context.BucketBusy);
 
 IF NOT Enable THEN
-    StartStop := FALSE;
-    Direction := 0;
+    RunRequest := FALSE;
+    ReqAscent  := FALSE;
+    ReqDescend := FALSE;
     StepTgt   := 0;
 ELSE
     // ── Chemin benne : M2 piloté par l'action benne (override) ──
-    IF Context.BucketBusy AND Context.BucketM2StartStop THEN
-        StartStop := Context.BucketM2StartStop;
-        Direction := SEL(Context.BucketM2Open, -1, 1);  // Open → +1, Close → -1
+    IF Context.BucketBusy AND Context.BucketM2RunRequest THEN
+        RunRequest := Context.BucketM2RunRequest;
+        ReqAscent  := Context.BucketM2Open;
+        ReqDescend := Context.BucketM2Close;
         StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN
-            StartStop := ReqWinch.ReqStartStop;
-            Direction := ReqWinch.ReqDirection;
+            RunRequest := ReqWinch.RunRequest;
+            ReqAscent  := ReqWinch.ReqAscent;
+            ReqDescend := ReqWinch.ReqDescend;
             StepTgt   := ReqWinch.StepTgt;
         ELSE
             // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
@@ -71,29 +76,36 @@ ELSE
                 // Mode Boutons IHM
                 IF BothIntent.Active THEN
                     // Both (BtnWinchBothAscent/Descent) — source unique PRG_03, plus de re-dérivation
-                    Direction := BothIntent.Direction;
+                    ReqAscent  := BothIntent.ReqAscent;
+                    ReqDescend := BothIntent.ReqDescend;
                     StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
                 ELSIF IHM.BtnAscentM2 THEN
-                    Direction := 1;
+                    ReqAscent  := TRUE;
+                    ReqDescend := FALSE;
                     StepTgt   := Cfg.BtnStepTgt;
                 ELSIF IHM.BtnDescentM2 THEN
-                    Direction := -1;
+                    ReqAscent  := FALSE;
+                    ReqDescend := TRUE;
                     StepTgt   := Cfg.BtnStepTgt;
                 ELSE
-                    Direction := 0;
+                    ReqAscent  := FALSE;
+                    ReqDescend := FALSE;
                     StepTgt   := 0;
                 END_IF;
             ELSE
                 // Mode Joystick Maître — M2 unitaire si Select = 2, both si Select = 0
                 IF Auth.JoystickWinchSelectArbitrated = 2 THEN
-                    Direction := Joystick.AxisY.Direction;
+                    ReqAscent  := Joystick.AxisY.Direction > 0;
+                    ReqDescend := Joystick.AxisY.Direction < 0;
                     StepTgt   := Joystick.AxisY.StepTgt;
                 ELSIF BothIntent.Active THEN
                     // Both (Select=0) — source unique PRG_03, plus de re-dérivation
-                    Direction := BothIntent.Direction;
+                    ReqAscent  := BothIntent.ReqAscent;
+                    ReqDescend := BothIntent.ReqDescend;
                     StepTgt   := Joystick.AxisY.StepTgt;
                 ELSE
-                    Direction := 0;
+                    ReqAscent  := FALSE;
+                    ReqDescend := FALSE;
                     StepTgt   := 0;
                 END_IF;
             END_IF;
@@ -102,21 +114,22 @@ ELSE
             // homme-mort qualifié en joystick
             // 🔗 Atomicité Both : cf. M1 — en both, la commande ne consomme QUE le
             // permit agrégé du sens demandé. Départ jamais isolé entre les 2 treuils.
+            RequestConflict := ReqAscent AND ReqDescend;
             BothDirectionAuthorized := (NOT BothIntent.Active)
-                OR ((Direction = 1) AND Context.BothAscentPermit)
-                OR ((Direction = -1) AND Context.BothDescendPermit);
-            StartStop := (Direction <> 0)
+                OR ((ReqAscent AND NOT ReqDescend) AND Context.M1AscentAllowed AND Context.M2AscentAllowed)
+                OR ((ReqDescend AND NOT ReqAscent) AND Context.M1DescendAllowed AND Context.M2DescendAllowed);
+            RunRequest := (ReqAscent OR ReqDescend) AND NOT RequestConflict
                       AND NOT Context.WinchBothMotionBlockedByBucket
-                      AND NOT ((Context.SyncBlocksAscent   AND (Direction = -1))
-                            OR (Context.SyncBlocksDescent AND (Direction = 1)))
+                      AND NOT ((Context.SyncBlocksAscent   AND ReqDescend)
+                            OR (Context.SyncBlocksDescent AND ReqAscent))
                       AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
                       AND BothDirectionAuthorized;
         END_IF;
     END_IF;
 
     // Front de fin d'action benne : arrêt forcé sauf mouvement both actif
-    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.Direction <> 0)) THEN
-        StartStop := FALSE;
+    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.ReqAscent OR BothIntent.ReqDescend)) THEN
+        RunRequest := FALSE;
     END_IF;
 END_IF;
 

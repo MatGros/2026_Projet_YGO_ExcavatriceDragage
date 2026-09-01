@@ -29,10 +29,11 @@ VAR_INPUT
     DriveActualFreqHz   : REAL;        // --> [HW] Vitesse réelle variateur (Hz)
     BrakeFeedback       : BOOL;        // --> [HW] Retour d'état bobine frein (TRUE = ouvert/desserré)
     BrakeCmd            : BOOL;        // --> [HW] Commande frein
-    Direction           : INT;         // --> [CMD] Direction commandée (-1: vers Maintenance, 0: Stop, 1: vers Trémie)
+    RunRequest          : BOOL;        // --> [CMD] Demande de marche maintenue
+    ReqTremie           : BOOL;        // --> [CMD] Demande explicite vers Trémie
+    ReqMaintenance      : BOOL;        // --> [CMD] Demande explicite vers Maintenance
     LimitSwitchTremie   : BOOL;        // --> [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)
     LimitSwitchMaintenance : BOOL;     // --> [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)
-    MaintenanceM3TargetEnable : BOOL;  // --> [CMD] Autorisation cible Maintenance (Auth.MaintenanceM3TargetEnable)
     SensorWordIncoherent: BOOL;        // --> [HW] Mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)
 
     // 🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass)
@@ -62,8 +63,8 @@ VAR_OUTPUT
     ErrorMecaA          : BOOL;        // <-- [DIAG] Mouvement non commandé (Méca A - bit5)
     ErrorLimitSwitch    : BOOL;        // <-- [DIAG] Limite extrême Translation atteinte (bit6)
     ErrorSensorIncoherent: BOOL;       // <-- [DIAG] Incohérence mot capteurs position (bit7)
-    TremiePermit        : BOOL;        // <-- [SAFE] Permis directionnel SAFETY vers Trémie (TRUE = autorisé, fail-safe). Niveau SAFETY (pur directionnel : fin de course). Le permit EFFECTIF « pouvoir bouger » est calculé en PRG_05 §1ter (AND NOT SafeStop AND NOT PowerCutOff).
-    MaintenancePermit   : BOOL;        // <-- [SAFE] Permis directionnel SAFETY vers Maintenance (TRUE = autorisé, fail-safe). Niveau SAFETY (pur directionnel : autorisation cible + fin de course). Le permit EFFECTIF « pouvoir bouger » est calculé en PRG_05 §1ter (AND NOT SafeStop AND NOT PowerCutOff).
+    TremieLimitClear        : BOOL;        // <-- [STAT] Fin de course Trémie libre (condition interne du permis M3)
+    MaintenanceLimitClear   : BOOL;        // <-- [STAT] Fin de course Maintenance/P1 libre (condition interne du permis M3)
 END_VAR
 VAR
     ResetEdge           : R_TRIG;   // . [LOC] Front Reset
@@ -153,7 +154,7 @@ IF NOT BypassGlobal THEN
     IF NOT (BypassSafety OR BypassMecaB) THEN
         IF NOT HeartbeatIhmOk THEN
             UncommandedActiveB := (ABS(DriveActualFreqHz) > 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
-        ELSIF (Direction = 0) AND NOT BrakeCmd THEN
+        ELSIF NOT RunRequest AND NOT BrakeCmd THEN
             UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
         ELSE
             UncommandedActiveB := FALSE;
@@ -169,7 +170,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 5 : Méca A (latched)
     IF NOT (BypassSafety OR BypassMecaA) THEN
-        IF (Direction = 0) AND NOT BrakeCmd THEN
+        IF NOT RunRequest AND NOT BrakeCmd THEN
             UncommandedActiveA := ABS(DriveActualFreqHz) > 0.5;
         ELSE
             UncommandedActiveA := FALSE;
@@ -185,8 +186,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 6 : Limite extrême escalade (live)
     IF NOT (BypassSafety OR BypassLimitSwitch) THEN
-        OverrunCondition := (LimitSwitchTremie AND (Direction = 1) AND (ABS(DriveActualFreqHz) > 0.5 OR DriveStatusWord.0))
-                         OR (LimitSwitchMaintenance AND (Direction = -1) AND (ABS(DriveActualFreqHz) > 0.5 OR DriveStatusWord.0));
+        OverrunCondition := (LimitSwitchTremie AND ReqTremie AND (ABS(DriveActualFreqHz) > 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchMaintenance AND ReqMaintenance AND (ABS(DriveActualFreqHz) > 0.5 OR DriveStatusWord.0));
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
         instCauses[6].Active := TonLimitSwitchOverrun.Q;
     ELSE
@@ -228,8 +229,8 @@ IF NOT Enable THEN
     ErrorMecaA := FALSE;
     ErrorLimitSwitch := FALSE;
     ErrorSensorIncoherent := FALSE;
-    TremiePermit := FALSE;
-    MaintenancePermit := FALSE;
+    TremieLimitClear := FALSE;
+    MaintenanceLimitClear := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
@@ -263,14 +264,12 @@ ErrorSensorIncoherent := instCauses[7].Active;
 // PRG_05_Translation §1ter : Safety directionnel AND NOT M3_SafeStop_Aggregate AND NOT
 // PowerCutOff. C'est LUI qui reflète la sémantique « pouvoir bouger » : quand l'axe est en
 // défaut (SafeStop/PowerCutOff), TOUS les sens sont bloqués ; au retour en condition, un sens
-// peut être permis et pas l'autre (ex. Maintenance interdite -> MaintenancePermit=FALSE,
-// TremiePermit=TRUE). Ces sorties SAFETY alimentent aussi le gate de FB_Translation
-// (EffectiveSafeStop).
-// TremiePermit : autorisé vers Trémie tant que la fin de course Trémie n'est pas atteinte.
-TremiePermit := NOT LimitSwitchTremie;
-// MaintenancePermit : autorisé vers Maintenance uniquement si la cible Maintenance est
-// autorisée (Auth.MaintenanceM3TargetEnable) ET la fin de course Maintenance non atteinte.
-MaintenancePermit := MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance;
+// La décision des huit permis est produite en PRG_05. Ce FB ne produit que les faits
+// de sécurité nécessaires à cette décision : les deux fins de course sont-elles libres ?
+// Le droit d'accès à la zone Maintenance (MaintenanceM3TargetEnable) est volontairement
+// séparé : il ne doit pas empêcher le déplacement légal jusqu'à P1.
+TremieLimitClear := NOT LimitSwitchTremie;
+MaintenanceLimitClear := NOT LimitSwitchMaintenance;
 {endregion}
 
 END_FUNCTION_BLOCK

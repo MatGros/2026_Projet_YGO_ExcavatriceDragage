@@ -8,7 +8,8 @@
    ======================================================================= *)
 TYPE ST_WinchBothIntent :
 STRUCT
-    Active    : BOOL; // Intention both active (homme-mort qualifié + Select=0 OU boutons BothUp/BothDown)
-    Direction : INT;  // Sens d'intention (-1: Descending, 0: Neutre, +1: Ascending)
+    Active      : BOOL; // Intention both active (homme-mort qualifié + Select=0 OU boutons BothUp/BothDown)
+    ReqAscent   : BOOL; // Intention both montée
+    ReqDescend  : BOOL; // Intention both descente
 END_STRUCT
 END_TYPE

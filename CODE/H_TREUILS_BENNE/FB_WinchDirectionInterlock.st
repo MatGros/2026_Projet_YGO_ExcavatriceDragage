@@ -13,12 +13,15 @@ VAR_INPUT
     Enable          : BOOL;   // --> [CMD] Gate TON (TRUE = treuil arrete, contacteurs retombes)
     EnableRising    : BOOL;   // --> [CMD] Front montant Enable du FB parent (D18)
     Reset           : BOOL;   // --> [CMD] Acquittement defaut (front) : purge la memoire de direction
-    ReqDirection    : INT;    // --> [CMD] Sens demande (-1: Descending, 0: Stop, 1: Ascending)
+    ReqAscent       : BOOL;   // --> [CMD] Demande montée
+    ReqDescend      : BOOL;   // --> [CMD] Demande descente
     ChangeDelayAscent   : TIME;   // --> [CFG] Delai interlock changement de sens montee
     ChangeDelayDescent : TIME;   // --> [CFG] Delai interlock changement de sens descente
 END_VAR
 VAR_OUTPUT
-    CommandedDirection      : INT;   // <-- [DIAG] Sens interne memorise
+    CommandedAscent         : BOOL;  // <-- [DIAG] Sens interne mémorisé : montée
+    CommandedDescend        : BOOL;  // <-- [DIAG] Sens interne mémorisé : descente
+    RequestConflict         : BOOL;  // <-- [DIAG] Double demande refusée
     DirectionChangePending  : BOOL;  // <-- [DIAG] Changement de sens en attente
     DelayElapsed            : TIME;  // <-- [DIAG] Ecoule delai changement de sens
 END_VAR
@@ -26,7 +29,10 @@ VAR
     DirectionChangeDelay : TON;      // . [LOC] Temporisation changement de sens
     EffectiveDelay       : TIME;     // . [LOC] Delai effectif selon sens
     DeadTimeArmed        : BOOL;     // . [LOC] Temps mort D18 arme (front Enable)
-    LastDirection        : INT;      // . [LOC] Dernier sens non nul memorise (interlock apres neutre)
+    LastAscent           : BOOL;     // . [LOC] Dernier sens adopté : montée
+    LastDescend          : BOOL;     // . [LOC] Dernier sens adopté : descente
+    RequestActive        : BOOL;     // . [LOC] Une seule demande de sens active
+    DirectionChanged     : BOOL;     // . [LOC] Demande différente du sens commandé
     ResetEdge            : R_TRIG;   // . [LOC] Front Reset : purge la memoire de direction
 END_VAR
 
@@ -36,37 +42,48 @@ END_VAR
 // l'historique, une reprise apres Reset est un depart propre, pas une inversion).
 ResetEdge(CLK := Reset);
 IF ResetEdge.Q THEN
-    LastDirection := 0;
-    CommandedDirection := 0;
+    LastAscent := FALSE;
+    LastDescend := FALSE;
+    CommandedAscent := FALSE;
+    CommandedDescend := FALSE;
     DeadTimeArmed := FALSE;
     DirectionChangePending := FALSE;
 END_IF;
 
-// Delai effectif selon le sens demande
-IF ReqDirection > 0 THEN
+RequestConflict := ReqAscent AND ReqDescend;
+RequestActive := (ReqAscent OR ReqDescend) AND NOT RequestConflict;
+
+// Délai effectif selon le sens demandé
+IF ReqAscent AND NOT ReqDescend THEN
     EffectiveDelay := ChangeDelayAscent;
 ELSE
     EffectiveDelay := ChangeDelayDescent;
 END_IF;
 
+DirectionChanged := (ReqAscent AND NOT CommandedAscent)
+                 OR (ReqDescend AND NOT CommandedDescend)
+                 OR (CommandedAscent AND NOT ReqAscent)
+                 OR (CommandedDescend AND NOT ReqDescend);
+
 // D18 : au front montant Enable avec sens maintenu, armer le temps mort
 // (ne pas re-adopter le sens immediatement — pas de redemarrage inrush).
-IF EnableRising AND (ReqDirection <> 0) THEN
+IF EnableRising AND RequestActive THEN
     DeadTimeArmed := TRUE;
 END_IF;
 
 // Temporisation : compte quand un changement de sens est demande et treuil arrete
 DirectionChangeDelay(
-    IN := Enable AND (ReqDirection <> 0) AND (ReqDirection <> CommandedDirection),
+    IN := Enable AND RequestActive AND DirectionChanged,
     PT := EffectiveDelay
 );
 DelayElapsed := DirectionChangeDelay.ET;
 
 // Adoption du sens
-IF ReqDirection = 0 THEN
-    // Neutre : CommandedDirection := 0 (relais/diagnostic neutres). La memoire du
-    // dernier sens non nul (LastDirection) est conservee pour l'interlock de reprise.
-    CommandedDirection := 0;
+IF NOT RequestActive THEN
+    // Neutre ou double demande : aucun sens commandé. Une double demande est
+    // explicitement refusée, sans priorité implicite.
+    CommandedAscent := FALSE;
+    CommandedDescend := FALSE;
     DirectionChangePending := FALSE;
     DeadTimeArmed := FALSE;
 ELSIF DeadTimeArmed THEN
@@ -74,19 +91,23 @@ ELSIF DeadTimeArmed THEN
     DirectionChangePending := TRUE;
 ELSIF DirectionChangeDelay.Q THEN
     // Temps mort ecoule : adoption du sens
-    CommandedDirection := ReqDirection;
+    CommandedAscent := ReqAscent;
+    CommandedDescend := ReqDescend;
     DirectionChangePending := FALSE;
     DeadTimeArmed := FALSE;
-ELSIF (CommandedDirection = 0) AND (ReqDirection <> 0) THEN
+ELSIF NOT (CommandedAscent OR CommandedDescend) THEN
     // Depuis le neutre : depart immediat si reprise du MEME sens (ou premier sens),
     // sinon (sens oppose) pending + delai dedie obligatoire.
-    IF (LastDirection = 0) OR (ReqDirection = LastDirection) THEN
-        CommandedDirection := ReqDirection;
+    IF (NOT (LastAscent OR LastDescend))
+       OR (ReqAscent AND LastAscent)
+       OR (ReqDescend AND LastDescend) THEN
+        CommandedAscent := ReqAscent;
+        CommandedDescend := ReqDescend;
         DirectionChangePending := FALSE;
     ELSE
         DirectionChangePending := TRUE;
     END_IF;
-ELSIF (ReqDirection <> 0) AND (ReqDirection <> CommandedDirection) THEN
+ELSIF DirectionChanged THEN
     // Inversion directe (sans passage au neutre) : pending + delai
     DirectionChangePending := TRUE;
 ELSE
@@ -95,8 +116,9 @@ END_IF;
 
 // Memorise le dernier sens non nul ADOPTE (pas la simple demande) : c'est ce sens qui
 // sert de reference pour detecter une reprise opposee apres passage au neutre.
-IF CommandedDirection <> 0 THEN
-    LastDirection := CommandedDirection;
+IF CommandedAscent OR CommandedDescend THEN
+    LastAscent := CommandedAscent;
+    LastDescend := CommandedDescend;
 END_IF;
 
 END_FUNCTION_BLOCK

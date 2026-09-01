@@ -1071,13 +1071,21 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Palier plafonné à 1 : approche limite basse (câble ou légale)</xhtml>
               </documentation>
             </variable>
-            <variable name="CommandedDirection">
+            <variable name="CommandedAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Diagnostic délai ressenti à la remontée
-🩺 Sens interne mémorisé FB_Winch (-1/0/+1)</xhtml>
+🩺 Sens interne mémorisé FB_Winch : montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandedDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Sens interne mémorisé FB_Winch : descente</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionChangeDelayElapsed">

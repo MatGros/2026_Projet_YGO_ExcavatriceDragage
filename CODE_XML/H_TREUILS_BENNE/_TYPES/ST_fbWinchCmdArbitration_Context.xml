@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T05:21:26.937670" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T05:21:26.937670">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:21:30.155138" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:21:30.155138">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -34,12 +34,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Action benne en cours (instBucket.Lifecycle.Busy)</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketM2StartStop">
+            <variable name="BucketM2RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande M2 par la benne active (instBucket.M2_StartStop)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande M2 par la benne active</xhtml>
               </documentation>
             </variable>
             <variable name="BucketM2Open">
@@ -47,7 +47,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ouverture benne (instBucket.M2_Direction = 1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ouverture benne</xhtml>
               </documentation>
             </variable>
             <variable name="BucketM2Close">
@@ -55,7 +55,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Fermeture benne (instBucket.M2_Direction = -1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Fermeture benne</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothMotionBlockedByBucket">
@@ -82,7 +82,7 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)</xhtml>
               </documentation>
             </variable>
-            <variable name="BothAscentPermit">
+            <variable name="M1AscentAllowed">
               <type>
                 <BOOL />
               </type>
@@ -91,15 +91,31 @@
 PRG_04 calcule BothAscentPermit/BothDescendPermit = AND des 4 permits effectifs.
 En commande both, la commande ne consomme QUE ces agrégats (jamais les permits
 individuels directement) : les 2 treuils partent ensemble ou aucun (NC-100).
---&gt; [SAFE] Permit montée Both (EffectivePermitM1_Ascent AND EffectivePermitM2_Ascent)</xhtml>
+--&gt; [SAFE] Fait EffectivePermitM1_Ascent</xhtml>
               </documentation>
             </variable>
-            <variable name="BothDescendPermit">
+            <variable name="M1DescendAllowed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permit descente Both (EffectivePermitM1_Descend AND EffectivePermitM2_Descend)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fait EffectivePermitM1_Descend</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2AscentAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fait EffectivePermitM2_Ascent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2DescendAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fait EffectivePermitM2_Descend</xhtml>
               </documentation>
             </variable>
             <variable name="BothBlock">

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T06:51:18.154207" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T06:51:18.154207">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:24:21.207082" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:24:21.207082">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -296,6 +296,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: bitfield brut FB_Bucket (bit0 configuration, bit1 écart M2/M1, bit2 timeout, bit3 glissement M1, bit4 codeurs non référencés)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx307_EffectivePermit_Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = ouverture benne physiquement autorisée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx308_EffectivePermit_Close">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = fermeture benne physiquement autorisée</xhtml>
               </documentation>
             </variable>
             <variable name="Idx401_BucketBusy">

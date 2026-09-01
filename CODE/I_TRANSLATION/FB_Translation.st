@@ -2,7 +2,7 @@
    ⚙️ FB_Translation — Directeur de l'axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
-   🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l'interface
+   🔌 FB DE MOUVEMENT : porte RunRequest + SafeStop en plus de l'interface
       standard. Précédence Enable > SafeStop > StartStop.
    Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
    🔧 Interface plate → structs : configuration regroupée en `Cfg : ST_fbTranslation_Cfg`
@@ -20,9 +20,10 @@ VAR_INPUT
     Reset                       : BOOL;        // --> [CMD] Acquittement défaut (front)
     PowerContactorEngaged       : BOOL;        // --> [SAFE] Chaîne AU réarmée + conditions globales OK
     Mode                        : E_Mode;      // --> [CMD] Mode courant
-    StartStop                   : BOOL;        // --> [CMD] TRUE = rampe accélération, FALSE = rampe décélération NORMALE
+    RunRequest                  : BOOL;        // --> [CMD] Demande de marche maintenue (FALSE = décélération/arrêt)
     SafeStop                    : BOOL;        // --> [SAFE] Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
-    Direction                   : INT;         // --> [CMD] -1 = vers Maintenance, 0 = Neutre, +1 = vers Trémie (source d'autorité du sens)
+    ReqTremie                   : BOOL;        // --> [CMD] Demande explicite vers Trémie
+    ReqMaintenance              : BOOL;        // --> [CMD] Demande explicite vers Maintenance
     SpeedTgt_Pct                : REAL;        // --> [CMD] Magnitude de la consigne (de 0 à 100%)
     PositionSensorTarget        : BOOL;        // --> [HW] Capteur position cible courante
     SlowdownSensorTremie        : BOOL;        // --> [HW] Capteur PV — ralentissement avant Trémie (Direction=1)
@@ -31,9 +32,9 @@ VAR_INPUT
     LimitSwitchTremie           : BOOL;        // --> [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)
     LimitSwitchMaintenance      : BOOL;        // --> [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)
 
-    // 🛡️ Permis directionnels SAFETY (source FB_Safety_Translation) — gate de sens
-    TremiePermit                : BOOL := FALSE;  // --> [SAFE] Permis directionnel SAFETY vers Trémie (TRUE = autorisé, fail-safe)
-    MaintenancePermit           : BOOL := FALSE;  // --> [SAFE] Permis directionnel SAFETY vers Maintenance (TRUE = autorisé, fail-safe)
+    // 🛡️ Permis directionnels canoniques M3 — gate de sens (TRUE = autorisé)
+    EffectivePermitM3_Tremie    : BOOL := FALSE;  // --> [SAFE] Permis effectif vers Trémie
+    EffectivePermitM3_Maintenance : BOOL := FALSE; // --> [SAFE] Permis effectif vers Maintenance/P1
 
     // 🔌 Spécifique ETHERCAT
     DriveStatusWord             : WORD;       // --> [HW] Mot d'état AC600 lu depuis l'image d'entrée EtherCAT
@@ -64,13 +65,16 @@ VAR
     SpeedRamp                   : FB_Ramp;       // * [INST] Rampe de vitesse logicielle (PLC)
     ResetEdge                   : R_TRIG;   // . [LOC] Front Reset
     DirectionChangeDelay        : TON;            // . [LOC] Interlock changement de sens
-    CommandedDirection          : INT;            // . [LOC] Sens réellement appliqué
+    CommandedTremie             : BOOL;           // . [LOC] Sens Trémie réellement appliqué
+    CommandedMaintenance        : BOOL;           // . [LOC] Sens Maintenance réellement appliqué
     DirectionChangePending      : BOOL;         // . [LOC] Force la rampe à 0 pendant une inversion de sens en attente
-    PhysicalDriveDirection      : INT;          // . [LOC] CommandedDirection compensé câblage
+    PhysicalTremie               : BOOL;         // . [LOC] Sens physique Trémie après inversion câblage
+    PhysicalMaintenance          : BOOL;         // . [LOC] Sens physique Maintenance après inversion câblage
     RampTargetPct               : REAL;   // . [LOC] Cible rampe en %
     CaptorDebounceTon           : TON;    // . [LOC] Debounce capteur cible
     ArrivalEdge                 : R_TRIG;   // . [LOC] Front arrivée sur capteur
-    DirectionAtArrival           : INT;    // . [LOC] Sens d'arrivée mémorisé
+    ArrivalWasTremie             : BOOL;  // . [LOC] Sens d'arrivée mémorisé
+    ArrivalWasMaintenance        : BOOL;  // . [LOC] Sens d'arrivée mémorisé
     ArrivalLock                 : BOOL;        // . [LOC] Arrêt exact sur capteur cible
     MovementRequested           : BOOL;         // . [LOC] Pilote FB_Brake
     FirstScanDone               : BOOL;   // . [LOC] Initialisation premier scan
@@ -105,7 +109,7 @@ instCauses[3].Active   := DriveFaultLatching;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Defaut variateur translation AC600';
 
-IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchTremie) OR (CommandedDirection = -1 AND LimitSwitchMaintenance)) THEN
+IF NOT BypassLimitSwitch AND ((CommandedTremie AND LimitSwitchTremie) OR (CommandedMaintenance AND LimitSwitchMaintenance)) THEN
     instCauses[6].Active := TRUE;
 ELSE
     instCauses[6].Active := FALSE;
@@ -129,9 +133,12 @@ IF NOT Enable THEN
     BrakeCommandOpenConfirmed := FALSE;
     BrakeContactorCheck.Command := FALSE;
     BrakeContactorCheck.Feedback := BrakeFeedback;
-    CommandedDirection := 0;
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
     ArrivalLock := FALSE;
+    ArrivalWasTremie := FALSE;
+    ArrivalWasMaintenance := FALSE;
     TargetReached := FALSE;
     DirectionChangeDelay(IN := FALSE);
     CaptorDebounceTon(IN := FALSE);
@@ -146,7 +153,8 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Premier scan et temps de cycle"}
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    CommandedDirection := Direction;
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
 END_IF;
 
 CycleTimeCalc();
@@ -159,52 +167,60 @@ ArrivalEdge(CLK := TargetReached);
 
 IF ArrivalEdge.Q THEN
     ArrivalLock := TRUE;
-    DirectionAtArrival := CommandedDirection;
+    ArrivalWasTremie := CommandedTremie;
+    ArrivalWasMaintenance := CommandedMaintenance;
 END_IF;
 
-IF ArrivalLock AND (Direction <> 0) AND (Direction <> DirectionAtArrival) THEN
+IF ArrivalLock AND ((ReqTremie AND NOT ArrivalWasTremie) OR (ReqMaintenance AND NOT ArrivalWasMaintenance)) THEN
     ArrivalLock := FALSE;
 END_IF;
 
 DirectionChangeDelay(
-    IN := (Direction <> 0) AND (Direction <> CommandedDirection) AND (ABS(SpeedRamp.Current) <= 0.1) AND (ABS(DriveActualFreqHz) <= 0.5),
+    IN := (ReqTremie OR ReqMaintenance)
+          AND ((ReqTremie AND NOT CommandedTremie) OR (ReqMaintenance AND NOT CommandedMaintenance))
+          AND (ABS(SpeedRamp.Current) <= 0.1)
+          AND (ABS(DriveActualFreqHz) <= 0.5),
     PT := Cfg.DirectionInterlockDelay
 );
 
-IF (CommandedDirection = 0) AND (Direction <> 0) THEN
-    CommandedDirection := Direction;
+IF NOT (CommandedTremie OR CommandedMaintenance) AND (ReqTremie OR ReqMaintenance) THEN
+    CommandedTremie := ReqTremie;
+    CommandedMaintenance := ReqMaintenance;
     DirectionChangePending := FALSE;
 ELSIF DirectionChangeDelay.Q THEN
-    CommandedDirection := Direction;
+    CommandedTremie := ReqTremie;
+    CommandedMaintenance := ReqMaintenance;
     DirectionChangePending := FALSE;
-ELSIF (Direction <> 0) AND (Direction <> CommandedDirection) THEN
+ELSIF (ReqTremie OR ReqMaintenance)
+      AND ((ReqTremie AND NOT CommandedTremie) OR (ReqMaintenance AND NOT CommandedMaintenance)) THEN
     DirectionChangePending := TRUE;
 ELSE
     DirectionChangePending := FALSE;
 END_IF;
 
-IF Direction = 0 THEN
-    CommandedDirection := 0;
+IF NOT (ReqTremie OR ReqMaintenance) THEN
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
 END_IF;
 {endregion}
 
 {region "§4bis Permis directionnels et EffectiveSafeStop"}
 // 🛡️ 4bis. GATE DE SENS (permis directionnels SAFETY) — modèle treuils FB_Winch
-// EffectiveSafeStop = SafeStop OR (Direction>0 ET Trémie non permise). Bloque la RAMPE
-// (arrêt réel) vers un sens non autorisé SANS toucher à Direction : l'estimateur de position,
-// les verrous bistables et la sélection PositionSensorTarget (PRG_05) restent informés.
+// RampStopActive = SafeStop OR demande vers un sens non permis. Bloque la RAMPE
+// (arrêt réel) vers un sens non autorisé sans fabriquer de sens numérique.
 // Consommé dans la gate de rampe (§5) et le choix de décélération.
-// ⚠️ Le sens Maintenance (−1) n'est PAS gaté ici : le segment P1→Maintenance est déjà protégé
-// par la coupure dure M3_LimitSwitchMaintenanceEffective (PRG_05:128-130) et les ralentissements.
-// Gater −1 sur MaintenancePermit bloquerait l'accès à P1 quand Maintenance n'est pas autorisée
-// (régression fonctionnelle). Le gate ne bloque que +1 (Trémie).
+// Le permis Maintenance représente la possibilité de rejoindre P1/maintenance physique ;
+// l'interdiction d'accès à la zone Maintenance est gérée séparément par la cible P1 et sa
+// coupure dure, sans couper le déplacement légal jusqu'à P1.
 EffectiveSafeStop := SafeStop
-                      OR (Direction > 0 AND NOT TremiePermit);
+                      OR (ReqTremie AND NOT EffectivePermitM3_Tremie)
+                      OR (ReqMaintenance AND NOT EffectivePermitM3_Maintenance)
+                      OR (ReqTremie AND ReqMaintenance);
 {endregion}
 
 {region "§5 Consigne et rampe de vitesse"}
-IF DirectionChangePending OR (Direction = 0) OR ArrivalLock OR EffectiveSafeStop OR NOT StartStop THEN
+IF DirectionChangePending OR NOT (ReqTremie OR ReqMaintenance) OR ArrivalLock OR EffectiveSafeStop OR NOT RunRequest THEN
     RampTargetPct := 0.0;
 ELSE
     RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
@@ -243,15 +259,16 @@ BrakeReleaseRequest := Brake.BrakeCmd;
 BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
 BrakeContactorCheck := Brake.ContactorCheck;
 
+PhysicalTremie := CommandedTremie;
+PhysicalMaintenance := CommandedMaintenance;
 IF InvertDriveDirection THEN
-    PhysicalDriveDirection := -CommandedDirection;
-ELSE
-    PhysicalDriveDirection := CommandedDirection;
+    PhysicalTremie := CommandedMaintenance;
+    PhysicalMaintenance := CommandedTremie;
 END_IF;
 
-IF (PhysicalDriveDirection = 1) AND Brake.BrakeCmd THEN
+IF PhysicalTremie AND Brake.BrakeCmd THEN
     RequestedDriveControlWord := 1; // FWD
-ELSIF (PhysicalDriveDirection = -1) AND Brake.BrakeCmd THEN
+ELSIF PhysicalMaintenance AND Brake.BrakeCmd THEN
     RequestedDriveControlWord := 2; // REV
 ELSE
     RequestedDriveControlWord := 0;
@@ -260,11 +277,11 @@ END_IF;
 RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * Cfg.DriveFreqScaleMaxHz;
 
 // Ralentissements d'approche
-IF (CommandedDirection = 1) AND SlowdownSensorTremie THEN
+IF CommandedTremie AND SlowdownSensorTremie THEN
     RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedTremieHz);
-ELSIF (CommandedDirection = -1) AND SlowdownSensorMaintenance THEN
+ELSIF CommandedMaintenance AND SlowdownSensorMaintenance THEN
     RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedMaintenanceHz);
-ELSIF (CommandedDirection = -1) AND SlowdownSensorP1 THEN
+ELSIF CommandedMaintenance AND SlowdownSensorP1 THEN
     RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedP1Hz);
 END_IF;
 

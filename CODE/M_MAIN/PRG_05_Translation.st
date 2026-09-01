@@ -37,8 +37,10 @@ VAR
     TranslationState                 : ST_TranslationState;                 // . [LOC] Etat public translation M3
     TranslationSafety                : ST_SafetyTranslation;                // . [LOC] Diagnostic et securites translation M3
 
-    M3_StartStop_Active     : BOOL;
-    M3_Direction_Active     : INT;
+    M3_RunRequest_Active    : BOOL;
+    M3_ReqTremie_Active     : BOOL;
+    M3_ReqMaintenance_Active : BOOL;
+    M3_CommandConflict      : BOOL;
     M3_SpeedCmd_Active      : REAL;
     M3_PositioningActive    : BOOL;
     M3_PositionSensorTarget : BOOL;
@@ -52,8 +54,8 @@ VAR
     // 🟢 Permis directionnels M3 EFFECTIFS (D1 — Phase 3) : information de POSSIBILITÉ de
     // mouvement dans une direction, donnée AVANT l'ordre. Reflète les conditions physiques/
     // logiques (fins de course, défauts, autorisation cible) — PAS la commande (homme-mort).
-    // Pour M3, les conditions physiques sont déjà dans FB_Safety_Translation (TremiePermit/
-    // MaintenancePermit) ; pas de Process supplémentaire (pas de benne/Kobold comme les treuils).
+    // Pour M3, les conditions physiques sont calculées ici à partir des faits Safety ;
+    // pas de permis secondaire (pas de benne/Kobold comme les treuils).
     EffectivePermitM3_Tremie    : BOOL; // 🟢 Permis effectif M3 vers Trémie (Safety)
     EffectivePermitM3_Maintenance : BOOL; // 🟢 Permis effectif M3 vers Maintenance (Safety)
 
@@ -135,13 +137,13 @@ M3_LimitSwitchMaintenanceEffective := SEL(PRG_03_Modes_Cycle.Data.Auth.Maintenan
 // Se libère uniquement sur un mouvement effectif dans le SENS INVERSE (dégagement).
 IF instPosDecoderM3.LimitSwitchTremie THEN
     M3_LimitSwitchTremieStable := TRUE;
-ELSIF M3_Direction_Active = -1 THEN
+ELSIF M3_ReqMaintenance_Active THEN
     M3_LimitSwitchTremieStable := FALSE;
 END_IF;
 
 IF M3_LimitSwitchMaintenanceEffective THEN
     M3_LimitSwitchMaintenanceStable := TRUE;
-ELSIF M3_Direction_Active = 1 OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchMaintenance) THEN
+ELSIF M3_ReqTremie_Active OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchMaintenance) THEN
     M3_LimitSwitchMaintenanceStable := FALSE;
 END_IF;
 
@@ -202,12 +204,14 @@ instArbM3(
 );
 M3_PositioningActive := instArbM3.PositioningActive;
 SelTarget := instArbM3.SelTarget;
-M3_StartStop_Active := instArbM3.StartStop;
-M3_Direction_Active := instArbM3.Direction;
+M3_RunRequest_Active := instArbM3.RunRequest;
+M3_ReqTremie_Active := instArbM3.ReqTremie;
+M3_ReqMaintenance_Active := instArbM3.ReqMaintenance;
+M3_CommandConflict := instArbM3.CommandConflict;
 M3_SpeedCmd_Active := instArbM3.SpeedPct;
 
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
-// de commande variateur en sortie — M3_Direction_Active reste partout le sens sémantique réel.
+// de commande variateur en sortie — les bits ReqTremie/ReqMaintenance restent le sens sémantique réel.
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
 // les retours frein/thermique/positions du VH_0808ETP/VH_0800END portant M3 — rampe rapide.
@@ -223,10 +227,10 @@ CASE SelTarget OF
     3: M3_PositionSensorTarget := M3_AtP1Stable;
     4: M3_PositionSensorTarget := M3_AtMaintenanceStable;
 ELSE
-    IF M3_Direction_Active = 1 THEN
+    IF M3_ReqTremie_Active THEN
         // En Marche Avant (+1 vers Trémie) : seule Trémie est le point d'arrêt automatique
         M3_PositionSensorTarget := M3_AtTremieStable;
-    ELSIF M3_Direction_Active = -1 THEN
+    ELSIF M3_ReqMaintenance_Active THEN
         // En Marche Arrière (-1 vers Maintenance) :
         // - Si Maintenance autorisée -> arrêt sur Maintenance
         // - Si Maintenance interdite -> arrêt sur P1
@@ -265,10 +269,11 @@ instSafetyTranslationM3(
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BrakeCmd                := instTranslationM3.BrakeReleaseRequest,
-    Direction               := M3_Direction_Active,
+    RunRequest              := M3_RunRequest_Active,
+    ReqTremie               := M3_ReqTremie_Active,
+    ReqMaintenance          := M3_ReqMaintenance_Active,
     LimitSwitchTremie       := M3_LimitSwitchTremieStable,
     LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
-    MaintenanceM3TargetEnable := PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable,
     SensorWordIncoherent    := instPosDecoderM3.Incoherent,
     BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
     BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
@@ -298,31 +303,27 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
 // autorisation cible). Il ne reflète PAS la commande (homme-mort) : l'homme-mort est une
 // condition de COMMANDE (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle), pas de
 // possibilité — il n'entre donc PAS dans le permit exposé.
-// Pour M3, le Safety (FB_Safety_Translation) fournit :
-//   - TremiePermit = NOT LimitSwitchTremie (direction possible vers Trémie)
-//   - MaintenancePermit = MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance
+// Pour M3, le Safety (FB_Safety_Translation) fournit les faits de sécurité :
+//   - TremieLimitClear = NOT LimitSwitchTremie (direction possible vers Trémie)
+//   - MaintenanceLimitClear = NOT LimitSwitchMaintenance (direction possible jusqu'à P1)
 //   - SafeStop / PowerCutOff = défauts (thermique, Méca A/B, incohérence, comm, phases...)
-// Le permit effectif = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff
+// Le permis effectif = fait de limite libre AND NOT SafeStop AND NOT PowerCutOff
 // (prêt à fonctionner), aligné sur le modèle treuils où le Safety produit déjà des
-// permits gatés par les défauts. Pas de Process supplémentaire (pas de benne/Kobold).
+// permis gatés par les défauts. Pas de Process supplémentaire (pas de benne/Kobold).
 // ⚠️ Le verrou « descente treuil interdite tant que M3 pas à P1 » (DumpAtTremieDescentLocked)
 // est côté TREUIL (PRG_04 §5, lignes 802-805), pas dans le permit M3 : le permit M3 reste une
 // information de possibilité de mouvement de la translation, indépendante de l'état de la trémie.
 // ⚠️ Le permit M3 est un permit EFFECTIF « pouvoir bouger » (prêt à fonctionner), PAS un pur
 // directionnel. Quand l'axe est en défaut (SafeStop/PowerCutOff), TOUS les sens sont bloqués ;
-// au retour en condition, un sens peut être permis et pas l'autre (ex. Maintenance interdite ->
-// MaintenancePermit=FALSE, TremiePermit=TRUE). Ce niveau effectif est exposé à l'IHM.
-// ⚠️ Ces permis effectifs sont des valeurs de DIAGNOSTIC/IHM (lecture seule) : la commande
-// réelle reste gatée par M3_SafeStop_Aggregate (PRG_05:343, superset incluant InputModuleFault)
-// et l'homme-mort (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle). Aucun impact sur la
-// chaîne de sécurité. Le gate (FB_Translation, EffectiveSafeStop) consomme les permits
-// directionnels SAFETY (instSafetyTranslationM3.TremiePermit/MaintenancePermit), pas ce niveau effectif.
-EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremiePermit
+// au retour en condition, un sens peut être permis et pas l'autre. L'interdiction d'accès à la
+// zone Maintenance ne retire PAS le permis de rejoindre P1 : elle agit sur la cible et la
+// coupure dure M3_LimitSwitchMaintenanceEffective.
+EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremieLimitClear
                                AND NOT M3_SafeStop_Aggregate
                                AND NOT instSafetyTranslationM3.PowerCutOff;
-EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenancePermit
-                                 AND NOT M3_SafeStop_Aggregate
-                                 AND NOT instSafetyTranslationM3.PowerCutOff;
+EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenanceLimitClear
+                                  AND NOT M3_SafeStop_Aggregate
+                                  AND NOT instSafetyTranslationM3.PowerCutOff;
 
 {endregion}
 
@@ -349,9 +350,10 @@ instTranslationM3(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                    := PRG_03_Modes_Cycle.Data.Auth.Mode,
-    StartStop               := M3_StartStop_Active,
+    RunRequest              := M3_RunRequest_Active,
     SafeStop                := M3_SafeStop_Aggregate,
-    Direction               := M3_Direction_Active,
+    ReqTremie               := M3_ReqTremie_Active,
+    ReqMaintenance          := M3_ReqMaintenance_Active,
     InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
     SpeedTgt_Pct            := M3_SpeedCmd_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
@@ -370,8 +372,8 @@ instTranslationM3(
     LimitSwitchTremie       := M3_LimitSwitchTremieStable,
     LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
     // 🛡️ Permis directionnels SAFETY (source unique instSafetyTranslationM3) — gate de sens FB_Translation
-    TremiePermit            := instSafetyTranslationM3.TremiePermit,
-    MaintenancePermit       := instSafetyTranslationM3.MaintenancePermit,
+    EffectivePermitM3_Tremie := EffectivePermitM3_Tremie,
+    EffectivePermitM3_Maintenance := EffectivePermitM3_Maintenance,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     Cfg                     := TranslationCfg,
@@ -385,7 +387,8 @@ instPosEstimatorM3(
     Enable               := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE),
     Reset                := PRG_07_Supervision.FaultMachineReset_IHM,
     DriveActualFreqHz    := TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
-    Direction            := M3_Direction_Active,
+    ReqTremie            := M3_ReqTremie_Active,
+    ReqMaintenance       := M3_ReqMaintenance_Active,
     SensorMaintenance    := instPosDecoderM3.TranslationPosMaintenance,
     SensorP1             := instPosDecoderM3.TranslationPosP1,
     SensorP2             := instPosDecoderM3.TranslationPosP2,
@@ -443,11 +446,12 @@ TranslationState.BrakeFeedback := PRG_02_Acquisition.HwIn.Translation.M3_BrakeIs
 TranslationState.PositionReached := instTranslationM3.TargetReached;
 TranslationState.DriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationState.DriveFreqCmd_Hz := instTranslationM3.RequestedDriveFreqHz;
-// 🎯 Cohérence sim : ActiveDirection/SpeedCmd_Pct n'affichent la
+// 🎯 Cohérence sim : les bits actifs/SpeedCmd_Pct n'affichent la
 // consigne QUE si la commande variateur est réellement émise (RequestedDriveControlWord <> 0).
 // Sinon, un interlock bloquant (hauteur, SafeStop…) laisserait l'IHM suggérer un mouvement
 // qui n'a pas lieu ("je bouge mais ça bouge pas"). Affiche 0 quand c'est bloqué.
-TranslationState.ActiveDirection := SEL(instTranslationM3.RequestedDriveControlWord <> 0, M3_Direction_Active, 0);
+TranslationState.ActiveTremie := instTranslationM3.RequestedDriveControlWord = 1;
+TranslationState.ActiveMaintenance := instTranslationM3.RequestedDriveControlWord = 2;
 TranslationState.SpeedCmd_Pct := SEL(instTranslationM3.RequestedDriveControlWord <> 0, M3_SpeedCmd_Active, 0.0);
 TranslationState.PositionTremie := instPosDecoderM3.TranslationPosTremie;
 TranslationState.PositionPV := instPosDecoderM3.TranslationPosPV;
@@ -504,8 +508,8 @@ TranslationSafety.ErrorLimitSwitch := instSafetyTranslationM3.ErrorLimitSwitch;
 TranslationSafety.ErrorSensorIncoherent := instSafetyTranslationM3.ErrorSensorIncoherent;
 // 🟢 Permis directionnels M3 EFFECTIFS (D1 — Safety AND Process, §1ter) — projetés vers l'IHM
 // (source safety : FB_Safety_Translation ; fusion Process en local, modèle treuils PRG_04 §5)
-TranslationSafety.TremiePermit := EffectivePermitM3_Tremie;
-TranslationSafety.MaintenancePermit := EffectivePermitM3_Maintenance;
+TranslationSafety.EffectivePermitM3_Tremie := EffectivePermitM3_Tremie;
+TranslationSafety.EffectivePermitM3_Maintenance := EffectivePermitM3_Maintenance;
 TranslationSafety.PowerCutOffSafety := PRG_06_Outputs.M3PowerCutOffSafetyInfo;
 TranslationSafety.SafeStopSafety := PRG_06_Outputs.M3SafeStopSafetyInfo;
 TranslationSafety.BlockedBySafety := PRG_06_Outputs.M3BlockedBySafetyInfo;
@@ -524,8 +528,8 @@ TranslationTrace.HeightInterlockBlocking  := NOT M3_HeightInterlockOk;
 TranslationTrace.DriveOperational         := PRG_02_Acquisition.Data.Network.DriveM3.Operational;
 TranslationTrace.FinalInterlockError      := TranslationState.FinalInterlockError;
 // 🟢 Permis directionnels par sens EFFECTIFS (D1 — Safety AND Process, §1ter) — reflet exact des permis appliqués
-TranslationTrace.TremiePermitEffective    := EffectivePermitM3_Tremie;
-TranslationTrace.MaintenancePermitEffective := EffectivePermitM3_Maintenance;
+TranslationTrace.EffectivePermitM3_Tremie      := EffectivePermitM3_Tremie;
+TranslationTrace.EffectivePermitM3_Maintenance := EffectivePermitM3_Maintenance;
 
 // Permis de mouvement effectif = toutes les barrières levées (agrégat diagnostic)
 TranslationTrace.MotionPermitEffective := NOT M3_SafeStop_Aggregate

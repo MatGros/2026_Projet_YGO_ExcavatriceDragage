@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Arbitrer la source de commande M3 (joystick jog / boutons IHM /
        demande cycle selon le mode) et produire la commande arbitrée.
-   🔌 FB d'arbitrage (non-mouvement) : ne porte ni SafeStop ni StartStop
+   🔌 FB d'arbitrage (non-mouvement) : ne porte ni SafeStop ni arrêt de sécurité
        de sécurité — il produit la commande logique, la safety reste dans
        FB_Safety_Translation / FB_Translation.
    📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
@@ -24,9 +24,11 @@ VAR_INPUT
     Cfg            : ST_fbTranslationCmdArbitration_Cfg;     // --> [CFG] Fréquence max (échelle FreqPct)
 END_VAR
 VAR_OUTPUT
-    Ready             : BOOL;  // <-- [STAT] FB prêt à arbitrer (Enable)
-    StartStop         : BOOL;  // <-- [CMD] Commande marche/arrêt arbitrée
-    Direction         : INT;   // <-- [CMD] Sens arbitré (-1: vers Maintenance, 0: Stop, 1: vers Trémie)
+  Ready             : BOOL;  // <-- [STAT] FB prêt à arbitrer (Enable)
+  RunRequest        : BOOL;  // <-- [CMD] Demande de marche maintenue (FALSE = décélération/arrêt)
+  ReqTremie         : BOOL;  // <-- [CMD] Demande explicite vers Trémie
+  ReqMaintenance    : BOOL;  // <-- [CMD] Demande explicite vers Maintenance
+  CommandConflict   : BOOL;  // <-- [DIAG] Deux sens demandés simultanément
     SpeedPct          : REAL;  // <-- [CMD] Consigne vitesse arbitrée (0..100 %)
     PositioningActive : BOOL;  // <-- [CMD] Mode positionnement actif (SEMI_AUTO)
     SelTarget         : INT;   // <-- [CMD] Cible position (1=Trémie, 2=P2, 3=P1, 4=Maintenance) — SEMI_AUTO
@@ -39,9 +41,18 @@ END_VAR
 
 Ready := Enable;
 
+// Les deux bits de sens sont reconstruits à chaque cycle : aucune demande ne doit
+// rester mémorisée lors d'un changement de source (IHM/joystick/cycle).
+RunRequest      := FALSE;
+ReqTremie       := FALSE;
+ReqMaintenance  := FALSE;
+CommandConflict := FALSE;
+
 IF NOT Enable THEN
-    StartStop         := FALSE;
-    Direction         := 0;
+    RunRequest        := FALSE;
+    ReqTremie         := FALSE;
+    ReqMaintenance    := FALSE;
+    CommandConflict   := FALSE;
     SpeedPct          := 0.0;
     PositioningActive := FALSE;
     SelTarget         := 0;
@@ -50,17 +61,16 @@ ELSE
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         PositioningActive := TRUE;
         SelTarget := ReqTranslation.PositionTgt;
-        StartStop := ReqTranslation.ReqStart AND Context.HeightInterlockOk;
-        IF StartStop THEN
+        RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk;
+        IF RunRequest THEN
             SpeedPct := 100.0;
             IF SelTarget = 1 THEN
-                Direction := 1;
+                ReqTremie := TRUE;
             ELSE
-                Direction := -1;
+                ReqMaintenance := TRUE;
             END_IF;
         ELSE
             SpeedPct := 0.0;
-            Direction := 0;
         END_IF;
     ELSIF (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2) THEN
         // ── Mode maintenance : jog joystick ou boutons IHM ──
@@ -68,18 +78,17 @@ ELSE
         SelTarget := 0;
 
         IF NOT TglJoystickMaster AND IHM.BtnTremie THEN
-            Direction := 1;
+            ReqTremie := TRUE;
         ELSIF NOT TglJoystickMaster AND IHM.BtnMaintenance THEN
-            Direction := -1;
+            ReqMaintenance := TRUE;
         ELSIF TglJoystickMaster THEN
-            Direction := Joystick.AxisX.Direction;
-        ELSE
-            Direction := 0;
+            ReqTremie := Joystick.AxisX.DirectionPositive;
+            ReqMaintenance := Joystick.AxisX.DirectionNegative;
         END_IF;
 
         // Homme-mort exigé même pour boutons IHM en MAINT_N1/N2.
         // ⚠️ Tautologie conservée bit-identique : (BypassGlobal OR NOT Tgl OR Tgl) = toujours TRUE.
-        StartStop := (Direction <> 0)
+        RunRequest := (ReqTremie OR ReqMaintenance)
                      AND (IHM.BypassGlobal OR NOT TglJoystickMaster OR TglJoystickMaster)
                      AND Joystick.DeadmanArmed
                      AND Context.HeightInterlockOk;
@@ -95,10 +104,17 @@ ELSE
         // ── Autres modes : neutralisé ──
         PositioningActive := FALSE;
         SelTarget := 0;
-        StartStop := FALSE;
-        Direction := 0;
+        RunRequest := FALSE;
         SpeedPct  := 0.0;
     END_IF;
+END_IF;
+
+// Une demande contradictoire est toujours neutralisée. RunRequest reste vrai afin de
+// conserver la sémantique de décélération de FB_Translation ; aucune direction n'est choisie.
+CommandConflict := ReqTremie AND ReqMaintenance;
+IF CommandConflict THEN
+    ReqTremie := FALSE;
+    ReqMaintenance := FALSE;
 END_IF;
 
 // Clamp consigne (bit-identique PRG_05 §1)

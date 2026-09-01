@@ -60,7 +60,8 @@ STRUCT
     InBottomSlowdownZone    : BOOL;             (* 🐢 Palier plafonné à 1 : approche limite basse (câble ou légale) *)
 
     (* 🩺 Diagnostic délai ressenti à la remontée *)
-    CommandedDirection        : INT;            (* 🩺 Sens interne mémorisé FB_Winch (-1/0/+1) *)
+    CommandedAscent           : BOOL;          (* 🩺 Sens interne mémorisé FB_Winch : montée *)
+    CommandedDescend          : BOOL;          (* 🩺 Sens interne mémorisé FB_Winch : descente *)
     DirectionChangeDelayElapsed : TIME;         (* 🩺 Écoulé de l'interlock changement/reprise de sens *)
     DirectionChangePending      : BOOL;         (* 🩺 TRUE tant que CommandedDirection n'a pas rejoint Direction *)
 END_STRUCT

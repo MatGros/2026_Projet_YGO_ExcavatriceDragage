@@ -16,6 +16,8 @@ contract:
     - "EffectivePermitM1_Descend : BOOL"
     - "EffectivePermitM2_Ascent : BOOL"
     - "EffectivePermitM2_Descend : BOOL"
+    - "EffectivePermitBucket_Open : BOOL"
+    - "EffectivePermitBucket_Close : BOOL"
     - "EffectivePermitM3_Maintenance : BOOL"
     - "EffectivePermitM3_Tremie : BOOL"
 
@@ -47,6 +49,12 @@ contract:
     - id: AC8
       statement: "Le cycle ne conserve qu'un permis humain commun et neutralise ses demandes en un site ; les limites propres de benne restent des causes directionnelles distinctes."
       verified_by: "lecture FB_Cycle et matrice benne : aucune limite Open/Close supprimée ou masquée"
+    - id: AC9
+      statement: "Aucune frontière fonctionnelle de demande, permis, commande, IHM ou inter-POU ne transporte Direction: INT ni le couple StartStop+Direction ; chaque sens est porté par un BOOL nommé selon l'axe."
+      verified_by: "audit rg des interfaces actives + matrice Req/Permit/commande M1, M2, benne et M3"
+    - id: AC10
+      statement: "Une double demande de sens sur un même axe est détectée, publiée et rend l'ordre de mouvement nul ; aucun choix implicite de priorité n'est admis."
+      verified_by: "tests CI M1/M2/M3 : deux Req directionnelles TRUE -> aucune sortie actionneur"
 
   scope:
     allowed:

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T23:20:54.572893" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T23:20:54.572893">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:08:45.017496" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:08:45.017496">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -222,12 +222,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation synchronisation treuils</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Consigne active de direction (-1/0/+1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande active montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande active descente</xhtml>
               </documentation>
             </variable>
             <variable name="MovementCommanded">
@@ -1372,8 +1380,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 14 : Sens opposé (latched)
     OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
-        AND (((Direction &gt; 0) AND (MeasuredSpeedSignedMps &lt; -MovementSpeedThresholdMps))
-          OR ((Direction &lt; 0) AND (MeasuredSpeedSignedMps &gt; MovementSpeedThresholdMps))));
+        AND ((ReqAscent AND (MeasuredSpeedSignedMps &lt; -MovementSpeedThresholdMps))
+          OR (ReqDescend AND (MeasuredSpeedSignedMps &gt; MovementSpeedThresholdMps))));
     TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
     IF TonOppositeDirection.Q THEN OppositeDirectionFaultLatched := TRUE; END_IF;
     instCauses[14].Active   := OppositeDirectionFaultLatched;

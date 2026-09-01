@@ -44,11 +44,11 @@ ELSE
     // Descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
     WinchBothDiveBucketOpenArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode <> E_Mode.SEMI_AUTO)
-        AND Context.MotionActive AND (Context.MotionDirection = -1)
+        AND Context.MotionActive AND Context.ReqDescend
         AND NOT Context.BucketIsOpen;
     WinchBothAscentBucketCloseArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode <> E_Mode.SEMI_AUTO)
-        AND Context.MotionActive AND (Context.MotionDirection = 1)
+        AND Context.MotionActive AND Context.ReqAscent
         AND NOT Context.BucketIsClosed;
 
     // ── Ouverture benne : bouton IHM OU séquencement couplé descente benne ouverte
