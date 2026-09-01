@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T18:16:25.975119" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T18:16:25.975119">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T00:14:31.359847" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T00:14:31.359847">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -142,7 +142,7 @@
       permis de mouvement effectif, interlock hauteur, source SafeStop/coupure
       et cause de blocage priorisée.
    📤 Producteur unique : PRG_05_Translation (Data.TranslationTrace).
-   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.TraceTranslation).
+   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.S_TraceTranslation).
    🔒 Lecture seule — aucun calcul de commande n'en dépend.
    🕒 BlockReasonTimestamp : ms depuis démarrage PLC (TIME()), latched au dernier
       changement de BlockReason (1 scan, mémoire).

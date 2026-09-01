@@ -5,7 +5,7 @@
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs)
    🧩 Défaut homogénéisé (AF-03 §3) : Fault:ST_Fault via FB_FaultCore (bit0 = timeout frein).
-   🔒 Sécurité : Surveillance feedback frein et temporisation d'inversion
+   🔒 Sécurité : Surveillance feedback frein, temporisation d'inversion et ordre de relâchement contacteurs
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_WinchOutputInterlock
@@ -39,6 +39,9 @@ VAR_INPUT
     // DropConfirmDelay (100 ms) < MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
     DropConfirmDelay                : TIME := T#100ms;               // --> [CFG] Debounce confirmation retombee contacteurs (AC7)
     MaxSenseHoldTime                : TIME := T#1s;                  // --> [CFG] T_max : borne superieure du maintien §3bis (AC7)
+
+    // === ORDRE DE RELACHEMENT CONTACTEURS (vitesse avant direction) ===
+    ReleaseOrderDelay               : TIME := T#100ms;               // --> [CFG] Decalage relachement direction apres vitesse (>= 100ms)
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
@@ -71,6 +74,9 @@ VAR_OUTPUT
     SenseHoldActive                 : BOOL;                           // <-- [DIAG] Maintien du contacteur de sens en cours
     ContactorStuck                  : BOOL;                           // <-- [DIAG] Latch T_max depasse sans confirmation retombee (AC7)
     SenseHoldElapsed                : TIME;                           // <-- [DIAG] Ecoule temporisation T_max maintien §3bis
+
+    // === DIAGNOSTICS ORDRE DE RELACHEMENT (AC1/AC2) ===
+    ReleaseOrderElapsed             : TIME;                           // <-- [DIAG] Ecoule temporisation ordre de relachement
 END_VAR
 VAR
     // === DETECTEURS ET TIMERS INTERNES ===
@@ -83,6 +89,9 @@ VAR
     DeadTime                        : TON;                            // . [LOC] Temporisation temps mort directionnel
     SenseHoldTimer                  : TON;                            // . [LOC] Temporisation T_max maintien §3bis (AC7)
     SenseHoldFeedbackTimer          : TON;                            // . [LOC] Debounce DropConfirmDelay retombee contacteurs (AC7)
+    ReleaseOrderTimer               : TON;                            // . [LOC] Temporisation ordre de relachement (vitesse avant direction)
+    ReleaseOrderActive              : BOOL;                           // . [LOC] Ordre de relachement en cours (direction tenue)
+    ReleaseOrderDone                : BOOL;                           // . [LOC] One-shot ordre de relachement effectue (anti-bouclage)
 
     // === VARIABLES LOCALES CALCULÉES ===
     RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage
@@ -134,6 +143,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
     SenseHoldElapsed := T#0ms;
     ContactorStuck := ContactorStuckLatched;
+    ReleaseOrderActive := FALSE; ReleaseOrderDone := FALSE;
+    ReleaseOrderTimer(IN := FALSE, PT := ReleaseOrderDelay);
+    ReleaseOrderElapsed := T#0ms;
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     BrakeCmd := FALSE; AuthorizedStep := 0;
@@ -292,6 +304,26 @@ END_IF;
 SenseHoldElapsed := SenseHoldTimer.ET;
 ContactorStuck := ContactorStuckLatched;
 
+// ── 4quater. Ordre de relâchement contacteurs (vitesse avant direction) ──
+// Quand le mouvement s'arrête (NOT MotorRequest ou SafeStop), les contacteurs
+// de VITESSE (Contactor1-4) sont relâchés immédiatement, puis le contacteur de
+// DIRECTION (RelayFwd/Rev) après ReleaseOrderDelay (>= 100ms). Protège le moteur :
+// on ne coupe jamais la direction pendant que la vitesse est encore engagée.
+// Les coupures dures (NOT Enable / PowerContactorEngaged / Error / RestartInhibit)
+// restent immédiates (AC9) — l'ordre ne s'applique qu'à l'arrêt commandé.
+// Le maintien transitoire §3bis (SenseHold) garde la priorité : quand il est actif,
+// c'est lui qui tient la direction (jusqu'à confirmation retombée), pas cet ordre.
+IF MotorRequest AND NOT SafeStop THEN
+    // Nouvelle demande de mouvement : l'ordre de relâchement est réarmé.
+    ReleaseOrderActive := FALSE;
+    ReleaseOrderDone := FALSE;
+    ReleaseOrderTimer(IN := FALSE, PT := ReleaseOrderDelay);
+ELSIF (NOT MotorRequest OR SafeStop) AND NOT ReleaseOrderActive AND NOT ReleaseOrderDone
+      AND (RequestedRelayFwd OR RequestedRelayRev) AND NOT SenseHoldActive THEN
+    // Arrêt commandé : entrée en ordre de relâchement (vitesse relâchée, direction tenue).
+    ReleaseOrderActive := TRUE;
+END_IF;
+
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -320,6 +352,25 @@ ELSIF ContactorStuckLatched THEN
     AuthorizedStep := 0;
     Reason := E_WinchFinalInterlockReason.SENSE_DROP_TIMEOUT;
     State := E_WinchFinalInterlockState.FAULT;
+ELSIF ReleaseOrderActive THEN
+    // Ordre de relâchement : vitesse relâchée immédiatement, direction tenue
+    // jusqu'à ReleaseOrderDelay, puis direction relâchée (AC1/AC2).
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    IF RequestedRelayFwd THEN RelayFwd := TRUE; END_IF;
+    IF RequestedRelayRev THEN RelayRev := TRUE; END_IF;
+    ReleaseOrderTimer(IN := TRUE, PT := ReleaseOrderDelay);
+    ReleaseOrderElapsed := ReleaseOrderTimer.ET;
+    IF ReleaseOrderTimer.Q THEN
+        ReleaseOrderActive := FALSE;
+        ReleaseOrderDone := TRUE;
+        RelayFwd := FALSE; RelayRev := FALSE;
+    END_IF;
+    State := E_WinchFinalInterlockState.READY;
+    Busy := TRUE;
 ELSIF SafeStop THEN
     // 🛡️ SafeStop : coupure dure indépendante de FB_Winch (défense en profondeur).
     // SafeStop n'est PAS un défaut : pas de FAULT, pas de latch, pas de Reset requis.

@@ -4726,3 +4726,58 @@ tasks:
   - Ne pas dégrader le fonctionnement nominal en cycle (Dive/Extraction)
   - Documenter dans l'AF (AF-04 / AF-10) et ajouter un garde-fou CI
   bloque_par: []
+
+- id: T213
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: OUTILLAGE
+  agent: ''
+  date: '2026-09-01T00:00:00+02:00'
+  titre: Refactorer le troubleshooting — ajouter les variables de homing M2 (cible dynamique, offset benne)
+  contexte: 'Demande utilisateur (2026-09-01) : le snapshot troubleshooting ne contient pas les variables
+    détaillées du homing (MachineHomingMechanicalStopOk, BucketReferenceRequested, UseDynamicTarget,
+    DynamicHomingTargetM, M2Demand, etc.). Pour diagnostiquer le bug homing M2 benne fermée (M2 reste
+    à 8.5m au lieu de prendre la cible), il faut exposer ces variables dans GVL_Troubleshooting.'
+  description: 'Refactorer le troubleshooting pour exposer les variables de homing M2 dans
+    GVL_Troubleshooting (structure + câblage FB_TroubleshootingView) et la liste du script
+    troubleshooting_variables.txt. Variables à ajouter : MachineHomingMechanicalStopOk,
+    BucketReferenceRequested, UseDynamicTarget, DynamicHomingTargetM, M2Demand (HomeReq,
+    UseDynamicTarget, DynamicTarget_M), CfgTopHomingTarget_M, CfgOffsetClose_M, état FB_MachineHomingCycle.
+    Régénérer la liste (generate_variable_list_from_code.py) et valider avec l''humain avant compilation.'
+  contrat: ''
+  objectifs:
+  - Exposer les variables de homing M2 dans GVL_Troubleshooting (structure + câblage)
+  - Ajouter les variables à troubleshooting_variables.txt (régénérer la liste)
+  - Permettre le diagnostic du homing M2 benne fermée (cible dynamique, offset)
+  - Valider avec l'humain avant compilation
+  bloque_par: []
+- id: T214
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: SIMULATION / IHM
+  agent: DSH-02
+  date: '2026-09-01T00:00:00'
+  titre: 'Stimuli de simulation des boutons IHM M3 (testabilité pilotage IHM)'
+  contexte: 'Intitulé complet : Ajouter des stimuli de simulation des boutons IHM M3
+    (SimBtnTremie/SimBtnMaintenance) pour tester le pilotage IHM en simulation quand
+    JoyMaster est inactif.'
+  description: 'Diagnostic 2026-09-01 : l''arbitrage M3 (FB_TranslationCmdArbitrationM3)
+    utilise une sélection de source EXCLUSIVE pilotée par TglJoystickMaster. Quand
+    JoyMaster est inactif, l''arbitrage utilise les boutons IHM (IHM.BtnTremie/BtnMaintenance),
+    qui ne sont PAS simulés → impossible de tester le pilotage par boutons IHM en
+    simulation. Objectif : ajouter des stimuli de simulation (SimBtnTremie/SimBtnMaintenance
+    dans GVL_Simulation), câblés vers GVL_IHM.TranslationM3.Cmd.BtnTremie/BtnMaintenance
+    en mode simulation, actifs uniquement quand JoyMaster est inactif (éviter conflit
+    avec le joystick). Vérifier que GVL_IHM.TranslationM3.Cmd.BtnTremie n''est pas écrasé
+    par l''IHM réelle.'
+  contrat: ''
+  objectifs:
+  - 'Ajouter SimBtnTremie/SimBtnMaintenance dans GVL_Simulation (stimuli de simulation)'
+  - 'Câbler les stimuli vers GVL_IHM.TranslationM3.Cmd.BtnTremie/BtnMaintenance en mode
+    simulation (actifs uniquement quand JoyMaster inactif)'
+  - 'Vérifier que GVL_IHM.TranslationM3.Cmd.BtnTremie n''est pas écrasé par l''IHM réelle'
+  - 'Permettre de tester le pilotage par boutons IHM M3 en simulation (JoyMaster inactif)'
+  - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS'
+  bloque_par: []

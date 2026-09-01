@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T14:23:59.434166" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T14:23:59.434166">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T00:06:07.384453" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T00:06:07.384453">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -238,6 +238,31 @@ Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bagotement au relâchement (petit balancement autour du neutre)</xhtml>
           </documentation>
         </variable>
+        <variable name="SimBtnTremie">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎛️ STIMULI BOUTONS IHM M3 — simulation des boutons IHM Translation M3 (Trémie/Maintenance).
+Pilotent GVL_IHM.TranslationM3.Cmd.BtnTremie/BtnMaintenance UNIQUEMENT en mode simulation
+ET quand JoyMaster est inactif (le joystick prime sinon). Défaut FALSE = bouton relâché.
+TRUE = bouton IHM "vers Trémie" simulé appuyé</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimBtnMaintenance">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = bouton IHM "vers Maintenance" simulé appuyé</xhtml>
+          </documentation>
+        </variable>
         <variable name="SimEncoderSpeedFactor">
           <type>
             <REAL />
@@ -322,7 +347,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🧪 GVL_Simulation — Variables et stimuli de simulation (Banc d'essai)
    ───────────────────────────────────────────────────────────────
-   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
    🎯 Polarité positive : TRUE = simulé/stimulus actif ; FALSE = réel/repos.
    🔒 Consommée à la frontière PRG_02_Acquisition, par le banc, et par PRG_04_Treuils_Benne
    🔒 (SimulationBypassActive : n'arme les bypass de sécurité QUE si SimulationModeActive
