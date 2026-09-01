@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T01:33:41.334158" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T01:33:41.334158">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:26:41.961053" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:26:41.961053">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -285,12 +285,20 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention mouvement both active (WinchBothMotionActive)</xhtml>
               </documentation>
             </variable>
-            <variable name="MotionDirection">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens mouvement both (1: montée, -1: descente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both descente</xhtml>
               </documentation>
             </variable>
             <variable name="BucketIsOpen">
@@ -550,11 +558,11 @@ ELSE
     // Descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
     WinchBothDiveBucketOpenArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
-        AND Context.MotionActive AND (Context.MotionDirection = -1)
+        AND Context.MotionActive AND Context.ReqDescend
         AND NOT Context.BucketIsOpen;
     WinchBothAscentBucketCloseArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
-        AND Context.MotionActive AND (Context.MotionDirection = 1)
+        AND Context.MotionActive AND Context.ReqAscent
         AND NOT Context.BucketIsClosed;
 
     // ── Ouverture benne : bouton IHM OU séquencement couplé descente benne ouverte

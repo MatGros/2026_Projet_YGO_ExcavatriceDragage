@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:14:31.353637" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:14:31.353637">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:26:41.656377" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:26:41.656377">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -42,12 +42,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention mouvement both active (WinchBothMotionActive)</xhtml>
               </documentation>
             </variable>
-            <variable name="MotionDirection">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens mouvement both (1: montée, -1: descente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both descente</xhtml>
               </documentation>
             </variable>
             <variable name="BucketIsOpen">

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:24:21.506627" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:24:21.506627">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:32:09.539444" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:32:09.539444">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -982,16 +982,6 @@ M1 : contacteurs retombés</xhtml>
               </type>
             </variable>
             <variable name="BothActive">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BothAscentPermit">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BothDescendPermit">
               <type>
                 <BOOL />
               </type>

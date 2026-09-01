@@ -55,6 +55,9 @@ contract:
     - id: AC10
       statement: "Une double demande de sens sur un même axe est détectée, publiée et rend l'ordre de mouvement nul ; aucun choix implicite de priorité n'est admis."
       verified_by: "tests CI M1/M2/M3 : deux Req directionnelles TRUE -> aucune sortie actionneur"
+    - id: AC11
+      statement: "Un plancher MinStepDown nul hors plongée ne peut jamais maintenir un palier pendant une inversion ; avec un plancher de plongée, l'injection attend l'adoption effective du sens descente."
+      verified_by: "relecture chaîne PRG_04 -> FB_WinchDirectionInterlock -> FB_Winch et essai CODESYS : reprise descente après montée, hors plongée puis avec MinStepDown=4"
 
   scope:
     allowed:

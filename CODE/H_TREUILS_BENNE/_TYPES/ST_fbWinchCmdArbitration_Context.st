@@ -6,15 +6,15 @@
        identifiée par l'instance : M1 ignore le chemin benne, M2 le consomme.
    📤 Producteur : PRG_04_Treuils_Benne (câblage).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Action benne : 2 bits BOOL (BucketM2Open/Close) dérivés de instBucket.M2_Direction.
+   🔌 Action benne : 2 bits BOOL directionnels M2 issus de FB_Bucket.
    ═══════════════════════════════════════════════════════════════ *)
 
 TYPE ST_fbWinchCmdArbitration_Context :
 STRUCT
     BucketBusy                     : BOOL;  // --> [STAT] Action benne en cours (instBucket.Lifecycle.Busy)
     BucketM2RunRequest             : BOOL;  // --> [CMD] Commande M2 par la benne active
-    BucketM2Open                   : BOOL;  // --> [CMD] Ouverture benne
-    BucketM2Close                  : BOOL;  // --> [CMD] Fermeture benne
+    BucketM2ReqAscent              : BOOL;  // --> [CMD] Demande montée M2 issue benne
+    BucketM2ReqDescend             : BOOL;  // --> [CMD] Demande descente M2 issue benne
     WinchBothMotionBlockedByBucket : BOOL;  // --> [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)
     SyncBlocksAscent                   : BOOL;  // --> [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)
     SyncBlocksDescent                 : BOOL;  // --> [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)

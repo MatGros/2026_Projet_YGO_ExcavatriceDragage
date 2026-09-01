@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:21:30.455092" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:21:30.455092">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:30:40.311489" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:30:40.311489">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -444,20 +444,20 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande M2 par la benne active</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketM2Open">
+            <variable name="BucketM2ReqAscent">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ouverture benne</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande montée M2 issue benne</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketM2Close">
+            <variable name="BucketM2ReqDescend">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Fermeture benne</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande descente M2 issue benne</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothMotionBlockedByBucket">
@@ -544,7 +544,7 @@ individuels directement) : les 2 treuils partent ensemble ou aucun (NC-100).
        identifiée par l'instance : M1 ignore le chemin benne, M2 le consomme.
    📤 Producteur : PRG_04_Treuils_Benne (câblage).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Action benne : 2 bits BOOL (BucketM2Open/Close) dérivés de instBucket.M2_Direction.
+   🔌 Action benne : 2 bits BOOL directionnels M2 issus de FB_Bucket.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1011,8 +1011,8 @@ ELSE
     // ── Chemin benne : M2 piloté par l'action benne (override) ──
     IF Context.BucketBusy AND Context.BucketM2RunRequest THEN
         RunRequest := Context.BucketM2RunRequest;
-        ReqAscent  := Context.BucketM2Open;
-        ReqDescend := Context.BucketM2Close;
+        ReqAscent  := Context.BucketM2ReqAscent;
+        ReqDescend := Context.BucketM2ReqDescend;
         StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──

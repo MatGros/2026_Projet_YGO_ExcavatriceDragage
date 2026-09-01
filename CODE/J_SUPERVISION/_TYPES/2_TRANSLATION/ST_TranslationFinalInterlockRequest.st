@@ -17,6 +17,8 @@ STRUCT
     Reset                        : BOOL;
     PowerContactorEngaged              : BOOL;
     SafeStop                     : BOOL;
+    EffectivePermitM3_Tremie     : BOOL;
+    EffectivePermitM3_Maintenance: BOOL;
     PowerCutOff                  : BOOL; // 🧨 Demande coupure puissance (FB_Safety_Translation) — consommée par PRG_06_Outputs (Enable)
     BrakeReleaseRequest          : BOOL;
     BrakeCommandOpenConfirmed    : BOOL; // TRUE = contacteur/bobine desserrage confirmé

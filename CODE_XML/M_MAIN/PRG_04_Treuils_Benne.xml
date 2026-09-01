@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:23:59.980347" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:23:59.980347">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:43:51.946177" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:43:51.946177">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1225,22 +1225,6 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
 🔗 Intention both active (M1+M2 ensemble)</xhtml>
               </documentation>
             </variable>
-            <variable name="BothAscentPermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Permit montée Both (EffectivePermitM1_Ascent AND EffectivePermitM2_Ascent)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BothDescendPermit">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Permit descente Both (EffectivePermitM1_Descend AND EffectivePermitM2_Descend)</xhtml>
-              </documentation>
-            </variable>
             <variable name="BothBlocked">
               <type>
                 <BOOL />
@@ -1705,12 +1689,20 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention mouvement both active (WinchBothMotionActive)</xhtml>
               </documentation>
             </variable>
-            <variable name="MotionDirection">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens mouvement both (1: montée, -1: descente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention both descente</xhtml>
               </documentation>
             </variable>
             <variable name="BucketIsOpen">
@@ -1852,20 +1844,20 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande M2 par la benne active</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketM2Open">
+            <variable name="BucketM2ReqAscent">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ouverture benne</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande montée M2 issue benne</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketM2Close">
+            <variable name="BucketM2ReqDescend">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Fermeture benne</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande descente M2 issue benne</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothMotionBlockedByBucket">
@@ -1952,7 +1944,7 @@ individuels directement) : les 2 treuils partent ensemble ou aucun (NC-100).
        identifiée par l'instance : M1 ignore le chemin benne, M2 le consomme.
    📤 Producteur : PRG_04_Treuils_Benne (câblage).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Action benne : 2 bits BOOL (BucketM2Open/Close) dérivés de instBucket.M2_Direction.
+   🔌 Action benne : 2 bits BOOL directionnels M2 issus de FB_Bucket.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4913,22 +4905,28 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <REAL />
               </type>
             </variable>
-            <variable name="BucketM2Open">
+            <variable name="BucketM2ReqAscent">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACTION BENNE M2 (dérivée de instBucket.M2_Direction, câblée au FB d'arbitrage) ===
-. [LOC] Ouverture benne active (instBucket.M2_Direction = 1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ACTION BENNE M2 (bits directionnels, câblés au FB d'arbitrage) ===</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketM2Close">
+            <variable name="BucketM2ReqDescend">
               <type>
                 <BOOL />
               </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fermeture benne active (instBucket.M2_Direction = -1)</xhtml>
-              </documentation>
+            </variable>
+            <variable name="M2AscentPermitApplied">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2DescendPermitApplied">
+              <type>
+                <BOOL />
+              </type>
             </variable>
             <variable name="ArbIHM">
               <type>
@@ -5592,7 +5590,6 @@ instBucket(
     Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
     CmdOpen_IHM         := instArbBucket.CmdOpen_IHM,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
-    MotionRequestActive := WinchBothMotionActive,
     ReqAscent           := WinchBothReqAscent,
     ReqDescend          := WinchBothReqDescend,
     EffectivePermitBucket_Open := EffectivePermitBucket_Open,
@@ -5670,8 +5667,8 @@ END_IF;
 
 // ── Arbitrage M1/M2 (FB_WinchCmdArbitrationM1/M2) ──
 // Dérivation des bits d'action benne M2 (consommés par les 2 FB d'arbitrage)
-BucketM2Open  := instBucket.M2_ReqAscent;
-BucketM2Close := instBucket.M2_ReqDescend;
+BucketM2ReqAscent  := instBucket.M2_ReqAscent;
+BucketM2ReqDescend := instBucket.M2_ReqDescend;
 
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
 ArbIHM.BtnAscentM1           := GVL_IHM.M1TreuilRetenue.Cmd.BtnAscent;
@@ -5683,8 +5680,8 @@ ArbIHM.BtnWinchBothDescent  := GVL_IHM.Commun.BtnWinchBothDescent;
 
 ArbContext.BucketBusy                     := instBucket.Lifecycle.Busy;
 ArbContext.BucketM2RunRequest             := instBucket.M2_RunRequest;
-ArbContext.BucketM2Open                   := BucketM2Open;
-ArbContext.BucketM2Close                  := BucketM2Close;
+ArbContext.BucketM2ReqAscent              := BucketM2ReqAscent;
+ArbContext.BucketM2ReqDescend             := BucketM2ReqDescend;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
 ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
 ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
@@ -6169,13 +6166,20 @@ EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND NOT SafeStopM2
 EffectivePermitBucket_Open := EffectivePermitM2_Descend
     AND PRG_02_Acquisition.Data.EncoderM1.Homed
     AND PRG_02_Acquisition.Data.EncoderM2.Homed
-    AND NOT _BucketState.IsOpen
+    AND (instBucket.Lifecycle.Busy OR NOT _BucketState.IsOpen)
     AND NOT instBucket.Fault.Error;
 EffectivePermitBucket_Close := EffectivePermitM2_Ascent
     AND PRG_02_Acquisition.Data.EncoderM1.Homed
     AND PRG_02_Acquisition.Data.EncoderM2.Homed
-    AND NOT _BucketState.IsClosed
+    AND (instBucket.Lifecycle.Busy OR NOT _BucketState.IsClosed)
     AND NOT instBucket.Fault.Error;
+
+// Défense en profondeur benne : le permis directionnel benne est appliqué au
+// même scan aux deux niveaux M2, uniquement lorsque FB_Bucket est producteur.
+M2AscentPermitApplied := EffectivePermitM2_Ascent
+    AND (NOT instBucket.M2_RunRequest OR EffectivePermitBucket_Close);
+M2DescendPermitApplied := EffectivePermitM2_Descend
+    AND (NOT instBucket.M2_RunRequest OR EffectivePermitBucket_Open);
 
 // 🔗 Agrégats Both : permis communs consommés par la commande both.
 // = AND des 4 permits effectifs. Chaque axe garde sa vérité propre
@@ -6227,12 +6231,15 @@ IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ExtractionControlActive OR Extra
     CommonMaxStepAscent := 1;
 END_IF;
 
-// Planchers communs : 1 (neutre) en montée ; en descente, MAX(1, plancher plongée FB_DiveSearch).
+// Planchers communs : 1 (neutre) en montée ; en descente, 0 hors plongée.
+// MinStepDown=0 signifie explicitement « aucun plancher » : seul FB_DiveSearch
+// peut imposer un palier de plongée. Ne jamais réintroduire un minimum à 1 ici,
+// sinon une inversion de sens ne peut plus atteindre StepNumber=0.
 // Règle de l'agrégateur : plancher = MAX des sources plancher ; si plancher &gt; plafond,
 // LE PLAFOND GAGNE — le clamp final (consommation FB_Winch, lot aval) borne au plafond,
 // on ne force donc jamais ici un palier au-delà de CommonMaxStepDescent.
 CommonMinStepUp   := 1;
-CommonMinStepDown := MAX(1, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStepDown);
+CommonMinStepDown := MAX(0, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStepDown);
 
 // --- M2-propre (jamais vu par M1) ---
 M2MaxStepUp   := CommonMaxStepAscent;
@@ -6380,8 +6387,8 @@ instWinchM2(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     SafeStop                := SafeStopM2_Active,
-    DescendPermit           := EffectivePermitM2_Descend,
-    AscentPermit            := EffectivePermitM2_Ascent,
+    DescendPermit           := M2DescendPermitApplied,
+    AscentPermit            := M2AscentPermitApplied,
     WinchRequest            := ReqM2Winch,
     Sensors                 := M2WinchSensors,
     Config                  := M2WinchCfg,
@@ -6474,8 +6481,8 @@ WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
 WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
-WinchM2FinalInterlockRequest.AscentPermit := EffectivePermitM2_Ascent;
-WinchM2FinalInterlockRequest.DescendPermit := EffectivePermitM2_Descend;
+WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitApplied;
+WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitApplied;
 
 {endregion}
 
@@ -6648,8 +6655,8 @@ TraceM1_PrevReason := TraceM1.BlockReason;
 // --- M2 ---
 TraceM2.DescendPermitEffective := EffectivePermitM2_Descend;
 TraceM2.AscentPermitEffective  := EffectivePermitM2_Ascent;
-TraceM2.AscentPermitApplied     := EffectivePermitM2_Ascent;
-TraceM2.DescendPermitApplied    := EffectivePermitM2_Descend;
+TraceM2.AscentPermitApplied     := M2AscentPermitApplied;
+TraceM2.DescendPermitApplied    := M2DescendPermitApplied;
 TraceM2.FinalPermitBlocked      := (ReqM2Winch.RunRequest AND ReqM2Winch.ReqAscent AND NOT EffectivePermitM2_Ascent)
                                OR (ReqM2Winch.RunRequest AND ReqM2Winch.ReqDescend AND NOT EffectivePermitM2_Descend);
 TraceM2.SafeStopActive         := SafeStopM2_Active;
@@ -7764,11 +7771,11 @@ ELSE
     // Descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
     WinchBothDiveBucketOpenArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
-        AND Context.MotionActive AND (Context.MotionDirection = -1)
+        AND Context.MotionActive AND Context.ReqDescend
         AND NOT Context.BucketIsOpen;
     WinchBothAscentBucketCloseArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
-        AND Context.MotionActive AND (Context.MotionDirection = 1)
+        AND Context.MotionActive AND Context.ReqAscent
         AND NOT Context.BucketIsClosed;
 
     // ── Ouverture benne : bouton IHM OU séquencement couplé descente benne ouverte
@@ -9750,12 +9757,15 @@ END_IF;
 // JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
 // ET NON bloquee par un arret/permis (NOT EffectiveSafeStop) : un permis descente FALSE
 // doit interdire physiquement le mouvement, sans re-atterrissage du plancher.
+// Le sens doit aussi etre deja adopte : pendant DirectionChangePending, le
+// StepNumber doit rester a 0 afin que le temps mort d'inversion puisse s'ecouler.
 // (RunRequest AND ReqDescend) : relache joystick (RunRequest=FALSE) -&gt; aucun plancher,
 // l'arret franc RequestedStep=0 / RampTargetStep=0 est preserve.
 // Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
 // ActiveMaxStep (ex. SlowdownMaxStep -&gt; palier 1 en bordure basse), on borne au plafond.
 IF WinchRequest.RunRequest AND WinchRequest.ReqDescend AND NOT WinchRequest.ReqAscent
-   AND (WinchRequest.MinStepDown &gt; 0) AND NOT EffectiveSafeStop THEN
+   AND (WinchRequest.MinStepDown &gt; 0) AND NOT EffectiveSafeStop
+   AND NOT DirectionChangePending AND CommandedDescend THEN
     IF RequestedStep &lt; WinchRequest.MinStepDown THEN
         RequestedStep := WinchRequest.MinStepDown;
     END_IF;
@@ -10302,8 +10312,8 @@ ELSE
     // ── Chemin benne : M2 piloté par l'action benne (override) ──
     IF Context.BucketBusy AND Context.BucketM2RunRequest THEN
         RunRequest := Context.BucketM2RunRequest;
-        ReqAscent  := Context.BucketM2Open;
-        ReqDescend := Context.BucketM2Close;
+        ReqAscent  := Context.BucketM2ReqAscent;
+        ReqDescend := Context.BucketM2ReqDescend;
         StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
