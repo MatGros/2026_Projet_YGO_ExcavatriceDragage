@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:57:18.037554" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:57:18.037554">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T10:18:02.699040" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T10:18:02.699040">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -7981,6 +7981,68 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne % cycle M2 (StepThreshold_Pct[StepTgt])</xhtml>
               </documentation>
             </variable>
+            <variable name="M1PosHmiHeld_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 📊 GEL AFFICHAGE POSITION PENDANT PRESET CODEUR (anti-clignotement IHM) ===
+Pendant la transaction preset (homing, y compris reference benne fermee), CablePosM
+transite par une valeur aberrante (compteur qui saute au centre de plage) : les champs
+Position_M / M2PositionCorrected clignotent a l'ecran. On fige la derniere valeur saine
+tant que HomingBusy + 2s de stabilisation (AF_Partie-09 §13 : consommateurs de position
+geles pendant HomingLifecycle.Busy). Affichage seul, aucune decision machine ici.
+. [LOC] Position M1 figee (affichage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2PosHmiHeld_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 figee (affichage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2PosCorrectedHmiHeld_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position benne corrigee M2 figee (affichage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1HomingDisplaySettle">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Prolonge le gel M1 apres retombee HomingBusy</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2HomingDisplaySettle">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Prolonge le gel M2 apres retombee HomingBusy</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1PosDisplayFrozen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Gel affichage position M1 actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2PosDisplayFrozen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Gel affichage position M2 actif</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -8346,6 +8408,26 @@ GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.Data.WinchM2Safety;
 GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.Data.SyncState;
 GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
 GVL_IHM.TranslationM3.State := PRG_05_Translation.Data.TranslationState;
+
+// ---------- §3e-bis. Gel affichage position pendant transaction preset codeur (anti-clignotement, voir VAR) ----------
+M1HomingDisplaySettle(IN := NOT GVL_IHM.M1TreuilRetenue.State.Encoder.HomingBusy, PT := T#2s);
+M2HomingDisplaySettle(IN := NOT GVL_IHM.M2TreuilBenne.State.Encoder.HomingBusy, PT := T#2s);
+M1PosDisplayFrozen := GVL_IHM.M1TreuilRetenue.State.Encoder.HomingBusy OR NOT M1HomingDisplaySettle.Q;
+M2PosDisplayFrozen := GVL_IHM.M2TreuilBenne.State.Encoder.HomingBusy OR NOT M2HomingDisplaySettle.Q;
+
+IF M1PosDisplayFrozen THEN
+    GVL_IHM.M1TreuilRetenue.State.Position_M := M1PosHmiHeld_M;
+ELSE
+    M1PosHmiHeld_M := GVL_IHM.M1TreuilRetenue.State.Position_M;
+END_IF;
+
+IF M2PosDisplayFrozen THEN
+    GVL_IHM.M2TreuilBenne.State.Position_M                 := M2PosHmiHeld_M;
+    GVL_IHM.M2TreuilBenne.Bucket.State.M2PositionCorrected := M2PosCorrectedHmiHeld_M;
+ELSE
+    M2PosHmiHeld_M          := GVL_IHM.M2TreuilBenne.State.Position_M;
+    M2PosCorrectedHmiHeld_M := GVL_IHM.M2TreuilBenne.Bucket.State.M2PositionCorrected;
+END_IF;
 GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Data.Auth.Mode;
@@ -8451,8 +8533,9 @@ GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.Data.WinchSyn
 GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
 GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
 GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
-GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
-GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
+// Position cycle : meme gel affichage que M1TreuilRetenue/M2TreuilBenne pendant le preset codeur.
+GVL_IHM.Cycle.State.M1Position_M           := SEL(M1PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM, M1PosHmiHeld_M);
+GVL_IHM.Cycle.State.M2Position_M           := SEL(M2PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM, M2PosHmiHeld_M);
 GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
 // 🕹️ JoystickDeflected = déflexion joystick seule (SANS homme-mort) — même signal que
 // JoystickDeflected (FB_Cycle, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal

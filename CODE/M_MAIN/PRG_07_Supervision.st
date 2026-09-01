@@ -72,6 +72,20 @@ VAR
     // === 🪜 DIAGNOSTIC % CYCLE (palier→%, borne haute du palier) ===
     CycleM1SpeedTgt_Pct     : REAL;   // . [LOC] Consigne % cycle M1 (StepThreshold_Pct[StepTgt])
     CycleM2SpeedTgt_Pct     : REAL;   // . [LOC] Consigne % cycle M2 (StepThreshold_Pct[StepTgt])
+
+    // === 📊 GEL AFFICHAGE POSITION PENDANT PRESET CODEUR (anti-clignotement IHM) ===
+    // Pendant la transaction preset (homing, y compris reference benne fermee), CablePosM
+    // transite par une valeur aberrante (compteur qui saute au centre de plage) : les champs
+    // Position_M / M2PositionCorrected clignotent a l'ecran. On fige la derniere valeur saine
+    // tant que HomingBusy + 2s de stabilisation (AF_Partie-09 §13 : consommateurs de position
+    // geles pendant HomingLifecycle.Busy). Affichage seul, aucune decision machine ici.
+    M1PosHmiHeld_M          : REAL;   // . [LOC] Position M1 figee (affichage)
+    M2PosHmiHeld_M          : REAL;   // . [LOC] Position M2 figee (affichage)
+    M2PosCorrectedHmiHeld_M : REAL;   // . [LOC] Position benne corrigee M2 figee (affichage)
+    M1HomingDisplaySettle   : TON;    // . [LOC] Prolonge le gel M1 apres retombee HomingBusy
+    M2HomingDisplaySettle   : TON;    // . [LOC] Prolonge le gel M2 apres retombee HomingBusy
+    M1PosDisplayFrozen      : BOOL;   // . [LOC] Gel affichage position M1 actif
+    M2PosDisplayFrozen      : BOOL;   // . [LOC] Gel affichage position M2 actif
 END_VAR
 
 {region "§1 Horloge, heartbeat et reset machine"}
@@ -423,6 +437,26 @@ GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.Data.WinchM2Safety;
 GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.Data.SyncState;
 GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
 GVL_IHM.TranslationM3.State := PRG_05_Translation.Data.TranslationState;
+
+// ---------- §3e-bis. Gel affichage position pendant transaction preset codeur (anti-clignotement, voir VAR) ----------
+M1HomingDisplaySettle(IN := NOT GVL_IHM.M1TreuilRetenue.State.Encoder.HomingBusy, PT := T#2s);
+M2HomingDisplaySettle(IN := NOT GVL_IHM.M2TreuilBenne.State.Encoder.HomingBusy, PT := T#2s);
+M1PosDisplayFrozen := GVL_IHM.M1TreuilRetenue.State.Encoder.HomingBusy OR NOT M1HomingDisplaySettle.Q;
+M2PosDisplayFrozen := GVL_IHM.M2TreuilBenne.State.Encoder.HomingBusy OR NOT M2HomingDisplaySettle.Q;
+
+IF M1PosDisplayFrozen THEN
+    GVL_IHM.M1TreuilRetenue.State.Position_M := M1PosHmiHeld_M;
+ELSE
+    M1PosHmiHeld_M := GVL_IHM.M1TreuilRetenue.State.Position_M;
+END_IF;
+
+IF M2PosDisplayFrozen THEN
+    GVL_IHM.M2TreuilBenne.State.Position_M                 := M2PosHmiHeld_M;
+    GVL_IHM.M2TreuilBenne.Bucket.State.M2PositionCorrected := M2PosCorrectedHmiHeld_M;
+ELSE
+    M2PosHmiHeld_M          := GVL_IHM.M2TreuilBenne.State.Position_M;
+    M2PosCorrectedHmiHeld_M := GVL_IHM.M2TreuilBenne.Bucket.State.M2PositionCorrected;
+END_IF;
 GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Data.Auth.Mode;
@@ -528,8 +562,9 @@ GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.Data.WinchSyn
 GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
 GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
 GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
-GVL_IHM.Cycle.State.M1Position_M           := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM;
-GVL_IHM.Cycle.State.M2Position_M           := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
+// Position cycle : meme gel affichage que M1TreuilRetenue/M2TreuilBenne pendant le preset codeur.
+GVL_IHM.Cycle.State.M1Position_M           := SEL(M1PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM, M1PosHmiHeld_M);
+GVL_IHM.Cycle.State.M2Position_M           := SEL(M2PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM, M2PosHmiHeld_M);
 GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
 // 🕹️ JoystickDeflected = déflexion joystick seule (SANS homme-mort) — même signal que
 // JoystickDeflected (FB_Cycle, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
