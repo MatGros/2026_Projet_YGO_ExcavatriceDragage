@@ -28,4 +28,5 @@ VAR_GLOBAL
     Q_TraceWinchM1          : ST_TraceWinch;        // 🕵️ 16. Trace blocage treuil M1 (cause priorisée + horodatage)
     R_TraceWinchM2          : ST_TraceWinch;        // 🕵️ 17. Trace blocage treuil M2 (cause priorisée + horodatage)
     S_TraceTranslation      : ST_TraceTranslation;  // ↔️ 18. Trace blocage translation M3 (cause priorisée + horodatage)
+    T_Permits : ST_PermitVisibilityHMI; // Vue unique IHM/terrain des permis canoniques
 END_VAR

@@ -20,5 +20,6 @@ VAR_GLOBAL
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
     Commun  : ST_CommunHMI; (* 🌐 Signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
     HmiInitDone : BOOL;               (* 🚩 Indicateur d'initialisation IHM depuis PERSISTENT *)
+    Permits : ST_PermitVisibilityHMI; (* Tableau lecture seule des permis canoniques, produit par PRG_07 *)
 END_VAR
 

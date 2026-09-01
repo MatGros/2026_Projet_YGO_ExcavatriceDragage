@@ -63,6 +63,7 @@ VAR_INPUT
     CycleExtraction          : ST_CycleExtractionHMI;   (* --> [HW] GVL_IHM.CycleExtraction *)
     CycleDumpAtTremie        : ST_CycleDumpAtTremieHMI; (* --> [HW] GVL_IHM.CycleDumpAtTremie *)
     JoystickHMI              : ST_JoystickHMI;   (* --> [HW] GVL_IHM.JOY1Joystick *)
+    Permits                  : ST_PermitVisibilityHMI; (* --> [DIAG] Vue unique des permis produite par PRG_07 *)
 
     (* 🛡️ Sorties publiques AU produites par PRG_06_Outputs *)
     EmergencyState           : ST_Safety_Emergency_State;   (* --> [SAFE] État AU *)
@@ -716,5 +717,6 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx306_WinchSyncError            := CycleWin
 GVL_Troubleshooting.Q_TraceWinchM1     := WinchM1Trace;
 GVL_Troubleshooting.R_TraceWinchM2     := WinchM2Trace;
 GVL_Troubleshooting.S_TraceTranslation := TranslationTrace;
+GVL_Troubleshooting.T_Permits           := Permits;
 {endregion}
 

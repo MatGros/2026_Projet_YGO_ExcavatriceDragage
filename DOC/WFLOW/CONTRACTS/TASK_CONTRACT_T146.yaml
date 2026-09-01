@@ -1,0 +1,145 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+# T146 — Référencement / homing des codeurs : arbitrage vitesse/position sans homing
+#
+# Criticité : C4 (SÉCURITÉ machine réelle — ISO 13849 & Directive Machine).
+# Source : DOC/WFLOW/TASKS.yaml → T146 (REQUALIFIÉE 2026-08-31).
+#   ✅ 2 volets clos (déjà conformes) : interlock hauteur M3 Homed=TRUE strict
+#      (PRG_05_Translation:102-116, commit d66728f6) ; synchro Homed
+#      Homing↔Safety producteur unique FB_Encoder_Homing.
+#   ⚠️ Périmètre restant (le vrai écart, objet de ce contrat) :
+#      • arbitrage bridage vitesse hors homing absent ; mouvement treuil possible
+#        à pleine vitesse, protections position inertes ;
+#      • pas de débridage « capteur TOP haut » ;
+#      • interlock grille levée / trémie pleine (TremieFull_OR_GateRaised_DI)
+#        déclaré NON consommé (PRG_02_Acquisition:170) ;
+#      • garde-fou vitesse SpeedGuardEnable=FALSE + FB_WinchRateInterlock
+#        inexistant à poursuivre AVANT tout bridage fondé sur la vitesse.
+#
+# Exécution : sur la base MAIN (hors worktree), application CODESYS manuelle par l'humain.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T146
+  criticality: C4            # C0 | C1 | C2 | C3 | C4
+  strategy: patch            # patch | rebuild   (extension d'interlocks, pas de rebuild)
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Arbitrer la posture sécurité « bridage hors homing » des treuils M1/M2 : soit un plafond de
+    palier vitesse réduit tant que la position n'est pas référencée, soit un repos capteur physique
+    TOP haut assumé et documenté. Puis définir la règle « capteur TOP haut ⇒ position connue ⇒
+    levée du bridage », câbler l'interlock grille levée / trémie pleine dans le permis M3→Trémie,
+    et poursuivre le garde-fou vitesse (SpeedGuardEnable + FB_WinchRateInterlock) AVANT tout bridage
+    fondé sur la vitesse — le tout verrouillé par une décision métier ISO 13849.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Le choix de posture (bridage hors homing via plafond de palier réduit, OU repos capteur physique TOP assumé et documenté) est TRANCHE et consigné comme décision métier ISO 13849 dans DECISIONS_T146_ARBITRAGE_ISO13849.md avec visa de validation humaine (ARRÊT VALIDATION HUMAINE C4)."
+      verified_by: "fichier présent + champ `decision` rempli + `validated_by` non vide ; arrêt validation dans la fiche"
+    - id: AC2
+      statement: "Aucun bridage fondé sur la VITESSE n'est armé tant que le garde-fou vitesse n'est pas opérationnel : SpeedGuardEnable reste FALSE dans PRG_04_Treuils_Benne tant que la table SpeedBandMaxMps n'est pas validée en charge réelle (contrainte conservée de PRG_04:1002-1017, dette safety S5 documentée)."
+      verified_by: "grep 'SpeedGuardEnable' CODE/M_MAIN/PRG_04_Treuils_Benne.st → FALSE ; la dette S5 reste tracée en commentaire"
+    - id: AC3
+      statement: "L'interlock TremieFull_OR_GateRaised_DI est CONSOMMÉ dans le permis M3→Trémie : quand il vaut TRUE, le mouvement de Translation M3 vers Trémie est bloqué (Direction=+1 refusé), la sortie de Trémie (Direction=-1) restant autorisée — la variable déclarée ne reste plus 'non consommée'."
+      verified_by: "grep consommateurs de 'TremieFull_OR_GateRaised_DI' dans PRG_05_Translation.st + gate G200 (liaison produit→consommé) ; TC-P11 dédié"
+    - id: AC4
+      statement: "La règle de débridage est définie et implémentée : si la posture choisie est le repos capteur physique, alors capteur TOP haut actif (TopPositionSensor) ⇒ position connue ⇒ levée du bridage de palier hors homing ; en posture bridée, le plafond de palier réduit tombe dès que Homed=TRUE."
+      verified_by: "lecture du câblage TopPositionSensor→Homed→plafond palier dans PRG_04/FB_SpeedStep + TC : TOP actif ⇒ palier maximal autorisé"
+    - id: AC5
+      statement: "Le garde-fou vitesse est poursuivi AVANT tout bridage fondé sur la vitesse : l'état de l'existence de FB_WinchRateInterlock (créé OU dette S5 explicitement maintenue et datée) est décidé et consigné pour toute évolution du plafond palier."
+      verified_by: "grep FB_WinchRateInterlock dans CODE/ (présent ou absence motivée datée) + note de décision dans DECISIONS_T146"
+    - id: AC6
+      statement: "Interlock hauteur M3 inchangé : M3_HeightInterlockOk exige toujours HomedAndReliable M1∧M2 strict (PRG_05_Translation:111-115, gate stricte), aucun assouplissement n'est introduit par la levée de bridage hors homing."
+      verified_by: "grep 'HomedAndReliable' PRG_05_Translation.st:111-115 inchangé + TC-P11 anti-collision hauteur"
+    - id: AC7
+      statement: "Critère structurel CODE/MAIN : chaque fichier du scope conserve un nom de fichier identique au nom du POU et un suffixe identique au langage généré dans le bundle ; aucun suffixe _CFC/_LD n'est apposé (PRG_04/PRG_05 restent du ST pur en .st)."
+      verified_by: "G310_check_code_structure.py + inspection du bundle (objets de langage ST)"
+    - id: AC8
+      statement: "Gates mécaniques : bundle régénéré (CODE_XML/CODE_Bundle.xml), G200 liaison PASS (TremieFull_OR_GateRaised_DI produit→consommé, TopPositionSensor câblé), palier C PASS."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py --report + run_all_gates.py --palier C"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_05_Translation.st          # câbler TremieFull dans permis M3→Trémie (§1ter/§2)
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st        # posture bridage hors homing, TopPositionSensor→plafond, SpeedGuardEnable
+      - CODE/H_TREUILS_BENNE/FB_SpeedStep.st       # plafond palier réduit hors homing (si posture bridée)
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st    # capteur TOP haut / permits (si posture repos capteur)
+      - CODE/E_CODEURS/FB_EncoderReliability.st    # gate HomedAndReliable (si consommée par le bridage)
+      - CODE/H_TREUILS_BENNE/FB_WinchRateInterlock.st   # à créer si le garde-fou vitesse est créé
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md        # arbitrage hors homing, règle TOP
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md          # §7.3 apprentissage, §9bis garde-fou
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md    # permis M3→Trémie, interlock trémie
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T146.yaml
+      - DOC/WFLOW/AUDITS/DESIGN/DECISIONS_T146_ARBITRAGE_ISO13849.md
+      - TOOLS/TEST_AUTO_CI/**  # TC-P09/TC-P10/TC-P11 associés si besoin
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md     # pas de convention modifiée sans validation humaine
+      - CODE/H_TREUILS_BENNE/FB_WinchSpeedLearning.st  # produit par T181-15/T96, pas ici
+      - Code hors liste allowed (surtout FB_Bucket / PRG_03 / cycle / benne : intouchés)
+
+  # ── 4. Contrat de conservation (patch → non bloquant, conservé par traçabilité) ──
+  conservation:
+    must_survive:
+      - "Interlock hauteur M3 Homed=TRUE strict via HomedAndReliable M1∧M2 (PRG_05_Translation:111-115) — non assoupli."
+      - "Synchronisation Homed Homing↔Safety : FB_Encoder_Homing reste producteur unique de Calib.Homed."
+      - "FB_Safety_Winch : top sensor et Méca A/B gardent leur comportement ; SafeStop 2 sens, Enable maintenu."
+      - "Décision ISO 13849 : bridage hors homing fondé sur la vitesse conditionné au garde-fou vitesse opérationnel."
+    dropped_on_purpose:
+      - "Le statut 'TremieFull_OR_GateRaised_DI déclaré non consommé' est soldé (consommation effective)."
+      - "Si posture repos capteur choisie : 'bridage logiciel hors homing' est abandonné au profit du capteur physique TOP documenté."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison" (G200 : TremieFull + TopPositionSensor consommés)
+    - run_all_gates          # résultat des gates (palier C)
+    - bundle                 # CODE_XML/CODE_Bundle.xml regenere
+    - check_task_contract    # python .../check_task_contract.py (ce fichier)
+    - decision_note          # DECISIONS_T146_ARBITRAGE_ISO13849.md remplie + visa humain
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+    - "deepseek"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    C4 SÉCURITÉ : ne JAMAIS armer un bridage fondé sur la vitesse tant que le garde-fou
+    (SpeedGuardEnable / FB_WinchRateInterlock / table SpeedBandMaxMps) n'est pas validé en
+    charge réelle. Toute ambiguïté sur la polarité de TremieFull_OR_GateRaised_DI (NC-100,
+    TRUE=bloqué vers Trémie), toute incohérence spec AF09/AF10/AF11, ou tout risque hors
+    scope est remonté IMMÉDIATEMENT à l'orchestrateur — jamais à la fin, jamais en silence.
+    La levée du bridage par le capteur TOP ne doit pas assouplir l'interlock hauteur M3 strict.
+    Aucun agent n'attribue le statut human-validated / n'équivaut le visa humain ISO 13849
+    (SAFETY_POLICY.md : advisory-only tant qu'un automaticien n'a pas validé explicitement).
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+execution:
+  executed_by: "DSH (DeepSeek)"   # qui prépare le contrat/plan (non-code)
+  completed_at: ""
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Contrat rédigé pour T146 (C4 SÉCURITÉ) : arbitrage bridage hors homing ISO 13849 + règle
+    capteur TOP haut + câblage interlock trémie M3→Trémie + poursuite garde-fou vitesse.
+    ARRÊT VALIDATION HUMAINE obligatoire (décision de posture) avant toute implémentation.
+  evidence_submitted: []
+
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Visa de validation humaine C4 OBLIGATOIRE avant toute implémentation : tranche la posture
+    ISO 13849 (bridage plafond OU repos capteur physique), valide la règle TOP et le périmètre
+    des fichiers CODE concernés.

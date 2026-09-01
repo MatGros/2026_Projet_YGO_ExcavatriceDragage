@@ -939,7 +939,7 @@ tasks:
     déclaré non consommé). Décision métier ISO 13849 requise : bridage progressif vs repos capteur physique assumé. Formulation
     « Homed=TRUE strict » : correcte pour l''anti-collision hauteur M3 et la benne, à NE PAS généraliser — à coupler à un
     bridage vitesse (Homed strict là où la position est critique, bridage sinon, levé si capteur TOP haut).'
-  contrat: ARCHIVES/Doc/WFLOW/CONTRACTS/TASK_CONTRACT_T146_C4_FBCODER_COMPLET.yaml
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T146.yaml
   objectifs:
   - 'Clos : interlock hauteur M3 exige Homed=TRUE strict (HomedAndReliable M1∧M2) — déjà conforme (commit d66728f6).'
   - 'Clos : synchronisation Homed Homing↔Safety — producteur unique, pas de désynchronisation.'
@@ -3904,7 +3904,7 @@ tasks:
   - FB_Cycle gate X0→X1 sur NOT Fault.Latched (plus de redémarrage après défaut non acquitté)
   - Reprise de cycle après bascule de mode exige un geste conscient (BtnStart)
   - G200 liaison PASS + tests
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T192.yaml
   bloque_par: []
 - id: T192-A
   parent_id: T192
@@ -3969,7 +3969,7 @@ tasks:
   - Regrouper la config FB_Translation en Cfg struct
   - Corriger ST_fbModes_Autorisations (NC-110)
   - G200 liaison PASS + tests
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T194.yaml
   bloque_par: []
 - id: T195
   parent_id: ''
@@ -4507,6 +4507,7 @@ tasks:
     son comportement
   - Bits IHM directionnels M3 déjà projetés (GVL_IHM.TranslationM3.Safety) reflètent le blocage réel
   - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS + tests CI étendus'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T204.yaml
   bloque_par:
   - T184
 - id: T205
@@ -4716,7 +4717,7 @@ tasks:
     d''activation sur une fenêtre glissante. À définir : seuils (durée max pilotage, temps de repos,
     fenêtre cumulée), comportement (couper le contacteur + message IHM), et intégration dans le graphe
     de commande Kobold. Ne pas dégrader le fonctionnement nominal en cycle (Dive/Extraction).'
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T212.yaml
   objectifs:
   - Définir les seuils anti-surchauffe Kobold (durée max pilotage, temps de repos, fenêtre cumulée)
   - Implémenter l'interlock anti-surchauffe sur le contacteur Kobold hors cycle
@@ -4743,7 +4744,7 @@ tasks:
     BucketReferenceRequested, UseDynamicTarget, DynamicHomingTargetM, M2Demand (HomeReq,
     UseDynamicTarget, DynamicTarget_M), CfgTopHomingTarget_M, CfgOffsetClose_M, état FB_MachineHomingCycle.
     Régénérer la liste (generate_variable_list_from_code.py) et valider avec l''humain avant compilation.'
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T213.yaml
   objectifs:
   - Exposer les variables de homing M2 dans GVL_Troubleshooting (structure + câblage)
   - Ajouter les variables à troubleshooting_variables.txt (régénérer la liste)

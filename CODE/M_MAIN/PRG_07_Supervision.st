@@ -634,6 +634,42 @@ ELSE
     CycleM2SpeedTgt_Pct := 0.0;
 END_IF;
 
+// Vue unique lecture seule : les champs recopies sont les permis reellement produits/consommes.
+// Aucun mouvement ne lit GVL_IHM.Permits ; elle sert uniquement a l'IHM et au troubleshooting.
+GVL_IHM.Permits.ArmingPermit := PRG_04_Treuils_Benne.Data.ArmingPermit;
+GVL_IHM.Permits.M1SafetyAscentPermit := PRG_04_Treuils_Benne.Data.WinchM1Safety.AscentPermit;
+GVL_IHM.Permits.M1SafetyDescendPermit := PRG_04_Treuils_Benne.Data.WinchM1Safety.DescendPermit;
+GVL_IHM.Permits.M1ProcessAscentPermit := PRG_04_Treuils_Benne.Data.ProcessPermitM1_Ascent;
+GVL_IHM.Permits.M1ProcessDescendPermit := PRG_04_Treuils_Benne.Data.ProcessPermitM1_Descend;
+GVL_IHM.Permits.EffectivePermitM1_Ascent := PRG_04_Treuils_Benne.Data.TraceM1.AscentPermitEffective;
+GVL_IHM.Permits.EffectivePermitM1_Descend := PRG_04_Treuils_Benne.Data.TraceM1.DescendPermitEffective;
+GVL_IHM.Permits.AppliedPermitM1_Ascent := PRG_04_Treuils_Benne.Data.TraceM1.AscentPermitApplied;
+GVL_IHM.Permits.AppliedPermitM1_Descend := PRG_04_Treuils_Benne.Data.TraceM1.DescendPermitApplied;
+GVL_IHM.Permits.M1FinalPermitBlocked := PRG_04_Treuils_Benne.Data.TraceM1.FinalPermitBlocked;
+GVL_IHM.Permits.M2SafetyAscentPermit := PRG_04_Treuils_Benne.Data.WinchM2Safety.AscentPermit;
+GVL_IHM.Permits.M2SafetyDescendPermit := PRG_04_Treuils_Benne.Data.WinchM2Safety.DescendPermit;
+GVL_IHM.Permits.M2ProcessAscentPermit := PRG_04_Treuils_Benne.Data.ProcessPermitM2_Ascent;
+GVL_IHM.Permits.M2ProcessDescendPermit := PRG_04_Treuils_Benne.Data.ProcessPermitM2_Descend;
+GVL_IHM.Permits.EffectivePermitM2_Ascent := PRG_04_Treuils_Benne.Data.TraceM2.AscentPermitEffective;
+GVL_IHM.Permits.EffectivePermitM2_Descend := PRG_04_Treuils_Benne.Data.TraceM2.DescendPermitEffective;
+GVL_IHM.Permits.AppliedPermitM2_Ascent := PRG_04_Treuils_Benne.Data.TraceM2.AscentPermitApplied;
+GVL_IHM.Permits.AppliedPermitM2_Descend := PRG_04_Treuils_Benne.Data.TraceM2.DescendPermitApplied;
+GVL_IHM.Permits.M2FinalPermitBlocked := PRG_04_Treuils_Benne.Data.TraceM2.FinalPermitBlocked;
+GVL_IHM.Permits.BothActive := PRG_04_Treuils_Benne.Data.BothActive;
+GVL_IHM.Permits.BothAscentPermit := PRG_04_Treuils_Benne.Data.BothAscentPermit;
+GVL_IHM.Permits.BothDescendPermit := PRG_04_Treuils_Benne.Data.BothDescendPermit;
+GVL_IHM.Permits.BothBlocked := PRG_04_Treuils_Benne.Data.BothBlocked;
+GVL_IHM.Permits.BothBlockReason := PRG_04_Treuils_Benne.Data.BothBlockReason;
+GVL_IHM.Permits.EffectivePermitM3_Tremie := PRG_05_Translation.Data.TranslationTrace.TremiePermitEffective;
+GVL_IHM.Permits.EffectivePermitM3_Maintenance := PRG_05_Translation.Data.TranslationTrace.MaintenancePermitEffective;
+GVL_IHM.Permits.M3MotionPermitEffective := PRG_05_Translation.Data.TranslationTrace.MotionPermitEffective;
+GVL_IHM.Permits.DiveDescendPermit := PRG_04_Treuils_Benne.Data.DescendPermitDiveBucketOpen;
+GVL_IHM.Permits.ExtractionAscentPermit := PRG_04_Treuils_Benne.Data.ExtractionAscentPermit;
+GVL_IHM.Permits.ExtractionAssistActive := PRG_04_Treuils_Benne.Data.ExtractionAssistActive;
+GVL_IHM.Permits.BucketOpenRequestActive := PRG_04_Treuils_Benne.Data.BucketState.OpenActive;
+GVL_IHM.Permits.BucketCloseRequestActive := PRG_04_Treuils_Benne.Data.BucketState.CloseActive;
+GVL_IHM.Permits.BucketMotionBlocked := PRG_04_Treuils_Benne.Data.BucketState.CoupledMotionBlockedByBucket;
+
 instTroubleshootingView(
     Enable               := TRUE,
     HwIn                 := PRG_02_Acquisition.HwIn,
@@ -669,6 +705,7 @@ instTroubleshootingView(
     CycleExtraction      := GVL_IHM.CycleExtraction,
     CycleDumpAtTremie    := GVL_IHM.CycleDumpAtTremie,
     JoystickHMI          := GVL_IHM.JOY1Joystick,
+    Permits              := GVL_IHM.Permits,
     EmergencyState       := PRG_06_Outputs.EmergencyState,
     EmergencyDiag        := PRG_06_Outputs.EmergencyDiag,
     PowerCutOffActive    := PRG_06_Outputs.PowerCutOffActive,

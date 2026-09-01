@@ -1,0 +1,168 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T208 : cohérence ActiveOffsetM / état benne (faux MecaE)
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Pourquoi ce fichier existe (REX 2026-07-29 & REX 2026-08-12) :
+# 1. Définit le contrat d'exécution (objectif, critères testables, scope, preuves).
+# 2. Sert de suivi lisible en un coup d'œil par l'humain (`status`).
+# 3. Consigne le rapport synthétique de l'agent (`execution:`) et le visa (`validation:`).
+#
+# Contexte (cause racine du faux MecaE) :
+#   ActiveOffsetM est dérivé de l'état benne mémorisé (latched) jamais
+#   reconcilié avec la position physique : FB_Bucket.st pilote
+#   `ActiveOffsetM := OffsetCloseM` dès que IsClosed=TRUE. Or IsClosed reste un
+#   état purement latched (jamais reconcilié — jog manuel M2 hors FB_Bucket,
+#   boot RETAIN périmé, cycle interrompu). Obs. : CablePosM(M1)=1.31m,
+#   ExpectedOtherWinchPosM=-13.7m donc ActiveOffsetM=15m (OffsetCloseM) alors que
+#   les 2 treuils sont à 1.31m (benne ouverte, offset attendu 0m) →
+#   ABS(M1-M2+ActiveOffsetM)=15m>2.5m → faux MecaE.
+#
+# ⚠️ Design CORRIGÉ validé par 2 challenges experts MAJOR (automatisme/sécurité +
+#    qualité/homing) : NE PAS réconcilier IsOpen/IsClosed depuis DeltaPosition_M
+#    (= raisonnement circulaire qui masque une vraie désynchronisation). Détecter
+#    la contradiction état<->position → StateIncoherent, sortie dédiée
+#    BucketStateCoherent := NOT StateIncoherent, gate sur la COMMANDE (StartStop,
+#    PAS SafeStop), MecaE reste armé, geler plutôt que forcer ActiveOffsetM,
+#    re-qualification opérateur.
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T208
+  criticality: C2            # C0 | C1 | C2 | C3 | C4
+  strategy: patch            # patch | rebuild   (axe independant de la criticite)
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Supprimer le faux défaut MecaE en rendant l'état benne cohérent avec la
+    position physique : détecter la contradiction état<->position
+    (StateIncoherent), geler la COMMANDE benne (StartStop, pas SafeStop) quand
+    l'état est inconnu ou incohérent, sans jamais réécrire IsOpen/IsClosed depuis
+    le signal de désynchronie (invariant anti-raisonnement-circulaire) et sans
+    altérer la synchro FB_WinchSync ni le cycle benne en état cohérent.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Au boot, si la position réelle du câble M2 est hors des fenêtres [LastPosM2Open ± CoherenceLimitM] et [LastPosM2Close ± CoherenceLimitM], alors StateIncoherent=TRUE et ActiveOffsetValid=FALSE, et IsOpen ni IsClosed ne sont modifiés."
+      verified_by: "TC boot hors-fenêtres dans TOOLS/TEST_AUTO_CI/H_TREUILS_BENNE/BENNE/tests/test_fb_bucket.st + lecture FB_Bucket.st"
+    - id: AC2
+      statement: "Au boot, si IsOpen=TRUE ET IsClosed=TRUE, alors StateIncoherent=TRUE."
+      verified_by: "TC-P10-047.2 (boot TRUE/TRUE, déjà couvert)"
+    - id: AC3
+      statement: "BucketStateCoherent := NOT StateIncoherent est une sortie dédiée qui gage le StartStop de la commande benne et PAS le SafeStop; MecaE reste armé et ActiveOffsetM n'est ni forcé ni réécrit à 15m/0m arbitrairement."
+      verified_by: "grep BucketStateCoherent + inspection gates commande dans FB_Bucket.st + TC non-forçage ActiveOffsetM"
+    - id: AC4
+      statement: "Le gate de commande StartStop benne est conditionné par HomedM1 AND HomedM2 AND BucketStateCoherent; la redondance avec la Cause 4 (HomingFault) est arbitrée explicitement et documentée."
+      verified_by: "inspection FB_Bucket.st + arbitrage M1/M2/benne/cycle consigné dans le plan"
+    - id: AC5
+      statement: "Dans FB_Bucket.st, IsOpen et IsClosed ne reçoivent aucune affectation depuis DeltaPosition_M (zéro écriture anti-raisonnement-circulaire)."
+      verified_by: "grep 'DeltaPosition_M' sur FB_Bucket.st retourne 0 affectation vers IsOpen/IsClosed"
+    - id: AC6
+      statement: "M2_LimitShift est gagé sur BucketStateCoherent, donc la butée haute M2 reste correcte quand l'état benne est inconnu."
+      verified_by: "inspection PRG_04_Treuils_Benne.st (M2_LimitShift)"
+    - id: AC7
+      statement: "FB_Cycle X3/X6 ne progresse pas tant que BucketStateCoherent=FALSE (pas d'avance du cycle benne sur état inconnu)."
+      verified_by: "inspection FB_Cycle.st (X3/X6) + TC cycle benne"
+    - id: AC8
+      statement: "L'opérateur voit un message IHM StateIncoherent et une action de re-confirmation ouvert/fermé avant toute reprise de commande."
+      verified_by: "inspection FB_Hmi_BannerFormatter.st + AFC AF_Partie-14 (FB_TroubleshootingView_v1.2)"
+    - id: AC9
+      statement: "En état benne cohérent (2 treuils à 1.31m, benne ouverte), ActiveOffsetM=0, M2PositionCorrected et FB_WinchSync inchangés, et ABS(CablePosM(M1)-CablePosM(M2)+ActiveOffsetM)=0 ≤ 2,5m donc aucun faux MecaE n'est déclenché."
+      verified_by: "TC non-régression benne ouverte + gates palier C + G200_check_linkage.py --report (PASS 0 erreur)"
+    - id: AC10
+      statement: "En état cohérent, aucune régression synchro/cycle : Benne_IsRoughlyClosed, BucketNotClosedAscentStep1, M2_LimitShift et M2PositionCorrected conservent leur comportement nominal sur TC-P10-023..048.1 + T196-001/002."
+      verified_by: "run_all_gates.py --palier C + tests non-régression TC-P10-023..048.1 + T196-001/002"
+    - id: AC11
+      statement: "Le nom de fichier de chaque POU modifié est identique au nom du POU; le suffixe de langage est égal au langage ST généré dans le bundle PLCopenXML."
+      verified_by: "inspection POU/PRG + bundle CODE/CODE_Bundle.xml régénéré par generate_codesys_bundle.py"
+    - id: AC12
+      statement: "La réconciliation de l'état benne est opérateur-dépendante (re-confirmation via IHM), jamais automatique depuis la position."
+      verified_by: "inspection chemins d'affectation IsOpen/IsClosed (aucun réécrit depuis DeltaPosition_M ni depuis l'horloge seule)"
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:                 # fichiers que la tache PEUT modifier
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st
+      - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - GVL_PERSISTENT.st
+      - TOOLS/TEST_AUTO_CI/H_TREUILS_BENNE/BENNE/tests/test_fb_bucket.st
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md
+      - DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+      - DOC/WFLOW/
+    forbidden:               # explicitement hors scope — ne pas y toucher
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st      # MecaE — comportement inchangé
+      - CODE/H_TREUILS_BENNE/FB_WinchSync.st         # synchro — comportement inchangé
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st  # chantier AU (autre agent)
+      - DOC/NAMING_CONVENTION.md                     # norme transverse — ne pas modifier par la tâche
+
+  # ── 4. Contrat de conservation (patch : informatif, préserve la non-régression) ──
+  conservation:
+    must_survive:            # comportements/données à préserver impérativement
+      - "MecaE reste ARMÉ : on ne l'inhibe pas, on gèle la COMMANDE benne."
+      - "ActiveOffsetM n'est JAMAIS forcé à 15m/0m arbitrairement (sinon SyncDeviationFault / faux MecaE)."
+      - "Synchro FB_WinchSync et M2PositionCorrected inchangés en état cohérent."
+      - "Pas de redémarrage automatique après défaut; Reset sur front, cause disparue + appui conscient."
+      - "IsOpen/IsClosed jamais réécrits depuis DeltaPosition_M (invariant du design corrigé)."
+    dropped_on_purpose:      # abandonné sciemment — décision humaine, tracée
+      - "Réconciliation automatique IsOpen/IsClosed depuis DeltaPosition_M (invalidée par les 2 challenges MAJOR : masque une vraie désynchronisation)."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_task_contract    # python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <contrat> → PASS
+    - check_linkage          # bloc "Auto-verification liaison" (G200_check_linkage.py --report, PASS 0 erreur)
+    - run_all_gates          # run_all_gates.py --palier C (et complet en fin)
+    - bundle                 # CODE/CODE_Bundle.xml régénéré (generate_codesys_bundle.py .)
+    - "TC bloquants verts dans test_fb_bucket.st (boot hors-fenêtres AC1, TRUE/TRUE AC2, non-forçage ActiveOffsetM AC3, non-régression AC9/AC10)"
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "deepseek-v4-flash:cloud"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout problème constaté en cours de route (incohérence de spec, bug
+    préexistant, divergence avec le challenge T175, conflit de gate homing
+    HomedM1/HomedM2 vs ActiveOffsetValid actuel MachineHomed/XOR, risque hors
+    scope) est remonté IMMÉDIATEMENT à l'orchestrateur, pas à la fin et jamais
+    silencieusement. Signaler n'est pas élargir le scope. En particulier : un
+    conflit entre le nouveau gate (HomedM1 AND HomedM2 AND BucketStateCoherent)
+    et l'ActiveOffsetValid actuel est une incohérence de diagnostic à trancher.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: "deepseek-v4-flash:cloud (préparation contrat + plan, NON-code)"
+  completed_at: ""
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Contrat T208 rédigé à partir du design corrigé validé par 2 challenges
+    experts MAJOR (détection contradiction état<->position → StateIncoherent,
+    sortie BucketStateCoherent, gate StartStop pas SafeStop, MecaE armé, geler
+    ActiveOffsetM, re-qualification opérateur). Plan de tâche dans
+    DOC/WFLOW/AUDITS/DESIGN/PLAN_T208coherence_ActiveOffsetM_benne.md.
+  evidence_submitted: []
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: ""           # à viser par l'humain / orchestrateur
+  validated_at: ""
+  notes: >
+    À valider AVANT tout code : mapping ErrorId AF_Partie-10 FAUX, CoherenceLimitM
+    (viser 1.0 unique, visa V2), boot RETAIN périmé (F08), doctrine d'arrêt
+    M1_Busy (V4). Arrêt de validation humaine obligatoire avant implémentation ST.

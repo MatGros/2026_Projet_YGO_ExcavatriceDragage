@@ -1,14 +1,14 @@
 Error compiling source files:
 
-FB_WinchOutputInterlock.st:48:39: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_WINCHOUTPUTINTERLOCK'
-  48 |     Fault                           : ST_Fault;                       // <-- [DIAG] Defaut transverse standard (socle FB_FaultCore, bit0: timeout frein)
+FB_WinchOutputInterlock.st:53:39: error: Undefined type 'ST_FAULT' in FUNCTION_BLOCK 'FB_WINCHOUTPUTINTERLOCK'
+  53 |     Fault                           : ST_Fault;                       // <-- [DIAG] Defaut transverse standard (socle FB_FaultCore, bit0: timeout frein)
      |                                       ^
 
-FB_WinchOutputInterlock.st:112:39: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_WINCHOUTPUTINTERLOCK'
- 112 |     instFault                       : FB_FaultCore;                  // * [INST] Socle defaut (vue live + latchee)
+FB_WinchOutputInterlock.st:124:39: error: Undefined type 'FB_FAULTCORE' in FUNCTION_BLOCK 'FB_WINCHOUTPUTINTERLOCK'
+ 124 |     instFault                       : FB_FaultCore;                  // * [INST] Socle defaut (vue live + latchee)
      |                                       ^
 
-FB_WinchOutputInterlock.st:113:5: error: Undefined type 'ST_FAULTCAUSE' in FUNCTION_BLOCK 'FB_WINCHOUTPUTINTERLOCK'
- 113 |     instCauses                      : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Causes en clair pour le socle defaut
+FB_WinchOutputInterlock.st:125:5: error: Undefined type 'ST_FAULTCAUSE' in FUNCTION_BLOCK 'FB_WINCHOUTPUTINTERLOCK'
+ 125 |     instCauses                      : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Causes en clair pour le socle defaut
      |     ^
 

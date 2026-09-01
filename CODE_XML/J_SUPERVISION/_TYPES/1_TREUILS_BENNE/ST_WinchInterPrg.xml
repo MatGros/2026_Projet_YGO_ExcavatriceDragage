@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T07:04:33.546526" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T07:04:33.546526">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T07:23:44.967572" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T07:23:44.967572">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -175,6 +175,41 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🛡️ Permission d'armement homme-mort (Option B — combiné interlock benne) ===
 🛡️ Permission d'armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)</xhtml>
               </documentation>
+            </variable>
+            <variable name="ProcessPermitM1_Ascent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ProcessPermitM1_Descend">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ProcessPermitM2_Ascent">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ProcessPermitM2_Descend">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="DescendPermitDiveBucketOpen">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ExtractionAssistActive">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ExtractionAscentPermit">
+              <type>
+                <BOOL />
+              </type>
             </variable>
             <variable name="PositionLimitOverriddenM1">
               <type>
