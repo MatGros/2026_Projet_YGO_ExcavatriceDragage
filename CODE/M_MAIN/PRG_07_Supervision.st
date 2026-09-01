@@ -409,8 +409,10 @@ GVL_IHM.Commun.WinchSymmetry.MaxSyncDeviation_M       := _WinchSymmetryDataPersi
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
-GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
-GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+// Ces deux indicateurs ne décrivent PAS le domaine simulation : ils publient
+// l'état des bypasss réellement consommés par FB_Safety_Winch.
+GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_IHM.Commun.Bypass.SlackCable;
+GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_IHM.Commun.Bypass.TopLimitSwitch;
 GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.InputSource.WinchInputSourceChanged;
 
 // ---------- §3e. Structures d'état & safety (recopies directes des bus) ----------

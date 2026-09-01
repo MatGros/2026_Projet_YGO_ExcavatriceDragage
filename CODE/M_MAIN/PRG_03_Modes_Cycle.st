@@ -152,8 +152,8 @@ DiveSearchInputs.ImmersionUpper_M      := GVL_IHM.CycleDiveSearch.Cfg.ImmersionU
 DiveSearchInputs.ImmersionLower_M      := GVL_IHM.CycleDiveSearch.Cfg.ImmersionLower_M;
 DiveSearchInputs.CableLimitAscent_M    := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M;
 DiveSearchInputs.LimitLegalDepthMin_M  := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
-// Plancher palier descente Kobold : non rendu reglable IHM, valeur roadmap 3.
-DiveSearchInputs.CfgDiveFloorStep      := 3;
+// Plancher palier descente Kobold : débit minimal nécessaire au fonctionnement du Kobold.
+DiveSearchInputs.CfgDiveFloorStep      := 4;
 DiveSearchInputs.CycleTime             := T#10ms;
 DiveSearchInputs.BypassPreconditions   := GVL_IHM.CycleDiveSearch.Cmd.TglBypassDiveSearchSequence;
 // Config : defaults du DUT ST_fbDiveSearch_Config conserves (DiveSpeedMin_Mps=0.15,

@@ -4623,10 +4623,10 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="3" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Limitation palier vitesse en descending (1..5), commun M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Plafond palier descente nominal (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="WinchMaxStepAscent">
@@ -4771,8 +4771,8 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur
-🩺 Capteur haut ignoré car simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Indicateurs diagnostic bypass — PLC→IHM, état réellement consommé
+🩺 1 = Bypass.TopLimitSwitch réellement actif</xhtml>
               </documentation>
             </variable>
             <variable name="SimSlackCableBypassActive">
@@ -4780,7 +4780,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Mou de câble ignoré car simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 1 = Bypass.SlackCable réellement actif</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceChanged">
@@ -45846,7 +45846,7 @@ ELSE
 END_IF;
 
 IF _CommunCfgPersist.WinchMaxStepDescent &lt;= 0 THEN
-    EffectiveMaxStepDescent := 3;
+    EffectiveMaxStepDescent := 5;
 ELSE
     EffectiveMaxStepDescent := _CommunCfgPersist.WinchMaxStepDescent;
 END_IF;
@@ -49027,17 +49027,20 @@ SimBypassFall(CLK := SimulationBypassEffective);
 IF SimBypassRise.Q THEN
     // 🧪 Bypass sim étendu aux tests Meca (Meca A-E via Safety ; NoMovement/
     // OppositeDir via Process) pour travailler sans faux blocage en banc.
-    // ❗ Les limites réelles (TopLimitSwitch / TopLimitSoftware / LimitLegal) NE sont PAS
-    //    bypassées par la simulation : la protection de montée/descente reste active au banc.
-    // Reste strictement inerte sur machine réelle (SimulationBypassEffective gate simulation+treuil).
+    // Les trois limites banc demandées sont écrites depuis leur producteur unique.
+    // Elles restent strictement inertes hors SimulationBypassEffective.
     GVL_IHM.M1TreuilRetenue.Bypass.Safety  := TRUE;
     GVL_IHM.M1TreuilRetenue.Bypass.Process := TRUE;
     GVL_IHM.M2TreuilBenne.Bypass.Safety    := TRUE;
     GVL_IHM.M2TreuilBenne.Bypass.Process   := TRUE;
+    GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
+    GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
+    GVL_IHM.Commun.Bypass.CableLimitSwitch := TRUE;
 END_IF;
 IF SimBypassFall.Q THEN
     GVL_IHM.Commun.Bypass.TopLimitSwitch   := FALSE;
     GVL_IHM.Commun.Bypass.TopLimitSoftware := FALSE;
+    GVL_IHM.Commun.Bypass.CableLimitSwitch := FALSE;
     GVL_IHM.Commun.Bypass.LimitLegal       := FALSE;
     GVL_IHM.M1TreuilRetenue.Bypass.Safety  := FALSE;
     GVL_IHM.M1TreuilRetenue.Bypass.Process := FALSE;
@@ -49134,8 +49137,10 @@ GVL_IHM.Commun.WinchSymmetry.MaxSyncDeviation_M       := _WinchSymmetryDataPersi
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
-GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
-GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
+// Ces deux indicateurs ne décrivent PAS le domaine simulation : ils publient
+// l'état des bypasss réellement consommés par FB_Safety_Winch.
+GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_IHM.Commun.Bypass.SlackCable;
+GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_IHM.Commun.Bypass.TopLimitSwitch;
 GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.InputSource.WinchInputSourceChanged;
 
 // ---------- §3e. Structures d'état &amp; safety (recopies directes des bus) ----------
@@ -50049,8 +50054,9 @@ Aucun abandon</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 Master Bypass Essais Banc — arme les bypass Meca (Safety/Process) en mode MAINT
-(inopérant sur machine réelle). ❗ N'arme PLUS les limites réelles (TopLimitSwitch /
-TopLimitSoftware / LimitLegal) : la protection de montée/descente reste active au banc.
+(inopérant sur machine réelle). Arme aussi les limites banc TopLimitSwitch,
+TopLimitSoftware et CableLimitSwitch, exclusivement sous le triple gate
+SimulationModeActive AND SimWinchActive AND SimulationBypassActive.
 Défaut TRUE : pré-arme le bypass banc dès le boot (n'agit que si SimulationModeActive AND SimWinchActive).
 Permet de travailler en banc sans faux blocage Meca au homing sans mouvement.</xhtml>
           </documentation>

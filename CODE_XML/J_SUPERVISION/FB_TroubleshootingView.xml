@@ -243,8 +243,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Indicateurs diagnostic simulation — PLC→IHM, pas des bypass opérateur
-🩺 Capteur haut ignoré car simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Indicateurs diagnostic bypass — PLC→IHM, état réellement consommé
+🩺 1 = Bypass.TopLimitSwitch réellement actif</xhtml>
               </documentation>
             </variable>
             <variable name="SimSlackCableBypassActive">
@@ -252,7 +252,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 Mou de câble ignoré car simulation active</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🩺 1 = Bypass.SlackCable réellement actif</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceChanged">
@@ -1839,10 +1839,10 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="3" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Limitation palier vitesse en descending (1..5), commun M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Plafond palier descente nominal (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="WinchMaxStepAscent">

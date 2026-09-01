@@ -63,10 +63,10 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="3" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Limitation palier vitesse en descending (1..5), commun M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Plafond palier descente nominal (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="WinchMaxStepAscent">
