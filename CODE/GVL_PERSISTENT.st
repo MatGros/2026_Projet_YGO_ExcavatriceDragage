@@ -114,16 +114,27 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 🔄 CYCLE (dragage semi-automatique)
     _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
 
-    // 🪨 ASSISTANCE PRÉLÈVEMENT MAINTENANCE
-    _DredgingAssistCfgPersist : ST_DredgingAssistCfg := (
+    // 🤿 CYCLE PLONGÉE (DiveSearch)
+    _CycleDiveSearchCfgPersist : ST_CycleDiveSearchCfg := (
         DiveStartMin_M := 1.0,
         ImmersionUpper_M := 0.5,
-        ImmersionLower_M := -0.5,
-        ExtractionControlDistance_M := 2.0,
+        ImmersionLower_M := -0.5
+    ); // 🌉 Pont FB_CfgPersistBridge_CycleDiveSearchCfg
+
+    // ⛏️ CYCLE EXTRACTION
+    _CycleExtractionCfgPersist : ST_CycleExtractionCfg := (
+        ExtractionControlDistance_M := 2.0
+    ); // 🌉 Pont FB_CfgPersistBridge_CycleExtractionCfg
+
+    // 🚚 CYCLE VIDAGE TRÉMIE (legacy)
+    _CycleDumpAtTremieCfgPersist : ST_CycleDumpAtTremieCfg := (); // 🌉 Pont FB_CfgPersistBridge_CycleDumpAtTremieCfg
+
+    // 🎛️ TOGGLES ASSISTANCE (mode mémorisé au boot)
+    _CycleAssistTogglesPersist : ST_CycleAssistToggles := (
         TglEnableDiveSearch := FALSE,
         TglEnableExtractionSequence := FALSE,
         TglEnableDumpAtTremie := FALSE
-    ); // 🌉 Pont FB_CfgPersistBridge_DredgingAssistCfg
+    ); // 🌉 Pont FB_CfgPersistBridge_CycleAssistToggles
 
     // 📏 RÉGLEMENTATION / LÉGAL
     _CommunCfgPersist : ST_CommunCfg := (

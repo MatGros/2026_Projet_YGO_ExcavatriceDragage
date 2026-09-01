@@ -4781,3 +4781,21 @@ tasks:
   - 'Permettre de tester le pilotage par boutons IHM M3 en simulation (JoyMaster inactif)'
   - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS'
   bloque_par: []
+- id: T215
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: IHM
+  agent: DSH (orchestrateur)
+  date: '2026-09-01T00:00:00+02:00'
+  titre: 'Refactor GVL_IHM.DredgingAssist en 3 sous-structures (CycleDiveSearch/CycleExtraction/CycleDumpAtTremie)'
+  contexte: 'Découper le bloc IHM mélangé GVL_IHM.DredgingAssist (Dive + Extraction + DumpAtTremie + Bypass) en 3 sous-structures homogènes Cmd/State/Cfg. Configs + toggles persistés (GVL_PERSISTENT). Refactor par étapes avec points de comparaison (baseline + diff de sortie nul). Option B validée par l''utilisateur.'
+  description: 'Refactor minimal par étapes (Phase 0 baseline → Phase 6 outillage), chaque étape avec bundle + G200 + gates + diff de sortie nul. Changement d''interface FB_TroubleshootingView (1 struct → 3 entrées) + refonte pont persistance. Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T215_REFACTOR_GVL_IHM_DREDGING.yaml.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T215_REFACTOR_GVL_IHM_DREDGING.yaml
+  objectifs:
+  - 'Découper GVL_IHM.DredgingAssist en CycleDiveSearch/CycleExtraction/CycleDumpAtTremie (Cmd/State/Cfg)'
+  - 'Configs + toggles persistés (GVL_PERSISTENT), pas de perte du mode mémorisé au boot'
+  - 'Adapter interface FB_TroubleshootingView (1 struct → 3 entrées) + projection'
+  - 'Zéro changement de logique : diff de sortie nul à chaque étape'
+  - 'Mettre à jour l''outillage (G330, registry, snapshots) — tous les gates verts'
+  bloque_par: []

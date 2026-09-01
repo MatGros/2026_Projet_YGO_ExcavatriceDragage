@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T20:06:42.873425" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T20:06:42.873425">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T01:03:01.341274" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T01:03:01.341274">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1876,14 +1876,14 @@ IF NOT (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MA
    OR NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
    OR PRG_07_Supervision.FaultMachineReset_IHM
    OR (WinchBothMotionActive AND (WinchBothMotionDirection = -1)) THEN
-    GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
+    GVL_IHM.CycleDiveSearch.Cmd.TglBucketAtBottomConfirmed := FALSE;
     BypassKoboldBottomTouched := FALSE;
 END_IF;
-ManualBottomPositionConfirmed := GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed;
+ManualBottomPositionConfirmed := GVL_IHM.CycleDiveSearch.Cmd.TglBucketAtBottomConfirmed;
 
 // 2. Détection front descendant Kobold sous bypass
 BypassKoboldFallEdge(CLK := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI);
-IF GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
+IF GVL_IHM.CycleDiveSearch.Cmd.TglBypassDiveSearchSequence
    AND WinchBothMotionActive AND (WinchBothMotionDirection = -1)
    AND BypassKoboldFallEdge.Q THEN
     BypassKoboldBottomTouched := TRUE;
@@ -1906,21 +1906,21 @@ DiveSearchInputs.PositionsValid        := NOT PRG_02_Acquisition.Data.EncoderM1.
 // PRG_04 de rang 04 : lecture du scan PRECEDENT (lag 1 scan assume, meme pratique que
 // le reste de PRG_03). Rend effectif le refus interne du Palier 5 en plongee Kobold.
 DiveSearchInputs.CurrentSpeedStep      := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber;
-DiveSearchInputs.DiveStartMin_M        := GVL_IHM.DredgingAssist.Cfg.DiveStartMin_M;
-DiveSearchInputs.ImmersionUpper_M      := GVL_IHM.DredgingAssist.Cfg.ImmersionUpper_M;
-DiveSearchInputs.ImmersionLower_M      := GVL_IHM.DredgingAssist.Cfg.ImmersionLower_M;
+DiveSearchInputs.DiveStartMin_M        := GVL_IHM.CycleDiveSearch.Cfg.DiveStartMin_M;
+DiveSearchInputs.ImmersionUpper_M      := GVL_IHM.CycleDiveSearch.Cfg.ImmersionUpper_M;
+DiveSearchInputs.ImmersionLower_M      := GVL_IHM.CycleDiveSearch.Cfg.ImmersionLower_M;
 DiveSearchInputs.CableLimitAscent_M    := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M;
 DiveSearchInputs.LimitLegalDepthMin_M  := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
 // Plancher palier descente Kobold : non rendu reglable IHM, valeur roadmap 3.
 DiveSearchInputs.CfgDiveFloorStep      := 3;
 DiveSearchInputs.CycleTime             := T#10ms;
-DiveSearchInputs.BypassPreconditions   := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence;
+DiveSearchInputs.BypassPreconditions   := GVL_IHM.CycleDiveSearch.Cmd.TglBypassDiveSearchSequence;
 // Config : defaults du DUT ST_fbDiveSearch_Config conserves (DiveSpeedMin_Mps=0.15,
 // TimeoutMarginFactor=1.5, TimeoutMinCourse_M=1.0, TimeoutMaxCourse_M=200.0, SecToMs=1000.0).
 
 instDiveSearch(
     Enable := (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2)
-              AND GVL_IHM.DredgingAssist.Cmd.TglEnableDiveSearch,
+              AND GVL_IHM.CycleDiveSearch.Cmd.TglEnableDiveSearch,
     Reset  := PRG_07_Supervision.FaultMachineReset_IHM,
     Inputs := DiveSearchInputs
 );
@@ -1931,7 +1931,7 @@ BottomPositionConfirmed := instDiveSearch.Outputs.BottomTouchConfirmed OR Manual
 // 4. Instance FB_ExtractionAssist (Fermeture et décollage assisté)
 instExtractionAssist(
     Enable := (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2)
-              AND GVL_IHM.DredgingAssist.Cmd.TglEnableExtractionSequence,
+              AND GVL_IHM.CycleExtraction.Cmd.TglEnableExtractionSequence,
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode := instModes.Auth.Mode,
@@ -1948,14 +1948,14 @@ instExtractionAssist(
     M2MeasuredSpeedValid := PRG_02_Acquisition.Data.EncoderM2.Measurement.SpeedValid,
     PositionsValid := NOT PRG_02_Acquisition.Data.EncoderM1.EncoderFault
                        AND NOT PRG_02_Acquisition.Data.EncoderM2.EncoderFault,
-    ControlAscentDistance_M := GVL_IHM.DredgingAssist.Cfg.ExtractionControlDistance_M,
+    ControlAscentDistance_M := GVL_IHM.CycleExtraction.Cfg.ExtractionControlDistance_M,
     CfgBucketCloseTimeout := T#75s,
     BucketMoveTimeout := GVL_IHM.M2TreuilBenne.Bucket.Cfg.CfgTimeoutDuration,
     CycleTime := T#10ms
 );
 
 IF instExtractionAssist.BottomConfirmationConsumed THEN
-    GVL_IHM.DredgingAssist.Cmd.TglBucketAtBottomConfirmed := FALSE;
+    GVL_IHM.CycleDiveSearch.Cmd.TglBucketAtBottomConfirmed := FALSE;
 END_IF;
 
 {endregion}
@@ -2103,7 +2103,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;
 
     // Requêtes benne et assistants
-    DumpAtTremieActive := GVL_IHM.DredgingAssist.Cmd.TglEnableDumpAtTremie;
+    DumpAtTremieActive := GVL_IHM.CycleDumpAtTremie.Cmd.TglEnableDumpAtTremie;
     DumpAtTremieAssistActive := DumpAtTremieActive;
     DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
 
@@ -2111,7 +2111,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqBucket.ReqClose                    := instExtractionAssist.BucketCloseRequest;
     // Contacteur Kobold : sortie FB_DiveSearch consommee (plus de recalcul inline).
     Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable      := instDiveSearch.Outputs.KoboldContactorCmd
-                                                            OR (GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence
+                                                            OR (GVL_IHM.CycleDiveSearch.Cmd.TglBypassDiveSearchSequence
                                                                 AND WinchBothMotionActive AND (WinchBothMotionDirection = -1));
     // Permis de descente plongee : sortie FB_DiveSearch consommee. Hors plongee (Enable=FALSE),
     // la descente reste libre ; pendant la plongee, elle n'est autorisee que si l'assistant la
@@ -2183,7 +2183,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
     Data.SequenceState.DumpAtTremieBucketOpenArmed   := DumpAtTremieBucketOpenArmed;
     Data.SequenceState.DumpAtTremieDescentLocked     := DumpAtTremieAssistActive AND NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable);
-    Data.SequenceState.BypassDiveActive            := GVL_IHM.DredgingAssist.Cmd.TglBypassDiveSearchSequence;
+    Data.SequenceState.BypassDiveActive            := GVL_IHM.CycleDiveSearch.Cmd.TglBypassDiveSearchSequence;
     Data.SequenceState.BypassKoboldBottomTouched   := BypassKoboldBottomTouched;
 
 ELSE
