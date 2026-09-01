@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T23:26:21.456525" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T23:26:21.456525">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T23:37:44.147823" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T23:37:44.147823">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -417,6 +417,18 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] T_max : borne superieure du maintien §3bis (AC7)</xhtml>
               </documentation>
             </variable>
+            <variable name="ReleaseOrderDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRE DE RELACHEMENT CONTACTEURS (vitesse avant direction) ===
+--&gt; [CFG] Decalage relachement direction apres vitesse (&gt;= 100ms)</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -607,6 +619,15 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecoule temporisation T_max maintien §3bis</xhtml>
               </documentation>
             </variable>
+            <variable name="ReleaseOrderElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DIAGNOSTICS ORDRE DE RELACHEMENT (AC1/AC2) ===
+&lt;-- [DIAG] Ecoule temporisation ordre de relachement</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -680,6 +701,30 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce DropConfirmDelay retombee contacteurs (AC7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReleaseOrderTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation ordre de relachement (vitesse avant direction)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReleaseOrderActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ordre de relachement en cours (direction tenue)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReleaseOrderDone">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] One-shot ordre de relachement effectue (anti-bouclage)</xhtml>
               </documentation>
             </variable>
             <variable name="RestartRequired">
@@ -857,7 +902,7 @@ SEULE la publication est homogénéisée sur Fault:ST_Fault (§6bis2).
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Interface : Interlock de sortie (entre FB_Winch et PRG_06_Outputs)
    🧩 Défaut homogénéisé (AF-03 §3) : Fault:ST_Fault via FB_FaultCore (bit0 = timeout frein).
-   🔒 Sécurité : Surveillance feedback frein et temporisation d'inversion
+   🔒 Sécurité : Surveillance feedback frein, temporisation d'inversion et ordre de relâchement contacteurs
    =======================================================================</xhtml>
           </documentation>
         </interface>
@@ -886,6 +931,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     SenseHoldTimer(IN := FALSE); SenseHoldFeedbackTimer(IN := FALSE);
     SenseHoldElapsed := T#0ms;
     ContactorStuck := ContactorStuckLatched;
+    ReleaseOrderActive := FALSE; ReleaseOrderDone := FALSE;
+    ReleaseOrderTimer(IN := FALSE, PT := ReleaseOrderDelay);
+    ReleaseOrderElapsed := T#0ms;
     RelayFwd := FALSE; RelayRev := FALSE;
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     BrakeCmd := FALSE; AuthorizedStep := 0;
@@ -1044,6 +1092,26 @@ END_IF;
 SenseHoldElapsed := SenseHoldTimer.ET;
 ContactorStuck := ContactorStuckLatched;
 
+// ── 4quater. Ordre de relâchement contacteurs (vitesse avant direction) ──
+// Quand le mouvement s'arrête (NOT MotorRequest ou SafeStop), les contacteurs
+// de VITESSE (Contactor1-4) sont relâchés immédiatement, puis le contacteur de
+// DIRECTION (RelayFwd/Rev) après ReleaseOrderDelay (&gt;= 100ms). Protège le moteur :
+// on ne coupe jamais la direction pendant que la vitesse est encore engagée.
+// Les coupures dures (NOT Enable / PowerContactorEngaged / Error / RestartInhibit)
+// restent immédiates (AC9) — l'ordre ne s'applique qu'à l'arrêt commandé.
+// Le maintien transitoire §3bis (SenseHold) garde la priorité : quand il est actif,
+// c'est lui qui tient la direction (jusqu'à confirmation retombée), pas cet ordre.
+IF MotorRequest AND NOT SafeStop THEN
+    // Nouvelle demande de mouvement : l'ordre de relâchement est réarmé.
+    ReleaseOrderActive := FALSE;
+    ReleaseOrderDone := FALSE;
+    ReleaseOrderTimer(IN := FALSE, PT := ReleaseOrderDelay);
+ELSIF (NOT MotorRequest OR SafeStop) AND NOT ReleaseOrderActive AND NOT ReleaseOrderDone
+      AND (RequestedRelayFwd OR RequestedRelayRev) AND NOT SenseHoldActive THEN
+    // Arrêt commandé : entrée en ordre de relâchement (vitesse relâchée, direction tenue).
+    ReleaseOrderActive := TRUE;
+END_IF;
+
 // ── 5. Autorisation moteur ────────────────────────────────────────────────
 RelayFwd := FALSE; RelayRev := FALSE;
 Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
@@ -1072,6 +1140,25 @@ ELSIF ContactorStuckLatched THEN
     AuthorizedStep := 0;
     Reason := E_WinchFinalInterlockReason.SENSE_DROP_TIMEOUT;
     State := E_WinchFinalInterlockState.FAULT;
+ELSIF ReleaseOrderActive THEN
+    // Ordre de relâchement : vitesse relâchée immédiatement, direction tenue
+    // jusqu'à ReleaseOrderDelay, puis direction relâchée (AC1/AC2).
+    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelayElapsed := StepDelay.ET;
+    StepDelayTarget := 0;
+    AuthorizedStep := 0;
+    Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
+    IF RequestedRelayFwd THEN RelayFwd := TRUE; END_IF;
+    IF RequestedRelayRev THEN RelayRev := TRUE; END_IF;
+    ReleaseOrderTimer(IN := TRUE, PT := ReleaseOrderDelay);
+    ReleaseOrderElapsed := ReleaseOrderTimer.ET;
+    IF ReleaseOrderTimer.Q THEN
+        ReleaseOrderActive := FALSE;
+        ReleaseOrderDone := TRUE;
+        RelayFwd := FALSE; RelayRev := FALSE;
+    END_IF;
+    State := E_WinchFinalInterlockState.READY;
+    Busy := TRUE;
 ELSIF SafeStop THEN
     // 🛡️ SafeStop : coupure dure indépendante de FB_Winch (défense en profondeur).
     // SafeStop n'est PAS un défaut : pas de FAULT, pas de latch, pas de Reset requis.

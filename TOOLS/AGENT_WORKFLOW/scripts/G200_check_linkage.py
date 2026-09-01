@@ -150,7 +150,8 @@ CROSS_REF = re.compile(r"\b(?P<pou>PRG_\w+)\s*\.\s*(?P<member>[A-Za-z_]\w*)")
 BUNDLE_BLOCK = re.compile(r'<block\b[^>]*typeName="(?P<type>[^"]+)"[^>]*instanceName="(?P<inst>[^"]+)"')
 BUNDLE_POU = re.compile(r'<pou\s+name="(?P<name>[^"]+)"')
 # `GVL_Foo.Champ` : reference a un champ de GVL (nom libre, pas seulement PRG_).
-GVL_FIELD_REF = re.compile(r"\b(?P<gvl>GVL_\w+)\s*\.\s*(?P<member>[A-Za-z_]\w*)")
+# Le membre peut commencer par un chiffre (ex. GVL_Troubleshooting.00_ContexteMachineGlobal).
+GVL_FIELD_REF = re.compile(r"\b(?P<gvl>GVL_\w+)\s*\.\s*(?P<member>\w+)")
 
 
 def strip_comments(text: str) -> str:

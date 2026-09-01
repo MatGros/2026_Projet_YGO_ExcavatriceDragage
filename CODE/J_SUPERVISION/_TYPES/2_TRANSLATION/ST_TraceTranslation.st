@@ -5,7 +5,7 @@
       permis de mouvement effectif, interlock hauteur, source SafeStop/coupure
       et cause de blocage priorisée.
    📤 Producteur unique : PRG_05_Translation (Data.TranslationTrace).
-   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.TraceTranslation).
+   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.S_TraceTranslation).
    🔒 Lecture seule — aucun calcul de commande n'en dépend.
    🕒 BlockReasonTimestamp : ms depuis démarrage PLC (TIME()), latched au dernier
       changement de BlockReason (1 scan, mémoire).

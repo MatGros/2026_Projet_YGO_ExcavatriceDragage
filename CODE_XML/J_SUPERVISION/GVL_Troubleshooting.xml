@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T17:12:08.176081" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T17:12:08.176081">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T00:13:36.456282" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T00:13:36.456282">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2011,7 +2011,7 @@ TRUE = Défaut sécurité actif</xhtml>
       permis de mouvement effectif, interlock hauteur, source SafeStop/coupure
       et cause de blocage priorisée.
    📤 Producteur unique : PRG_05_Translation (Data.TranslationTrace).
-   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.TraceTranslation).
+   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.S_TraceTranslation).
    🔒 Lecture seule — aucun calcul de commande n'en dépend.
    🕒 BlockReasonTimestamp : ms depuis démarrage PLC (TIME()), latched au dernier
       changement de BlockReason (1 scan, mémoire).
@@ -4300,7 +4300,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
   <addData>
     <data name="http://www.3s-software.com/plcopenxml/globalvars" handleUnknown="implementation">
       <globalVars name="GVL_Troubleshooting">
-        <variable name="ContexteMachineGlobal">
+        <variable name="A_ContexteMachineGlobal">
           <type>
             <derived name="ST_ChainContextGlobal" />
           </type>
@@ -4308,7 +4308,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 0. Contexte Global Machine (Mode, Simu, Commande, Bypass)</xhtml>
           </documentation>
         </variable>
-        <variable name="Inputs">
+        <variable name="B_Inputs">
           <type>
             <derived name="ST_HardwareImage" />
           </type>
@@ -4316,7 +4316,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">📥 1. Image complète des entrées réelles / qualifiées / simulées</xhtml>
           </documentation>
         </variable>
-        <variable name="Safety">
+        <variable name="C_Safety">
           <type>
             <derived name="ST_SafetyChecklist" />
           </type>
@@ -4324,7 +4324,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ 2. Diagnostic chronologique Chaîne de Sécurité &amp; Réarmement AU</xhtml>
           </documentation>
         </variable>
-        <variable name="Joystick">
+        <variable name="D_Joystick">
           <type>
             <derived name="ST_JoystickChecklist" />
           </type>
@@ -4332,7 +4332,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ 3. Diagnostic chronologique Bus CANopen &amp; Homme-Mort Joystick</xhtml>
           </documentation>
         </variable>
-        <variable name="HomingM1">
+        <variable name="E_HomingM1">
           <type>
             <derived name="ST_HomingChecklist" />
           </type>
@@ -4340,7 +4340,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 4. Diagnostic chronologique Homing M1 (Treuil Retenue)</xhtml>
           </documentation>
         </variable>
-        <variable name="HomingM2">
+        <variable name="F_HomingM2">
           <type>
             <derived name="ST_HomingChecklist" />
           </type>
@@ -4348,7 +4348,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 5. Diagnostic chronologique Homing M2 (Treuil Benne)</xhtml>
           </documentation>
         </variable>
-        <variable name="CycleSemiAuto">
+        <variable name="G_CycleSemiAuto">
           <type>
             <derived name="ST_ChainCycleSemiAuto" />
           </type>
@@ -4356,7 +4356,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 6. Séquenceur de Cycle Semi-Automatique (X0 à X13)</xhtml>
           </documentation>
         </variable>
-        <variable name="LevageSynchroniseM1M2">
+        <variable name="H_LevageSynchroniseM1M2">
           <type>
             <derived name="ST_ChainWinchSync" />
           </type>
@@ -4364,7 +4364,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 7. Levage Synchronisé M1+M2 (Mode Couplé Nominal)</xhtml>
           </documentation>
         </variable>
-        <variable name="LevageUnitaireM1">
+        <variable name="I_LevageUnitaireM1">
           <type>
             <derived name="ST_ChainWinch" />
           </type>
@@ -4372,7 +4372,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 8. Levage Unitaire M1 (Treuil Retenue)</xhtml>
           </documentation>
         </variable>
-        <variable name="LevageUnitaireM2">
+        <variable name="J_LevageUnitaireM2">
           <type>
             <derived name="ST_ChainWinch" />
           </type>
@@ -4380,7 +4380,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 9. Levage Unitaire M2 (Treuil Benne)</xhtml>
           </documentation>
         </variable>
-        <variable name="BenneOuvertureFermeture">
+        <variable name="K_BenneOuvertureFermeture">
           <type>
             <derived name="ST_ChainBucket" />
           </type>
@@ -4388,7 +4388,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🪣 10. Ouverture / Fermeture Benne</xhtml>
           </documentation>
         </variable>
-        <variable name="TranslationPontM3">
+        <variable name="L_TranslationPontM3">
           <type>
             <derived name="ST_ChainTranslation" />
           </type>
@@ -4396,7 +4396,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ 11. Translation Pont M3 (Variateur AC600)</xhtml>
           </documentation>
         </variable>
-        <variable name="AssistanceDragage">
+        <variable name="M_AssistanceDragage">
           <type>
             <derived name="ST_ChainDredgingAssist" />
           </type>
@@ -4404,7 +4404,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌊 12. Assistance Plongée/Extraction/Vidage Trémie</xhtml>
           </documentation>
         </variable>
-        <variable name="MotionM1">
+        <variable name="N_MotionM1">
           <type>
             <derived name="ST_MotionChecklist" />
           </type>
@@ -4412,7 +4412,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ 13. Diagnostic chronologique Mouvement M1 (Treuil Retenue)</xhtml>
           </documentation>
         </variable>
-        <variable name="MotionM2">
+        <variable name="O_MotionM2">
           <type>
             <derived name="ST_MotionChecklist" />
           </type>
@@ -4420,7 +4420,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ 14. Diagnostic chronologique Mouvement M2 (Treuil Benne)</xhtml>
           </documentation>
         </variable>
-        <variable name="MotionM3">
+        <variable name="P_MotionM3">
           <type>
             <derived name="ST_MotionChecklist" />
           </type>
@@ -4428,7 +4428,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ 15. Diagnostic chronologique Mouvement M3 (Translation)</xhtml>
           </documentation>
         </variable>
-        <variable name="TraceWinchM1">
+        <variable name="Q_TraceWinchM1">
           <type>
             <derived name="ST_TraceWinch" />
           </type>
@@ -4437,7 +4437,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
 🕵️ 16. Trace blocage treuil M1 (cause priorisée + horodatage)</xhtml>
           </documentation>
         </variable>
-        <variable name="TraceWinchM2">
+        <variable name="R_TraceWinchM2">
           <type>
             <derived name="ST_TraceWinch" />
           </type>
@@ -4445,7 +4445,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🕵️ 17. Trace blocage treuil M2 (cause priorisée + horodatage)</xhtml>
           </documentation>
         </variable>
-        <variable name="TraceTranslation">
+        <variable name="S_TraceTranslation">
           <type>
             <derived name="ST_TraceTranslation" />
           </type>

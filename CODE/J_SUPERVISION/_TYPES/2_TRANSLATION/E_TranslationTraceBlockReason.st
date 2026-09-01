@@ -6,7 +6,7 @@
       L'ordre de l'enum EST l'ordre de priorité (valeur croissante = priorité
       décroissante) : la cause la plus grave gagne (PowerCutOff > … > NONE).
    📤 Producteur unique : PRG_05_Translation.
-   📥 Consommateur : FB_TroubleshootingView (recopie → GVL_Troubleshooting.TraceTranslation).
+   📥 Consommateur : FB_TroubleshootingView (recopie → GVL_Troubleshooting.S_TraceTranslation).
    🔒 Lecture seule — aucune action de conduite n'en dépend.
    📄 Doc métier : DOC/AF/AF_Partie-14_Fonction_Troubleshooting/FB_TroubleshootingView_v1.2.md
    ======================================================================= *)

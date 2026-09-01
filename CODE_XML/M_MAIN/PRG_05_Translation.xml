@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T22:48:46.985117" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T22:48:46.985117">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T00:05:20.999805" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T00:05:20.999805">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -383,7 +383,7 @@
       permis de mouvement effectif, interlock hauteur, source SafeStop/coupure
       et cause de blocage priorisée.
    📤 Producteur unique : PRG_05_Translation (Data.TranslationTrace).
-   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.TraceTranslation).
+   📥 Consommateur : FB_TroubleshootingView (pure recopie → GVL_Troubleshooting.S_TraceTranslation).
    🔒 Lecture seule — aucun calcul de commande n'en dépend.
    🕒 BlockReasonTimestamp : ms depuis démarrage PLC (TIME()), latched au dernier
       changement de BlockReason (1 scan, mémoire).
@@ -1982,6 +1982,14 @@ M1 : re-homing obligatoire avant tout retour SEMI_AUTO</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="SimBtnIHM_Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stimuli boutons IHM M3 actifs (simulation ET JoyMaster inactif)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SelTarget">
               <type>
                 <INT />
@@ -2231,8 +2239,11 @@ END_IF;
 
 // ── Arbitrage M3 (FB_TranslationCmdArbitrationM3) ──
 // Remplissage des structs d'arbitrage (champ par champ, CODESYS 3.5 refuse l'init anonyme en appel)
-ArbM3_IHM.BtnTremie         := GVL_IHM.TranslationM3.Cmd.BtnTremie;
-ArbM3_IHM.BtnMaintenance    := GVL_IHM.TranslationM3.Cmd.BtnMaintenance;
+// 🎛️ Stimuli boutons IHM M3 : en simulation ET JoyMaster inactif, les stimuli pilotent les
+// boutons IHM (SEL) ; sinon la valeur IHM réelle est conservée (jamais écrasée, producteur unique).
+SimBtnIHM_Active := GVL_Simulation.SimulationModeActive AND NOT GVL_IHM.Modes.Cmd.TglJoystickMaster;
+ArbM3_IHM.BtnTremie         := SEL(SimBtnIHM_Active, GVL_IHM.TranslationM3.Cmd.BtnTremie, GVL_Simulation.SimBtnTremie);
+ArbM3_IHM.BtnMaintenance    := SEL(SimBtnIHM_Active, GVL_IHM.TranslationM3.Cmd.BtnMaintenance, GVL_Simulation.SimBtnMaintenance);
 ArbM3_IHM.SelPositioning    := GVL_IHM.TranslationM3.Cmd.SelPositioning;
 ArbM3_IHM.SetFreq_Hz        := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
 ArbM3_IHM.BypassGlobal      := GVL_IHM.TranslationM3.Bypass.Global;
