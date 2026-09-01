@@ -17,3 +17,6 @@ Analyse T131
 et
 
 fait un point poussé avec un agent pour savoir qu'est ce qui est intégré dans la dans le code? Qu'est ce qui est intégré dans l'analyse fonctionnelle et dans le dans la documentation projet? Qu'est ce que est ce que le cette tâche est est périmée ou est ce qu'elle encore lieu d'être?
+
+
+Je veux que tu fasse auditer et challenger ton travail et celuis des autre agent (historique git 10 comit max) et ta solution ... avec un agent expert avec un vue projet et utilisateur safety test automatisme industriel... je veux que l'agent parcours mentalement tous les cas possible de pilotage et de defaillance pour détecter les probleme de foncitonnement ou effet de bord cest un travail qui demande un effort important! Il doit avoir les compétence d'un expert automatisme industriel IHM SAFETY NORME TEST CI avec vu d essemble pour détecter les effet de bord ou inatendu des modification de code ...
