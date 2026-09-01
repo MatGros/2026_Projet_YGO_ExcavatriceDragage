@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:15:03.050979" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:15:03.050979">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T05:21:26.970337" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T05:21:26.970337">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -468,6 +468,34 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)</xhtml>
               </documentation>
             </variable>
+            <variable name="BothAscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🔗 ATOMICITÉ DE LA COMMANDE BOTH : permis agrégés consommés ===
+PRG_04 calcule BothAscentPermit/BothDescendPermit = AND des 4 permits effectifs.
+En commande both, la commande ne consomme QUE ces agrégats (jamais les permits
+individuels directement) : les 2 treuils partent ensemble ou aucun (NC-100).
+--&gt; [SAFE] Permit montée Both (EffectivePermitM1_Ascent AND EffectivePermitM2_Ascent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BothDescendPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permit descente Both (EffectivePermitM1_Descend AND EffectivePermitM2_Descend)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BothBlock">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Commande Both bloquée (aucun départ possible — diagnostic IHM)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -887,6 +915,14 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant action benne (arrêt forcé)</xhtml>
               </documentation>
             </variable>
+            <variable name="BothDirectionAuthorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Atomicité Both : permit agrégé du sens demandé délivré</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -965,12 +1001,21 @@ ELSE
         END_IF;
 
         // Gating StartStop (bit-identique PRG_04 §3) — homme-mort qualifié en joystick
+        // 🔗 Atomicité Both : en commande both, la commande ne consomme QUE le
+        // permit agrégé (BothAscentPermit/BothDescendPermit) du sens demandé — jamais
+        // un permit individuel. Si l'un des 2 treuils n'a pas son permit effectif,
+        // AUCUN des deux ne part (départ jamais isolé). En unitaire (BothIntent inactif),
+        // le gate est neutre.
+        BothDirectionAuthorized := (NOT BothIntent.Active)
+            OR ((Direction = 1) AND Context.BothAscentPermit)
+            OR ((Direction = -1) AND Context.BothDescendPermit);
         StartStop := (Direction &lt;&gt; 0)
                   AND NOT Context.BucketBusy
                   AND NOT Context.WinchBothMotionBlockedByBucket
                   AND NOT ((Context.SyncBlocksAscent   AND (Direction = 1))
                         OR (Context.SyncBlocksDescent AND (Direction = -1)))
-                  AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed);
+                  AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
+                  AND BothDirectionAuthorized;
     END_IF;
 
     // Front de fin d'action benne : arrêt forcé sauf mouvement both actif

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.181790" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.181790">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T05:36:02.427130" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T05:36:02.427130">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -98,6 +98,19 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
             <variable name="RequestedStep">
               <type>
                 <INT />
+              </type>
+            </variable>
+            <variable name="AscentPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis effectifs deja appliques par FB_Winch et reutilises par la barriere finale.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescendPermit">
+              <type>
+                <BOOL />
               </type>
             </variable>
             <variable name="PowerCutOff">

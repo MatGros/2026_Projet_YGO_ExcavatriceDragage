@@ -18,14 +18,14 @@ END_SETUP
 
 TEST 'TC-P10-012 Watchdog frein : BrakeCmd sans confirmation 500ms -> bit0, RestartInhibit, FAULT ; pas de faux defaut au RestartRequired'
     (* Scan 1 : regime nominal, frein serre (BrakeFeedback=FALSE), pause pour purger *)
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0);
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -35,7 +35,7 @@ TEST 'TC-P10-012 Watchdog frein : BrakeCmd sans confirmation 500ms -> bit0, Rest
 
     (* Scan 2 : demande mouvement, frein NON confirme ouvert (BrakeFeedback=FALSE) -> watchdog arme *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -47,7 +47,7 @@ TEST 'TC-P10-012 Watchdog frein : BrakeCmd sans confirmation 500ms -> bit0, Rest
 
     (* Scan 3 : apres 500ms sans confirmation -> defaut frein *)
     ADVANCE_TIME(500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -62,14 +62,14 @@ END_TEST
 
 TEST 'TC-P10-012bis Pas de faux defaut au RestartRequired : BrakeCmd retenu ne doit pas armer le watchdog'
     (* Scan 1 : regime nominal, pause pour purger *)
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0);
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -78,7 +78,7 @@ TEST 'TC-P10-012bis Pas de faux defaut au RestartRequired : BrakeCmd retenu ne d
 
     (* Scan 2 : demande mouvement, frein confirme (BrakeFeedback=TRUE) -> mouvement autorise *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -88,7 +88,7 @@ TEST 'TC-P10-012bis Pas de faux defaut au RestartRequired : BrakeCmd retenu ne d
 
     (* Scan 3 : arret -> RestartRequired=TRUE *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -97,7 +97,7 @@ TEST 'TC-P10-012bis Pas de faux defaut au RestartRequired : BrakeCmd retenu ne d
 
     (* Scan 4 : nouvelle demande IMMEDIATE (RestartRequired=TRUE) -> BrakeCmd retenu, watchdog NON arme *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -109,7 +109,7 @@ TEST 'TC-P10-012bis Pas de faux defaut au RestartRequired : BrakeCmd retenu ne d
 
     (* Scan 5 : apres 500ms, BrakeCmd=FALSE -> PAS de faux defaut *)
     ADVANCE_TIME(500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -121,14 +121,14 @@ END_TEST
 
 TEST 'TC-P10-013 Defaut frein : latches preserves hors Enable, reautorisation complete'
     (* Scan 1 : regime nominal, pause pour purger *)
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0);
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -137,14 +137,14 @@ TEST 'TC-P10-013 Defaut frein : latches preserves hors Enable, reautorisation co
 
     (* Scan 2 : demande mouvement, frein non confirme -> watchdog arme *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 1);
     ADVANCE_TIME(500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -175,7 +175,7 @@ TEST 'TC-P10-013 Defaut frein : latches preserves hors Enable, reautorisation co
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0);
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -185,7 +185,7 @@ TEST 'TC-P10-013 Defaut frein : latches preserves hors Enable, reautorisation co
 
     (* Scan 5 : demande neutre observee (MotorRequest=FALSE) -> NeutralRequestSeen *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -194,7 +194,7 @@ TEST 'TC-P10-013 Defaut frein : latches preserves hors Enable, reautorisation co
 
     (* Scan 6 : nouvelle demande distincte -> RestartInhibit leve *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -209,7 +209,7 @@ TEST 'TC-P10-020 Watchdog frein reel terrain : temps/contacteur/bobine'
        est une verification terrain sur l automate reel, jamais automatisable en boite noire.
        On verifie ici la brique logicielle : le watchdog 500ms se declenche sur BrakeCmd sans
        confirmation, condition necessaire du diagnostic terrain. *)
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -218,21 +218,21 @@ TEST 'TC-P10-020 Watchdog frein reel terrain : temps/contacteur/bobine'
     ADVANCE_TIME(1500000000);
     // Scan neutre temporise : purge RestartRequired/DeadTimePending (TON tickes apres la pause,
     // comme les ~150 scans de 10ms d'une vraie pause automate) avant la demande mouvement.
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0);
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 1);
     ADVANCE_TIME(500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -246,14 +246,14 @@ TEST 'TC-P10-021 Temps mort meme sens : 1s apres arret -> nouvelle demande (Dead
     (* DeadTimeSameDir=2s force pour rendre le temps mort observable (par defaut 1s, masque
        par RestartDelay 1500ms). La demande meme sens est retenue tant que DeadTimeSameDir
        n est pas ecoule. *)
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0, DeadTimeSameDir := T#2s, DeadTimeOppositeDir := T#2s);
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -262,7 +262,7 @@ TEST 'TC-P10-021 Temps mort meme sens : 1s apres arret -> nouvelle demande (Dead
 
     (* Scan 2 : demande montee, frein confirme -> mouvement *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -272,7 +272,7 @@ TEST 'TC-P10-021 Temps mort meme sens : 1s apres arret -> nouvelle demande (Dead
 
     (* Scan 3 : arret -> DeadTimePending=TRUE *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -281,7 +281,7 @@ TEST 'TC-P10-021 Temps mort meme sens : 1s apres arret -> nouvelle demande (Dead
 
     (* Scan 4 : apres 1500ms (RestartRequired leve), DeadTimeSameDir=2s pas encore ecoule -> retenu *)
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -292,7 +292,7 @@ TEST 'TC-P10-021 Temps mort meme sens : 1s apres arret -> nouvelle demande (Dead
 
     (* Scan 5 : apres 2s (DeadTimeSameDir ecoule) -> demande meme sens acceptee *)
     ADVANCE_TIME(500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -304,14 +304,14 @@ END_TEST
 TEST 'TC-P10-022 Temps mort inversion : 1s apres arret + inversion sens (DeadTimeOppositeDir)'
     (* DeadTimeOppositeDir=2s force pour rendre le temps mort d inversion observable.
        L inversion est retenue tant que DeadTimeOppositeDir n est pas ecoule. *)
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0, DeadTimeSameDir := T#1s, DeadTimeOppositeDir := T#2s);
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -320,7 +320,7 @@ TEST 'TC-P10-022 Temps mort inversion : 1s apres arret + inversion sens (DeadTim
 
     (* Scan 2 : demande montee, frein confirme -> mouvement *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -330,7 +330,7 @@ TEST 'TC-P10-022 Temps mort inversion : 1s apres arret + inversion sens (DeadTim
 
     (* Scan 3 : arret -> DeadTimePending=TRUE *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -339,7 +339,7 @@ TEST 'TC-P10-022 Temps mort inversion : 1s apres arret + inversion sens (DeadTim
 
     (* Scan 4 : apres 1500ms, inversion (descente) -> DeadTimeOppositeDir=2s pas ecoule -> retenu *)
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := TRUE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -350,7 +350,7 @@ TEST 'TC-P10-022 Temps mort inversion : 1s apres arret + inversion sens (DeadTim
 
     (* Scan 5 : apres 2s (DeadTimeOppositeDir ecoule) -> inversion acceptee *)
     ADVANCE_TIME(500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := TRUE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -361,14 +361,14 @@ END_TEST
 
 TEST 'TC-P10-039.1 Frein couple direct : BrakeCmd = RelayFwd OR RelayRev dans tous les etats'
     (* Scan 1 : regime nominal, pause pour purger *)
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0);
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -378,7 +378,7 @@ TEST 'TC-P10-039.1 Frein couple direct : BrakeCmd = RelayFwd OR RelayRev dans to
 
     (* Scan 2 : mouvement montee -> BrakeCmd=TRUE (RelayFwd=TRUE) *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -389,7 +389,7 @@ TEST 'TC-P10-039.1 Frein couple direct : BrakeCmd = RelayFwd OR RelayRev dans to
 
     (* Scan 3 : arret -> BrakeCmd=FALSE *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -403,14 +403,14 @@ TEST 'TC-P10-023a §3bis : sens maintenu apres chute de palier a 0 tant que cont
     (* Chute de palier : RequestedStep -> 0 mais RequestedRelayFwd reste TRUE (demande transitoire
        FB_Winch). La barriere TIENT le contacteur de sens jusqu a FwdRevSpeedFeedbackOff confirme
        (debounced DropConfirmDelay=300ms) OU T_max. Aucun faux arret pendant le debounce. *)
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -420,7 +420,7 @@ TEST 'TC-P10-023a §3bis : sens maintenu apres chute de palier a 0 tant que cont
 
     (* Scan 2 : mouvement montee, frein confirme, contacteurs engages (FwdRevSpeedFeedbackOff=FALSE) *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -431,7 +431,7 @@ TEST 'TC-P10-023a §3bis : sens maintenu apres chute de palier a 0 tant que cont
 
     (* Scan 3 : chute a palier 0, RequestedRelayFwd TOUJOURS TRUE, contacteurs pas encore retombes *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -444,7 +444,7 @@ TEST 'TC-P10-023a §3bis : sens maintenu apres chute de palier a 0 tant que cont
 
     (* Scan 4 : feedback retombee percu (FwdRevSpeedFeedbackOff=TRUE) mais debounce pas ecoule -> tenu *)
     ADVANCE_TIME(100000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -454,7 +454,7 @@ TEST 'TC-P10-023a §3bis : sens maintenu apres chute de palier a 0 tant que cont
 
     (* Scan 5 : DropConfirmDelay (300ms) ecoule -> chute normale du sens *)
     ADVANCE_TIME(300000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -470,14 +470,14 @@ TEST 'TC-P10-023b §3bis : T_max atteint sans confirmation -> chute du sens FORC
     (* FwdRevSpeedFeedbackOff reste FALSE (contacteurs ne confirment pas la retombee). Apres
        MaxSenseHoldTime (T_max=300ms) la barriere FORCE la chute du sens et latche
        ContactorStuck (AC7). Le maintien indefini du stator est interdit. *)
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -486,7 +486,7 @@ TEST 'TC-P10-023b §3bis : T_max atteint sans confirmation -> chute du sens FORC
 
     (* Scan 2 : mouvement montee *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -496,7 +496,7 @@ TEST 'TC-P10-023b §3bis : T_max atteint sans confirmation -> chute du sens FORC
 
     (* Scan 3 : chute palier a 0, sens maintenu, MAIS contacteurs jamais confirmes retombes *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -507,14 +507,14 @@ TEST 'TC-P10-023b §3bis : T_max atteint sans confirmation -> chute du sens FORC
 
     (* Scan 4 : T_max (300ms) depasse sans confirmation -> chute forcee + latch *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
     ADVANCE_TIME(400000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -537,7 +537,7 @@ TEST 'TC-P10-023b §3bis : T_max atteint sans confirmation -> chute du sens FORC
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0, DropConfirmDelay := T#200ms, MaxSenseHoldTime := T#300ms);
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -549,14 +549,14 @@ END_TEST
 TEST 'TC-P10-023c §3bis : coupure dure (Enable=FALSE) pendant le maintien -> RelayFwd=FALSE immediat'
     (* La coupure dure ne passe JAMAIS par le maintien §3bis (AC9) : Enable=FALSE en pleine
        tenue du sens coupe RelayFwd/Rev au cycle suivant, sans attendre confirmation ni T_max. *)
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
        RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
     ADVANCE_TIME(1500000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -565,7 +565,7 @@ TEST 'TC-P10-023c §3bis : coupure dure (Enable=FALSE) pendant le maintien -> Re
 
     (* Scan 2 : mouvement montee *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
@@ -575,7 +575,7 @@ TEST 'TC-P10-023c §3bis : coupure dure (Enable=FALSE) pendant le maintien -> Re
 
     (* Scan 3 : chute palier a 0 -> maintien actif *)
     ADVANCE_TIME(10000000);
-    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, PowerContactorEngaged := TRUE,
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := FALSE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
@@ -595,4 +595,36 @@ TEST 'TC-P10-023c §3bis : coupure dure (Enable=FALSE) pendant le maintien -> Re
     ASSERT_FALSE(fb.RelayFwd, 'Enable=FALSE -> RelayFwd=FALSE immediat (AC9)');
     ASSERT_FALSE(fb.BrakeCmd, 'Enable=FALSE -> BrakeCmd=FALSE immediat');
     ASSERT_FALSE(fb.SenseHoldActive, 'Maintien neutralise par la gate');
+END_TEST
+
+TEST 'TC-T216-FINAL-PERMIT Direction refusee coupe la barriere finale, direction autorisee passe'
+    (* Le permis final est une defense en profondeur : il doit couper relais,
+       contacteurs et frein meme si une demande physique est encore presente. *)
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE,
+       PowerContactorEngaged := TRUE, BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE, RequestedStep := 1);
+    ASSERT_TRUE(fb.RelayFwd, 'Permis montee TRUE -> relais montee autorise');
+    ASSERT_TRUE(fb.BrakeCmd, 'Permis montee TRUE -> frein desserre');
+
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := FALSE, DescendPermit := TRUE,
+       PowerContactorEngaged := TRUE, BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE, RequestedStep := 1);
+    ASSERT_FALSE(fb.RelayFwd, 'Permis montee FALSE -> relais montee coupe');
+    ASSERT_FALSE(fb.Contactor1, 'Permis montee FALSE -> contacteur coupe');
+    ASSERT_FALSE(fb.BrakeCmd, 'Permis montee FALSE -> frein serre');
+
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := FALSE,
+       PowerContactorEngaged := TRUE, BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := TRUE,
+       RequestedContactor1 := TRUE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE, RequestedStep := 1);
+    ASSERT_FALSE(fb.RelayRev, 'Permis descente FALSE -> relais descente coupe');
+    ASSERT_FALSE(fb.Contactor1, 'Permis descente FALSE -> contacteur coupe');
+    ASSERT_FALSE(fb.BrakeCmd, 'Permis descente FALSE -> frein serre');
 END_TEST

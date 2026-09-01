@@ -25,6 +25,9 @@ STRUCT
     RequestedContactor3          : BOOL;
     RequestedContactor4          : BOOL;
     RequestedStep                : INT;
+    // Permis effectifs deja appliques par FB_Winch et reutilises par la barriere finale.
+    AscentPermit                 : BOOL;
+    DescendPermit                : BOOL;
     PowerCutOff                  : BOOL; // : demande coupure puissance (FB_Safety_Winch), agrégée par PRG_06 (M5, A-04)
 END_STRUCT
 END_TYPE

@@ -146,6 +146,25 @@ VAR
     EffectivePermitM1_Ascent  : BOOL;
     EffectivePermitM2_Ascent  : BOOL;
 
+    // === 🔗 ATOMICITÉ BOTH — états agrégés explicites ===
+    // CoupledBoth := couplage atomique M1/M2 indépendant de SyncEnable : actif en
+    // synchro classique (anti-télescopage) OU dès qu'un mouvement both est demandé
+    // (même si SyncEnable=FALSE en MAINT_N2). Une permission ou un SafeStop d'un
+    // treuil bloque alors l'autre : départ jamais isolé.
+    CoupledBoth             : BOOL;
+    // Permis agrégés consommés par la commande both : AND des 4 permits effectifs.
+    // Les permits individuels EffectivePermitM*_* restent la vérité propre de chaque axe.
+    BothAscentPermit        : BOOL;
+    BothDescendPermit       : BOOL;
+    // Diagnostic IHM : Both bloqué + cause priorisée (voir §5).
+    BothBlocked             : BOOL;
+    BothBlockReason         : E_WinchTraceBlockReason;
+    // Permis effectifs routés vers les FB_Winch (both = agrégat, unitaire = individuel).
+    M1AscentPermitUse       : BOOL;
+    M1DescendPermitUse      : BOOL;
+    M2AscentPermitUse       : BOOL;
+    M2DescendPermitUse      : BOOL;
+
     BenneBusyFallEdge     : F_TRIG;
 
     // Arrêt auto descente sur détection fond Kobold (pilotage normal)
@@ -333,8 +352,13 @@ SlackCableAscentStep1 := NOT GVL_IHM.Commun.Bypass.SlackCable
 );
 
 SyncMinorDeviation := (instWinchSync.Fault.ErrorId AND 16#0001) <> 16#0000;
-SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM > 0.0);
-SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM < 0.0);
+// 🛡️ Soft-stop synchro : rattrapage directionnel volontaire UNIQUEMENT en
+// commande unitaire. En commande BOTH (WinchBothMotionActive), l'écart mineur ne doit
+// JAMAIS produire de rattrapage unilatéral d'un seul treuil — il est géré par le clamp
+// palier §5ter (les 2 treuils sont bridés à 1) et le seuil critique (SafeStop des 2,
+// §5). Donc les drapeaux sync sont coupés dès qu'un mouvement both est demandé.
+SyncMinorDeviationBlocksUp   := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM > 0.0) AND NOT WinchBothMotionActive;
+SyncMinorDeviationBlocksDown := _SyncSoftStopEnable AND SyncMinorDeviation AND (instWinchSync.SignedDeltaPosM < 0.0) AND NOT WinchBothMotionActive;
 
 IF _CommunCfgPersist.WinchMaxStepAscent <= 0 THEN
     EffectiveMaxStepAscent := 5;
@@ -374,6 +398,13 @@ ArbContext.BucketM2Close                  := BucketM2Close;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
 ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
 ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
+// 🔗 Atomicité Both : agrégats consommés par la commande both (§5 calcule
+// Both*Permit APRÈS §3 → lag 1 scan assumé au gate d'arbitre, documenté comme les
+// autres gates lag-1 de PRG_04 ; l'enforcement même-scan est assuré par le routage
+// §6 vers FB_Winch).
+ArbContext.BothAscentPermit  := BothAscentPermit;
+ArbContext.BothDescendPermit := BothDescendPermit;
+ArbContext.BothBlock         := BothBlocked;
 
 ArbM1Cfg.BtnStepTgt := 5;
 ArbM2Cfg.BtnStepTgt := 5;
@@ -585,6 +616,15 @@ ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTo
 // (mêmes que FB_Bucket) pour couvrir aussi le jog unitaire.
 ProcessPermitM2_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM <= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
+
+// Permis process de montee : contrat extraction commun aux deux axes.
+// M2 conserve l'anticipation de fermeture du pilotage benne unitaire, deja appliquee
+// historiquement dans ProcessAndSafetyPermitM2_Ascent (refactor sans changement fonctionnel).
+ProcessPermitM1_Ascent := NOT ExtractionAssistActive
+    OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit;
+ProcessPermitM2_Ascent := (NOT ExtractionAssistActive
+    OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit)
+    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM >= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
@@ -807,23 +847,48 @@ END_IF;
 // Hors extraction (NOT ExtractionAssistActive), la montée reste libre ; pendant l'extraction,
 // la montée n'est autorisée que si l'assistant la délivre (AscentPermit, qui intègre les
 // conditions process AscentControlSafe/AscentNominalSafe). Polarité fail-safe (TRUE = autorisé).
-ProcessAndSafetyPermitM1_Ascent := SafetyPermitM1_Ascent
-    AND (NOT ExtractionAssistActive OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit);
-ProcessAndSafetyPermitM2_Ascent := SafetyPermitM2_Ascent
-    AND (NOT ExtractionAssistActive OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit)
-    // Même anticipation que ProcessPermitM2_Descend ci-dessus.
-    AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM >= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
+ProcessAndSafetyPermitM1_Ascent := ProcessPermitM1_Ascent AND SafetyPermitM1_Ascent;
+ProcessAndSafetyPermitM2_Ascent := ProcessPermitM2_Ascent AND SafetyPermitM2_Ascent;
 
-SafeStopM1_Active := SafeStopM1_Raw OR (instWinchSync.SyncActive AND SafeStopM2_Raw);
-SafeStopM2_Active := SafeStopM2_Raw OR (instWinchSync.SyncActive AND SafeStopM1_Raw);
+// 🔗 Couplage atomique M1/M2 : indépendant de SyncEnable. Actif en synchro
+// classique (anti-télescopage) OU dès qu'un mouvement both est demandé — même si
+// SyncEnable=FALSE (ex. MAINT_N2). Permet qu'une permission ou un SafeStop d'un
+// treuil bloque l'autre : départ jamais isolé. WinchBothMotionActive est défini en
+// §1 (disponible avant §5).
+CoupledBoth := instWinchSync.SyncActive OR WinchBothMotionActive;
+
+SafeStopM1_Active := SafeStopM1_Raw OR (CoupledBoth AND SafeStopM2_Raw);
+SafeStopM2_Active := SafeStopM2_Raw OR (CoupledBoth AND SafeStopM1_Raw);
 // EffectivePermit = ProcessAndSafetyPermit combine au couplage synchro (anti-télescopage)
 // ET gaté par NOT SafeStop (défauts thermique/phase/codeur/méca) : le permit reflète « prêt à
 // fonctionner », aligné sur M3 (PRG_05 §1ter). SafeStopM1/M2_Active agrège déjà le couplage
 // synchro (SafeStop de l'autre treuil pendant SyncActive) — cohérent avec l'anti-télescopage.
-EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND NOT SafeStopM1_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Descend);
-EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND NOT SafeStopM2_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Descend);
-EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND NOT SafeStopM1_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM2_Ascent);
-EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND NOT SafeStopM2_Active AND (NOT instWinchSync.SyncActive OR ProcessAndSafetyPermitM1_Ascent);
+EffectivePermitM1_Descend := ProcessAndSafetyPermitM1_Descend AND NOT SafeStopM1_Active AND (NOT CoupledBoth OR ProcessAndSafetyPermitM2_Descend);
+EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND NOT SafeStopM2_Active AND (NOT CoupledBoth OR ProcessAndSafetyPermitM1_Descend);
+EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND NOT SafeStopM1_Active AND (NOT CoupledBoth OR ProcessAndSafetyPermitM2_Ascent);
+EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND NOT SafeStopM2_Active AND (NOT CoupledBoth OR ProcessAndSafetyPermitM1_Ascent);
+
+// 🔗 Agrégats Both : permis communs consommés par la commande both.
+// = AND des 4 permits effectifs. Chaque axe garde sa vérité propre
+// (EffectivePermitM*_*) ; en commande both, seul l'agrégat est consommé (§6),
+// garantissant "les 2 treuils partent ensemble, ou aucun".
+BothAscentPermit  := EffectivePermitM1_Ascent  AND EffectivePermitM2_Ascent;
+BothDescendPermit := EffectivePermitM1_Descend AND EffectivePermitM2_Descend;
+
+// 📉 Diagnostic IHM — cause priorisée du blocage Both (lecture seule, NC-100).
+// N'a AUCUN effet de conduite : l'arrêt est porté par Both*Permit (§6, consommé par les
+// 2 FB_Winch) et la défense en profondeur par la barrière finale (FB_WinchOutputInterlock,
+// coupe par PermitFinalBlocked). Ordre : cause la plus grave gagne.
+IF NOT WinchBothMotionActive THEN
+    BothBlocked             := FALSE;
+    BothBlockReason         := E_WinchTraceBlockReason.NONE;
+ELSIF NOT (BothAscentPermit OR BothDescendPermit) THEN
+    BothBlocked             := TRUE;
+    BothBlockReason         := E_WinchTraceBlockReason.COUPLING_BLOCKED;
+ELSE
+    BothBlocked             := FALSE;
+    BothBlockReason         := E_WinchTraceBlockReason.NONE;
+END_IF;
 
 // 🛡️ ArmingPermit (général — permis de mouvement) : on ne peut armer QUE si au moins
 // un axe (treuil M1/M2 ou translation M3) a un permis de mouvement effectif.
@@ -906,6 +971,15 @@ instWinchLoadEstimatorM2(
 );
 
 // --- M1 : assemblage des structs (CODESYS refuse l'initialiseur inline en appel) ---
+// 🔗 Routage permit both : en commande both (WinchBothMotionActive=TRUE), les
+// 2 treuils consomment le permit AGRÉGÉ commun (BothAscentPermit/BothDescendPermit) —
+// jamais les permits individuels directement. En unitaire (M1 seul / M2 seul / benne M2),
+// chacun consomme son permit effectif propre (comportement inchangé). SEL(a, b, c) := a ? c : b.
+M1AscentPermitUse  := SEL(WinchBothMotionActive, EffectivePermitM1_Ascent,  BothAscentPermit);
+M1DescendPermitUse := SEL(WinchBothMotionActive, EffectivePermitM1_Descend, BothDescendPermit);
+M2AscentPermitUse  := SEL(WinchBothMotionActive, EffectivePermitM2_Ascent,  BothAscentPermit);
+M2DescendPermitUse := SEL(WinchBothMotionActive, EffectivePermitM2_Descend, BothDescendPermit);
+
 M1DriveRequest.StartStop            := M1LogicRequestStartStop;
 M1DriveRequest.Direction            := M1LogicRequestDirection;
 M1DriveRequest.SpeedStepReq         := M1LogicRequestStepTgt;
@@ -952,8 +1026,8 @@ instWinchM1(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     SafeStop                := SafeStopM1_Active,
-    DescendPermit           := EffectivePermitM1_Descend,
-    AscentPermit            := EffectivePermitM1_Ascent,
+    DescendPermit           := M1DescendPermitUse,
+    AscentPermit            := M1AscentPermitUse,
     DriveRequest            := M1DriveRequest,
     Sensors                 := M1WinchSensors,
     Config                  := M1WinchCfg,
@@ -1000,8 +1074,8 @@ instWinchM2(
     Reset                   := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     SafeStop                := SafeStopM2_Active,
-    DescendPermit           := EffectivePermitM2_Descend,
-    AscentPermit            := EffectivePermitM2_Ascent,
+    DescendPermit           := M2DescendPermitUse,
+    AscentPermit            := M2AscentPermitUse,
     DriveRequest            := M2DriveRequest,
     Sensors                 := M2WinchSensors,
     Config                  := M2WinchCfg,
@@ -1075,6 +1149,8 @@ WinchM1FinalInterlockRequest.RequestedContactor3 := instWinchM1.Contactor3;
 WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
 WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
 WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff;
+WinchM1FinalInterlockRequest.AscentPermit := M1AscentPermitUse;
+WinchM1FinalInterlockRequest.DescendPermit := M1DescendPermitUse;
 
 WinchM2FinalInterlockRequest.Enable := TRUE;
 WinchM2FinalInterlockRequest.Reset := PRG_07_Supervision.FaultMachineReset_IHM;
@@ -1090,6 +1166,8 @@ WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
 WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
+WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitUse;
+WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitUse;
 
 {endregion}
 
@@ -1214,6 +1292,10 @@ Benne_IsRoughlyClosed := _BucketState.IsClosed
 // --- M1 ---
 TraceM1.DescendPermitEffective := EffectivePermitM1_Descend;
 TraceM1.AscentPermitEffective  := EffectivePermitM1_Ascent;
+TraceM1.AscentPermitApplied     := M1AscentPermitUse;
+TraceM1.DescendPermitApplied    := M1DescendPermitUse;
+TraceM1.FinalPermitBlocked      := (M1DriveRequest.StartStop AND (M1DriveRequest.Direction = 1) AND NOT M1AscentPermitUse)
+                               OR (M1DriveRequest.StartStop AND (M1DriveRequest.Direction = -1) AND NOT M1DescendPermitUse);
 TraceM1.SafeStopActive         := SafeStopM1_Active;
 TraceM1.SafeStopSourceSafety   := instSafetyWinchM1.SafeStop;
 TraceM1.SafeStopSourceInput    := PRG_02_Acquisition.Data.InputModules.Fault
@@ -1257,6 +1339,10 @@ TraceM1_PrevReason := TraceM1.BlockReason;
 // --- M2 ---
 TraceM2.DescendPermitEffective := EffectivePermitM2_Descend;
 TraceM2.AscentPermitEffective  := EffectivePermitM2_Ascent;
+TraceM2.AscentPermitApplied     := M2AscentPermitUse;
+TraceM2.DescendPermitApplied    := M2DescendPermitUse;
+TraceM2.FinalPermitBlocked      := (M2DriveRequest.StartStop AND (M2DriveRequest.Direction = 1) AND NOT M2AscentPermitUse)
+                               OR (M2DriveRequest.StartStop AND (M2DriveRequest.Direction = -1) AND NOT M2DescendPermitUse);
 TraceM2.SafeStopActive         := SafeStopM2_Active;
 TraceM2.SafeStopSourceSafety   := instSafetyWinchM2.SafeStop;
 TraceM2.SafeStopSourceInput    := PRG_02_Acquisition.Data.InputModules.Fault
@@ -1328,6 +1414,12 @@ Data.PositionLimitOverriddenM2    := PositionLimitOverriddenM2;
 // 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView)
 Data.TraceM1                      := TraceM1;
 Data.TraceM2                      := TraceM2;
+// 🔗 ATOMICITÉ BOTH : diagnostic IHM lecture seule
+Data.BothActive                   := WinchBothMotionActive;
+Data.BothAscentPermit             := BothAscentPermit;
+Data.BothDescendPermit            := BothDescendPermit;
+Data.BothBlocked                  := BothBlocked;
+Data.BothBlockReason              := BothBlockReason;
 
 {endregion}
 END_PROGRAM

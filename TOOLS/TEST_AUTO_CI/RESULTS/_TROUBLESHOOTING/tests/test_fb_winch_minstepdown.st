@@ -208,3 +208,175 @@ TEST 'TROUBLESHOOT-03 Controle : DescendPermit=FALSE SANS plancher (MinStepDown=
     ASSERT_EQ(FB_W.StepNumber, 0, 'Sans plancher : permis FALSE -> StepNumber=0 (verrou effectif)');
     ASSERT_FALSE(FB_W.RelayRev, 'Sans plancher : permis FALSE -> RelayRev=FALSE');
 END_TEST
+
+TEST 'T216-AC4-1 Regression : DescendPermit=FALSE + MinStepDown=1 -> StepNumber=0 et sorties=0'
+    Table.StepThreshold_Pct[1] := 10.0;
+    Table.StepThreshold_Pct[2] := 30.0;
+    Table.StepThreshold_Pct[3] := 50.0;
+    Table.StepThreshold_Pct[4] := 70.0;
+    Table.StepThreshold_Pct[5] := 90.0;
+    Table.P2R1 := TRUE;
+    Table.P3R1 := TRUE;
+    Table.P4R1 := TRUE;
+    Table.P5R1 := TRUE;
+    Cfg.SpeedStepTable := Table;
+    Sens.Homed := TRUE;
+    Sens.ContactorsAllOff := TRUE;
+    Sens.SpeedGuardReady := TRUE;
+
+    // Neutre (arme interlock direction)
+    DriveReq.StartStop := FALSE;
+    DriveReq.Direction := 0;
+    DriveReq.SpeedStepReq := 0;
+    DriveReq.MinStepDown := 1;
+    DriveReq.MaxStepDown := 3;
+    DriveReq.BottomLimitM := -20.0;
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+
+    // Descente demandee mais permis DESCENTE FALSE (limite basse)
+    DriveReq.StartStop := TRUE;
+    DriveReq.Direction := -1;
+    DriveReq.SpeedStepReq := 1;
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := FALSE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := FALSE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := FALSE, AscentPermit := TRUE);
+
+    ASSERT_EQ(FB_W.StepNumber, 0, 'Permis FALSE + MinStepDown : StepNumber=0 (descente interdite)');
+    ASSERT_FALSE(FB_W.RelayRev, 'Permis FALSE + MinStepDown : RelayRev=FALSE');
+    ASSERT_FALSE(FB_W.Contactor1, 'Permis FALSE + MinStepDown : contacteur descente OFF');
+END_TEST
+
+TEST 'T216-AC4-2 Non-regression plongee Kobold : DescendPermit=TRUE + MinStepDown=3 -> plancher applique'
+    Table.StepThreshold_Pct[1] := 10.0;
+    Table.StepThreshold_Pct[2] := 30.0;
+    Table.StepThreshold_Pct[3] := 50.0;
+    Table.StepThreshold_Pct[4] := 70.0;
+    Table.StepThreshold_Pct[5] := 90.0;
+    Table.P2R1 := TRUE;
+    Table.P3R1 := TRUE;
+    Table.P4R1 := TRUE;
+    Table.P5R1 := TRUE;
+    Table.P3R2 := TRUE;
+    Table.P3R4 := TRUE;
+    Cfg.SpeedStepTable := Table;
+    Sens.Homed := TRUE;
+    Sens.ContactorsAllOff := TRUE;
+    Sens.SpeedGuardReady := TRUE;
+
+    // Neutre
+    DriveReq.StartStop := FALSE;
+    DriveReq.Direction := 0;
+    DriveReq.SpeedStepReq := 0;
+    DriveReq.MinStepDown := 3;
+    DriveReq.MaxStepDown := 3;
+    DriveReq.BottomLimitM := -20.0;
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+
+    // Descente avec permis OK, cible basse mais plancher MinStepDown=3
+    DriveReq.StartStop := TRUE;
+    DriveReq.Direction := -1;
+    DriveReq.SpeedStepReq := 1;
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+
+    ASSERT_EQ(FB_W.RequestedStep, 3, 'Plancher MinStepDown=3 releve RequestedStep (permis OK)');
+    ASSERT_TRUE(FB_W.StepNumber > 0, 'Plancher MinStepDown=3 -> StepNumber>0 (plongee maintenue)');
+    ASSERT_TRUE(FB_W.RelayRev, 'Plancher MinStepDown=3 -> RelayRev commande (plongee Kobold)');
+END_TEST
+
+TEST 'T216-AC4-3 Perte du permis en mouvement : StepNumber retombe a 0 sans reprise de plancher'
+    Table.StepThreshold_Pct[1] := 10.0;
+    Table.StepThreshold_Pct[2] := 30.0;
+    Table.StepThreshold_Pct[3] := 50.0;
+    Table.StepThreshold_Pct[4] := 70.0;
+    Table.StepThreshold_Pct[5] := 90.0;
+    Table.P2R1 := TRUE;
+    Table.P3R1 := TRUE;
+    Table.P4R1 := TRUE;
+    Table.P5R1 := TRUE;
+    Cfg.SpeedStepTable := Table;
+    Sens.Homed := TRUE;
+    Sens.ContactorsAllOff := TRUE;
+    Sens.SpeedGuardReady := TRUE;
+
+    // Neutre
+    DriveReq.StartStop := FALSE;
+    DriveReq.Direction := 0;
+    DriveReq.SpeedStepReq := 0;
+    DriveReq.MinStepDown := 1;
+    DriveReq.MaxStepDown := 3;
+    DriveReq.BottomLimitM := -20.0;
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+
+    // Etablir la descente (permis OK)
+    DriveReq.StartStop := TRUE;
+    DriveReq.Direction := -1;
+    DriveReq.SpeedStepReq := 1;
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := TRUE, AscentPermit := TRUE);
+    ASSERT_TRUE(FB_W.RelayRev, 'Pre-condition : descente etablie (permis OK)');
+
+    // Le permis tombe EN MOUVEMENT (operateur tient la demande)
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := FALSE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := FALSE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := FALSE, AscentPermit := TRUE);
+    ADVANCE_TIME(10000000);
+    FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
+         DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
+         SafeStop := FALSE, DescendPermit := FALSE, AscentPermit := TRUE);
+
+    ASSERT_EQ(FB_W.StepNumber, 0, 'Permis perdu en mouvement -> StepNumber retombe a 0 (sans reprise)');
+    ASSERT_FALSE(FB_W.RelayRev, 'Permis perdu en mouvement -> RelayRev=FALSE (pas de re-atterrissage)');
+END_TEST

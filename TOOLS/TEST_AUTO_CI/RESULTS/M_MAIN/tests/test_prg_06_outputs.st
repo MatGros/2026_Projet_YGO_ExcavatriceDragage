@@ -12,6 +12,8 @@ TEST 'PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale'
     winchData.WinchM1FinalInterlockRequest.PowerContactorEngaged := TRUE;
     winchData.WinchM1FinalInterlockRequest.SafeStop := FALSE;
     winchData.WinchM1FinalInterlockRequest.PowerCutOff := FALSE;
+    winchData.WinchM1FinalInterlockRequest.AscentPermit := TRUE;
+    winchData.WinchM1FinalInterlockRequest.DescendPermit := TRUE;
     winchData.WinchM1FinalInterlockRequest.RequestedRelayFwd := TRUE;
     winchData.WinchM1FinalInterlockRequest.RequestedContactor1 := TRUE;
     winchData.WinchM1FinalInterlockRequest.RequestedStep := 1;
@@ -44,6 +46,8 @@ TEST 'PRG_06_Outputs : Transmission Ordre M2 en Marche Normale'
     winchData.WinchM2FinalInterlockRequest.PowerContactorEngaged := TRUE;
     winchData.WinchM2FinalInterlockRequest.SafeStop := FALSE;
     winchData.WinchM2FinalInterlockRequest.PowerCutOff := FALSE;
+    winchData.WinchM2FinalInterlockRequest.AscentPermit := TRUE;
+    winchData.WinchM2FinalInterlockRequest.DescendPermit := TRUE;
     winchData.WinchM2FinalInterlockRequest.RequestedRelayFwd := TRUE;
     winchData.WinchM2FinalInterlockRequest.RequestedContactor1 := TRUE;
     winchData.WinchM2FinalInterlockRequest.RequestedStep := 1;

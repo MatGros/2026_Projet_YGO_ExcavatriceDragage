@@ -221,6 +221,8 @@ commande n'en dépend.
   au sein de `ST_WinchInterPrg`), publié via `Data.TraceM1/M2`.
 - **Consommateur** : `FB_TroubleshootingView` (pure recopie → `GVL_Troubleshooting.TraceM1/2`).
 - **Champs** : `DescendPermitEffective`/`AscentPermitEffective` (permis effectifs par sens),
+  `DescendPermitApplied`/`AscentPermitApplied` (bits effectivement transmis a la barriere finale),
+  `FinalPermitBlocked` (demande presente mais refusee par ce permis),
   `SafeStopActive` + sources (`SafeStopSourceSafety`/`Input`/`Sync`), `PowerCutOffActive`,
   `Inhibited`, `FinalInterlockError`/`FinalInterlockReason`, `BlockReason`
   (`E_WinchTraceBlockReason`), `BlockReasonTimestamp` (ms depuis démarrage PLC, latched au

@@ -55,5 +55,14 @@ STRUCT
     // === 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView) ===
     TraceM1                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M1 (cause priorisée + horodatage)
     TraceM2                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M2 (cause priorisée + horodatage)
+
+    // === 🔗 ATOMICITÉ BOTH : diagnostic IHM lecture seule ===
+    // Permis agrégés consommés par la commande both + cause priorisée du blocage.
+    // Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_04).
+    BothActive                   : BOOL;               // 🔗 Intention both active (M1+M2 ensemble)
+    BothAscentPermit             : BOOL;               // 🔗 Permit montée Both (EffectivePermitM1_Ascent AND EffectivePermitM2_Ascent)
+    BothDescendPermit            : BOOL;               // 🔗 Permit descente Both (EffectivePermitM1_Descend AND EffectivePermitM2_Descend)
+    BothBlocked                  : BOOL;               // 🔗 Commande Both bloquée par le permis agrégé (diagnostic uniquement)
+    BothBlockReason              : E_WinchTraceBlockReason; // 🔗 Cause priorisée du blocage Both
 END_STRUCT
 END_TYPE

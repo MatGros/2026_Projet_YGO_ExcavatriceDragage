@@ -18,5 +18,13 @@ STRUCT
     WinchBothMotionBlockedByBucket : BOOL;  // --> [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)
     SyncBlocksAscent                   : BOOL;  // --> [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)
     SyncBlocksDescent                 : BOOL;  // --> [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)
+
+    // === 🔗 ATOMICITÉ DE LA COMMANDE BOTH : permis agrégés consommés ===
+    // PRG_04 calcule BothAscentPermit/BothDescendPermit = AND des 4 permits effectifs.
+    // En commande both, la commande ne consomme QUE ces agrégats (jamais les permits
+    // individuels directement) : les 2 treuils partent ensemble ou aucun (NC-100).
+    BothAscentPermit                : BOOL;  // --> [SAFE] Permit montée Both (EffectivePermitM1_Ascent AND EffectivePermitM2_Ascent)
+    BothDescendPermit               : BOOL;  // --> [SAFE] Permit descente Both (EffectivePermitM1_Descend AND EffectivePermitM2_Descend)
+    BothBlock                       : BOOL;  // --> [STAT] Commande Both bloquée (aucun départ possible — diagnostic IHM)
 END_STRUCT
 END_TYPE

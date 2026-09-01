@@ -85,7 +85,8 @@ END_VAR
 //   - M1InterlockEnable      : gate finale (Enable ET pas de PowerCutOff)
 //   - M1PowerCutOffSafetyInfo: défauts qui COUPENT la puissance
 //   - M1SafeStopSafetyInfo   : défauts qui font SafeStop (rampe rapide)
-//   - M1BlockedBySafetyInfo  : synthèse (PowerCutOff OU SafeStop)
+//   - AscentPermit/DescendPermit : permis directionnels reconsommes par la barriere finale
+//   - M1BlockedBySafetyInfo  : synthese (PowerCutOff OU SafeStop)
 // Sources : PRG_04 (WinchM1FinalInterlockRequest / WinchM1Safety).
 
 M1InterlockEnable := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.Enable
@@ -114,6 +115,8 @@ instWinchOutputInterlockM1(
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.SafeStop,
+    AscentPermit               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.AscentPermit,
+    DescendPermit              := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.DescendPermit,
     BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.BrakeFeedback,
     FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
     RequestedRelayFwd          := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayFwd,
@@ -187,6 +190,8 @@ instWinchOutputInterlockM2(
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.SafeStop,
+    AscentPermit               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.AscentPermit,
+    DescendPermit              := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.DescendPermit,
     BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.BrakeFeedback,
     FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
     RequestedRelayFwd          := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayFwd,

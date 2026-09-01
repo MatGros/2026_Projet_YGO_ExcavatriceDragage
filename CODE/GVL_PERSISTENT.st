@@ -127,7 +127,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     ); // 🌉 Pont FB_CfgPersistBridge_CycleExtractionCfg
 
     // 🚚 CYCLE VIDAGE TRÉMIE (legacy)
-    _CycleDumpAtTremieCfgPersist : ST_CycleDumpAtTremieCfg := (); // 🌉 Pont FB_CfgPersistBridge_CycleDumpAtTremieCfg
+    _CycleDumpAtTremieCfgPersist : ST_CycleDumpAtTremieCfg := (Initialized := FALSE); // 🌉 Pont FB_CfgPersistBridge_CycleDumpAtTremieCfg
 
     // 🎛️ TOGGLES ASSISTANCE (mode mémorisé au boot)
     _CycleAssistTogglesPersist : ST_CycleAssistToggles := (
