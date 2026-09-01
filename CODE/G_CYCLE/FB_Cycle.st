@@ -237,7 +237,7 @@ IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     END_IF;
 
     CycleStep            := State;
-    CycleStateStr        := 'Cycle desactive : securite absente, defaut codeur ou mode hors semi-auto';
+    CycleStateStr        := 'Cycle desactive : securite/codeur/mode';
     Ready                := FALSE;
     Lifecycle.Busy       := FALSE;
     Lifecycle.Done       := FALSE;
