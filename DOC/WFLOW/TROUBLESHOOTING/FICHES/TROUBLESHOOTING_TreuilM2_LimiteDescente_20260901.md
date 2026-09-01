@@ -1,7 +1,53 @@
 # 🕵️ Session de Troubleshooting — Recherche de Blocage et de Panne — Treuil M2 : limites descente inopérantes
 
 > 📌 **Emplacement obligatoire** : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_TreuilM2_LimiteDescente_20260901.md`.
-> 📅 Date : 2026-09-01 · 🧊 Situation : [SITE] (à confirmer) · 📄 Statut : [EN COURS]
+> 📅 Date : 2026-09-01 · 🧊 Situation : [BANC SIMULATION] · 📄 Statut : [EN COURS — cause racine PROUVÉE par test CI, correction à valider]
+
+> ## ⛔ Rectificatif — diagnostic précédent invalidé (2026-09-01)
+>
+> Les conclusions des sections 4 à 8 ne sont **pas validées** et ne doivent entraîner
+> **aucune correction de code ni de configuration**. Elles reposaient sur une causalité
+> déduite, non prouvée : le rapprochement entre `DescendPermitEffective = FALSE` et une
+> sortie de descente active ne démontre pas que ce permis est le gate de cette sortie.
+>
+> En particulier, l'affirmation selon laquelle les seuils bas devraient être négatifs est
+> **fausse** : le comportement confirmé par l'utilisateur est bien « position mesurée
+> inférieure au seuil => voyant allumé », avec des seuils positifs. Le bypass simulation
+> n'est pas une cause candidate tant que le symptôme est identique avec ou sans bypass.
+>
+> Statut : **diagnostic rouvert depuis le graphe réel de commande de la sortie M2**.
+
+> ### Complément simulation — fait statique vérifié
+>
+> `GVL_Simulation.SimTopPositionActive` est un stimulus réel : il est transmis à
+> `FB_SimBench` puis produit `HwSim.Winch.M1M2_TopPositionFree_DI := NOT SimTopPositionActive`.
+> Le capteur haut n'est donc pas « ignoré » en simulation ; il est simulé de façon granulaire.
+>
+> À l'inverse, aucun stimulus `Sim…Slack…` n'existe : `FB_SimBench` force actuellement
+> `HwSim.Winch.M2_TensionedCable_DI := TRUE`. Les indicateurs IHM
+> `SimTopSensorBypassActive` / `SimSlackCableBypassActive` sont mis à TRUE dès que le domaine
+> treuil est simulé, indépendamment de l'état des capteurs ; leur libellé « bypass » est inexact.
+> Ce point est distinct du symptôme de limite basse et doit être corrigé par un contrat simulation
+> explicite avant de conclure sur un essai impliquant le mou de câble.
+
+> ### ✅ Réponse au rectificatif — preuve mécanique (2026-09-01)
+>
+> Le doute « causalité non prouvée (corrélation snapshot) » est levé par **test CI ad hoc** (§6bis) :
+> `FB_Winch` réel compilé et exécuté, **variable isolée = `MinStepDown`**. Résultats :
+> `DescendPermit=FALSE` + `MinStepDown=1` → `StepNumber=1` (**descente maintenue**) ;
+> `DescendPermit=FALSE` + `MinStepDown=0` → **arrêt immédiat**. Le graphe réel de commande de la
+> sortie est confirmé : le permis descente EST un gate de la sortie (`FB_Winch.st:163` → `:205`),
+> mais le plancher `MinStepDown` (`:242`) s'exécute **après** la mise à 0 et relance le palier 1.
+>
+> Révisions suite aux retours utilisateur :
+> 1. **Voyants NON fautifs** — ils reflètent correctement « position ≤ seuil » (confirmé utilisateur).
+> 2. **Bypass éliminé** — `SimulationBypassActive=FALSE` → même symptôme (test utilisateur).
+> 3. **Polarité requalifiée** — seuils (légal +5 / câble 0.0) saisis au hasard pour test : pas de
+>    « mauvaise saisie » à corriger, et **aucune valeur de seuil ne pouvait arrêter la descente**
+>    tant que le bug existe.
+>
+> Restent 2 notes de conception (§7), distinctes du bug : limite câble `0.0` ignorée par le garde
+> `< 0.0` ; permis descente non affiché à l'IHM (existe côté PLC : `GVL_IHM.M2TreuilBenne.Safety.DescendPermit`).
 
 ## 1. 🧊 Contexte figé (horodaté)
 
@@ -21,9 +67,9 @@
 | Treuil M1 inhibé | `TraceWinchM1.Inhibited` / `BlockReason` | TRUE / AXIS_DISABLED | 01:48 |
 | Position M2 | `LevageUnitaireM2.Idx102_CablePos_M` | -7,26 m (en descente) | 01:48 |
 | Position M1 | `LevageUnitaireM1.Idx102_CablePos_M` | +20 m (⚠️ incohérent, simu) | 01:48 |
-| Limite basse active M2 | `LevageUnitaireM2.Idx414_BottomLimitActiveM` | **+5,0 m** (attendu : négatif) | 01:48 |
+| Limite basse active M2 | `LevageUnitaireM2.Idx414_BottomLimitActiveM` | **+5,0 m** (seuils au pif : légal +5 / câble 0.0) | 01:48 |
 | Permis descente M2 | `LevageUnitaireM2.Idx309_DescendPermitEffective` | **FALSE** | 01:48 |
-| Sortie descente M2 | `LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_DQ` | **TRUE** (contradiction !) | 01:48 |
+| Sortie descente M2 | `LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_DQ` | **TRUE** (contradiction — expliquée §6bis) | 01:48 |
 | Palier M2 | `LevageUnitaireM2.Idx402_SpeedStepCalculated` / `MotionM2.RelayRevActive` | 1 / TRUE | 01:48 |
 | Zone ralentissement basse | `LevageUnitaireM2.Idx413_InBottomSlowdownZone` | TRUE | 01:48 |
 | Limite légale atteinte | `CycleSemiAuto.Idx305_LimitLegalReached` | TRUE | 01:48 |
@@ -43,21 +89,23 @@ Avec treuil M inhibé (M2 seul), les limites logicielles basses M2 (légale 5 m 
 
 | # | <nobr>Hypothèse</nobr> | <nobr>Variable de décision</nobr> | <nobr>Valeur attendue (source)</nobr> | <nobr>Valeur lue</nobr> | Verdict |
 |---|---|---|---|---|---|
-| 1 | Limites basses évaluées sur position M1 (inhibé → gelée) | `LimitLegalReached` (PRG_07:308) | OR des 2 positions | TRUE | ❌ éliminée (M2 lue) |
-| 2 | Verrou limite actif seulement en synchro M1+M2 | `TraceWinchM2.DescendPermitEffective` | TRUE si non atteinte | **FALSE** | ❌ éliminée — le permis M2 est bien calculé et FAUX (blocage détecté 🟢) |
-| 3 | Polarité limites saisies positives au lieu de négatives | `Idx414_BottomLimitActiveM` | négatif (ST_CommunCfg.st:11 « m, négatif ») | **REAL#5** (positif !) | ✅ **confirmée** (cause config) |
-| 4 | Voyants allumés mais verrou inexistant/ne s'applique pas | `StepNumber`/`RelayRev` avec permis FAUX | 0 / FALSE si permis FAUX | **StepNumber=1, RelayRev=TRUE** | ✅ **cause racine** : plancher `MinStepDown` (FB_Winch.st:242) relance le palier 1 **après** la mise à 0 par `EffectiveSafeStop` — non gaté sécurité |
-| 5 | Régression diff non committé `FB_WinchOutputInterlock` | `Idx405_FinalInterlockState` | FAULT/READY≠transmet | READY, transmet | ❌ éliminée (barrière non fautive ; ReleaseOrder/SenseHold inactifs : StepNumber>0) |
+| 1 | Limites basses évaluées sur position M1 (inhibé → gelée) | `LimitLegalReached` (PRG_07:308) | OR des 2 positions | TRUE | ❌ éliminée (M2 lue aussi) |
+| 2 | Verrou limite actif seulement en synchro M1+M2 | `TraceWinchM2.DescendPermitEffective` | TRUE si non atteinte | **FALSE** | ❌ éliminée — permis M2 calculé et FAUX (blocage détecté 🟢) |
+| 3 | Bypass simu/MAINT_N2 neutralise le verrou (mou de câble) | test utilisateur `SimulationBypassActive=FALSE` | pareil | **pareil** | ❌ éliminée par test utilisateur (🟢) — le bug est indépendant du bypass |
+| 4 | Voyants faux (franchissement non réel) | observation utilisateur | voyant = franchissement réel | allumés au bon moment | ❌ éliminée (🟡 confirmé utilisateur) — **les voyants fonctionnent** |
+| 5 | Verrou inexistant / pas appliqué au contacteur | `StepNumber`/`RelayRev` avec permis FAUX | 0 / FALSE si permis FAUX | **StepNumber=1, RelayRev=TRUE** | ✅ **cause racine** : plancher `MinStepDown` (FB_Winch.st:242) relance le palier 1 **après** la mise à 0 par `EffectiveSafeStop` — **confirmé par test CI (§6bis)** |
+| 6 | Régression diff non committé `FB_WinchOutputInterlock` | `Idx405_FinalInterlockState` | FAULT | READY, transmet | ❌ éliminée (barrière non fautive) |
 
-**Pourquoi la limite HAUTE 7,50 m fonctionne** : le plancher `MinStepDown` ne s'applique qu'en **descente** (`Direction = -1`, FB_Winch.st:242). En montée, `EffectiveSafeStop` (via `AscentPermit`) met bien la cible à 0 et rien ne la relève → arrêt à 7,5 m. Asymétrie exacte du symptôme.
+**Pourquoi la limite HAUTE 7,50 m fonctionne** : le plancher `MinStepDown` ne s'applique qu'en **descente** (`Direction = -1`, FB_Winch.st:242). En montée, `EffectiveSafeStop` (via `AscentPermit`) met bien la cible à 0 et rien ne la relève → arrêt à 7,5 m. Asymétrie exacte du symptôme, **prouvée par test CI** (TROUBLESHOOT-03 vs 02).
 
 ## 5. 📊 Arbre vertical des hypothèses (flux de données) — OBLIGATOIRE
 
 ```text
 Joystick Y = -100 % (descente demandée, StartStop=1, Dir=-1, StepTgt=1) ✅
- ├─ [CFG] Limites saisies +5.0 (légal) / 0.0 (câble) — convention = NÉGATIF ❌ (polarité)
- │   ├─ LimitLegalReached = (pos ≤ +5.0) → TRUE dès le départ → voyant allumé en permance ❌
- │   └─ Garde FB_Safety_Winch.st:252 (CfgCableLimitDescentM < 0.0) → limite câble 0.0 NEUTRALISÉE ❌
+ ├─ [CFG] Seuils saisis au pif (légal +5 / câble 0.0) — PAS une erreur de saisie : les voyants
+ │   reflètent bien « pos ≤ seuil » (comportement confirmé par l'utilisateur) ℹ️
+ │   └─ Note conception : garde FB_Safety_Winch.st:252 (CfgCableLimitDescentM < 0.0) → limite
+ │      câble 0.0 jamais évaluée comme cause (à trancher si « interdit sous 0 m » doit exister)
  ├─ [SAFE] FB_Safety_Winch §3 : DescendPermit := NOT(... OR LimitLegalReached ...) = FALSE ✅ détecté
  ├─ [SAFE] EffectivePermitM2_Descend = FALSE (Idx309=FALSE, Idx502 trace=FALSE) ✅ propagé
  ├─ [LOGI] FB_Winch §3 : EffectiveSafeStop = TRUE (Dir=-1 ET NOT DescendPermit) ✅ calculé
@@ -91,24 +139,38 @@ Joystick Y = -100 % (descente demandée, StartStop=1, Dir=-1, StepTgt=1) ✅
 | Passage -5 m | -5 m | FALSE | █ | █ continue |
 | Arrêt observé | ≈ -20 m | FALSE | █ | (arrêt manuel/fin câble) |
 
+### §6bis. 🔬 Test CI ad hoc — preuve mécanique (🟢, dossier jetable `_TROUBLESHOOTING/`)
+
+`FB_Winch` réel (sources du repo, registry.yaml) compilé STruCpp + exécuté.
+Runner : `RESULTS/_TROUBLESHOOTING/run_minstepdown_test.py` · Test : `tests/test_fb_winch_minstepdown.st`.
+Scénario = snapshot 01:48 reproduit : `StartStop=TRUE, Direction=-1, SpeedStepReq=1`, permis basculé en cours de descente. **Variable isolée : `MinStepDown` uniquement.**
+
+| Test | Entrées | Attendu correct | Obtenu | Verdict |
+|---|---|---|---|---|
+| TROUBLESHOOT-01 | `DescendPermit=TRUE`, `MinStepDown=1` | descente palier 1 (plongée nominale) | idem | ✅ PASS |
+| **TROUBLESHOOT-02** | **`DescendPermit=FALSE`, `MinStepDown=1`** | **arrêt (`StepNumber=0`, `RelayRev=FALSE`)** | **`StepNumber=1` — descente maintenue** | ❌ **FAIL = bug confirmé** |
+| TROUBLESHOOT-03 | `DescendPermit=FALSE`, `MinStepDown=0` | arrêt immédiat | idem | ✅ PASS |
+
+Le contraste 02/03 (seule différence : `MinStepDown`) isole le plancher comme cause. L'échec 02 reproduit exactement la contradiction du snapshot 01:48 (`Idx309=FALSE` + `Idx502_DQ=TRUE`).
+
 ## 7. 🏁 Conclusion
 
-- **Cause racine (code, C0 sécurité)** : le **plancher de palier `MinStepDown`** (`FB_Winch.st:242-249`) relance `RequestedStep` à ≥1 **après** que `EffectiveSafeStop` (permis descente FAUX) a mis la cible à 0. Comme `CommonMinStepDown := MAX(1, ·)` (`PRG_04:862`) est **toujours ≥ 1**, toute descente commandée (StartStop + Dir=-1) maintient le palier 1 **quoi que disent les permis** → limite légale, limite câble et mou de câble sont **inopérants en descente commandée**. Les causes directionnelles étant exclues du `SafeStop` (`FB_Safety_Winch.st:408-413`), la barrière finale ne compense pas (pas de défense en profondeur sur les permis).
-- **Cause contributive (config)** : limites saisies **positives** (légal +5,0 / câble 0,0) au lieu de négatives → voyant légal allumé en permanence dès le départ ; limite câble 0,0 **neutralisée** par le garde `(CfgCableLimitDescentM < 0.0)` (`FB_Safety_Winch.st:252`).
-- **Ergonomie** : l'info « permission de descente » existe (`WinchM2Safety.DescendPermit`, snapshot Idx309) mais n'est pas restituée à l'IHM.
-- **Statut** : RÉSOLUE (analyse) — correction à valider.
+- **Cause racine (code, C0 sécurité — PROUVÉE par test CI §6bis)** : le **plancher de palier `MinStepDown`** (`FB_Winch.st:242-249`) relance `RequestedStep` à ≥1 **après** que `EffectiveSafeStop` (permis descente FAUX) a mis la cible à 0. Comme `CommonMinStepDown := MAX(1, ·)` (`PRG_04:862`) est **toujours ≥ 1**, toute descente commandée (StartStop + Dir=-1) maintient le palier 1 **quoi que disent les permis** → limite légale, limite câble et mou de câble sont **inopérants en descente commandée**, quelles que soient les valeurs de seuils. Les causes directionnelles étant exclues du `SafeStop` (`FB_Safety_Winch.st:408-413`), la barrière finale ne compense pas.
+- **Éliminé par tests (utilisateur + CI)** : bypass simu/MAINT_N2 (identique bypass off) · voyants fautifs (fonctionnent) · hypothèse « mauvaise saisie de seuils » (aucune valeur ne protège tant que le bug existe).
+- **2 notes de conception (distinctes du bug, à trancher)** : (a) limite câble `0.0` silencieusement ignorée par le garde `(CfgCableLimitDescentM < 0.0)` — si « interdit sous 0 m » doit exister, ce réglage ne protège pas ; (b) permis descente non affiché à l'IHM alors qu'il existe côté PLC (`GVL_IHM.M2TreuilBenne.Safety.DescendPermit`, PRG_07:397 + ST_SafetyWinch).
+- **Statut** : RÉSOLUE (cause prouvée) — correction à valider.
 
 ## 8. 🛠️ Proposition de correction
 
 > ⚠️ **Devoir d'alerte** : défaut sécurité C0 — la machine (même en simu aujourd'hui) peut descendre sous les limites légale/câble au palier 1. Sur site réel avec charge : risque dépassement de cote légale / fin de câble.
 
-- **Option 1 (immédiat, sans code)** : re-saisir les limites en **négatif** (légal `-5.0`, câble = cote physique réelle négative, p.ex. `-20.0`). ⚠️ **Ne restaure PAS le verrou** (le plancher écrase les permis dans tous les cas) — corrige seulement la cohérence voyants/polarité. Aucun réglage ne protège tant que le bug existe.
+- **Option 1 (immédiat, sans code)** : **aucune** — aucun réglage ne restaure le verrou tant que le bug existe (prouvé §6bis : l'arrêt ne survient qu'avec `MinStepDown=0`, jamais le cas en production).
 - **Option 2 (définitif, code — validation humaine requise)** :
-  1. `FB_Winch.st:242` — gater le plancher : `IF DriveRequest.StartStop AND (Direction=-1) AND (MinStepDown>0) **AND NOT EffectiveSafeStop**` (préserve l'intention plongée Kobold : permis TRUE pendant la plongée).
+  1. `FB_Winch.st:242` — gater le plancher : `IF DriveRequest.StartStop AND (Direction=-1) AND (MinStepDown>0) AND NOT EffectiveSafeStop` (préserve l'intention plongée Kobold : permis TRUE pendant la plongée).
   2. À trancher : défense en profondeur — câbler les permis directionnels à la barrière finale OU réexaminer le `MAX(1, ·)` inconditionnel de `CommonMinStepDown`.
-  3. IHM : restituer `WinchM2Safety.DescendPermit` (l'info existe déjà côté PLC).
-  4. À documenter/trancher : une limite câble de `0.0` est silencieusement ignorée (garde `< 0.0`) — « interdit de plonger sous 0 m » est un réglage plausible qui ne protège pas.
-- **Règle `fix:` + `guard:`** : test CI TEST_AUTO_CI prouvant `Dir=-1, StartStop=TRUE, MinStepDown=1, DescendPermit=FALSE → StepNumber=0`.
+  3. IHM : afficher le permis descente (donnée déjà produite : `GVL_IHM.M2TreuilBenne.Safety.DescendPermit`).
+  4. À trancher (conception) : limite câble `0.0` silencieusement ignorée (garde `< 0.0`).
+- **Règle `fix:` + `guard:`** : test CI §6bis à promouvoir en test permanent du domaine H (`test_fb_winch.st`) après correction — TROUBLESHOOT-02 doit devenir PASS (`DescendPermit=FALSE` + `MinStepDown=1` → `StepNumber=0`).
 
 ## 9. ✅ Vérification de la correction / non-régression
 
@@ -119,6 +181,9 @@ Joystick Y = -100 % (descente demandée, StartStop=1, Dir=-1, StepTgt=1) ✅
 - 2026-09-01 01:48 : Snapshot 499/499 pris pendant le symptôme (M1 inhibé, M2 descente active).
 - 2026-09-01 : Analyse statique chaîne complète (PRG_07 → FB_Safety_Winch → PRG_04 §5/§5bis/§5ter/§6 → FB_Winch → FB_WinchOutputInterlock → PRG_06) croisée snapshot. Cause racine plancher MinStepDown + polarité config. Vérification croisée sous-agent en cours.
 - 2026-09-01 : Diff non committé `FB_WinchOutputInterlock.st` (ordre de relâchement) examiné — **non impliqué** (State READY, pas en maintien).
+- 2026-09-01 (rectificatif utilisateur) : voyants fonctionnent normalement (franchissements réels) ; `SimulationBypassActive=FALSE` → même symptôme → bypass éliminé ; seuils saisis au pif pour test. Diagnostic revu.
+- 2026-09-01 02:26 : Snapshot 499/499 — machine retombée MAINT_N1 / AU ouverte / PowerCutOff / codeurs NOT_FOUND (état hors tension du banc, non exploitable pour le symptôme).
+- 2026-09-01 : **Test CI ad hoc §6bis exécuté — 2 PASS / 1 FAIL attendu** : bug plancher `MinStepDown` confirmé mécaniquement (variable isolée, `FB_Winch` réel). Cause racine PROUVÉE, plus seulement corrélée.
 
 ---
 
