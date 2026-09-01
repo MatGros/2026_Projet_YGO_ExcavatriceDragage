@@ -4454,11 +4454,12 @@ tasks:
   bloque_par: []
 - id: T203
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: IHM
   agent: DSH-02
   date: '2026-08-31T00:00:00'
+  completed_at: '2026-09-01T00:00:00'
   titre: Réorganisation chronologique GVL_Troubleshooting (ordre de lecture haut→bas)
   contexte: 'Intitulé complet : Réorganiser GVL_Troubleshooting par ordre chronologique de la chaîne de commande (contexte
     machine → entrées → joystick → homing → safety → modes/cycle → treuils → benne → translation → motion → traces), sans
@@ -4754,11 +4755,12 @@ tasks:
   bloque_par: []
 - id: T214
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: SIMULATION / IHM
   agent: DSH-02
   date: '2026-09-01T00:00:00'
+  completed_at: '2026-09-01T00:00:00'
   titre: 'Stimuli de simulation des boutons IHM M3 (testabilité pilotage IHM)'
   contexte: 'Intitulé complet : Ajouter des stimuli de simulation des boutons IHM M3
     (SimBtnTremie/SimBtnMaintenance) pour tester le pilotage IHM en simulation quand
