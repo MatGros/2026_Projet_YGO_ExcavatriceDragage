@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.643618" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.643618">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T09:05:25.776590" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T09:05:25.776590">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -104,7 +104,19 @@ Delai interlock changement de sens montee</xhtml>
 Delai d'attente retombee des contacteurs</xhtml>
               </documentation>
             </variable>
-            <variable name="SlowdownDistance_M">
+            <variable name="SlowdownDistanceTop_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RALENTISSEMENT BORDURE ===
+Distance avant limite haute pour ralentir (m) : 0 = arrêt au seuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowdownDistanceBottom_M">
               <type>
                 <REAL />
               </type>
@@ -112,8 +124,7 @@ Delai d'attente retombee des contacteurs</xhtml>
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RALENTISSEMENT BORDURE ===
-Distance d'approche avant limite pour ralentir (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant limite basse pour ralentir (m)</xhtml>
               </documentation>
             </variable>
             <variable name="SlowdownMaxStep">

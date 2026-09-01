@@ -76,6 +76,14 @@ VAR
 
     // === ⚙️ VARIABLES LOCALES INTERNES ===
     PowerCutOffReq                   : BOOL; // . [LOC] Demande agregative coupure puissance
+
+    // === 🔒 CONCORDANCE SORTIES TREUILS M1/M2 (§2ter) ===
+    WinchOutputCoupled               : BOOL; // . [LOC] Treuils couples (synchro OU both) : concordance des sorties exigee
+    WinchOutputConcordanceBypass     : BOOL; // . [LOC] Bypass global synchro M1/M2 : neutralise le controle de concordance
+    WinchDirectionRelaysMatch        : BOOL; // . [LOC] Contacteurs de sens M1 = M2 (Fwd et Rev)
+    WinchSpeedContactorsMatch        : BOOL; // . [LOC] Contacteurs de vitesse M1 = M2 (paliers 1 a 4)
+    WinchOutputsConcordant           : BOOL; // . [LOC] Vecteurs de sortie M1 et M2 identiques
+    WinchOutputSyncMismatch          : BOOL; // <-- [SAFE] Ecart de commande M1/M2 en couple : aucune sortie treuil pilotee
 END_VAR
 
 // ═══════════════════════════════════════════════════════════════
@@ -134,26 +142,10 @@ M1SpeedContactor1 := instWinchOutputInterlockM1.Contactor1;
 M1SpeedContactor2 := instWinchOutputInterlockM1.Contactor2;
 M1SpeedContactor3 := instWinchOutputInterlockM1.Contactor3;
 M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
-// Recalcul independant sur les DQ finaux (pas une recopie de BrakeCmd).
+// Pre-calcul frein M1 (regate en §2ter apres controle concordance M1/M2).
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
-
-// ── Sorties physiques M1 ──
-M1_RelayAscent_DQ            := M1RelayFwd;
-M1_RelayDescent_DQ           := M1RelayRev;
-M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
-M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
-M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
-M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
-M1_BrakeRelease_RQ           := M1BrakeCmd;
-
-// ── Bus inter-PRG M1 ──
-Data.M1RelayFwd            := M1RelayFwd;
-Data.M1RelayRev            := M1RelayRev;
-Data.M1SpeedContactor1     := M1SpeedContactor1;
-Data.M1SpeedContactor2     := M1SpeedContactor2;
-Data.M1SpeedContactor3     := M1SpeedContactor3;
-Data.M1SpeedContactor4     := M1SpeedContactor4;
-Data.M1BrakeCmd            := M1BrakeCmd;
+// Sorties physiques M1 + bus inter-PRG : ecrites en §2ter, apres le controle
+// de concordance des vecteurs M1/M2 (une seule ecriture des DQ treuils).
 
 // ═══════════════════════════════════════════════════════════════
 // 🛗 §2 TREUIL M2 (Benne) — conditions + interlock + sorties
@@ -209,10 +201,60 @@ M2SpeedContactor1 := instWinchOutputInterlockM2.Contactor1;
 M2SpeedContactor2 := instWinchOutputInterlockM2.Contactor2;
 M2SpeedContactor3 := instWinchOutputInterlockM2.Contactor3;
 M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
-// Recalcul independant, voir M1.
+// Pre-calcul frein M2 (regate en §2ter apres controle concordance M1/M2).
 M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
-// ── Sorties physiques M2 ──
+// ═══════════════════════════════════════════════════════════════
+// 🔒 §2ter CONCORDANCE SORTIES TREUILS M1/M2 — AVANT ECRITURE HARDWARE
+// ═══════════════════════════════════════════════════════════════
+// Les 2 barrieres finales (instWinchOutputInterlockM1/M2) resolvent chacune
+// leur commande via des temporisations INDEPENDANTES (RestartDelay, SenseHold,
+// ReleaseOrder, DeadTime) : rien ne garantit des vecteurs de sortie identiques
+// le meme scan. En couple (synchro OU both), un contacteur de sens ou de vitesse
+// asymetrique = les 2 treuils tirent le meme cable de facon desynchronisee.
+// 🛡️ Regle : au moindre ecart M1/M2 pendant le couplage (hors BypassGlobal),
+// AUCUNE sortie treuil n'est ecrite (M1 ET M2), le frein se referme. Reprise
+// par la chaine defaut existante (Reset conscient) une fois les 2 barrieres realignees.
+
+WinchOutputCoupled := PRG_04_Treuils_Benne.Data.SyncState.SyncActive
+                      OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active;
+WinchOutputConcordanceBypass := GVL_IHM.M1M2Sync.Bypass.Global;
+
+WinchDirectionRelaysMatch := (M1RelayFwd = M2RelayFwd) AND (M1RelayRev = M2RelayRev);
+// Agregat de concordance homogene (4 comparaisons de meme forme, paliers 1 a 4).
+WinchSpeedContactorsMatch := (M1SpeedContactor1 = M2SpeedContactor1)
+                          AND (M1SpeedContactor2 = M2SpeedContactor2)
+                          AND (M1SpeedContactor3 = M2SpeedContactor3)
+                          AND (M1SpeedContactor4 = M2SpeedContactor4);
+WinchOutputsConcordant := WinchDirectionRelaysMatch AND WinchSpeedContactorsMatch;
+
+WinchOutputSyncMismatch := WinchOutputCoupled
+                        AND NOT WinchOutputConcordanceBypass
+                        AND NOT WinchOutputsConcordant;
+
+IF WinchOutputSyncMismatch THEN
+    M1RelayFwd := FALSE; M1RelayRev := FALSE;
+    M1SpeedContactor1 := FALSE; M1SpeedContactor2 := FALSE;
+    M1SpeedContactor3 := FALSE; M1SpeedContactor4 := FALSE;
+    M2RelayFwd := FALSE; M2RelayRev := FALSE;
+    M2SpeedContactor1 := FALSE; M2SpeedContactor2 := FALSE;
+    M2SpeedContactor3 := FALSE; M2SpeedContactor4 := FALSE;
+END_IF;
+
+// Frein = OR des relais de sens GATES (jamais desserre sans un sens valide).
+M1BrakeCmd := M1RelayFwd OR M1RelayRev;
+M2BrakeCmd := M2RelayFwd OR M2RelayRev;
+
+// ── Sorties physiques M1 (apres controle concordance §2ter) ──
+M1_RelayAscent_DQ            := M1RelayFwd;
+M1_RelayDescent_DQ           := M1RelayRev;
+M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
+M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
+M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
+M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
+M1_BrakeRelease_RQ           := M1BrakeCmd;
+
+// ── Sorties physiques M2 (apres controle concordance §2ter) ──
 M2_RelayAscent_Close_DQ      := M2RelayFwd;
 M2_RelayDescent_Open_DQ      := M2RelayRev;
 M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
@@ -221,7 +263,16 @@ M2_SpeedContactor_3_DQ       := M2SpeedContactor3;
 M2_SpeedContactor_4_DQ       := M2SpeedContactor4;
 M2_BrakeRelease_RQ           := M2BrakeCmd;
 
-// ── Bus inter-PRG M2 ──
+// ── Bus inter-PRG M1 (image reelle des sorties, apres §2ter) ──
+Data.M1RelayFwd            := M1RelayFwd;
+Data.M1RelayRev            := M1RelayRev;
+Data.M1SpeedContactor1     := M1SpeedContactor1;
+Data.M1SpeedContactor2     := M1SpeedContactor2;
+Data.M1SpeedContactor3     := M1SpeedContactor3;
+Data.M1SpeedContactor4     := M1SpeedContactor4;
+Data.M1BrakeCmd            := M1BrakeCmd;
+
+// ── Bus inter-PRG M2 (image reelle des sorties, apres §2ter) ──
 Data.M2RelayFwd            := M2RelayFwd;
 Data.M2RelayRev            := M2RelayRev;
 Data.M2SpeedContactor1     := M2SpeedContactor1;

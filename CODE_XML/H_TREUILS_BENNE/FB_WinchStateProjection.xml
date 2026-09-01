@@ -1391,7 +1391,19 @@ Delai interlock changement de sens montee</xhtml>
 Delai d'attente retombee des contacteurs</xhtml>
               </documentation>
             </variable>
-            <variable name="SlowdownDistance_M">
+            <variable name="SlowdownDistanceTop_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RALENTISSEMENT BORDURE ===
+Distance avant limite haute pour ralentir (m) : 0 = arrêt au seuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowdownDistanceBottom_M">
               <type>
                 <REAL />
               </type>
@@ -1399,8 +1411,7 @@ Delai d'attente retombee des contacteurs</xhtml>
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RALENTISSEMENT BORDURE ===
-Distance d'approche avant limite pour ralentir (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant limite basse pour ralentir (m)</xhtml>
               </documentation>
             </variable>
             <variable name="SlowdownMaxStep">
@@ -4225,7 +4236,7 @@ IF NOT BypassGlobal THEN
     instCauses[5].Texte    := 'Fin de course haut capteur atteint';
 
     // Cause 6 : Limite max câble descente (live)
-    IF NOT (BypassProcess OR BypassCableLimitSwitch) AND ((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) THEN
+    IF NOT (BypassProcess OR BypassCableLimitSwitch) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
         instCauses[6].Active := TRUE;
     ELSE
         instCauses[6].Active := FALSE;
@@ -4430,7 +4441,7 @@ END_IF;
 
 DescendPermit := NOT (
     ((CauseCableLimitActive OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
-    OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
+    OR ((CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode AND NOT BypassCableLimitSwitch)
     // La limite légale est une interdiction d'exploitation distincte du groupe
     // SafeStop/Permit. Le bypass banc BypassProcess ne doit jamais la lever :
     // seul le bypass dédié BypassLimitLegal, déjà filtré par la matrice MAINT_N2
@@ -4443,9 +4454,9 @@ AscentPermit := NOT (
     ((CauseTopLimitSwitchActive
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
-    // TopLimitM porte deja la relaxation 7,5-&gt;8,5 m (override N1 / bypass N2, bornee par la
-    // bande de ralentissement, PRG_04 TopLimitM1_M/TopLimitM2_M) : la butee logicielle reste
-    // active a la valeur relevee. Bypasser le logiciel releve la butee, il ne la supprime pas.
+    // TopLimitM porte la relaxation 7,5-&gt;8,5 m en override N1 / bypass N2 : la butee
+    // logicielle reste active a la valeur relevee. Bypasser le logiciel releve la butee,
+    // il ne la supprime pas ; le FDC haut materiel reste une barriere independante.
     OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM))
 );
 
@@ -4991,8 +5002,8 @@ EffectiveSafeStop := SafeStop OR DirectionConflict
                      OR (WinchRequest.ReqAscent AND NOT AscentPermit)
                      OR (WinchRequest.ReqDescend AND NOT DescendPermit);
 
-InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &gt;= (WinchRequest.TopLimitM - Config.SlowdownDistance_M));
-InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &lt;= (WinchRequest.BottomLimitM + Config.SlowdownDistance_M));
+InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &gt;= (WinchRequest.TopLimitM - Config.SlowdownDistanceTop_M));
+InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &lt;= (WinchRequest.BottomLimitM + Config.SlowdownDistanceBottom_M));
 
 IF WinchRequest.ReqAscent AND NOT WinchRequest.ReqDescend THEN
     ActiveMaxStep := WinchRequest.MaxStepUp;

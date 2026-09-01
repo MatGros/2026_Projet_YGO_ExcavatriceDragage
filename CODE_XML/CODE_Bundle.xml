@@ -4640,7 +4640,18 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Limitation palier vitesse en montée (1..5), commun M1/M2</xhtml>
               </documentation>
             </variable>
-            <variable name="WinchSlowdownDistance_M">
+            <variable name="WinchSlowdownDistanceTop_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite haute : 0 = arrêt au seuil (m), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSlowdownDistanceBottom_M">
               <type>
                 <REAL />
               </type>
@@ -4648,7 +4659,7 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite pour enclencher le ralentissement (m), commun M1/M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite basse pour ralentir (m), commun M1/M2</xhtml>
               </documentation>
             </variable>
             <variable name="WinchSlowdownMaxStep">
@@ -15496,7 +15507,19 @@ Delai interlock changement de sens montee</xhtml>
 Delai d'attente retombee des contacteurs</xhtml>
               </documentation>
             </variable>
-            <variable name="SlowdownDistance_M">
+            <variable name="SlowdownDistanceTop_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RALENTISSEMENT BORDURE ===
+Distance avant limite haute pour ralentir (m) : 0 = arrêt au seuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SlowdownDistanceBottom_M">
               <type>
                 <REAL />
               </type>
@@ -15504,8 +15527,7 @@ Delai d'attente retombee des contacteurs</xhtml>
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RALENTISSEMENT BORDURE ===
-Distance d'approche avant limite pour ralentir (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant limite basse pour ralentir (m)</xhtml>
               </documentation>
             </variable>
             <variable name="SlowdownMaxStep">
@@ -31638,7 +31660,7 @@ IF NOT BypassGlobal THEN
     instCauses[5].Texte    := 'Fin de course haut capteur atteint';
 
     // Cause 6 : Limite max câble descente (live)
-    IF NOT (BypassProcess OR BypassCableLimitSwitch) AND ((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) THEN
+    IF NOT (BypassProcess OR BypassCableLimitSwitch) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode THEN
         instCauses[6].Active := TRUE;
     ELSE
         instCauses[6].Active := FALSE;
@@ -31843,7 +31865,7 @@ END_IF;
 
 DescendPermit := NOT (
     ((CauseCableLimitActive OR NOT PowerContactorEngaged) AND NOT (BypassGlobal OR BypassCableLimitSwitch))
-    OR (((CfgCableLimitDescentM &lt; 0.0) AND (CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode) AND NOT BypassCableLimitSwitch)
+    OR ((CablePosM &lt;= CfgCableLimitDescentM) AND NOT InReferencingMode AND NOT BypassCableLimitSwitch)
     // La limite légale est une interdiction d'exploitation distincte du groupe
     // SafeStop/Permit. Le bypass banc BypassProcess ne doit jamais la lever :
     // seul le bypass dédié BypassLimitLegal, déjà filtré par la matrice MAINT_N2
@@ -31856,9 +31878,9 @@ AscentPermit := NOT (
     ((CauseTopLimitSwitchActive
     OR (NOT TopPositionSensor AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
-    // TopLimitM porte deja la relaxation 7,5-&gt;8,5 m (override N1 / bypass N2, bornee par la
-    // bande de ralentissement, PRG_04 TopLimitM1_M/TopLimitM2_M) : la butee logicielle reste
-    // active a la valeur relevee. Bypasser le logiciel releve la butee, il ne la supprime pas.
+    // TopLimitM porte la relaxation 7,5-&gt;8,5 m en override N1 / bypass N2 : la butee
+    // logicielle reste active a la valeur relevee. Bypasser le logiciel releve la butee,
+    // il ne la supprime pas ; le FDC haut materiel reste une barriere independante.
     OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM))
 );
 
@@ -38878,8 +38900,8 @@ EffectiveSafeStop := SafeStop OR DirectionConflict
                      OR (WinchRequest.ReqAscent AND NOT AscentPermit)
                      OR (WinchRequest.ReqDescend AND NOT DescendPermit);
 
-InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &gt;= (WinchRequest.TopLimitM - Config.SlowdownDistance_M));
-InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &lt;= (WinchRequest.BottomLimitM + Config.SlowdownDistance_M));
+InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &gt;= (WinchRequest.TopLimitM - Config.SlowdownDistanceTop_M));
+InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM &lt;= (WinchRequest.BottomLimitM + Config.SlowdownDistanceBottom_M));
 
 IF WinchRequest.ReqAscent AND NOT WinchRequest.ReqDescend THEN
     ActiveMaxStep := WinchRequest.MaxStepUp;
@@ -44363,8 +44385,8 @@ DiveSearchInputs.ImmersionUpper_M      := GVL_IHM.CycleDiveSearch.Cfg.ImmersionU
 DiveSearchInputs.ImmersionLower_M      := GVL_IHM.CycleDiveSearch.Cfg.ImmersionLower_M;
 DiveSearchInputs.CableLimitAscent_M    := GVL_IHM.Commun.Cfg.CfgCableLimitAscent_M;
 DiveSearchInputs.LimitLegalDepthMin_M  := GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M;
-// Plancher palier descente Kobold : non rendu reglable IHM, valeur roadmap 3.
-DiveSearchInputs.CfgDiveFloorStep      := 3;
+// Plancher palier descente Kobold : débit minimal nécessaire au fonctionnement du Kobold.
+DiveSearchInputs.CfgDiveFloorStep      := 4;
 DiveSearchInputs.CycleTime             := T#10ms;
 DiveSearchInputs.BypassPreconditions   := GVL_IHM.CycleDiveSearch.Cmd.TglBypassDiveSearchSequence;
 // Config : defaults du DUT ST_fbDiveSearch_Config conserves (DiveSpeedMin_Mps=0.15,
@@ -46157,20 +46179,14 @@ BypassM2MecaDEff            := MaintN2 AND GVL_IHM.M2TreuilBenne.Bypass.MecaD;
 // Nominal 7,5 m (CfgCableLimitAscent_M) ; 8,5 m (CfgTopSensorPos_M) sous override N1 momentané
 // ou bypass N2 latché du FDC logiciel. M2 conserve son décalage benne (M2_LimitShift) dans les
 // deux cas : l'override ne modifie que l'assiette de référence, pas la géométrie M1/M2.
-// ⛔ PLAFOND DE SÉCURITÉ : le relèvement ne peut jamais excéder la bande de ralentissement
-// (WinchSlowdownDistance_M). Au-delà, FB_Winch §3 n'engagerait plus le palier 1 avant le capteur
-// physique : arrivée à pleine vitesse puis arrêt sec en 1 scan. Aujourd'hui 8,5 = 7,5 + 1,0 :
-// le MIN est neutre, mais il rend la protection STRUCTURELLE — tout réglage de
-// CfgTopSensorPos_M au-delà de la bande est désormais borné ici ET refusé par le gate G483.
-TopLimitM1_M := MIN(SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff,
-                        _CommunCfgPersist.CfgCableLimitAscent_M,
-                        _WinchM1CfgPersist.CfgTopSensorPos_M),
-                    _CommunCfgPersist.CfgCableLimitAscent_M + _CommunCfgPersist.WinchSlowdownDistance_M);
-TopLimitM2_M := MIN(SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
-                        _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
-                        _WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift),
-                    _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift
-                    + _CommunCfgPersist.WinchSlowdownDistance_M);
+// Le seuil haut nominal est un arrêt immédiat (distance de ralentissement = 0 m).
+// En override/bypass MAINT, seul le FDC haut matériel définit la borne : il reste non-bypassable.
+TopLimitM1_M := SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff,
+                    _CommunCfgPersist.CfgCableLimitAscent_M,
+                    _WinchM1CfgPersist.CfgTopSensorPos_M);
+TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
+                    _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
+                    _WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift);
 
 // --- Usage effectif d'un override/bypass de position → re-homing obligatoire ---------------
 // Publié vers PRG_03 (rang 03) ➔ FB_Modes arme HomingRequiredMx à la sortie du mode maintenance.
@@ -46522,7 +46538,8 @@ M1WinchSensors.SpeedGuardEnable   := FALSE;
 M1WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
 
 M1WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
-M1WinchCfg.SlowdownDistance_M     := _CommunCfgPersist.WinchSlowdownDistance_M;
+M1WinchCfg.SlowdownDistanceTop_M  := _CommunCfgPersist.WinchSlowdownDistanceTop_M;
+M1WinchCfg.SlowdownDistanceBottom_M := _CommunCfgPersist.WinchSlowdownDistanceBottom_M;
 M1WinchCfg.SlowdownMaxStep        := _CommunCfgPersist.WinchSlowdownMaxStep;
 
 instWinchM1(
@@ -46571,7 +46588,8 @@ M2WinchSensors.SpeedGuardEnable   := FALSE;
 M2WinchSensors.SpeedGuardReady    := NOT instWinchSync.Fault.Error;
 
 M2WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
-M2WinchCfg.SlowdownDistance_M     := _CommunCfgPersist.WinchSlowdownDistance_M;
+M2WinchCfg.SlowdownDistanceTop_M  := _CommunCfgPersist.WinchSlowdownDistanceTop_M;
+M2WinchCfg.SlowdownDistanceBottom_M := _CommunCfgPersist.WinchSlowdownDistanceBottom_M;
 M2WinchCfg.SlowdownMaxStep        := _CommunCfgPersist.WinchSlowdownMaxStep;
 
 instWinchM2(
@@ -48117,6 +48135,55 @@ creerait une collision avec la globale homonyme du mapping E/S.
 . [LOC] Demande agregative coupure puissance</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchOutputCoupled">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🔒 CONCORDANCE SORTIES TREUILS M1/M2 (§2ter) ===
+. [LOC] Treuils couples (synchro OU both) : concordance des sorties exigee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchOutputConcordanceBypass">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bypass global synchro M1/M2 : neutralise le controle de concordance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchDirectionRelaysMatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Contacteurs de sens M1 = M2 (Fwd et Rev)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSpeedContactorsMatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Contacteurs de vitesse M1 = M2 (paliers 1 a 4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchOutputsConcordant">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Vecteurs de sortie M1 et M2 identiques</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchOutputSyncMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Ecart de commande M1/M2 en couple : aucune sortie treuil pilotee</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -48192,26 +48259,10 @@ M1SpeedContactor1 := instWinchOutputInterlockM1.Contactor1;
 M1SpeedContactor2 := instWinchOutputInterlockM1.Contactor2;
 M1SpeedContactor3 := instWinchOutputInterlockM1.Contactor3;
 M1SpeedContactor4 := instWinchOutputInterlockM1.Contactor4;
-// Recalcul independant sur les DQ finaux (pas une recopie de BrakeCmd).
+// Pre-calcul frein M1 (regate en §2ter apres controle concordance M1/M2).
 M1BrakeCmd        := M1RelayFwd OR M1RelayRev;
-
-// ── Sorties physiques M1 ──
-M1_RelayAscent_DQ            := M1RelayFwd;
-M1_RelayDescent_DQ           := M1RelayRev;
-M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
-M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
-M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
-M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
-M1_BrakeRelease_RQ           := M1BrakeCmd;
-
-// ── Bus inter-PRG M1 ──
-Data.M1RelayFwd            := M1RelayFwd;
-Data.M1RelayRev            := M1RelayRev;
-Data.M1SpeedContactor1     := M1SpeedContactor1;
-Data.M1SpeedContactor2     := M1SpeedContactor2;
-Data.M1SpeedContactor3     := M1SpeedContactor3;
-Data.M1SpeedContactor4     := M1SpeedContactor4;
-Data.M1BrakeCmd            := M1BrakeCmd;
+// Sorties physiques M1 + bus inter-PRG : ecrites en §2ter, apres le controle
+// de concordance des vecteurs M1/M2 (une seule ecriture des DQ treuils).
 
 // ═══════════════════════════════════════════════════════════════
 // 🛗 §2 TREUIL M2 (Benne) — conditions + interlock + sorties
@@ -48267,10 +48318,60 @@ M2SpeedContactor1 := instWinchOutputInterlockM2.Contactor1;
 M2SpeedContactor2 := instWinchOutputInterlockM2.Contactor2;
 M2SpeedContactor3 := instWinchOutputInterlockM2.Contactor3;
 M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
-// Recalcul independant, voir M1.
+// Pre-calcul frein M2 (regate en §2ter apres controle concordance M1/M2).
 M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
-// ── Sorties physiques M2 ──
+// ═══════════════════════════════════════════════════════════════
+// 🔒 §2ter CONCORDANCE SORTIES TREUILS M1/M2 — AVANT ECRITURE HARDWARE
+// ═══════════════════════════════════════════════════════════════
+// Les 2 barrieres finales (instWinchOutputInterlockM1/M2) resolvent chacune
+// leur commande via des temporisations INDEPENDANTES (RestartDelay, SenseHold,
+// ReleaseOrder, DeadTime) : rien ne garantit des vecteurs de sortie identiques
+// le meme scan. En couple (synchro OU both), un contacteur de sens ou de vitesse
+// asymetrique = les 2 treuils tirent le meme cable de facon desynchronisee.
+// 🛡️ Regle : au moindre ecart M1/M2 pendant le couplage (hors BypassGlobal),
+// AUCUNE sortie treuil n'est ecrite (M1 ET M2), le frein se referme. Reprise
+// par la chaine defaut existante (Reset conscient) une fois les 2 barrieres realignees.
+
+WinchOutputCoupled := PRG_04_Treuils_Benne.Data.SyncState.SyncActive
+                      OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active;
+WinchOutputConcordanceBypass := GVL_IHM.M1M2Sync.Bypass.Global;
+
+WinchDirectionRelaysMatch := (M1RelayFwd = M2RelayFwd) AND (M1RelayRev = M2RelayRev);
+// Agregat de concordance homogene (4 comparaisons de meme forme, paliers 1 a 4).
+WinchSpeedContactorsMatch := (M1SpeedContactor1 = M2SpeedContactor1)
+                          AND (M1SpeedContactor2 = M2SpeedContactor2)
+                          AND (M1SpeedContactor3 = M2SpeedContactor3)
+                          AND (M1SpeedContactor4 = M2SpeedContactor4);
+WinchOutputsConcordant := WinchDirectionRelaysMatch AND WinchSpeedContactorsMatch;
+
+WinchOutputSyncMismatch := WinchOutputCoupled
+                        AND NOT WinchOutputConcordanceBypass
+                        AND NOT WinchOutputsConcordant;
+
+IF WinchOutputSyncMismatch THEN
+    M1RelayFwd := FALSE; M1RelayRev := FALSE;
+    M1SpeedContactor1 := FALSE; M1SpeedContactor2 := FALSE;
+    M1SpeedContactor3 := FALSE; M1SpeedContactor4 := FALSE;
+    M2RelayFwd := FALSE; M2RelayRev := FALSE;
+    M2SpeedContactor1 := FALSE; M2SpeedContactor2 := FALSE;
+    M2SpeedContactor3 := FALSE; M2SpeedContactor4 := FALSE;
+END_IF;
+
+// Frein = OR des relais de sens GATES (jamais desserre sans un sens valide).
+M1BrakeCmd := M1RelayFwd OR M1RelayRev;
+M2BrakeCmd := M2RelayFwd OR M2RelayRev;
+
+// ── Sorties physiques M1 (apres controle concordance §2ter) ──
+M1_RelayAscent_DQ            := M1RelayFwd;
+M1_RelayDescent_DQ           := M1RelayRev;
+M1_SpeedContactor_1_DQ       := M1SpeedContactor1;
+M1_SpeedContactor_2_DQ       := M1SpeedContactor2;
+M1_SpeedContactor_3_DQ       := M1SpeedContactor3;
+M1_SpeedContactor_4_DQ       := M1SpeedContactor4;
+M1_BrakeRelease_RQ           := M1BrakeCmd;
+
+// ── Sorties physiques M2 (apres controle concordance §2ter) ──
 M2_RelayAscent_Close_DQ      := M2RelayFwd;
 M2_RelayDescent_Open_DQ      := M2RelayRev;
 M2_SpeedContactor_1_DQ       := M2SpeedContactor1;
@@ -48279,7 +48380,16 @@ M2_SpeedContactor_3_DQ       := M2SpeedContactor3;
 M2_SpeedContactor_4_DQ       := M2SpeedContactor4;
 M2_BrakeRelease_RQ           := M2BrakeCmd;
 
-// ── Bus inter-PRG M2 ──
+// ── Bus inter-PRG M1 (image reelle des sorties, apres §2ter) ──
+Data.M1RelayFwd            := M1RelayFwd;
+Data.M1RelayRev            := M1RelayRev;
+Data.M1SpeedContactor1     := M1SpeedContactor1;
+Data.M1SpeedContactor2     := M1SpeedContactor2;
+Data.M1SpeedContactor3     := M1SpeedContactor3;
+Data.M1SpeedContactor4     := M1SpeedContactor4;
+Data.M1BrakeCmd            := M1BrakeCmd;
+
+// ── Bus inter-PRG M2 (image reelle des sorties, apres §2ter) ──
 Data.M2RelayFwd            := M2RelayFwd;
 Data.M2RelayRev            := M2RelayRev;
 Data.M2SpeedContactor1     := M2SpeedContactor1;
