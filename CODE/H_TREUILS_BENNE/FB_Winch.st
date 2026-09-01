@@ -3,9 +3,9 @@
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Pilotage d'un treuil individuel (contacteurs de sens et de vitesse)
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   🔌 Interface : FB de mouvement (Enable, SafeStop, StartStop via DriveRequest)
+   🔌 Interface : FB de mouvement (Enable, SafeStop, RunRequest via WinchRequest)
    🔒 Sécurité : Interlock inversion de sens et gestion des autorisations
-   🔧 Interface plate → structs (DriveRequest / Sensors / Config),
+   🔧 Interface plate → structs (WinchRequest / Sensors / Config),
       logique interne conservée (comportement bit-identique).
    ======================================================================= *)
 
@@ -17,7 +17,7 @@ VAR_INPUT
     PowerContactorEngaged           : BOOL;                           // --> [SAFE] Statut contacteur de ligne / puissance
 
     // === REQUÊTE D'AXE (struct) ===
-    DriveRequest                    : ST_fbWinch_DriveRequest;         // --> [REQ] Ordre, palier, bornes et limites effectives
+    WinchRequest                    : ST_fbWinch_Req;                  // --> [REQ] RunRequest + 2 bits de sens, palier et limites
 
     // === MESURES ET FEEDBACKS (struct) ===
     Sensors                         : ST_fbWinch_Sensors;             // --> [HW] Position, referencement, contacteurs, vitesse
@@ -56,7 +56,9 @@ VAR_OUTPUT
     ContactorsCheck                 : ST_ContactorCheck;              // <-- [DIAG] Diagnostic concorde contacteurs
     InTopSlowdownZone               : BOOL;                           // <-- [DIAG] Zone de ralentissement haut active
     InBottomSlowdownZone            : BOOL;                           // <-- [DIAG] Zone de ralentissement bas active
-    CommandedDirection              : INT;                            // <-- [DIAG] Sens interne memorise
+    CommandedAscent                 : BOOL;                           // <-- [DIAG] Sens interne mémorisé : montée
+    CommandedDescend                : BOOL;                           // <-- [DIAG] Sens interne mémorisé : descente
+    RequestConflict                 : BOOL;                           // <-- [DIAG] Double demande de sens détectée
     DirectionChangeDelayElapsed     : TIME;                           // <-- [DIAG] Ecoule delai changement de sens
     DirectionChangePending          : BOOL;                           // <-- [DIAG] Changement de sens en attente
 
@@ -78,6 +80,7 @@ VAR
     AllContactorsCommandedOff       : BOOL;                           // . [LOC] Tous contacteurs commandes a FALSE
     RampTargetStep                  : INT;                            // . [LOC] Palier demandé par l'arbitrage amont
     EffectiveSafeStop               : BOOL;                           // . [LOC] SafeStop effectif incluant permis
+    DirectionConflict               : BOOL;                           // . [LOC] Les deux demandes de sens sont actives
     ActiveMaxStep                   : INT;                            // . [LOC] Plafond palier actif dynamique
     EffectiveStepRampDelay          : TIME;                           // . [LOC] Cadence palier selon sens, distincte interlock
 
@@ -131,7 +134,7 @@ Fault := instFault.Fault;
 // 🛑 2. GATE
 IF NOT Enable THEN
     SpeedStep(Enable := FALSE, SpeedStepReq := 0, Table := Config.SpeedStepTable);
-    DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqDirection := 0,
+    DirectionInterlock(Enable := FALSE, EnableRising := FALSE, Reset := Reset, ReqAscent := FALSE, ReqDescend := FALSE,
                        ChangeDelayAscent := Config.DirectionInterlockDelayAscent,
                        ChangeDelayDescent := Config.DirectionInterlockDelayDescent);
     StepShaper(Enable := FALSE, TargetStep := 0, StepRampDelay := Config.StepRampDelayAscent);
@@ -140,7 +143,9 @@ IF NOT Enable THEN
     Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FALSE;
     RequestedStep := 0;
     StepNumber := StepShaper.ShapedStep;
-    CommandedDirection := DirectionInterlock.CommandedDirection;
+    CommandedAscent := DirectionInterlock.CommandedAscent;
+    CommandedDescend := DirectionInterlock.CommandedDescend;
+    RequestConflict := DirectionInterlock.RequestConflict;
     DirectionChangePending := DirectionInterlock.DirectionChangePending;
     TonContactorsDropped(IN := FALSE);
     ContactorsCheck.Command := FALSE;
@@ -160,26 +165,29 @@ Ready := Enable AND NOT Fault.Latched;
 {endregion}
 
 {region "§3 Permis et zones de ralentissement"}
-EffectiveSafeStop := SafeStop OR (DriveRequest.Direction > 0 AND NOT AscentPermit) OR (DriveRequest.Direction < 0 AND NOT DescendPermit);
+DirectionConflict := WinchRequest.ReqAscent AND WinchRequest.ReqDescend;
+EffectiveSafeStop := SafeStop OR DirectionConflict
+                     OR (WinchRequest.ReqAscent AND NOT AscentPermit)
+                     OR (WinchRequest.ReqDescend AND NOT DescendPermit);
 
-InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM >= (DriveRequest.TopLimitM - Config.SlowdownDistance_M));
-InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM <= (DriveRequest.BottomLimitM + Config.SlowdownDistance_M));
+InTopSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM >= (WinchRequest.TopLimitM - Config.SlowdownDistance_M));
+InBottomSlowdownZone := Sensors.Homed AND NOT Sensors.HomingSuspect AND (Sensors.CablePosM <= (WinchRequest.BottomLimitM + Config.SlowdownDistance_M));
 
-IF DriveRequest.Direction > 0 THEN
-    ActiveMaxStep := DriveRequest.MaxStepUp;
+IF WinchRequest.ReqAscent AND NOT WinchRequest.ReqDescend THEN
+    ActiveMaxStep := WinchRequest.MaxStepUp;
     IF InTopSlowdownZone THEN
         ActiveMaxStep := MIN(ActiveMaxStep, Config.SlowdownMaxStep);
     END_IF;
-ELSIF DriveRequest.Direction < 0 THEN
-    ActiveMaxStep := DriveRequest.MaxStepDown;
+ELSIF WinchRequest.ReqDescend AND NOT WinchRequest.ReqAscent THEN
+    ActiveMaxStep := WinchRequest.MaxStepDown;
     IF InBottomSlowdownZone THEN
         ActiveMaxStep := MIN(ActiveMaxStep, Config.SlowdownMaxStep);
     END_IF;
 ELSE
-    ActiveMaxStep := DriveRequest.MaxStepUp;
+    ActiveMaxStep := WinchRequest.MaxStepUp;
 END_IF;
 
-IF DriveRequest.HomingApproachActive THEN
+IF WinchRequest.HomingApproachActive THEN
     ActiveMaxStep := 1;
 END_IF;
 {endregion}
@@ -190,22 +198,25 @@ DirectionInterlock(
     Enable := (StepNumber = 0) AND Sensors.ContactorsAllOff,
     EnableRising := EnableRisingEdge.Q,
     Reset := Reset,
-    ReqDirection := DriveRequest.Direction,
+    ReqAscent := WinchRequest.ReqAscent,
+    ReqDescend := WinchRequest.ReqDescend,
     ChangeDelayAscent := Config.DirectionInterlockDelayAscent,
     ChangeDelayDescent := Config.DirectionInterlockDelayDescent
 );
-CommandedDirection := DirectionInterlock.CommandedDirection;
+CommandedAscent := DirectionInterlock.CommandedAscent;
+CommandedDescend := DirectionInterlock.CommandedDescend;
+RequestConflict := DirectionInterlock.RequestConflict;
 DirectionChangePending := DirectionInterlock.DirectionChangePending;
 DirectionChangeDelayElapsed := DirectionInterlock.DelayElapsed;
 {endregion}
 
 {region "§5 Paliers vitesse et contacteurs"}
-// -B : la consigne est désormais un PALIER discret (DriveRequest.SpeedStepReq,
+// -B : la consigne est désormais un PALIER discret (WinchRequest.SpeedStepReq,
 // 1..5, 0 = arrêt) produit par l'arbitrage. Plus de décodage %→palier ici.
-IF DirectionChangePending OR (DriveRequest.Direction = 0) OR EffectiveSafeStop OR NOT DriveRequest.StartStop THEN
+IF DirectionChangePending OR NOT (WinchRequest.ReqAscent OR WinchRequest.ReqDescend) OR EffectiveSafeStop OR NOT WinchRequest.RunRequest THEN
     RampTargetStep := 0;
 ELSE
-    RampTargetStep := DriveRequest.SpeedStepReq;
+    RampTargetStep := WinchRequest.SpeedStepReq;
 END_IF;
 
 SpeedStep(
@@ -237,13 +248,14 @@ END_IF;
 // JAMAIS sur StepNumber directement. Actif uniquement en descente commandee
 // ET NON bloquee par un arret/permis (NOT EffectiveSafeStop) : un permis descente FALSE
 // doit interdire physiquement le mouvement, sans re-atterrissage du plancher.
-// (StartStop AND Direction=-1) : relache joystick (StartStop=FALSE) -> aucun plancher,
+// (RunRequest AND ReqDescend) : relache joystick (RunRequest=FALSE) -> aucun plancher,
 // l'arret franc RequestedStep=0 / RampTargetStep=0 est preserve.
 // Regle d'agregation : le PLAFOND GAGNE -- si le plancher depasse le plafond courant
 // ActiveMaxStep (ex. SlowdownMaxStep -> palier 1 en bordure basse), on borne au plafond.
-IF DriveRequest.StartStop AND (DriveRequest.Direction = -1) AND (DriveRequest.MinStepDown > 0) AND NOT EffectiveSafeStop THEN
-    IF RequestedStep < DriveRequest.MinStepDown THEN
-        RequestedStep := DriveRequest.MinStepDown;
+IF WinchRequest.RunRequest AND WinchRequest.ReqDescend AND NOT WinchRequest.ReqAscent
+   AND (WinchRequest.MinStepDown > 0) AND NOT EffectiveSafeStop THEN
+    IF RequestedStep < WinchRequest.MinStepDown THEN
+        RequestedStep := WinchRequest.MinStepDown;
     END_IF;
     IF RequestedStep > ActiveMaxStep THEN
         RequestedStep := ActiveMaxStep;
@@ -253,7 +265,7 @@ END_IF;
 // ⚙️ Cadencement de palier (extrait dans FB_WinchStepShaper, D10).
 // Les deux cadences historiques sont preservees sans reutiliser les delais
 // d'interlock direction : 1 s en montee, 500 ms en descente.
-IF CommandedDirection = -1 THEN
+IF CommandedDescend THEN
     EffectiveStepRampDelay := Config.StepRampDelayDescent;
 ELSE
     EffectiveStepRampDelay := Config.StepRampDelayAscent;
@@ -266,10 +278,10 @@ StepShaper(
 StepNumber := StepShaper.ShapedStep;
 BusinessStepDelayElapsed := StepShaper.StepDelayElapsed;
 
-IF StepNumber > 0 AND CommandedDirection = 1 THEN
+IF StepNumber > 0 AND CommandedAscent THEN
     RelayFwd := TRUE;
     RelayRev := FALSE;
-ELSIF StepNumber > 0 AND CommandedDirection = -1 THEN
+ELSIF StepNumber > 0 AND CommandedDescend THEN
     RelayFwd := FALSE;
     RelayRev := TRUE;
 ELSE
@@ -320,7 +332,7 @@ SenseHoldHardCut := (NOT PowerContactorEngaged) OR EffectiveSafeStop OR Fault.Er
 
 IF SenseHoldHardCut THEN
     SenseHoldActiveInt := FALSE;
-ELSIF (PrevStepNumber > 0) AND (StepNumber = 0) AND (CommandedDirection <> 0) THEN
+ELSIF (PrevStepNumber > 0) AND (StepNumber = 0) AND (CommandedAscent OR CommandedDescend) THEN
     SenseHoldActiveInt := TRUE;   // front de chute de palier a 0 avec sens encore actif
 END_IF;
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T00:14:31.359847" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T00:14:31.359847">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:07:48.152624" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:07:48.152624">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -35,21 +35,21 @@
 🟢 Translation réellement autorisée à se déplacer</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermitEffective">
+            <variable name="EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
-🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+🟢 Permis canonique M3 vers Trémie (reflet lecture seule)</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermitEffective">
+            <variable name="EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Maintenance/P1 (reflet lecture seule)</xhtml>
               </documentation>
             </variable>
             <variable name="HeightInterlockBlocking">

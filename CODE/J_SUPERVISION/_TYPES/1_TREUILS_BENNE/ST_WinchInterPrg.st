@@ -38,6 +38,8 @@ STRUCT
     BucketBusy                   : BOOL;               // ⚙️ Mouvement d'ouverture/fermeture benne en cours
     BucketDone                   : BOOL;               // ✅ Mouvement benne termine avec succes
     BucketError                  : BOOL;               // ❌ Defaut sur sous-systeme benne
+    EffectivePermitBucket_Open   : BOOL;               // 🟢 Permis effectif ouverture benne
+    EffectivePermitBucket_Close  : BOOL;               // 🟢 Permis effectif fermeture benne
 
     // === 🛡️ Permission d'armement homme-mort (Option B — combiné interlock benne) ===
     ArmingPermit                 : BOOL;               // 🛡️ Permission d'armement homme-mort (consommée PRG_02 → FB_Joystick). TRUE = armement autorisé (NC-100)
@@ -67,8 +69,6 @@ STRUCT
     // Permis agrégés consommés par la commande both + cause priorisée du blocage.
     // Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_04).
     BothActive                   : BOOL;               // 🔗 Intention both active (M1+M2 ensemble)
-    BothAscentPermit             : BOOL;               // 🔗 Permit montée Both (EffectivePermitM1_Ascent AND EffectivePermitM2_Ascent)
-    BothDescendPermit            : BOOL;               // 🔗 Permit descente Both (EffectivePermitM1_Descend AND EffectivePermitM2_Descend)
     BothBlocked                  : BOOL;               // 🔗 Commande Both bloquée par le permis agrégé (diagnostic uniquement)
     BothBlockReason              : E_WinchTraceBlockReason; // 🔗 Cause priorisée du blocage Both
 END_STRUCT

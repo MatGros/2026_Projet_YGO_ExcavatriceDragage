@@ -12,9 +12,9 @@
 TYPE ST_fbWinchCmdArbitration_Context :
 STRUCT
     BucketBusy                     : BOOL;  // --> [STAT] Action benne en cours (instBucket.Lifecycle.Busy)
-    BucketM2StartStop              : BOOL;  // --> [CMD] Commande M2 par la benne active (instBucket.M2_StartStop)
-    BucketM2Open                   : BOOL;  // --> [CMD] Ouverture benne (instBucket.M2_Direction = 1)
-    BucketM2Close                  : BOOL;  // --> [CMD] Fermeture benne (instBucket.M2_Direction = -1)
+    BucketM2RunRequest             : BOOL;  // --> [CMD] Commande M2 par la benne active
+    BucketM2Open                   : BOOL;  // --> [CMD] Ouverture benne
+    BucketM2Close                  : BOOL;  // --> [CMD] Fermeture benne
     WinchBothMotionBlockedByBucket : BOOL;  // --> [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)
     SyncBlocksAscent                   : BOOL;  // --> [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)
     SyncBlocksDescent                 : BOOL;  // --> [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)
@@ -23,8 +23,10 @@ STRUCT
     // PRG_04 calcule BothAscentPermit/BothDescendPermit = AND des 4 permits effectifs.
     // En commande both, la commande ne consomme QUE ces agrégats (jamais les permits
     // individuels directement) : les 2 treuils partent ensemble ou aucun (NC-100).
-    BothAscentPermit                : BOOL;  // --> [SAFE] Permit montée Both (EffectivePermitM1_Ascent AND EffectivePermitM2_Ascent)
-    BothDescendPermit               : BOOL;  // --> [SAFE] Permit descente Both (EffectivePermitM1_Descend AND EffectivePermitM2_Descend)
+    M1AscentAllowed                 : BOOL;  // --> [SAFE] Fait EffectivePermitM1_Ascent
+    M1DescendAllowed                : BOOL;  // --> [SAFE] Fait EffectivePermitM1_Descend
+    M2AscentAllowed                 : BOOL;  // --> [SAFE] Fait EffectivePermitM2_Ascent
+    M2DescendAllowed                : BOOL;  // --> [SAFE] Fait EffectivePermitM2_Descend
     BothBlock                       : BOOL;  // --> [STAT] Commande Both bloquée (aucun départ possible — diagnostic IHM)
 END_STRUCT
 END_TYPE

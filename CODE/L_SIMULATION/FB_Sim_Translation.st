@@ -18,7 +18,8 @@
 FUNCTION_BLOCK PUBLIC FB_Sim_Translation
 VAR_INPUT
     Enable          : BOOL;              (* --> [CMD] TRUE = modèle actif *)
-    Direction       : INT;               (* --> [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position *)
+    ReqTremie       : BOOL;              (* --> [CMD] Demande explicite vers Trémie *)
+    ReqMaintenance  : BOOL;              (* --> [CMD] Demande explicite vers Maintenance *)
     SpeedTgt_Pct    : REAL;              (* --> [CMD] Magnitude commande 0..100 %, bornée avant calcul *)
     FullTravelTimeS : REAL := 8.0;       (* --> [CFG] Temps complet Trémie→Maintenance à 100 %, simulation seulement *)
 END_VAR
@@ -76,7 +77,7 @@ instCycleTime(DefaultValueS := 0.010);
 SpeedPctBounded := LIMIT(0.0, ABS(SpeedTgt_Pct), 100.0);
 
 // Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
-// Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.
+// Les demandes de sens sont des bits explicites ; une demande contradictoire est neutre.
 IF FullTravelTimeS >= CST_MinFullTravelTimeS THEN
     PositionIncrement := (SpeedPctBounded / 100.0)
                          * (CST_TotalDistanceM / FullTravelTimeS)
@@ -85,9 +86,9 @@ ELSE
     PositionIncrement := 0.0;
 END_IF;
 
-IF Direction = 1 THEN
+IF ReqTremie AND NOT ReqMaintenance THEN
     PositionProgress := MAX(CST_PositionAtTremie, PositionProgress - PositionIncrement);
-ELSIF Direction = -1 THEN
+ELSIF ReqMaintenance AND NOT ReqTremie THEN
     PositionProgress := MIN(CST_PositionAtMaintenance, PositionProgress + PositionIncrement);
 END_IF;
 {endregion}

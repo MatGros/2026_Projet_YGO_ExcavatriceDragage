@@ -21,8 +21,6 @@ STRUCT
     AppliedPermitM2_Descend : BOOL;
     M2FinalPermitBlocked : BOOL;
     BothActive : BOOL;
-    BothAscentPermit : BOOL;
-    BothDescendPermit : BOOL;
     BothBlocked : BOOL;
     BothBlockReason : E_WinchTraceBlockReason;
     EffectivePermitM3_Tremie : BOOL;
@@ -31,7 +29,9 @@ STRUCT
     DiveDescendPermit : BOOL;
     ExtractionAscentPermit : BOOL;
     ExtractionAssistActive : BOOL;
-    // Benne : pas de bit Permit canonique a ce stade ; publication des faits consommes.
+    EffectivePermitBucket_Open : BOOL;
+    EffectivePermitBucket_Close : BOOL;
+    // Benne : demandes et diagnostic d'execution, distincts des permis canoniques.
     BucketOpenRequestActive : BOOL;
     BucketCloseRequestActive : BOOL;
     BucketMotionBlocked : BOOL;

@@ -239,20 +239,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧨 Coupure puissance demandée</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermit">
+            <variable name="EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Trémie EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Trémie, TRUE = autorisé</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermit">
+            <variable name="EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis directionnel vers Maintenance EFFECTIF (Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, TRUE = autorisé, fail-safe) — §1ter PRG_05. Pas de Process pour M3 ; homme-mort = condition de commande, exclu du permit</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Maintenance/P1, TRUE = autorisé</xhtml>
               </documentation>
             </variable>
             <variable name="BlockedBySafety">
@@ -306,21 +306,21 @@
 🟢 Translation réellement autorisée à se déplacer</xhtml>
               </documentation>
             </variable>
-            <variable name="TremiePermitEffective">
+            <variable name="EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
-🟢 Sens Trémie effectivement permis (EffectivePermitM3_Tremie = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+🟢 Permis canonique M3 vers Trémie (reflet lecture seule)</xhtml>
               </documentation>
             </variable>
-            <variable name="MaintenancePermitEffective">
+            <variable name="EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Sens Maintenance effectivement permis (EffectivePermitM3_Maintenance = Safety directionnel AND NOT SafeStop AND NOT PowerCutOff, §1ter PRG_05 — pas de Process M3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Maintenance/P1 (reflet lecture seule)</xhtml>
               </documentation>
             </variable>
             <variable name="HeightInterlockBlocking">
@@ -616,12 +616,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Commande fréquence réellement appliquée</xhtml>
               </documentation>
             </variable>
-            <variable name="ActiveDirection">
+            <variable name="ActiveTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Sens arbitré : -1 / 0 / +1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Commande active vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Commande active vers Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedCmd_Pct">

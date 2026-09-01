@@ -206,20 +206,28 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Offset actif injecté dans la synchro</xhtml>
               </documentation>
             </variable>
-            <variable name="M2StartStop">
+            <variable name="M2RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande Start/Stop forcée vers M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande marche forcée vers M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2Direction">
+            <variable name="M2ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande direction forcée vers M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande montée forcée vers M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Commande descente forcée vers M2</xhtml>
               </documentation>
             </variable>
             <variable name="M2BucketJogLimit">

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T09:14:34.631005" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T09:14:34.631005">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:10:59.472018" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:10:59.472018">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -188,12 +188,20 @@ palier : 1..5</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Axe cible (1=M1, 2=M2)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Sens mesure (-1 descente, 0 stop, +1 montee)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mesure active montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mesure active descente</xhtml>
               </documentation>
             </variable>
             <variable name="StepNumber">
@@ -332,7 +340,15 @@ palier : 1..5</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Sens non nul</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Un seul sens actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SensConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Deux sens actifs : collecte interdite</xhtml>
               </documentation>
             </variable>
             <variable name="StepInRange">
@@ -542,7 +558,8 @@ LampLearn := FALSE;
 // Conditions de collecte scindees (lisibilite Watch, &lt;=3 termes par predicat)
 LearnRequested := Enable AND LearnStart;
 MeasureUsable := MeasuredSpeedValid AND StableForLearn;
-SensActive := (Direction &lt;&gt; 0);
+SensConflict := ReqAscent AND ReqDescend;
+SensActive := (ReqAscent OR ReqDescend) AND NOT SensConflict;
 StepInRange := (StepNumber &gt;= 1) AND (StepNumber &lt;= CST_PalierCount);
 AxeInRange := (WinchId &gt;= 1) AND (WinchId &lt;= CST_AxeCount);
 ContextValid := SensActive AND StepInRange AND AxeInRange;
@@ -552,7 +569,7 @@ CollectAllowed := LearnRequested AND MeasureUsable AND ContextValid;
 {region "§2 Collecte passive"}
 IF CollectAllowed THEN
     // Index sens et charge
-    IF Direction &gt; 0 THEN SensIdx := CST_IdxAscent; ELSE SensIdx := CST_IdxDescent; END_IF;
+    IF ReqAscent THEN SensIdx := CST_IdxAscent; ELSE SensIdx := CST_IdxDescent; END_IF;
     IF LoadPresent THEN ChargeIdx := CST_IdxCharge; ELSE ChargeIdx := CST_IdxVide; END_IF;
 
     // Plausibilite : vitesse dans l'enveloppe du palier (borne min/max)

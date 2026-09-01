@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T17:45:23.098859" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T17:45:23.098859">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:07:48.463118" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:07:48.463118">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -163,7 +163,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Masque brut complet (latch cause) — source d'arbitrage PowerCutOff</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx318_TremiePermit">
+            <variable name="Idx318_EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
@@ -172,12 +172,12 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
 1 = Translation vers Trémie autorisée | 0 = SENS TRÉMIE BLOQUÉ</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx319_MaintenancePermit">
+            <variable name="Idx319_EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Translation vers Maintenance autorisée | 0 = SENS MAINTENANCE BLOQUÉ</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Translation vers Maintenance/P1 autorisée | 0 = SENS MAINTENANCE BLOQUÉ</xhtml>
               </documentation>
             </variable>
           </struct>

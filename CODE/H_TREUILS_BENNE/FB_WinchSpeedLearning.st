@@ -12,7 +12,8 @@ VAR_INPUT
     Enable                          : BOOL;   // --> [CMD] Autorisation generale FB (TRUE=Autorise)
     LearnStart                      : BOOL;   // --> [CMD] Bit IHM lancer apprentissage
     WinchId                         : INT;    // --> [CMD] Axe cible (1=M1, 2=M2)
-    Direction                       : INT;    // --> [HW] Sens mesure (-1 descente, 0 stop, +1 montee)
+    ReqAscent                       : BOOL;   // --> [HW] Mesure active montée
+    ReqDescend                      : BOOL;   // --> [HW] Mesure active descente
     StepNumber                      : INT;    // --> [HW] Palier actif (1..5)
     MeasuredSpeedMps                : REAL;   // --> [HW] Vitesse mesuree (m/s)
     MeasuredSpeedValid              : BOOL;   // --> [HW] Mesure exploitable
@@ -41,7 +42,8 @@ VAR
     // === VARIABLES LOCALES CALCULEES ===
     LearnRequested                  : BOOL;   // . [LOC] Bit IHM + Enable
     MeasureUsable                   : BOOL;   // . [LOC] Mesure valide + conditions stables
-    SensActive                      : BOOL;   // . [LOC] Sens non nul
+    SensActive                      : BOOL;   // . [LOC] Un seul sens actif
+    SensConflict                    : BOOL;   // . [LOC] Deux sens actifs : collecte interdite
     StepInRange                     : BOOL;   // . [LOC] Palier dans 1..5
     AxeInRange                      : BOOL;   // . [LOC] Axe dans 1..2
     ContextValid                    : BOOL;   // . [LOC] Sens, palier et axe dans le domaine
@@ -74,7 +76,8 @@ LampLearn := FALSE;
 // Conditions de collecte scindees (lisibilite Watch, <=3 termes par predicat)
 LearnRequested := Enable AND LearnStart;
 MeasureUsable := MeasuredSpeedValid AND StableForLearn;
-SensActive := (Direction <> 0);
+SensConflict := ReqAscent AND ReqDescend;
+SensActive := (ReqAscent OR ReqDescend) AND NOT SensConflict;
 StepInRange := (StepNumber >= 1) AND (StepNumber <= CST_PalierCount);
 AxeInRange := (WinchId >= 1) AND (WinchId <= CST_AxeCount);
 ContextValid := SensActive AND StepInRange AND AxeInRange;
@@ -84,7 +87,7 @@ CollectAllowed := LearnRequested AND MeasureUsable AND ContextValid;
 {region "§2 Collecte passive"}
 IF CollectAllowed THEN
     // Index sens et charge
-    IF Direction > 0 THEN SensIdx := CST_IdxAscent; ELSE SensIdx := CST_IdxDescent; END_IF;
+    IF ReqAscent THEN SensIdx := CST_IdxAscent; ELSE SensIdx := CST_IdxDescent; END_IF;
     IF LoadPresent THEN ChargeIdx := CST_IdxCharge; ELSE ChargeIdx := CST_IdxVide; END_IF;
 
     // Plausibilite : vitesse dans l'enveloppe du palier (borne min/max)

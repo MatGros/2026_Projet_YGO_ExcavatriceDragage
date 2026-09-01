@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T15:56:25.859240" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T15:56:25.859240">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:05:51.069249" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:05:51.069249">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -51,12 +51,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Fréquence réelle variateur en Hz (ex: 5.0 Hz)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens effectif : +1 = Fwd (vers Trémie), -1 = Rev (vers Maint), 0 = Arrêt</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="SensorMaintenance">
@@ -387,10 +395,14 @@ IF NOT Initialized THEN
 END_IF;
 
 // 4. Intégration temporelle continue (Odométrie cycle par cycle)
-// dX = -Direction * (FreqHz * Gain) * dt — convention 0 m=Trémie, 30 m=Maintenance :
-// le sens +1 (vers Trémie) DÉCROÎT la position vers 0 m, le sens -1 (vers Maintenance) la CROÎT vers 30 m.
-IF Direction &lt;&gt; 0 AND DriveActualFreqHz &gt; 0.1 THEN
-    PositionEstimatedM := PositionEstimatedM - (INT_TO_REAL(Direction) * DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+// Les bits explicites portent le sens sémantique. Une demande contradictoire est
+// neutralisée : aucun déplacement estimé ne doit être inventé.
+IF DriveActualFreqHz &gt; 0.1 THEN
+    IF ReqTremie AND NOT ReqMaintenance THEN
+        PositionEstimatedM := PositionEstimatedM - (DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+    ELSIF ReqMaintenance AND NOT ReqTremie THEN
+        PositionEstimatedM := PositionEstimatedM + (DriveActualFreqHz * GainMetersPerHzSec * CycleTimeCalc.CycleTimeS);
+    END_IF;
 END_IF;
 {endregion}
 

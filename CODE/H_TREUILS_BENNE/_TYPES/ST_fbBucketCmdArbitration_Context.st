@@ -14,7 +14,8 @@ TYPE ST_fbBucketCmdArbitration_Context :
 STRUCT
     TglEnableCoupledBucketSequencing : BOOL;  // --> [CFG] Activation séquencement couplé benne (Commun.Cfg)
     MotionActive                     : BOOL;  // --> [CMD] Intention mouvement both active (WinchBothMotionActive)
-    MotionDirection                  : INT;   // --> [CMD] Sens mouvement both (1: montée, -1: descente)
+    ReqAscent                        : BOOL;  // --> [CMD] Intention both montée
+    ReqDescend                       : BOOL;  // --> [CMD] Intention both descente
     BucketIsOpen                     : BOOL;  // --> [STAT] Benne ouverte (BucketState.IsOpen)
     BucketIsClosed                   : BOOL;  // --> [STAT] Benne fermée (BucketState.IsClosed)
 END_STRUCT

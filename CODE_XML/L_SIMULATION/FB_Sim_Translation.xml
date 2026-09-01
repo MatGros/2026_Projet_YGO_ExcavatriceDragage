@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.196915" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.196915">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:06:38.838683" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:06:38.838683">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -35,12 +35,20 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = modèle actif</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqTremie">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] +1 = vers Trémie ; -1 = vers Maintenance ; 0 = maintien position</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqMaintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande explicite vers Maintenance</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedTgt_Pct">
@@ -267,7 +275,7 @@ instCycleTime(DefaultValueS := 0.010);
 SpeedPctBounded := LIMIT(0.0, ABS(SpeedTgt_Pct), 100.0);
 
 // Une vitesse à 100 % parcourt les 30 m (Trémie→Maintenance) pendant FullTravelTimeS.
-// Direction sémantique : +1 réduit la progression vers Trémie ; -1 l'augmente vers Maintenance.
+// Les demandes de sens sont des bits explicites ; une demande contradictoire est neutre.
 IF FullTravelTimeS &gt;= CST_MinFullTravelTimeS THEN
     PositionIncrement := (SpeedPctBounded / 100.0)
                          * (CST_TotalDistanceM / FullTravelTimeS)
@@ -276,9 +284,9 @@ ELSE
     PositionIncrement := 0.0;
 END_IF;
 
-IF Direction = 1 THEN
+IF ReqTremie AND NOT ReqMaintenance THEN
     PositionProgress := MAX(CST_PositionAtTremie, PositionProgress - PositionIncrement);
-ELSIF Direction = -1 THEN
+ELSIF ReqMaintenance AND NOT ReqTremie THEN
     PositionProgress := MIN(CST_PositionAtMaintenance, PositionProgress + PositionIncrement);
 END_IF;
 {endregion}

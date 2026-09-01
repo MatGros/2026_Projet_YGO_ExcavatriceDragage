@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T12:27:14.944711" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T12:27:14.944711">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:23:43.602399" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:23:43.602399">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -424,20 +424,36 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande fermeture depuis IHM</xhtml>
               </documentation>
             </variable>
-            <variable name="MotionRequestActive">
+            <variable name="ReqAscent">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention mouvement arbitree</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande montee arbitree</xhtml>
               </documentation>
             </variable>
-            <variable name="MotionDirection">
+            <variable name="ReqDescend">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sens arbitre (1: montee, -1: descente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande descente arbitree</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitBucket_Open">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Ouverture benne autorisee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EffectivePermitBucket_Close">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fermeture benne autorisee</xhtml>
               </documentation>
             </variable>
             <variable name="MachineHomingCommitOpen">
@@ -653,20 +669,28 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Demande d'ouverture memorisee</xhtml>
               </documentation>
             </variable>
-            <variable name="M2_StartStop">
+            <variable name="M2_RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre StartStop vers Winch M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre marche vers Winch M2</xhtml>
               </documentation>
             </variable>
-            <variable name="M2_Direction">
+            <variable name="M2_ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre Direction vers Winch M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre montee vers Winch M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT] Ordre descente vers Winch M2</xhtml>
               </documentation>
             </variable>
             <variable name="M2_BucketJogLimit">
@@ -840,6 +864,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart reel mémorise (gel en position intermediaire)</xhtml>
               </documentation>
             </variable>
+            <variable name="MotionRequestActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande valide : un seul sens</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotionRequestConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Deux sens = arrêt sûr</xhtml>
+              </documentation>
+            </variable>
             <variable name="CfgFaultLatched">
               <type>
                 <BOOL />
@@ -992,8 +1032,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     RemainingTravelM := 0.0;
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
-    M2_StartStop := FALSE;
-    M2_Direction := 0;
+    M2_RunRequest := FALSE;
+    M2_ReqAscent := FALSE;
+    M2_ReqDescend := FALSE;
     M2_BucketJogLimit := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
@@ -1054,10 +1095,13 @@ END_IF;
 
 {region "§4 Séquencement mouvement benne"}
 SevereError := Fault.Error;
+MotionRequestConflict := ReqAscent AND ReqDescend;
+MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
 
 IF SevereError THEN
-    M2_StartStop := FALSE;
-    M2_Direction := 0;
+    M2_RunRequest := FALSE;
+    M2_ReqAscent := FALSE;
+    M2_ReqDescend := FALSE;
     M2_BucketJogLimit := FALSE;
     CloseReq := FALSE;
     OpenReq := FALSE;
@@ -1090,32 +1134,39 @@ ELSE
         IF CloseReq THEN
             RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
             M2_BucketJogLimit := TRUE;
-            IF MotionRequestActive AND (MotionDirection = 1) THEN
-                M2_StartStop := TRUE;
-                M2_Direction := 1;
-            ELSIF MotionRequestActive AND (MotionDirection = -1) THEN
-                M2_StartStop := TRUE;
-                M2_Direction := -1;
+            IF MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close THEN
+                M2_RunRequest := TRUE;
+                M2_ReqAscent := TRUE;
+                M2_ReqDescend := FALSE;
+            ELSIF MotionRequestActive AND ReqDescend AND EffectivePermitBucket_Open THEN
+                M2_RunRequest := TRUE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := TRUE;
             ELSE
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
             END_IF;
         ELSIF OpenReq THEN
             RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
             M2_BucketJogLimit := TRUE;
-            IF MotionRequestActive AND (MotionDirection = -1) THEN
-                M2_StartStop := TRUE;
-                M2_Direction := -1;
-            ELSIF MotionRequestActive AND (MotionDirection = 1) THEN
-                M2_StartStop := TRUE;
-                M2_Direction := 1;
+            IF MotionRequestActive AND ReqDescend AND EffectivePermitBucket_Open THEN
+                M2_RunRequest := TRUE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := TRUE;
+            ELSIF MotionRequestActive AND ReqAscent AND EffectivePermitBucket_Close THEN
+                M2_RunRequest := TRUE;
+                M2_ReqAscent := TRUE;
+                M2_ReqDescend := FALSE;
             ELSE
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
             END_IF;
         ELSE
-            M2_StartStop := FALSE;
-            M2_Direction := 0;
+            M2_RunRequest := FALSE;
+            M2_ReqAscent := FALSE;
+            M2_ReqDescend := FALSE;
             M2_BucketJogLimit := FALSE;
         END_IF;
 
@@ -1126,8 +1177,9 @@ ELSE
         // Arrêt fermeture
         IF CloseReq THEN
             IF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
                 BucketState.IsOpen := FALSE;
                 BucketState.IsClosed := TRUE;
                 BucketState.LastPosM2Close := CablePosM2;
@@ -1136,8 +1188,9 @@ ELSE
                 Lifecycle.Busy := FALSE;
                 Lifecycle.Done := TRUE;
             ELSIF LeftStartSinceArm AND (CablePosM2 &lt;= M2StartPosM) THEN
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
                 BucketState.IsOpen := WasOpenAtStart;
                 BucketState.IsClosed := WasClosedAtStart;
                 CloseReq := FALSE;
@@ -1149,8 +1202,9 @@ ELSE
         // Arrêt ouverture
         IF OpenReq THEN
             IF CablePosM2 &lt;= (CablePosM1 + Config.OffsetOpenM + Config.OpenAnticipationM) THEN
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
                 BucketState.IsOpen := TRUE;
                 BucketState.IsClosed := FALSE;
                 BucketState.LastPosM2Open := CablePosM2;
@@ -1159,8 +1213,9 @@ ELSE
                 Lifecycle.Busy := FALSE;
                 Lifecycle.Done := TRUE;
             ELSIF LeftStartSinceArm AND (CablePosM2 &gt;= M2StartPosM) THEN
-                M2_StartStop := FALSE;
-                M2_Direction := 0;
+                M2_RunRequest := FALSE;
+                M2_ReqAscent := FALSE;
+                M2_ReqDescend := FALSE;
                 BucketState.IsOpen := WasOpenAtStart;
                 BucketState.IsClosed := WasClosedAtStart;
                 OpenReq := FALSE;
@@ -1169,8 +1224,9 @@ ELSE
             END_IF;
         END_IF;
     ELSIF Lifecycle.Done THEN
-        M2_StartStop := FALSE;
-        M2_Direction := 0;
+        M2_RunRequest := FALSE;
+        M2_ReqAscent := FALSE;
+        M2_ReqDescend := FALSE;
         M2_BucketJogLimit := FALSE;
         RemainingTravelM := 0.0;
         IF NOT MotionRequestActive THEN

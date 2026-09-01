@@ -467,7 +467,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Masque brut complet (latch cause) — source d'arbitrage PowerCutOff</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx318_TremiePermit">
+            <variable name="Idx318_EffectivePermitM3_Tremie">
               <type>
                 <BOOL />
               </type>
@@ -476,12 +476,12 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
 1 = Translation vers Trémie autorisée | 0 = SENS TRÉMIE BLOQUÉ</xhtml>
               </documentation>
             </variable>
-            <variable name="Idx319_MaintenancePermit">
+            <variable name="Idx319_EffectivePermitM3_Maintenance">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Translation vers Maintenance autorisée | 0 = SENS MAINTENANCE BLOQUÉ</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Translation vers Maintenance/P1 autorisée | 0 = SENS MAINTENANCE BLOQUÉ</xhtml>
               </documentation>
             </variable>
           </struct>

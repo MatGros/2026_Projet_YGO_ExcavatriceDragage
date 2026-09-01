@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T05:21:27.001729" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T05:21:27.001729">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:21:30.455092" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:21:30.455092">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -287,20 +287,28 @@ M1 : contacteurs retombés</xhtml>
       <dataType name="ST_ProgramWinchRequest">
         <baseType>
           <struct>
-            <variable name="ReqStartStop">
+            <variable name="RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche/arrêt demandé par le programme (TRUE=Marche)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche demandé par le programme</xhtml>
               </documentation>
             </variable>
-            <variable name="ReqDirection">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens demandé (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande descente</xhtml>
               </documentation>
             </variable>
             <variable name="StepTgt">
@@ -338,12 +346,20 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention both active (homme-mort qualifié + Select=0 OU boutons BothUp/BothDown)</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sens d'intention (-1: Descending, 0: Neutre, +1: Ascending)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention both montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Intention both descente</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -420,12 +436,12 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Action benne en cours (instBucket.Lifecycle.Busy)</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketM2StartStop">
+            <variable name="BucketM2RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande M2 par la benne active (instBucket.M2_StartStop)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Commande M2 par la benne active</xhtml>
               </documentation>
             </variable>
             <variable name="BucketM2Open">
@@ -433,7 +449,7 @@ M1 : contacteurs retombés</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ouverture benne (instBucket.M2_Direction = 1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Ouverture benne</xhtml>
               </documentation>
             </variable>
             <variable name="BucketM2Close">
@@ -441,7 +457,7 @@ M1 : contacteurs retombés</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Fermeture benne (instBucket.M2_Direction = -1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Fermeture benne</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothMotionBlockedByBucket">
@@ -468,7 +484,7 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)</xhtml>
               </documentation>
             </variable>
-            <variable name="BothAscentPermit">
+            <variable name="M1AscentAllowed">
               <type>
                 <BOOL />
               </type>
@@ -477,15 +493,31 @@ M1 : contacteurs retombés</xhtml>
 PRG_04 calcule BothAscentPermit/BothDescendPermit = AND des 4 permits effectifs.
 En commande both, la commande ne consomme QUE ces agrégats (jamais les permits
 individuels directement) : les 2 treuils partent ensemble ou aucun (NC-100).
---&gt; [SAFE] Permit montée Both (EffectivePermitM1_Ascent AND EffectivePermitM2_Ascent)</xhtml>
+--&gt; [SAFE] Fait EffectivePermitM1_Ascent</xhtml>
               </documentation>
             </variable>
-            <variable name="BothDescendPermit">
+            <variable name="M1DescendAllowed">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Permit descente Both (EffectivePermitM1_Descend AND EffectivePermitM2_Descend)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fait EffectivePermitM1_Descend</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2AscentAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fait EffectivePermitM2_Ascent</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2DescendAllowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Fait EffectivePermitM2_Descend</xhtml>
               </documentation>
             </variable>
             <variable name="BothBlock">
@@ -881,20 +913,28 @@ individuels directement) : les 2 treuils partent ensemble ou aucun (NC-100).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB prêt à arbitrer (Enable)</xhtml>
               </documentation>
             </variable>
-            <variable name="StartStop">
+            <variable name="RunRequest">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Commande marche/arrêt arbitrée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande marche arbitrée</xhtml>
               </documentation>
             </variable>
-            <variable name="Direction">
+            <variable name="ReqAscent">
               <type>
-                <INT />
+                <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Sens arbitré (-1: Descending, 0: Stop, 1: Ascending)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande montée arbitrée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [CMD] Demande descente arbitrée</xhtml>
               </documentation>
             </variable>
             <variable name="StepTgt">
@@ -920,7 +960,15 @@ individuels directement) : les 2 treuils partent ensemble ou aucun (NC-100).
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Atomicité Both : permit agrégé du sens demandé délivré</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Atomicité Both : deux axes autorisés dans le même sens</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RequestConflict">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Double demande de sens refusée</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -955,20 +1003,23 @@ Ready := Enable;
 BenneBusyFallEdge(CLK := Context.BucketBusy);
 
 IF NOT Enable THEN
-    StartStop := FALSE;
-    Direction := 0;
+    RunRequest := FALSE;
+    ReqAscent  := FALSE;
+    ReqDescend := FALSE;
     StepTgt   := 0;
 ELSE
     // ── Chemin benne : M2 piloté par l'action benne (override) ──
-    IF Context.BucketBusy AND Context.BucketM2StartStop THEN
-        StartStop := Context.BucketM2StartStop;
-        Direction := SEL(Context.BucketM2Open, -1, 1);  // Open → +1, Close → -1
+    IF Context.BucketBusy AND Context.BucketM2RunRequest THEN
+        RunRequest := Context.BucketM2RunRequest;
+        ReqAscent  := Context.BucketM2Open;
+        ReqDescend := Context.BucketM2Close;
         StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN
-            StartStop := ReqWinch.ReqStartStop;
-            Direction := ReqWinch.ReqDirection;
+            RunRequest := ReqWinch.RunRequest;
+            ReqAscent  := ReqWinch.ReqAscent;
+            ReqDescend := ReqWinch.ReqDescend;
             StepTgt   := ReqWinch.StepTgt;
         ELSE
             // ── Mode manuel : commande both issue de l'intention UNIQUE PRG_03 (BothIntent),
@@ -980,29 +1031,36 @@ ELSE
                 // Mode Boutons IHM
                 IF BothIntent.Active THEN
                     // Both (BtnWinchBothAscent/Descent) — source unique PRG_03, plus de re-dérivation
-                    Direction := BothIntent.Direction;
+                    ReqAscent  := BothIntent.ReqAscent;
+                    ReqDescend := BothIntent.ReqDescend;
                     StepTgt   := Cfg.BtnStepTgt;   // 100 % → palier max (configurable)
                 ELSIF IHM.BtnAscentM2 THEN
-                    Direction := 1;
+                    ReqAscent  := TRUE;
+                    ReqDescend := FALSE;
                     StepTgt   := Cfg.BtnStepTgt;
                 ELSIF IHM.BtnDescentM2 THEN
-                    Direction := -1;
+                    ReqAscent  := FALSE;
+                    ReqDescend := TRUE;
                     StepTgt   := Cfg.BtnStepTgt;
                 ELSE
-                    Direction := 0;
+                    ReqAscent  := FALSE;
+                    ReqDescend := FALSE;
                     StepTgt   := 0;
                 END_IF;
             ELSE
                 // Mode Joystick Maître — M2 unitaire si Select = 2, both si Select = 0
                 IF Auth.JoystickWinchSelectArbitrated = 2 THEN
-                    Direction := Joystick.AxisY.Direction;
+                    ReqAscent  := Joystick.AxisY.Direction &gt; 0;
+                    ReqDescend := Joystick.AxisY.Direction &lt; 0;
                     StepTgt   := Joystick.AxisY.StepTgt;
                 ELSIF BothIntent.Active THEN
                     // Both (Select=0) — source unique PRG_03, plus de re-dérivation
-                    Direction := BothIntent.Direction;
+                    ReqAscent  := BothIntent.ReqAscent;
+                    ReqDescend := BothIntent.ReqDescend;
                     StepTgt   := Joystick.AxisY.StepTgt;
                 ELSE
-                    Direction := 0;
+                    ReqAscent  := FALSE;
+                    ReqDescend := FALSE;
                     StepTgt   := 0;
                 END_IF;
             END_IF;
@@ -1011,21 +1069,22 @@ ELSE
             // homme-mort qualifié en joystick
             // 🔗 Atomicité Both : cf. M1 — en both, la commande ne consomme QUE le
             // permit agrégé du sens demandé. Départ jamais isolé entre les 2 treuils.
+            RequestConflict := ReqAscent AND ReqDescend;
             BothDirectionAuthorized := (NOT BothIntent.Active)
-                OR ((Direction = 1) AND Context.BothAscentPermit)
-                OR ((Direction = -1) AND Context.BothDescendPermit);
-            StartStop := (Direction &lt;&gt; 0)
+                OR ((ReqAscent AND NOT ReqDescend) AND Context.M1AscentAllowed AND Context.M2AscentAllowed)
+                OR ((ReqDescend AND NOT ReqAscent) AND Context.M1DescendAllowed AND Context.M2DescendAllowed);
+            RunRequest := (ReqAscent OR ReqDescend) AND NOT RequestConflict
                       AND NOT Context.WinchBothMotionBlockedByBucket
-                      AND NOT ((Context.SyncBlocksAscent   AND (Direction = -1))
-                            OR (Context.SyncBlocksDescent AND (Direction = 1)))
+                      AND NOT ((Context.SyncBlocksAscent   AND ReqDescend)
+                            OR (Context.SyncBlocksDescent AND ReqAscent))
                       AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
                       AND BothDirectionAuthorized;
         END_IF;
     END_IF;
 
     // Front de fin d'action benne : arrêt forcé sauf mouvement both actif
-    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.Direction &lt;&gt; 0)) THEN
-        StartStop := FALSE;
+    IF BenneBusyFallEdge.Q AND NOT (BothIntent.Active AND (BothIntent.ReqAscent OR BothIntent.ReqDescend)) THEN
+        RunRequest := FALSE;
     END_IF;
 END_IF;
 </xhtml>
