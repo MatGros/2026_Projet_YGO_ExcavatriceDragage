@@ -35,6 +35,8 @@ VAR_INPUT
     BypassSyncActive     : BOOL;   // --> [TST] Bypass synchro
     SyncDegradedActive   : BOOL;   // --> [TST] Synchro bridée
     LegalLimitReached    : BOOL;   // --> [SAFE] Limite légale atteinte
+    ModeChangePendingBlocked : BOOL;   // --> [DIAG] Bascule de mode refusée (treuils non à l'arrêt)
+    ModeChangeBlockReason    : STRING(40); // --> [DIAG] Motif du blocage de bascule (ex. "Chgt mode refuse : contacteur M1")
 
     // 🎮 Sécurité, causes et intention de direction
     EmergencyChainClosed : BOOL;   // --> [SAFE] Chaîne AU fermée
@@ -293,7 +295,10 @@ AnyBypassActive := BypassGlobalActive
                 OR BypassWinchM2Active
                 OR BypassTranslation
                 OR BypassSyncActive;
-IF AnyBypassActive THEN
+IF ModeChangePendingBlocked AND ModeChangeBlockReason <> '' THEN
+    // Bascule de mode refusée : motif prioritaire (info opérateur, ex. "Chgt mode refuse : contacteur M1").
+    SpecialConditionCandidate := ModeChangeBlockReason;
+ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN
     SpecialConditionCandidate := 'ATTENTION: Synchro bridée';
