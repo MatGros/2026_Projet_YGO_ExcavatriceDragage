@@ -1,0 +1,99 @@
+contract:
+  task_id: T216_PERMITS_DIRECTIONNELS_UNIQUES
+  criticality: C4
+  strategy: rebuild
+  objective: >
+    Rendre chaque autorisation de mouvement M1, M2 et M3 unique, directionnelle,
+    traçable et effectivement appliquée, avec atomicité stricte de la commande Both M1/M2.
+
+  naming_frozen:
+    - "EffectivePermitM1_Ascent : BOOL"
+    - "EffectivePermitM1_Descend : BOOL"
+    - "EffectivePermitM2_Ascent : BOOL"
+    - "EffectivePermitM2_Descend : BOOL"
+    - "EffectivePermitM3_Maintenance : BOOL"
+    - "EffectivePermitM3_Tremie : BOOL"
+
+  acceptance:
+    - id: AC1
+      statement: "Chaque axe et sens possède un unique EffectiveDirectionPermit et un BlockReason publié."
+      verified_by: "matrice producteur-route-consommateur, grep des consommateurs et revue du diff"
+    - id: AC2
+      statement: "Une commande Both M1/M2 ne produit jamais un départ isolé : chaque sens démarre les deux treuils ou aucun."
+      verified_by: "tests CI BothUp/BothDown avec refus unilatéral, synchronisation et délais finaux dissymétriques"
+    - id: AC3
+      statement: "Un permis FALSE dans l'IHM/diagnostic interdit réellement la sortie correspondante."
+      verified_by: "tests de chaîne permis -> commande -> interverrouillage final -> DQ"
+    - id: AC4
+      statement: "Le plancher MinStepDown ne relance jamais une descente lorsque le permis effectif est FALSE."
+      verified_by: "test de régression DescendPermit=FALSE, MinStepDown=1 -> StepNumber=0 et sorties=0"
+    - id: AC5
+      statement: "Les commandes unitaires M1, M2 et le mouvement M2 explicitement piloté par la benne restent des exceptions identifiées et testées."
+      verified_by: "tests de non-régression par source de commande et revue IHM"
+    - id: AC6
+      statement: "Les permis M3 Trémie et Maintenance ont une sémantique directionnelle, un producteur unique et un consommateur de commande identifié."
+      verified_by: "matrice M3 code/AF/IHM et tests des deux sens, y compris accès P1"
+    - id: AC6bis
+      statement: "Les déplacements benne ouverture et fermeture restent bornés chacun par leur fin de course logicielle ; leurs permis et raisons de blocage sont distincts et visibles."
+      verified_by: "matrice benne ouverture/fermeture : limite -> permis -> commande M2 -> diagnostic, et tests aux deux bornes"
+    - id: AC7
+      statement: "Le nom du fichier est identique au nom du POU ; le suffixe est égal au langage ST du bundle PLCopenXML."
+      verified_by: "inspection des déclarations POU et bundle généré"
+
+  scope:
+    allowed:
+      - CODE/D_JOYSTICK/FB_Joystick.st
+      - CODE/F_MODES/FB_Modes.st
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_Bucket*.st
+      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st
+      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM2.st
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/I_TRANSLATION/FB_TranslationCmdArbitrationM3.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/_TYPES/
+      - DOC/AF/
+      - DOC/WFLOW/
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/
+
+  conservation:
+    must_survive:
+      - "AU matériel et PowerCutOff restent indépendants et prioritaires."
+      - "Aucun redémarrage automatique après défaut ou arrêt de sécurité."
+      - "Modes unitaires M1/M2 et commande benne M2 demeurent possibles seulement par sources explicitement identifiées."
+      - "Le trajet M3 autorisé vers P1 est préservé tant que la règle métier le confirme."
+    dropped_on_purpose:
+      - "Gates directionnels cachés ou doublons qui ne publient ni permis effectif ni raison de blocage."
+
+  evidence_required:
+    - matrix_producer_route_consumer
+    - test_fix_guard
+    - check_linkage
+    - bundle
+    - run_all_gates
+    - human_design_validation
+
+  alert_duty: >
+    Toute divergence AF/code, toute exception unitaire non documentée ou tout veto final
+    non reflété dans le permis doit être signalé avant toute implémentation.
+
+status: IN_PROGRESS
+execution:
+  executed_by: Codex
+  status: IN_PROGRESS
+  summary: "Cartographie parallèle et plan d'intégration avant modification ST."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  notes: "Politique validée : un permis effectif unique par axe/sens ; Both = deux ou aucun."
