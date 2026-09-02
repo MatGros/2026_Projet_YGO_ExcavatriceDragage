@@ -72,6 +72,10 @@ VAR
     instM2Sc2Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 2 M2
     instM2Sc3Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 3 M2
     instM2Sc4Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 4 M2
+    // Concordance contacteurs M1/M2 sur les vecteurs PHYSIQUES finaux (post §2quater),
+    // reponse graduee (debounce 500 ms -> SafeStop ; +escalade -> PowerCutOff MecaE bit13).
+    // Remplace le zeroage binaire instantane de l'ex-§2ter.
+    instSyncContactorFinal          : FB_SyncContactor;                 // * [INST] Coherence commandes/contacteurs M1/M2 finaux
 
     // === ⚡ ORDRES ACTIONNEURS (publiés via Data) ===
     M1RelayFwd                   : BOOL; // . [LOC] Ordre contacteur montee treuil M1
@@ -97,12 +101,7 @@ VAR
     PowerCutOffReq                   : BOOL; // . [LOC] Demande agregative coupure puissance
 
     // === 🔒 CONCORDANCE SORTIES TREUILS M1/M2 (§2ter) ===
-    WinchOutputCoupled               : BOOL; // . [LOC] Treuils couples (synchro OU both) : concordance des sorties exigee
-    WinchOutputConcordanceBypass     : BOOL; // . [LOC] Bypass global synchro M1/M2 : neutralise le controle de concordance
-    WinchDirectionRelaysMatch        : BOOL; // . [LOC] Contacteurs de sens M1 = M2 (Fwd et Rev)
-    WinchSpeedContactorsMatch        : BOOL; // . [LOC] Contacteurs de vitesse M1 = M2 (paliers 1 a 4)
-    WinchOutputsConcordant           : BOOL; // . [LOC] Vecteurs de sortie M1 et M2 identiques
-    WinchOutputSyncMismatch          : BOOL; // <-- [SAFE] Ecart de commande M1/M2 en couple : aucune sortie treuil pilotee
+    WinchOutputCoupled               : BOOL; // . [LOC] Treuils couples (synchro OU both) : arme instSyncContactorFinal
 END_VAR
 
 VAR CONSTANT
@@ -231,41 +230,19 @@ M2SpeedContactor4 := instWinchOutputInterlockM2.Contactor4;
 M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 
 // ═══════════════════════════════════════════════════════════════
-// 🔒 §2ter CONCORDANCE SORTIES TREUILS M1/M2 — AVANT ECRITURE HARDWARE
+// 🔒 §2ter CONCORDANCE SORTIES TREUILS M1/M2
 // ═══════════════════════════════════════════════════════════════
-// Les 2 barrieres finales (instWinchOutputInterlockM1/M2) resolvent chacune
-// leur commande via des temporisations INDEPENDANTES (RestartDelay, SenseHold,
-// ReleaseOrder, DeadTime) : rien ne garantit des vecteurs de sortie identiques
-// le meme scan. En couple (synchro OU both), un contacteur de sens ou de vitesse
-// asymetrique = les 2 treuils tirent le meme cable de facon desynchronisee.
-// 🛡️ Regle : au moindre ecart M1/M2 pendant le couplage (hors BypassGlobal),
-// AUCUNE sortie treuil n'est ecrite (M1 ET M2), le frein se referme. Reprise
-// par la chaine defaut existante (Reset conscient) une fois les 2 barrieres realignees.
-
+// Les 2 barrieres finales (instWinchOutputInterlockM1/M2) resolvent chacune leur
+// commande via des tempos INDEPENDANTES : rien ne garantit des vecteurs identiques
+// le meme scan. En couple, un contacteur asymetrique = les 2 treuils tirent le
+// cable de facon desynchronisee.
+// 🛡️ L'ex-zeroage binaire INSTANTANE est remplace par instSyncContactorFinal :
+//    reponse graduee, debounce 500 ms (tolere les transitoires de changement de
+//    palier), et remontee decodee. La coupure effective (SafeStop niveau 1,
+//    PowerCutOff niveau 2 via MecaE bit13) est appliquee par la chaine safety
+//    (PRG_04) au scan suivant. Bypass = GVL_IHM.M1M2Sync.Bypass.Global.
 WinchOutputCoupled := PRG_04_Treuils_Benne.Data.SyncState.SyncActive
                       OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active;
-WinchOutputConcordanceBypass := GVL_IHM.M1M2Sync.Bypass.Global;
-
-WinchDirectionRelaysMatch := (M1RelayFwd = M2RelayFwd) AND (M1RelayRev = M2RelayRev);
-// Agregat de concordance homogene (4 comparaisons de meme forme, paliers 1 a 4).
-WinchSpeedContactorsMatch := (M1SpeedContactor1 = M2SpeedContactor1)
-                          AND (M1SpeedContactor2 = M2SpeedContactor2)
-                          AND (M1SpeedContactor3 = M2SpeedContactor3)
-                          AND (M1SpeedContactor4 = M2SpeedContactor4);
-WinchOutputsConcordant := WinchDirectionRelaysMatch AND WinchSpeedContactorsMatch;
-
-WinchOutputSyncMismatch := WinchOutputCoupled
-                        AND NOT WinchOutputConcordanceBypass
-                        AND NOT WinchOutputsConcordant;
-
-IF WinchOutputSyncMismatch THEN
-    M1RelayFwd := FALSE; M1RelayRev := FALSE;
-    M1SpeedContactor1 := FALSE; M1SpeedContactor2 := FALSE;
-    M1SpeedContactor3 := FALSE; M1SpeedContactor4 := FALSE;
-    M2RelayFwd := FALSE; M2RelayRev := FALSE;
-    M2SpeedContactor1 := FALSE; M2SpeedContactor2 := FALSE;
-    M2SpeedContactor3 := FALSE; M2SpeedContactor4 := FALSE;
-END_IF;
 
 // Frein = OR des relais de sens GATES (jamais desserre sans un sens valide).
 M1BrakeCmd := M1RelayFwd OR M1RelayRev;
@@ -284,7 +261,7 @@ M2BrakeCmd := M2RelayFwd OR M2RelayRev;
 //
 // ⚠️ PAS sur le FREIN : il doit pouvoir re-desserrer IMMÉDIATEMENT quand un mouvement est
 //    (re)commandé. Un plancher retarderait le desserrage -> couple moteur contre frein serré
-//    = contrainte méca + usure (REX snapshot 133950). Le frein suit déjà les relais de sens
+//    = contrainte méca + usure (frein serré alors que le treuil est commandé). Le frein suit déjà les relais de sens
 //    filtrés (M1BrakeCmd := M1RelayFwd OR M1RelayRev), eux planchés à 1 s par le DeadTime
 //    interlock -> il ne peut pas mitrailler plus vite que les relais.
 instM1FwdProtector(Enable := TRUE, Request := M1RelayFwd, Cfg_MinInterval := CST_ContactorMinInterval);
@@ -316,6 +293,29 @@ M2SpeedContactor4 := instM2Sc4Protector.Cmd;
 // Frein recalculé APRÈS filtrage des relais de sens (pas de protecteur propre, cf. supra).
 M1BrakeCmd := M1RelayFwd OR M1RelayRev;
 M2BrakeCmd := M2RelayFwd OR M2RelayRev;
+{endregion}
+
+{region "🔀 §2quinquies Concordance contacteurs M1/M2"}
+// Compare les vecteurs PHYSIQUES finaux M1/M2 (post §2quater). Reponse graduee via
+// FB_SyncContactor : niveau 1 (debounce 500 ms) -> Data.ContactorMismatch -> SafeStop
+// des 2 treuils (PRG_04, scan N+1) ; niveau 2 (persistance CST_SyncEscalationTime) ->
+// Data.ContactorMismatchEscalated -> latch MecaE escalade -> PowerCutOff.
+// Bypass : GVL_IHM.M1M2Sync.Bypass.Global (groupe synchro treuils, pas de nouveau bit).
+instSyncContactorFinal(
+    Enable        := TRUE,
+    Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
+    SyncEnable    := WinchOutputCoupled,
+    RelayFwdM1    := M1RelayFwd,        RelayFwdM2    := M2RelayFwd,
+    RelayRevM1    := M1RelayRev,        RelayRevM2    := M2RelayRev,
+    Contactor1_M1 := M1SpeedContactor1, Contactor1_M2 := M2SpeedContactor1,
+    Contactor2_M1 := M1SpeedContactor2, Contactor2_M2 := M2SpeedContactor2,
+    Contactor3_M1 := M1SpeedContactor3, Contactor3_M2 := M2SpeedContactor3,
+    Contactor4_M1 := M1SpeedContactor4, Contactor4_M2 := M2SpeedContactor4,
+    BypassGlobal  := GVL_IHM.M1M2Sync.Bypass.Global
+);
+Data.ContactorMismatch          := instSyncContactorFinal.ContactorMismatch;
+Data.ContactorMismatchEscalated := instSyncContactorFinal.ContactorMismatchEscalated;
+Data.SyncContactorDiag          := instSyncContactorFinal.Diag;
 {endregion}
 
 // ── Sorties physiques M1 (apres controle concordance §2ter) ──

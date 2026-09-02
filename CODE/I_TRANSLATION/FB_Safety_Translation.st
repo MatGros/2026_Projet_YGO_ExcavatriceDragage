@@ -156,11 +156,11 @@ IF NOT BypassGlobal THEN
     // ⚠️ Éval gardée par la comm drive (DriveOnline AND DriveOperational) : sans comm, le
     //    statusword / la fréquence remontés ne sont pas fiables. Une perte bus doit tomber en
     //    Cause 1 (DriveComm, bit1 -> SafeStop acquittable), PAS en Méca B (bit4 -> PowerCutOff
-    //    non-resettable). REX MES 2026-09-02 : DriveStatusWord.0 (= "ready to switch on")
+    //    non-resettable). DriveStatusWord.0 (= "ready to switch on")
     //    figé sur bus mort -> coupure chaîne intempestive.
     // Déclencheur = preuve de rotation RÉELLE (fréquence de sortie mesurée) OU retour frein
     // encore ouvert. DriveStatusWord.0 ("ready to switch on") retiré : à 1 dès variateur
-    // alimenté, il ne prouve PAS un mouvement (REX MES 2026-09-02).
+    // alimenté, il ne prouve PAS un mouvement.
     IF NOT (BypassSafety OR BypassMecaB) AND DriveOnline AND DriveOperational THEN
         IF (NOT HeartbeatIhmOk) OR (NOT RunRequest AND NOT BrakeCmd) THEN
             UncommandedActiveB := (ABS(DriveActualFreqHz) > CST_StopFreqThresholdHz) OR BrakeFeedback;
