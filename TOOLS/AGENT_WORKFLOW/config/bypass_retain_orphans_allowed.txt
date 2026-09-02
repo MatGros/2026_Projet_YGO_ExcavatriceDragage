@@ -5,3 +5,8 @@
 # Orphelin connu au 2026-09-02 : jamais relayé vers GVL_IHM.M2TreuilBenne.Bucket.Bypass.
 # À câbler (boot-restore + instMirrorBypassBucket) — hors périmètre du lot BypassNetworkGlobal.
 BypassBucketGlobal
+
+# Bypass ingénierie AU (trace MES) : volontairement PAS relayés via PRG_07/GVL_IHM.
+# Consommés directement par PRG_06 (instSafetyEmergencyManagement). Jamais sur IHM.
+BypassAuArmingPreconditions
+BypassAuRedundancyTest

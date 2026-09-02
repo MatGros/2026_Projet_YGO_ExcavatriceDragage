@@ -21,6 +21,12 @@ VAR_INPUT
     // === RETOURS MATERIELS (HW) ===
     EmergencyChainClosed    : BOOL; // --> [HW]   Retour physique boucle d'urgence amont contacteur
     PowerContactorEngaged   : BOOL; // --> [HW]   Confirmation contacteur de puissance principal
+
+    // === BYPASS INGENIERIE MES (jamais IHM, jamais production) ===
+    // Outils de TRACE mise en service : observer le vrai timing chaine/contacteur sans le
+    // shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
+    BypassArmingPreconditions : BOOL := FALSE; // --> [TST] Arme sans les preconditions (chaine fermee, contacteur au repos, lockout, coupure metier/IHM)
+    BypassRedundancyTest      : BOOL := FALSE; // --> [TST] Saute l'auto-test A/B : IDLE -> PULSE directement
 END_VAR
 VAR_OUTPUT
     // === SORTIES STRUCTUREES (2 DUT) ===
@@ -220,7 +226,9 @@ IF Enable THEN
     Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
     Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
-    Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
+    // 🛠️ BypassArmingPreconditions (MES trace) : lève ChainOk + NoBlock ; la séquence doit
+    //    toujours partir du repos (Armable_Idle conservé). ⛔ NON SECURISE.
+    Armable := (BypassArmingPreconditions OR (Armable_ChainOk AND Armable_NoBlock)) AND Armable_Idle;
     // CASE à étiquettes littérales : 0..6 = CST_STEP_* (GVL_Safety_Emergency).
     // La CI STruCpp exige ces littéraux pour les étiquettes CASE.
     CASE ArmingSeqStep OF
@@ -237,7 +245,12 @@ IF Enable THEN
             IF ArmReqEdge.Q AND Armable THEN
                 RedundancyTestFailedCause := FALSE;
                 EmergencyArmingFailedCause := FALSE;
-                ArmingSeqStep := CST_STEP_TEST_A;
+                // 🛠️ BypassRedundancyTest (MES trace) : saute TEST_A..RESTORE_B, va au pulse.
+                IF BypassRedundancyTest THEN
+                    ArmingSeqStep := CST_STEP_PULSE;
+                ELSE
+                    ArmingSeqStep := CST_STEP_TEST_A;
+                END_IF;
             END_IF;
 
         1: // CST_STEP_TEST_A
@@ -451,6 +464,8 @@ Status.Done  := PowerContactorEngaged;
 // opérateurs (FB_Hmi_BannerFormatter lit Diag.ErrorId / scalaires).
 IF NOT Enable THEN
     Status.OperatorMessage := 'AU neutralisee (Enable=FALSE)';
+ELSIF (BypassArmingPreconditions OR BypassRedundancyTest) THEN
+    Status.OperatorMessage := 'AU: BYPASS INGENIERIE MES ACTIF - controles/auto-test desactives - NON SECURISE';
 ELSIF StartupFail THEN
     Status.OperatorMessage := 'AU: autotest demarrage echoue - verifier boucle/contacteur puis Reset';
 ELSIF RedundancyTestFailed THEN

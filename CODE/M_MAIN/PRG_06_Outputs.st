@@ -355,7 +355,10 @@ instSafetyEmergencyManagement(
     EmergencyChainClosed := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     PowerCutOffRequest := PowerCutOffReq,
-    BtnEmergencyCutOff := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff
+    BtnEmergencyCutOff := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff,
+    // 🛠️ Bypass ingenierie MES (RETAIN, jamais IHM) — trace timing chaine/contacteur
+    BypassArmingPreconditions := GVL_BypassRetain.BypassAuArmingPreconditions,
+    BypassRedundancyTest := GVL_BypassRetain.BypassAuRedundancyTest
 );
 
 // ── Ordres AU (logique) — sorties structurées Status : ST_Safety_Emergency_Status + Cmd : ST_Safety_Emergency_Cmd ──

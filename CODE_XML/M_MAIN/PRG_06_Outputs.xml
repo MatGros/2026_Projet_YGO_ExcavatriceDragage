@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T17:18:38.665632" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T17:18:38.665632">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T06:45:37.174220" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T06:45:37.174220">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1440,7 +1440,10 @@ instSafetyEmergencyManagement(
     EmergencyChainClosed := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     PowerCutOffRequest := PowerCutOffReq,
-    BtnEmergencyCutOff := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff
+    BtnEmergencyCutOff := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff,
+    // 🛠️ Bypass ingenierie MES (RETAIN, jamais IHM) — trace timing chaine/contacteur
+    BypassArmingPreconditions := GVL_BypassRetain.BypassAuArmingPreconditions,
+    BypassRedundancyTest := GVL_BypassRetain.BypassAuRedundancyTest
 );
 
 // ── Ordres AU (logique) — sorties structurées Status : ST_Safety_Emergency_Status + Cmd : ST_Safety_Emergency_Cmd ──
@@ -1536,6 +1539,31 @@ PowerCutOffActive := PowerCutOffReq;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Confirmation contacteur de puissance principal</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassArmingPreconditions">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASS INGENIERIE MES (jamais IHM, jamais production) ===
+Outils de TRACE mise en service : observer le vrai timing chaine/contacteur sans le
+shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
+--&gt; [TST] Arme sans les preconditions (chaine fermee, contacteur au repos, lockout, coupure metier/IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassRedundancyTest">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Saute l'auto-test A/B : IDLE -&gt; PULSE directement</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -2107,7 +2135,9 @@ IF Enable THEN
     Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
     Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
-    Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
+    // 🛠️ BypassArmingPreconditions (MES trace) : lève ChainOk + NoBlock ; la séquence doit
+    //    toujours partir du repos (Armable_Idle conservé). ⛔ NON SECURISE.
+    Armable := (BypassArmingPreconditions OR (Armable_ChainOk AND Armable_NoBlock)) AND Armable_Idle;
     // CASE à étiquettes littérales : 0..6 = CST_STEP_* (GVL_Safety_Emergency).
     // La CI STruCpp exige ces littéraux pour les étiquettes CASE.
     CASE ArmingSeqStep OF
@@ -2124,7 +2154,12 @@ IF Enable THEN
             IF ArmReqEdge.Q AND Armable THEN
                 RedundancyTestFailedCause := FALSE;
                 EmergencyArmingFailedCause := FALSE;
-                ArmingSeqStep := CST_STEP_TEST_A;
+                // 🛠️ BypassRedundancyTest (MES trace) : saute TEST_A..RESTORE_B, va au pulse.
+                IF BypassRedundancyTest THEN
+                    ArmingSeqStep := CST_STEP_PULSE;
+                ELSE
+                    ArmingSeqStep := CST_STEP_TEST_A;
+                END_IF;
             END_IF;
 
         1: // CST_STEP_TEST_A
@@ -2338,6 +2373,8 @@ Status.Done  := PowerContactorEngaged;
 // opérateurs (FB_Hmi_BannerFormatter lit Diag.ErrorId / scalaires).
 IF NOT Enable THEN
     Status.OperatorMessage := 'AU neutralisee (Enable=FALSE)';
+ELSIF (BypassArmingPreconditions OR BypassRedundancyTest) THEN
+    Status.OperatorMessage := 'AU: BYPASS INGENIERIE MES ACTIF - controles/auto-test desactives - NON SECURISE';
 ELSIF StartupFail THEN
     Status.OperatorMessage := 'AU: autotest demarrage echoue - verifier boucle/contacteur puis Reset';
 ELSIF RedundancyTestFailed THEN

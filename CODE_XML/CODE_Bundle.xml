@@ -6771,6 +6771,14 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Action attendue : [ORGANE] Action physique &gt; Fin</xhtml>
               </documentation>
             </variable>
+            <variable name="PositionM3Text">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">5. État stable M3 : position utilisateur, hors priorités bandeau</xhtml>
+              </documentation>
+            </variable>
             <variable name="AlarmBanner">
               <type>
                 <derived name="ST_AlarmBanner" />
@@ -6791,8 +6799,8 @@ TRUE des qu'un referencement a reussi</xhtml>
    🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
    ───────────────────────────────────────────────────────────────
    📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md §4, §4bis
-   🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
-      IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
+   🎯 Responsabilité : regroupe les 4 champs de guidage et contexte, plus
+      un état position M3 dédié, à responsabilités disjointes.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -25301,6 +25309,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Cycle auto actif</xhtml>
               </documentation>
             </variable>
+            <variable name="M3AtP1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] M3 positionné stable au Point 1</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchM1Safety">
               <type>
                 <derived name="ST_SafetyWinch" />
@@ -25930,6 +25946,7 @@ IF NOT Enable THEN
     Banner.SequenceProgressText  := '';
     Banner.SpecialConditionText  := '';
     Banner.OperatorActionText    := '';
+    Banner.PositionM3Text        := '';
     Banner.AlarmBanner.HasAlarm  := FALSE;
     Banner.AlarmBanner.Text      := '';
     Banner.AlarmBanner.Index     := 0;
@@ -26065,6 +26082,16 @@ ELSIF CurrentMode = E_Mode.MAINT_N1 OR CurrentMode = E_Mode.MAINT_N2 THEN
     Banner.SequenceProgressText := 'Manuel: PILOTAGE DIRECT';
 ELSE
     Banner.SequenceProgressText := 'Machine: ARRÊTÉE';
+END_IF;
+{endregion}
+
+{region "§2bis Position M3"}
+// État indépendant : ne participe pas aux arbitrages des quatre champs historiques
+// ni au carrousel des défauts. M3AtP1 est publié par PRG_05 puis projeté par PRG_07.
+IF M3AtP1 THEN
+    Banner.PositionM3Text := 'Position M3 : P1';
+ELSE
+    Banner.PositionM3Text := '';
 END_IF;
 {endregion}
 
@@ -28941,6 +28968,31 @@ Current := LIMIT(-100.0, Current, 100.0);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   Confirmation contacteur de puissance principal</xhtml>
               </documentation>
             </variable>
+            <variable name="BypassArmingPreconditions">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BYPASS INGENIERIE MES (jamais IHM, jamais production) ===
+Outils de TRACE mise en service : observer le vrai timing chaine/contacteur sans le
+shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
+--&gt; [TST] Arme sans les preconditions (chaine fermee, contacteur au repos, lockout, coupure metier/IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassRedundancyTest">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Saute l'auto-test A/B : IDLE -&gt; PULSE directement</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Status">
@@ -29510,7 +29562,9 @@ IF Enable THEN
     Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
     Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
-    Armable := Armable_ChainOk AND Armable_Idle AND Armable_NoBlock;
+    // 🛠️ BypassArmingPreconditions (MES trace) : lève ChainOk + NoBlock ; la séquence doit
+    //    toujours partir du repos (Armable_Idle conservé). ⛔ NON SECURISE.
+    Armable := (BypassArmingPreconditions OR (Armable_ChainOk AND Armable_NoBlock)) AND Armable_Idle;
     // CASE à étiquettes littérales : 0..6 = CST_STEP_* (GVL_Safety_Emergency).
     // La CI STruCpp exige ces littéraux pour les étiquettes CASE.
     CASE ArmingSeqStep OF
@@ -29527,7 +29581,12 @@ IF Enable THEN
             IF ArmReqEdge.Q AND Armable THEN
                 RedundancyTestFailedCause := FALSE;
                 EmergencyArmingFailedCause := FALSE;
-                ArmingSeqStep := CST_STEP_TEST_A;
+                // 🛠️ BypassRedundancyTest (MES trace) : saute TEST_A..RESTORE_B, va au pulse.
+                IF BypassRedundancyTest THEN
+                    ArmingSeqStep := CST_STEP_PULSE;
+                ELSE
+                    ArmingSeqStep := CST_STEP_TEST_A;
+                END_IF;
             END_IF;
 
         1: // CST_STEP_TEST_A
@@ -29741,6 +29800,8 @@ Status.Done  := PowerContactorEngaged;
 // opérateurs (FB_Hmi_BannerFormatter lit Diag.ErrorId / scalaires).
 IF NOT Enable THEN
     Status.OperatorMessage := 'AU neutralisee (Enable=FALSE)';
+ELSIF (BypassArmingPreconditions OR BypassRedundancyTest) THEN
+    Status.OperatorMessage := 'AU: BYPASS INGENIERIE MES ACTIF - controles/auto-test desactives - NON SECURISE';
 ELSIF StartupFail THEN
     Status.OperatorMessage := 'AU: autotest demarrage echoue - verifier boucle/contacteur puis Reset';
 ELSIF RedundancyTestFailed THEN
@@ -48596,7 +48657,10 @@ instSafetyEmergencyManagement(
     EmergencyChainClosed := PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     PowerCutOffRequest := PowerCutOffReq,
-    BtnEmergencyCutOff := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff
+    BtnEmergencyCutOff := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff,
+    // 🛠️ Bypass ingenierie MES (RETAIN, jamais IHM) — trace timing chaine/contacteur
+    BypassArmingPreconditions := GVL_BypassRetain.BypassAuArmingPreconditions,
+    BypassRedundancyTest := GVL_BypassRetain.BypassAuRedundancyTest
 );
 
 // ── Ordres AU (logique) — sorties structurées Status : ST_Safety_Emergency_Status + Cmd : ST_Safety_Emergency_Cmd ──
@@ -49676,6 +49740,7 @@ instHmiBannerFormatter(
     DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
+    M3AtP1                      := GVL_IHM.TranslationM3.State.AtP1,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
@@ -49915,6 +49980,31 @@ instTroubleshootingView(
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Commun M1+M2 (GVL_IHM.Commun.Bypass.Global)</xhtml>
           </documentation>
         </variable>
+        <variable name="BypassAuArmingPreconditions">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛠️ BYPASS INGENIERIE AU — TRACE mise en service uniquement (jamais IHM, jamais production).
+Observer le vrai timing chaine/contacteur sans le shunt materiel de PowerKeepAlive_A/B_RQ.
+⛔ NON SECURISE tant qu'actif — consommes directement par PRG_06 (instSafetyEmergencyManagement).
+arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassAuRedundancyTest">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute l'auto-test A/B : IDLE -&gt; PULSE</xhtml>
+          </documentation>
+        </variable>
         <variable name="BypassLimitLegal">
           <type>
             <BOOL />
@@ -50111,7 +50201,7 @@ instTroubleshootingView(
             <derived name="ST_HmiBanner" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4) — OperatorActionText = unique consigne conduite</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Bandeau : 4 champs de conduite + état position M3 dédié (AF-07 §4)</xhtml>
           </documentation>
         </variable>
         <variable name="Network">

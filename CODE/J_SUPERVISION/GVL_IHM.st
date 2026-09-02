@@ -16,7 +16,7 @@ VAR_GLOBAL
     CycleDiveSearch   : ST_CycleDiveSearchHMI;   (* 🤿 Assistance plongée (DiveSearch) MAINT_N1/N2 *)
     CycleExtraction   : ST_CycleExtractionHMI;   (* ⛏️ Assistance extraction MAINT_N1/N2 *)
     CycleDumpAtTremie : ST_CycleDumpAtTremieHMI; (* 🚚 Vidage à la trémie (legacy) *)
-    Banner  : ST_HmiBanner; (* 🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4) — OperatorActionText = unique consigne conduite *)
+    Banner  : ST_HmiBanner; (* 🖥️ Bandeau : 4 champs de conduite + état position M3 dédié (AF-07 §4) *)
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
     Commun  : ST_CommunHMI; (* 🌐 Signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
     HmiInitDone : BOOL;               (* 🚩 Indicateur d'initialisation IHM depuis PERSISTENT *)

@@ -21,6 +21,12 @@ VAR_GLOBAL RETAIN
     // 🌐 Bypass Global Commun M1+M2 (GVL_IHM.Commun.Bypass.Global)
     BypassCommunGlobal          : BOOL := FALSE;
 
+    // 🛠️ BYPASS INGENIERIE AU — TRACE mise en service uniquement (jamais IHM, jamais production).
+    // Observer le vrai timing chaine/contacteur sans le shunt materiel de PowerKeepAlive_A/B_RQ.
+    // ⛔ NON SECURISE tant qu'actif — consommes directement par PRG_06 (instSafetyEmergencyManagement).
+    BypassAuArmingPreconditions : BOOL := FALSE; // arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)
+    BypassAuRedundancyTest      : BOOL := FALSE; // saute l'auto-test A/B : IDLE -> PULSE
+
     // ⚡ BYPASS RAPIDES UNITAIRES COMMUMS (Levée immédiate des sécurités d'essai)
     BypassLimitLegal            : BOOL := FALSE; // 📐 Bypass Limite Légale de Profondeur
     BypassTopLimitSwitch        : BOOL := FALSE; // 🚧 Bypass Capteur Fin de Course Haut Physique

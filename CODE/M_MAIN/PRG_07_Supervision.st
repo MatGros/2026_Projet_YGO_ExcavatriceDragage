@@ -652,6 +652,7 @@ instHmiBannerFormatter(
     DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
+    M3AtP1                      := GVL_IHM.TranslationM3.State.AtP1,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
