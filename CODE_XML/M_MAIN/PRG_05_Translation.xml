@@ -3290,6 +3290,14 @@ Data.TranslationTrace                 := TranslationTrace;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
               </documentation>
             </variable>
+            <variable name="CauseIdx">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de boucle — purge des causes vives sous BypassGlobal</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -3428,6 +3436,13 @@ ELSE
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
+
+    // 🧪 BypassGlobal : l'évaluation des causes ci-dessus est sautée. Purge de la vue LIVE
+    // pour que instCauses[i].Active ne reste pas FIGÉ (sinon PowerCutOff / SafeStop gelés,
+    // réarmement impossible malgré le bypass). Latches déjà effacés au § FRONTS &amp; REARMENT.
+    FOR CauseIdx := 0 TO 15 DO
+        instCauses[CauseIdx].Active := FALSE;
+    END_FOR;
 END_IF;
 
 // Appel du socle de défaut

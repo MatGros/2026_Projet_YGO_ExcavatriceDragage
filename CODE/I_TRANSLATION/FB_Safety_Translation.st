@@ -88,6 +88,7 @@ VAR
     // Socle défaut
     instFault           : FB_FaultCore;                  // * [INST] Socle défaut transverse
     instCauses          : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+    CauseIdx            : INT;                            // . [LOC] Index de boucle — purge des causes vives sous BypassGlobal
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -209,6 +210,13 @@ ELSE
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
+
+    // 🧪 BypassGlobal : l'évaluation des causes ci-dessus est sautée. Purge de la vue LIVE
+    // pour que instCauses[i].Active ne reste pas FIGÉ (sinon PowerCutOff / SafeStop gelés,
+    // réarmement impossible malgré le bypass). Latches déjà effacés au § FRONTS & REARMENT.
+    FOR CauseIdx := 0 TO 15 DO
+        instCauses[CauseIdx].Active := FALSE;
+    END_FOR;
 END_IF;
 
 // Appel du socle de défaut
