@@ -42112,7 +42112,11 @@ ELSE
     // quelle que soit la consigne amont. Descente immédiate. 1er cran immédiat
     // (frein + sens). Si le shaper déraille (rampe à 0 -&gt; palier 5 instantané),
     // l'interlock ramène quand même la montée en crans (défense en profondeur).
-    StepDelay(IN := (RequestedStepClamped &gt; AuthorizedStep) AND (AuthorizedStep &gt; 0),
+    // NOT StepDelay.Q : un TON garde .Q TRUE tant que IN est TRUE (pas d'impulsion).
+    // Sans ce terme, une fois PT ecoule le +1 ci-dessous s'appliquerait a CHAQUE scan
+    // (1 -&gt; 5 en quelques scans, contacteurs relaches d'un coup). Ici le timer se re-arme
+    // apres chaque cran -&gt; les contacteurs de vitesse s'enclenchent EN CASCADE, 1 / PT.
+    StepDelay(IN := (RequestedStepClamped &gt; AuthorizedStep) AND (AuthorizedStep &gt; 0) AND NOT StepDelay.Q,
               PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := RequestedStepClamped;
@@ -43344,9 +43348,13 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-// Temporisation : compte quand la cible est au-dessus du palier courant
+// Temporisation : compte quand la cible est au-dessus du palier courant.
+// NOT StepDelay.Q : un TON garde .Q TRUE tant que IN est TRUE (pas d'impulsion).
+// Sans ce terme, une fois StepRampDelay ecoule le +1 ci-dessous s'appliquerait a
+// CHAQUE scan -&gt; montee 1 -&gt; N en quelques scans. Ici le timer se re-arme apres
+// chaque cran -&gt; une hausse de palier / StepRampDelay (cascade reelle).
 StepDelay(
-    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0),
+    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0) AND NOT StepDelay.Q,
     PT := StepRampDelay
 );
 StepDelayElapsed := StepDelay.ET;

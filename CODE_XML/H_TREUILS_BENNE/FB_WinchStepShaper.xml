@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-29T22:08:32.151772" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-29T22:08:32.151772">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T14:01:32.784677" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T14:01:32.784677">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -105,9 +105,13 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-// Temporisation : compte quand la cible est au-dessus du palier courant
+// Temporisation : compte quand la cible est au-dessus du palier courant.
+// NOT StepDelay.Q : un TON garde .Q TRUE tant que IN est TRUE (pas d'impulsion).
+// Sans ce terme, une fois StepRampDelay ecoule le +1 ci-dessous s'appliquerait a
+// CHAQUE scan -&gt; montee 1 -&gt; N en quelques scans. Ici le timer se re-arme apres
+// chaque cran -&gt; une hausse de palier / StepRampDelay (cascade reelle).
 StepDelay(
-    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0),
+    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0) AND NOT StepDelay.Q,
     PT := StepRampDelay
 );
 StepDelayElapsed := StepDelay.ET;

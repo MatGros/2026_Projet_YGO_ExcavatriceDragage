@@ -434,7 +434,11 @@ ELSE
     // quelle que soit la consigne amont. Descente immédiate. 1er cran immédiat
     // (frein + sens). Si le shaper déraille (rampe à 0 -> palier 5 instantané),
     // l'interlock ramène quand même la montée en crans (défense en profondeur).
-    StepDelay(IN := (RequestedStepClamped > AuthorizedStep) AND (AuthorizedStep > 0),
+    // NOT StepDelay.Q : un TON garde .Q TRUE tant que IN est TRUE (pas d'impulsion).
+    // Sans ce terme, une fois PT ecoule le +1 ci-dessous s'appliquerait a CHAQUE scan
+    // (1 -> 5 en quelques scans, contacteurs relaches d'un coup). Ici le timer se re-arme
+    // apres chaque cran -> les contacteurs de vitesse s'enclenchent EN CASCADE, 1 / PT.
+    StepDelay(IN := (RequestedStepClamped > AuthorizedStep) AND (AuthorizedStep > 0) AND NOT StepDelay.Q,
               PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := RequestedStepClamped;

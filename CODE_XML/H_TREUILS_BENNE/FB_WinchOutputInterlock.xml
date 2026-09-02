@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T13:48:32.074355" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T13:48:32.074355">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T14:01:18.929241" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T14:01:18.929241">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1249,7 +1249,11 @@ ELSE
     // quelle que soit la consigne amont. Descente immédiate. 1er cran immédiat
     // (frein + sens). Si le shaper déraille (rampe à 0 -&gt; palier 5 instantané),
     // l'interlock ramène quand même la montée en crans (défense en profondeur).
-    StepDelay(IN := (RequestedStepClamped &gt; AuthorizedStep) AND (AuthorizedStep &gt; 0),
+    // NOT StepDelay.Q : un TON garde .Q TRUE tant que IN est TRUE (pas d'impulsion).
+    // Sans ce terme, une fois PT ecoule le +1 ci-dessous s'appliquerait a CHAQUE scan
+    // (1 -&gt; 5 en quelques scans, contacteurs relaches d'un coup). Ici le timer se re-arme
+    // apres chaque cran -&gt; les contacteurs de vitesse s'enclenchent EN CASCADE, 1 / PT.
+    StepDelay(IN := (RequestedStepClamped &gt; AuthorizedStep) AND (AuthorizedStep &gt; 0) AND NOT StepDelay.Q,
               PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := RequestedStepClamped;
