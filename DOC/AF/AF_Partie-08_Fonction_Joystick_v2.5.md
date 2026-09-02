@@ -437,6 +437,21 @@ pas le bouton une fois armé).
 
 Désarmement (F08.04) = `ArmingPermit=FALSE` (niveau, immédiat) **ou** neutre tenu après la grâce.
 
+### 🔀 Règle C4 — inversion inter-scan sans neutre observé (T222)
+
+Une inversion directe qualifiée `+1 → -1` ou `-1 → +1` sur **X ou Y** entre deux scans,
+sans direction `0` intermédiaire, pose `InversionLockActive` et désarme le geste dans le même
+scan. Le sens n'est **retenu** pour cette détection que si `ABS(OutPct) > CST_InversionFlipThreshold_Pct`
+(10 %, **après** zone morte) — seuil large volontairement : ni le bruit Hall proche du neutre ni
+un franchissement lent (un scan sous 10 %) ne déclenche ce verrou. Distinct du seuil d'axe actif
+`CST_DirectionQualificationThreshold_Pct` (0,1 %) qui pilote `StartStop` / bits de sens / palier.
+
+- Les deux `AxisCmd` publient alors `SpeedTgt=0`, `StartStop=FALSE`, `Direction=0` : les FB
+  mouvement aval effectuent leur rampe normale, sans action sur `SafeStop` ni `PowerCutOff`.
+- Le verrou survit à `Reset` et au cycle `ArmingPermit=FALSE→TRUE`.
+- Il est levé uniquement au premier front `AtNeutralXY=TRUE` (X **et** Y simultanément au neutre).
+- Après ce front neutre, un nouveau front `RawButton` maintenu `DeadmanArmHoldTime` reste obligatoire.
+
 ⚠️ **Ce que « immédiat » ne veut PAS dire** : perdre `ArmingPermit` ne coupe pas la puissance et
 n'est pas un arrêt d'urgence — `DeadmanArmed:=FALSE` force `SpeedTgt:=0`/`StartStop:=FALSE`, ce qui
 déclenche côté FB de mouvement aval (`FB_Winch`/`FB_Translation`) une **décélération normale**

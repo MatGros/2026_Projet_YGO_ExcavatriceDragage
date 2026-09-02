@@ -1,0 +1,67 @@
+contract:
+  task_id: T223_JOYSTICK_SPEEDSTEP_TABLE_LINK
+  criticality: C4
+  strategy: patch
+  objective: >
+    Garantir que le decodage du joystick Y en palier 1..5 consomme la table
+    centrale persistante des treuils, sans creer ni ecrire une seconde table persistante.
+  acceptance:
+    - id: AC1
+      statement: "La configuration effective passee a instJoystick contient exactement GVL_PERSISTENT._WinchSpeedStepTable."
+      verified_by: "Revue du call-site PRG_02 et test structurel cible."
+    - id: AC2
+      statement: "Les reglages joystick persistants hors table (deadband, temporisations, marge hysteres) restent issus de _JoystickCfgPersist."
+      verified_by: "Test structurel et revue du diff."
+    - id: AC3
+      statement: "Aucune ecriture cyclique dans GVL_PERSISTENT._JoystickCfgPersist ni dans _WinchSpeedStepTable n'est introduite."
+      verified_by: "Test guard automatique et revue du diff."
+    - id: AC4
+      statement: "Avec la table nominale 20/40/60/80/100 et une deflexion Y a 96 %, FB_Joystick produit StepTgt = 5."
+      verified_by: "Test unitaire FB_Joystick existant et scenario ajoute si manquant."
+    - id: AC5
+      statement: "La chaine SafeStop, PowerCutOff, ArmingPermit et les sorties PRG_06 reste inchangee."
+      verified_by: "G200, gates palier C et revue de portee."
+    - id: AC6
+      statement: "Le nom de fichier est identique au nom de POU PRG_02_Acquisition; le suffixe correspond au langage bundle PLCopenXML. PRG_02 declare JoystickCfgEffective, le copie depuis _JoystickCfgPersist, remplace uniquement SpeedStepTable par _WinchSpeedStepTable et le passe a instJoystick.Cfg."
+      verified_by: "G493_check_joystick_speedstep_table_link.py."
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/D_JOYSTICK/tests/test_fb_joystick.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G493_check_joystick_speedstep_table_link.py
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T223_JOYSTICK_SPEEDSTEP_TABLE_LINK.yaml
+    forbidden:
+      - CODE/D_JOYSTICK/FB_Joystick.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/
+  conservation:
+    must_survive:
+      - "_WinchSpeedStepTable reste l'unique source persistante des paliers et de la matrice contacteurs."
+      - "_JoystickCfgPersist conserve ses reglages propres et le pont IHM/persistant existant."
+      - "PRG_02 continue de publier les memes sorties joystick et de consommer ArmingPermit depuis PRG_04."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute divergence entre le source versionne, le projet CODESYS en ligne ou les valeurs
+    persistantes est remontee avant validation. Aucun bypass de securite ne fait partie de la tache.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

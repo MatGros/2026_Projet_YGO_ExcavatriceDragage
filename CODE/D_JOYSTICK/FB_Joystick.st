@@ -64,11 +64,18 @@ VAR_IN_OUT
     NeutralXMem               : INT;        // <-> [BUS]  Point neutre X persistant global
     NeutralYMem               : INT;        // <-> [BUS]  Point neutre Y persistant global
 END_VAR
+VAR CONSTANT
+    CST_DirectionQualificationThreshold_Pct : REAL := 0.1;  // Seuil % : axe actif (StartStop / bits sens / palier 0)
+    CST_InversionFlipThreshold_Pct          : REAL := 10.0; // Seuil % : sens RETENU pour la détection d'inversion inter-scan.
+                                                            // Large volontairement (>> bruit Hall, >> bord de deadband) :
+                                                            // seule une déflexion franche opposée compte comme flip.
+END_VAR
 VAR
     // === SOUS-INSTANCES FB & TIMERS ===
     ScaleX                    : FB_AxisScale;        // * [INST] Normalisation et zone morte axe X
     ScaleY                    : FB_AxisScale;        // * [INST] Normalisation et zone morte axe Y
     DeadmanEdge               : R_TRIG;              // * [INST] Detecteur front montant bouton homme-mort
+    NeutralXYEdge             : R_TRIG;              // * [INST] Front retour simultane X+Y au neutre (libere verrou inversion)
     NeutralHoldTimer          : TON;                 // * [INST] Temporisation maintien au neutre
     DeadmanArmTimer           : TON;                 // * [INST] Temporisation maintien bouton armement
     DeadmanArmGraceTimer      : TON;                 // * [INST] Temporisation delai de grace post-armement
@@ -83,6 +90,13 @@ VAR
     CmdYVal                   : REAL;                // . [LOC]  Consigne axe Y calculee apres filtrage/homme-mort
     LastCalibrate             : BOOL;                // . [LOC]  Memorisation etat precedent commande Calibrate (front)
     DeadmanArmPending         : BOOL;                // . [LOC]  Armement en cours d'attente de la temporisation maintien
+    InversionLockActive       : BOOL;                // . [LOC]  Verrou retour neutre apres inversion inter-scan directe
+    PrevDirX                  : INT;                 // . [LOC]  Sens X qualifie au scan precedent (-1, 0, +1)
+    PrevDirY                  : INT;                 // . [LOC]  Sens Y qualifie au scan precedent (-1, 0, +1)
+    DirX                      : INT;                 // . [LOC]  Sens X qualifie au scan courant (-1, 0, +1)
+    DirY                      : INT;                 // . [LOC]  Sens Y qualifie au scan courant (-1, 0, +1)
+    FlipX                     : BOOL;                // . [LOC]  Inversion X directe sans echantillon neutre
+    FlipY                     : BOOL;                // . [LOC]  Inversion Y directe sans echantillon neutre
     RawOutOfRange             : BOOL;                // . [LOC]  Surveillance capteur continue (AF08 §5bis) : RawX/RawY hors plage nominale+marge
     CalibFail                 : BOOL;                // . [LOC]  Echec calibration (front Calibrate hors zone) - cause a acquitter (latching)
     BusLost                   : BOOL;                // . [LOC]  Perte liaison bus / device non operationnel - cause live seulement
@@ -149,7 +163,11 @@ IF NOT Enable OR BusLost THEN
     AtNeutralXY := TRUE;
     DeadmanArmed := FALSE;
     DeadmanArmPending := FALSE;
+    InversionLockActive := FALSE;
+    PrevDirX := 0;
+    PrevDirY := 0;
     ArmingPermitDenied := FALSE;
+    NeutralXYEdge(CLK := FALSE);
     NeutralHoldTimer(IN := FALSE, PT := Cfg.NeutralHoldTime);
     DeadmanArmTimer(IN := FALSE, PT := Cfg.DeadmanArmHoldTime);
     DeadmanArmGraceTimer(IN := FALSE, PT := Cfg.DeadmanArmGraceTime);
@@ -167,13 +185,48 @@ AtNeutralXY := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // les 2 axes 
 {endregion}
 
 {region "§4 Armement homme mort"}
+// 🔀 Inversion inter-scan : le sens n'est RETENU que si la déflexion dépasse
+// CST_InversionFlipThreshold_Pct (>> bruit Hall / bord de deadband). Un aller-retour
+// +1<->-1 sans échantillon 0 pose le verrou. Levé exclusivement au front AtNeutralXY.
+// RawOutOfRange : lecture capteur non fiable -> aucun sens retenu (le geste est déjà forcé à 0
+// par le SEL du pipeline). Une reprise capteur-défaut -> valide ne compte donc pas comme flip.
+DirX := 0;
+DirY := 0;
+IF NOT RawOutOfRange THEN
+    IF ScaleX.OutPct > CST_InversionFlipThreshold_Pct THEN
+        DirX := 1;
+    ELSIF ScaleX.OutPct < -CST_InversionFlipThreshold_Pct THEN
+        DirX := -1;
+    END_IF;
+    IF ScaleY.OutPct > CST_InversionFlipThreshold_Pct THEN
+        DirY := 1;
+    ELSIF ScaleY.OutPct < -CST_InversionFlipThreshold_Pct THEN
+        DirY := -1;
+    END_IF;
+END_IF;
+FlipX := ((PrevDirX = 1) AND (DirX = -1)) OR ((PrevDirX = -1) AND (DirX = 1));
+FlipY := ((PrevDirY = 1) AND (DirY = -1)) OR ((PrevDirY = -1) AND (DirY = 1));
+
+NeutralXYEdge(CLK := AtNeutralXY);
+IF NeutralXYEdge.Q THEN
+    InversionLockActive := FALSE;
+END_IF;
+
+IF FlipX OR FlipY THEN
+    InversionLockActive := TRUE;
+    DeadmanArmed := FALSE;
+    DeadmanArmPending := FALSE;
+END_IF;
+
 // Bouton homme-mort : armement par MAINTIEN (Cfg.DeadmanArmHoldTime), independant de la position.
+// ⚠️ Un appui PENDANT le verrou d'inversion n'arme PAS de demande : le nouveau front conscient
+//    doit survenir APRÈS le retour au neutre (sinon on "pré-charge" le réarmement stick inversé).
 DeadmanEdge(CLK := RawButton);
-IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
+IF DeadmanEdge.Q AND NOT InversionLockActive THEN DeadmanArmPending := TRUE; END_IF;
 IF NOT RawButton THEN DeadmanArmPending := FALSE; END_IF;
 
 // Securite : armage UNIQUEMENT si DeadmanArmPending ET ArmingPermit.
-DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit, PT := Cfg.DeadmanArmHoldTime);
+DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit AND NOT InversionLockActive, PT := Cfg.DeadmanArmHoldTime);
 IF DeadmanArmTimer.Q THEN
     DeadmanArmed := TRUE;
     DeadmanArmPending := FALSE;
@@ -200,10 +253,10 @@ CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdX.SpeedTgt := ABS(CmdXVal);   // NON signee (le sens = bits DirectionPositive/Negative + AxisCmdX.Direction)
-AxisCmdX.StartStop := (ABS(CmdXVal) > 0.1);
+AxisCmdX.StartStop := (ABS(CmdXVal) > CST_DirectionQualificationThreshold_Pct);
 
-AxisCmdX.DirectionPositive := (CmdXVal > 0.1);
-AxisCmdX.DirectionNegative := (CmdXVal < -0.1);
+AxisCmdX.DirectionPositive := (CmdXVal > CST_DirectionQualificationThreshold_Pct);
+AxisCmdX.DirectionNegative := (CmdXVal < -CST_DirectionQualificationThreshold_Pct);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
 IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
@@ -219,10 +272,10 @@ CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdY.SpeedTgt := ABS(CmdYVal);   // NON signee (le sens = bits DirectionPositive/Negative + AxisCmdY.Direction)
-AxisCmdY.StartStop := (ABS(CmdYVal) > 0.1);
+AxisCmdY.StartStop := (ABS(CmdYVal) > CST_DirectionQualificationThreshold_Pct);
 
-AxisCmdY.DirectionPositive := (CmdYVal > 0.1);
-AxisCmdY.DirectionNegative := (CmdYVal < -0.1);
+AxisCmdY.DirectionPositive := (CmdYVal > CST_DirectionQualificationThreshold_Pct);
+AxisCmdY.DirectionNegative := (CmdYVal < -CST_DirectionQualificationThreshold_Pct);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
 IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
 
@@ -235,7 +288,7 @@ SpeedStepHyst4(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.Spe
 
 // Algorithme ASCENDANT : OUT=TRUE quand IN>HIGH (au-dessus du seuil) → palier supérieur.
 // Petite déflexion → palier bas ; grande déflexion → palier haut (borne haute du palier).
-IF AxisCmdY.SpeedTgt <= 0.1 THEN
+IF AxisCmdY.SpeedTgt <= CST_DirectionQualificationThreshold_Pct THEN
     AxisCmdY.StepTgt := 0;
 ELSE
     AxisCmdY.StepTgt := 1;
@@ -250,6 +303,10 @@ IF AxisCmdY.DirectionPositive THEN AxisCmdY.Direction := 1;
 ELSIF AxisCmdY.DirectionNegative THEN AxisCmdY.Direction := -1;
 ELSE AxisCmdY.Direction := 0; END_IF;
 AxisCmdY.Deflection := REAL_TO_INT(CmdYVal);   // deflexion signee -100..+100 % (anim IHM)
+
+// Memorisation apres traitement : l'inversion suivante compare deux scans qualifies successifs.
+PrevDirX := DirX;
+PrevDirY := DirY;
 
 // Miroirs point neutre courant
 NeutralXAct := NeutralXMem;

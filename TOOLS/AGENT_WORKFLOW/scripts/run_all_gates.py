@@ -132,6 +132,8 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "484", "G484 - ContactorStuck proprietaire unique (T181-02/03 AC7)", [sys.executable, f"{S}/G484_check_stuckclosed_single_owner.py"]),
     ("C", "487", "G487 - Initialiseur struct anonyme en appel FB interdit (CODESYS 3.5, REX 2026-08-30 PRG_04/T181-08)", [sys.executable, f"{S}/G487_check_no_inline_struct_literal.py", "."]),
     ("C", "491", "G491 - Anti-orphelin bypass RETAIN (relais PRG_07, REX 2026-09-01 BypassNetworkGlobal)", [sys.executable, f"{S}/G491_check_bypass_retain_relayed.py"]),
+    ("C", "492", "G492 - Verrou inversion joystick inter-scan (T222)", [sys.executable, f"{S}/G492_check_joystick_inversion_lock.py", "."]),
+    ("C", "493", "G493 - Table paliers centrale vers joystick (T223)", [sys.executable, f"{S}/G493_check_joystick_speedstep_table_link.py", "."]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]
