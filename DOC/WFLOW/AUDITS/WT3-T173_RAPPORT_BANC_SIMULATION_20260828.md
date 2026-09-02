@@ -125,7 +125,7 @@ position** dans `collectStimuli()`. C'est la réponse du *monde*, jamais la logi
 
 ```powershell
 cd C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\WT3_TEST_AUTO_CI
-.\run_banc.bat
+.\LANCER_BANC_CYCLE.bat
 ```
 Le `.bat` : (1) trouve Python (fallbacks), (2) compile le moteur **si absent**,
 (3) démarre le serveur → ouvre le navigateur sur `http://127.0.0.1:8090`.

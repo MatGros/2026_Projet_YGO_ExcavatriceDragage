@@ -18,7 +18,7 @@ VAR_GLOBAL
     // SimulationModeActive AND SimWinchActive AND SimulationBypassActive.
     // Défaut TRUE : pré-arme le bypass banc dès le boot (n'agit que si SimulationModeActive AND SimWinchActive).
     // Permet de travailler en banc sans faux blocage Meca au homing sans mouvement.
-    SimulationBypassActive      : BOOL := TRUE;
+    SimulationBypassActive      : BOOL := FALSE;
 
     // 🌐 Activation par domaine (simulé si SimulationModeActive AND Sim<Domaine>Active)
     SimWinchActive              : BOOL := FALSE; // M1+M2 : codeurs, contacteurs, freins, thermiques, capteur haut, câble tendu

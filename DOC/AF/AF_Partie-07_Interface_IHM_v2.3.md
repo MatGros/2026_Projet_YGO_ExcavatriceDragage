@@ -235,6 +235,7 @@ flowchart LR
 | **2** | **`SequenceProgressText`** *(Micro)* | Étape courante du cycle maître **ET** de la sous-séquence active (Kobold, arrachage, homing). | `Macro: <Étape> > Sous-cycle: <Sous-étape>` | • `Cycle: DESCENTE > Kobold: 02_IMMERSION_SURFACE`<br>• `Homing: M1_RECHERCHE_INDEX_HAUT` |
 | **3** | **`SpecialConditionText`** *(Dérogations)* | Régimes dérogatoires de maintenance, sécurités neutralisées, bridages actifs (*vide si nominal*). | `ATTENTION: <Type> : <Détail>` ou `INFO: <Type> : <Détail>` | • `ATTENTION: DÉROGATION : Butées logicielles M2 inactives`<br>• `INFO: BRIDAGE : Palier 1 forcé (Désynchronisme 0.4m)` |
 | **4** | **`OperatorActionText`** *(Action)* | Consigne d'action physique attendue immédiatement du conducteur. | `[Organe] <Verbe d'action> > <Condition de fin>` | • `[JOYSTICK] Pousser Y- (Descente) > Attendre contact fond`<br>• `[PUPITRE] Appuyer sur Bouton HOMING M2` |
+| **5** | **`PositionM3Text`** *(État M3)* | Position stable M3 affichée indépendamment des quatre messages de conduite ; vide hors position publiée. | `Position M3 : <Point>` | • `Position M3 : P1` |
 
 ### 🧩 5.2 Principes de génération & Typage fort
 

@@ -20,7 +20,7 @@ interprétées à tort comme celles de la **machine complète**.
 5. **La scène SVG lit `TRANSLATION_AT_*` et `BENNE_ISOPEN` comme si elles venaient du moteur**,
    alors que `cycle_engine.cpp` ne les émet pas → affichage potentiellement incohérent. (CONFIRMÉ)
 6. **Traçabilité insuffisante** : SHA-256 différents entre `CODE/` et `WORKING_COPY/`, exécutable
-   non versionné, `run_banc.bat` ne recompile que si l'exe est absent.
+   non versionné, `LANCER_BANC_CYCLE.bat` ne recompile que si l'exe est absent.
 
 ## Marquage de provenance à imposer dans l'IHM
 | Catégorie | Marquage |
