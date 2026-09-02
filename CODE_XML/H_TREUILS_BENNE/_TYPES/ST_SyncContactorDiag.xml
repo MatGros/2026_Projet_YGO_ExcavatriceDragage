@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T13:10:22.081393" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T13:10:22.081393">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_SyncContactorDiag">
+        <baseType>
+          <struct>
+            <variable name="RelayFwdMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais montée M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais descente M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step1Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 1 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 2 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 3 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 4 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MismatchLevel">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = aucun · 1 = discordance confirmée (SafeStop) · 2 = escalade (PowerCutOff)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e71417df-d1db-5140-ade6-a84ec0d571c8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔀 ST_SyncContactorDiag — Diagnostic discordance contacteurs M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : dire EN CLAIR quel contacteur diverge entre M1 et M2 et à quel
+      niveau on est (aucun / mismatch confirmé / escalade). Consommé par le
+      bandeau IHM et le troubleshooting pour répondre « pourquoi ça bloque ».
+   🔒 Bits nommés (pas de masque hexa, AF03 §4). Plusieurs bits peuvent être
+      TRUE simultanément (toutes les divergences détectées).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="H_TREUILS_BENNE">
+          <Folder Name="_TYPES">
+            <Object Name="ST_SyncContactorDiag" ObjectId="e71417df-d1db-5140-ade6-a84ec0d571c8" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

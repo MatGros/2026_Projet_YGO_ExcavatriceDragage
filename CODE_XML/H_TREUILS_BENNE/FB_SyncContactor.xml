@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T21:17:33.165908" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T21:17:33.165908">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T13:10:55.090054" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T13:10:55.090054">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -22,7 +22,87 @@
     </addData>
   </contentHeader>
   <types>
-    <dataTypes />
+    <dataTypes>
+      <dataType name="ST_SyncContactorDiag">
+        <baseType>
+          <struct>
+            <variable name="RelayFwdMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais montée M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais descente M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step1Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 1 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 2 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 3 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 4 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MismatchLevel">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = aucun · 1 = discordance confirmée (SafeStop) · 2 = escalade (PowerCutOff)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e71417df-d1db-5140-ade6-a84ec0d571c8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔀 ST_SyncContactorDiag — Diagnostic discordance contacteurs M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : dire EN CLAIR quel contacteur diverge entre M1 et M2 et à quel
+      niveau on est (aucun / mismatch confirmé / escalade). Consommé par le
+      bandeau IHM et le troubleshooting pour répondre « pourquoi ça bloque ».
+   🔒 Bits nommés (pas de masque hexa, AF03 §4). Plusieurs bits peuvent être
+      TRUE simultanément (toutes les divergences détectées).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
     <pous>
       <pou name="FB_SyncContactor" pouType="functionBlock">
         <interface>
@@ -168,19 +248,65 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTAT ===
-&lt;-- [SAFE] Discordance commande/contacteurs confirmee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RESULTAT (reponse graduee) ===
+&lt;-- [SAFE] Niveau 1 : discordance commande/contacteurs confirmee (debounce) -&gt; SafeStop</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorMismatchEscalated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Niveau 2 : discordance persistante -&gt; escalade PowerCutOff</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Diag">
+              <type>
+                <derived name="ST_SyncContactorDiag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Detail : quel contacteur diverge + niveau atteint</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
+            <variable name="MismatchDebounce">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Filtre transitoires/rampes avant de confirmer la discordance (niveau 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_SyncEscalationTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#3s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Discordance confirmee tenue au-dela de ce delai -&gt; escalade (niveau 2)</xhtml>
+              </documentation>
+            </variable>
             <variable name="MismatchTimer">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS ET TIMERS INTERNES ===
-. [LOC] Tempo filtrage incoherence commande</xhtml>
+. [LOC] Tempo filtrage incoherence (niveau 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EscalationTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo escalade (niveau 2)</xhtml>
               </documentation>
             </variable>
             <variable name="MismatchActive">
@@ -189,7 +315,7 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
-. [LOC] Discordance commande active</xhtml>
+. [LOC] Discordance instantanee (avant debounce)</xhtml>
               </documentation>
             </variable>
             <variable name="BothCommanded">
@@ -208,8 +334,12 @@
    🎯 Rôle : Detecter une discordance entre les commandes/contacteurs des
       2 treuils (sens + paliers). Independante des codeurs — surveillable
       meme si les codeurs sont bypasses.
-   🔌 Interface : Bloc de surveillance transverse (1 instance)
-   🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee.
+   🔌 Interface : Bloc de surveillance transverse (1..N instances : requetes
+      amont dans FB_WinchSync, sorties physiques finales dans PRG_06).
+   🔒 Polarite : ContactorMismatch = TRUE si discordance confirmee (debounce).
+      Reponse GRADUEE : ContactorMismatch (niveau 1, filtre MismatchDebounce)
+      -&gt; SafeStop ; ContactorMismatchEscalated (niveau 2, si la discordance
+      tient CST_SyncEscalationTime) -&gt; escalade PowerCutOff.
    ⚖️ Concordance ACTIVE des que les 2 treuils sont commandes (relais ou
       contacteur) OU en mode synchronisme (SyncEnable). Seul BypassGlobal
       neutralise.
@@ -223,40 +353,61 @@
 
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE
-IF NOT Enable THEN
+IF NOT Enable OR BypassGlobal THEN
     ContactorMismatch := FALSE;
+    ContactorMismatchEscalated := FALSE;
     MismatchActive := FALSE;
+    BothCommanded := FALSE;
     MismatchTimer(IN := FALSE);
+    EscalationTimer(IN := FALSE);
+    Diag.RelayFwdMismatch := FALSE;
+    Diag.RelayRevMismatch := FALSE;
+    Diag.Step1Mismatch := FALSE;
+    Diag.Step2Mismatch := FALSE;
+    Diag.Step3Mismatch := FALSE;
+    Diag.Step4Mismatch := FALSE;
+    Diag.MismatchLevel := 0;
     RETURN;
 END_IF;
 {endregion}
 
-{region "§2 Detection discordance"}
+{region "§2 Detection discordance + diagnostic decode"}
 // 🔍 2. COHÉRENCE DES COMMANDES SÉCURITÉ — verifie que les commandes envoyees
 // aux deux treuils sont identiques (sens et contacteurs).
 // Concordance ACTIVE des que les 2 treuils sont commandes (relais ou contacteur)
-// OU en mode synchronisme (SyncEnable). Seul BypassGlobal neutralise.
-// Filtre de 500ms pour tolerer les transitions et rampes.
-IF NOT BypassGlobal THEN
-    BothCommanded := (RelayFwdM1 OR RelayRevM1 OR Contactor1_M1 OR Contactor2_M1
-                      OR Contactor3_M1 OR Contactor4_M1)
-                 AND (RelayFwdM2 OR RelayRevM2 OR Contactor1_M2 OR Contactor2_M2
-                      OR Contactor3_M2 OR Contactor4_M2);
-    MismatchActive := (BothCommanded OR SyncEnable) AND (
-        (RelayFwdM1 &lt;&gt; RelayFwdM2) OR
-        (RelayRevM1 &lt;&gt; RelayRevM2) OR
-        (Contactor1_M1 &lt;&gt; Contactor1_M2) OR
-        (Contactor2_M1 &lt;&gt; Contactor2_M2) OR
-        (Contactor3_M1 &lt;&gt; Contactor3_M2) OR
-        (Contactor4_M1 &lt;&gt; Contactor4_M2)
-    );
-    MismatchTimer(IN := MismatchActive, PT := T#500ms);
-    ContactorMismatch := MismatchTimer.Q;
+// OU en mode synchronisme (SyncEnable).
+BothCommanded := (RelayFwdM1 OR RelayRevM1 OR Contactor1_M1 OR Contactor2_M1
+                  OR Contactor3_M1 OR Contactor4_M1)
+             AND (RelayFwdM2 OR RelayRevM2 OR Contactor1_M2 OR Contactor2_M2
+                  OR Contactor3_M2 OR Contactor4_M2);
+
+// Diagnostic decode : quel(s) contacteur(s) diverge(nt) (bits nommes, plusieurs possibles).
+Diag.RelayFwdMismatch := (BothCommanded OR SyncEnable) AND (RelayFwdM1 &lt;&gt; RelayFwdM2);
+Diag.RelayRevMismatch := (BothCommanded OR SyncEnable) AND (RelayRevM1 &lt;&gt; RelayRevM2);
+Diag.Step1Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor1_M1 &lt;&gt; Contactor1_M2);
+Diag.Step2Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor2_M1 &lt;&gt; Contactor2_M2);
+Diag.Step3Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor3_M1 &lt;&gt; Contactor3_M2);
+Diag.Step4Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor4_M1 &lt;&gt; Contactor4_M2);
+
+MismatchActive := Diag.RelayFwdMismatch OR Diag.RelayRevMismatch
+    OR Diag.Step1Mismatch OR Diag.Step2Mismatch
+    OR Diag.Step3Mismatch OR Diag.Step4Mismatch;
+
+// Niveau 1 : discordance confirmee apres MismatchDebounce.
+MismatchTimer(IN := MismatchActive, PT := MismatchDebounce);
+ContactorMismatch := MismatchTimer.Q;
+
+// Niveau 2 : la discordance confirmee tient au-dela de CST_SyncEscalationTime.
+EscalationTimer(IN := ContactorMismatch, PT := CST_SyncEscalationTime);
+ContactorMismatchEscalated := EscalationTimer.Q;
+
+// Niveau publie.
+IF ContactorMismatchEscalated THEN
+    Diag.MismatchLevel := 2;
+ELSIF ContactorMismatch THEN
+    Diag.MismatchLevel := 1;
 ELSE
-    ContactorMismatch := FALSE;
-    MismatchActive := FALSE;
-    BothCommanded := FALSE;
-    MismatchTimer(IN := FALSE);
+    Diag.MismatchLevel := 0;
 END_IF;
 {endregion}
 </xhtml>
@@ -278,6 +429,9 @@ END_IF;
       <ProjectStructure>
         <Folder Name="H_TREUILS_BENNE">
           <Object Name="FB_SyncContactor" ObjectId="afd229de-316d-5899-8a37-8c30dbfd06db" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_SyncContactorDiag" ObjectId="e71417df-d1db-5140-ade6-a84ec0d571c8" />
+          </Folder>
         </Folder>
       </ProjectStructure>
     </data>
