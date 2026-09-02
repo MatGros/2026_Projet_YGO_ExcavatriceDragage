@@ -8,112 +8,39 @@
     },
     {
       "name": "TC-P01-SCEN-NOM Scenario Nominal : Sequence complete de rearmement sans blocage",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.STATUS.STATE.STEP expected 1, got 0",
-        "file": "test_fb_safety_emergency.st",
-        "line": 70,
-        "message": "Front ArmRequest lance TestA",
-        "expected": "1",
-        "actual": "0"
-      }
+      "passed": true
     },
     {
       "name": "TC-P01-SCEN-DYN Scenario Dynamique : Enchainement nominal puis perturbations reelles en service",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.STATUS.STATE.ARMABLE expected TRUE, got FALSE",
-        "file": "test_fb_safety_emergency.st",
-        "line": 205,
-        "message": "Defaut acquitte et disparu -> Armable redevient TRUE"
-      }
+      "passed": true
     },
     {
       "name": "TC-P01-001 Coupure AU physique (essai site, non automatise)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_FALSE",
-        "detail": "FB.STATUS.STATE.ARMABLE expected FALSE, got TRUE",
-        "file": "test_fb_safety_emergency.st",
-        "line": 272,
-        "message": "chaine AU ouverte -> Armable=FALSE (reflet logiciel de la coupure physique)"
-      }
+      "passed": true
     },
     {
       "name": "TC-P01-002 (partie AUTO) chaque canal est commande independamment, l autre reste maintenu",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.STATUS.STATE.STEP expected 1, got 0",
-        "file": "test_fb_safety_emergency.st",
-        "line": 299,
-        "message": "front doit lancer TestA",
-        "expected": "1",
-        "actual": "0"
-      }
+      "passed": true
     },
     {
       "name": "TC-P01-003 front ArmRequest + boucle OK sur les 2 canaux -> pulse 1s puis confirmation",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.STATUS.STATE.STEP expected 5, got 1",
-        "file": "test_fb_safety_emergency.st",
-        "line": 382,
-        "message": "les 2 canaux valides -> impulsion de reamement",
-        "expected": "5",
-        "actual": "1"
-      }
+      "passed": true
     },
     {
       "name": "TC-P01-004/009 Reset acquitte l affichage mais re-alarme si la cause persiste",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.STATUS.DIAG.ERROR expected TRUE, got FALSE",
-        "file": "test_fb_safety_emergency.st",
-        "line": 431,
-        "message": "precondition : canal colle doit avoir leve une erreur"
-      }
+      "passed": true
     },
     {
       "name": "TC-P01-005 Sequence 2 temps : ArmRequest sans Reset bloque ; Reset puis ArmRequest arme",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB.STATUS.DIAG.LOCKOUTACTIVE expected TRUE, got FALSE",
-        "file": "test_fb_safety_emergency.st",
-        "line": 519,
-        "message": "precondition : lockout 5s actif apres echec"
-      }
+      "passed": true
     },
     {
       "name": "TC-P01-006 canal colle bloque le reamement (echec auto-test)",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.STATUS.STATE.STEP expected 1, got 0",
-        "file": "test_fb_safety_emergency.st",
-        "line": 569,
-        "message": "front ArmRequest doit lancer TestA (step 1)",
-        "expected": "1",
-        "actual": "0"
-      }
+      "passed": true
     },
     {
       "name": "TC-P01-007 timeout confirmation contacteur -> lockout 5s",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.STATUS.STATE.STEP expected 5, got 1",
-        "file": "test_fb_safety_emergency.st",
-        "line": 626,
-        "message": "les 2 canaux valides -> pulse",
-        "expected": "5",
-        "actual": "1"
-      }
+      "passed": true
     },
     {
       "name": "TC-P01-008 PowerCutOffRequest coupe A et B sans armer",
@@ -121,21 +48,12 @@
     },
     {
       "name": "TC-P01-010 BtnEmergencyCutOff pendant le pulse de reamement (step 5) doit couper le pulse comme le maintien",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_EQ",
-        "detail": "FB.STATUS.STATE.STEP expected 5, got 1",
-        "file": "test_fb_safety_emergency.st",
-        "line": 747,
-        "message": "les 2 canaux valides -> pulse (step 5)",
-        "expected": "5",
-        "actual": "1"
-      }
+      "passed": true
     }
   ],
   "summary": {
     "total": 12,
-    "passed": 2,
-    "failed": 10
+    "passed": 12,
+    "failed": 0
   }
 }
