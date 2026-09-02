@@ -1,0 +1,716 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T08:09:19.557899" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T08:09:19.557899">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_Fault">
+        <baseType>
+          <struct>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LIVE : au moins une cause présente maintenant</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] bitfield des causes présentes maintenant (0 si aucune)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] vue LATCHÉE : défaut non acquitté, reste jusqu'au front Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] ErrorId figé à l'apparition du défaut, effacé au Reset</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ffe904a3-501c-5aac-bc38-202f178a61f2</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Fault — Brique socle défaut (2 vues : live + latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l'état défaut d'un composant, applicable dans TOUS les cas
+      (acquittable ou non), sans brique warning séparée.
+        • Vue LIVE   (Error / ErrorId)     : suit la cause, retombe seule à 0.
+        • Vue LATCHÉE (Latched / LatchedId): mémorisée au défaut, reste jusqu'au front Reset.
+      Le choix acquittable / non-acquittable se fait PAR CAUSE
+      (ST_FaultCause.Latching), jamais par bloc.
+   🔒 Sécurité : interlock TOUJOURS sur la cause brute (Error / ErrorId), jamais
+      sur l'acquittement. Reset TOUJOURS effectif, jamais conditionné (std §9).
+   🧬 Composition : brique de base réutilisable — sortie de FB, struct métier, GVL.
+      Texte IHM NON stocké ici : dérivé côté IHM depuis LatchedId / ErrorId.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_FaultCause">
+        <baseType>
+          <struct>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause présente maintenant (interlock sur cette valeur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latching">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cause à acquitter (arme Latched) ; 0 = live seulement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Texte">
+              <type>
+                <derived name="STRING" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">libellé prêt IHM (non stocké dans ST_Fault, dérivé côté IHM)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>dafea4e6-0b73-5895-8c57-ef302142ebf7</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_FaultCause — Cause élémentaire alimentant ST_Fault (socle FB_FaultCore)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : une cause exprimée EN CLAIR (BOOL + libellé), sans bitfield ni masque.
+      Le FB métier remplit une liste (ARRAY[0..15] OF ST_FaultCause) ;
+      le socle FB_FaultCore en déduit ST_Fault (vue live + vue latchée).
+   🔒 Sécurité : interlock TOUJOURS sur Active (cause brute), jamais sur le latch.
+      Latching = TRUE  → la cause ARME la vue latchée (défaut à acquitter).
+      Latching = FALSE → la cause n'alimente que la vue live (retombe seule).
+      Fail-safe : une cause laissée à Latching=FALSE reste visible en live —
+      pour la rendre acquittable, il faut le déclarer explicitement.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Lifecycle">
+        <baseType>
+          <struct>
+            <variable name="Busy">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Done">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] 1 = action terminée avec succès</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b6983c9c-4d76-5d4e-899b-e996cbf34849</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 ST_Lifecycle — Brique socle cycle d'exécution
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter l'avancement d'une action à cycle (organe, séquenceur).
+      Optionnelle : un FB purement synchrone (conditionneur, filtre, joystick)
+      ne la porte pas.
+   🧬 Composition : brique de base réutilisable, composée avec ST_Fault.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous>
+      <pou name="FB_Recover_Ethercat" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Enable + Reset) ===
+--&gt; [CMD]  Autorisation generale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Front acquittement defauts</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Request">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ===
+--&gt; [CMD]  Front = demande de relance (= FaultMachineReset_IHM si bus en erreur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BusInError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   TRUE = au moins un esclave EtherCAT hors RUNNING OU maitre en erreur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MasterConfigFinished">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS MAITRE ETHERCAT (cables depuis PRG_02 : EtherCAT_Master.*) ===
+--&gt; [HW]   EtherCAT_Master.xConfigFinished</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MasterError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   EtherCAT_Master.xError</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineStopped">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GARDE SECURITE ===
+--&gt; [SAFE] TRUE = aucun mouvement commande, freins serres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_PowerUpDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#4s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ===
+--&gt; [CFG] Delai apres retour energie avant impulsion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_ConfigTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#10s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai max attente xConfigFinished</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Ready + Fault) ===
+&lt;-- [STAT] Surveillance active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut (via FB_FaultCore)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Lifecycle">
+              <type>
+                <derived name="ST_Lifecycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CYCLE DE VIE ===
+&lt;-- [STAT] Busy / Done</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartPulse">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES D'ACTION ===
+&lt;-- [ACT]  Impulsion 1 cycle -&gt; EtherCAT_Master.xRestart (piloté par PRG_02)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InvalidateEncoders">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Impulsion a la reprise -&gt; forcer re-homing M1/M2</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Socle defaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Liste des causes en clair</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT ===
+. [LOC] Front montant Request</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MACHINE D'ETAT ===
+. [LOC] 0 IDLE, 1 WAIT_POWERUP, 2 PULSE, 3 WAIT_CONFIG, 4 SETTLE, 5 DONE, 6 FAIL</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonPowerUp">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo power-up devices</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonConfig">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timeout attente xConfigFinished</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseNotStopped">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES (drapeaux latches) ===
+. [LOC] Relance refusee : machine non arretee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseConfigTimeout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] xConfigFinished jamais TRUE dans le delai</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseMasterError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] EtherCAT_Master.xError pendant la relance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseBusStillDown">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Relance faite mais esclaves toujours hors RUNNING</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ FB_Recover_Ethercat — Relance à chaud du maître EtherCAT
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : sur front Request, machine à l'arrêt, attend une tempo power-up
+      puis émet RestartPulse (→ EtherCAT_Master.xRestart, piloté par PRG_02)
+      et surveille xConfigFinished / xError jusqu'au retour du bus.
+   🔒 Sécurité : ne relance aucun mouvement ; RestartPulse conditionné
+      MachineStopped ; InvalidateEncoders force le re-référencement à la reprise.
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Gate + fronts + machine d'etat"}
+ReqEdge(CLK := Request);
+ResetEdge(CLK := Reset);
+
+IF NOT Enable THEN
+    Step := 0;
+    RestartPulse := FALSE;
+    InvalidateEncoders := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+    Ready := FALSE;
+    TonPowerUp(IN := FALSE);
+    TonConfig(IN := FALSE);
+ELSE
+    Ready := TRUE;
+    RestartPulse := FALSE;      // impulsion : FALSE par defaut, TRUE 1 cycle en step PULSE
+    InvalidateEncoders := FALSE;
+
+    // CASE a etiquettes litterales : 0..6 (voir declaration Step).
+    CASE Step OF
+        0: // IDLE
+            Lifecycle.Busy := FALSE;
+            TonPowerUp(IN := FALSE);
+            TonConfig(IN := FALSE);
+            IF ReqEdge.Q AND BusInError THEN
+                IF MachineStopped THEN
+                    CauseNotStopped    := FALSE;
+                    CauseConfigTimeout := FALSE;
+                    CauseMasterError   := FALSE;
+                    CauseBusStillDown  := FALSE;
+                    Lifecycle.Done := FALSE;
+                    Step := 1;
+                ELSE
+                    CauseNotStopped := TRUE; // refus : machine pas a l'arret
+                END_IF;
+            END_IF;
+
+        1: // WAIT_POWERUP
+            Lifecycle.Busy := TRUE;
+            TonPowerUp(IN := TRUE, PT := Cfg_PowerUpDelay);
+            IF NOT MachineStopped THEN
+                CauseNotStopped := TRUE;
+                Step := 6;
+            ELSIF TonPowerUp.Q THEN
+                Step := 2;
+            END_IF;
+
+        2: // PULSE
+            RestartPulse := TRUE; // 1 cycle -&gt; EtherCAT_Master.xRestart
+            Step := 3;
+
+        3: // WAIT_CONFIG
+            TonConfig(IN := TRUE, PT := Cfg_ConfigTimeout);
+            IF MasterError THEN
+                CauseMasterError := TRUE;
+                Step := 6;
+            ELSIF MasterConfigFinished AND NOT BusInError THEN
+                Step := 4;
+            ELSIF TonConfig.Q THEN
+                IF BusInError THEN
+                    CauseBusStillDown := TRUE;
+                ELSE
+                    CauseConfigTimeout := TRUE;
+                END_IF;
+                Step := 6;
+            END_IF;
+
+        4: // SETTLE
+            InvalidateEncoders := TRUE; // 1 cycle -&gt; re-homing obligatoire M1/M2
+            Step := 5;
+
+        5: // DONE
+            Lifecycle.Busy := FALSE;
+            Lifecycle.Done := TRUE;
+            IF ReqEdge.Q THEN
+                Step := 0; // re-armable
+            END_IF;
+
+        6: // FAIL
+            Lifecycle.Busy := FALSE;
+            IF ResetEdge.Q THEN
+                Step := 0;
+            END_IF;
+
+        ELSE
+            Step := 0;
+    END_CASE;
+END_IF;
+{endregion}
+
+{region "§2 Socle defaut (FB_FaultCore)"}
+instCauses[0].Active := CauseNotStopped;    instCauses[0].Latching := TRUE; instCauses[0].Texte := 'Recovery EtherCAT refuse - machine non arretee';
+instCauses[1].Active := CauseConfigTimeout; instCauses[1].Latching := TRUE; instCauses[1].Texte := 'Recovery EtherCAT - xConfigFinished timeout';
+instCauses[2].Active := CauseMasterError;   instCauses[2].Latching := TRUE; instCauses[2].Texte := 'Recovery EtherCAT - maitre en erreur';
+instCauses[3].Active := CauseBusStillDown;  instCauses[3].Latching := TRUE; instCauses[3].Texte := 'Recovery EtherCAT - esclaves hors RUNNING';
+
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>18d2a32a-036a-562e-88a4-1b95a9acfc14</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_FaultCore" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation générale du FB porteur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Front d'acquittement (jamais conditionné, §9)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Causes">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Liste des causes en clair (Active / Latching / Texte)</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] FB porteur autorisé (= Enable)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Brique défaut (mappée 1:1 sur la sortie du FB porteur)</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Latch">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <BOOL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Bit laté par cause, jusqu'au Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="i">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de parcours de la liste</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧩 FB_FaultCore — Socle de remplissage de ST_Fault (vue live + vue latchée)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à partir d'une LISTE de causes en clair (ARRAY[0..15] OF
+      ST_FaultCause), produire la brique ST_Fault :
+        • Error / ErrorId   : vue LIVE, suit les causes Active, retombe seule.
+        • Latched / LatchedId: vue LATCHÉE, chaque bit figé à l'apparition d'une
+          cause `Active AND Latching`, conservé jusqu'au front Reset.
+   🔒 Sécurité :
+      - interlock TOUJOURS sur `Causes[i].Active` (cause brute), jamais sur le latch.
+      - Reset TOUJOURS effectif, jamais conditionné (std §9) — agit même Enable=FALSE.
+      - Latching=FALSE → cause visible en LIVE seulement (fail-safe : reste visible).
+      - un défaut laté non acquitté reste publié même FB désactivé (pas d'effacement
+        silencieux sur bascule Enable OFF→ON sans Reset).
+      - une cause à acquitter réapparue re-arme son bit (ré-alarme).
+   🧬 Un seul socle, réutilisé par tout FB `standard` qui expose un ST_Fault.
+      Pas de State, pas de Warning, pas de texte — hors périmètre de ce socle.
+   📄 Doc : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies / §9
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Reset (front, toujours effectif)"}
+// Front Reset : efface tous les latches. Jamais conditionné, agit même Enable=FALSE (§9).
+Ready := Enable;
+ResetEdge(CLK := Reset);
+IF ResetEdge.Q THEN
+    FOR i := 0 TO 15 DO Latch[i] := FALSE; END_FOR;
+END_IF;
+{endregion}
+
+{region "§2 Vue LIVE — Error / ErrorId"}
+// Bitfield des causes présentes MAINTENANT. Retombe seule à 0 quand les causes disparaissent.
+// Non évaluée si Enable=FALSE (pas de lecture de cause hors autorisation).
+Fault.ErrorId := 0;
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active THEN
+            Fault.ErrorId := Fault.ErrorId OR SHL(WORD#1, INT_TO_DWORD(i));
+        END_IF;
+    END_FOR;
+END_IF;
+Fault.Error := (Fault.ErrorId &lt;&gt; 0);
+{endregion}
+
+{region "§3 Armement des latches (causes à acquitter)"}
+// Une cause Active ET Latching arme son bit ; le bit reste jusqu'au front Reset (§1),
+// même si la cause disparaît. Réapparition =&gt; ré-armement (ré-alarme).
+IF Enable THEN
+    FOR i := 0 TO 15 DO
+        IF Causes[i].Active AND Causes[i].Latching THEN
+            Latch[i] := TRUE;
+        END_IF;
+    END_FOR;
+END_IF;
+{endregion}
+
+{region "§4 Vue LATCHÉE — Latched / LatchedId"}
+// Toujours publiée, y compris Enable=FALSE : un défaut non acquitté reste visible.
+Fault.LatchedId := 0;
+FOR i := 0 TO 15 DO
+    IF Latch[i] THEN
+        Fault.LatchedId := Fault.LatchedId OR SHL(WORD#1, INT_TO_DWORD(i));
+    END_IF;
+END_FOR;
+Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>182a55ac-4f1f-5204-b2e2-869f3904964e</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="C_DIAG_RESEAUX">
+          <Object Name="FB_Recover_Ethercat" ObjectId="18d2a32a-036a-562e-88a4-1b95a9acfc14" />
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
+            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

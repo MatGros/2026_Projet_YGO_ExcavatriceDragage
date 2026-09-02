@@ -89,8 +89,8 @@ VAR
     TonArmPulseInhibit      : TON; // . [LOC] Garde DURE : intervalle mini entre 2 impulsions contacteur (anti-chatter, inconditionnel)
     TonRedundancyDisplay    : TON; // . [LOC] Timer debounce affichage IHM redondance
     TonArmingFailedDisplay  : TON; // . [LOC] Timer debounce affichage IHM rearmement
-    PulseStepEndEdge        : F_TRIG; // . [LOC] Front descendant sortie etape PULSE (arme la garde anti-chatter)
-    ArmPulseInhibitActive   : BOOL;   // . [LOC] Garde anti-chatter contacteur active (aucune nouvelle impulsion)
+    SeqRunStartEdge         : R_TRIG; // . [LOC] Front montant "sequence en cours" (arme la garde anti-chatter)
+    ArmPulseInhibitActive   : BOOL;   // . [LOC] Garde anti-chatter : aucune nouvelle tentative d'armement (test A/B ou impulsion)
 
     // === SOCLE DEFAUT STANDARD (FB_FaultCore) ===
     instFault               : FB_FaultCore;                  // * [INST] Socle defaut (liste de causes -> ST_Fault)
@@ -458,12 +458,12 @@ MaintainA_NoBlock := Maintain_NoCutOff AND MaintainA_NoFault;
 MaintainB_NoBlock := Maintain_NoCutOff AND MaintainB_NoFault;
 Cmd.MaintainA_Cmd := Enable AND Maintain_ChainOk AND MaintainA_NoBlock;
 Cmd.MaintainB_Cmd := Enable AND Maintain_ChainOk AND MaintainB_NoBlock;
-// 🛡️ Garde DURE anti-chatter contacteur principal : après CHAQUE impulsion d'armement,
-//    aucune nouvelle impulsion avant CST_ArmingLockout — quel que soit l'état séquence,
-//    succès ou échec, ET les bypass ingénierie MES. Un cyclage rapide du contacteur casse
-//    le matériel. Garde inconditionnelle, au plus près de la sortie.
-PulseStepEndEdge(CLK := (ArmingSeqStep = CST_STEP_PULSE));
-IF PulseStepEndEdge.Q THEN
+// 🛡️ Garde DURE anti-chatter : dès qu'une séquence d'armement DÉMARRE (IDLE -> non-IDLE),
+//    aucune nouvelle tentative avant CST_ArmingLockout. Bloque aussi bien le test redondance
+//    (ForceTestA/B ouvre PowerKeepAlive A puis B) que l'impulsion contacteur. Inconditionnel :
+//    succès, échec, bypass ingénierie MES. Un cyclage rapide du contacteur casse le matériel.
+SeqRunStartEdge(CLK := (ArmingSeqStep <> CST_STEP_IDLE));
+IF SeqRunStartEdge.Q THEN
     ArmPulseInhibitActive := TRUE;
 END_IF;
 IF NOT Enable OR EnableRising.Q THEN

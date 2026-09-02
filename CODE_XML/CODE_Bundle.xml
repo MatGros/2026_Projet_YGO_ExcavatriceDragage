@@ -28923,6 +28923,362 @@ Current := LIMIT(-100.0, Current, 100.0);
           </data>
         </addData>
       </pou>
+      <pou name="FB_Recover_Ethercat" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Enable + Reset) ===
+--&gt; [CMD]  Autorisation generale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Reset">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD]  Front acquittement defauts</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Request">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMMANDES ===
+--&gt; [CMD]  Front = demande de relance (= FaultMachineReset_IHM si bus en erreur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BusInError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   TRUE = au moins un esclave EtherCAT hors RUNNING OU maitre en erreur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MasterConfigFinished">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RETOURS MAITRE ETHERCAT (cables depuis PRG_02 : EtherCAT_Master.*) ===
+--&gt; [HW]   EtherCAT_Master.xConfigFinished</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MasterError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW]   EtherCAT_Master.xError</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineStopped">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GARDE SECURITE ===
+--&gt; [SAFE] TRUE = aucun mouvement commande, freins serres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_PowerUpDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#4s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ===
+--&gt; [CFG] Delai apres retour energie avant impulsion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_ConfigTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#10s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai max attente xConfigFinished</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONTRAT STANDARD (Ready + Fault) ===
+&lt;-- [STAT] Surveillance active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <derived name="ST_Fault" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Defaut (via FB_FaultCore)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Lifecycle">
+              <type>
+                <derived name="ST_Lifecycle" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CYCLE DE VIE ===
+&lt;-- [STAT] Busy / Done</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartPulse">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES D'ACTION ===
+&lt;-- [ACT]  Impulsion 1 cycle -&gt; EtherCAT_Master.xRestart (piloté par PRG_02)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InvalidateEncoders">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Impulsion a la reprise -&gt; forcer re-homing M1/M2</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="instFault">
+              <type>
+                <derived name="FB_FaultCore" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES FB ===
+* [INST] Socle defaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instCauses">
+              <type>
+                <array>
+                  <dimension lower="0" upper="15" />
+                  <baseType>
+                    <derived name="ST_FaultCause" />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Liste des causes en clair</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DETECTEURS DE FRONT ===
+. [LOC] Front montant Request</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ResetEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Reset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MACHINE D'ETAT ===
+. [LOC] 0 IDLE, 1 WAIT_POWERUP, 2 PULSE, 3 WAIT_CONFIG, 4 SETTLE, 5 DONE, 6 FAIL</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonPowerUp">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo power-up devices</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonConfig">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timeout attente xConfigFinished</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseNotStopped">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CAUSES (drapeaux latches) ===
+. [LOC] Relance refusee : machine non arretee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseConfigTimeout">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] xConfigFinished jamais TRUE dans le delai</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseMasterError">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] EtherCAT_Master.xError pendant la relance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CauseBusStillDown">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Relance faite mais esclaves toujours hors RUNNING</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ FB_Recover_Ethercat — Relance à chaud du maître EtherCAT
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : sur front Request, machine à l'arrêt, attend une tempo power-up
+      puis émet RestartPulse (→ EtherCAT_Master.xRestart, piloté par PRG_02)
+      et surveille xConfigFinished / xError jusqu'au retour du bus.
+   🔒 Sécurité : ne relance aucun mouvement ; RestartPulse conditionné
+      MachineStopped ; InvalidateEncoders force le re-référencement à la reprise.
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+{region "§1 Gate + fronts + machine d'etat"}
+ReqEdge(CLK := Request);
+ResetEdge(CLK := Reset);
+
+IF NOT Enable THEN
+    Step := 0;
+    RestartPulse := FALSE;
+    InvalidateEncoders := FALSE;
+    Lifecycle.Busy := FALSE;
+    Lifecycle.Done := FALSE;
+    Ready := FALSE;
+    TonPowerUp(IN := FALSE);
+    TonConfig(IN := FALSE);
+ELSE
+    Ready := TRUE;
+    RestartPulse := FALSE;      // impulsion : FALSE par defaut, TRUE 1 cycle en step PULSE
+    InvalidateEncoders := FALSE;
+
+    // CASE a etiquettes litterales : 0..6 (voir declaration Step).
+    CASE Step OF
+        0: // IDLE
+            Lifecycle.Busy := FALSE;
+            TonPowerUp(IN := FALSE);
+            TonConfig(IN := FALSE);
+            IF ReqEdge.Q AND BusInError THEN
+                IF MachineStopped THEN
+                    CauseNotStopped    := FALSE;
+                    CauseConfigTimeout := FALSE;
+                    CauseMasterError   := FALSE;
+                    CauseBusStillDown  := FALSE;
+                    Lifecycle.Done := FALSE;
+                    Step := 1;
+                ELSE
+                    CauseNotStopped := TRUE; // refus : machine pas a l'arret
+                END_IF;
+            END_IF;
+
+        1: // WAIT_POWERUP
+            Lifecycle.Busy := TRUE;
+            TonPowerUp(IN := TRUE, PT := Cfg_PowerUpDelay);
+            IF NOT MachineStopped THEN
+                CauseNotStopped := TRUE;
+                Step := 6;
+            ELSIF TonPowerUp.Q THEN
+                Step := 2;
+            END_IF;
+
+        2: // PULSE
+            RestartPulse := TRUE; // 1 cycle -&gt; EtherCAT_Master.xRestart
+            Step := 3;
+
+        3: // WAIT_CONFIG
+            TonConfig(IN := TRUE, PT := Cfg_ConfigTimeout);
+            IF MasterError THEN
+                CauseMasterError := TRUE;
+                Step := 6;
+            ELSIF MasterConfigFinished AND NOT BusInError THEN
+                Step := 4;
+            ELSIF TonConfig.Q THEN
+                IF BusInError THEN
+                    CauseBusStillDown := TRUE;
+                ELSE
+                    CauseConfigTimeout := TRUE;
+                END_IF;
+                Step := 6;
+            END_IF;
+
+        4: // SETTLE
+            InvalidateEncoders := TRUE; // 1 cycle -&gt; re-homing obligatoire M1/M2
+            Step := 5;
+
+        5: // DONE
+            Lifecycle.Busy := FALSE;
+            Lifecycle.Done := TRUE;
+            IF ReqEdge.Q THEN
+                Step := 0; // re-armable
+            END_IF;
+
+        6: // FAIL
+            Lifecycle.Busy := FALSE;
+            IF ResetEdge.Q THEN
+                Step := 0;
+            END_IF;
+
+        ELSE
+            Step := 0;
+    END_CASE;
+END_IF;
+{endregion}
+
+{region "§2 Socle defaut (FB_FaultCore)"}
+instCauses[0].Active := CauseNotStopped;    instCauses[0].Latching := TRUE; instCauses[0].Texte := 'Recovery EtherCAT refuse - machine non arretee';
+instCauses[1].Active := CauseConfigTimeout; instCauses[1].Latching := TRUE; instCauses[1].Texte := 'Recovery EtherCAT - xConfigFinished timeout';
+instCauses[2].Active := CauseMasterError;   instCauses[2].Latching := TRUE; instCauses[2].Texte := 'Recovery EtherCAT - maitre en erreur';
+instCauses[3].Active := CauseBusStillDown;  instCauses[3].Latching := TRUE; instCauses[3].Texte := 'Recovery EtherCAT - esclaves hors RUNNING';
+
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+{endregion}
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>18d2a32a-036a-562e-88a4-1b95a9acfc14</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_Safety_EmergencyManagement" pouType="functionBlock">
         <interface>
           <inputVars>
@@ -29379,12 +29735,12 @@ shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer debounce affichage IHM rearmement</xhtml>
               </documentation>
             </variable>
-            <variable name="PulseStepEndEdge">
+            <variable name="SeqRunStartEdge">
               <type>
-                <derived name="F_TRIG" />
+                <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant sortie etape PULSE (arme la garde anti-chatter)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant "sequence en cours" (arme la garde anti-chatter)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmPulseInhibitActive">
@@ -29392,7 +29748,7 @@ shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde anti-chatter contacteur active (aucune nouvelle impulsion)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde anti-chatter : aucune nouvelle tentative d'armement (test A/B ou impulsion)</xhtml>
               </documentation>
             </variable>
             <variable name="instFault">
@@ -29838,12 +30194,12 @@ MaintainA_NoBlock := Maintain_NoCutOff AND MaintainA_NoFault;
 MaintainB_NoBlock := Maintain_NoCutOff AND MaintainB_NoFault;
 Cmd.MaintainA_Cmd := Enable AND Maintain_ChainOk AND MaintainA_NoBlock;
 Cmd.MaintainB_Cmd := Enable AND Maintain_ChainOk AND MaintainB_NoBlock;
-// 🛡️ Garde DURE anti-chatter contacteur principal : après CHAQUE impulsion d'armement,
-//    aucune nouvelle impulsion avant CST_ArmingLockout — quel que soit l'état séquence,
-//    succès ou échec, ET les bypass ingénierie MES. Un cyclage rapide du contacteur casse
-//    le matériel. Garde inconditionnelle, au plus près de la sortie.
-PulseStepEndEdge(CLK := (ArmingSeqStep = CST_STEP_PULSE));
-IF PulseStepEndEdge.Q THEN
+// 🛡️ Garde DURE anti-chatter : dès qu'une séquence d'armement DÉMARRE (IDLE -&gt; non-IDLE),
+//    aucune nouvelle tentative avant CST_ArmingLockout. Bloque aussi bien le test redondance
+//    (ForceTestA/B ouvre PowerKeepAlive A puis B) que l'impulsion contacteur. Inconditionnel :
+//    succès, échec, bypass ingénierie MES. Un cyclage rapide du contacteur casse le matériel.
+SeqRunStartEdge(CLK := (ArmingSeqStep &lt;&gt; CST_STEP_IDLE));
+IF SeqRunStartEdge.Q THEN
     ArmPulseInhibitActive := TRUE;
 END_IF;
 IF NOT Enable OR EnableRising.Q THEN
@@ -51115,6 +51471,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
           <Object Name="FB_Diag_CanOpen" ObjectId="335793a2-469c-5bc1-8663-6c12c4d0dfde" />
           <Object Name="FB_Diag_Ethercat" ObjectId="014990de-caff-57d6-8d15-66c7ad1a6908" />
           <Object Name="FB_Diag_IhmHeartbeat" ObjectId="7e9589ba-412d-5501-80d5-184905e87d23" />
+          <Object Name="FB_Recover_Ethercat" ObjectId="18d2a32a-036a-562e-88a4-1b95a9acfc14" />
           <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
         </Folder>
         <Folder Name="F_MODES">
