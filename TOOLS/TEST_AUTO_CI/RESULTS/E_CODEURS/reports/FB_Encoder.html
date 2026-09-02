@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-31 22:40:09</div>
+    <div class="exec-time">2026-09-03 01:16:12</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (40 tests)</summary>
@@ -4318,8 +4318,52 @@ Ready := Enable AND NOT Fault.Latched;
     </details>
     <details>
         <summary>Sortie brute strucpp</summary>
-        <pre>
-[VAR_IN_OUT] Assertions executees par le runner copy-out recompile; voir le resultat JSON final.
+        <pre>STruC++ Test Runner v1.0
+
+test_fb_encoder.st
+  [PASS] TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure
+  [PASS] TC-P09-010 Acquisition codeur : mise en service nominale
+  [PASS] TC-P09-011 Preset READBACK_ONLY : commit atomique apres relecture 500ms
+  [PASS] TC-P09-012 Preset READBACK_AND_STATUSBIT : bit FALSE refuse sans valider
+  [PASS] TC-P09-013 Echec relecture 50mm : suspicion et diagnostic sans validation
+  [PASS] TC-P09-014 STATUSBIT_ONLY : bit TRUE valide la transaction
+  [PASS] TC-P09-015 Reset conscient : acquitte le latch sans valider le preset
+  [PASS] TC-P09-016 Fault live : perte materiel codeur (Cause 0)
+  [PASS] TC-P09-017 Fault latched : echec preset + acquittement Reset (Cause 2)
+  [PASS] TC-P09-018 Fault live : incoherence mesure (Cause 1)
+  [PASS] TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations)
+  [PASS] TC-P09-010.1 Abs gel sur doute : perte bus -&gt; EncoderAvailable=FALSE, RawPos gele
+  [PASS] TC-P09-010.3 Abs acquisition nominale : bus OK -&gt; RawPos=RawPosIn, EncoderAvailable
+  [PASS] TC-P09-010.4 Abs preset : front PresetRequest -&gt; PresetTriggerCmd=2
+  [PASS] TC-P09-020 Homing : sequence nominale complete (front Home + capteur haut) -&gt; Homed
+  [PASS] TC-P09-020.1 Homing nominal : front Home + capteur haut -&gt; cible CfgTopSensorPosM
+  [PASS] TC-P09-020.2 Homing unitaire : front Home seul -&gt; cible CfgHomingTargetM
+  [PASS] T198-001 Commande BtnHome : cible haute explicite meme sans capteur
+  [PASS] T198-002 Commande BtnHomingAtZero : cible zero explicite
+  [PASS] TC-P09-020.3 Homing dynamique : front UseDynamicTarget -&gt; cible DynamicHomingTargetM
+  [PASS] TC-P09-020.4 Homing cible hors plage : cible &gt; 99m -&gt; refuse, pas d ecriture
+  [PASS] TC-P09-020.5 Coherence boot : ecart RawPos/LastKnown &gt; tolerance -&gt; HomingSuspect, leve par ConfirmCoherence+Permit
+  [PASS] TC-P09-020.6 Capteur haut absent : mode nominal ne declenche pas, seul unitaire/dynamique
+  [PASS] TC-P09-020.7 Homing sans permit : front Home sans HomingPermit -&gt; HomingModeError, pas d ecriture
+  [PASS] TC-P09-020.8 HomingSuspect RETAIN : stocke dans Calib -&gt; persiste (FB_Encoder_Homing.st:185)
+  [PASS] TC-P09-030.1 Scale : RawPos=HomingRefRaw+4096 (1/2 tour) -&gt; CablePosM=1.0
+  [PASS] TC-P09-030.2 Scale : RawPos &lt; HomingRefRaw -&gt; CablePosM negative (sous l eau)
+  [PASS] TC-P09-030.4 Safety bornage : CablePosM hors [Min;Max] -&gt; EncoderIncoherent, auto-efface
+  [PASS] TC-P09-030.5 Safety HomingSuspect : HomingSuspect=TRUE -&gt; EncoderIncoherent, tant que non confirme
+  [PASS] TC-P09-030.6 Safety BypassGlobal : TRUE neutralise bornage+coherence, retour FALSE -&gt; causes reactives
+  [PASS] TC-P09-030.7 Safety CablePosMSafe : = CablePosM toujours (jamais gelee)
+  [PASS] TC-P09-030.8 Scale garde DINT : conversion DINT avant soustraction -&gt; pas de depassement
+  [PASS] TC-P09-030.9 Scale : RawPos=HomingRefRaw -&gt; CablePosM=0.0
+  [PASS] TC-P09-040.1 Reliability : EncoderAvailable=TRUE, Homed=FALSE, Incoherent=FALSE -&gt; EncoderFault=FALSE
+  [PASS] TC-P09-040.2 Reliability : meme cas -&gt; HomedAndReliable=FALSE (gate stricte exige Homed)
+  [PASS] TC-P09-040.3 Reliability : EncoderAvailable=FALSE -&gt; EncoderFault=TRUE quel que soit Homed
+  [PASS] TC-P09-040.4 Reliability : table de verite des 2 gates sur 8 combos
+  [PASS] TC-P09-040.5 Reliability : EncoderIncoherent -&gt; EncoderFault=TRUE et HomedAndReliable=FALSE
+  [PASS] TC-P09-050.5 Speed : fenetre &lt;50ms -&gt; Valid=FALSE sans purge (essai SITE - stub logique)
+  [PASS] TC-P09-050.6 Speed : SignedSpeed=(P[5]-P[0])/WindowElapsed, Speed=ABS
+
+-----------------------------------------
+40 tests, 40 passed, 0 failed
 </pre>
     </details>
 </div>

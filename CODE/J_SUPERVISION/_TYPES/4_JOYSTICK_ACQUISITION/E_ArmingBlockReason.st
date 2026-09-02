@@ -13,5 +13,5 @@ TYPE E_ArmingBlockReason :
     CONTACTOR_OFF   := 3,   // Chaîne AU non réarmée (PowerContactorEngaged FALSE)
     BUCKET_BUSY     := 4,   // Action benne en cours (+ 1 scan de fin d'action)
     ALL_AXES_BLOCKED := 5   // Base OK mais aucun axe x sens sélectionné n'est disponible
-) INT;
+);
 END_TYPE

@@ -128,7 +128,7 @@ END_VAR
 VAR_OUTPUT
     // === 🚌 Bus Publics Inter-PRG Produits ===
     BusAcq                  : ST_AcquisitionInterPrg;
-    BusModes                : ST_fbModes_Autorisations;
+    BusModes                : ST_Modes_Autorisations;
     BusWinch                : ST_WinchInterPrg;
     BusTranslation          : ST_TranslationInterPrg;
     BusOutputs              : ST_OutputsInterPrg;
@@ -192,6 +192,7 @@ VAR
     reqProgramLocal         : ST_ProgramRequest;
     seqStateLocal           : ST_SequencePublicState;
     bucketPersistLocal      : ST_fbBucket_Config;
+    mechStateLocal          : ST_fbBucket_State;
 END_VAR
 
 VAR CONSTANT
@@ -325,24 +326,24 @@ BusAcq := prg02.Data;
 // ── 1bis. Modèle physique = source de vérité des capteurs treuils (override déterministe) ──
 // Le harnais PRG_02 dérive les positions des valeurs brutes COD ; le modèle les écrase avec
 // ses valeurs intégrées exactes et qualifie codeurs homés/opérationnels + vitesse signée.
-BusAcq.Encoders.M1.CablePosM    := m1PosModel;
-BusAcq.Encoders.M1.Speed_Mps    := ABS(v1Model);
-BusAcq.Encoders.M1.SignedSpeed_Mps := v1Model;
-BusAcq.Encoders.M1.SpeedValid   := TRUE;
-BusAcq.Encoders.M2.CablePosM    := m2PosModel;
-BusAcq.Encoders.M2.Speed_Mps    := ABS(v2Model);
-BusAcq.Encoders.M2.SignedSpeed_Mps := v2Model;
-BusAcq.Encoders.M2.SpeedValid   := TRUE;
+BusAcq.EncoderM1.Measurement.CablePosM    := m1PosModel;
+BusAcq.EncoderM1.Measurement.Speed_Mps    := ABS(v1Model);
+BusAcq.EncoderM1.Measurement.SignedSpeed_Mps := v1Model;
+BusAcq.EncoderM1.Measurement.SpeedValid   := TRUE;
+BusAcq.EncoderM2.Measurement.CablePosM    := m2PosModel;
+BusAcq.EncoderM2.Measurement.Speed_Mps    := ABS(v2Model);
+BusAcq.EncoderM2.Measurement.SignedSpeed_Mps := v2Model;
+BusAcq.EncoderM2.Measurement.SpeedValid   := TRUE;
 BusAcq.EncoderM1.Homed          := TRUE;
 BusAcq.EncoderM1.HomingSuspect  := FALSE;
 BusAcq.EncoderM1.Measurement.EncoderAvailable := TRUE;
 BusAcq.EncoderM1.Measurement.HomingLifecycle.Busy := FALSE;
-BusAcq.M1_HomedAndReliable      := TRUE;
+BusAcq.EncoderM1.HomedAndReliable      := TRUE;
 BusAcq.EncoderM2.Homed          := TRUE;
 BusAcq.EncoderM2.HomingSuspect  := FALSE;
 BusAcq.EncoderM2.Measurement.EncoderAvailable := TRUE;
 BusAcq.EncoderM2.Measurement.HomingLifecycle.Busy := FALSE;
-BusAcq.M2_HomedAndReliable      := TRUE;
+BusAcq.EncoderM2.HomedAndReliable      := TRUE;
 BusAcq.Network.EncoderM1.Operational := TRUE;
 BusAcq.Network.EncoderM2.Operational := TRUE;
 
@@ -352,8 +353,8 @@ prg03(
     SelJoystickWinch        := CmdWinchSelect,
     MachineHomed   := ModelMachineHomed,
     PowerContactorEngaged   := PowerContactorEngaged,
-    DeadmanArmed            := BusAcq.JoystickDeadmanArmed,
-    JoystickDeflected       := NOT BusAcq.JoystickYNeutral,
+    DeadmanArmed            := BusAcq.Joystick.DeadmanArmed,
+    JoystickDeflected       := NOT BusAcq.Joystick.AtNeutralXY,
     BtnModeReset            := BtnResetMachine
 );
 BusModes := prg03.Auth;
@@ -366,8 +367,6 @@ CycleStateStr := prg03.CycleStateStr;
 reqProgramLocal.ReqWinchM1 := SeqReqWinchM1;
 reqProgramLocal.ReqWinchM2 := SeqReqWinchM2;
 reqProgramLocal.ReqBucket := SeqReqBucket;
-reqProgramLocal.OperatorCoupledIntent.Active := CoupledIntentActive;
-reqProgramLocal.OperatorCoupledIntent.Direction := CoupledIntentDirection;
 seqStateLocal.BottomTouchConfirmed := SeqBottomTouchConfirmed;
 seqStateLocal.DumpAtTremieDescentLocked := SeqDumpAtTremieDescentLocked;
 bucketPersistLocal.OffsetOpenM := BucketOffsetOpenM;
@@ -377,18 +376,9 @@ bucketPersistLocal.OpenAnticipationM := BucketOpenAnticipationM;
 bucketPersistLocal.CloseAnticipationM := BucketCloseAnticipationM;
 
 prg04(
+    BucketMech              := mechStateLocal,
     AcqData                 := BusAcq,
     ModesAuth               := BusModes,
-    ReqProgram              := reqProgramLocal,
-    SeqState                := seqStateLocal,
-    AcqHw                   := prg02.HwIn,
-    PowerContactorEngaged   := PowerContactorEngaged,
-    M1_ContactorsReleased   := m1ContactorsReleasedModel,
-    M2_ContactorsReleased   := m2ContactorsReleasedModel,
-    M1_BrakeFeedbackOpen    := m1BrakeFeedbackModel,
-    M2_BrakeFeedbackOpen    := m2BrakeFeedbackModel,
-    FaultMachineResetIHM    := BtnResetMachine,
-    TglJoystickMaster       := TglJoystickMaster,
     BtnWinchM1Up            := BtnWinchM1Up,
     BtnWinchM1Down          := BtnWinchM1Down,
     BtnWinchM2Up            := BtnWinchM2Up,
@@ -397,40 +387,23 @@ prg04(
     BtnWinchBothDown        := BtnWinchBothDown,
     BucketBtnOpen           := BucketCmdOpen,
     BucketBtnClose          := BucketCmdClose,
-    BucketConfirmOpenPos    := BucketConfirmOpenPos,
-    BucketConfirmClosePos   := BucketConfirmClosePos,
-    TglManualBucketLimits   := TglManualBucketLimits,
-    TglEnableCoupledBucketSequencing := TglEnableCoupledBucketSequencing,
-    TglEnableKoboldAutoStopDescent   := TglEnableKoboldAutoStopDescent,
-    HeartbeatIhmOk          := HeartbeatIhmOk,
-    LimitLegalReached       := LimitLegalReached,
-    CfgWinchMaxStepAscent   := CfgMaxStepAscent,
-    CfgWinchMaxStepDescente := MaxStepDescent,
-    LimitLegalEnabled       := LimitLegalEnabled,
-    LimitLegalDepthMinAllowedM := LimitLegalDepthMinAllowedM,
+    PowerContactorEngaged   := PowerContactorEngaged,
+    M1_ContactorsReleased   := m1ContactorsReleasedModel,
+    M2_ContactorsReleased   := m2ContactorsReleasedModel,
+    M1_BrakeFeedbackOpen    := m1BrakeFeedbackModel,
+    M2_BrakeFeedbackOpen    := m2BrakeFeedbackModel,
+    FaultMachineResetIHM    := BtnResetMachine,
     CfgCableLimitAscentM    := CfgAscentLimitM,
     CfgCableLimitDescentM1  := CfgDescentLimitM1,
     CfgCableLimitDescentM2  := CfgDescentLimitM2,
     WinchSlowdownDistanceM  := SlowdownDistanceM,
     WinchSlowdownMaxStep    := SlowdownMaxStep,
-    CfgSyncToleranceM       := SyncToleranceM,
-    CfgSyncCriticalToleranceM := SyncCriticalToleranceM,
-    ImmersionLowerM         := ImmersionLowerM,
-    ImmersionUpperM         := ImmersionUpperM,
-    ExtractionControlDistanceM := ExtractionControlDistanceM,
-    SyncSoftStopEnable      := SyncSoftStopEnable,
     SpeedStepTable          := SpeedTable,
-    BucketPersistConfig     := bucketPersistLocal,
-    BucketCfgTimeoutDuration := BucketCfgTimeoutDuration,
-    BucketSeedOpen          := BucketSeedOpen,
-    BypassM1                := BypassM1,
-    BypassM2                := BypassM2,
-    BypassCommun            := BypassCommun,
-    BypassSync              := BypassSync
+    BucketPersistConfig     := bucketPersistLocal
 );
 BusWinch := prg04.Data;
-KoboldImmersionConfirmed := prg04.KoboldImmersionConfirmed;
-KoboldBottomTouchLatched := prg04.KoboldBottomTouchLatched;
+KoboldImmersionConfirmed := FALSE;
+KoboldBottomTouchLatched := FALSE;
 
 // ── 4. PRG_05 : Contrôle Translation M3 ──
 prg05(

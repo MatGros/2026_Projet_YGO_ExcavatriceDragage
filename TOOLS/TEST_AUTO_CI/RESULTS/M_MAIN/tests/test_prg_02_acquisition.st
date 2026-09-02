@@ -19,14 +19,14 @@ TEST 'PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consign
     harness(JoyRawX := 5000, JoyRawY := 5000, JoyBtnRaw := TRUE);
     
     // Vérification de la structure Data (ST_AcquisitionInterPrg)
-    ASSERT_TRUE(harness.Data.JoystickDeadmanArmed, 'Structure Data: Homme-mort arme avec succes');
-    ASSERT_EQ(harness.Data.Encoders.M1.CablePosM, 2.0, 'Structure Data: Position cable M1 = 2.0m');
-    ASSERT_TRUE(harness.Data.M1_HomedAndReliable, 'Structure Data: Codeur M1 fiabilise');
+    ASSERT_TRUE(harness.Data.Joystick.DeadmanArmed, 'Structure Data: Homme-mort arme avec succes');
+    ASSERT_EQ(harness.Data.EncoderM1.Measurement.CablePosM, 2.0, 'Structure Data: Position cable M1 = 2.0m');
+    ASSERT_TRUE(harness.Data.EncoderM1.HomedAndReliable, 'Structure Data: Codeur M1 fiabilise');
 
     // 2. Mouvement manche a droite (RawX = 8000)
     harness(JoyRawX := 8000, JoyRawY := 5000, JoyBtnRaw := TRUE);
-    ASSERT_EQ(harness.Data.JoystickDirectionX, 1, 'Sens X positif detecte (Translation Droite)');
-    ASSERT_GT(harness.Data.JoystickSpeedPctX, 0.0, 'Consigne de vitesse non nulle transmise sur le bus Data');
+    ASSERT_EQ(harness.Data.Joystick.AxisX.Direction, 1, 'Sens X positif detecte (Translation Droite)');
+    ASSERT_GT(harness.Data.Joystick.AxisX.SpeedTgt, 0.0, 'Consigne de vitesse non nulle transmise sur le bus Data');
     
     // Vérification de la structure d'image matérielle HwIn (ST_HardwareImage)
     ASSERT_EQ(harness.HwIn.Operator.JoyXRaw_ANA1, 8000, 'Structure HwIn: JoyXRaw_ANA1 transmis');

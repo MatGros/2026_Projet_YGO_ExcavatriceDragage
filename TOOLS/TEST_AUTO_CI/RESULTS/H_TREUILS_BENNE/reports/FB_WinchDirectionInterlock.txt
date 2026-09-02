@@ -1,86 +1,134 @@
 Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:26:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:25:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'REQDIRECTION'
+   25 |         s.FB.REQDIRECTION = 1;
+      |              ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:26:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
    26 |         s.FB.CHANGEDELAYUP = 900000000LL;
       |              ^~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:27:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:27:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
    27 |         s.FB.CHANGEDELAYDOWN = 400000000LL;
       |              ^~~~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:47:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:30:33: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'COMMANDEDDIRECTION'
+   30 |         if (!ctx.assert_eq(s.FB.COMMANDEDDIRECTION, 1, "FB.COMMANDEDDIRECTION", "1", 13, "Adoption immediate du premier sens")) return false;
+      |                                 ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:46:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'REQDIRECTION'
+   46 |         s.FB.REQDIRECTION = 1;
+      |              ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:47:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
    47 |         s.FB.CHANGEDELAYUP = 900000000LL;
       |              ^~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:48:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:48:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
    48 |         s.FB.CHANGEDELAYDOWN = 400000000LL;
       |              ^~~~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:55:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:54:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'REQDIRECTION'
+   54 |         s.FB.REQDIRECTION = 0;
+      |              ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:55:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
    55 |         s.FB.CHANGEDELAYUP = 900000000LL;
       |              ^~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:56:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:56:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
    56 |         s.FB.CHANGEDELAYDOWN = 400000000LL;
       |              ^~~~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:64:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:59:33: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'COMMANDEDDIRECTION'
+   59 |         if (!ctx.assert_eq(s.FB.COMMANDEDDIRECTION, 0, "FB.COMMANDEDDIRECTION", "0", 20, "Retour au neutre")) return false;
+      |                                 ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:63:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'REQDIRECTION'
+   63 |         s.FB.REQDIRECTION = 1;
+      |              ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:64:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
    64 |         s.FB.CHANGEDELAYUP = 900000000LL;
       |              ^~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:65:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:65:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
    65 |         s.FB.CHANGEDELAYDOWN = 400000000LL;
       |              ^~~~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:85:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:68:33: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'COMMANDEDDIRECTION'
+   68 |         if (!ctx.assert_eq(s.FB.COMMANDEDDIRECTION, 1, "FB.COMMANDEDDIRECTION", "1", 22, "Reprise du meme sens : immediate")) return false;
+      |                                 ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:84:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'REQDIRECTION'
+   84 |         s.FB.REQDIRECTION = 1;
+      |              ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:85:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
    85 |         s.FB.CHANGEDELAYUP = 900000000LL;
       |              ^~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:86:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:86:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
    86 |         s.FB.CHANGEDELAYDOWN = 400000000LL;
       |              ^~~~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:93:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:92:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'REQDIRECTION'
+   92 |         s.FB.REQDIRECTION = 0;
+      |              ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:93:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
    93 |         s.FB.CHANGEDELAYUP = 900000000LL;
       |              ^~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:94:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:94:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
    94 |         s.FB.CHANGEDELAYDOWN = 400000000LL;
       |              ^~~~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:101:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:100:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'REQDIRECTION'
+  100 |         s.FB.REQDIRECTION = -1;
+      |              ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:101:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
   101 |         s.FB.CHANGEDELAYUP = 900000000LL;
       |              ^~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:102:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:102:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
   102 |         s.FB.CHANGEDELAYDOWN = 400000000LL;
       |              ^~~~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:112:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:105:33: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'COMMANDEDDIRECTION'
+  105 |         if (!ctx.assert_eq(s.FB.COMMANDEDDIRECTION, 0, "FB.COMMANDEDDIRECTION", "0", 30, "Pas encore adopte (pending)")) return false;
+      |                                 ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:111:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'REQDIRECTION'
+  111 |         s.FB.REQDIRECTION = -1;
+      |              ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:112:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
   112 |         s.FB.CHANGEDELAYUP = 900000000LL;
       |              ^~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:113:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:113:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
   113 |         s.FB.CHANGEDELAYDOWN = 400000000LL;
       |              ^~~~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:133:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:116:33: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'COMMANDEDDIRECTION'
+  116 |         if (!ctx.assert_eq(s.FB.COMMANDEDDIRECTION, -1, "FB.COMMANDEDDIRECTION", "-1", 34, "Sens oppose adopte apres ChangeDelayDown")) return false;
+      |                                 ^~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:132:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'REQDIRECTION'
+  132 |         s.FB.REQDIRECTION = 1;
+      |              ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:133:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
   133 |         s.FB.CHANGEDELAYUP = 900000000LL;
       |              ^~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:134:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:134:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
   134 |         s.FB.CHANGEDELAYDOWN = 400000000LL;
       |              ^~~~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:141:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:140:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'REQDIRECTION'
+  140 |         s.FB.REQDIRECTION = 0;
+      |              ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:141:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYUP'; did you mean 'CHANGEDELAYASCENT'?
   141 |         s.FB.CHANGEDELAYUP = 900000000LL;
       |              ^~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_wx9u3v36\strucpp-test-nxMntQ\test_main.cpp:142:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:142:14: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'CHANGEDELAYDOWN'; did you mean 'CHANGEDELAYASCENT'?
   142 |         s.FB.CHANGEDELAYDOWN = 400000000LL;
       |              ^~~~~~~~~~~~~~~
       |              CHANGEDELAYASCENT
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_WinchDirectionInterlock_kkqetsnc\strucpp-test-Ew2M9V\test_main.cpp:145:33: error: 'class strucpp::FB_WINCHDIRECTIONINTERLOCK' has no member named 'COMMANDEDDIRECTION'
+  145 |         if (!ctx.assert_eq(s.FB.COMMANDEDDIRECTION, 0, "FB.COMMANDEDDIRECTION", "0", 41, "Neutre commande")) return false;
+      |                                 ^~~~~~~~~~~~~~~~~~
 

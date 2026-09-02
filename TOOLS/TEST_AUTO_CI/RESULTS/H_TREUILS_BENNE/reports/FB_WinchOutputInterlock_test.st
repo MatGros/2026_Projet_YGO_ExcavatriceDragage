@@ -186,7 +186,14 @@ fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, Desc
     (* Scan 5 : demande neutre observee (MotorRequest=FALSE) -> NeutralRequestSeen *)
     ADVANCE_TIME(10000000);
 fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
-       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
+       BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0);
+    ADVANCE_TIME(1500000000);
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := FALSE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := FALSE,
        RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
        RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
@@ -291,7 +298,7 @@ fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, Desc
     ASSERT_EQ(fb.State, E_WinchFinalInterlockState.WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
 
     (* Scan 5 : apres 2s (DeadTimeSameDir ecoule) -> demande meme sens acceptee *)
-    ADVANCE_TIME(500000000);
+    ADVANCE_TIME(600000000);
 fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
@@ -349,7 +356,7 @@ fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, Desc
     ASSERT_EQ(fb.State, E_WinchFinalInterlockState.WAIT_RESTART_DELAY, 'Etat WAIT_RESTART_DELAY (4)');
 
     (* Scan 5 : apres 2s (DeadTimeOppositeDir ecoule) -> inversion acceptee *)
-    ADVANCE_TIME(500000000);
+    ADVANCE_TIME(600000000);
 fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := FALSE, RequestedRelayRev := TRUE,
@@ -454,6 +461,13 @@ fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, Desc
 
     (* Scan 5 : DropConfirmDelay (300ms) ecoule -> chute normale du sens *)
     ADVANCE_TIME(300000000);
+fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
+       BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
+       RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,
+       RequestedContactor1 := FALSE, RequestedContactor2 := FALSE,
+       RequestedContactor3 := FALSE, RequestedContactor4 := FALSE,
+       RequestedStep := 0, DropConfirmDelay := T#300ms, MaxSenseHoldTime := T#1s);
+    ADVANCE_TIME(10000000);
 fb(Enable := TRUE, Reset := FALSE, SafeStop := FALSE, AscentPermit := TRUE, DescendPermit := TRUE, PowerContactorEngaged := TRUE,
        BrakeFeedback := TRUE, FwdRevSpeedFeedbackOff := TRUE,
        RequestedRelayFwd := TRUE, RequestedRelayRev := FALSE,

@@ -2,7 +2,7 @@ SETUP
 VAR
     harness   : FB_TestHarness_PRG_05;
     acqData   : ST_AcquisitionInterPrg;
-    modesAuth : ST_fbModes_Autorisations;
+    modesAuth : ST_Modes_Autorisations;
 END_VAR
 END_SETUP
 
@@ -11,18 +11,36 @@ TEST 'PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuil
     modesAuth.Mode := E_Mode.MAINT_N1;
     
     // 2. Stimulus issu du bus PRG_02 : Joystick armé vers la droite (+X)
-    acqData.JoystickDeadmanArmed := TRUE;
-    acqData.JoystickDirectionX := 1;
-    acqData.JoystickSpeedPctX := 75.0;
-    // Capteurs M3 par défaut à FALSE (non en butée) — décodage M3 propriété PRG_05 (AF-02 TBD §8 #5)
-
+    acqData.Joystick.DeadmanArmed := TRUE;
+    acqData.Joystick.AxisX.Direction := 1;
+    acqData.Joystick.AxisX.SpeedTgt := 75.0;
     
-    // 3. Exécution PRG_05 (3 scans : 1=FirstScanDone, 2=CommandedDirection, 3=SpeedRamp/Brake)
+    // 3. Exécution PRG_05 (Position P2/P1/Maintenance = mot valide 00111, ni butée Trémie ni butée Maintenance)
     harness(
         AcqData := acqData,
         ModesAuth := modesAuth,
         WinchM1CablePosM := 5.0,
         WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := FALSE,
+        M3_PosPV_DI := FALSE,
+        M3_PosPVP2_DI := TRUE,
+        M3_PosP1_DI := TRUE,
+        M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE,
+        DriveOnline := TRUE,
+        DriveOperational := TRUE
+    );
+    ADVANCE_TIME(1000000000);
+    harness(
+        AcqData := acqData,
+        ModesAuth := modesAuth,
+        WinchM1CablePosM := 5.0,
+        WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := FALSE,
+        M3_PosPV_DI := FALSE,
+        M3_PosPVP2_DI := TRUE,
+        M3_PosP1_DI := TRUE,
+        M3_PosMaintenance_DI := TRUE,
         PowerContactorEngaged := TRUE,
         DriveOnline := TRUE,
         DriveOperational := TRUE
@@ -32,15 +50,11 @@ TEST 'PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuil
         ModesAuth := modesAuth,
         WinchM1CablePosM := 5.0,
         WinchM2CablePosM := 5.0,
-        PowerContactorEngaged := TRUE,
-        DriveOnline := TRUE,
-        DriveOperational := TRUE
-    );
-    harness(
-        AcqData := acqData,
-        ModesAuth := modesAuth,
-        WinchM1CablePosM := 5.0,
-        WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := FALSE,
+        M3_PosPV_DI := FALSE,
+        M3_PosPVP2_DI := TRUE,
+        M3_PosP1_DI := TRUE,
+        M3_PosMaintenance_DI := TRUE,
         PowerContactorEngaged := TRUE,
         DriveOnline := TRUE,
         DriveOperational := TRUE
@@ -51,16 +65,16 @@ TEST 'PRG_05_Translation : Commande Translation Fwd (Joystick X + Hauteur Treuil
     // 4. Vérification du bus sortant ST_TranslationInterPrg vers PRG_06
     ASSERT_TRUE(harness.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest, 'Demande desserrage frein M3 generee');
     ASSERT_FALSE(harness.Data.TranslationSafety.SafeStop, 'Aucun SafeStop actif sur translation');
-    ASSERT_EQ(harness.Data.TranslationState.ActiveDirection, 1, 'Sens translation avant arbitre');
+    ASSERT_TRUE(harness.Data.TranslationState.ActiveTremie, 'Sens translation avant arbitre');
     ASSERT_GT(harness.Data.TranslationState.SpeedCmd_Pct, 0.0, 'Consigne vitesse M3 arbitree non nulle');
     ASSERT_NEQ(harness.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord, 16#0000, 'ControlWord variateur active pendant la commande');
 END_TEST
 
 TEST 'PRG_05_Translation : Commande Translation Rev (Joystick X negatif)'
     modesAuth.Mode := E_Mode.MAINT_N1;
-    acqData.JoystickDeadmanArmed := TRUE;
-    acqData.JoystickDirectionX := -1;
-    acqData.JoystickSpeedPctX := 60.0;
+    acqData.Joystick.DeadmanArmed := TRUE;
+    acqData.Joystick.AxisX.Direction := -1;
+    acqData.Joystick.AxisX.SpeedTgt := 60.0;
 
     harness(
         AcqData := acqData,
@@ -96,7 +110,7 @@ TEST 'PRG_05_Translation : Commande Translation Rev (Joystick X negatif)'
         DriveOnline := TRUE,
         DriveOperational := TRUE
     );
-    ASSERT_EQ(harness.Data.TranslationState.ActiveDirection, -1, 'Sens translation arriere arbitre');
+    ASSERT_TRUE(harness.Data.TranslationState.ActiveMaintenance, 'Sens translation arriere arbitre');
     ASSERT_TRUE(harness.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest, 'Frein M3 desserre en arriere');
     ASSERT_FALSE(harness.Data.TranslationSafety.SafeStop, 'Aucun SafeStop en commande arriere nominale');
 END_TEST
@@ -113,6 +127,7 @@ TEST 'PRG_05_Translation : Interdiction Mouvement Translation si Treuils en Bas'
     
     // Vérification : mouvement bloqué par l'interlock de hauteur
     ASSERT_FALSE(harness.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest, 'Frein reste serre');
-    ASSERT_EQ(harness.Data.TranslationState.ActiveDirection, 0, 'Mouvement interdit');
+    ASSERT_FALSE(harness.Data.TranslationState.ActiveTremie, 'Mouvement interdit');
+    ASSERT_FALSE(harness.Data.TranslationState.ActiveMaintenance, 'Mouvement interdit');
 END_TEST
 

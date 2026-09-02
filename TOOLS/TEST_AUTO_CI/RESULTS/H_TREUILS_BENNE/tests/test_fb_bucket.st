@@ -75,8 +75,8 @@ TEST 'TC-P10-023 Fermeture seulement si MotionDirection=1 ET MotionRequestActive
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(FB.CloseReq, 'CmdClose -> CloseReq');
-    ASSERT_TRUE(FB.M2_StartStop, 'Fermeture -> M2_StartStop=TRUE');
-    ASSERT_EQ(FB.M2_Direction, 1, 'Fermeture -> M2_Direction=1');
+    ASSERT_TRUE(FB.M2_RunRequest, 'Fermeture -> M2_StartStop=TRUE');
+    ASSERT_EQ(FB.M2_ReqAscent, 1, 'Fermeture -> M2_Direction=1');
     ASSERT_TRUE(FB.M2_BucketJogLimit, 'Fermeture -> vitesse lente forcee');
 END_TEST
 
@@ -105,8 +105,8 @@ TEST 'TC-P10-024 Ouverture seulement si MotionDirection=-1 ET MotionRequestActiv
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(FB.OpenReq, 'CmdOpen -> OpenReq');
-    ASSERT_TRUE(FB.M2_StartStop, 'Ouverture -> M2_StartStop=TRUE');
-    ASSERT_EQ(FB.M2_Direction, -1, 'Ouverture -> M2_Direction=-1');
+    ASSERT_TRUE(FB.M2_RunRequest, 'Ouverture -> M2_StartStop=TRUE');
+    ASSERT_EQ(FB.M2_ReqAscent, -1, 'Ouverture -> M2_Direction=-1');
     ASSERT_TRUE(FB.M2_BucketJogLimit, 'Ouverture -> vitesse lente forcee');
 END_TEST
 
@@ -195,7 +195,7 @@ TEST 'TC-P10-025 Demande benne refusee si M1_Busy OR M2_Busy a l entree (READY)'
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     ASSERT_FALSE(FB.CloseReq, 'M1_Busy -> CloseReq refuse');
-    ASSERT_FALSE(FB.M2_StartStop, 'M1_Busy -> pas de mouvement benne');
+    ASSERT_FALSE(FB.M2_RunRequest, 'M1_Busy -> pas de mouvement benne');
     ASSERT_FALSE(FB.Lifecycle.Busy, 'M1_Busy -> pas de Busy');
 END_TEST
 
@@ -226,7 +226,7 @@ TEST 'TC-P10-025.1 Anti-traversee : M2_Busy seul refuse une demande benne a l en
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     ASSERT_FALSE(FB.CloseReq, 'M2_Busy -> CloseReq refuse');
-    ASSERT_FALSE(FB.M2_StartStop, 'M2_Busy -> pas de mouvement benne');
+    ASSERT_FALSE(FB.M2_RunRequest, 'M2_Busy -> pas de mouvement benne');
     ASSERT_FALSE(FB.Lifecycle.Busy, 'M2_Busy -> pas de Busy');
 END_TEST
 
@@ -267,8 +267,8 @@ TEST 'TC-P10-025.2 Anti-traversee : mouvement deja engage + M2_Busy -> pas d avo
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(FB.Lifecycle.Busy, 'M2_Busy pendant manuvre -> Busy conserve');
-    ASSERT_TRUE(FB.M2_StartStop, 'M2_Busy pendant manuvre -> pas d avortement');
-    ASSERT_EQ(FB.M2_Direction, 1, 'M2_Busy pendant manuvre -> direction conservee');
+    ASSERT_TRUE(FB.M2_RunRequest, 'M2_Busy pendant manuvre -> pas d avortement');
+    ASSERT_EQ(FB.M2_ReqAscent, 1, 'M2_Busy pendant manuvre -> direction conservee');
 END_TEST
 
 TEST 'TC-P10-026 Glissement M1 >1.0m pendant BUSY -> M1SlipDetected + coupe M2'
@@ -306,7 +306,7 @@ TEST 'TC-P10-026 Glissement M1 >1.0m pendant BUSY -> M1SlipDetected + coupe M2'
        Config := Config, BucketState := BucketState);
     ASSERT_TRUE(FB.M1SlipDetected, 'Glissement M1 >1.0m -> M1SlipDetected');
     ASSERT_TRUE(FB.Fault.Error, 'Glissement M1 -> Error');
-    ASSERT_FALSE(FB.M2_StartStop, 'Glissement M1 -> M2 coupe (M2_StartStop=FALSE)');
+    ASSERT_FALSE(FB.M2_RunRequest, 'Glissement M1 -> M2 coupe (M2_StartStop=FALSE)');
 END_TEST
 
 TEST 'TC-P10-027 M1SlipDetected force SafeStop sur M1 cote Treuils'
@@ -388,8 +388,8 @@ TEST 'TC-P10-029 Recul (sens inverse) borne a la position de depart, jamais au-d
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
-    ASSERT_EQ(FB.M2_Direction, -1, 'Recul -> M2_Direction=-1');
-    ASSERT_TRUE(FB.M2_StartStop, 'Recul commande (borne a M2StartPosM)');
+    ASSERT_EQ(FB.M2_ReqAscent, -1, 'Recul -> M2_Direction=-1');
+    ASSERT_TRUE(FB.M2_RunRequest, 'Recul commande (borne a M2StartPosM)');
 END_TEST
 
 TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Direction/StartStop)'
@@ -436,8 +436,8 @@ TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Directi
        CablePosM1 := 0.0, CablePosM2 := 1.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
-    ASSERT_EQ(FB.M2_Direction, -1, 'Recul -> M2_Direction=-1');
-    ASSERT_TRUE(FB.M2_StartStop, 'Recul commande');
+    ASSERT_EQ(FB.M2_ReqAscent, -1, 'Recul -> M2_Direction=-1');
+    ASSERT_TRUE(FB.M2_RunRequest, 'Recul commande');
 
     (* Scan 5 : le recul n'a pas encore atteint M2StartPosM -> pas d arret *)
     ADVANCE_TIME(10000000);
@@ -446,7 +446,7 @@ TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Directi
        CablePosM1 := 0.0, CablePosM2 := 0.5,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
-    ASSERT_TRUE(FB.M2_StartStop, 'Recul avant M2StartPosM -> toujours commande');
+    ASSERT_TRUE(FB.M2_RunRequest, 'Recul avant M2StartPosM -> toujours commande');
 
     (* Scan 6 : recul A M2StartPosM (0.0) -> ARRET reel, jamais au-dela *)
     ADVANCE_TIME(10000000);
@@ -455,8 +455,8 @@ TEST 'TC-P10-029.1 Recul borne : arret reel a M2StartPosM (pas seulement Directi
        CablePosM1 := 0.0, CablePosM2 := 0.0,
        HomedM1 := TRUE, HomedM2 := TRUE,
        Config := Config, BucketState := BucketState);
-    ASSERT_FALSE(FB.M2_StartStop, 'Recul a M2StartPosM -> M2_StartStop=FALSE (arret)');
-    ASSERT_EQ(FB.M2_Direction, 0, 'Recul a M2StartPosM -> M2_Direction=0');
+    ASSERT_FALSE(FB.M2_RunRequest, 'Recul a M2StartPosM -> M2_StartStop=FALSE (arret)');
+    ASSERT_EQ(FB.M2_ReqAscent, 0, 'Recul a M2StartPosM -> M2_Direction=0');
     ASSERT_FALSE(FB.Lifecycle.Busy, 'Recul a M2StartPosM -> Busy=FALSE');
     ASSERT_TRUE(FB.Lifecycle.Done, 'Recul a M2StartPosM -> Done=TRUE');
 

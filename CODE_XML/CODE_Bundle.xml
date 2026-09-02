@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:02:16.682334" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:02:16.682334">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T22:08:09.664897" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T22:08:09.664897">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -508,6 +508,50 @@
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>91b3da89-8226-5d1f-92ee-cf29483801dd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_MachineHomingTxState">
+        <baseType>
+          <enum>
+            <values>
+              <value name="IDLE" value="0" />
+              <value name="ARMED" value="1" />
+              <value name="BUSY_OBSERVED" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>IDLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucune transaction : attente d'un front de confirmation dans la fenetre sure</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ARMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande homing conjoint emise (HomeReq M1+M2) ; attente qu'un axe passe Busy</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUSY_OBSERVED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Au moins un axe a ete vu Busy ; attente des 2 succes -&gt; commit atomique</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>74e41b9c-4f86-5300-8b05-c49be09e5fcb</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -19602,69 +19646,13 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Error</xhtml>
               </documentation>
             </variable>
-            <variable name="ProcessPermitM1_Ascent">
+            <variable name="CycleMotionPermit">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GATE CONTINU HOMME-MORT (permis par action hardware) ===
-. [LOC] Permis ascending treuil M1 = JoystickDeflected AND DeadmanArmed</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ProcessPermitM1_Descend">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis descending treuil M1 = JoystickDeflected AND DeadmanArmed</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ProcessPermitM2_Ascent">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis ascending treuil M2 = JoystickDeflected AND DeadmanArmed</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ProcessPermitM2_Descend">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis descending treuil M2 = JoystickDeflected AND DeadmanArmed</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ProcessPermitBucket_Open">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis ouverture benne = JoystickDeflected AND DeadmanArmed</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ProcessPermitBucket_Close">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis fermeture benne = JoystickDeflected AND DeadmanArmed</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ProcessPermitM3_Tremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis translation M3 cote tremie = JoystickDeflected AND DeadmanArmed</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ProcessPermitM3_Maintenance">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Permis translation M3 cote maintenance = JoystickDeflected AND DeadmanArmed</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GATE CONTINU HOMME-MORT ===
+. [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme) ; gate commun a toutes les commandes d'actionneur du sequenceur. Le sens du mouvement reste porte par ReqAscent/ReqDescend de chaque etape.</xhtml>
               </documentation>
             </variable>
             <variable name="SampleCountDone">
@@ -19860,6 +19848,40 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes de defaut</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_StepSlow">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Paliers de vitesse treuil par etape (StepTgt des demandes WinchMxCmd, 1..5 ; 0 = arret).
+Palier lent : referencement X1, remontee X5, controle X7, vidage X11</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_StepDive">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="3" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier plongee Kobold X4 : debit mini requis pour la mesure de fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_StepLoaded">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier montee en charge X8 (bridage strict &lt;= 4, jamais palier 5)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -19997,14 +20019,7 @@ Ready := Enable AND NOT Fault.Latched;
 // défléchi (JoystickDeflected) ET l'homme-mort est armé (DeadmanArmed). Chaque
 // commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par JoystickDeflected.
-ProcessPermitM1_Ascent        := JoystickDeflected AND DeadmanArmed;
-ProcessPermitM1_Descend      := JoystickDeflected AND DeadmanArmed;
-ProcessPermitM2_Ascent        := JoystickDeflected AND DeadmanArmed;
-ProcessPermitM2_Descend      := JoystickDeflected AND DeadmanArmed;
-ProcessPermitBucket_Open := JoystickDeflected AND DeadmanArmed;
-ProcessPermitBucket_Close := JoystickDeflected AND DeadmanArmed;
-ProcessPermitM3_Tremie        := JoystickDeflected AND DeadmanArmed;
-ProcessPermitM3_Maintenance   := JoystickDeflected AND DeadmanArmed;
+CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
 IF WaitingResume THEN
@@ -20096,30 +20111,29 @@ CASE State OF
 
     E_CycleStep.X1_HOMING:
         CycleStep := E_CycleStep.X1_HOMING;
-        CycleStateStr := 'X1 - Referencement codeurs (vitesses lentes)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
-        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
-        ExpectedDirection := 1;
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
-        OperatorActionId := 16#0401;
-        OperatorAction := 'Maintenir la montee lente vers les capteurs de referencement.';
+        ExpectedDirection := 0;
 
-        // Vitesses lentes pour chercher capteur top + référencement
-        IF NOT HomedM1 OR NOT HomedM2 THEN
-            WinchM1Cmd.RunRequest := ProcessPermitM1_Ascent;
-            WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;   // montée lente vers capteur top
-            WinchM1Cmd.StepTgt := 1;
-            WinchM2Cmd.RunRequest := ProcessPermitM2_Ascent;
-            WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-            WinchM2Cmd.StepTgt := 1;
-            IF HomingRequest THEN
-                State := E_CycleStep.X2_WORK_POS_SELECT;
-            END_IF;
+        // 🎯 Le referencement machine (datum M1/M2 + etat benne) est la responsabilite
+        // EXCLUSIVE de FB_MachineHomingCycle. SEMI_AUTO n'est cense etre accessible que si
+        // MachineHomed (gate FB_Modes). X1 ne fait donc QUE verifier la condition : elle
+        // n'emet AUCUN ordre de mouvement et ne contient aucun referencement.
+        IF HomedM1 AND HomedM2 THEN
+            CycleStateStr := 'X1 - Codeurs references : position validee';
+            ExpectedAxis := E_OperatorAxis.NONE;
+            WaitingForOperator := FALSE;
+            WaitingForProcess := TRUE;
+            OperatorActionId := 0;
+            OperatorAction := '';
+            State := E_CycleStep.X2_WORK_POS_SELECT;   // franchie sans mouvement
         ELSE
-            // déjà homé → passe vite
-            State := E_CycleStep.X2_WORK_POS_SELECT;
+            CycleStateStr := 'X1 - Machine non referencee';
+            ExpectedAxis := E_OperatorAxis.BUTTON;
+            WaitingForOperator := TRUE;
+            WaitingForProcess := FALSE;
+            OperatorActionId := 16#0401;
+            OperatorAction := 'Machine non referencee : passer en maintenance pour le referencement.';
         END_IF;
 
     E_CycleStep.X2_WORK_POS_SELECT:
@@ -20137,7 +20151,7 @@ CASE State OF
         IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
             SelectedWorkTarget := SelTarget;
             TranslationCmd.PositionTgt := SelTarget;
-            TranslationCmd.ReqStart := ProcessPermitM3_Tremie;
+            TranslationCmd.ReqStart := CycleMotionPermit;
             // Arrivée à la cible (Trémie/P1/Maintenance)
             IF JoystickDeflected AND (
                 (SelTarget = 1 AND Translation_At_Tremie) OR
@@ -20163,7 +20177,7 @@ CASE State OF
         IF Benne_IsOpen THEN
             State := E_CycleStep.X4_DESCEND_OPEN;
         ELSE
-            BucketCmd.ReqOpen := ProcessPermitBucket_Open;
+            BucketCmd.ReqOpen := CycleMotionPermit;
             IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
                 BucketCmd.ReqOpen := FALSE;
                 State := E_CycleStep.X4_DESCEND_OPEN;
@@ -20183,13 +20197,13 @@ CASE State OF
         OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
         // M1 et M2 descendent ensemble (synchro gérée en aval)
-        WinchM1Cmd.RunRequest := ProcessPermitM1_Descend;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
-        WinchM1Cmd.StepTgt  := 3;
-        WinchM2Cmd.RunRequest := ProcessPermitM2_Descend;
+        WinchM1Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.StepTgt  := 3;
-        BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descend;
+        WinchM2Cmd.StepTgt  := CST_StepDive;
+        BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
 
         // Transition uniquement sur le retour dédié Kobold.
         IF JoystickDeflected AND KoboldContactFond THEN
@@ -20217,12 +20231,12 @@ CASE State OF
         OperatorActionId := 16#0405;
         OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
 
-        WinchM1Cmd.RunRequest := ProcessPermitM1_Ascent;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
-        WinchM1Cmd.StepTgt := 1;
-        WinchM2Cmd.RunRequest := ProcessPermitM2_Ascent;
+        WinchM1Cmd.StepTgt := CST_StepSlow;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-        WinchM2Cmd.StepTgt := 1;
+        WinchM2Cmd.StepTgt := CST_StepSlow;
 
         IF JoystickDeflected AND (M1_CablePosM &gt;= RaiseTargetM) AND (M2_CablePosM &gt;= RaiseTargetM) THEN
             WinchM1Cmd.RunRequest := FALSE;
@@ -20245,7 +20259,7 @@ CASE State OF
         WinchM1Cmd.RunRequest := FALSE;
         // L'ordre benne reste soumis au même homme-mort que le cycle : aucune
         // commande d'actionneur ne doit survivre à la perte du permis opérateur.
-        BucketCmd.ReqClose := ProcessPermitBucket_Close;
+        BucketCmd.ReqClose := CycleMotionPermit;
 
         IF JoystickDeflected AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.ReqClose := FALSE;
@@ -20264,12 +20278,12 @@ CASE State OF
         OperatorActionId := 16#0407;
         OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
 
-        WinchM1Cmd.RunRequest := ProcessPermitM1_Ascent;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
-        WinchM1Cmd.StepTgt  := 1;
-        WinchM2Cmd.RunRequest := ProcessPermitM2_Ascent;
+        WinchM1Cmd.StepTgt  := CST_StepSlow;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-        WinchM2Cmd.StepTgt  := 1;
+        WinchM2Cmd.StepTgt  := CST_StepSlow;
 
         IF JoystickDeflected
            AND (M1_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
@@ -20290,12 +20304,12 @@ CASE State OF
         OperatorActionId := 16#0408;
         OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
-        WinchM1Cmd.RunRequest := ProcessPermitM1_Ascent;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
-        WinchM1Cmd.StepTgt  := 4;
-        WinchM2Cmd.RunRequest := ProcessPermitM2_Ascent;
+        WinchM1Cmd.StepTgt  := CST_StepLoaded;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-        WinchM2Cmd.StepTgt  := 4;
+        WinchM2Cmd.StepTgt  := CST_StepLoaded;
 
         IF JoystickDeflected AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
             WinchM1Cmd.RunRequest := FALSE;
@@ -20336,7 +20350,7 @@ CASE State OF
         OperatorAction := 'Maintenir la translation vers la tremie de dechargement.';
 
         TranslationCmd.PositionTgt := 1; // Trémie
-        TranslationCmd.ReqStart := ProcessPermitM3_Tremie;
+        TranslationCmd.ReqStart := CycleMotionPermit;
 
         IF JoystickDeflected AND Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
@@ -20359,13 +20373,13 @@ CASE State OF
         // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
         // précédent). Les deux treuils restent synchrones et sous homme-mort.
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
-        WinchM1Cmd.RunRequest := ProcessPermitM1_Descend;
-        WinchM1Cmd.StepTgt  := 1;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.StepTgt  := CST_StepSlow;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.RunRequest := ProcessPermitM2_Descend;
-        WinchM2Cmd.StepTgt  := 1;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.StepTgt  := CST_StepSlow;
 
-        BucketCmd.ReqOpen := ProcessPermitBucket_Open AND WinchM1Cmd.ReqDescend;
+        BucketCmd.ReqOpen := CycleMotionPermit AND WinchM1Cmd.ReqDescend;
 
         IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
@@ -20425,7 +20439,7 @@ END_IF;
 // 🛑 Relâchement du manche (retour au centre) OU de l'homme-mort : neutralisation
 // des demandes actives. Gate continu : aucune commande d'actionneur ne survit à la
 // perte du permis opérateur (manche défléchi ET homme-mort armé).
-IF Lifecycle.Busy AND NOT ProcessPermitM1_Ascent THEN
+IF Lifecycle.Busy AND NOT CycleMotionPermit THEN
     WinchM1Cmd.RunRequest := FALSE;
     WinchM2Cmd.RunRequest := FALSE;
     TranslationCmd.ReqStart := FALSE;
@@ -28135,7 +28149,7 @@ NeutralYAct := NeutralYMem;
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant Reset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Reset</xhtml>
               </documentation>
             </variable>
             <variable name="ConfirmOpenEdge">
@@ -28143,7 +28157,7 @@ NeutralYAct := NeutralYMem;
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant ConfirmOpenPosition</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant ConfirmOpenPosition</xhtml>
               </documentation>
             </variable>
             <variable name="ConfirmCloseEdge">
@@ -28151,7 +28165,7 @@ NeutralYAct := NeutralYMem;
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant ConfirmClosePosition</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant ConfirmClosePosition</xhtml>
               </documentation>
             </variable>
             <variable name="LatchedEdge">
@@ -28159,7 +28173,7 @@ NeutralYAct := NeutralYMem;
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front montant Fault.Latched (capture R9)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Fault.Latched (capture R9)</xhtml>
               </documentation>
             </variable>
             <variable name="instCauses">
@@ -28176,13 +28190,24 @@ NeutralYAct := NeutralYMem;
 . [LOC] Causes en clair pour FB_FaultCore</xhtml>
               </documentation>
             </variable>
+            <variable name="TxState">
+              <type>
+                <derived name="E_MachineHomingTxState" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_MachineHomingTxState.IDLE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS INTERNES TRANSACTION ===
+. [LOC] Etat de la machine a etats transaction (§4)</xhtml>
+              </documentation>
+            </variable>
             <variable name="PendingOpen">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS INTERNES TRANSACTION ===
-. [LOC] Confirmation "ouverte" en attente de commit</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation "ouverte" en attente de commit</xhtml>
               </documentation>
             </variable>
             <variable name="PendingClose">
@@ -28198,7 +28223,7 @@ NeutralYAct := NeutralYMem;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Transaction homing conjoint armee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Miroir booleen de (TxState &lt;&gt; IDLE) ; lu par §1 cause-table et §6 guide/Lifecycle</xhtml>
               </documentation>
             </variable>
             <variable name="HomingBusyObserved">
@@ -28389,7 +28414,7 @@ Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🎯 FB_MachineHomingCycle — Guide de referencement machine M1/M2/benne
    ───────────────────────────────────────────────────────────────
-   🎯 Role : Qualifier le datum machine (2 codeurs cales + etat benne
+   Role : Qualifier le datum machine (2 codeurs cales + etat benne
              confirme) et guider le homing conjoint M1/M2 + le commit
              atomique de l'etat benne. N'emet AUCUN ordre de mouvement.
    🔒 Securite : SEMI_AUTO interdit tant que MachineHomed=FALSE. Perte de
@@ -28408,8 +28433,7 @@ Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-// === 🔑 §1 FRONTS, CIBLE DYNAMIQUE, CAUSES ET SOCLE DEFAUT ===
-{region "§1 Fronts &amp; causes"}
+{region "§1 Fronts &amp; cible dynamique M2"}
 
 // Sorties impulsionnelles remises a FALSE en tete de scan (1 scan actif au commit / a la demande).
 M1Demand.HomeReq := FALSE;
@@ -28434,6 +28458,7 @@ LatchedEdge(CLK := Fault.Latched);
 
 // Purge sur front Reset (inclut C-1 : ReHomingAckRequired).
 IF ResetEdge.Q THEN
+    TxState             := E_MachineHomingTxState.IDLE;
     PendingOpen         := FALSE;
     PendingClose        := FALSE;
     HomingStarted       := FALSE;
@@ -28445,6 +28470,9 @@ IF ResetEdge.Q THEN
     ReHomingAckRequired := FALSE;
 END_IF;
 
+{endregion}
+
+{region "§1bis Conditions intermediaires &amp; detection de perte de datum"}
 // Conditions intermediaires nommees (std 2quater).
 DoubleConfirmRequested := ConfirmOpenEdge.Q AND ConfirmCloseEdge.Q;
 SingleConfirm          := ConfirmOpenEdge.Q XOR ConfirmCloseEdge.Q;
@@ -28478,6 +28506,9 @@ IF HomingLossLatched AND NOT ReHomingAckRequired THEN
     ReHomingAckRequired := TRUE;
 END_IF;
 
+{endregion}
+
+{region "§1ter Table des causes &amp; socle defaut"}
 // Table des causes (toutes Latching : acquittables au front Reset).
 instCauses[CST_CAUSE_HOMING_LOST_IN_MOTION].Active   := HomingLossLatched OR ReHomingAckRequired;
 instCauses[CST_CAUSE_HOMING_LOST_IN_MOTION].Latching := TRUE;
@@ -28514,16 +28545,14 @@ instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
 {endregion}
 
-// === 🔑 §2 DEMANDE SAFESTOP SUR PERTE DE DATUM ===
-{region "§2 Perte datum"}
+{region "§2 Demande SafeStop sur perte de datum"}
 // Demande d'arret controle tant que la perte n'est pas mecaniquement resolue.
 // La qualification de sortie MachineHomed est calculee en §6, APRES le deroule de
 // transaction (commit ou abandon du meme scan pris en compte) — calcul unique.
 MachineHomingLossSafeStop := HomingLossLatched;
 {endregion}
 
-// === 🔑 §3 GATE D'INITIALISATION (NOT Enable) ===
-{region "§3 Gate init NOT Enable"}
+{region "§3 Gate initialisation (NOT Enable)"}
 IF NOT Enable THEN
     MachineHomingStep         := E_MachineHomingStep.IDLE;
     MachineHomingInstruction  := 'Referencement indisponible';
@@ -28542,71 +28571,123 @@ IF NOT Enable THEN
 END_IF;
 {endregion}
 
-// === 🔑 §4 OUVERTURE DE LA TRANSACTION DE REFERENCEMENT CONJOINT ===
-{region "§4 Ouverture transaction"}
-(* C : jamais "au vol" par-dessus un homing d'axe deja en cours.
-   Demande acceptee uniquement dans la fenetre mecanique sure, front unique, hors double. *)
-IF SingleConfirm AND NOT HomingStarted AND NOT DoubleConfirmRequested AND NOT ConfirmWhileHoming
-   AND WindowSafe
-   AND NOT M1Status.HomingBusy AND NOT M2Status.HomingBusy THEN
-    PendingOpen        := ConfirmOpenEdge.Q;
-    PendingClose       := ConfirmCloseEdge.Q;
-    HomingStarted      := TRUE;
-    HomingBusyObserved := FALSE;
-    CommitPublished    := FALSE;
-    MachineHomingFailed := FALSE;
-    M1Demand.HomeReq          := TRUE;
-    M2Demand.HomeReq          := TRUE;
+{region "§4 Transaction de referencement conjoint (machine a etats)"}
+// ======================================================================
+//  TRANSACTION DE REFERENCEMENT CONJOINT M1/M2  —  CASE E_MachineHomingTxState
+//
+//  IDLE
+//    --[ SingleConfirm ET WindowSafe (MAINT_N2 + capteur haut + arret meca)
+//        ET aucun axe HomingBusy ET hors double-confirm / confirm-while-homing ]--&gt;  ARMED
+//        action : HomeReq M1+M2, memorise PendingOpen/Close, cible dynamique M2
+//  ARMED
+//    --[ TransactionAbort : capteur haut perdu OU treuil bouge OU HomingError M1/M2 ]--&gt; FAILED (-&gt; IDLE)
+//    --[ un axe HomingBusy ]--&gt;  BUSY_OBSERVED
+//  BUSY_OBSERVED
+//    --[ TransactionAbort ]--&gt;  FAILED (-&gt; IDLE)
+//    --[ 2x HomedAndReliable ET 2x HomingDone ]--&gt;  COMMIT atomique BucketCommit -&gt; IDLE
+//
+//  HomingStarted est maintenu en miroir de (TxState &lt;&gt; IDLE) — lu par §1 (cause-table,
+//  M2Demand.UseDynamicTarget) et §6 (guide operateur, Lifecycle).
+// ======================================================================
+
+// Cible dynamique M2 + condition d'abandon : recalculees chaque scan tant que la
+// transaction est active (idempotent). Hors transaction : abandon neutre.
+IF TxState &lt;&gt; E_MachineHomingTxState.IDLE THEN
     M2Demand.UseDynamicTarget := TRUE;
     IF PendingClose THEN
         M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
     ELSE
         M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
     END_IF;
-END_IF;
-{endregion}
-
-// === 🔑 §5 DEROULE DE LA TRANSACTION &amp; COMMIT ATOMIQUE ===
-{region "§5 Deroule transaction &amp; commit atomique"}
-IF HomingStarted THEN
-    M2Demand.UseDynamicTarget := TRUE;
-    IF PendingClose THEN
-        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
-    ELSE
-        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
-    END_IF;
-
     TransactionAbort := (NOT TopPositionActive) OR (NOT WinchesMechanicallyStopped)
                         OR M1Status.HomingError OR M2Status.HomingError;
-
-    IF TransactionAbort THEN
-        MachineHomingFailed := TRUE;
-        HomingStarted       := FALSE;
-        PendingOpen         := FALSE;
-        PendingClose        := FALSE;
-    ELSIF M1Status.HomingBusy OR M2Status.HomingBusy THEN
-        HomingBusyObserved := TRUE;
-    ELSIF HomingBusyObserved AND M1Status.HomedAndReliable AND M2Status.HomedAndReliable
-          AND M1Status.HomingDone AND M2Status.HomingDone THEN
-        (* Publication atomique : les deux etats benne ecrits par FB_Bucket dans le meme
-           scan, uniquement apres les deux succes observes. *)
-        BucketCommit.CommitOpen  := PendingOpen;
-        BucketCommit.CommitClose := PendingClose;
-        CommitPublished := TRUE;
-        HomingStarted   := FALSE;
-        PendingOpen     := FALSE;
-        PendingClose    := FALSE;
-    END_IF;
+ELSE
+    TransactionAbort := FALSE;
 END_IF;
+
+CASE TxState OF
+
+    E_MachineHomingTxState.IDLE:
+        (* C : jamais "au vol" par-dessus un homing d'axe deja en cours. Demande acceptee
+           uniquement dans la fenetre mecanique sure, sur front unique, hors double. *)
+        // --[ IDLE -&gt; ARMED ]--
+        IF SingleConfirm AND NOT DoubleConfirmRequested AND NOT ConfirmWhileHoming
+           AND WindowSafe
+           AND NOT M1Status.HomingBusy AND NOT M2Status.HomingBusy THEN
+            PendingOpen         := ConfirmOpenEdge.Q;
+            PendingClose        := ConfirmCloseEdge.Q;
+            HomingBusyObserved  := FALSE;
+            CommitPublished     := FALSE;
+            MachineHomingFailed := FALSE;
+            M1Demand.HomeReq          := TRUE;
+            M2Demand.HomeReq          := TRUE;
+            M2Demand.UseDynamicTarget := TRUE;
+            IF PendingClose THEN
+                M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
+            ELSE
+                M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
+            END_IF;
+            // --[ IDLE -&gt; FAILED ]-- HomingError present des le scan d'ouverture :
+            // abandon fail-safe LE MEME SCAN (l'axe emet HomeReq une impulsion puis echec),
+            // sans transiter par ARMED. Sans ce test, l'abort serait differe de 1 scan et
+            // MachineHomed (gate SEMI_AUTO) pourrait pulser TRUE 1 scan.
+            IF M1Status.HomingError OR M2Status.HomingError THEN
+                MachineHomingFailed := TRUE;
+                PendingOpen   := FALSE;
+                PendingClose  := FALSE;
+                TxState       := E_MachineHomingTxState.IDLE;
+                HomingStarted := FALSE;
+            ELSE
+                TxState       := E_MachineHomingTxState.ARMED;
+                HomingStarted := TRUE;
+            END_IF;
+        END_IF;
+
+    E_MachineHomingTxState.ARMED:
+        // --[ ARMED -&gt; FAILED ]-- abandon fail-safe
+        IF TransactionAbort THEN
+            MachineHomingFailed := TRUE;
+            PendingOpen  := FALSE;
+            PendingClose := FALSE;
+            TxState       := E_MachineHomingTxState.IDLE;
+            HomingStarted := FALSE;
+        // --[ ARMED -&gt; BUSY_OBSERVED ]-- au moins un axe en homing
+        ELSIF M1Status.HomingBusy OR M2Status.HomingBusy THEN
+            HomingBusyObserved := TRUE;
+            TxState := E_MachineHomingTxState.BUSY_OBSERVED;
+        END_IF;
+
+    E_MachineHomingTxState.BUSY_OBSERVED:
+        // --[ BUSY_OBSERVED -&gt; FAILED ]-- abandon fail-safe
+        IF TransactionAbort THEN
+            MachineHomingFailed := TRUE;
+            PendingOpen  := FALSE;
+            PendingClose := FALSE;
+            TxState       := E_MachineHomingTxState.IDLE;
+            HomingStarted := FALSE;
+        // --[ BUSY_OBSERVED -&gt; IDLE ]-- les 2 axes homes+fiables+done -&gt; COMMIT atomique
+        ELSIF M1Status.HomedAndReliable AND M2Status.HomedAndReliable
+              AND M1Status.HomingDone AND M2Status.HomingDone THEN
+            (* Publication atomique : les deux etats benne ecrits par FB_Bucket dans le meme
+               scan, uniquement apres les deux succes observes. *)
+            BucketCommit.CommitOpen  := PendingOpen;
+            BucketCommit.CommitClose := PendingClose;
+            CommitPublished := TRUE;
+            PendingOpen  := FALSE;
+            PendingClose := FALSE;
+            TxState       := E_MachineHomingTxState.IDLE;
+            HomingStarted := FALSE;
+        END_IF;
+
+END_CASE;
 {endregion}
 
-// === 🔑 §6 CYCLE DE VIE, R9 ET GUIDE OPERATEUR ===
-{region "§6 Guide operateur &amp; sorties"}
+{region "§6 Guide operateur &amp; cycle de vie"}
 MachineHomingActive := HomingStarted;
 Lifecycle.Busy      := HomingStarted;
 Lifecycle.Done      := CommitPublished;
 
-// Qualification de sortie — calcul UNIQUE, apres le deroule de transaction (§5) : un commit
+// Qualification de sortie — calcul UNIQUE, apres le deroule de transaction (§4) : un commit
 // atomique OU un abandon du meme scan est immediatement reflete (comportement d'origine).
 CommitOrOffsetValid := CommitPublished OR BucketOffsetValid;
 MachineHomed := AxisHomed AND CommitOrOffsetValid
@@ -28618,7 +28699,10 @@ IF LatchedEdge.Q THEN
     MachineHomingStepAtError := MachineHomingStep;
 END_IF;
 
-// Guide operateur — priorite decroissante, textes conserves a l'identique.
+// Guide operateur : ECHELLE DE PRIORITE, pas une machine d'etat. MachineHomingStep est
+// RECALCULE chaque scan a partir des conditions courantes (l'etape est le resultat, pas
+// l'etat ou l'on dispatche) -&gt; IF/ELSIF en priorite decroissante, pas de CASE.
+// La vraie machine d etat du FB est la transaction de referencement (§4, CASE TxState).
 IF MachineHomingFailed THEN
     MachineHomingStep := E_MachineHomingStep.FAILED;
     MachineHomingInstruction := 'Referencement incomplet : rester en N2 et recommencer';
@@ -52451,6 +52535,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
             <Object Name="E_ExtractionAssistState" ObjectId="52924d25-cfcc-5dc2-a673-d7581dfb2d37" />
             <Object Name="E_MachineHomingStep" ObjectId="91b3da89-8226-5d1f-92ee-cf29483801dd" />
+            <Object Name="E_MachineHomingTxState" ObjectId="74e41b9c-4f86-5300-8b05-c49be09e5fcb" />
             <Object Name="E_OperatorAxis" ObjectId="07a48a82-b7c8-54f5-9041-14c13244835f" />
             <Object Name="ST_MachineHoming" ObjectId="719346ef-3775-5b4e-ac3c-37b255640eba" />
             <Object Name="ST_fbDiveSearch_Config" ObjectId="a0057069-451b-5e0e-ad42-ec2a185a596c" />

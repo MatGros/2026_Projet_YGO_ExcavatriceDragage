@@ -37,8 +37,8 @@ TEST 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au
     Sens.SpeedGuardReady := TRUE;
 
     (* Scan 0 : Enable=FALSE -> Neutralisation initiale *)
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := FALSE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -81,8 +81,8 @@ TEST 'TC-P10-011 Inversion Fwd<->Rev : neutre->sens immediat, inversion exige de
     Sens.SpeedGuardReady := TRUE;
 
     (* Scan 1 : regime nominal *)
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -93,8 +93,8 @@ TEST 'TC-P10-011 Inversion Fwd<->Rev : neutre->sens immediat, inversion exige de
 
     (* Scan 2 : neutre -> montee = IMMEDIAT (pas de DirectionChangePending) *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := 1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := TRUE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 20.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -106,8 +106,8 @@ TEST 'TC-P10-011 Inversion Fwd<->Rev : neutre->sens immediat, inversion exige de
        CommandedDirection=0 (relais/diagnostic neutres) ; le dernier sens non nul est
        memorise en interne (LastDirection) pour l'interlock de reprise opposee *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -116,8 +116,8 @@ TEST 'TC-P10-011 Inversion Fwd<->Rev : neutre->sens immediat, inversion exige de
 
     (* Scan 4 : inversion montee->descente apres neutre (StepNumber=0) -> pending + rampe a 0 *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := -1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := TRUE;
     DriveReq.SpeedTgt_Pct := 20.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -148,8 +148,8 @@ TEST 'TC-P10-011b Inversion via neutre : montee reelle -> relache neutre -> repr
     Sens.SpeedGuardReady := TRUE;
 
     (* Scan 1 : regime nominal *)
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -160,8 +160,8 @@ TEST 'TC-P10-011b Inversion via neutre : montee reelle -> relache neutre -> repr
 
     (* Scan 2 : montee reelle etablie *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := 1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := TRUE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 90.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -171,8 +171,8 @@ TEST 'TC-P10-011b Inversion via neutre : montee reelle -> relache neutre -> repr
     (* Scan 3 : relachement neutre (Direction=0) -> StepNumber=0, CommandedDirection=0,
        relais coupes immediatement *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -183,8 +183,8 @@ TEST 'TC-P10-011b Inversion via neutre : montee reelle -> relache neutre -> repr
 
     (* Scan 4 : reprise descente (Direction=-1) -> pending + zero relais jusqu au delai *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := -1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := TRUE;
     DriveReq.SpeedTgt_Pct := 20.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -217,8 +217,8 @@ TEST 'TC-P10-011c Reprise du MEME sens apres neutre : depart immediat (pas de pe
     Sens.SpeedGuardReady := TRUE;
 
     (* Scan 1 : regime nominal *)
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -229,8 +229,8 @@ TEST 'TC-P10-011c Reprise du MEME sens apres neutre : depart immediat (pas de pe
 
     (* Scan 2 : montee reelle etablie *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := 1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := TRUE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 20.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -239,8 +239,8 @@ TEST 'TC-P10-011c Reprise du MEME sens apres neutre : depart immediat (pas de pe
 
     (* Scan 3 : relachement neutre -> CommandedDirection=0 *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -248,8 +248,8 @@ TEST 'TC-P10-011c Reprise du MEME sens apres neutre : depart immediat (pas de pe
 
     (* Scan 4 : reprise du MEME sens (montee) -> depart immediat, pas de pending *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := 1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := TRUE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 20.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -271,8 +271,8 @@ TEST 'TC-P10-017 Config palier invalide : palier 0, sorties sures'
     Sens.SpeedGuardReady := TRUE;
 
     (* Scan 1 : Enable=TRUE, config invalide -> ConfigError latche *)
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := 1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := TRUE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 50.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -308,14 +308,14 @@ TEST 'TC-P10-019 Ordre MainTask : Safety -> WinchControl -> PRG_06_Outputs'
     Sens.ContactorsAllOff := TRUE;
     Sens.SpeedGuardReady := TRUE;
 
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := 1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := TRUE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 20.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -342,8 +342,8 @@ TEST 'TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, ap
     Cfg.SlowdownDistance_M := 1.0;
 
     (* Scan 1 : regime nominal *)
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -353,8 +353,8 @@ TEST 'TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, ap
 
     (* Descente : SpeedTgt_Pct=90 -> RequestedStep cape a CfgMaxStepDescente=3 *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := -1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := TRUE;
     DriveReq.SpeedTgt_Pct := 90.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -362,14 +362,14 @@ TEST 'TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, ap
 
     (* Reset + montee : SpeedTgt_Pct=90 -> RequestedStep=5 (MaxStepAscent) *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := 1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := TRUE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 90.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -377,14 +377,14 @@ TEST 'TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, ap
 
     (* Approche capteur haut : HomingApproachActive=TRUE -> palier 1 *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := 1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := TRUE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 90.0;
     DriveReq.HomingApproachActive := TRUE;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
@@ -393,15 +393,15 @@ TEST 'TC-P10-042.1 Plafonds dynamiques palier : descente max 3, montee max 5, ap
 
     (* Zone ralentissement haut : CablePosM >= TopLimitM - CfgSlowdownDistanceM -> palier 1 *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     DriveReq.HomingApproachActive := FALSE;
     FB_W(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := 1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := TRUE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 90.0;
     DriveReq.TopLimitM := 8.5;
     Sens.CablePosM := 8.0;
@@ -433,8 +433,8 @@ TEST 'TC-P10-052.1 Garde-fou vitesse : vitesse non-stable -> palier 1 (activatio
     Cfg.SlowdownDistance_M := 1.0;
 
     (* Scan 1 : regime nominal *)
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 0.0;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg);
@@ -444,8 +444,8 @@ TEST 'TC-P10-052.1 Garde-fou vitesse : vitesse non-stable -> palier 1 (activatio
 
     (* Scan 2 : SpeedGuardEnable=TRUE (defaut), SpeedGuardReady=FALSE (vitesse non stable) -> palier 1 *)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := 1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := TRUE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedTgt_Pct := 90.0;
     Sens.SpeedGuardReady := FALSE;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
@@ -481,8 +481,8 @@ TEST 'T216-AC4-1 Regression : DescendPermit=FALSE + MinStepDown=1 -> StepNumber=
     Cfg.SlowdownDistance_M := 1.0;
 
     // Scan 1 : regime nominal neutre (arme l interlock direction), permis deja FALSE
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedStepReq := 0;
     DriveReq.MinStepDown := 1;
     DriveReq.MaxStepDown := 3;
@@ -498,8 +498,8 @@ TEST 'T216-AC4-1 Regression : DescendPermit=FALSE + MinStepDown=1 -> StepNumber=
     // MAIS DescendPermit=FALSE -> EffectiveSafeStop=TRUE doit garder RequestedStep=0.
     // Le plancher MinStepDown=1 ne doit PAS relever RequestedStep a >=1.
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := -1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := TRUE;
     DriveReq.SpeedStepReq := 1;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
@@ -541,8 +541,8 @@ TEST 'T216-AC4-2 Non-regression plongee Kobold : DescendPermit=TRUE + MinStepDow
     Cfg.SlowdownDistance_M := 1.0;
 
     // Scan 1 : regime nominal neutre
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedStepReq := 0;
     DriveReq.MinStepDown := 3;
     DriveReq.MaxStepDown := 3;
@@ -557,8 +557,8 @@ TEST 'T216-AC4-2 Non-regression plongee Kobold : DescendPermit=TRUE + MinStepDow
     // Scan 2 : descente demandee, cible basse (SpeedStepReq=1) mais plancher MinStepDown=3
     // permis OK -> le plancher releve RequestedStep a 3 (clamp au plafond MaxStepDown=3)
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := -1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := TRUE;
     DriveReq.SpeedStepReq := 1;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,
@@ -598,8 +598,8 @@ TEST 'T216-AC4-3 Perte du permis en mouvement : StepNumber retombe a 0 sans repr
     Cfg.SlowdownDistance_M := 1.0;
 
     // Scan 1 : regime nominal neutre
-    DriveReq.StartStop := FALSE;
-    DriveReq.Direction := 0;
+    DriveReq.RunRequest := FALSE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := FALSE;
     DriveReq.SpeedStepReq := 0;
     DriveReq.MinStepDown := 1;
     DriveReq.MaxStepDown := 3;
@@ -613,8 +613,8 @@ TEST 'T216-AC4-3 Perte du permis en mouvement : StepNumber retombe a 0 sans repr
 
     // Scan 2-3 : descente etablie (permis OK) -> StepNumber=1, RelayRev commande
     ADVANCE_TIME(10000000);
-    DriveReq.StartStop := TRUE;
-    DriveReq.Direction := -1;
+    DriveReq.RunRequest := TRUE;
+    DriveReq.ReqAscent := FALSE; DriveReq.ReqDescend := TRUE;
     DriveReq.SpeedStepReq := 1;
     FB_W(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE,
          DriveRequest := DriveReq, Sensors := Sens, Config := Cfg,

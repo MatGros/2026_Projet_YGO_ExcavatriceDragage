@@ -1,6 +1,6 @@
 Error compiling source files:
 
-ST_ProgramRequest.st:13:29: error: Undefined type 'ST_OPERATORCOUPLEDINTENT' in STRUCT 'ST_PROGRAMREQUEST'
-  13 |     OperatorCoupledIntent : ST_OperatorCoupledIntent;     // Intention couplée continue opérateur (joystick/boutons), TOUS modes
-     |                             ^
+ST_fbDiveSearch_Inputs.st:29:30: error: Undefined type 'ST_FBDIVESEARCH_CONFIG' in STRUCT 'ST_FBDIVESEARCH_INPUTS'
+  29 |     Config                 : ST_fbDiveSearch_Config; // Parametres timeout
+     |                              ^
 

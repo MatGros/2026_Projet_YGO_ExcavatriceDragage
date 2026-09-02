@@ -1,0 +1,23 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_Winch_fxdp3d2r\strucpp-test-Sc2kYs\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_Winch_fxdp3d2r\strucpp-test-Sc2kYs\test_main.cpp:622:14: error: 'class strucpp::FB_SAFETY_WINCH' has no member named 'DIRECTION'
+  622 |         s.FB.DIRECTION = 1;
+      |              ^~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_Winch_fxdp3d2r\strucpp-test-Sc2kYs\test_main.cpp:649:14: error: 'class strucpp::FB_SAFETY_WINCH' has no member named 'DIRECTION'
+  649 |         s.FB.DIRECTION = 1;
+      |              ^~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_Winch_fxdp3d2r\strucpp-test-Sc2kYs\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_Winch_fxdp3d2r\strucpp-test-Sc2kYs\test_main.cpp:710:14: error: 'class strucpp::FB_SAFETY_WINCH' has no member named 'DIRECTION'
+  710 |         s.FB.DIRECTION = 1;
+      |              ^~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_Winch_fxdp3d2r\strucpp-test-Sc2kYs\test_main.cpp:737:14: error: 'class strucpp::FB_SAFETY_WINCH' has no member named 'DIRECTION'
+  737 |         s.FB.DIRECTION = 1;
+      |              ^~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_Winch_fxdp3d2r\strucpp-test-Sc2kYs\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_Winch_fxdp3d2r\strucpp-test-Sc2kYs\test_main.cpp:869:14: error: 'class strucpp::FB_SAFETY_WINCH' has no member named 'DIRECTION'
+  869 |         s.FB.DIRECTION = 1;
+      |              ^~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Safety_Winch_fxdp3d2r\strucpp-test-Sc2kYs\test_main.cpp:895:14: error: 'class strucpp::FB_SAFETY_WINCH' has no member named 'DIRECTION'
+  895 |         s.FB.DIRECTION = 1;
+      |              ^~~~~~~~~
+

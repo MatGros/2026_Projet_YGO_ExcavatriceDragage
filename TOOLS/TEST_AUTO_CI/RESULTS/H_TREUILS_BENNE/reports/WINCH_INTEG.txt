@@ -1,6 +1,6 @@
-Error compiling source files:
-
-FB_TestHarness_PRG_03.st:80:9: error: Cannot assign ST_MODES_AUTORISATIONS to ST_FBMODES_AUTORISATIONS
-  80 | Auth := instModes.Auth;
-     |         ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_WINCH_INTEG_kdsh_92s\strucpp_tmp\strucpp-test-RUrpsP\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\st2c_WINCH_INTEG_kdsh_92s\strucpp_tmp\strucpp-test-RUrpsP\test_main.cpp:4315:20: error: 'struct strucpp::ST_PROGRAMWINCHREQUEST' has no member named 'REQSTARTSTOP'
+ 4315 |         s.SEQREQM2.REQSTARTSTOP = false;
+      |                    ^~~~~~~~~~~~
 

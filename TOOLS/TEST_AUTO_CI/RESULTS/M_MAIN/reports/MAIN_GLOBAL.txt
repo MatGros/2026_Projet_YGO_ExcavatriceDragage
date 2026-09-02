@@ -1,6 +1,19 @@
-Error compiling source files:
-
-ST_ProgramRequest.st:13:29: error: Undefined type 'ST_OPERATORCOUPLEDINTENT' in STRUCT 'ST_PROGRAMREQUEST'
-  13 |     OperatorCoupledIntent : ST_OperatorCoupledIntent;     // Intention couplée continue opérateur (joystick/boutons), TOUS modes
-     |                             ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_9lwlgg29\strucpp-test-EJriNb\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_9lwlgg29\strucpp-test-EJriNb\test_main.cpp:69:69: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'JOYSTICKDEADMANARMED'
+   69 |         if (!ctx.assert_true(static_cast<bool>(s.MAINMACHINE.BUSACQ.JOYSTICKDEADMANARMED), "MAINMACHINE.BUSACQ.JOYSTICKDEADMANARMED", 68, "PRG_02: Homme-mort qualifie")) return false;
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_9lwlgg29\strucpp-test-EJriNb\generated.cpp: In member function 'void strucpp::FB_MAIN_ENDTOEND::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_9lwlgg29\strucpp-test-EJriNb\generated.cpp:19291:21: error: 'struct strucpp::ST_PROGRAMREQUEST' has no member named 'OPERATORCOUPLEDINTENT'
+19291 |     REQPROGRAMLOCAL.OPERATORCOUPLEDINTENT.ACTIVE = COUPLEDINTENTACTIVE;
+      |                     ^~~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_9lwlgg29\strucpp-test-EJriNb\generated.cpp:19292:21: error: 'struct strucpp::ST_PROGRAMREQUEST' has no member named 'OPERATORCOUPLEDINTENT'
+19292 |     REQPROGRAMLOCAL.OPERATORCOUPLEDINTENT.DIRECTION = COUPLEDINTENTDIRECTION;
+      |                     ^~~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_9lwlgg29\strucpp-test-EJriNb\generated.cpp:19328:38: error: 'class strucpp::FB_TESTHARNESS_PRG_04' has no member named 'KOBOLDIMMERSIONCONFIRMED'
+19328 |     KOBOLDIMMERSIONCONFIRMED = PRG04.KOBOLDIMMERSIONCONFIRMED;
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_MAIN_GLOBAL_9lwlgg29\strucpp-test-EJriNb\generated.cpp:19329:38: error: 'class strucpp::FB_TESTHARNESS_PRG_04' has no member named 'KOBOLDBOTTOMTOUCHLATCHED'
+19329 |     KOBOLDBOTTOMTOUCHLATCHED = PRG04.KOBOLDBOTTOMTOUCHLATCHED;
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~
 

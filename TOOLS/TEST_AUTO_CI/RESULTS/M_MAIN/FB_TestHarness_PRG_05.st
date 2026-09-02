@@ -12,7 +12,7 @@ VAR_INPUT
     AcqData                 : ST_AcquisitionInterPrg;
     
     // === 📥 Bus d'Entrée issus de PRG_03 (Modes) ===
-    ModesAuth               : ST_fbModes_Autorisations;
+    ModesAuth               : ST_Modes_Autorisations;
     
     // === 📥 Bus d'Entrée issus de PRG_04 (Treuils / Hauteur câble) ===
     WinchM1CablePosM        : REAL := 5.0;
@@ -30,7 +30,7 @@ VAR_INPUT
     BtnTranslationFwd       : BOOL := FALSE;
     BtnTranslationRev       : BOOL := FALSE;
 
-    // === 🧩 Capteurs position M3 (décodage propriété PRG_05, AF-02 TBD §8 #5) ===
+    // === 🧩 Capteurs position M3 ===
     M3_PosTremie_DI         : BOOL := FALSE;
     M3_PosPV_DI             : BOOL := FALSE;
     M3_PosPVP2_DI           : BOOL := FALSE;
@@ -48,14 +48,26 @@ VAR
     instSafetyTranslationM3 : FB_Safety_Translation;
     instPosDecoderM3        : FB_Translation_PositionDecoder;
     
-    m3StartStop             : BOOL;
+    m3Cfg                   : ST_fbTranslation_Cfg;
+    m3RunRequest            : BOOL;
+    m3ReqTremie             : BOOL;
+    m3ReqMaintenance        : BOOL;
     m3Direction             : INT;
     m3SpeedTgt              : REAL;
     m3HeightOk              : BOOL;
+    initDone                : BOOL := FALSE;
 END_VAR
 
 {region "Corps d'exécution PRG_05 encapsulé"}
-// 0. Décodage position M3 (migré de PRG_02, AF-02 TBD §8 #5)
+IF NOT initDone THEN
+    m3Cfg.CfgRampAccelRate := 1000.0;
+    m3Cfg.CfgRampDecelNormalRate := 1000.0;
+    m3Cfg.CfgRampDecelFastRate := 2000.0;
+    m3Cfg.DriveFreqScaleMaxHz := 50.0;
+    initDone := TRUE;
+END_IF;
+
+// 0. Décodage position M3
 instPosDecoderM3(
     SensorTremie      := M3_PosTremie_DI,
     SensorPV          := M3_PosPV_DI,
@@ -64,12 +76,39 @@ instPosDecoderM3(
     SensorMaintenance := M3_PosMaintenance_DI
 );
 
-// 1. Interlock Hauteur Treuils (Treuils doivent être au-dessus du seuil mini pour translater)
+// 1. Interlock Hauteur Treuils
 m3HeightOk := (WinchM1CablePosM >= 2.0) AND (WinchM2CablePosM >= 2.0);
 
-// 2. Sécurité Translation M3
+// 2. Arbitrage Commande Translation
+IF BtnTranslationFwd THEN
+    m3ReqTremie      := TRUE;
+    m3ReqMaintenance := FALSE;
+    m3RunRequest     := TRUE;
+    m3Direction      := 1;
+    m3SpeedTgt       := 50.0;
+ELSIF BtnTranslationRev THEN
+    m3ReqTremie      := FALSE;
+    m3ReqMaintenance := TRUE;
+    m3RunRequest     := TRUE;
+    m3Direction      := -1;
+    m3SpeedTgt       := 50.0;
+ELSIF AcqData.Joystick.DeadmanArmed AND (AcqData.Joystick.AxisX.Direction <> 0) AND m3HeightOk THEN
+    m3ReqTremie      := (AcqData.Joystick.AxisX.Direction = 1);
+    m3ReqMaintenance := (AcqData.Joystick.AxisX.Direction = -1);
+    m3RunRequest     := TRUE;
+    m3Direction      := AcqData.Joystick.AxisX.Direction;
+    m3SpeedTgt       := ABS(AcqData.Joystick.AxisX.SpeedTgt);
+ELSE
+    m3ReqTremie      := FALSE;
+    m3ReqMaintenance := FALSE;
+    m3RunRequest     := FALSE;
+    m3Direction      := 0;
+    m3SpeedTgt       := 0.0;
+END_IF;
+
+// 3. Sécurité Translation M3
 instSafetyTranslationM3(
-    Enable                  := (ModesAuth.Mode = E_Mode.MAINT_N1 OR ModesAuth.Mode = E_Mode.MAINT_N2 OR ModesAuth.Mode = E_Mode.SEMI_AUTO),
+    Enable                  := (ModesAuth.Mode <> E_Mode.DISABLE),
     Reset                   := BtnReset,
     PowerContactorEngaged   := PowerContactorEngaged,
     Mode                    := ModesAuth.Mode,
@@ -84,58 +123,41 @@ instSafetyTranslationM3(
     DriveActualFreqHz       := 0.0,
     BrakeFeedback           := BrakeFeedbackOpen,
     BrakeCmd                := FALSE,
-    Direction               := m3Direction,
-    LimitSwitchFwd          := instPosDecoderM3.LimitSwitchFwd,
-    LimitSwitchRev          := instPosDecoderM3.LimitSwitchRev,
+    RunRequest              := m3RunRequest,
+    ReqTremie               := m3ReqTremie,
+    ReqMaintenance          := m3ReqMaintenance,
+    LimitSwitchTremie       := instPosDecoderM3.LimitSwitchTremie,
+    LimitSwitchMaintenance  := instPosDecoderM3.LimitSwitchMaintenance,
     SensorWordIncoherent    := instPosDecoderM3.Incoherent
 );
 
 Data.TranslationSafety.SafeStop    := instSafetyTranslationM3.SafeStop;
 Data.TranslationSafety.PowerCutOff := instSafetyTranslationM3.PowerCutOff;
 
-// 3. Arbitrage Commande Translation (Joystick X ou Boutons)
-m3StartStop := (AcqData.JoystickDeadmanArmed AND (AcqData.JoystickDirectionX <> 0) AND m3HeightOk)
-               OR BtnTranslationFwd OR BtnTranslationRev;
-
-IF BtnTranslationFwd THEN
-    m3Direction := 1;
-    m3SpeedTgt  := 50.0;
-ELSIF BtnTranslationRev THEN
-    m3Direction := -1;
-    m3SpeedTgt  := 50.0;
-ELSIF AcqData.JoystickDeadmanArmed AND (AcqData.JoystickDirectionX <> 0) AND m3HeightOk THEN
-    m3Direction := AcqData.JoystickDirectionX;
-    m3SpeedTgt  := AcqData.JoystickSpeedPctX;
-ELSE
-    m3Direction := 0;
-    m3SpeedTgt  := 0.0;
-END_IF;
-
 // 4. Pilotage M3
 instTranslationM3(
-    Enable                  := (ModesAuth.Mode = E_Mode.MAINT_N1 OR ModesAuth.Mode = E_Mode.MAINT_N2 OR ModesAuth.Mode = E_Mode.SEMI_AUTO),
-    Reset                   := BtnReset,
-    PowerContactorEngaged   := PowerContactorEngaged,
-    Mode                    := ModesAuth.Mode,
-    StartStop               := m3StartStop,
-    SafeStop                := Data.TranslationSafety.SafeStop,
-    Direction               := m3Direction,
-    SpeedTgt_Pct            := m3SpeedTgt,
-    PositionSensorTarget    := FALSE,
-    SlowdownSensorTremie    := instPosDecoderM3.TranslationAtPV,
-    SlowdownSensorMaintenance := instPosDecoderM3.TranslationAtP1,
-    SlowdownSensorP1        := instPosDecoderM3.TranslationAtP2,
-    LimitSwitchFwd          := instPosDecoderM3.LimitSwitchFwd,
-    LimitSwitchRev          := instPosDecoderM3.LimitSwitchRev,
-    DriveStatusWord         := 16#0081,
-    DriveActualFreqHz       := 0.0,
-    BrakeFeedback           := BrakeFeedbackOpen,
-    BrakeDelayContactClose  := T#0ms,
-    BrakeDelayMagnetise     := T#0ms,
-    CfgRampAccelRate        := 1000.0
+    Enable                     := (ModesAuth.Mode <> E_Mode.DISABLE),
+    Reset                      := BtnReset,
+    PowerContactorEngaged      := PowerContactorEngaged,
+    Mode                       := ModesAuth.Mode,
+    RunRequest                 := m3RunRequest,
+    SafeStop                   := Data.TranslationSafety.SafeStop,
+    ReqTremie                  := m3ReqTremie,
+    ReqMaintenance             := m3ReqMaintenance,
+    SpeedTgt_Pct               := m3SpeedTgt,
+    PositionSensorTarget       := FALSE,
+    SlowdownSensorTremie       := instPosDecoderM3.TranslationPosPV,
+    SlowdownSensorMaintenance  := instPosDecoderM3.TranslationPosP1,
+    SlowdownSensorP1           := instPosDecoderM3.TranslationPosP2,
+    LimitSwitchTremie          := instPosDecoderM3.LimitSwitchTremie,
+    LimitSwitchMaintenance     := instPosDecoderM3.LimitSwitchMaintenance,
+    EffectivePermitM3_Tremie   := instSafetyTranslationM3.TremieLimitClear,
+    EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenanceLimitClear,
+    DriveStatusWord            := 16#0081,
+    DriveActualFreqHz          := 0.0,
+    BrakeFeedback              := BrakeFeedbackOpen,
+    Cfg                        := m3Cfg
 );
-
-
 
 // 5. Remplissage Bus Sortie Data
 Data.TranslationFinalInterlockRequest.Enable                    := instTranslationM3.Enable;
@@ -147,7 +169,8 @@ Data.TranslationFinalInterlockRequest.BrakeReleaseRequest       := instTranslati
 Data.TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz      := instTranslationM3.RequestedDriveFreqHz;
 
-Data.TranslationState.ActiveDirection                          := m3Direction;
+Data.TranslationState.ActiveTremie := (m3Direction = 1);
+Data.TranslationState.ActiveMaintenance := (m3Direction = -1);
 Data.TranslationState.SpeedCmd_Pct                             := m3SpeedTgt;
 Data.TranslationState.Busy                                     := (instTranslationM3.RequestedDriveControlWord <> 0);
 Data.TranslationState.Ready                                    := instTranslationM3.Ready;

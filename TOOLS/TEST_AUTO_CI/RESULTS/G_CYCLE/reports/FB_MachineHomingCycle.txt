@@ -1,6 +1,0 @@
-Error compiling source files:
-
-FB_MachineHomingCycle.st:42:35: error: Undefined type 'ST_FBMACHINEHOMINGCYCLE_CFG' in FUNCTION_BLOCK 'FB_MACHINEHOMINGCYCLE'
-  42 |     Cfg                         : ST_fbMachineHomingCycle_Cfg;              // --> [CFG] Reglages geometriques referencement (cible M1 + ecarts benne)
-     |                                   ^
-

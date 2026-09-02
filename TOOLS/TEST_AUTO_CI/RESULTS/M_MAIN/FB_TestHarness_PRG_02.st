@@ -131,14 +131,14 @@ instJoystick(
 );
 
 
-Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
+Data.Joystick.DeadmanArmed := instJoystick.DeadmanArmed;
 // Miroir fidèle de PRG_02_Acquisition : PRG_03/PRG_04 consomment l'axe Y
 // structuré pour arbitrer le sens et la vitesse des treuils.
 Data.Joystick.AxisY          := instJoystick.AxisCmdY;
-Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
-Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
-Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
-Data.JoystickSpeedPctX    := ABS(instJoystick.AxisCmdX.SpeedTgt);
+
+
+Data.Joystick.AxisX := instJoystick.AxisCmdX;
+
 
 // Publication réseau : miroir de PRG_02_Acquisition. PRG_04/FB_Safety_Winch
 // consomment Data.Network.Joystick ; ne pas laisser ce bus à sa valeur par défaut.
@@ -162,9 +162,11 @@ instEncoderM1(
     Cfg := encoderCfg,
     Calib := calibM1
 );
-Data.Encoders.M1            := instEncoderM1.Measurement;
-Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
-Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
+Data.EncoderM1.Measurement := instEncoderM1.Measurement;
+Data.EncoderM1.Fault := instEncoderM1.Fault;
+Data.EncoderM1.HomedAndReliable := instEncoderM1.HomedAndReliable;
+Data.EncoderM1.Homed := instEncoderM1.Homed;
+Data.EncoderM1.HomingSuspect := instEncoderM1.HomingSuspect;
 
 HwInM2.RawPosIn := COD2_PosValue;
 HwInM2.SlaveOperational := EcatOperational;
@@ -181,15 +183,17 @@ instEncoderM2(
     Calib := calibM2
 );
 
-Data.Encoders.M2            := instEncoderM2.Measurement;
-Data.M2_EncoderFault        := instEncoderM2.EncoderFault;
-Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;
+Data.EncoderM2.Measurement := instEncoderM2.Measurement;
+Data.EncoderM2.Fault := instEncoderM2.Fault;
+Data.EncoderM2.HomedAndReliable := instEncoderM2.HomedAndReliable;
+Data.EncoderM2.Homed := instEncoderM2.Homed;
+Data.EncoderM2.HomingSuspect := instEncoderM2.HomingSuspect;
 
 // 4. Diagnostics Cartes DI
-Data.LocalDigitalIoOk := TRUE;
-Data.Vh0800EndOk      := TRUE;
-Data.Vh0808EtpOk      := TRUE;
-Data.InputModuleFault := FALSE;
+Data.InputModules.LocalDigitalIoOk := TRUE;
+Data.InputModules.Vh0800EndOk := TRUE;
+Data.InputModules.Vh0808EtpOk := TRUE;
+Data.InputModules.Fault := FALSE;
 
 // 5. Renseignement de l'Image Matérielle HwIn (Structure Complète)
 HwIn.Winch.M1_ContactorsReleased_DI := M1_ContactorsReleased;

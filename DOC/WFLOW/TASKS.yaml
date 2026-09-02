@@ -5117,3 +5117,28 @@ tasks:
   bloque_par:
   - STUB rapide cree pendant MES - a completer (valeurs tempo, placement Q1, politique bypass Q2, remontee IHM Q4)
   - Lien avec T229 (FB_Cycle X4) et AF-04 3bis H1
+
+- id: T231
+  parent_id: ''
+  statut: ⬜
+  criticite: C1
+  domaine: OUTILLAGE / TEST_AUTO_CI
+  agent: ''
+  date: '2026-09-03T01:25:00+02:00'
+  titre: Assainissement compilation des harnais STruCpp et types résiduels (WINCH_INTEG, FB_Bucket, FB_TroubleshootingView)
+  contexte: >
+    La suite de tests automatiques CI (run_tests.py) relève 3 blocs/harnais non compilés
+    ou en échec de types STruCpp lors de la conversion C++ : WINCH_INTEG, FB_Bucket et FB_TroubleshootingView.
+    Le code de production CODE/ reste la source de vérité et ne doit pas être dégradé.
+  description: >
+    Tracer et appliquer les solutions d'alignement pour compiler les blocs résiduels :
+    1. FB_TroubleshootingView : GVL_Troubleshooting et GVL_IHM globaux à intégrer/mocker proprement dans le harnais sans dépendance circulaire.
+    2. FB_Bucket & FB_Winch : aligner les fichiers de tests test_fb_bucket.st et test_fb_winch.st sur les noms exacts d'interfaces ST (M2_RunRequest, ReqAscent/ReqDescend, RunRequest/StepTgt).
+    3. WINCH_INTEG : finaliser l'alignement des structures d'intégration multi-FB avec les types inter-PRG qualifiés.
+  objectifs:
+  - Intégrer les variables globales GVL_Troubleshooting / GVL_IHM dans l'environnement de compilation STruCpp pour FB_TroubleshootingView
+  - Valider la compilation et l'exécution de FB_Bucket sous test_fb_bucket.st
+  - Valider la compilation et l'exécution du harnais d'intégration WINCH_INTEG
+  - Maintenir 100% de conformité de index.html et des rapports CI
+  contrat: ''
+  bloque_par: []

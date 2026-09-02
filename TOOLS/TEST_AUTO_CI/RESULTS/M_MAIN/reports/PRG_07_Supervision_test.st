@@ -2,7 +2,7 @@ SETUP
 VAR
     harness         : FB_TestHarness_PRG_07;
     acqData         : ST_AcquisitionInterPrg;
-    modesAuth       : ST_fbModes_Autorisations;
+    modesAuth       : ST_Modes_Autorisations;
     winchData       : ST_WinchInterPrg;
     translationData : ST_TranslationInterPrg;
 END_VAR
@@ -14,8 +14,8 @@ TEST 'PRG_07_Supervision : Formatage Bandeau IHM Mode Manuel Sans Defaut'
     modesAuth.JoystickWinchSelectArbitrated := 0; // Couplé
     
     // 2. Stimulus : Machine saine, puissance engagée
-    acqData.JoystickDeadmanArmed := TRUE;
-    acqData.JoystickYNeutral := TRUE;
+    acqData.Joystick.DeadmanArmed := TRUE;
+    acqData.Joystick.AtNeutralXY := TRUE;
     winchData.WinchM1Safety.DescendPermit := TRUE;
     winchData.WinchM1Safety.AscentPermit := TRUE;
     winchData.WinchM2Safety.DescendPermit := TRUE;

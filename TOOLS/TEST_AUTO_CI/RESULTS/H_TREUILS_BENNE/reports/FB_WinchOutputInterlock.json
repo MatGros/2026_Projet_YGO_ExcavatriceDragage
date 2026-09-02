@@ -17,7 +17,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.RELAYFWD expected TRUE, got FALSE",
         "file": "test_fb_winchoutputinterlock.st",
-        "line": 204,
+        "line": 211,
         "message": "Reautorisation -> mouvement autorise"
       }
     },
@@ -32,7 +32,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.RELAYFWD expected TRUE, got FALSE",
         "file": "test_fb_winchoutputinterlock.st",
-        "line": 271,
+        "line": 278,
         "message": "Mouvement autorise -> RelayFwd"
       }
     },
@@ -43,7 +43,7 @@
         "assertType": "ASSERT_TRUE",
         "detail": "FB.RELAYFWD expected TRUE, got FALSE",
         "file": "test_fb_winchoutputinterlock.st",
-        "line": 329,
+        "line": 336,
         "message": "Mouvement montee -> RelayFwd"
       }
     },
@@ -58,7 +58,7 @@
         "assertType": "ASSERT_FALSE",
         "detail": "FB.RELAYFWD expected FALSE, got TRUE",
         "file": "test_fb_winchoutputinterlock.st",
-        "line": 463,
+        "line": 477,
         "message": "Confirmation retombee -> chute du sens (\u00a73bis)"
       }
     },

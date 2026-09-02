@@ -315,11 +315,11 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 23:01:37</div>
+    <div class="exec-time">2026-09-03 01:16:58</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (3 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-archi-0">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-archi-1">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-archi-2">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1</a></li></ul>
+        <summary>📋 Sommaire (5 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-archi-0">TC-P02-001 Un seul producteur par donnee : bus Data qualifie et complet (essai d architecture - validation partielle boite noire)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-archi-1">TC-P02-002 Orchestration ST sans logique cachee : qualification joystick et codeurs (essai d architecture - validation partielle boite noire)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-archi-2">TC-P02-003 Sorties physiques via PRG_06 : PRG_02 ne produit aucune commande actionneur (essai d architecture - validation partielle boite noire)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-archi-3">TC-P02-004 Ordre MainTask conforme : HwIn image arbitree reel/simule (essai d architecture - validation partielle boite noire)</a></li><li class="toc-item toc-pass"><a href="#test-prg-02-acquisition-archi-4">TC-P02-005 Troubleshooting lecture seule : PRG_02 produit les diagnostics observes (essai d architecture - validation partielle boite noire)</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -328,12 +328,12 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Programme POU)</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            3/3 vérifications validées
+            5/5 vérifications validées
         </div>
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 48 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 54 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -344,6 +344,54 @@
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td>Simulé pour environnement CI (hors CODESYS)</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>HYSTERESIS.st</code><span style="background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid #d97706;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;">MOCK</span></td>
+                <td>FB</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Simulé pour environnement CI (hors CODESYS)</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_SpeedStepTable.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_MachineHoming.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_IOModuleDiag.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_InputSource.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_M3DriveFeedback.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
                 <td><code>E_State.st</code></td>
@@ -618,7 +666,7 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
-                <td><code>ST_fbCycle_TranslationCmdDemand.st</code></td>
+                <td><code>ST_ProgramTranslationRequest.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -726,22 +774,22 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_02_Acquisition</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 89 flux entrants · 121 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_02_Acquisition</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 93 flux entrants · 123 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimBench <span style="color:var(--muted);font-weight:500;">(FB_SimBench)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instJoystick <span style="color:var(--muted);font-weight:500;">(FB_Joystick)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiagCanOpen <span style="color:var(--muted);font-weight:500;">(FB_Diag_CanOpen)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiagEthercat <span style="color:var(--muted);font-weight:500;">(FB_Diag_Ethercat)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instEncoderM1 <span style="color:var(--muted);font-weight:500;">(FB_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instEncoderM2 <span style="color:var(--muted);font-weight:500;">(FB_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ M2BucketRefOpenEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ M2BucketRefCloseEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ HwInM1 <span style="color:var(--muted);font-weight:500;">(ST_fbEncoder_HwIn)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ HwInM2 <span style="color:var(--muted);font-weight:500;">(ST_fbEncoder_HwIn)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SimulationModeRise <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SimulationModeFall <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instSimBench <span style="color:var(--muted);font-weight:500;">(FB_SimBench)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instJoystick <span style="color:var(--muted);font-weight:500;">(FB_Joystick)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiagCanOpen <span style="color:var(--muted);font-weight:500;">(FB_Diag_CanOpen)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiagEthercat <span style="color:var(--muted);font-weight:500;">(FB_Diag_Ethercat)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instEncoderM1 <span style="color:var(--muted);font-weight:500;">(FB_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instEncoderM2 <span style="color:var(--muted);font-weight:500;">(FB_Encoder)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instMachineHomingCycle <span style="color:var(--muted);font-weight:500;">(FB_MachineHomingCycle)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ HwInM1 <span style="color:var(--muted);font-weight:500;">(ST_fbEncoder_HwIn)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ HwInM2 <span style="color:var(--muted);font-weight:500;">(ST_fbEncoder_HwIn)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ MachineHomingM1Status <span style="color:var(--muted);font-weight:500;">(ST_fbMachineHomingCycle_AxisHomingStatus)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ MachineHomingM2Status <span style="color:var(--muted);font-weight:500;">(ST_fbMachineHomingCycle_AxisHomingStatus)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ MachineHomingCfg <span style="color:var(--muted);font-weight:500;">(ST_fbMachineHomingCycle_Cfg)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ BucketReferenceOpenEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ BucketReferenceCloseEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ JoystickCfgEffective <span style="color:var(--muted);font-weight:500;">(ST_fbJoystick_Cfg)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SimulationModeRise <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SimulationModeFall <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span></div>
         </div>
         
         <div style="margin:6px 0;font-size:13px;color:var(--muted);">
             <b>Constantes internes (VAR CONSTANT) :</b><br>
-            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>ENCODER_POINTS_PER_REV</b> : UDINT := 8192</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>ENCODER_MULTITURN_REVS_MAX</b> : UDINT := 4096</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>WINCH_CABLE_M_PER_REV</b> : REAL := 2.0</span></div>
+            <div style="margin-top:4px;"><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>ENCODER_POINTS_PER_REV</b> : UDINT := 8192</span><span style="background:var(--card-sub);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">📐 <b>WINCH_CABLE_M_PER_REV</b> : REAL := 2.0</span></div>
         </div>
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
             <div class="pin-col pin-col-in">
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-wired" style="background:rgba(20,184,166,0.15);border:1px solid #14b8a6;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#5eead4;font-weight:700;font-size:12px;">🔌 Entrées Physiques / E/S Mappées</span> <span style="font-size:11px;color:#2dd4bf;">(34 capteurs/adresses ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#5eead4;font-weight:700;font-size:12px;">🔌 Entrées Physiques / E/S Mappées</span> <span style="font-size:11px;color:#2dd4bf;">(36 capteurs/adresses ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(20,184,166,0.25);color:#5eead4;">Device_IO</span></div>
                 </div>
             </summary>
@@ -843,6 +891,10 @@
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(20,184,166,0.2);color:#5eead4;font-size:10px;">🔌 E/S Matérielle</span></div>
             </div>
             <div class="pin-row pin-row-wired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #14b8a6;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#2dd4bf;background:rgba(20,184,166,0.15);font-size:11px;">M3_CommandWord</code> <span style="font-size:10px;color:var(--muted);">[%QW6 · AC600_ECAT_Drive]</span></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(20,184,166,0.2);color:#5eead4;font-size:10px;">🔌 E/S Matérielle</span></div>
+            </div>
+            <div class="pin-row pin-row-wired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #14b8a6;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#2dd4bf;background:rgba(20,184,166,0.15);font-size:11px;">M3_PosMaintenance_DI</code> <span style="font-size:10px;color:var(--muted);">[%IX224.4 · VH_0808ETP]</span></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(20,184,166,0.2);color:#5eead4;font-size:10px;">🔌 E/S Matérielle</span></div>
             </div>
@@ -860,6 +912,10 @@
             </div>
             <div class="pin-row pin-row-wired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #14b8a6;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#2dd4bf;background:rgba(20,184,166,0.15);font-size:11px;">M3_PosTremie_DI</code> <span style="font-size:10px;color:var(--muted);">[%IX224.0 · VH_0808ETP]</span></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(20,184,166,0.2);color:#5eead4;font-size:10px;">🔌 E/S Matérielle</span></div>
+            </div>
+            <div class="pin-row pin-row-wired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #14b8a6;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#2dd4bf;background:rgba(20,184,166,0.15);font-size:11px;">M3_SetpointFrequencyHz</code> <span style="font-size:10px;color:var(--muted);">[%QW7 · AC600_ECAT_Drive]</span></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(20,184,166,0.2);color:#5eead4;font-size:10px;">🔌 E/S Matérielle</span></div>
             </div>
             <div class="pin-row pin-row-wired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #14b8a6;margin-top:2px;">
@@ -935,13 +991,17 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(2,132,199,0.15);border:1px solid #0284c7;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_PERSISTENT</span> <span style="font-size:11px;color:#38bdf8;">(1 signaux ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_PERSISTENT</span> <span style="font-size:11px;color:#38bdf8;">(2 signaux ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.25);color:#7dd3fc;">Lecture Globale</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_PERSISTENT._JoystickCfgPersist</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_PERSISTENT._WinchSpeedStepTable</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL In</span></div>
             </div></div>
         </details>
@@ -990,13 +1050,17 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_04_Treuils_Benne</span> <span style="font-size:11px;color:#818cf8;">(5 retours ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_04_Treuils_Benne</span> <span style="font-size:11px;color:#818cf8;">(6 retours ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.ArmingPermit</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.BucketState.MechState.ActiveOffsetValid</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
@@ -1013,23 +1077,6 @@
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div></div>
-        </details>
-        <details style="margin:4px 0;">
-            <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_05_Translation</span> <span style="font-size:11px;color:#818cf8;">(2 retours ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
-                </div>
-            </summary>
-            <div style="margin-top:2px;">
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_05_Translation.Data.TranslationState.ActiveDirection</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div></div>
         </details>
@@ -1184,7 +1231,7 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(217,119,6,0.18);border:1px solid #92400e;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#fde68a;font-weight:700;font-size:12px;">💾 Variables Rémanentes Persistantes / RETAIN</span> <span style="font-size:11px;color:#fcd34d;">(3 variables ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#fde68a;font-weight:700;font-size:12px;">💾 Variables Rémanentes Persistantes / RETAIN</span> <span style="font-size:11px;color:#fcd34d;">(5 variables ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.3);color:#fef3c7;font-weight:700;">VAR PERSISTENT</span></div>
                 </div>
             </summary>
@@ -1194,11 +1241,19 @@
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.25);color:#fde68a;font-size:10px;font-weight:700;">💾 RETAIN PERSISTANT</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #d97706;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#fcd34d;background:rgba(217,119,6,0.2);font-size:11px;">_BucketCfgPersist.Config.OffsetOpenM</code> <span style="font-size:10px;color:var(--muted);">[VAR_GLOBAL PERSISTENT RETAIN]</span></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.25);color:#fde68a;font-size:10px;font-weight:700;">💾 RETAIN PERSISTANT</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #d97706;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#fcd34d;background:rgba(217,119,6,0.2);font-size:11px;">_JoystickNeutralX</code> <span style="font-size:10px;color:var(--muted);">[VAR_GLOBAL PERSISTENT RETAIN]</span></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.25);color:#fde68a;font-size:10px;font-weight:700;">💾 RETAIN PERSISTANT</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #d97706;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#fcd34d;background:rgba(217,119,6,0.2);font-size:11px;">_JoystickNeutralY</code> <span style="font-size:10px;color:var(--muted);">[VAR_GLOBAL PERSISTENT RETAIN]</span></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.25);color:#fde68a;font-size:10px;font-weight:700;">💾 RETAIN PERSISTANT</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #d97706;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#fcd34d;background:rgba(217,119,6,0.2);font-size:11px;">_WinchM1CfgPersist.CfgTopSensorPos_M</code> <span style="font-size:10px;color:var(--muted);">[VAR_GLOBAL PERSISTENT RETAIN]</span></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(217,119,6,0.25);color:#fde68a;font-size:10px;font-weight:700;">💾 RETAIN PERSISTANT</span></div>
             </div></div>
         </details></div>
@@ -1209,14 +1264,14 @@
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
                     <div>• Entrées Formelles : <b style="color:#ffffff;">0</b></div>
-                    <div>• Entrées Physiques : <b style="color:#ffffff;">34</b></div>
-                    <div>• Lectures GVL : <b style="color:#ffffff;">16</b></div>
-                    <div>• Retours PRG : <b style="color:#ffffff;">23</b></div>
-                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">3</b></div>
+                    <div>• Entrées Physiques : <b style="color:#ffffff;">36</b></div>
+                    <div>• Lectures GVL : <b style="color:#ffffff;">17</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">22</b></div>
+                    <div>• Calibrations RETAIN : <b style="color:#ffffff;">5</b></div>
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">4</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">101</b></div>
-                    <div>• Écritures GVL : <b style="color:#ffffff;">20</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">89 IN</b> / <b style="color:#ffffff;">121 OUT</b></div>
+                    <div>• Écritures GVL : <b style="color:#ffffff;">22</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">93 IN</b> / <b style="color:#ffffff;">123 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -1313,15 +1368,43 @@
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.Encoders.M1</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputModules.Fault</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.Encoders.M2</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputModules.LocalDigitalIoOk</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputModuleFault</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputModules.Vh0008Er1Ok</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputModules.Vh0008ErOk</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputModules.Vh0800EndOk</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputModules.Vh0808EtpOk</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputSource.MachineInputSourceChanged</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputSource.OperatorInputSourceChanged</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputSource.TranslationInputSourceChanged</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.InputSource.WinchInputSourceChanged</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
@@ -1361,51 +1444,43 @@
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.JoystickDeadmanArmed</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M3.ActualFrequencyHz</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.JoystickDirectionX</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M3.StatusWord</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.JoystickSpeedPctX</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.MachineHoming.Active</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.JoystickXNeutral</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.MachineHoming.Failed</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.JoystickYNeutral</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.MachineHoming.Homed</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.LocalDigitalIoOk</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.MachineHoming.HomingLoss</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M1_EncoderFault</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.MachineHoming.Instruction</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M1_HomedAndReliable</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.MachineHoming.SetPosBucketClose</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M2_EncoderFault</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.MachineHoming.SetPosBucketOpen</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M2_HomedAndReliable</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M3_ActualFrequencyHz_Filtered</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.M3_StatusWord_Filtered</div>
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.MachineHoming.Step</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
@@ -1430,26 +1505,6 @@
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.Network.Joystick</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.Vh0008Er1Ok</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.Vh0008ErOk</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.Vh0800EndOk</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.Vh0808EtpOk</div>
-                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
-                </div>
-                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
-                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.WinchInputSourceChanged</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_AcquisitionInterPrg</span></div>
                 </div></div>
             </details>
@@ -1671,11 +1726,15 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired pin-row-out" style="background:rgba(2,132,199,0.15);border:1px solid #0284c7;cursor:pointer;">
-                    <div class="pin-name"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_Simulation</span> <span style="font-size:11px;color:#38bdf8;">(20 écritures ▾)</span></div>
+                    <div class="pin-name"><span style="color:#7dd3fc;font-weight:700;font-size:12px;">🌐 GVL_Simulation</span> <span style="font-size:11px;color:#38bdf8;">(22 écritures ▾)</span></div>
                     <div class="pin-expr"><span class="pin-tag" style="background:rgba(2,132,199,0.25);color:#7dd3fc;">Écriture Globale</span></div>
                 </div>
             </summary>
             <div style="margin-top:2px;">
+            <div class="pin-row pin-row-unwired pin-row-out" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL Out</span></div>
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_Simulation.SimChainOk</code></div>
+            </div>
             <div class="pin-row pin-row-unwired pin-row-out" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL Out</span></div>
                 <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_Simulation.SimEncoderSpeedFactor</code></div>
@@ -1750,6 +1809,10 @@
             </div>
             <div class="pin-row pin-row-unwired pin-row-out" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL Out</span></div>
+                <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_Simulation.SimTopPositionActive</code></div>
+            </div>
+            <div class="pin-row pin-row-unwired pin-row-out" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(2,132,199,0.2);color:#7dd3fc;font-size:10px;">🌐 GVL Out</span></div>
                 <div class="pin-expr"><code style="color:#38bdf8;background:rgba(2,132,199,0.15);font-size:11px;">GVL_Simulation.SimTranslationActive</code></div>
             </div>
             <div class="pin-row pin-row-unwired pin-row-out" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #0284c7;margin-top:2px;">
@@ -1762,7 +1825,7 @@
     
     
     <details class="encaps-details" >
-        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 17 FB de la chaine, encapsulation propre (0 violation)</summary>
+        <summary>🔒 Encapsulation (Interface & POO) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 18 FB de la chaine, encapsulation propre (0 violation)</summary>
         
         <details style="margin: 12px 0 16px 0; background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;">
             <summary style="cursor: pointer; color: var(--accent); font-weight: 700; font-size: 13px;">
@@ -1828,6 +1891,13 @@
             <tbody>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
+                <td><code>FB_Hysteresis_Util</code></td>
+                <td>3</td><td>1</td>
+                <td>0</td><td>0</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (0 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+            </tr>
+            <tr class="encaps-row-pass">
+                <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_FaultCore</code></td>
                 <td>3</td><td>2</td>
                 <td>0</td><td>3</td>
@@ -1886,8 +1956,8 @@
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Joystick</code></td>
                 <td>10</td><td>9</td>
-                <td>2</td><td>15</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (15 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>2</td><td>29</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (29 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1956,56 +2026,323 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 3 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 5 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-prg-02-acquisition-archi-0" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale </h3>
+                <h3 style="flex: 1;">TC-P02-001 Un seul producteur par donnee : bus Data qualifie et complet (essai d architecture - validation partielle boite noire) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Architecture F02.03 : chaque image/bus/commande a un proprietaire unique. En boite
+       noire, on verifie que PRG_02 (via le harnais) peuple le bus Data de facon coherente
+       et complete : diagnostics DI, qualification codeurs, mesures.</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
+                <ul class="checks-list"><li>Diagnostic module LocalDigitalIoOk publie (producteur unique)</li><li>Diagnostic module VH0800 publie</li><li>Diagnostic module VH0808 publie</li><li>Pas de defaut module E/S (nominal)</li><li>Codeur M1 qualifie publie</li><li>Mesure cable M1 publiee (2.0 m)</li></ul>
+            </details>
                 
                 
-                
+    <div class="chronogram-group">
+        
+        <!-- Décision (2026-08-29) : les 2 chronogrammes (graphique + tableau) sont OUVERTS par
+             défaut quand la carte du test est dépliée, quel que soit le PASS/FAIL. Avant, ils
+             ne s'ouvraient qu'en cas d'échec. L'échec reste signalé par `fail_note` ci-dessus. -->
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (2 scans, 0 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (2 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P02-001 Un seul producteur par donnee : bus Data qualifie et complet (essai d architecture - validation partielle boite noire)')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (64)</summary>
+        <table class="static-table"><tbody><tr><td><code>CALIBM1.HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM2.HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM1.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM1.HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBM2.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM2.HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBINIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CANBUSOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>COD1_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>COD2_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>DATA.DATAVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAGCANDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGCANDEV.OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGCANDEV.STATE</code></td><td>1</td></tr><tr><td><code>DIAGCANDEV.STATEATERROR</code></td><td>0</td></tr><tr><td><code>DIAGECATDEV.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGECATDEV.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAGECATDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.STATE</code></td><td>1</td></tr><tr><td><code>DIAGECATDEV.STATEATERROR</code></td><td>0</td></tr><tr><td><code>ECATOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM1.ALARMSIN</code></td><td>0</td></tr><tr><td><code>HWINM1.PRESETSTATUSBIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWINM1.SLAVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM1.WARNINGSIN</code></td><td>0</td></tr><tr><td><code>HWINM2.ALARMSIN</code></td><td>0</td></tr><tr><td><code>HWINM2.PRESETSTATUSBIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWINM2.SLAVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM2.WARNINGSIN</code></td><td>0</td></tr><tr><td><code>JOYOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSMAINTENANCE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSP1_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPVP2_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPV_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSTREMIE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NXMEM</code></td><td>5000</td></tr><tr><td><code>NYMEM</code></td><td>5000</td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SIMULATIONMODEACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBM1.LASTKNOWNRAWPOS</code></td><td>1008192</td></tr><tr><td><code>CALIBM2.LASTKNOWNRAWPOS</code></td><td>1008192</td></tr><tr><td><code>HWINM1.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>HWINM2.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>JOYBTNRAW</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>JOYRAWX</code></td><td>5000</td></tr><tr><td><code>JOYRAWY</code></td><td>5000</td></tr></tbody></table>
+    </details>
+    </div>
             </div>
         </article>
         <article id="test-prg-02-acquisition-archi-1" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_06_Outputs : Transmission Ordre M2 en Marche Normale </h3>
+                <h3 style="flex: 1;">TC-P02-002 Orchestration ST sans logique cachee : qualification joystick et codeurs (essai d architecture - validation partielle boite noire) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Architecture F02.02 : les calculs resident dans les FB, le PRG orchestre. En boite
+       noire, on verifie que le bus Data porte les resultats qualifies des sous-FB
+       (joystick, codeurs) — preuve que l orchestration ST rend les flux lisibles.</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>Homme-mort arme (qualification joystick)</li><li>Axe X au neutre</li><li>Mesure codeur M1 publiee</li></ul>
+            </details>
                 
                 
-                
+    <div class="chronogram-group">
+        
+        <!-- Décision (2026-08-29) : les 2 chronogrammes (graphique + tableau) sont OUVERTS par
+             défaut quand la carte du test est dépliée, quel que soit le PASS/FAIL. Avant, ils
+             ne s'ouvraient qu'en cas d'échec. L'échec reste signalé par `fail_note` ci-dessus. -->
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (3 scans, 1 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"><svg width="388" height="132" viewBox="0 0 388 132" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;JOYRAWX&quot;: &quot;5000&quot;, &quot;JOYRAWY&quot;: &quot;5000&quot;, &quot;JOYBTNRAW&quot;: &quot;0&quot;, &quot;COD1_POSVALUE&quot;: &quot;1008192&quot;, &quot;COD2_POSVALUE&quot;: &quot;1008192&quot;, &quot;M3_POSTREMIE_DI&quot;: &quot;0&quot;, &quot;M3_POSPV_DI&quot;: &quot;0&quot;, &quot;M3_POSPVP2_DI&quot;: &quot;0&quot;, &quot;M3_POSP1_DI&quot;: &quot;0&quot;, &quot;M3_POSMAINTENANCE_DI&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;EMERGENCYCHAINCLOSED&quot;: &quot;1&quot;, &quot;PHASEROTATIONOK&quot;: &quot;1&quot;, &quot;BRAKETHERMALOK&quot;: &quot;1&quot;, &quot;M1_CONTACTORSRELEASED&quot;: &quot;1&quot;, &quot;M2_CONTACTORSRELEASED&quot;: &quot;1&quot;, &quot;M1_THERMALOK&quot;: &quot;1&quot;, &quot;M2_THERMALOK&quot;: &quot;1&quot;, &quot;CANBUSOPERATIONAL&quot;: &quot;1&quot;, &quot;JOYOPERATIONAL&quot;: &quot;1&quot;, &quot;ECATOPERATIONAL&quot;: &quot;1&quot;, &quot;BTNRESET_IHM&quot;: &quot;0&quot;, &quot;M1_RELAYFWD&quot;: &quot;0&quot;, &quot;M1_RELAYREV&quot;: &quot;0&quot;, &quot;M1_BRAKECMD&quot;: &quot;0&quot;, &quot;M2_RELAYFWD&quot;: &quot;0&quot;, &quot;M2_RELAYREV&quot;: &quot;0&quot;, &quot;M2_BRAKECMD&quot;: &quot;0&quot;, &quot;M3_BRAKECMD&quot;: &quot;0&quot;, &quot;SIMULATIONMODEACTIVE&quot;: &quot;0&quot;, &quot;DATA.DATAVALID&quot;: &quot;0&quot;, &quot;DIAGCANDEV.ONLINE&quot;: &quot;1&quot;, &quot;DIAGCANDEV.OPERATIONAL&quot;: &quot;1&quot;, &quot;DIAGCANDEV.ERROR&quot;: &quot;0&quot;, &quot;DIAGCANDEV.ERRORID&quot;: &quot;0&quot;, &quot;DIAGCANDEV.STATE&quot;: &quot;1&quot;, &quot;DIAGCANDEV.STATEATERROR&quot;: &quot;0&quot;, &quot;DIAGECATDEV.ONLINE&quot;: &quot;1&quot;, &quot;DIAGECATDEV.OPERATIONAL&quot;: &quot;1&quot;, &quot;DIAGECATDEV.ERROR&quot;: &quot;0&quot;, &quot;DIAGECATDEV.ERRORID&quot;: &quot;0&quot;, &quot;DIAGECATDEV.STATE&quot;: &quot;1&quot;, &quot;DIAGECATDEV.STATEATERROR&quot;: &quot;0&quot;, &quot;CALIBM1.HOMINGREFRAW&quot;: &quot;1000000&quot;, &quot;CALIBM1.LASTKNOWNRAWPOS&quot;: &quot;1008192&quot;, &quot;CALIBM1.HOMED&quot;: &quot;1&quot;, &quot;CALIBM1.HOMINGSUSPECT&quot;: &quot;0&quot;, &quot;CALIBM2.HOMINGREFRAW&quot;: &quot;1000000&quot;, &quot;CALIBM2.LASTKNOWNRAWPOS&quot;: &quot;1008192&quot;, &quot;CALIBM2.HOMED&quot;: &quot;1&quot;, &quot;CALIBM2.HOMINGSUSPECT&quot;: &quot;0&quot;, &quot;HWINM1.RAWPOSIN&quot;: &quot;1008192&quot;, &quot;HWINM1.ALARMSIN&quot;: &quot;0&quot;, &quot;HWINM1.WARNINGSIN&quot;: &quot;0&quot;, &quot;HWINM1.SLAVEOPERATIONAL&quot;: &quot;1&quot;, &quot;HWINM1.PRESETSTATUSBIT&quot;: &quot;0&quot;, &quot;HWINM2.RAWPOSIN&quot;: &quot;1008192&quot;, &quot;HWINM2.ALARMSIN&quot;: &quot;0&quot;, &quot;HWINM2.WARNINGSIN&quot;: &quot;0&quot;, &quot;HWINM2.SLAVEOPERATIONAL&quot;: &quot;1&quot;, &quot;HWINM2.PRESETSTATUSBIT&quot;: &quot;0&quot;, &quot;NXMEM&quot;: &quot;5000&quot;, &quot;NYMEM&quot;: &quot;5000&quot;, &quot;CALIBINIT&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 60.0, &quot;fields&quot;: {&quot;JOYRAWX&quot;: &quot;5000&quot;, &quot;JOYRAWY&quot;: &quot;5000&quot;, &quot;JOYBTNRAW&quot;: &quot;1&quot;, &quot;COD1_POSVALUE&quot;: &quot;1008192&quot;, &quot;COD2_POSVALUE&quot;: &quot;1008192&quot;, &quot;M3_POSTREMIE_DI&quot;: &quot;0&quot;, &quot;M3_POSPV_DI&quot;: &quot;0&quot;, &quot;M3_POSPVP2_DI&quot;: &quot;0&quot;, &quot;M3_POSP1_DI&quot;: &quot;0&quot;, &quot;M3_POSMAINTENANCE_DI&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;EMERGENCYCHAINCLOSED&quot;: &quot;1&quot;, &quot;PHASEROTATIONOK&quot;: &quot;1&quot;, &quot;BRAKETHERMALOK&quot;: &quot;1&quot;, &quot;M1_CONTACTORSRELEASED&quot;: &quot;1&quot;, &quot;M2_CONTACTORSRELEASED&quot;: &quot;1&quot;, &quot;M1_THERMALOK&quot;: &quot;1&quot;, &quot;M2_THERMALOK&quot;: &quot;1&quot;, &quot;CANBUSOPERATIONAL&quot;: &quot;1&quot;, &quot;JOYOPERATIONAL&quot;: &quot;1&quot;, &quot;ECATOPERATIONAL&quot;: &quot;1&quot;, &quot;BTNRESET_IHM&quot;: &quot;0&quot;, &quot;M1_RELAYFWD&quot;: &quot;0&quot;, &quot;M1_RELAYREV&quot;: &quot;0&quot;, &quot;M1_BRAKECMD&quot;: &quot;0&quot;, &quot;M2_RELAYFWD&quot;: &quot;0&quot;, &quot;M2_RELAYREV&quot;: &quot;0&quot;, &quot;M2_BRAKECMD&quot;: &quot;0&quot;, &quot;M3_BRAKECMD&quot;: &quot;0&quot;, &quot;SIMULATIONMODEACTIVE&quot;: &quot;0&quot;, &quot;DATA.DATAVALID&quot;: &quot;0&quot;, &quot;DIAGCANDEV.ONLINE&quot;: &quot;1&quot;, &quot;DIAGCANDEV.OPERATIONAL&quot;: &quot;1&quot;, &quot;DIAGCANDEV.ERROR&quot;: &quot;0&quot;, &quot;DIAGCANDEV.ERRORID&quot;: &quot;0&quot;, &quot;DIAGCANDEV.STATE&quot;: &quot;1&quot;, &quot;DIAGCANDEV.STATEATERROR&quot;: &quot;0&quot;, &quot;DIAGECATDEV.ONLINE&quot;: &quot;1&quot;, &quot;DIAGECATDEV.OPERATIONAL&quot;: &quot;1&quot;, &quot;DIAGECATDEV.ERROR&quot;: &quot;0&quot;, &quot;DIAGECATDEV.ERRORID&quot;: &quot;0&quot;, &quot;DIAGECATDEV.STATE&quot;: &quot;1&quot;, &quot;DIAGECATDEV.STATEATERROR&quot;: &quot;0&quot;, &quot;CALIBM1.HOMINGREFRAW&quot;: &quot;1000000&quot;, &quot;CALIBM1.LASTKNOWNRAWPOS&quot;: &quot;1008192&quot;, &quot;CALIBM1.HOMED&quot;: &quot;1&quot;, &quot;CALIBM1.HOMINGSUSPECT&quot;: &quot;0&quot;, &quot;CALIBM2.HOMINGREFRAW&quot;: &quot;1000000&quot;, &quot;CALIBM2.LASTKNOWNRAWPOS&quot;: &quot;1008192&quot;, &quot;CALIBM2.HOMED&quot;: &quot;1&quot;, &quot;CALIBM2.HOMINGSUSPECT&quot;: &quot;0&quot;, &quot;HWINM1.RAWPOSIN&quot;: &quot;1008192&quot;, &quot;HWINM1.ALARMSIN&quot;: &quot;0&quot;, &quot;HWINM1.WARNINGSIN&quot;: &quot;0&quot;, &quot;HWINM1.SLAVEOPERATIONAL&quot;: &quot;1&quot;, &quot;HWINM1.PRESETSTATUSBIT&quot;: &quot;0&quot;, &quot;HWINM2.RAWPOSIN&quot;: &quot;1008192&quot;, &quot;HWINM2.ALARMSIN&quot;: &quot;0&quot;, &quot;HWINM2.WARNINGSIN&quot;: &quot;0&quot;, &quot;HWINM2.SLAVEOPERATIONAL&quot;: &quot;1&quot;, &quot;HWINM2.PRESETSTATUSBIT&quot;: &quot;0&quot;, &quot;NXMEM&quot;: &quot;5000&quot;, &quot;NYMEM&quot;: &quot;5000&quot;, &quot;CALIBINIT&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 210.0, &quot;fields&quot;: {&quot;JOYRAWX&quot;: &quot;5000&quot;, &quot;JOYRAWY&quot;: &quot;5000&quot;, &quot;JOYBTNRAW&quot;: &quot;1&quot;, &quot;COD1_POSVALUE&quot;: &quot;1008192&quot;, &quot;COD2_POSVALUE&quot;: &quot;1008192&quot;, &quot;M3_POSTREMIE_DI&quot;: &quot;0&quot;, &quot;M3_POSPV_DI&quot;: &quot;0&quot;, &quot;M3_POSPVP2_DI&quot;: &quot;0&quot;, &quot;M3_POSP1_DI&quot;: &quot;0&quot;, &quot;M3_POSMAINTENANCE_DI&quot;: &quot;0&quot;, &quot;POWERCONTACTORENGAGED&quot;: &quot;1&quot;, &quot;EMERGENCYCHAINCLOSED&quot;: &quot;1&quot;, &quot;PHASEROTATIONOK&quot;: &quot;1&quot;, &quot;BRAKETHERMALOK&quot;: &quot;1&quot;, &quot;M1_CONTACTORSRELEASED&quot;: &quot;1&quot;, &quot;M2_CONTACTORSRELEASED&quot;: &quot;1&quot;, &quot;M1_THERMALOK&quot;: &quot;1&quot;, &quot;M2_THERMALOK&quot;: &quot;1&quot;, &quot;CANBUSOPERATIONAL&quot;: &quot;1&quot;, &quot;JOYOPERATIONAL&quot;: &quot;1&quot;, &quot;ECATOPERATIONAL&quot;: &quot;1&quot;, &quot;BTNRESET_IHM&quot;: &quot;0&quot;, &quot;M1_RELAYFWD&quot;: &quot;0&quot;, &quot;M1_RELAYREV&quot;: &quot;0&quot;, &quot;M1_BRAKECMD&quot;: &quot;0&quot;, &quot;M2_RELAYFWD&quot;: &quot;0&quot;, &quot;M2_RELAYREV&quot;: &quot;0&quot;, &quot;M2_BRAKECMD&quot;: &quot;0&quot;, &quot;M3_BRAKECMD&quot;: &quot;0&quot;, &quot;SIMULATIONMODEACTIVE&quot;: &quot;0&quot;, &quot;DATA.DATAVALID&quot;: &quot;0&quot;, &quot;DIAGCANDEV.ONLINE&quot;: &quot;1&quot;, &quot;DIAGCANDEV.OPERATIONAL&quot;: &quot;1&quot;, &quot;DIAGCANDEV.ERROR&quot;: &quot;0&quot;, &quot;DIAGCANDEV.ERRORID&quot;: &quot;0&quot;, &quot;DIAGCANDEV.STATE&quot;: &quot;1&quot;, &quot;DIAGCANDEV.STATEATERROR&quot;: &quot;0&quot;, &quot;DIAGECATDEV.ONLINE&quot;: &quot;1&quot;, &quot;DIAGECATDEV.OPERATIONAL&quot;: &quot;1&quot;, &quot;DIAGECATDEV.ERROR&quot;: &quot;0&quot;, &quot;DIAGECATDEV.ERRORID&quot;: &quot;0&quot;, &quot;DIAGECATDEV.STATE&quot;: &quot;1&quot;, &quot;DIAGECATDEV.STATEATERROR&quot;: &quot;0&quot;, &quot;CALIBM1.HOMINGREFRAW&quot;: &quot;1000000&quot;, &quot;CALIBM1.LASTKNOWNRAWPOS&quot;: &quot;1008192&quot;, &quot;CALIBM1.HOMED&quot;: &quot;1&quot;, &quot;CALIBM1.HOMINGSUSPECT&quot;: &quot;0&quot;, &quot;CALIBM2.HOMINGREFRAW&quot;: &quot;1000000&quot;, &quot;CALIBM2.LASTKNOWNRAWPOS&quot;: &quot;1008192&quot;, &quot;CALIBM2.HOMED&quot;: &quot;1&quot;, &quot;CALIBM2.HOMINGSUSPECT&quot;: &quot;0&quot;, &quot;HWINM1.RAWPOSIN&quot;: &quot;1008192&quot;, &quot;HWINM1.ALARMSIN&quot;: &quot;0&quot;, &quot;HWINM1.WARNINGSIN&quot;: &quot;0&quot;, &quot;HWINM1.SLAVEOPERATIONAL&quot;: &quot;1&quot;, &quot;HWINM1.PRESETSTATUSBIT&quot;: &quot;0&quot;, &quot;HWINM2.RAWPOSIN&quot;: &quot;1008192&quot;, &quot;HWINM2.ALARMSIN&quot;: &quot;0&quot;, &quot;HWINM2.WARNINGSIN&quot;: &quot;0&quot;, &quot;HWINM2.SLAVEOPERATIONAL&quot;: &quot;1&quot;, &quot;HWINM2.PRESETSTATUSBIT&quot;: &quot;0&quot;, &quot;NXMEM&quot;: &quot;5000&quot;, &quot;NYMEM&quot;: &quot;5000&quot;, &quot;CALIBINIT&quot;: &quot;1&quot;}, &quot;note&quot;: &quot;&quot;}]" data-fields="[&quot;JOYBTNRAW&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="114" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#64748b"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#ef4444"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#f97316"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#0284c7"/><text x="418" y="17" class="wf-legend">Voies actives</text><line x1="200" y1="56" x2="200" y2="114" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="126" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="114" class="wf-grid"/><text x="284.0" y="52" class="wf-time">60ms</text><text x="284.0" y="126" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="114" class="wf-grid"/><text x="340.0" y="52" class="wf-time">210ms</text><text x="340.0" y="126" class="wf-scan">#2</text><circle cx="192" cy="82.0" r="4" fill="#0284c7"/><text x="182" y="86.0" class="wf-label">JOYBTNRAW</text><text x="194" y="71" class="wf-scale">1</text><text x="194" y="97" class="wf-scale">0</text><path d="M200,94L256,94L256,94L256,68L312,68L368,68" class="wf-line" stroke="#0284c7"/></svg></div>
+        </details>
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (3 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P02-002 Orchestration ST sans logique cachee : qualification joystick et codeurs (essai d architecture - validation partielle boite noire)')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>JOYBTNRAW</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td><span class="v-false">FALSE</span></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>60 ms</td><td class='changed'><span class="v-true">TRUE</span></td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>210 ms</td><td><span class="v-true">TRUE</span></td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (63)</summary>
+        <table class="static-table"><tbody><tr><td><code>CALIBM1.HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM2.HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM1.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM1.HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBM2.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM2.HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBINIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CANBUSOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>COD1_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>COD2_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>DATA.DATAVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAGCANDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGCANDEV.OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGCANDEV.STATE</code></td><td>1</td></tr><tr><td><code>DIAGCANDEV.STATEATERROR</code></td><td>0</td></tr><tr><td><code>DIAGECATDEV.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGECATDEV.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAGECATDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.STATE</code></td><td>1</td></tr><tr><td><code>DIAGECATDEV.STATEATERROR</code></td><td>0</td></tr><tr><td><code>ECATOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM1.ALARMSIN</code></td><td>0</td></tr><tr><td><code>HWINM1.PRESETSTATUSBIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWINM1.SLAVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM1.WARNINGSIN</code></td><td>0</td></tr><tr><td><code>HWINM2.ALARMSIN</code></td><td>0</td></tr><tr><td><code>HWINM2.PRESETSTATUSBIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWINM2.SLAVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM2.WARNINGSIN</code></td><td>0</td></tr><tr><td><code>JOYOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSMAINTENANCE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSP1_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPVP2_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPV_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSTREMIE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NXMEM</code></td><td>5000</td></tr><tr><td><code>NYMEM</code></td><td>5000</td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SIMULATIONMODEACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBM1.LASTKNOWNRAWPOS</code></td><td>1008192</td></tr><tr><td><code>CALIBM2.LASTKNOWNRAWPOS</code></td><td>1008192</td></tr><tr><td><code>HWINM1.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>HWINM2.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>JOYRAWX</code></td><td>5000</td></tr><tr><td><code>JOYRAWY</code></td><td>5000</td></tr></tbody></table>
+    </details>
+    </div>
             </div>
         </article>
         <article id="test-prg-02-acquisition-archi-2" class="test-card test-card-pass test-card-collapsed">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1 </h3>
+                <h3 style="flex: 1;">TC-P02-003 Sorties physiques via PRG_06 : PRG_02 ne produit aucune commande actionneur (essai d architecture - validation partielle boite noire) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Architecture F02.04 : seul PRG_06_Outputs ecrit les Q/PDO. Le harnais PRG_02 n expose
+       que Data (bus) et HwIn (image) — aucune sortie physique. On verifie que l image HwIn
+       est bien peuplee (frontiere acquisition) sans commande actionneur.</li><li>(essai d architecture - validation partielle boite noire) : le harnais PRG_02 n a aucune
+       VAR_OUTPUT de commande actionneur (Q/PDO) — la barriere sortie est PRG_06.</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>Image HwIn peuplee (frontiere acquisition)</li><li>Image machine peuplee</li></ul>
+            </details>
                 
                 
+    <div class="chronogram-group">
+        
+        <!-- Décision (2026-08-29) : les 2 chronogrammes (graphique + tableau) sont OUVERTS par
+             défaut quand la carte du test est dépliée, quel que soit le PASS/FAIL. Avant, ils
+             ne s'ouvraient qu'en cas d'échec. L'échec reste signalé par `fail_note` ci-dessus. -->
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (2 scans, 0 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (2 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P02-003 Sorties physiques via PRG_06 : PRG_02 ne produit aucune commande actionneur (essai d architecture - validation partielle boite noire)')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (64)</summary>
+        <table class="static-table"><tbody><tr><td><code>CALIBM1.HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM2.HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM1.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM1.HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBM2.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM2.HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBINIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CANBUSOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>COD1_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>COD2_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>DATA.DATAVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAGCANDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGCANDEV.OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGCANDEV.STATE</code></td><td>1</td></tr><tr><td><code>DIAGCANDEV.STATEATERROR</code></td><td>0</td></tr><tr><td><code>DIAGECATDEV.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGECATDEV.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAGECATDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.STATE</code></td><td>1</td></tr><tr><td><code>DIAGECATDEV.STATEATERROR</code></td><td>0</td></tr><tr><td><code>ECATOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM1.ALARMSIN</code></td><td>0</td></tr><tr><td><code>HWINM1.PRESETSTATUSBIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWINM1.SLAVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM1.WARNINGSIN</code></td><td>0</td></tr><tr><td><code>HWINM2.ALARMSIN</code></td><td>0</td></tr><tr><td><code>HWINM2.PRESETSTATUSBIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWINM2.SLAVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM2.WARNINGSIN</code></td><td>0</td></tr><tr><td><code>JOYOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BRAKECMD</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_RELAYFWD</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSMAINTENANCE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSP1_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPVP2_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPV_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSTREMIE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NXMEM</code></td><td>5000</td></tr><tr><td><code>NYMEM</code></td><td>5000</td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SIMULATIONMODEACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBM1.LASTKNOWNRAWPOS</code></td><td>1008192</td></tr><tr><td><code>CALIBM2.LASTKNOWNRAWPOS</code></td><td>1008192</td></tr><tr><td><code>HWINM1.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>HWINM2.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>JOYBTNRAW</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>JOYRAWX</code></td><td>5000</td></tr><tr><td><code>JOYRAWY</code></td><td>5000</td></tr></tbody></table>
+    </details>
+    </div>
+            </div>
+        </article>
+        <article id="test-prg-02-acquisition-archi-3" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P02-004 Ordre MainTask conforme : HwIn image arbitree reel/simule (essai d architecture - validation partielle boite noire) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
                 
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>Architecture F02.01/F02.05 : ordre MainTask + retards N-1. En boite noire, on verifie
+       l aiguillage reel/simule : hors simulation, HwIn reflete l image reelle (entrees).</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>Hors simulation -&gt; HwIn reflete le reel (M1 contacteurs relaches)</li><li>Hors simulation -&gt; HwIn reflete le reel (AU non arme)</li></ul>
+            </details>
+                
+                
+    <div class="chronogram-group">
+        
+        <!-- Décision (2026-08-29) : les 2 chronogrammes (graphique + tableau) sont OUVERTS par
+             défaut quand la carte du test est dépliée, quel que soit le PASS/FAIL. Avant, ils
+             ne s'ouvraient qu'en cas d'échec. L'échec reste signalé par `fail_note` ci-dessus. -->
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (2 scans, 0 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (2 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P02-004 Ordre MainTask conforme : HwIn image arbitree reel/simule (essai d architecture - validation partielle boite noire)')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (64)</summary>
+        <table class="static-table"><tbody><tr><td><code>CALIBM1.HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM2.HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM1.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM1.HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBM2.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM2.HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBINIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CANBUSOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>COD1_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>COD2_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>DATA.DATAVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAGCANDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGCANDEV.OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGCANDEV.STATE</code></td><td>1</td></tr><tr><td><code>DIAGCANDEV.STATEATERROR</code></td><td>0</td></tr><tr><td><code>DIAGECATDEV.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGECATDEV.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAGECATDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.STATE</code></td><td>1</td></tr><tr><td><code>DIAGECATDEV.STATEATERROR</code></td><td>0</td></tr><tr><td><code>ECATOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM1.ALARMSIN</code></td><td>0</td></tr><tr><td><code>HWINM1.PRESETSTATUSBIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWINM1.SLAVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM1.WARNINGSIN</code></td><td>0</td></tr><tr><td><code>HWINM2.ALARMSIN</code></td><td>0</td></tr><tr><td><code>HWINM2.PRESETSTATUSBIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWINM2.SLAVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM2.WARNINGSIN</code></td><td>0</td></tr><tr><td><code>JOYOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSMAINTENANCE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSP1_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPVP2_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPV_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSTREMIE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NXMEM</code></td><td>5000</td></tr><tr><td><code>NYMEM</code></td><td>5000</td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SIMULATIONMODEACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBM1.LASTKNOWNRAWPOS</code></td><td>1008192</td></tr><tr><td><code>CALIBM2.LASTKNOWNRAWPOS</code></td><td>1008192</td></tr><tr><td><code>HWINM1.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>HWINM2.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>JOYBTNRAW</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>JOYRAWX</code></td><td>5000</td></tr><tr><td><code>JOYRAWY</code></td><td>5000</td></tr></tbody></table>
+    </details>
+    </div>
+            </div>
+        </article>
+        <article id="test-prg-02-acquisition-archi-4" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P02-005 Troubleshooting lecture seule : PRG_02 produit les diagnostics observes (essai d architecture - validation partielle boite noire) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Architecture F02.06 : la vue troubleshooting observe seulement. PRG_02 produit les faits
+       diagnostiques (InputModuleFault, etats modules) consommes par la vue. En boite noire, on
+       verifie que ces diagnostics sont publies sur le bus Data.</li><li>(essai d architecture - validation partielle boite noire) : la lecture seule stricte de la
+       vue troubleshooting est couverte en AF-14 (TC-P14-TSV-01..05).</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>Diagnostic InputModuleFault publie (FALSE nominal)</li><li>Diagnostic module LocalDigitalIoOk publie</li></ul>
+            </details>
+                
+                
+    <div class="chronogram-group">
+        
+        <!-- Décision (2026-08-29) : les 2 chronogrammes (graphique + tableau) sont OUVERTS par
+             défaut quand la carte du test est dépliée, quel que soit le PASS/FAIL. Avant, ils
+             ne s'ouvraient qu'en cas d'échec. L'échec reste signalé par `fail_note` ci-dessus. -->
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📊 Chronogramme graphique (2 scans, 0 variables actives)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleAllWaveforms(this)" title="Basculer toutes les pistes numériques entre Courbes et Chiffres">📈 Courbes / 🔢 Chiffres</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="wf-scroll"></div>
+        </details>
+        <details open>
+            <summary class="chrono-table-summary">
+                <div class="chrono-summary-inner">
+                    <span>📋 Chronogramme tableau (2 scans)</span>
+                    <span class="table-export-actions" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-export" onclick="toggleVerticalHeaders(this)" title="Basculer l'orientation des en-têtes (gain de place)">📐 Titres Verticaux</button>
+                        <button type="button" class="btn-export" onclick="exportTableCSV(this, 'TC-P02-005 Troubleshooting lecture seule : PRG_02 produit les diagnostics observes (essai d architecture - validation partielle boite noire)')" title="Télécharger le tableau en CSV">📥 CSV</button>
+                        <button type="button" class="btn-export" onclick="copyTableMarkdown(this)" title="Copier le tableau en Markdown">📋 Markdown</button>
+                    </span>
+                </div>
+            </summary>
+            <div class="chrono-scroll"><table class="chrono-table">
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
+    </table></div>
+        </details>
+        
+    <details class="chronogram-static">
+        <summary>🔒 Valeurs constantes sur toute la séquence (64)</summary>
+        <table class="static-table"><tbody><tr><td><code>CALIBM1.HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM2.HOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CALIBM1.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM1.HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBM2.HOMINGREFRAW</code></td><td>1000000</td></tr><tr><td><code>CALIBM2.HOMINGSUSPECT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BRAKETHERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNRESET_IHM</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBINIT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>CANBUSOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>COD1_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>COD2_POSVALUE</code></td><td>1008192</td></tr><tr><td><code>DATA.DATAVALID</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGCANDEV.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAGCANDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGCANDEV.OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGCANDEV.STATE</code></td><td>1</td></tr><tr><td><code>DIAGCANDEV.STATEATERROR</code></td><td>0</td></tr><tr><td><code>DIAGECATDEV.ERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DIAGECATDEV.ERRORID</code></td><td>0</td></tr><tr><td><code>DIAGECATDEV.ONLINE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.OPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>DIAGECATDEV.STATE</code></td><td>1</td></tr><tr><td><code>DIAGECATDEV.STATEATERROR</code></td><td>0</td></tr><tr><td><code>ECATOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>EMERGENCYCHAINCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM1.ALARMSIN</code></td><td>0</td></tr><tr><td><code>HWINM1.PRESETSTATUSBIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWINM1.SLAVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM1.WARNINGSIN</code></td><td>0</td></tr><tr><td><code>HWINM2.ALARMSIN</code></td><td>0</td></tr><tr><td><code>HWINM2.PRESETSTATUSBIT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>HWINM2.SLAVEOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HWINM2.WARNINGSIN</code></td><td>0</td></tr><tr><td><code>JOYOPERATIONAL</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M1_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_CONTACTORSRELEASED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M2_RELAYFWD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_RELAYREV</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M2_THERMALOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M3_BRAKECMD</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSMAINTENANCE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSP1_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPVP2_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSPV_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>M3_POSTREMIE_DI</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>NXMEM</code></td><td>5000</td></tr><tr><td><code>NYMEM</code></td><td>5000</td></tr><tr><td><code>PHASEROTATIONOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SIMULATIONMODEACTIVE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CALIBM1.LASTKNOWNRAWPOS</code></td><td>1008192</td></tr><tr><td><code>CALIBM2.LASTKNOWNRAWPOS</code></td><td>1008192</td></tr><tr><td><code>HWINM1.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>HWINM2.RAWPOSIN</code></td><td>1008192</td></tr><tr><td><code>JOYBTNRAW</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>JOYRAWX</code></td><td>5000</td></tr><tr><td><code>JOYRAWY</code></td><td>5000</td></tr></tbody></table>
+    </details>
+    </div>
             </div>
         </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (48)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/D_JOYSTICK/FB_AxisScale.st</code></li><li><code>CODE/D_JOYSTICK/FB_Joystick.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Abs.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Homing.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Scale.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Safety.st</code></li><li><code>CODE/E_CODEURS/FB_EncoderReliability.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/ST_fbCycle_TranslationCmdDemand.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st</code></li></ul>
+        <summary>Fichiers source compilés (54)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/G_CYCLE/_TYPES/ST_MachineHoming.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_IOModuleDiag.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_InputSource.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_M3DriveFeedback.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Acquisition_Preflight.st</code></li><li><code>CODE/A_COMMUN/FB_Filter.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st</code></li><li><code>CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/D_JOYSTICK/FB_AxisScale.st</code></li><li><code>CODE/D_JOYSTICK/FB_Joystick.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_Encoder_Calib.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Abs.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Homing.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Scale.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_Safety.st</code></li><li><code>CODE/E_CODEURS/FB_EncoderReliability.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st</code></li><li><code>CODE/E_CODEURS/FB_Encoder.st</code></li><li><code>CODE/I_TRANSLATION/_TYPES/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>TOOLS/TEST_AUTO_CI/RESULTS/M_MAIN/FB_TestHarness_PRG_02.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (48)</summary>
+        <summary>Code source ST original (54)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -2030,6 +2367,173 @@ END_TYPE
 </pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\HYSTERESIS.st</code></summary>
+                <pre>(* =======================================================================
+   📊 HYSTERESIS — Bibliothèque standard Util CODESYS (IN, HIGH, LOW -&gt; OUT)
+   ======================================================================= *)
+FUNCTION_BLOCK FB_Hysteresis_Util
+VAR_INPUT
+    IN   : INT;
+    HIGH : INT;
+    LOW  : INT;
+END_VAR
+VAR_OUTPUT
+    OUT  : BOOL := TRUE;
+END_VAR
+
+IF OUT THEN
+    IF IN &gt;= HIGH THEN
+        OUT := FALSE;
+    END_IF;
+ELSE
+    IF IN &lt;= LOW THEN
+        OUT := TRUE;
+    END_IF;
+END_IF;
+END_FUNCTION_BLOCK
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\H_TREUILS_BENNE\_TYPES\ST_SpeedStepTable.st</code></summary>
+                <pre>(* =======================================================================
+   🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   ======================================================================= *)
+TYPE ST_SpeedStepTable :
+STRUCT
+    // === PALIER 1 (VITESSE MINIMALE) ===
+    P1R1              : BOOL;                                         // Contacteur 1 pour Palier 1
+    P1R2              : BOOL;                                         // Contacteur 2 pour Palier 1
+    P1R3              : BOOL;                                         // Contacteur 3 pour Palier 1
+    P1R4              : BOOL;                                         // Contacteur 4 pour Palier 1
+
+    // === PALIER 2 ===
+    P2R1              : BOOL;                                         // Contacteur 1 pour Palier 2
+    P2R2              : BOOL;                                         // Contacteur 2 pour Palier 2
+    P2R3              : BOOL;                                         // Contacteur 3 pour Palier 2
+    P2R4              : BOOL;                                         // Contacteur 4 pour Palier 2
+
+    // === PALIER 3 ===
+    P3R1              : BOOL;                                         // Contacteur 1 pour Palier 3
+    P3R2              : BOOL;                                         // Contacteur 2 pour Palier 3
+    P3R3              : BOOL;                                         // Contacteur 3 pour Palier 3
+    P3R4              : BOOL;                                         // Contacteur 4 pour Palier 3
+
+    // === PALIER 4 ===
+    P4R1              : BOOL;                                         // Contacteur 1 pour Palier 4
+    P4R2              : BOOL;                                         // Contacteur 2 pour Palier 4
+    P4R3              : BOOL;                                         // Contacteur 3 pour Palier 4
+    P4R4              : BOOL;                                         // Contacteur 4 pour Palier 4
+
+    // === PALIER 5 (VITESSE MAXIMALE) ===
+    P5R1              : BOOL;                                         // Contacteur 1 pour Palier 5
+    P5R2              : BOOL;                                         // Contacteur 2 pour Palier 5
+    P5R3              : BOOL;                                         // Contacteur 3 pour Palier 5
+    P5R4              : BOOL;                                         // Contacteur 4 pour Palier 5
+
+    // === SEUILS DE TRANSITION (%) ===
+    StepThreshold_Pct : ARRAY[1..5] OF REAL;                          // Seuils de changement de palier (0..100%)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\ST_MachineHoming.st</code></summary>
+                <pre>(* =======================================================================
+   🧭 ST_MachineHoming — Etat publie du homing conjoint machine (M1/M2/benne)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les 8 sorties homing a plat de PRG_02_Acquisition en
+             un bus struct unique, publie sur le bus inter-PRG.
+   🔒 Sécurité : Homed = qualification conjointe reference machine (gate SEMI_AUTO).
+                 HomingLoss = perte reference en mouvement : arret controle SafeStop.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   ======================================================================= *)
+TYPE ST_MachineHoming :
+STRUCT
+    Homed            : BOOL;          (* Qualification conjointe reference machine *)
+    SetPosBucketOpen : BOOL;          (* Valider position actuelle = reference benne ouverte *)
+    SetPosBucketClose: BOOL;          (* Valider position actuelle = reference benne fermee *)
+    Active           : BOOL;          (* Homing conjoint en cours *)
+    HomingLoss       : BOOL;          (* Perte reference en mouvement : arret controle SafeStop *)
+    Step             : INT;           (* Etape guidee reference *)
+    Instruction      : STRING(120);   (* Consigne IHM reference *)
+    Failed           : BOOL;          (* Transaction reference abandonnee *)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\6_DIAG_ET_CHAINES\ST_IOModuleDiag.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🩺 ST_IOModuleDiag — Diagnostic carte des 5 modules E/S physiques
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3bis
+   🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
+      pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
+      TOR ment, seulement qu&#x27;aucune des TOR qu&#x27;il porte n&#x27;est fiable.
+   🔗 Producteur : PRG_02_Acquisition (5 appels GetDeviceState()).
+   🔌 Consommateurs : PRG_04 (SafeStop treuils), PRG_05 (SafeStop M3),
+      PRG_07 (recopie IHM GVL_IHM.Network.InputModules + FB_TroubleshootingView).
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_IOModuleDiag :
+STRUCT
+    LocalDigitalIoOk : BOOL;  // Module Local_Digital_IO OK (DI8/DO8)
+    Vh0800EndOk      : BOOL;  // Module VH_0800END OK (DI8)
+    Vh0808EtpOk      : BOOL;  // Module VH_0808ETP OK (DI8/DO8)
+    Vh0008ErOk       : BOOL;  // Module VH_0008ER OK (DO8 Relais Freins/Kobold)
+    Vh0008Er1Ok      : BOOL;  // Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
+    Fault            : BOOL;  // Défaut sur au moins un module E/S
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_InputSource.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   🔀 ST_InputSource — Flags de bascule de source (réel/simu) par domaine
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regrouper les 4 impulsions 1 cycle signalant qu&#x27;une source
+      d&#x27;entrée a basculé (réel ↔ simu) pour un domaine donné.
+   📤 Producteur unique : PRG_02_Acquisition (Data.InputSource).
+   📥 Consommateur : PRG_07_Supervision (Data.InputSource.* → GVL_IHM).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_InputSource :
+STRUCT
+    WinchInputSourceChanged       : BOOL; // 🔀 Source Winch a basculé (réel/simu)
+    TranslationInputSourceChanged: BOOL; // 🔀 Source Translation a basculé
+    OperatorInputSourceChanged   : BOOL; // 🔀 Source Opérateur a basculé
+    MachineInputSourceChanged    : BOOL; // 🔀 Source Machine a basculé
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\4_JOYSTICK_ACQUISITION\ST_M3DriveFeedback.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   ↔️ ST_M3DriveFeedback — Retours variateur M3 filtrés
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les retours variateur M3 (mot d&#x27;état + fréquence réelle)
+      conditionnés par PRG_02_Acquisition et consommés par PRG_05_Translation.
+   📤 Producteur unique : PRG_02_Acquisition (Data.M3).
+   📥 Consommateur : PRG_05_Translation (Data.M3.StatusWord / Data.M3.ActualFrequencyHz).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_M3DriveFeedback :
+STRUCT
+    StatusWord        : UINT; // 📊 Mot d&#x27;état variateur M3 filtré
+    ActualFrequencyHz : UINT; // 📊 Fréquence réelle M3 filtrée
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
                 <pre>(* =======================================================================
    ⚙️ E_State — Phase opérationnelle d&#x27;un FB métier (valeurs EXCLUSIVES)
@@ -2046,7 +2550,8 @@ ENUM
     READY    := 2,   (* Prêt, attend ordre *)
     BUSY     := 3,   (* Action en cours *)
     DONE     := 4,   (* Action terminée *)
-    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    STOPPING := 5,   (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    ERROR    := 6    (* Défaut actif non acquitté (FB en erreur — HMI non aveugle) *)
 END_ENUM
 END_TYPE
 </pre>
@@ -2882,7 +3387,8 @@ END_IF;
    🕹️ ST_fbJoystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d&#x27;axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📤 Champs : Enable, StartStop, SpeedTgt (%) + StepTgt (palier 1..5) + direction en bits
+               (DirectionPositive/Negative, AtNeutral). SpeedTgt reste pour l&#x27;IHM, StepTgt pour la logique.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    ======================================================================= *)
 
@@ -2891,7 +3397,8 @@ STRUCT
     // === CONSIGNES DE PILOTAGE AXE ===
     Enable      : BOOL;   // --&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
     StartStop   : BOOL;   // --&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)
-    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)
+    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction) - IHM
+    StepTgt     : INT;    // --&gt; [CMD] Palier de vitesse (1..5, 0=arret) - logique/limitations (derive de SpeedTgt)
     DirectionNegative   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     DirectionPositive   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     AtNeutral   : BOOL;   // --&gt; [CMD] TRUE si axes en zone morte (position centrale)
@@ -2923,6 +3430,11 @@ STRUCT
     DeadmanArmHoldTime   : TIME := T#100MS;  // Appui continu bouton requis pour armer le geste
     DeadmanArmGraceTime  : TIME := T#3S;     // Délai de grâce post-armement avant désarmement neutre
     RawOutOfRangeMargin  : INT  := 500;      // Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)
+    // Les initialiseurs imbriqués de STRUCT (notamment les ARRAY) ne sont pas
+    // acceptés par STruCpp/CODESYS dans une déclaration de type. La table est
+    // fournie par la configuration persistante de l&#x27;appelant.
+    SpeedStepTable       : ST_SpeedStepTable; // 🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)
+    SpeedStepHystMargin  : REAL := 2.0;      // Marge d&#x27;hystérésis palier (%) autour des seuils (anti-oscillation)
     Initialized          : BOOL := FALSE;    // 🚦 Flag restauration boot (interne pont FB_CfgPersistBridge_fbJoystick_Cfg)
 END_STRUCT
 END_TYPE
@@ -2993,7 +3505,7 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                   externe, vue joystick) ; FALSE = armement bloqué + warning.
                   Désarmement sur neutre prolongé ; le changement de mode / fin de
                   cycle benne est géré par l&#x27;externe via ArmingPermit (vue joystick).
-   📤 Sorties : AxisCmdX/Y (struct = source unique : SpeedTgt NON signee + bits sens
+   📤 Sorties : AxisCmdX/Y (struct = source unique : SpeedTgt NON signee % pour IHM + StepTgt palier 1..5 pour logique + bits sens
                 + Direction -1/0/+1 et Deflection -100..+100 % pour anim IHM), Fault : ST_Fault
                 (socle FB_FaultCore), AtNeutralXY (permis logique), NeutralXAct/YAct (miroirs IHM).
    🧬 Contrat : `standard` — pas de struct métier propre → `Fault : ST_Fault` à plat.
@@ -3049,21 +3561,39 @@ VAR_IN_OUT
     NeutralXMem               : INT;        // &lt;-&gt; [BUS]  Point neutre X persistant global
     NeutralYMem               : INT;        // &lt;-&gt; [BUS]  Point neutre Y persistant global
 END_VAR
+VAR CONSTANT
+    CST_DirectionQualificationThreshold_Pct : REAL := 0.1;  // Seuil % : axe actif (StartStop / bits sens / palier 0)
+    CST_InversionFlipThreshold_Pct          : REAL := 10.0; // Seuil % : sens RETENU pour la détection d&#x27;inversion inter-scan.
+                                                            // Large volontairement (&gt;&gt; bruit Hall, &gt;&gt; bord de deadband) :
+                                                            // seule une déflexion franche opposée compte comme flip.
+END_VAR
 VAR
     // === SOUS-INSTANCES FB &amp; TIMERS ===
     ScaleX                    : FB_AxisScale;        // * [INST] Normalisation et zone morte axe X
     ScaleY                    : FB_AxisScale;        // * [INST] Normalisation et zone morte axe Y
     DeadmanEdge               : R_TRIG;              // * [INST] Detecteur front montant bouton homme-mort
+    NeutralXYEdge             : R_TRIG;              // * [INST] Front retour simultane X+Y au neutre (libere verrou inversion)
     NeutralHoldTimer          : TON;                 // * [INST] Temporisation maintien au neutre
     DeadmanArmTimer           : TON;                 // * [INST] Temporisation maintien bouton armement
     DeadmanArmGraceTimer      : TON;                 // * [INST] Temporisation delai de grace post-armement
     instFault                 : FB_FaultCore;        // * [INST] Socle de defaut (liste de causes -&gt; ST_Fault)
+    SpeedStepHyst1            : HYSTERESIS;          // * [INST] Decodage % -&gt; palier, seuil 1 (logique FB_Winch §5)
+    SpeedStepHyst2            : HYSTERESIS;          // * [INST] Decodage % -&gt; palier, seuil 2
+    SpeedStepHyst3            : HYSTERESIS;          // * [INST] Decodage % -&gt; palier, seuil 3
+    SpeedStepHyst4            : HYSTERESIS;          // * [INST] Decodage % -&gt; palier, seuil 4
 
     // === VARIABLES LOCALES INTERNES ===
     CmdXVal                   : REAL;                // . [LOC]  Consigne axe X calculee apres filtrage/homme-mort
     CmdYVal                   : REAL;                // . [LOC]  Consigne axe Y calculee apres filtrage/homme-mort
     LastCalibrate             : BOOL;                // . [LOC]  Memorisation etat precedent commande Calibrate (front)
     DeadmanArmPending         : BOOL;                // . [LOC]  Armement en cours d&#x27;attente de la temporisation maintien
+    InversionLockActive       : BOOL;                // . [LOC]  Verrou retour neutre apres inversion inter-scan directe
+    PrevDirX                  : INT;                 // . [LOC]  Sens X qualifie au scan precedent (-1, 0, +1)
+    PrevDirY                  : INT;                 // . [LOC]  Sens Y qualifie au scan precedent (-1, 0, +1)
+    DirX                      : INT;                 // . [LOC]  Sens X qualifie au scan courant (-1, 0, +1)
+    DirY                      : INT;                 // . [LOC]  Sens Y qualifie au scan courant (-1, 0, +1)
+    FlipX                     : BOOL;                // . [LOC]  Inversion X directe sans echantillon neutre
+    FlipY                     : BOOL;                // . [LOC]  Inversion Y directe sans echantillon neutre
     RawOutOfRange             : BOOL;                // . [LOC]  Surveillance capteur continue (AF08 §5bis) : RawX/RawY hors plage nominale+marge
     CalibFail                 : BOOL;                // . [LOC]  Echec calibration (front Calibrate hors zone) - cause a acquitter (latching)
     BusLost                   : BOOL;                // . [LOC]  Perte liaison bus / device non operationnel - cause live seulement
@@ -3121,16 +3651,20 @@ Ready := Enable AND BusCanOpenOP.Operational AND JoystickOP.Operational AND NOT 
 {region &quot;§2 Gate securite (neutralisation pipeline, n efface pas le statut)&quot;}
 // 1. GATE — neutralise le pipeline si indisponible. Le statut a deja ete rempli (zone 0).
 IF NOT Enable OR BusLost THEN
-    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0;
+    AxisCmdX.Enable := FALSE; AxisCmdX.StartStop := FALSE; AxisCmdX.SpeedTgt := 0.0; AxisCmdX.StepTgt := 0;
     AxisCmdX.DirectionPositive := FALSE; AxisCmdX.DirectionNegative := FALSE; AxisCmdX.AtNeutral := TRUE;
-    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0;
+    AxisCmdY.Enable := FALSE; AxisCmdY.StartStop := FALSE; AxisCmdY.SpeedTgt := 0.0; AxisCmdY.StepTgt := 0;
     AxisCmdY.DirectionPositive := FALSE; AxisCmdY.DirectionNegative := FALSE; AxisCmdY.AtNeutral := TRUE;
     AxisCmdX.Direction := 0; AxisCmdX.Deflection := 0;
     AxisCmdY.Direction := 0; AxisCmdY.Deflection := 0;
     AtNeutralXY := TRUE;
     DeadmanArmed := FALSE;
     DeadmanArmPending := FALSE;
+    InversionLockActive := FALSE;
+    PrevDirX := 0;
+    PrevDirY := 0;
     ArmingPermitDenied := FALSE;
+    NeutralXYEdge(CLK := FALSE);
     NeutralHoldTimer(IN := FALSE, PT := Cfg.NeutralHoldTime);
     DeadmanArmTimer(IN := FALSE, PT := Cfg.DeadmanArmHoldTime);
     DeadmanArmGraceTimer(IN := FALSE, PT := Cfg.DeadmanArmGraceTime);
@@ -3148,13 +3682,48 @@ AtNeutralXY := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // les 2 axes 
 {endregion}
 
 {region &quot;§4 Armement homme mort&quot;}
+// 🔀 Inversion inter-scan : le sens n&#x27;est RETENU que si la déflexion dépasse
+// CST_InversionFlipThreshold_Pct (&gt;&gt; bruit Hall / bord de deadband). Un aller-retour
+// +1&lt;-&gt;-1 sans échantillon 0 pose le verrou. Levé exclusivement au front AtNeutralXY.
+// RawOutOfRange : lecture capteur non fiable -&gt; aucun sens retenu (le geste est déjà forcé à 0
+// par le SEL du pipeline). Une reprise capteur-défaut -&gt; valide ne compte donc pas comme flip.
+DirX := 0;
+DirY := 0;
+IF NOT RawOutOfRange THEN
+    IF ScaleX.OutPct &gt; CST_InversionFlipThreshold_Pct THEN
+        DirX := 1;
+    ELSIF ScaleX.OutPct &lt; -CST_InversionFlipThreshold_Pct THEN
+        DirX := -1;
+    END_IF;
+    IF ScaleY.OutPct &gt; CST_InversionFlipThreshold_Pct THEN
+        DirY := 1;
+    ELSIF ScaleY.OutPct &lt; -CST_InversionFlipThreshold_Pct THEN
+        DirY := -1;
+    END_IF;
+END_IF;
+FlipX := ((PrevDirX = 1) AND (DirX = -1)) OR ((PrevDirX = -1) AND (DirX = 1));
+FlipY := ((PrevDirY = 1) AND (DirY = -1)) OR ((PrevDirY = -1) AND (DirY = 1));
+
+NeutralXYEdge(CLK := AtNeutralXY);
+IF NeutralXYEdge.Q THEN
+    InversionLockActive := FALSE;
+END_IF;
+
+IF FlipX OR FlipY THEN
+    InversionLockActive := TRUE;
+    DeadmanArmed := FALSE;
+    DeadmanArmPending := FALSE;
+END_IF;
+
 // Bouton homme-mort : armement par MAINTIEN (Cfg.DeadmanArmHoldTime), independant de la position.
+// ⚠️ Un appui PENDANT le verrou d&#x27;inversion n&#x27;arme PAS de demande : le nouveau front conscient
+//    doit survenir APRÈS le retour au neutre (sinon on &quot;pré-charge&quot; le réarmement stick inversé).
 DeadmanEdge(CLK := RawButton);
-IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
+IF DeadmanEdge.Q AND NOT InversionLockActive THEN DeadmanArmPending := TRUE; END_IF;
 IF NOT RawButton THEN DeadmanArmPending := FALSE; END_IF;
 
 // Securite : armage UNIQUEMENT si DeadmanArmPending ET ArmingPermit.
-DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit, PT := Cfg.DeadmanArmHoldTime);
+DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit AND NOT InversionLockActive, PT := Cfg.DeadmanArmHoldTime);
 IF DeadmanArmTimer.Q THEN
     DeadmanArmed := TRUE;
     DeadmanArmPending := FALSE;
@@ -3181,10 +3750,10 @@ CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdX.SpeedTgt := ABS(CmdXVal);   // NON signee (le sens = bits DirectionPositive/Negative + AxisCmdX.Direction)
-AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
+AxisCmdX.StartStop := (ABS(CmdXVal) &gt; CST_DirectionQualificationThreshold_Pct);
 
-AxisCmdX.DirectionPositive := (CmdXVal &gt; 0.1);
-AxisCmdX.DirectionNegative := (CmdXVal &lt; -0.1);
+AxisCmdX.DirectionPositive := (CmdXVal &gt; CST_DirectionQualificationThreshold_Pct);
+AxisCmdX.DirectionNegative := (CmdXVal &lt; -CST_DirectionQualificationThreshold_Pct);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
 IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
@@ -3200,18 +3769,43 @@ CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdY.SpeedTgt := ABS(CmdYVal);   // NON signee (le sens = bits DirectionPositive/Negative + AxisCmdY.Direction)
-AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
+AxisCmdY.StartStop := (ABS(CmdYVal) &gt; CST_DirectionQualificationThreshold_Pct);
 
-AxisCmdY.DirectionPositive := (CmdYVal &gt; 0.1);
-AxisCmdY.DirectionNegative := (CmdYVal &lt; -0.1);
+AxisCmdY.DirectionPositive := (CmdYVal &gt; CST_DirectionQualificationThreshold_Pct);
+AxisCmdY.DirectionNegative := (CmdYVal &lt; -CST_DirectionQualificationThreshold_Pct);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
 IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
+
+// 🪜 Decodage consigne % -&gt; palier (logique FB_Winch §5, deplacee au joystick).
+//    AxisCmdY.SpeedTgt (%) reste pour l&#x27;IHM ; AxisCmdY.StepTgt (1..5, 0=arret) pour la logique/limitations.
+SpeedStepHyst1(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[1] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[1] - Cfg.SpeedStepHystMargin));
+SpeedStepHyst2(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[2] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[2] - Cfg.SpeedStepHystMargin));
+SpeedStepHyst3(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[3] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[3] - Cfg.SpeedStepHystMargin));
+SpeedStepHyst4(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[4] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[4] - Cfg.SpeedStepHystMargin));
+
+// ⚠️ HYSTERESIS (Util CODESYS) est un hystérésis BAS : OUT=TRUE quand IN&lt;LOW, OUT=FALSE
+//    quand IN&gt;HIGH. Pour un décodage ASCENDANT (petite déflexion → palier bas, grande →
+//    palier haut) on teste donc `NOT OUT` : palier supérieur seulement une fois IN au-dessus
+//    du seuil (bande d&#x27;hystérésis LOW..HIGH autour de StepThreshold_Pct[n]).
+IF AxisCmdY.SpeedTgt &lt;= CST_DirectionQualificationThreshold_Pct THEN
+    AxisCmdY.StepTgt := 0;
+ELSE
+    AxisCmdY.StepTgt := 1;
+    IF NOT SpeedStepHyst1.OUT THEN AxisCmdY.StepTgt := 2; END_IF;
+    IF NOT SpeedStepHyst2.OUT THEN AxisCmdY.StepTgt := 3; END_IF;
+    IF NOT SpeedStepHyst3.OUT THEN AxisCmdY.StepTgt := 4; END_IF;
+    IF NOT SpeedStepHyst4.OUT THEN AxisCmdY.StepTgt := 5; END_IF;
+END_IF;
 
 // Projections monitoring dans le struct (les bits restent la source logique)
 IF AxisCmdY.DirectionPositive THEN AxisCmdY.Direction := 1;
 ELSIF AxisCmdY.DirectionNegative THEN AxisCmdY.Direction := -1;
 ELSE AxisCmdY.Direction := 0; END_IF;
 AxisCmdY.Deflection := REAL_TO_INT(CmdYVal);   // deflexion signee -100..+100 % (anim IHM)
+
+// Memorisation apres traitement : l&#x27;inversion suivante compare deux scans qualifies successifs.
+PrevDirX := DirX;
+PrevDirY := DirY;
 
 // Miroirs point neutre courant
 NeutralXAct := NeutralXMem;
@@ -3227,7 +3821,7 @@ END_FUNCTION_BLOCK
    ⚙️ E_PresetConfirmMode — Mode de confirmation du preset codeur
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : sélectionner le fait public utilisé pour valider un preset.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE E_PresetConfirmMode :
@@ -3246,7 +3840,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : porter le mode de confirmation preset commun aux codeurs.
    🔒 Ownership : GVL_IHM.Commun.EncoderCfg ↔ GVL_PERSISTENT._EncoderCfgPersist.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE ST_fbEncoder_Cfg :
@@ -3268,7 +3862,7 @@ END_TYPE
    🛡️ PresetStatusBit : bit du mot d&#x27;état codeur, réservé site futur —
       câblé à FALSE tant qu&#x27;aucun bit n&#x27;est identifié (aucun signal absent
       ne confirme implicitement le preset).
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE ST_fbEncoder_HwIn :
@@ -3292,7 +3886,7 @@ END_TYPE
       EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
    🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
       vers le device.
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE ST_fbEncoder_HwOut :
@@ -3313,7 +3907,7 @@ END_TYPE
    🎯 Regroupe les entrées/sorties hardware d&#x27;un codeur absolu EtherCAT
       pour exposer l&#x27;interface physique de FB_Encoder de façon testable.
    🔌 Producteur/consommateur : PRG_02_Acquisition câble ce bus vers le device.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_EncoderHw :
 STRUCT
@@ -3340,7 +3934,7 @@ END_TYPE
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de calibration RETAIN par treuil (M1_EncoderCalib / M2_EncoderCalib)
    💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE ST_Encoder_Calib :
@@ -3399,6 +3993,14 @@ END_TYPE
                 <pre>(* =======================================================================
    📊 ST_EncoderMeasurements — Mesures codeurs M1/M2 (contrat frontière)
    ───────────────────────────────────────────────────────────────
+   ⚠️ ORPHELIN (Tâche C5 — nettoyage données mortes) : ce type n&#x27;est plus
+   référencé par aucun consommateur dans le CODE actif (après consolidation
+   bus acquisition I8, le bus ST_AcquisitionInterPrg utilise désormais
+   EncoderM1/EncoderM2 : ST_AcquisitionEncoderQualified). CONSERVÉ (non
+   supprimé) car référencé par le harnais de test TOOLS/TEST_AUTO_CI/
+   registry.yaml (10 entrées) et par des artefacts bundle. → Proposé à
+   l&#x27;archivage APRÈS mise à jour du harnais de test.
+   ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure frontière regroupant les sous-DUTs de mesure des treuils M1 et M2
    🔌 Interface : Producteur unique PRG_02_Acquisition
    📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
@@ -3421,7 +4023,7 @@ END_TYPE
    🎯 Rôle : Accès bus EtherCAT, extraction positions brutes et séquence de Preset SDO
    🔒 Polarité : EncoderAvailable=TRUE si communication bus et esclave OK
    🔌 Architecture : Module d&#x27;acquisition codeur absolu
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Abs) ===
@@ -3513,7 +4115,7 @@ EncoderAvailable := NOT instCauses[0].Active;
 IF NOT Enable THEN
     EncoderAvailable := FALSE;
     Ready := FALSE;
-    PresetTriggerCmd := 16#0000; CodeSeqTriggerCmd := 16#0000; PresetValueOut := 0;
+    PresetTriggerCmd := 0; CodeSeqTriggerCmd := 0; PresetValueOut := 0;
     PresetSeqStep := 0;
     PresetCompleted := FALSE;
     PresetTimer(IN := FALSE, PT := PresetTimeout);
@@ -3544,7 +4146,7 @@ END_IF;
 // fonction n&#x27;est pas confirmée. Ne jamais lui donner une valeur arbitraire.
 PresetReqEdge(CLK := PresetRequest);
 PresetCompleted := FALSE;
-CodeSeqTriggerCmd := 16#0000;           // non piloté — rôle inconnu, voir note ci-dessus
+CodeSeqTriggerCmd := 0;                 // non piloté — rôle inconnu, voir note ci-dessus
 CASE PresetSeqStep OF
     0: // IDLE
         PresetTriggerCmd := 0;
@@ -3584,7 +4186,7 @@ END_CASE;
    🎯 Rôle : Séquence de référencement nominal (capteur haut) ou unitaire (MAINT_N2)
    🔒 Polarité : Homed=TRUE dès qu&#x27;un référencement valide est enregistré
    🔌 Architecture : Expose ST_Encoder_Calib en VAR_IN_OUT
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Homing) ===
@@ -3881,7 +4483,7 @@ HomingRefRaw := Calib.HomingRefRaw;
    🎯 Rôle : Calcul de la position câble en mètres par conversion arithmétique signée
    🔒 Polarité : CablePosM signée (+ enroulé, - sous l&#x27;eau)
    🔌 Architecture : Convertisseur de mesure unitaire par treuil
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 // === DECLARATION (à coller dans la partie déclaration du POU FB_Encoder_Scale) ===
@@ -3926,7 +4528,7 @@ END_IF;
    🎯 Rôle : Bornage physique absolu [-99; +99]m et relais d&#x27;incohérence redémarrage
    🔒 Polarité : EncoderIncoherent=TRUE en cas de hors bornes ou HomingSuspect
    🛡️ Sécurité : Verrouillage de la position câble sûre
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_Safety
@@ -4017,7 +4619,7 @@ EncoderIncoherent := Fault.Error;
       HomedAndReliable = EncoderAvailable AND Homed AND NOT EncoderIncoherent (gate STRICT M3)
    🧩 Responsabilite scindee (D-A2bis) : Homing = referencement, Safety = coherence,
       ce FB = « le codeur est fiable ». Aucune recomposition chez les consommateurs.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_EncoderReliability
@@ -4049,7 +4651,7 @@ HomedAndReliable := EncoderAvailable AND Homed AND (NOT EncoderIncoherent);
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Calcul de la vitesse absolue et signée sur fenêtre glissante horodatée
    🔒 Polarité : Valid=TRUE après 6 échantillons couvrant au moins 50ms
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder_SpeedMeasure
@@ -4203,7 +4805,7 @@ END_IF;
    🧩 Defaut : Fault:ST_Fault rempli par FB_FaultCore (instFault) depuis une liste
       de causes en clair (instCauses) — pattern FB_Joystick. Ready = Enable ET pas de
       defaut late. Interlocks machine sur les faits bruts, jamais sur Fault.Latched.
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Encoder
@@ -4280,9 +4882,9 @@ IF NOT Enable THEN
     Measurement.RawPos := 0; Measurement.EncoderAvailable := FALSE;
     Measurement.CablePosM := 0.0; Measurement.CablePosMSafe := 0.0; Measurement.EncoderIncoherent := FALSE;
     Measurement.Speed_Mps := 0.0; Measurement.SignedSpeed_Mps := 0.0; Measurement.SpeedValid := FALSE;
-    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 16#0000;
+    Measurement.HomingFault.Error := FALSE; Measurement.HomingFault.ErrorId := 0;
     Measurement.HomingLifecycle.Busy := FALSE; Measurement.HomingLifecycle.Done := FALSE;
-    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 16#0000;
+    Measurement.AbsFault.Error := FALSE;    Measurement.AbsFault.ErrorId := 0;
     EncoderFault := TRUE;
     HomedAndReliable := FALSE;
     // Frontiere HW sortie : aucun ordre preset publie hors autorisation
@@ -4429,7 +5031,7 @@ Ready := Enable AND NOT Fault.Latched;
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\E_TranslationFinalInterlockReason.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\_TYPES\E_TranslationFinalInterlockReason.st</code></summary>
                 <pre>(* =======================================================================
    🛡️ E_TranslationFinalInterlockReason — Raisons d&#x27;interlock M3
    ───────────────────────────────────────────────────────────────
@@ -4447,17 +5049,17 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\ST_fbCycle_TranslationCmdDemand.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ProgramTranslationRequest.st</code></summary>
                 <pre>(* =======================================================================
-   🎯 ST_fbCycle_TranslationCmdDemand — Demande de commande translation M3
+   🎯 ST_ProgramTranslationRequest — Demande de mouvement translation par le programme
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Regroupement des consignes de mouvement translation M3
-   📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   🎯 Rôle : Regroupe les demandes logiques de translation M3 formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
    ======================================================================= *)
-TYPE ST_fbCycle_TranslationCmdDemand :
+TYPE ST_ProgramTranslationRequest :
 STRUCT
-    Start   : BOOL;  // --&gt; [CMD] Demande de demarrage du mouvement
-    Target  : INT;   // --&gt; [CMD] Cible de position (1=Tremie, 2=P2, 3=P1, 4=Maintenance)
+    ReqStart    : BOOL; // Demande de démarrage mouvement translation
+    PositionTgt : INT;  // Cible de position demandée (1=Trémie, 2=P2, 3=P1, 4=Maintenance)
 END_STRUCT
 END_TYPE
 </pre>
@@ -4582,7 +5184,8 @@ END_TYPE
    🕹️ ST_fbJoystick_AxisCmd — Consigne d&#x27;axe normalisée (sortie FB_Joystick)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Structure de consigne d&#x27;axe produite par FB_Joystick.
-   📤 Champs : Enable, StartStop, SpeedTgt + direction en bits (DirectionPositive/Negative, AtNeutral).
+   📤 Champs : Enable, StartStop, SpeedTgt (%) + StepTgt (palier 1..5) + direction en bits
+               (DirectionPositive/Negative, AtNeutral). SpeedTgt reste pour l&#x27;IHM, StepTgt pour la logique.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
    ======================================================================= *)
 
@@ -4591,7 +5194,8 @@ STRUCT
     // === CONSIGNES DE PILOTAGE AXE ===
     Enable      : BOOL;   // --&gt; [CMD] Autorisation globale pipeline (FALSE=neutralisation, sorties coupees)
     StartStop   : BOOL;   // --&gt; [CMD] Validation de mouvement (TRUE=acceleration, FALSE=deceleration/arret)
-    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction)
+    SpeedTgt    : REAL;   // --&gt; [CMD] Vitesse cible non signee (0...100 %, signe/sens donné par Direction) - IHM
+    StepTgt     : INT;    // --&gt; [CMD] Palier de vitesse (1..5, 0=arret) - logique/limitations (derive de SpeedTgt)
     DirectionNegative   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     DirectionPositive   : BOOL;   // --&gt; [CMD] Direction joystick ou intension de gestuelle
     AtNeutral   : BOOL;   // --&gt; [CMD] TRUE si axes en zone morte (position centrale)
@@ -4661,7 +5265,7 @@ END_TYPE
       EtherCAT produits par FB_Encoder vers le PDO Rx (bus sortie).
    🔒 Ownership : FB_Encoder produit ce bus ; PRG_02_Acquisition le relaie
       vers le device.
-   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.3.md
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
 TYPE ST_fbEncoder_HwOut :
@@ -4723,35 +5327,14 @@ STRUCT
     Network                      : ST_AcquisitionNetworkDiagnostics;  // 🔌 Diagnostics réseaux CANopen et EtherCAT
     EncoderM1                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M1 (Retenue)
     EncoderM2                    : ST_AcquisitionEncoderQualified;     // 🧲 Façade codeur qualifiée M2 (Benne)
-
-    // === 🧲 Mesures codeurs M1/M2 (compatibilité de transition) ===
-    Encoders                     : ST_EncoderMeasurements;             // 📊 Mesures + statuts codeurs M1/M2 (sous-DUT)
-
-    // === 🛡️ Gates fiabilité codeurs (compatibilité de transition) ===
-    M1_EncoderFault              : BOOL; // ❌ Gate fiabilite M1 (NOT Available OR Incoherent, sans Homed)
-    M2_EncoderFault              : BOOL; // ❌ Gate fiabilite M2 (NOT Available OR Incoherent, sans Homed)
-    M1_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M1 : dispo ET reference ET pas incoherent
-    M2_HomedAndReliable          : BOOL; // ✅ Gate strict M3 M2 : dispo ET reference ET pas incoherent
-
-    // === 🕹️ États joystick qualifiés (compatibilité de transition) ===
-    JoystickDeadmanArmed         : BOOL; // 🔒 Homme-mort joystick arme (1=Arme)
-    JoystickYNeutral             : BOOL; // 🟢 Axe Y joystick au neutre
-    JoystickDirectionX           : INT;  // 🎯 Sens X demande (-1:Gauche, 0:Neutre, 1:Droite)
-    JoystickSpeedPctX            : REAL; // 📈 Magnitude deviation axe X en % (0..100)
-    JoystickXNeutral             : BOOL; // 🟢 Axe X joystick au neutre
+    MachineHoming                : ST_MachineHoming;                   // 🎯 État homing conjoint machine (M1/M2/benne)
 
     // === 🩺 Diagnostics modules E/S ===
-    LocalDigitalIoOk             : BOOL; // 🟢 Module Local_Digital_IO OK (DI8/DO8)
-    Vh0800EndOk                  : BOOL; // 🟢 Module VH_0800END OK (DI8)
-    Vh0808EtpOk                  : BOOL; // 🟢 Module VH_0808ETP OK (DI8/DO8)
-    Vh0008ErOk                   : BOOL; // 🟢 Module VH_0008ER OK (DO8 Relais Freins/Kobold)
-    Vh0008Er1Ok                  : BOOL; // 🟢 Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)
-    InputModuleFault             : BOOL; // ❌ Defaut sur au moins un module E/S
+    InputModules                 : ST_IOModuleDiag; // 🩺 Diagnostic carte des 5 modules E/S (AF06 §3bis)
 
     // === 🧪 Simulation &amp; variateur M3 filtré ===
-    WinchInputSourceChanged       : BOOL; // 🔀 Impulsion 1 cycle si source Winch bascule (IHM)
-    M3_StatusWord_Filtered        : UINT; // 📊 Mot d&#x27;etat variateur M3 filtre (consommé PRG_05)
-    M3_ActualFrequencyHz_Filtered : UINT; // 📊 Frequence reelle M3 filtree (consommé PRG_05)
+    InputSource                  : ST_InputSource; // 🔀 Flags de bascule de source (réel/simu) par domaine
+    M3                           : ST_M3DriveFeedback; // ↔️ Retours variateur M3 filtrés (consommé PRG_05)
 END_STRUCT
 END_TYPE
 </pre>
@@ -4891,11 +5474,20 @@ instJoystick(
 );
 
 
-Data.JoystickDeadmanArmed := instJoystick.DeadmanArmed;
-Data.JoystickXNeutral     := (instJoystick.AxisCmdX.Direction = 0);
-Data.JoystickYNeutral     := (instJoystick.AxisCmdY.Direction = 0);
-Data.JoystickDirectionX   := instJoystick.AxisCmdX.Direction;
-Data.JoystickSpeedPctX    := ABS(instJoystick.AxisCmdX.SpeedTgt);
+Data.Joystick.DeadmanArmed := instJoystick.DeadmanArmed;
+// Miroir fidèle de PRG_02_Acquisition : PRG_03/PRG_04 consomment l&#x27;axe Y
+// structuré pour arbitrer le sens et la vitesse des treuils.
+Data.Joystick.AxisY          := instJoystick.AxisCmdY;
+
+
+Data.Joystick.AxisX := instJoystick.AxisCmdX;
+
+
+// Publication réseau : miroir de PRG_02_Acquisition. PRG_04/FB_Safety_Winch
+// consomment Data.Network.Joystick ; ne pas laisser ce bus à sa valeur par défaut.
+Data.Network.CanOpenMaster  := diagCanDev;
+Data.Network.Joystick       := diagCanDev;
+Data.Network.EthercatMaster := diagEcatDev;
 
 
 // 3. Traitement Codeurs Treuils M1 / M2
@@ -4913,9 +5505,11 @@ instEncoderM1(
     Cfg := encoderCfg,
     Calib := calibM1
 );
-Data.Encoders.M1            := instEncoderM1.Measurement;
-Data.M1_EncoderFault        := instEncoderM1.EncoderFault;
-Data.M1_HomedAndReliable    := instEncoderM1.HomedAndReliable;
+Data.EncoderM1.Measurement := instEncoderM1.Measurement;
+Data.EncoderM1.Fault := instEncoderM1.Fault;
+Data.EncoderM1.HomedAndReliable := instEncoderM1.HomedAndReliable;
+Data.EncoderM1.Homed := instEncoderM1.Homed;
+Data.EncoderM1.HomingSuspect := instEncoderM1.HomingSuspect;
 
 HwInM2.RawPosIn := COD2_PosValue;
 HwInM2.SlaveOperational := EcatOperational;
@@ -4932,15 +5526,17 @@ instEncoderM2(
     Calib := calibM2
 );
 
-Data.Encoders.M2            := instEncoderM2.Measurement;
-Data.M2_EncoderFault        := instEncoderM2.EncoderFault;
-Data.M2_HomedAndReliable    := instEncoderM2.HomedAndReliable;
+Data.EncoderM2.Measurement := instEncoderM2.Measurement;
+Data.EncoderM2.Fault := instEncoderM2.Fault;
+Data.EncoderM2.HomedAndReliable := instEncoderM2.HomedAndReliable;
+Data.EncoderM2.Homed := instEncoderM2.Homed;
+Data.EncoderM2.HomingSuspect := instEncoderM2.HomingSuspect;
 
 // 4. Diagnostics Cartes DI
-Data.LocalDigitalIoOk := TRUE;
-Data.Vh0800EndOk      := TRUE;
-Data.Vh0808EtpOk      := TRUE;
-Data.InputModuleFault := FALSE;
+Data.InputModules.LocalDigitalIoOk := TRUE;
+Data.InputModules.Vh0800EndOk := TRUE;
+Data.InputModules.Vh0808EtpOk := TRUE;
+Data.InputModules.Fault := FALSE;
 
 // 5. Renseignement de l&#x27;Image Matérielle HwIn (Structure Complète)
 HwIn.Winch.M1_ContactorsReleased_DI := M1_ContactorsReleased;

@@ -1,34 +1,21 @@
-Error compiling source files:
-
-FB_Translation.st:48:35: error: Undefined type 'ST_FBTRANSLATION_CFG' in FUNCTION_BLOCK 'FB_TRANSLATION'
-  48 |     Cfg                         : ST_fbTranslation_Cfg; // --> [CFG] Rampe, vitesses d'approche, échelle, frein (source GVL_PERSISTENT)
-     |                                   ^
-
-FB_TestHarness_PRG_05.st:15:31: error: Undefined type 'ST_FBMODES_AUTORISATIONS' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_05'
-  15 |     ModesAuth               : ST_fbModes_Autorisations;
-     |                               ^
-
-ST_TranslationState.st:10:31: error: Undefined type 'E_TRANSLATIONTRACEBLOCKREASON' in STRUCT 'ST_TRANSLATIONSTATE'
-  10 |     AxisBlockReason         : E_TranslationTraceBlockReason; (* 🧩 Cause prioritaire de blocage (miroir de TranslationTrace.BlockReason) *)
-     |                               ^
-
-ST_TranslationInterPrg.st:34:36: error: Undefined type 'ST_TRACETRANSLATION' in STRUCT 'ST_TRANSLATIONINTERPRG'
-  34 |     TranslationTrace             : ST_TraceTranslation; // 🕵️ Trace blocage translation M3 (cause priorisée + horodatage)
-     |                                    ^
-
-ST_AcquisitionInterPrg.st:22:36: error: Undefined type 'ST_MACHINEHOMING' in STRUCT 'ST_ACQUISITIONINTERPRG'
-  22 |     MachineHoming                : ST_MachineHoming;                   // 🎯 État homing conjoint machine (M1/M2/benne)
-     |                                    ^
-
-ST_AcquisitionInterPrg.st:25:36: error: Undefined type 'ST_IOMODULEDIAG' in STRUCT 'ST_ACQUISITIONINTERPRG'
-  25 |     InputModules                 : ST_IOModuleDiag; // 🩺 Diagnostic carte des 5 modules E/S (AF06 §3bis)
-     |                                    ^
-
-ST_AcquisitionInterPrg.st:28:36: error: Undefined type 'ST_INPUTSOURCE' in STRUCT 'ST_ACQUISITIONINTERPRG'
-  28 |     InputSource                  : ST_InputSource; // 🔀 Flags de bascule de source (réel/simu) par domaine
-     |                                    ^
-
-ST_AcquisitionInterPrg.st:29:36: error: Undefined type 'ST_M3DRIVEFEEDBACK' in STRUCT 'ST_ACQUISITIONINTERPRG'
-  29 |     M3                           : ST_M3DriveFeedback; // ↔️ Retours variateur M3 filtrés (consommé PRG_05)
-     |                                    ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_05_Translation_ho44xhoc\strucpp-test-PYQVHX\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_05_Translation_ho44xhoc\strucpp-test-PYQVHX\test_main.cpp:57:60: error: 'struct strucpp::ST_TRANSLATIONSTATE' has no member named 'ACTIVEDIRECTION'
+   57 |         if (!ctx.assert_eq(s.HARNESS.DATA.TRANSLATIONSTATE.ACTIVEDIRECTION, 1, "HARNESS.DATA.TRANSLATIONSTATE.ACTIVEDIRECTION", "1", 54, "Sens translation avant arbitre")) return false;
+      |                                                            ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_05_Translation_ho44xhoc\strucpp-test-PYQVHX\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_05_Translation_ho44xhoc\strucpp-test-PYQVHX\test_main.cpp:74:19: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'JOYSTICKSPEEDPCTX'
+   74 |         s.ACQDATA.JOYSTICKSPEEDPCTX = 60.0;
+      |                   ^~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_05_Translation_ho44xhoc\strucpp-test-PYQVHX\test_main.cpp:109:60: error: 'struct strucpp::ST_TRANSLATIONSTATE' has no member named 'ACTIVEDIRECTION'
+  109 |         if (!ctx.assert_eq(s.HARNESS.DATA.TRANSLATIONSTATE.ACTIVEDIRECTION, -1, "HARNESS.DATA.TRANSLATIONSTATE.ACTIVEDIRECTION", "-1", 99, "Sens translation arriere arbitre")) return false;
+      |                                                            ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_05_Translation_ho44xhoc\strucpp-test-PYQVHX\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_05_Translation_ho44xhoc\strucpp-test-PYQVHX\test_main.cpp:131:60: error: 'struct strucpp::ST_TRANSLATIONSTATE' has no member named 'ACTIVEDIRECTION'
+  131 |         if (!ctx.assert_eq(s.HARNESS.DATA.TRANSLATIONSTATE.ACTIVEDIRECTION, 0, "HARNESS.DATA.TRANSLATIONSTATE.ACTIVEDIRECTION", "0", 116, "Mouvement interdit")) return false;
+      |                                                            ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_05_Translation_ho44xhoc\strucpp-test-PYQVHX\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_05::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_05_Translation_ho44xhoc\strucpp-test-PYQVHX\generated.cpp:13608:27: error: 'struct strucpp::ST_TRANSLATIONSTATE' has no member named 'ACTIVEDIRECTION'
+13608 |     DATA.TRANSLATIONSTATE.ACTIVEDIRECTION = M3DIRECTION;
+      |                           ^~~~~~~~~~~~~~~
 
