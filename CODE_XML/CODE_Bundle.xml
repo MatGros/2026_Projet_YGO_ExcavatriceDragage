@@ -10310,6 +10310,14 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Absence de mouvement malgré commande (bit15)</xhtml>
               </documentation>
             </variable>
+            <variable name="NoMovementContactorSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 bit15 déclenché par le retour « tous contacteurs retombés » → contacteur de sens non engagé</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -27013,7 +27021,12 @@ IF WinchM1Safety.ErrorOppositeDir AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxA
     AlarmArray[AlarmCount] := '[M1] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorNoMovement AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
+    IF WinchM1Safety.NoMovementContactorSuspect THEN
+        AlarmArray[AlarmCount] := '[M1] ErrorID:16 - contacteur de sens non engage (retour tous retombes)';
+    ELSE
+        AlarmArray[AlarmCount] := '[M1] ErrorID:16 - absence mouvement';
+    END_IF;
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5b. Collecte — treuil M2 (mêmes bits que M1, tri bloquant/warning identique)
@@ -27045,7 +27058,12 @@ IF WinchM2Safety.ErrorOppositeDir AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxA
     AlarmArray[AlarmCount] := '[M2] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorNoMovement AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
+    IF WinchM2Safety.NoMovementContactorSuspect THEN
+        AlarmArray[AlarmCount] := '[M2] ErrorID:16 - contacteur de sens non engage (retour tous retombes)';
+    ELSE
+        AlarmArray[AlarmCount] := '[M2] ErrorID:16 - absence mouvement';
+    END_IF;
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5c. Collecte — translation M3 (ST_SafetyTranslation, tri bloquant/warning identique)
@@ -32225,6 +32243,14 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Survitesse latchée (acquittée au Reset)</xhtml>
               </documentation>
             </variable>
+            <variable name="NoMovementContactorSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] NoMovement (bit15) declenche par le retour "tous contacteurs retombes" alors qu'un contacteur de sens etait commande</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="DriftGuardA">
@@ -32591,6 +32617,14 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <BOOL />
               </type>
             </variable>
+            <variable name="NoMovementContactorSuspectLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch : NoMovement declenche par le retour "tous contacteurs retombes"</xhtml>
+              </documentation>
+            </variable>
             <variable name="OverspeedFaultLatched">
               <type>
                 <BOOL />
@@ -32685,6 +32719,7 @@ IF ResetEdge.Q OR BypassGlobal THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -32704,6 +32739,7 @@ IF NOT FirstScanDone THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -32898,7 +32934,10 @@ IF NOT BypassGlobal THEN
               AND FwdRevSpeedFeedbackOff,
         PT := CST_ContactorConfirmDelay
     );
-    IF TonNoMoveContactor.Q THEN NoMovementFaultLatched := TRUE; END_IF;
+    IF TonNoMoveContactor.Q THEN
+        NoMovementFaultLatched := TRUE;
+        NoMovementContactorSuspectLatched := TRUE;
+    END_IF;
     instCauses[15].Active   := NoMovementFaultLatched;
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
@@ -32941,6 +32980,7 @@ END_IF;
 // FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
 ContactorStuck := MecaBFaultLatched;
 OverspeedFault := OverspeedFaultLatched;
+NoMovementContactorSuspect := NoMovementContactorSuspectLatched;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -43590,6 +43630,7 @@ WinchM1Safety.ErrorMecaD         := (SafetyM1.Fault.ErrorId AND 16#0800) &lt;&gt
 WinchM1Safety.ErrorMecaE         := (SafetyM1.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
 WinchM1Safety.ErrorOppositeDir   := (SafetyM1.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
 WinchM1Safety.ErrorNoMovement    := (SafetyM1.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM1Safety.NoMovementContactorSuspect := SafetyM1.NoMovementContactorSuspect;
 WinchM1Safety.PowerCutOffSafety  := M1PowerCutOffSafetyInfo;
 WinchM1Safety.SafeStopSafety     := M1SafeStopSafetyInfo;
 WinchM1Safety.BlockedBySafety    := M1BlockedBySafetyInfo;
@@ -43617,6 +43658,7 @@ WinchM2Safety.ErrorMecaD         := (SafetyM2.Fault.ErrorId AND 16#0800) &lt;&gt
 WinchM2Safety.ErrorMecaE         := (SafetyM2.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
 WinchM2Safety.ErrorOppositeDir   := (SafetyM2.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
 WinchM2Safety.ErrorNoMovement    := (SafetyM2.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM2Safety.NoMovementContactorSuspect := SafetyM2.NoMovementContactorSuspect;
 WinchM2Safety.PowerCutOffSafety  := M2PowerCutOffSafetyInfo;
 WinchM2Safety.SafeStopSafety     := M2SafeStopSafetyInfo;
 WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;

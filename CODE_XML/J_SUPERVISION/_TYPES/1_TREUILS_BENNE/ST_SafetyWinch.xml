@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T22:48:44.074806" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T22:48:44.074806">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:45:12.883798" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:45:12.883798">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -265,6 +265,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Absence de mouvement malgré commande (bit15)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NoMovementContactorSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 bit15 déclenché par le retour « tous contacteurs retombés » → contacteur de sens non engagé</xhtml>
               </documentation>
             </variable>
           </struct>

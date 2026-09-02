@@ -97,6 +97,7 @@ VAR_OUTPUT
     MecaBElapsedTime                : TIME;                           // <-- [DIAG] Ecoule confirmation contacteurs/frein
     ContactorStuck                  : BOOL;                           // <-- [DIAG] Contacteur colle (proprietaire unique, re-alimente IHM/Troubleshooting a la phase suivante)
     OverspeedFault                  : BOOL;                           // <-- [DIAG] Survitesse latchée (acquittée au Reset)
+    NoMovementContactorSuspect      : BOOL;                           // <-- [DIAG] NoMovement (bit15) declenche par le retour "tous contacteurs retombes" alors qu'un contacteur de sens etait commande
 END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
@@ -158,6 +159,7 @@ VAR
     MecaEEscaladeFaultLatched       : BOOL;
     OppositeDirectionFaultLatched   : BOOL;
     NoMovementFaultLatched          : BOOL;
+    NoMovementContactorSuspectLatched : BOOL;                         // . [LOC] Latch : NoMovement declenche par le retour "tous contacteurs retombes"
     OverspeedFaultLatched           : BOOL;                           // . [LOC] Latch survitesse (hors bitfield)
 
     // Socle défaut
@@ -189,6 +191,7 @@ IF ResetEdge.Q OR BypassGlobal THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -208,6 +211,7 @@ IF NOT FirstScanDone THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -402,7 +406,10 @@ IF NOT BypassGlobal THEN
               AND FwdRevSpeedFeedbackOff,
         PT := CST_ContactorConfirmDelay
     );
-    IF TonNoMoveContactor.Q THEN NoMovementFaultLatched := TRUE; END_IF;
+    IF TonNoMoveContactor.Q THEN
+        NoMovementFaultLatched := TRUE;
+        NoMovementContactorSuspectLatched := TRUE;
+    END_IF;
     instCauses[15].Active   := NoMovementFaultLatched;
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
@@ -445,6 +452,7 @@ END_IF;
 // FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
 ContactorStuck := MecaBFaultLatched;
 OverspeedFault := OverspeedFaultLatched;
+NoMovementContactorSuspect := NoMovementContactorSuspectLatched;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);

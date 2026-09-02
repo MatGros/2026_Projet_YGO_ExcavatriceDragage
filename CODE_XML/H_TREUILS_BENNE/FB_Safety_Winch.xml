@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:36:02.049586" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:36:02.049586">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:45:05.629293" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:45:05.629293">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -850,6 +850,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Survitesse latchée (acquittée au Reset)</xhtml>
               </documentation>
             </variable>
+            <variable name="NoMovementContactorSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] NoMovement (bit15) declenche par le retour "tous contacteurs retombes" alors qu'un contacteur de sens etait commande</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="DriftGuardA">
@@ -1216,6 +1224,14 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <BOOL />
               </type>
             </variable>
+            <variable name="NoMovementContactorSuspectLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch : NoMovement declenche par le retour "tous contacteurs retombes"</xhtml>
+              </documentation>
+            </variable>
             <variable name="OverspeedFaultLatched">
               <type>
                 <BOOL />
@@ -1310,6 +1326,7 @@ IF ResetEdge.Q OR BypassGlobal THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -1329,6 +1346,7 @@ IF NOT FirstScanDone THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -1523,7 +1541,10 @@ IF NOT BypassGlobal THEN
               AND FwdRevSpeedFeedbackOff,
         PT := CST_ContactorConfirmDelay
     );
-    IF TonNoMoveContactor.Q THEN NoMovementFaultLatched := TRUE; END_IF;
+    IF TonNoMoveContactor.Q THEN
+        NoMovementFaultLatched := TRUE;
+        NoMovementContactorSuspectLatched := TRUE;
+    END_IF;
     instCauses[15].Active   := NoMovementFaultLatched;
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
@@ -1566,6 +1587,7 @@ END_IF;
 // FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
 ContactorStuck := MecaBFaultLatched;
 OverspeedFault := OverspeedFaultLatched;
+NoMovementContactorSuspect := NoMovementContactorSuspectLatched;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);

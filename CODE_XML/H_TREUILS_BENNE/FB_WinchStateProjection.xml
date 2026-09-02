@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:20:21.023731" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:20:21.023731">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:45:49.453450" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:45:49.453450">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -672,6 +672,14 @@ M1 : contacteurs retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Absence de mouvement malgré commande (bit15)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NoMovementContactorSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 bit15 déclenché par le retour « tous contacteurs retombés » → contacteur de sens non engagé</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3088,6 +3096,7 @@ WinchM1Safety.ErrorMecaD         := (SafetyM1.Fault.ErrorId AND 16#0800) &lt;&gt
 WinchM1Safety.ErrorMecaE         := (SafetyM1.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
 WinchM1Safety.ErrorOppositeDir   := (SafetyM1.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
 WinchM1Safety.ErrorNoMovement    := (SafetyM1.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM1Safety.NoMovementContactorSuspect := SafetyM1.NoMovementContactorSuspect;
 WinchM1Safety.PowerCutOffSafety  := M1PowerCutOffSafetyInfo;
 WinchM1Safety.SafeStopSafety     := M1SafeStopSafetyInfo;
 WinchM1Safety.BlockedBySafety    := M1BlockedBySafetyInfo;
@@ -3115,6 +3124,7 @@ WinchM2Safety.ErrorMecaD         := (SafetyM2.Fault.ErrorId AND 16#0800) &lt;&gt
 WinchM2Safety.ErrorMecaE         := (SafetyM2.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
 WinchM2Safety.ErrorOppositeDir   := (SafetyM2.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
 WinchM2Safety.ErrorNoMovement    := (SafetyM2.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM2Safety.NoMovementContactorSuspect := SafetyM2.NoMovementContactorSuspect;
 WinchM2Safety.PowerCutOffSafety  := M2PowerCutOffSafetyInfo;
 WinchM2Safety.SafeStopSafety     := M2SafeStopSafetyInfo;
 WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
@@ -3791,6 +3801,14 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Survitesse latchée (acquittée au Reset)</xhtml>
               </documentation>
             </variable>
+            <variable name="NoMovementContactorSuspect">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] NoMovement (bit15) declenche par le retour "tous contacteurs retombes" alors qu'un contacteur de sens etait commande</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="DriftGuardA">
@@ -3857,6 +3875,14 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Delai confirmation absence mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonNoMoveContactor">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Chemin rapide : contacteur de sens commande mais retour "tous retombes"</xhtml>
               </documentation>
             </variable>
             <variable name="TonStartupWarmup">
@@ -4149,6 +4175,14 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <BOOL />
               </type>
             </variable>
+            <variable name="NoMovementContactorSuspectLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch : NoMovement declenche par le retour "tous contacteurs retombes"</xhtml>
+              </documentation>
+            </variable>
             <variable name="OverspeedFaultLatched">
               <type>
                 <BOOL />
@@ -4198,6 +4232,17 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur) — la course reelle d'un treuil par scan 10ms reste sous ~0.01 m</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_ContactorConfirmDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai avant NoMovement quand un contacteur de sens est commande mais que le retour dit "tous retombes" (pickup contacteur + marge)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -4232,6 +4277,7 @@ IF ResetEdge.Q OR BypassGlobal THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -4251,6 +4297,7 @@ IF NOT FirstScanDone THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
+    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -4430,12 +4477,25 @@ IF NOT BypassGlobal THEN
     instCauses[14].Texte    := 'Sens reel oppose a la commande treuil';
 
     // Cause 15 : Absence mouvement (latched)
+    // Chemin nominal : commande presente mais vitesse mesuree quasi nulle (NoMovementTimeout).
     TonNoMovement(
         IN := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
               AND (ABS(MeasuredSpeedSignedMps) &lt; MovementSpeedThresholdMps)),
         PT := NoMovementTimeout
     );
     IF TonNoMovement.Q THEN NoMovementFaultLatched := TRUE; END_IF;
+    // Chemin rapide (independant de la mesure vitesse) : un contacteur de sens est
+    // commande mais le retour materiel dit "tous les contacteurs retombes" -&gt; le
+    // contacteur n'a pas engage / a chute. Inutile d'attendre NoMovementTimeout.
+    TonNoMoveContactor(
+        IN := NOT BypassProcess AND MovementCommanded AND NOT InReferencingMode
+              AND FwdRevSpeedFeedbackOff,
+        PT := CST_ContactorConfirmDelay
+    );
+    IF TonNoMoveContactor.Q THEN
+        NoMovementFaultLatched := TRUE;
+        NoMovementContactorSuspectLatched := TRUE;
+    END_IF;
     instCauses[15].Active   := NoMovementFaultLatched;
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
@@ -4454,6 +4514,7 @@ ELSE
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
+    TonNoMoveContactor(IN := FALSE);
     TonRefSettle(IN := FALSE);
     RefWindowActive := FALSE;
     PosStepDetected := FALSE;
@@ -4477,6 +4538,7 @@ END_IF;
 // FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
 ContactorStuck := MecaBFaultLatched;
 OverspeedFault := OverspeedFaultLatched;
+NoMovementContactorSuspect := NoMovementContactorSuspectLatched;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -4531,6 +4593,7 @@ IF NOT Enable THEN
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
+    TonNoMoveContactor(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
     MecaBElapsedTime := T#0s;
     Ready := FALSE;
@@ -6419,18 +6482,21 @@ IF Error THEN
 END_IF;
 
 // ── 6quater. Disponibilite mouvement ──
-// TRUE tant qu'une temporisation d'attente ou une inhibition interdit REELLEMENT
-// une nouvelle demande de mouvement ce scan (meme condition que la branche §5
-// "ELSIF RestartRequired OR DeadTimePending THEN ... WAIT_RESTART_DELAY"), pour
-// que la disponibilite d'armement (PRG_04) et le voyant joystick tombent pendant
-// ces fenetres. Toutes ces variables se purgent seules (RestartDelay.Q 1,5 s,
-// DeadTime.Q). StepDelay EXCLU : il bride la hausse de palier, il n'interdit pas
-// de partir. N'ajoute aucune coupure : signal de disponibilite uniquement.
+// TRUE tant qu'une nouvelle demande de mouvement est REELLEMENT impossible ce scan :
+//  - RestartRequired : anti-court-cycle RestartDelay (1,5 s) ; TRUE des le retour
+//    au neutre (State=READY) ET pendant le deadlock manche deflechi (WAIT_RESTART_DELAY,
+//    ou RestartDelayElapsed est fige). Se purge seul via RestartDelay.Q.
+//  - DeadTimePending : temps mort directionnel (~1 s apres arret). Se purge via DeadTime.Q.
+//  - RestartInhibit / ContactorStuck : latches a acquittement conscient.
+//  - NOT Ready / State FAULT : FB non operationnel.
+// WAIT_STEP_DELAY EXCLU (bride la hausse de palier, n'interdit pas de partir).
+// Aucune coupure ajoutee : signal de disponibilite consomme par la dispo d'armement PRG_04.
 MovementInhibited := NOT Ready
                      OR RestartInhibit
+                     OR ContactorStuck
                      OR RestartRequired
                      OR DeadTimePending
-                     OR ContactorStuck;
+                     OR (State = E_WinchFinalInterlockState.FAULT);
 </xhtml>
           </ST>
         </body>
