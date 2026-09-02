@@ -286,16 +286,18 @@ SpeedStepHyst2(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.Spe
 SpeedStepHyst3(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[3] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[3] - Cfg.SpeedStepHystMargin));
 SpeedStepHyst4(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[4] + Cfg.SpeedStepHystMargin), LOW := REAL_TO_INT(Cfg.SpeedStepTable.StepThreshold_Pct[4] - Cfg.SpeedStepHystMargin));
 
-// Algorithme ASCENDANT : OUT=TRUE quand IN>HIGH (au-dessus du seuil) → palier supérieur.
-// Petite déflexion → palier bas ; grande déflexion → palier haut (borne haute du palier).
+// ⚠️ HYSTERESIS (Util CODESYS) est un hystérésis BAS : OUT=TRUE quand IN<LOW, OUT=FALSE
+//    quand IN>HIGH. Pour un décodage ASCENDANT (petite déflexion → palier bas, grande →
+//    palier haut) on teste donc `NOT OUT` : palier supérieur seulement une fois IN au-dessus
+//    du seuil (bande d'hystérésis LOW..HIGH autour de StepThreshold_Pct[n]).
 IF AxisCmdY.SpeedTgt <= CST_DirectionQualificationThreshold_Pct THEN
     AxisCmdY.StepTgt := 0;
 ELSE
     AxisCmdY.StepTgt := 1;
-    IF SpeedStepHyst1.OUT THEN AxisCmdY.StepTgt := 2; END_IF;
-    IF SpeedStepHyst2.OUT THEN AxisCmdY.StepTgt := 3; END_IF;
-    IF SpeedStepHyst3.OUT THEN AxisCmdY.StepTgt := 4; END_IF;
-    IF SpeedStepHyst4.OUT THEN AxisCmdY.StepTgt := 5; END_IF;
+    IF NOT SpeedStepHyst1.OUT THEN AxisCmdY.StepTgt := 2; END_IF;
+    IF NOT SpeedStepHyst2.OUT THEN AxisCmdY.StepTgt := 3; END_IF;
+    IF NOT SpeedStepHyst3.OUT THEN AxisCmdY.StepTgt := 4; END_IF;
+    IF NOT SpeedStepHyst4.OUT THEN AxisCmdY.StepTgt := 5; END_IF;
 END_IF;
 
 // Projections monitoring dans le struct (les bits restent la source logique)
