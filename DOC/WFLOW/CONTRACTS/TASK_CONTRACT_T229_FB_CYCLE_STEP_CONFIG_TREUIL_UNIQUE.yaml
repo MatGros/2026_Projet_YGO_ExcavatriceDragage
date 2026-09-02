@@ -1,0 +1,111 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T229 : FB_Cycle - une config treuil unique par etape (split X11, sequenceur au propre)
+# ═══════════════════════════════════════════════════════════════════════════
+# STUB rapide — a completer. Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Restructurer les etapes du sequenceur SEMI_AUTO pour que chaque etape presente
+    UNE configuration treuil coherente et unique (M1 seul, M2 seul, ou couple), au
+    lieu de melanger descente couplee et ouverture benne differentielle dans une
+    meme etape (X11_OPEN_DUMP). Le sequenceur cycle/homing n'est pas encore en
+    service : c'est le moment de le mettre au propre avant mise en service.
+
+  acceptance:
+    - id: AC1
+      statement: "X11_OPEN_DUMP est decoupe : une etape 'arrivee tremie' (arret), une etape 'ouverture benne' (M2 pilote seul, treuils sinon tenus), une etape optionnelle 'repositionnement couple' (montee/descente synchro, validee par l'operateur), retour a l'etape ouverture benne."
+      verified_by: "Chronogramme sequenceur X11 : jamais de descente couplee ET d'ouverture benne differentielle actives au meme scan."
+    - id: AC2
+      statement: "Pour chaque etape du cycle (X0..X13, STABILIZING), la configuration treuil est explicite et unique : aucune etape ne commande M1/M2 de facon asymetrique hors d'une phase 'benne' clairement identifiee."
+      verified_by: "Table etape -> config treuil dans FB_Cycle + revue chronogrammes ; test integration par etape."
+    - id: AC3
+      statement: "Pendant une descente reellement couplee, la surveillance d'ecart de position M1/M2 (FB_SyncDeviation) reste active (l'ecart grossier reste detecte) ; seule la concordance contacteurs est neutralisee pendant l'ouverture/fermeture benne differentielle."
+      verified_by: "Scenario : descente couplee + treuil cale -> ecart detecte ; ouverture benne -> pas de faux ContactorMismatch."
+    - id: AC4
+      statement: "Le split X11 se fait dans FB_Cycle / E_CycleStep / PRG_03 uniquement (arbitrage d'un eventuel bit IHM 'option repositionnement') ; PRG_04 et PRG_05 ne sont pas modifies (ils recoivent WinchMxCmd / Auth comme aujourd'hui)."
+      verified_by: "git diff : aucune modification CODE/M_MAIN/PRG_04_Treuils_Benne.st ni PRG_05_Translation.st."
+    - id: AC5
+      statement: "Le nom de fichier est identique au nom de POU et son suffixe est egal au langage ST du bundle genere, pour chaque POU modifie."
+      verified_by: "Gate structurel dedie et bundle PLCopenXML frais."
+    - id: AC6
+      statement: "En vidage a la tremie, la benne s'ouvre completement puis le cycle repart vers P1 sans arret machine intempestif ; si l'operateur demande un repositionnement, les deux treuils montent/descendent ensemble puis le vidage reprend."
+      verified_by: "Scenario integration end-to-end vidage tremie avec et sans repositionnement operateur ; observation aucun SafeStop synchro."
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+      - CODE/G_CYCLE/_TYPES/
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml
+      - DOC/WFLOW/REGISTRES/
+    forbidden:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/F_MODES/FB_Modes.st
+      - CODE/H_TREUILS_BENNE/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - DOC/AF/
+      - ARCHIVES/
+
+  conservation:
+    must_survive:
+      - "Le sequenceur reste producteur unique des commandes de cycle ; PRG_04/05 restent de simples consommateurs de WinchMxCmd / Auth."
+      - "Aucun redemarrage automatique apres defaut, arret ou pause de cycle."
+      - "Le rebouclage X13 -> X2 (reprise cycle) est conserve."
+      - "L'anti-telescopage M1/M2 (surveillance ecart de position pendant les phases couplees) n'est jamais affaibli par le decoupage."
+    dropped_on_purpose:
+      - "L'etape X11_OPEN_DUMP monolithe (descente couplee + ouverture benne simultanees) est remplacee par des sous-etapes a config unique."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  open_questions:
+    - id: Q1
+      q: "Un bit IHM 'option repositionnement en X11' est-il souhaite (pause manuelle pilotee) ou l'operateur agit-il seulement via le joystick + validation ?"
+    - id: Q2
+      q: "Le decoupage vaut-il aussi pour X3_OPEN_BUCKET / X6_CLOSE_BUCKET (deja Busy=TRUE, deja couvert) ou seulement X11 ?"
+    - id: Q3
+      q: "Le renommage du selecteur treuil (SelJoystickWinch -> SelWinchPilot) est HORS scope T229 (MAINT unitaire en service) — a confirmer, sinon tache dediee + migration IHM."
+    - id: Q4
+      q: "Lien avec T226 (refonte homing <-> SEMI_AUTO) : T229 en depend-il, ou peut-il etre fait avant/apres independamment ?"
+
+  alert_duty: >
+    STOP si le decoupage impose de toucher PRG_04/PRG_05/FB_Modes (forbidden),
+    si une sous-etape reintroduit un mouvement M1/M2 asymetrique non signe,
+    si l'anti-telescopage est affaibli, ou si une reponse d'open_question reste
+    indeterminee au moment de coder.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    STUB cree rapidement 2026-09-02 pendant MES. A completer : detail des sous-etapes,
+    table etape->config treuil complete, chronogrammes, arbitrage bit IHM.
