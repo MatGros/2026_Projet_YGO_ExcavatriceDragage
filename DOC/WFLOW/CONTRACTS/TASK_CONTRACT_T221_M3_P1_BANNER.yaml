@@ -1,0 +1,67 @@
+contract:
+  task_id: T221
+  criticality: C2
+  strategy: patch
+  objective: >
+    Exposer l'information stable "Position M3 : P1" dans un champ IHM dédié,
+    sans modifier ni masquer les quatre messages existants du bandeau.
+  acceptance:
+    - id: AC1
+      statement: "PositionM3Text vaut 'Position M3 : P1' lorsque TranslationM3.State.AtP1 vaut TRUE."
+      verified_by: "Observation en ligne de GVL_IHM.Banner.PositionM3Text."
+    - id: AC2
+      statement: "PositionM3Text est vide lorsque TranslationM3.State.AtP1 vaut FALSE."
+      verified_by: "Observation en ligne de GVL_IHM.Banner.PositionM3Text."
+    - id: AC3
+      statement: "Les quatre champs existants et le carrousel d'alarmes restent produits par leur logique inchangée."
+      verified_by: "Revue du diff, G200 et gates du projet."
+    - id: AC4
+      statement: "PRG_07_Supervision.st conserve un nom de fichier identique au nom du POU et le suffixe est identique au langage du bundle PLCopenXML."
+      verified_by: "G310 structure et inspection du bundle régénéré."
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md
+    forbidden:
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "Priorités et contenus des quatre champs historiques du bandeau."
+      - "Carrousel des alarmes bloquantes et logique safety M3."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute incompatibilité du binding IHM CODESYS ou tout impact sur un message
+    existant impose l'arrêt du lot et une remontée à l'utilisateur.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-02"
+  status: COMPLETED
+  summary: >
+    Ajout du champ indépendant PositionM3Text, alimenté par M3AtP1 depuis
+    GVL_IHM.TranslationM3.State.AtP1. Les quatre champs historiques et le
+    carrousel ne sont pas modifiés. Le palier C reste rouge sur des écarts
+    préexistants hors scope (G340, G483) et des refus Windows de nettoyage
+    temporaire (G390, G481).
+  evidence_submitted:
+    - "check_task_contract: PASS"
+    - "bundle: 255 objets, 0 erreur"
+    - "G200: PASS, 0 erreur"
+    - "palier C: 24/28 PASS; 4 échecs hors scope"
+validation:
+  status: APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-09-02"
+  notes: "Ajout d'un cinquième champ dédié demandé pour essai IHM."
