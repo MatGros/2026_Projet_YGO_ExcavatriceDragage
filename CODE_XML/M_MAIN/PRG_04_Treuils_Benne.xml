@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T13:39:39.793518" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T13:39:39.793518">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T14:07:10.609749" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T14:07:10.609749">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1239,6 +1239,16 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Cause priorisée du blocage Both</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmingAvailability">
+              <type>
+                <derived name="ST_ArmingAvailability" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚦 Disponibilité de mouvement par axe/sens (base honnête de ArmingPermit) ===
+Producteur unique : PRG_04_Treuils_Benne §5-0. Lecteurs : PRG_02 (ArmingPermit),
+FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3849,6 +3859,93 @@ palier : 1..5</xhtml>
           </data>
         </addData>
       </dataType>
+      <dataType name="ST_ArmingAvailability">
+        <baseType>
+          <struct>
+            <variable name="M1AscentAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = montée M1 peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1DescendAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = descente M1 peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2AscentAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = montée/fermeture M2 peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2DescendAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = descente/ouverture M2 peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3TremieAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation M3 vers trémie peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3MaintenanceAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation M3 vers maintenance peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AnyAxisAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">OR des 6 — au moins une action peut partir (condition d'armement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockedReason">
+              <type>
+                <derived name="E_ArmingBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif si armement impossible</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f7d0454a-a0b2-5865-9243-b1407b8f55d4</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🚦 ST_ArmingAvailability — Disponibilité de mouvement par axe et sens
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : dire, pour chaque axe x sens, si le mouvement peut REELLEMENT
+      partir (permis effectif + pas de SafeStop/faute de CET axe). Sert de
+      base honnête à ArmingPermit (au moins un dispo) et de diagnostic
+      « pourquoi ça bloque » pour l'IHM / le troubleshooting.
+   📤 Producteur : PRG_04_Treuils_Benne (agrège M1/M2 + lit M3 via bus PRG_05, lag 1 scan).
+   📄 Doc : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md §7
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_WinchFinalInterlockState">
         <baseType>
           <enum>
@@ -4615,6 +4712,71 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="E_ArmingBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="MODE_DISABLE" value="1" />
+              <value name="POWER_CUTOFF" value="2" />
+              <value name="CONTACTOR_OFF" value="3" />
+              <value name="BUCKET_BUSY" value="4" />
+              <value name="ALL_AXES_BLOCKED" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Armement possible (au moins un axe x sens dispo)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MODE_DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode DISABLE</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont (M1/M2/M3)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CONTACTOR_OFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU non réarmée (PowerContactorEngaged FALSE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUCKET_BUSY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action benne en cours (+ 1 scan de fin d'action)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ALL_AXES_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Base OK mais aucun axe x sens sélectionné n'est disponible</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a32c1a39-1a70-5035-9855-43f98d655fd2</ObjectId>
+          </data>
+        </addData>
+      </dataType>
     </dataTypes>
     <pous>
       <pou name="PRG_04_Treuils_Benne" pouType="program">
@@ -5173,6 +5335,64 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
               </type>
             </variable>
             <variable name="SafeStopM2_Active">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmM1AscentAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Disponibilité de mouvement par axe/sens + conditions de base ArmingPermit</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmM1DescendAvail">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmM2AscentAvail">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmM2DescendAvail">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmM3TremieAvail">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmM3MaintenanceAvail">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmAnyAxisAvail">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmBucketBusy">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmModeDisabled">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmContactorOff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="ArmPowerCutOff">
               <type>
                 <BOOL />
               </type>
@@ -6294,14 +6514,59 @@ ELSE
     BothBlockReason         := E_WinchTraceBlockReason.NONE;
 END_IF;
 
-// 🛡️ ArmingPermit (général — permis de mouvement) : on ne peut armer QUE si au moins
-// un axe (treuil M1/M2 ou translation M3) a un permis de mouvement effectif.
-// M3 : NOT TranslationSafety.SafeStop = permis de mouvement translation.
-// Combiné interlock benne conservé (pas d'armement pendant action benne + 1 scan).
-ArmingPermit := (EffectivePermitM1_Ascent OR EffectivePermitM1_Descend
-              OR EffectivePermitM2_Ascent OR EffectivePermitM2_Descend
-              OR NOT PRG_05_Translation.Data.TranslationSafety.SafeStop)
-              AND NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
+// 🛡️ ArmingPermit : armer HONNETEMENT, seulement si au moins une action
+// selectionnee peut REELLEMENT partir. Disponibilite par axe x sens + motif de
+// blocage decode pour l'IHM / troubleshooting. Reprise apres perte = nouveau front
+// homme-mort global (FB_Joystick : IF NOT ArmingPermit -&gt; desarme le geste entier).
+// EffectivePermitM*_* couvre deja process + safety + NOT SafeStop de cet axe +
+// verif couplage ; on ajoute NOT Fault.Latched (faute finale) et, pour M3, le
+// permis effectif directionnel + SafeStop/PowerCutOff M3 (bus PRG_05, lag 1 scan).
+ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched;
+ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched;
+ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched;
+ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched;
+ArmM3TremieAvail  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+ArmM3MaintenanceAvail := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+
+ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
+               OR ArmM2AscentAvail OR ArmM2DescendAvail
+               OR ArmM3TremieAvail OR ArmM3MaintenanceAvail;
+
+// Conditions de base (AC1) — priorite decroissante pour le motif.
+ArmBucketBusy := instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q;
+ArmModeDisabled := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE);
+ArmContactorOff := NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
+ArmPowerCutOff := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
+               OR PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+
+IF ArmModeDisabled THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.MODE_DISABLE;
+ELSIF ArmContactorOff THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.CONTACTOR_OFF;
+ELSIF ArmPowerCutOff THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.POWER_CUTOFF;
+ELSIF ArmBucketBusy THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.BUCKET_BUSY;
+ELSIF NOT ArmAnyAxisAvail THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.ALL_AXES_BLOCKED;
+ELSE
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.NONE;
+END_IF;
+
+ArmingPermit := NOT ArmModeDisabled AND NOT ArmContactorOff AND NOT ArmPowerCutOff
+             AND NOT ArmBucketBusy AND ArmAnyAxisAvail;
+
+Data.ArmingAvailability.M1AscentAvail      := ArmM1AscentAvail;
+Data.ArmingAvailability.M1DescendAvail     := ArmM1DescendAvail;
+Data.ArmingAvailability.M2AscentAvail      := ArmM2AscentAvail;
+Data.ArmingAvailability.M2DescendAvail     := ArmM2DescendAvail;
+Data.ArmingAvailability.M3TremieAvail      := ArmM3TremieAvail;
+Data.ArmingAvailability.M3MaintenanceAvail := ArmM3MaintenanceAvail;
+Data.ArmingAvailability.AnyAxisAvail       := ArmAnyAxisAvail;
 
 
 {endregion}
@@ -13262,9 +13527,13 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-// Temporisation : compte quand la cible est au-dessus du palier courant
+// Temporisation : compte quand la cible est au-dessus du palier courant.
+// NOT StepDelay.Q : un TON garde .Q TRUE tant que IN est TRUE (pas d'impulsion).
+// Sans ce terme, une fois StepRampDelay ecoule le +1 ci-dessous s'appliquerait a
+// CHAQUE scan -&gt; montee 1 -&gt; N en quelques scans. Ici le timer se re-arme apres
+// chaque cran -&gt; une hausse de palier / StepRampDelay (cascade reelle).
 StepDelay(
-    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0),
+    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0) AND NOT StepDelay.Q,
     PT := StepRampDelay
 );
 StepDelayElapsed := StepDelay.ET;
@@ -13949,6 +14218,22 @@ SEULE la publication est homogénéisée sur Fault:ST_Fault (§6bis2).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Causes en clair pour le socle defaut</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_StepRampFloorDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#700ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher DUR de cadence de montee de palier a la barriere finale, INDEPENDANT
+de FB_WinchStepShaper (metier). Choisi PLUS COURT que la cadence nominale du
+shaper (1 s en montee) : en exploitation le shaper reste le rythme primaire,
+ce plancher n'ajoute qu'un leger retard borne par cran. Il ne devient decisif
+QUE si le shaper deraille (rampe a 0 -&gt; palier 5 instantane, decodage inverse) :
+la barriere ramene alors la montee a +1 cran / ce delai. Descente non limitee.</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -13977,7 +14262,7 @@ ResetEdge(CLK := Reset);
 // acquittement conscient puis une nouvelle demande opérateur.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     RestartDelay(IN := FALSE, PT := T#1000ms);
     DeadTime(IN := FALSE);
     DeadTimePending := FALSE;
@@ -14179,13 +14464,13 @@ Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FAL
 Busy := FALSE; Done := FALSE; Ready := NOT Error AND NOT ContactorStuckLatched;
 
 IF Error THEN
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.FAULT;
 ELSIF RestartInhibit THEN
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
@@ -14195,7 +14480,7 @@ ELSIF ContactorStuckLatched THEN
     // AC7 : T_max §3bis dépassé sans confirmation retombée -&gt; chute du sens FORCÉE.
     // RelayFwd/Rev et BrakeCmd (= RelayFwd OR RelayRev) retombent à FALSE ci-dessus.
     // Latch à acquittement conscient (ResetEdge) — jamais de redémarrage auto.
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
@@ -14204,7 +14489,7 @@ ELSIF ContactorStuckLatched THEN
 ELSIF ReleaseOrderActive AND NOT PermitFinalBlocked THEN
     // Ordre de relâchement : vitesse relâchée immédiatement, direction tenue
     // jusqu'à ReleaseOrderDelay, puis direction relâchée (AC1/AC2).
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
@@ -14225,7 +14510,7 @@ ELSIF SafeStop OR PermitFinalBlocked THEN
     // SafeStop n'est PAS un défaut : pas de FAULT, pas de latch, pas de Reset requis.
     // Les sorties sont coupées tant que l'une des causes est TRUE ; retour nominal dès sa retombée.
     // BrakeCmd (= RelayFwd OR RelayRev, §6) retombe à FALSE automatiquement.
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
@@ -14236,7 +14521,7 @@ ELSIF SenseHoldActive THEN
     // §3bis : RequestedStep retombé à 0 mais sens encore commandé -&gt; on TIENT le
     // contacteur de sens jusqu'à FwdRevSpeedFeedbackOff (debounced DropConfirmDelay)
     // OU T_max. AuthorizedStep=0 (aucun contacteur de vitesse), seul le sens est tenu.
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
@@ -14246,34 +14531,54 @@ ELSIF SenseHoldActive THEN
     Busy := TRUE;
 ELSIF NOT MotorRequest THEN
     // Toute annulation de demande annule la temporisation de hausse en cours.
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.READY;
 ELSIF RestartRequired OR DeadTimePending THEN
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.WAIT_RESTART_DELAY;
     Busy := TRUE;
 ELSE
-    // ⚡ Progression de palier directe : la temporisation (tempo palier) est gérée
-    // par le métier (FB_Winch). La barrière finale transmet directement la consigne
-    // sans micro-coupure des contacteurs.
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    // ⚡ Progression de palier : la cadence NOMINALE est faite par le métier
+    // (FB_WinchStepShaper). La barrière finale ajoute un PLANCHER DUR indépendant :
+    // AuthorizedStep ne monte jamais de plus de +1 cran / CST_StepRampFloorDelay,
+    // quelle que soit la consigne amont. Descente immédiate. 1er cran immédiat
+    // (frein + sens). Si le shaper déraille (rampe à 0 -&gt; palier 5 instantané),
+    // l'interlock ramène quand même la montée en crans (défense en profondeur).
+    // NOT StepDelay.Q : un TON garde .Q TRUE tant que IN est TRUE (pas d'impulsion).
+    // Sans ce terme, une fois PT ecoule le +1 ci-dessous s'appliquerait a CHAQUE scan
+    // (1 -&gt; 5 en quelques scans, contacteurs relaches d'un coup). Ici le timer se re-arme
+    // apres chaque cran -&gt; les contacteurs de vitesse s'enclenchent EN CASCADE, 1 / PT.
+    StepDelay(IN := (RequestedStepClamped &gt; AuthorizedStep) AND (AuthorizedStep &gt; 0) AND NOT StepDelay.Q,
+              PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
-    StepDelayTarget := 0;
-    AuthorizedStep := RequestedStepClamped;
+    StepDelayTarget := RequestedStepClamped;
+
+    IF RequestedStepClamped = 0 THEN
+        AuthorizedStep := 0;
+    ELSIF RequestedStepClamped &lt; AuthorizedStep THEN
+        AuthorizedStep := RequestedStepClamped;        // descente : immédiate
+    ELSIF AuthorizedStep = 0 THEN
+        AuthorizedStep := 1;                           // 1er cran immédiat
+    ELSIF StepDelay.Q THEN
+        AuthorizedStep := AuthorizedStep + 1;          // +1 cran par CST_StepRampFloorDelay
+    END_IF;
 
     IF (AuthorizedStep &gt; 0) OR (RequestedStepClamped &gt; 0) THEN
         RelayFwd := RequestedRelayFwd;
         RelayRev := RequestedRelayRev;
-        Contactor1 := RequestedContactor1;
-        Contactor2 := RequestedContactor2;
-        Contactor3 := RequestedContactor3;
-        Contactor4 := RequestedContactor4;
+        // Contacteurs de vitesse MASQUÉS par AuthorizedStep (table cumulative :
+        // P1={} P2={K1} P3={K1,K2} P4={K1,K2,K3} P5={K1,K2,K3,K4}). La barrière ne
+        // laisse jamais fermer plus de contacteurs que son propre palier autorisé.
+        Contactor1 := RequestedContactor1 AND (AuthorizedStep &gt;= 2);
+        Contactor2 := RequestedContactor2 AND (AuthorizedStep &gt;= 3);
+        Contactor3 := RequestedContactor3 AND (AuthorizedStep &gt;= 4);
+        Contactor4 := RequestedContactor4 AND (AuthorizedStep &gt;= 5);
     END_IF;
 
     IF NOT BrakeFeedback THEN
@@ -14977,7 +15282,9 @@ END_IF;
             <Folder Name="4_JOYSTICK_ACQUISITION">
               <Object Name="ST_AcquisitionJoystickQualified" ObjectId="e915927d-33f8-504a-9060-48dca13140d7" />
               <Object Name="ST_AcquisitionEncoderQualified" ObjectId="bc4dc502-575b-5c03-a159-0fc9e08c35c2" />
+              <Object Name="ST_ArmingAvailability" ObjectId="f7d0454a-a0b2-5865-9243-b1407b8f55d4" />
               <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
+              <Object Name="E_ArmingBlockReason" ObjectId="a32c1a39-1a70-5035-9855-43f98d655fd2" />
             </Folder>
           </Folder>
         </Folder>

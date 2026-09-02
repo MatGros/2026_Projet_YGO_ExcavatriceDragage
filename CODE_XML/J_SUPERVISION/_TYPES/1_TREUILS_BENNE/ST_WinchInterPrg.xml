@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:27:18.186158" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:27:18.186158">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T14:05:53.651644" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T14:05:53.651644">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -294,6 +294,16 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔗 Cause priorisée du blocage Both</xhtml>
               </documentation>
             </variable>
+            <variable name="ArmingAvailability">
+              <type>
+                <derived name="ST_ArmingAvailability" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚦 Disponibilité de mouvement par axe/sens (base honnête de ArmingPermit) ===
+Producteur unique : PRG_04_Treuils_Benne §5-0. Lecteurs : PRG_02 (ArmingPermit),
+FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -407,6 +417,93 @@ Aucune action de conduite n'en dépend (l'arrêt est porté par §5/§6 de PRG_0
             <ObjectId>96d04ade-707d-5249-90f0-8daa4cdfac0f</ObjectId>
           </data>
         </addData>
+      </dataType>
+      <dataType name="ST_ArmingAvailability">
+        <baseType>
+          <struct>
+            <variable name="M1AscentAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = montée M1 peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1DescendAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = descente M1 peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2AscentAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = montée/fermeture M2 peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2DescendAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = descente/ouverture M2 peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3TremieAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation M3 vers trémie peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3MaintenanceAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = translation M3 vers maintenance peut partir</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AnyAxisAvail">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">OR des 6 — au moins une action peut partir (condition d'armement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BlockedReason">
+              <type>
+                <derived name="E_ArmingBlockReason" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif si armement impossible</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f7d0454a-a0b2-5865-9243-b1407b8f55d4</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🚦 ST_ArmingAvailability — Disponibilité de mouvement par axe et sens
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : dire, pour chaque axe x sens, si le mouvement peut REELLEMENT
+      partir (permis effectif + pas de SafeStop/faute de CET axe). Sert de
+      base honnête à ArmingPermit (au moins un dispo) et de diagnostic
+      « pourquoi ça bloque » pour l'IHM / le troubleshooting.
+   📤 Producteur : PRG_04_Treuils_Benne (agrège M1/M2 + lit M3 via bus PRG_05, lag 1 scan).
+   📄 Doc : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md §7
+   =======================================================================</xhtml>
+        </documentation>
       </dataType>
       <dataType name="ST_BucketHMIState">
         <baseType>
@@ -1670,6 +1767,71 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="E_ArmingBlockReason">
+        <baseType>
+          <enum>
+            <values>
+              <value name="NONE" value="0" />
+              <value name="MODE_DISABLE" value="1" />
+              <value name="POWER_CUTOFF" value="2" />
+              <value name="CONTACTOR_OFF" value="3" />
+              <value name="BUCKET_BUSY" value="4" />
+              <value name="ALL_AXES_BLOCKED" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>NONE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Armement possible (au moins un axe x sens dispo)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MODE_DISABLE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode DISABLE</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>POWER_CUTOFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Coupure puissance amont (M1/M2/M3)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>CONTACTOR_OFF</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Chaîne AU non réarmée (PowerContactorEngaged FALSE)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>BUCKET_BUSY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Action benne en cours (+ 1 scan de fin d'action)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ALL_AXES_BLOCKED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Base OK mais aucun axe x sens sélectionné n'est disponible</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a32c1a39-1a70-5035-9855-43f98d655fd2</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="E_State">
         <baseType>
           <enum>
@@ -2183,11 +2345,13 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               <Object Name="ST_WinchFinalInterlockRequest" ObjectId="1a0be5b9-7748-52ea-86e2-35102e49b3f8" />
               <Object Name="ST_WinchState" ObjectId="ab6744c5-7e72-572e-a7d1-2ecd0e822a82" />
             </Folder>
+            <Folder Name="4_JOYSTICK_ACQUISITION">
+              <Object Name="ST_ArmingAvailability" ObjectId="f7d0454a-a0b2-5865-9243-b1407b8f55d4" />
+              <Object Name="E_ArmingBlockReason" ObjectId="a32c1a39-1a70-5035-9855-43f98d655fd2" />
+              <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
+            </Folder>
             <Folder Name="7_COMMUN_CONFIG">
               <Object Name="ST_SyncState" ObjectId="f5b307ad-efb8-5c21-8a1b-ab717dc1a82b" />
-            </Folder>
-            <Folder Name="4_JOYSTICK_ACQUISITION">
-              <Object Name="ST_EncoderHMI" ObjectId="1fe33006-0986-5d90-8db8-7f4fc8eae79e" />
             </Folder>
           </Folder>
         </Folder>

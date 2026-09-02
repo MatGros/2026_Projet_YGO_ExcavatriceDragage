@@ -133,6 +133,18 @@ VAR
     WinchContactorMismatchLvl1 : BOOL;   // . [LOC] niveau 1 : discordance contacteurs M1/M2 confirmee (amont OU vecteurs finaux) -> SafeStop
     SafeStopM1_Active       : BOOL;
     SafeStopM2_Active       : BOOL;
+    // Disponibilité de mouvement par axe/sens + conditions de base ArmingPermit
+    ArmM1AscentAvail        : BOOL;
+    ArmM1DescendAvail       : BOOL;
+    ArmM2AscentAvail        : BOOL;
+    ArmM2DescendAvail       : BOOL;
+    ArmM3TremieAvail        : BOOL;
+    ArmM3MaintenanceAvail   : BOOL;
+    ArmAnyAxisAvail         : BOOL;
+    ArmBucketBusy           : BOOL;
+    ArmModeDisabled         : BOOL;
+    ArmContactorOff         : BOOL;
+    ArmPowerCutOff          : BOOL;
     // Taxonomie permit (D-P1 à D-P11) : SafetyPermit (safety pure), ProcessPermit (process pur),
     // ProcessAndSafetyPermit (= Safety AND Process), EffectivePermit (= couplage synchro).
     SafetyPermitM1_Descend   : BOOL;
@@ -919,14 +931,59 @@ ELSE
     BothBlockReason         := E_WinchTraceBlockReason.NONE;
 END_IF;
 
-// 🛡️ ArmingPermit (général — permis de mouvement) : on ne peut armer QUE si au moins
-// un axe (treuil M1/M2 ou translation M3) a un permis de mouvement effectif.
-// M3 : NOT TranslationSafety.SafeStop = permis de mouvement translation.
-// Combiné interlock benne conservé (pas d'armement pendant action benne + 1 scan).
-ArmingPermit := (EffectivePermitM1_Ascent OR EffectivePermitM1_Descend
-              OR EffectivePermitM2_Ascent OR EffectivePermitM2_Descend
-              OR NOT PRG_05_Translation.Data.TranslationSafety.SafeStop)
-              AND NOT instBucket.Lifecycle.Busy AND NOT BenneBusyFallEdge.Q;
+// 🛡️ ArmingPermit : armer HONNETEMENT, seulement si au moins une action
+// selectionnee peut REELLEMENT partir. Disponibilite par axe x sens + motif de
+// blocage decode pour l'IHM / troubleshooting. Reprise apres perte = nouveau front
+// homme-mort global (FB_Joystick : IF NOT ArmingPermit -> desarme le geste entier).
+// EffectivePermitM*_* couvre deja process + safety + NOT SafeStop de cet axe +
+// verif couplage ; on ajoute NOT Fault.Latched (faute finale) et, pour M3, le
+// permis effectif directionnel + SafeStop/PowerCutOff M3 (bus PRG_05, lag 1 scan).
+ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched;
+ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched;
+ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched;
+ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched;
+ArmM3TremieAvail  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+ArmM3MaintenanceAvail := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+
+ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
+               OR ArmM2AscentAvail OR ArmM2DescendAvail
+               OR ArmM3TremieAvail OR ArmM3MaintenanceAvail;
+
+// Conditions de base (AC1) — priorite decroissante pour le motif.
+ArmBucketBusy := instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q;
+ArmModeDisabled := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE);
+ArmContactorOff := NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
+ArmPowerCutOff := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
+               OR PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+
+IF ArmModeDisabled THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.MODE_DISABLE;
+ELSIF ArmContactorOff THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.CONTACTOR_OFF;
+ELSIF ArmPowerCutOff THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.POWER_CUTOFF;
+ELSIF ArmBucketBusy THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.BUCKET_BUSY;
+ELSIF NOT ArmAnyAxisAvail THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.ALL_AXES_BLOCKED;
+ELSE
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.NONE;
+END_IF;
+
+ArmingPermit := NOT ArmModeDisabled AND NOT ArmContactorOff AND NOT ArmPowerCutOff
+             AND NOT ArmBucketBusy AND ArmAnyAxisAvail;
+
+Data.ArmingAvailability.M1AscentAvail      := ArmM1AscentAvail;
+Data.ArmingAvailability.M1DescendAvail     := ArmM1DescendAvail;
+Data.ArmingAvailability.M2AscentAvail      := ArmM2AscentAvail;
+Data.ArmingAvailability.M2DescendAvail     := ArmM2DescendAvail;
+Data.ArmingAvailability.M3TremieAvail      := ArmM3TremieAvail;
+Data.ArmingAvailability.M3MaintenanceAvail := ArmM3MaintenanceAvail;
+Data.ArmingAvailability.AnyAxisAvail       := ArmAnyAxisAvail;
 
 
 {endregion}

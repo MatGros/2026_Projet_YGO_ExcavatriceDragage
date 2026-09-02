@@ -71,5 +71,10 @@ STRUCT
     BothActive                   : BOOL;               // 🔗 Intention both active (M1+M2 ensemble)
     BothBlocked                  : BOOL;               // 🔗 Commande Both bloquée par le permis agrégé (diagnostic uniquement)
     BothBlockReason              : E_WinchTraceBlockReason; // 🔗 Cause priorisée du blocage Both
+
+    // === 🚦 Disponibilité de mouvement par axe/sens (base honnête de ArmingPermit) ===
+    // Producteur unique : PRG_04_Treuils_Benne §5-0. Lecteurs : PRG_02 (ArmingPermit),
+    // FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).
+    ArmingAvailability           : ST_ArmingAvailability;
 END_STRUCT
 END_TYPE
