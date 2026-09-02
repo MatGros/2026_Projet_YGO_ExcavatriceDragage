@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T08:15:50.711093" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T08:15:50.711093">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T08:27:04.381843" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T08:27:04.381843">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -82,20 +82,12 @@
             </variable>
           </outputVars>
           <localVars>
-            <variable name="ReqRise">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Request</xhtml>
-              </documentation>
-            </variable>
             <variable name="ReqFall">
               <type>
                 <derived name="F_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant Request</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant Request (arme l'intervalle)</xhtml>
               </documentation>
             </variable>
             <variable name="TonInterval">
@@ -149,7 +141,6 @@ IF NOT Enable THEN
     TonInterval(IN := FALSE);
 ELSE
     Ready := TRUE;
-    ReqRise(CLK := Request);
     ReqFall(CLK := Request);
 
     // Intervalle : arme a la retombee d'une activation, tient Cfg_MinInterval
@@ -161,9 +152,10 @@ ELSE
         InhibitActive := FALSE;
     END_IF;
 
-    // Nouvelle activation autorisee seulement hors intervalle ; ensuite elle passe
-    // integralement (non decoupee) tant que Request est maintenu.
-    IF ReqRise.Q AND NOT InhibitActive THEN
+    // Une demande passe integralement (non decoupee) tant qu'elle est maintenue, mais ne
+    // peut (re)demarrer que hors intervalle. Test de niveau : robuste si Request est deja
+    // TRUE au demarrage (pas de front observe).
+    IF Request AND NOT InhibitActive THEN
         ActivationLatched := TRUE;
     END_IF;
     IF NOT Request THEN

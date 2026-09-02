@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T08:11:27.552145" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T08:11:27.552145">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T08:25:22.896871" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T08:25:22.896871">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1122,7 +1122,11 @@ IF Enable THEN
             TonArmingPulse(IN := FALSE, PT := CST_ArmingPulseDuration);
             TonArmingConfirm(IN := FALSE, PT := CST_ArmingConfirmTimeout);
 
-            IF ArmReqEdge.Q AND Armable AND NOT ArmPulseInhibitActive THEN
+            // ⛔ Ne JAMAIS démarrer la séquence si une coupure métier est active : sinon
+            //    ArmingSeqStep passe non-IDLE 1 scan -&gt; Maintain_ChainOk TRUE -&gt; PowerKeepAlive
+            //    (contacteur CHAIN OK) colle puis lâche à l'abandon -&gt; mitraillage. On ne
+            //    démarre que si la cause est levée. Non contournable par les bypass MES.
+            IF ArmReqEdge.Q AND Armable AND NOT ArmPulseInhibitActive AND NOT PowerCutOffRequest AND NOT BtnEmergencyCutOff THEN
                 RedundancyTestFailedCause := FALSE;
                 EmergencyArmingFailedCause := FALSE;
                 // 🛠️ BypassRedundancyTest (MES trace) : saute TEST_A..RESTORE_B, va au pulse.

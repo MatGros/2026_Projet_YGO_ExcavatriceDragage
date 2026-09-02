@@ -53,7 +53,9 @@ VAR
     instWinchOutputInterlockM2       : FB_WinchOutputInterlock;       // * [INST] Barriere finale treuil M2
     instTranslationOutputInterlockM3 : FB_TranslationOutputInterlock; // * [INST] Barriere finale translation M3
     instSafetyEmergencyManagement    : FB_Safety_EmergencyManagement;    // * [INST] Gestionnaire de rearmement AU
-    instArmContactorProtector        : FB_ContactorProtector;            // * [INST] Garde anti-chatter sur l'impulsion contacteur AU (EmergencyArming_RQ)
+    instArmContactorProtector        : FB_ContactorProtector;            // * [INST] Garde anti-chatter impulsion contacteur AU (EmergencyArming_RQ)
+    instKeepAliveAProtector          : FB_ContactorProtector;            // * [INST] Garde anti-chatter contacteur CHAIN OK voie A (PowerKeepAlive_A_RQ)
+    instKeepAliveBProtector          : FB_ContactorProtector;            // * [INST] Garde anti-chatter contacteur CHAIN OK voie B (PowerKeepAlive_B_RQ)
 
     // === ⚡ ORDRES ACTIONNEURS (publiés via Data) ===
     M1RelayFwd                   : BOOL; // . [LOC] Ordre contacteur montee treuil M1
@@ -363,8 +365,22 @@ instSafetyEmergencyManagement(
 );
 
 // ── Ordres AU (logique) — sorties structurées Status : ST_Safety_Emergency_Status + Cmd : ST_Safety_Emergency_Cmd ──
-PowerKeepAliveACmd := instSafetyEmergencyManagement.Cmd.MaintainA_Cmd;
-PowerKeepAliveBCmd := instSafetyEmergencyManagement.Cmd.MaintainB_Cmd;
+// 🛡️ Garde anti-chatter sur les 2 contacteurs CHAIN OK (PowerKeepAlive A/B) : chaque
+//    ré-enclenchement est espacé d'au moins Cfg_MinInterval. Intervalle court (100 ms) :
+//    inférieur à la durée du test de redondance (CST_TestDuration 200 ms) pour ne pas bloquer
+//    RESTORE_A/B, mais suffisant pour tuer un mitraillage. La retombée reste instantanée.
+instKeepAliveAProtector(
+    Enable          := TRUE,
+    Request         := instSafetyEmergencyManagement.Cmd.MaintainA_Cmd,
+    Cfg_MinInterval := T#100ms
+);
+instKeepAliveBProtector(
+    Enable          := TRUE,
+    Request         := instSafetyEmergencyManagement.Cmd.MaintainB_Cmd,
+    Cfg_MinInterval := T#100ms
+);
+PowerKeepAliveACmd := instKeepAliveAProtector.Cmd;
+PowerKeepAliveBCmd := instKeepAliveBProtector.Cmd;
 // 🛡️ Garde anti-chatter generique sur l'impulsion contacteur AU : une impulsion passe
 //    integralement, puis aucune nouvelle avant 5s (redondant avec la garde interne du FB AU,
 //    au plus pres de la sortie physique). Un cyclage rapide du contacteur casse le materiel.
