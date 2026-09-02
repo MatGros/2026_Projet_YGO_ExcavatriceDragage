@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:26:26.083199" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:26:26.083199">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:02:16.682334" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:02:16.682334">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -33,7 +33,6 @@
               <value name="CONTACTOR_OFF" value="3" />
               <value name="BUCKET_BUSY" value="4" />
               <value name="ALL_AXES_BLOCKED" value="5" />
-              <value name="MOVEMENT_TEMPO" value="6" />
             </values>
           </enum>
         </baseType>
@@ -74,12 +73,6 @@
                 <Name>ALL_AXES_BLOCKED</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Base OK mais aucun axe x sens sélectionné n'est disponible</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MOVEMENT_TEMPO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Base OK mais un axe est en tempo anti-court-cycle (WAIT_RESTART_DELAY) — se lève seul</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -3721,79 +3714,6 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ascending M2 ON | 0 = OFF</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx310_ContactorMismatch">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== Discordance contacteurs M1/M2 (FB_SyncContactor sur vecteurs finaux PRG_06) ===
-1 = discordance confirmee (debounce 500 ms) -&gt; SafeStop des 2 treuils</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx311_ContactorMismatchEscalated">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = discordance persistante -&gt; escalade PowerCutOff</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx312_ContactorMismatchLevel">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 aucun / 1 confirme (SafeStop) / 2 escalade (PowerCutOff)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx313_Mismatch_RelayFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = relais montee M1 &lt;&gt; M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx314_Mismatch_RelayRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = relais descente M1 &lt;&gt; M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx315_Mismatch_SpeedContactor1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 1 M1 &lt;&gt; M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx316_Mismatch_SpeedContactor2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 2 M1 &lt;&gt; M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx317_Mismatch_SpeedContactor3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 3 M1 &lt;&gt; M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx318_Mismatch_SpeedContactor4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 4 M1 &lt;&gt; M2</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -9141,33 +9061,6 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
 🔓 Demande frein M3 arbitree</xhtml>
               </documentation>
             </variable>
-            <variable name="M1MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚦 Disponibilite mouvement barriere finale ===
-TRUE = une tempo idle / inhibition de l'interlock final interdit REELLEMENT de bouger maintenant
-(FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien.
-🚦 Treuil M1 — mouvement inhibe par tempo interlock final</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Treuil M2 — mouvement inhibe par tempo interlock final</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Translation M3 — mouvement inhibe par tempo interlock final</xhtml>
-              </documentation>
-            </variable>
             <variable name="PowerKeepAliveACmd">
               <type>
                 <BOOL />
@@ -10308,14 +10201,6 @@ TRUE = Défaut sécurité actif</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Absence de mouvement malgré commande (bit15)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="NoMovementContactorSuspect">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 bit15 déclenché par le retour « tous contacteurs retombés » → contacteur de sens non engagé</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -25897,14 +25782,6 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut synchro M1/M2 (FB_WinchSync.ErrorId)</xhtml>
               </documentation>
             </variable>
-            <variable name="SyncContactorDiag">
-              <type>
-                <derived name="ST_SyncContactorDiag" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Discordance contacteurs M1/M2 décodée (FB_SyncContactor, vecteurs finaux PRG_06)</xhtml>
-              </documentation>
-            </variable>
             <variable name="DiveErrorId">
               <type>
                 <WORD />
@@ -26211,14 +26088,6 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Nombre de messages actifs</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BannerSyncContactorWhich">
-              <type>
-                <string length="80" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Libellé du/des contacteur(s) M1/M2 en discordance</xhtml>
               </documentation>
             </variable>
             <variable name="AlarmIndex">
@@ -26943,16 +26812,6 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
 // ═══════════════════════════════════════════════════════════════
 AlarmCount := 0;
 
-// Libellé compact du 1er contacteur M1/M2 en discordance (priorité relais &gt; paliers).
-IF    SyncContactorDiag.RelayFwdMismatch THEN BannerSyncContactorWhich := 'relais montee';
-ELSIF SyncContactorDiag.RelayRevMismatch THEN BannerSyncContactorWhich := 'relais descente';
-ELSIF SyncContactorDiag.Step1Mismatch   THEN BannerSyncContactorWhich := 'palier 1';
-ELSIF SyncContactorDiag.Step2Mismatch   THEN BannerSyncContactorWhich := 'palier 2';
-ELSIF SyncContactorDiag.Step3Mismatch   THEN BannerSyncContactorWhich := 'palier 3';
-ELSIF SyncContactorDiag.Step4Mismatch   THEN BannerSyncContactorWhich := 'palier 4';
-ELSE  BannerSyncContactorWhich := '';
-END_IF;
-
 // 5.0 Collecte — Défauts matériels parents (priorité absolue carrousel)
 IF NOT LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[IO] Defaut module Local IO (DI8/DO8)'; AlarmCount := AlarmCount + 1;
@@ -27021,12 +26880,7 @@ IF WinchM1Safety.ErrorOppositeDir AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxA
     AlarmArray[AlarmCount] := '[M1] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorNoMovement AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    IF WinchM1Safety.NoMovementContactorSuspect THEN
-        AlarmArray[AlarmCount] := '[M1] ErrorID:16 - contacteur de sens non engage (retour tous retombes)';
-    ELSE
-        AlarmArray[AlarmCount] := '[M1] ErrorID:16 - absence mouvement';
-    END_IF;
-    AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5b. Collecte — treuil M2 (mêmes bits que M1, tri bloquant/warning identique)
@@ -27058,12 +26912,7 @@ IF WinchM2Safety.ErrorOppositeDir AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxA
     AlarmArray[AlarmCount] := '[M2] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorNoMovement AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    IF WinchM2Safety.NoMovementContactorSuspect THEN
-        AlarmArray[AlarmCount] := '[M2] ErrorID:16 - contacteur de sens non engage (retour tous retombes)';
-    ELSE
-        AlarmArray[AlarmCount] := '[M2] ErrorID:16 - absence mouvement';
-    END_IF;
-    AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5c. Collecte — translation M3 (ST_SafetyTranslation, tri bloquant/warning identique)
@@ -27114,14 +26963,6 @@ IF ((SyncErrorId AND 16#0001) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AN
 END_IF;
 IF ((SyncErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[SYNC] ErrorID:02 - incoherence commande'; AlarmCount := AlarmCount + 1;
-END_IF;
-// Discordance contacteurs M1/M2 décodée (FB_SyncContactor).
-IF (SyncContactorDiag.MismatchLevel &gt;= 2) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := CONCAT('[SYNC] discordance M1/M2 persistante -&gt; coupure : ', BannerSyncContactorWhich);
-    AlarmCount := AlarmCount + 1;
-ELSIF (SyncContactorDiag.MismatchLevel = 1) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := CONCAT('[SYNC] discordance M1/M2 -&gt; arret : ', BannerSyncContactorWhich);
-    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionAssist)
@@ -31953,17 +31794,6 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai confirmation absence mouvement</xhtml>
               </documentation>
             </variable>
-            <variable name="ContactorFeedbackTrusted">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] TRUE = le retour "tous contacteurs retombes" (FwdRevSpeedFeedbackOff) est reellement cable et fiable -&gt; autorise le chemin rapide NoMovement. FALSE (defaut, banc sans DI) = chemin rapide inerte.</xhtml>
-              </documentation>
-            </variable>
             <variable name="ExternalSyncEscalation">
               <type>
                 <BOOL />
@@ -32254,14 +32084,6 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Survitesse latchée (acquittée au Reset)</xhtml>
               </documentation>
             </variable>
-            <variable name="NoMovementContactorSuspect">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] NoMovement (bit15) declenche par le retour "tous contacteurs retombes" alors qu'un contacteur de sens etait commande</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <localVars>
             <variable name="DriftGuardA">
@@ -32328,14 +32150,6 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Delai confirmation absence mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonNoMoveContactor">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Chemin rapide : contacteur de sens commande mais retour "tous retombes"</xhtml>
               </documentation>
             </variable>
             <variable name="TonStartupWarmup">
@@ -32628,14 +32442,6 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <BOOL />
               </type>
             </variable>
-            <variable name="NoMovementContactorSuspectLatched">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch : NoMovement declenche par le retour "tous contacteurs retombes"</xhtml>
-              </documentation>
-            </variable>
             <variable name="OverspeedFaultLatched">
               <type>
                 <BOOL />
@@ -32685,17 +32491,6 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur) — la course reelle d'un treuil par scan 10ms reste sous ~0.01 m</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_ContactorConfirmDelay">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#500ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai avant NoMovement quand un contacteur de sens est commande mais que le retour dit "tous retombes" (pickup contacteur + marge)</xhtml>
-              </documentation>
-            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -32730,7 +32525,6 @@ IF ResetEdge.Q OR BypassGlobal THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
-    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -32750,7 +32544,6 @@ IF NOT FirstScanDone THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
-    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -32930,25 +32723,12 @@ IF NOT BypassGlobal THEN
     instCauses[14].Texte    := 'Sens reel oppose a la commande treuil';
 
     // Cause 15 : Absence mouvement (latched)
-    // Chemin nominal : commande presente mais vitesse mesuree quasi nulle (NoMovementTimeout).
     TonNoMovement(
         IN := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
               AND (ABS(MeasuredSpeedSignedMps) &lt; MovementSpeedThresholdMps)),
         PT := NoMovementTimeout
     );
     IF TonNoMovement.Q THEN NoMovementFaultLatched := TRUE; END_IF;
-    // Chemin rapide (independant de la mesure vitesse) : un contacteur de sens est
-    // commande mais le retour materiel dit "tous les contacteurs retombes" -&gt; le
-    // contacteur n'a pas engage / a chute. Inutile d'attendre NoMovementTimeout.
-    TonNoMoveContactor(
-        IN := ContactorFeedbackTrusted AND NOT BypassProcess AND MovementCommanded
-              AND NOT InReferencingMode AND FwdRevSpeedFeedbackOff,
-        PT := CST_ContactorConfirmDelay
-    );
-    IF TonNoMoveContactor.Q THEN
-        NoMovementFaultLatched := TRUE;
-        NoMovementContactorSuspectLatched := TRUE;
-    END_IF;
     instCauses[15].Active   := NoMovementFaultLatched;
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
@@ -32967,7 +32747,6 @@ ELSE
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
-    TonNoMoveContactor(IN := FALSE);
     TonRefSettle(IN := FALSE);
     RefWindowActive := FALSE;
     PosStepDetected := FALSE;
@@ -32991,7 +32770,6 @@ END_IF;
 // FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
 ContactorStuck := MecaBFaultLatched;
 OverspeedFault := OverspeedFaultLatched;
-NoMovementContactorSuspect := NoMovementContactorSuspectLatched;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -33046,7 +32824,6 @@ IF NOT Enable THEN
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
-    TonNoMoveContactor(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
     MecaBElapsedTime := T#0s;
     Ready := FALSE;
@@ -37458,15 +37235,6 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif</xhtml>
               </documentation>
             </variable>
-            <variable name="MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04 via PRG_06) ===
-&lt;-- [STAT] TRUE = FB non pret ou inhibition redemarrage active : aucun mouvement M3 possible maintenant. N'arrete rien : retire la disponibilite.</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -37619,7 +37387,6 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
     Ready := FALSE;
-    MovementInhibited := TRUE;   // FB neutralise -&gt; aucun mouvement M3 possible, disponibilite retiree
     Reason := E_TranslationFinalInterlockReason.NONE;
     RETURN;
 END_IF;
@@ -37679,9 +37446,6 @@ DriveFreqCmdWord := 0;
 
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
-
-// Disponibilite mouvement M3 (signal de disponibilite, n'arrete rien).
-MovementInhibited := NOT Ready OR RestartInhibit;
 
 IF Fault.Error THEN
     BrakeCmd := FALSE;
@@ -41893,15 +41657,6 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
 &lt;-- [DIAG] Ecoule temporisation ordre de relachement</xhtml>
               </documentation>
             </variable>
-            <variable name="MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04) ===
-&lt;-- [STAT] TRUE = une tempo idle / inhibition interdit reellement de bouger maintenant (FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien : retire la disponibilite.</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <localVars>
             <variable name="PermitFinalBlocked">
@@ -42240,7 +41995,6 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Error := (ErrorId &lt;&gt; 16#0000);
     State := E_WinchFinalInterlockState.DISABLED;
     RestartRequired := TRUE;
-    MovementInhibited := TRUE;   // FB neutralise -&gt; aucun mouvement possible, disponibilite retiree
     // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
     // - ErrorId &amp; RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d'Enable, acquittement conscient requis)
     // - StateAtError &amp; Reason : snapshot d'état et cause de blocage préservés pour diagnostic IHM
@@ -42619,23 +42373,6 @@ IF Error THEN
     Busy := FALSE; Done := FALSE; Ready := FALSE;
     State := E_WinchFinalInterlockState.FAULT;
 END_IF;
-
-// ── 6quater. Disponibilite mouvement ──
-// TRUE quand une demande de mouvement est REELLEMENT bloquee ce scan par la
-// machine d'etat : WAIT_RESTART_DELAY (anti-court-cycle : n'apparait QUE si un
-// mouvement est demande alors que RestartRequired/DeadTimePending est actif -&gt;
-// c'est le vrai deadlock manche deflechi) ou FAULT, plus les latches conscients
-// RestartInhibit / ContactorStuck et le FB non pret.
-// PAS de RestartRequired/DeadTimePending bruts : ils sont re-armes a CHAQUE scan
-// au neutre (pas seulement pendant 1,5 s) et ne se purgent que si RestartDelay
-// compte -&gt; sur banc, retour frein fige -&gt; ArmingPermit resterait bloque a 0.
-// WAIT_STEP_DELAY EXCLU (bride la hausse de palier, n'interdit pas de partir).
-// Aucune coupure ajoutee : signal de disponibilite consomme par la dispo d'armement PRG_04.
-MovementInhibited := NOT Ready
-                     OR RestartInhibit
-                     OR ContactorStuck
-                     OR (State = E_WinchFinalInterlockState.WAIT_RESTART_DELAY)
-                     OR (State = E_WinchFinalInterlockState.FAULT);
 </xhtml>
           </ST>
         </body>
@@ -43641,7 +43378,6 @@ WinchM1Safety.ErrorMecaD         := (SafetyM1.Fault.ErrorId AND 16#0800) &lt;&gt
 WinchM1Safety.ErrorMecaE         := (SafetyM1.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
 WinchM1Safety.ErrorOppositeDir   := (SafetyM1.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
 WinchM1Safety.ErrorNoMovement    := (SafetyM1.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
-WinchM1Safety.NoMovementContactorSuspect := SafetyM1.NoMovementContactorSuspect;
 WinchM1Safety.PowerCutOffSafety  := M1PowerCutOffSafetyInfo;
 WinchM1Safety.SafeStopSafety     := M1SafeStopSafetyInfo;
 WinchM1Safety.BlockedBySafety    := M1BlockedBySafetyInfo;
@@ -43669,7 +43405,6 @@ WinchM2Safety.ErrorMecaD         := (SafetyM2.Fault.ErrorId AND 16#0800) &lt;&gt
 WinchM2Safety.ErrorMecaE         := (SafetyM2.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
 WinchM2Safety.ErrorOppositeDir   := (SafetyM2.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
 WinchM2Safety.ErrorNoMovement    := (SafetyM2.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
-WinchM2Safety.NoMovementContactorSuspect := SafetyM2.NoMovementContactorSuspect;
 WinchM2Safety.PowerCutOffSafety  := M2PowerCutOffSafetyInfo;
 WinchM2Safety.SafeStopSafety     := M2SafeStopSafetyInfo;
 WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
@@ -46759,14 +46494,6 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <BOOL />
               </type>
             </variable>
-            <variable name="ArmMovementInhibitedAny">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Un axe en tempo anti-court-cycle (WAIT_RESTART_DELAY, barriere finale PRG_06, scan N-1)</xhtml>
-              </documentation>
-            </variable>
             <variable name="SafetyPermitM1_Descend">
               <type>
                 <BOOL />
@@ -47906,13 +47633,6 @@ ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM2AscentAvail OR ArmM2DescendAvail
                OR ArmM3TremieAvail OR ArmM3MaintenanceAvail;
 
-// Tempo anti-court-cycle : un axe en WAIT_RESTART_DELAY / FAULT (barriere finale
-// PRG_06, scan N-1) fait tomber ArmingPermit -&gt; l'operateur ne peut pas re-armer
-// dans le deadlock. Se leve seul (retour neutre 1,5 s), pas de bypass.
-ArmMovementInhibitedAny := PRG_06_Outputs.Data.M1MovementInhibited
-                        OR PRG_06_Outputs.Data.M2MovementInhibited
-                        OR PRG_06_Outputs.Data.M3MovementInhibited;
-
 // Conditions de base (AC1) — priorite decroissante pour le motif.
 ArmBucketBusy := instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q;
 ArmModeDisabled := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE);
@@ -47930,15 +47650,12 @@ ELSIF ArmBucketBusy THEN
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.BUCKET_BUSY;
 ELSIF NOT ArmAnyAxisAvail THEN
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.ALL_AXES_BLOCKED;
-ELSIF ArmMovementInhibitedAny THEN
-    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.MOVEMENT_TEMPO;
 ELSE
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.NONE;
 END_IF;
 
 ArmingPermit := NOT ArmModeDisabled AND NOT ArmContactorOff AND NOT ArmPowerCutOff
-             AND NOT ArmBucketBusy AND ArmAnyAxisAvail
-             AND NOT ArmMovementInhibitedAny;
+             AND NOT ArmBucketBusy AND ArmAnyAxisAvail;
 
 Data.ArmingAvailability.M1AscentAvail      := ArmM1AscentAvail;
 Data.ArmingAvailability.M1DescendAvail     := ArmM1DescendAvail;
@@ -50139,13 +49856,6 @@ M3_SetpointFrequencyHz       := instTranslationOutputInterlockM3.DriveFreqCmdWor
 // ── Bus inter-PRG M3 ──
 Data.TranslationBrakeCmd   := TranslationBrakeCmd;
 
-// ── Bus inter-PRG : disponibilite mouvement barriere finale ──
-// Consomme par la disponibilite d'armement (PRG_04, scan N-1). Signal de
-// disponibilite uniquement : n'ajoute aucune coupure.
-Data.M1MovementInhibited := instWinchOutputInterlockM1.MovementInhibited;
-Data.M2MovementInhibited := instWinchOutputInterlockM2.MovementInhibited;
-Data.M3MovementInhibited := instTranslationOutputInterlockM3.MovementInhibited;
-
 // ═══════════════════════════════════════════════════════════════
 // 🪝 §4 KOBOLD (capteur fond) — commande + sortie
 // ═══════════════════════════════════════════════════════════════
@@ -51284,7 +50994,6 @@ instHmiBannerFormatter(
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
     BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
     SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
-    SyncContactorDiag           := PRG_06_Outputs.Data.SyncContactorDiag,
     DiveErrorId                 := GVL_IHM.CycleDiveSearch.State.DiveErrorId,
     ExtractionErrorId           := GVL_IHM.CycleExtraction.State.ExtractionErrorId,
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
@@ -51423,18 +51132,6 @@ instTroubleshootingView(
     WinchM2Trace         := PRG_04_Treuils_Benne.Data.TraceM2,
     TranslationTrace     := PRG_05_Translation.Data.TranslationTrace
 );
-
-// Remontee decodee discordance contacteurs M1/M2 (FB_SyncContactor sur vecteurs
-// finaux PRG_06) vers le troubleshooting — quel contacteur diverge + niveau.
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx310_ContactorMismatch          := PRG_06_Outputs.Data.ContactorMismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx311_ContactorMismatchEscalated := PRG_06_Outputs.Data.ContactorMismatchEscalated;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx312_ContactorMismatchLevel     := PRG_06_Outputs.Data.SyncContactorDiag.MismatchLevel;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx313_Mismatch_RelayFwd          := PRG_06_Outputs.Data.SyncContactorDiag.RelayFwdMismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx314_Mismatch_RelayRev          := PRG_06_Outputs.Data.SyncContactorDiag.RelayRevMismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx315_Mismatch_SpeedContactor1   := PRG_06_Outputs.Data.SyncContactorDiag.Step1Mismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx316_Mismatch_SpeedContactor2   := PRG_06_Outputs.Data.SyncContactorDiag.Step2Mismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx317_Mismatch_SpeedContactor3   := PRG_06_Outputs.Data.SyncContactorDiag.Step3Mismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx318_Mismatch_SpeedContactor4   := PRG_06_Outputs.Data.SyncContactorDiag.Step4Mismatch;
 
 {endregion}
 </xhtml>

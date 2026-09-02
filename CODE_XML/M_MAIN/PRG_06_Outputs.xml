@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T15:40:44.484169" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T15:40:44.484169">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:02:16.684334" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:02:16.684334">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -232,33 +232,6 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ↔️ Ordre actionneur final translation M3 ===
 🔓 Demande frein M3 arbitree</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M1MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚦 Disponibilite mouvement barriere finale ===
-TRUE = une tempo idle / inhibition de l'interlock final interdit REELLEMENT de bouger maintenant
-(FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien.
-🚦 Treuil M1 — mouvement inhibe par tempo interlock final</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Treuil M2 — mouvement inhibe par tempo interlock final</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M3MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Translation M3 — mouvement inhibe par tempo interlock final</xhtml>
               </documentation>
             </variable>
             <variable name="PowerKeepAliveACmd">
@@ -1708,13 +1681,6 @@ M3_SetpointFrequencyHz       := instTranslationOutputInterlockM3.DriveFreqCmdWor
 
 // ── Bus inter-PRG M3 ──
 Data.TranslationBrakeCmd   := TranslationBrakeCmd;
-
-// ── Bus inter-PRG : disponibilite mouvement barriere finale ──
-// Consomme par la disponibilite d'armement (PRG_04, scan N-1). Signal de
-// disponibilite uniquement : n'ajoute aucune coupure.
-Data.M1MovementInhibited := instWinchOutputInterlockM1.MovementInhibited;
-Data.M2MovementInhibited := instWinchOutputInterlockM2.MovementInhibited;
-Data.M3MovementInhibited := instTranslationOutputInterlockM3.MovementInhibited;
 
 // ═══════════════════════════════════════════════════════════════
 // 🪝 §4 KOBOLD (capteur fond) — commande + sortie
@@ -3598,15 +3564,6 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif</xhtml>
               </documentation>
             </variable>
-            <variable name="MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04 via PRG_06) ===
-&lt;-- [STAT] TRUE = FB non pret ou inhibition redemarrage active : aucun mouvement M3 possible maintenant. N'arrete rien : retire la disponibilite.</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -3759,7 +3716,6 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
     Ready := FALSE;
-    MovementInhibited := TRUE;   // FB neutralise -&gt; aucun mouvement M3 possible, disponibilite retiree
     Reason := E_TranslationFinalInterlockReason.NONE;
     RETURN;
 END_IF;
@@ -3819,9 +3775,6 @@ DriveFreqCmdWord := 0;
 
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
-
-// Disponibilite mouvement M3 (signal de disponibilite, n'arrete rien).
-MovementInhibited := NOT Ready OR RestartInhibit;
 
 IF Fault.Error THEN
     BrakeCmd := FALSE;
@@ -4233,15 +4186,6 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
 &lt;-- [DIAG] Ecoule temporisation ordre de relachement</xhtml>
               </documentation>
             </variable>
-            <variable name="MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04) ===
-&lt;-- [STAT] TRUE = une tempo idle / inhibition interdit reellement de bouger maintenant (FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien : retire la disponibilite.</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <localVars>
             <variable name="PermitFinalBlocked">
@@ -4580,7 +4524,6 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Error := (ErrorId &lt;&gt; 16#0000);
     State := E_WinchFinalInterlockState.DISABLED;
     RestartRequired := TRUE;
-    MovementInhibited := TRUE;   // FB neutralise -&gt; aucun mouvement possible, disponibilite retiree
     // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
     // - ErrorId &amp; RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d'Enable, acquittement conscient requis)
     // - StateAtError &amp; Reason : snapshot d'état et cause de blocage préservés pour diagnostic IHM
@@ -4959,23 +4902,6 @@ IF Error THEN
     Busy := FALSE; Done := FALSE; Ready := FALSE;
     State := E_WinchFinalInterlockState.FAULT;
 END_IF;
-
-// ── 6quater. Disponibilite mouvement ──
-// TRUE tant qu'une nouvelle demande de mouvement est REELLEMENT impossible ce scan :
-//  - RestartRequired : anti-court-cycle RestartDelay (1,5 s) ; TRUE des le retour
-//    au neutre (State=READY) ET pendant le deadlock manche deflechi (WAIT_RESTART_DELAY,
-//    ou RestartDelayElapsed est fige). Se purge seul via RestartDelay.Q.
-//  - DeadTimePending : temps mort directionnel (~1 s apres arret). Se purge via DeadTime.Q.
-//  - RestartInhibit / ContactorStuck : latches a acquittement conscient.
-//  - NOT Ready / State FAULT : FB non operationnel.
-// WAIT_STEP_DELAY EXCLU (bride la hausse de palier, n'interdit pas de partir).
-// Aucune coupure ajoutee : signal de disponibilite consomme par la dispo d'armement PRG_04.
-MovementInhibited := NOT Ready
-                     OR RestartInhibit
-                     OR ContactorStuck
-                     OR RestartRequired
-                     OR DeadTimePending
-                     OR (State = E_WinchFinalInterlockState.FAULT);
 </xhtml>
           </ST>
         </body>

@@ -39,9 +39,6 @@ VAR_OUTPUT
     // === DIAGNOSTICS & TEMPORISATIONS ===
     BrakeTimeoutElapsed          : TIME;   // <-- [DIAG] Ecoule temporisation watchdog frein
     RestartInhibit               : BOOL;   // <-- [DIAG] Inhibition redemarrage actif
-
-    // === DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04 via PRG_06) ===
-    MovementInhibited            : BOOL;   // <-- [STAT] TRUE = FB non pret ou inhibition redemarrage active : aucun mouvement M3 possible maintenant. N'arrete rien : retire la disponibilite.
 END_VAR
 VAR
     // === DETECTEURS DE FRONTS ===
@@ -80,7 +77,6 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
     Ready := FALSE;
-    MovementInhibited := TRUE;   // FB neutralise -> aucun mouvement M3 possible, disponibilite retiree
     Reason := E_TranslationFinalInterlockReason.NONE;
     RETURN;
 END_IF;
@@ -140,9 +136,6 @@ DriveFreqCmdWord := 0;
 
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
-
-// Disponibilite mouvement M3 (signal de disponibilite, n'arrete rien).
-MovementInhibited := NOT Ready OR RestartInhibit;
 
 IF Fault.Error THEN
     BrakeCmd := FALSE;

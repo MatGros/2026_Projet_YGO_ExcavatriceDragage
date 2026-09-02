@@ -36,6 +36,5 @@ STRUCT
     ErrorMecaE        : BOOL;    (* 🔄 Écart de synchronisation critique M1/M2 (Méca E - bit12/13) *)
     ErrorOppositeDir  : BOOL;    (* 🧭 Sens réel opposé au sens commandé (bit14) *)
     ErrorNoMovement   : BOOL;    (* ⏱️ Absence de mouvement malgré commande (bit15) *)
-    NoMovementContactorSuspect : BOOL;  (* 🔌 bit15 déclenché par le retour « tous contacteurs retombés » → contacteur de sens non engagé *)
 END_STRUCT
 END_TYPE
