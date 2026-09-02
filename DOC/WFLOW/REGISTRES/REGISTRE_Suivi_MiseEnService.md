@@ -45,6 +45,22 @@
 
 ---
 
+### MES-037 — 🔧 `FB_Safety_EmergencyManagement` phase 2 : staccato contacteurs + 3 bypass MES orthogonaux
+- 📅 **2026-09-02 ~11:30** | 📍 Banc (traces `Suivi_AUSTEP_20260902_6/7`) | 🏷️ `backup/mes-septembre-20260902` | 🚦 🟢 **Testé banc (traces)**, 🟠 non testé machine
+- **Fait** :
+  - `0f08a0ad` pass-through bypass (armement aboutit + `WasArmed` tenu) · `6892bb31` **tempo des étapes** : `CST_PreArmDelay` 500 ms (appui → KeepAlive), `CST_TestDuration` 200 ms→1 s, `CST_RestoreSettle` 500 ms, `CST_KeepAliveHold` 1 s (RESTORE_B tient A+B avant PULSE) → CHAIN OK puis gros contacteur 1 s après, plus de claquement simultané. Chemin bypass redondance entre en RESTORE_B.
+  - `b56d0844` **fix** : `Cmd.ArmPulse_Cmd` n'était jamais émis (gaté par `ArmPulseInhibitActive`, contradiction). Trace 7 : `EmergencyArming_RQ` pulse 1 s après CHAIN OK ✅.
+  - `State.Armable` inclut `NOT ArmPulseInhibitActive` → reflète « on peut appuyer » (FALSE pendant la garde dure 5 s). Messages IHM : « temporisation 5 s », « appui pris en compte ».
+  - **3 bypass MES orthogonaux** (recadrage après scope creep signalé opérateur) :
+    - `BypassArmingPreconditions` : arme malgré chaîne ouverte / contacteur / lockout / coupure ; CONFIRM sans retour contacteur ; lève CHAIN_DROP.
+    - `BypassRedundancyTest` : saute **uniquement** l'auto-test A/B (pas de latch `RedundancyTestFailed`). Armable, CONFIRM, aborts **et exigence chaîne fermée** restent normaux (un vrai coup-de-poing = même DI → jamais de pulse chaîne ouverte).
+    - `BypassPowerCutOff` **(nouveau, `GVL_BypassRetain.BypassAuPowerCutOff`)** : neutralise `PowerCutOffRequest` **dans le FB** → le PLC ne fait plus chuter l'AU par coupure métier. `BtnEmergencyCutOff` reste dur.
+    - Local unique `CutOffActive := PowerCutOffRequest AND NOT BypassPowerCutOff AND NOT BypassArmingPreconditions` (abort, Armable, Maintain, ArmPulse, clear `WasArmed`).
+  - Revue critique Codex : 1 blocker (BRT masquait un AU physique) → corrigé ; MAJOR (`BypassPowerCutOff` local, ne lève pas la chaîne sim en amont) accepté et documenté.
+- **Reste** : phase 2 pt 1 (re-test voie A après RESTORE_A) · `FB_ContactorProtector` sur les autres sorties · MecaE/sync (MES-035 D3) · MAJ spec `FB_Safety_EmergencyManagement` v1.2→v1.3 (agent Antigravity en cours).
+
+---
+
 ### MES-036 — 🔧 `FB_Safety_EmergencyManagement` phase 1 (avant traces) — commit `4080df6b`
 - 📅 **2026-09-02 ~09:30** | 📍 Banc | 🏷️ `backup/mes-septembre-20260902` | 🚦 🟠 **NON testé automate**
 - **Fait** :
