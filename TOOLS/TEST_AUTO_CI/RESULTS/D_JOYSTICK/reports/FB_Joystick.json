@@ -113,11 +113,15 @@
     {
       "name": "TC-P08-072 T222 Qualification anti-bruit et non-regression sans inversion",
       "passed": true
+    },
+    {
+      "name": "TC-P08-073 Decodage palier ASCENDANT : StepTgt suit la deflexion (1 a 5), pas 5 des le debut",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 28,
-    "passed": 28,
+    "total": 29,
+    "passed": 29,
     "failed": 0
   }
 }

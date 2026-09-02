@@ -1239,3 +1239,64 @@ TEST 'TC-P08-072 T222 Qualification anti-bruit et non-regression sans inversion'
        RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_FALSE(fb.DEADMANARMED, 'AC6 : arrêt opérateur existant par retrait ArmingPermit conservé');
 END_TEST
+
+TEST 'TC-P08-073 Decodage palier ASCENDANT : StepTgt suit la deflexion (1 a 5), pas 5 des le debut'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+    (* STruCpp n applique pas les defauts SETUP : on garnit la cfg ici. Table = celle du
+       treuil (source unique T223), marge d hysteresis = defaut ST_fbJoystick_Cfg. *)
+    cfg.DeadbandRaw := 300;
+    cfg.SpeedStepHystMargin := 2.0;
+    cfg.SpeedStepTable.StepThreshold_Pct[1] := 20.0;
+    cfg.SpeedStepTable.StepThreshold_Pct[2] := 40.0;
+    cfg.SpeedStepTable.StepThreshold_Pct[3] := 60.0;
+    cfg.SpeedStepTable.StepThreshold_Pct[4] := 80.0;
+    cfg.SpeedStepTable.StepThreshold_Pct[5] := 100.0;
+
+    (* Arme le geste au neutre *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'precondition : geste arme');
+    ASSERT_EQ(fb.AXISCMDY.STEPTGT, 0, 'neutre : palier 0');
+
+    (* Petite deflexion descente (~10 %) : palier 1, PAS 5 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 4230, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_EQ(fb.AXISCMDY.STEPTGT, 1, 'deflexion ~10 % : palier 1');
+
+    (* ~30 % -> palier 2 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 3525, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_EQ(fb.AXISCMDY.STEPTGT, 2, 'deflexion ~30 % : palier 2');
+
+    (* ~50 % -> palier 3 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 2350, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_EQ(fb.AXISCMDY.STEPTGT, 3, 'deflexion ~50 % : palier 3');
+
+    (* ~70 % -> palier 4 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 1410, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_EQ(fb.AXISCMDY.STEPTGT, 4, 'deflexion ~70 % : palier 4');
+
+    (* Pleine deflexion -> palier 5 *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 0, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_EQ(fb.AXISCMDY.STEPTGT, 5, 'pleine deflexion : palier 5');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 100.0, 0.5, 'pleine deflexion : SpeedTgt ~100 %');
+
+    (* Retour vers petite deflexion : redescend les paliers (hysteresis, pas bloque a 5) *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 4230, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_EQ(fb.AXISCMDY.STEPTGT, 1, 'retour ~10 % : palier redescend a 1');
+END_TEST
