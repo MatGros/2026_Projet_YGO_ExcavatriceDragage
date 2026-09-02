@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:25:42.309356" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:25:42.309356">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:36:14.997924" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:36:14.997924">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6101,7 +6101,12 @@ END_IF;
 // === 🔄 §4 SYNCHRONISATION M1 / M2 ===
 
 instWinchSync(
+    // Surveillance synchro (ecart position + concordance contacteurs) UNIQUEMENT en
+    // pilotage couple. En unitaire M1 ou M2 (JoystickWinchSelectArbitrated &lt;&gt; 0) les
+    // deux treuils sont volontairement independants : comparer M1/M2 declencherait un
+    // faux ContactorMismatch (M2 commande seul, M1 non) -&gt; SafeStop.
     Enable          := PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND NOT instBucket.Lifecycle.Busy
+                        AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
                         AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
                         AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
                         AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
