@@ -52,7 +52,11 @@
   - Latch interne **`WasArmed`** : `PowerKeepAlive` maintenu à travers un appui AU pur ; retombe sur raison métier (coupure métier/IHM, `Enable` OFF, redondance). `Maintain_ChainOk += WasArmed`.
   - Étape CONFIRM : `BypassArmingPreconditions` ⇒ contacteur considéré confirmé (banc) → armement aboutit **sans alarme ni lockout**.
   - `WasArmed` publié : `ST_Safety_Emergency_Diag` + `ST_SafetyChecklist` + `GVL_Troubleshooting.C_Safety.WasArmed`.
-- **Reste (phase 2)** : départ chaîne ouverte → TEST_A ne prouve pas la voie A (TEST_B OK) → re-tester A après RESTORE_A. Puis MecaE/sync (MES-035 D3).
+- **2026-09-02 ~10:30** — commits `c2dace2b` (WasArmed posé aussi sous bypass CONFIRM), `80da17e5` (message échec décodé), `aa31684c` (**garde dure anti-chatter** : trace 3 = contacteur pulsé 4×/s sous `BypassAuRedundancyTest` → `ArmPulseInhibitActive`, mini 5s entre impulsions, inconditionnel bypass inclus) + messages IHM raccourcis.
+- **Reste phase 2** :
+  1. Départ chaîne ouverte → TEST_A ne prouve pas la voie A (TEST_B OK) → re-tester A après RESTORE_A.
+  2. **`FB_ContactorProtector`** (bloc générique, C2) : placé juste avant CHAQUE sortie contacteur puissance (treuils M1/M2, frein, translation M3, réarmement AU) — style interlock. À l'activation → lance une **tempo réglable (défaut 2 s)** ; tant qu'elle n'est pas écoulée, toute nouvelle commande contacteur est **bloquée**. Empêche le cyclage rapide destructif quelle que soit la source (bug logique, spam opérateur, bypass). Interface : `IN Request : BOOL`, `IN Cfg_MinInterval_Ms : DINT := 2000`, `OUT Allowed : BOOL`, `OUT Cmd : BOOL` (= `Request AND Allowed`).
+  3. Puis MecaE/sync (MES-035 D3).
 
 ---
 
