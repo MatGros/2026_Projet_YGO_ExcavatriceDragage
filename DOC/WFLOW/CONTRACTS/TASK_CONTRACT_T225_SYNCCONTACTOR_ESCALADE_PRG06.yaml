@@ -1,0 +1,138 @@
+contract:
+  task_id: T225_SYNCCONTACTOR_ESCALADE_PRG06
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Surveiller la concordance des sorties contacteurs M1/M2 (sens + paliers) au plus
+    pres du hardware (PRG_06, apres §2ter/§2quater), avec reponse GRADUEE : discordance
+    breve confirmee -> SafeStop des 2 treuils ; discordance PERSISTANTE -> escalade
+    PowerCutOff. Remonter une info d'erreur decodee (quel contacteur diverge, quel
+    niveau) vers l'IHM/troubleshooting. Neutralisable par le bypass groupe synchro
+    treuils existant. Remplacer le zeroage binaire du §2ter par cette logique.
+
+  context: >
+    §2ter (PRG_06) detecte une divergence des vecteurs M1/M2 et met INSTANTANEMENT
+    toutes les sorties treuil a FALSE : aucune tolerance ms (un decalage d'1 scan
+    entre les 2 FB_WinchOutputInterlock coupe), pas de gradation, aucune remontee
+    decodee. FB_SyncContactor existe deja (CODE/H_TREUILS_BENNE/FB_SyncContactor.st),
+    instancie dans FB_WinchSync (PRG_04) : compare relais sens + contacteurs 1..4,
+    debounce 500 ms, sortie ContactorMismatch -> FB_WinchSync.Fault.ErrorId bit1 ->
+    SafeStop M1+M2 (PRG_04:568/570 via masque 16#0002). Mais : (a) pas d'escalade,
+    (b) tourne AVANT PRG_06 -> ne voit pas les vecteurs physiques finaux
+    (divergence induite par les timers interlock ou par §2quater), (c) remontee via
+    masque hexa 16#0002 (interdit AF03 §4).
+
+  acceptance:
+    - id: AC1
+      statement: "FB_SyncContactor gagne une 2e sortie booleenne ContactorMismatchEscalated, posee quand ContactorMismatch tient CST_SyncEscalationMs (nouveau seuil nomme, config), effacee comme ContactorMismatch (front Reset si discordance resorbee)."
+      verified_by: "Test CI FB_SyncContactor : injection discordance continue ; ContactorMismatch=TRUE apres 500 ms, ContactorMismatchEscalated=TRUE apres CST_SyncEscalationMs, les 2 retombent apres resorption + Reset."
+    - id: AC2
+      statement: "FB_SyncContactor expose un mot/enum de diagnostic identifiant la 1re divergence detectee (RelayFwd, RelayRev, Contactor1..4) et le niveau atteint (aucun / mismatch / escalade), lisible sans masque hexa."
+      verified_by: "Assertions CI sur le champ diagnostic pour chaque type de divergence injectee."
+    - id: AC3
+      statement: "Une instance de FB_SyncContactor est ajoutee dans PRG_06_Outputs, alimentee par les vecteurs M1/M2 EFFECTIFS post §2quater (M1RelayFwd/Rev, M1SpeedContactor1..4 et equivalents M2), armee quand les treuils sont couples (SyncActive OU WinchBothIntent.Active)."
+      verified_by: "Revue du cablage PRG_06 + G200 : instance declaree et appelee, entrees = variables locales post §2quater."
+    - id: AC4
+      statement: "ContactorMismatch (instance PRG_06) -> SafeStop des 2 treuils sans couper la chaine ; ContactorMismatchEscalated -> PowerCutOff. Le chemin ne passe par AUCUN masque hexadecimal (miroirs de causes nommes, AF03 §4)."
+      verified_by: "Revue PRG_06 + PRG_04 : suppression des masques 16#0002 lies a ContactorMismatch, remplacement par miroir booleen nomme. Test integration : divergence breve -> SafeStop only ; divergence longue -> PowerCutOff."
+    - id: AC5
+      statement: "Le §2ter actuel (zeroage binaire WinchOutputSyncMismatch) est retire ou reduit au strict role transitoire non couvert par le nouveau FB ; aucune double action contradictoire sur les memes sorties."
+      verified_by: "Revue diff PRG_06 : plus de bloc 'IF WinchOutputSyncMismatch THEN <zero tout>' redondant ; un seul point de decision concordance."
+    - id: AC6
+      statement: "La surveillance PRG_06 est neutralisee par le bypass groupe synchro treuils existant GVL_IHM.M1M2Sync.Bypass.Global (deja consomme par FB_WinchSync.instContactor et par l'ancien §2ter). Aucun nouveau bit de bypass cree sans validation."
+      verified_by: "Revue cablage : entree BypassGlobal de l'instance PRG_06 = GVL_IHM.M1M2Sync.Bypass.Global. Test : bypass=TRUE -> ContactorMismatch/Escalated forces FALSE, sorties non bridees."
+    - id: AC7
+      statement: "L'info d'erreur (niveau + contacteur fautif) est publiee vers GVL_Troubleshooting (section treuils/synchro) et vers la chaine bandeau IHM, decodee en clair, pour diagnostiquer 'pourquoi ca bloque'."
+      verified_by: "Test CI FB_TroubleshootingView : injection ContactorMismatch / ContactorMismatchEscalated -> assertion sur le champ GVL_Troubleshooting decode. Plus revue FB_Hmi_BannerFormatter : assertion sur le message operateur genere (STRING non vide, decode par type de divergence et par niveau)."
+    - id: AC8
+      statement: "Comportement inchange hors couplage (mode unitaire MAINT_N1/N2) et sous bypass : pas de SafeStop/PowerCutOff additionnel."
+      verified_by: "Tests non-regression FB_SyncContactor + integration : un seul treuil commande -> pas de mismatch ; bypass -> pas d'action."
+    - id: AC9
+      statement: "Pour chaque PROGRAM modifie, le nom de fichier est identique au nom de POU et son suffixe est egal au langage ST du bundle genere ; aucun POU renomme, aucun suffixe _CFC/_LD ajoute."
+      verified_by: "Inspection des declarations PROGRAM/FUNCTION_BLOCK et du bundle PLCopenXML regenere : chaque POU modifie apparait sous le meme nom et le meme langage qu'avant."
+    - id: AC11
+      statement: "Bundle regenere, G200 vert (instances declarees ET appelees, zero orphelin), run_all_gates palier C sans NOUVELLE regression (G340/G483 pre-existants toleres)."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py --report + run_all_gates.py --palier C, blocs de sortie colles dans la restitution."
+    - id: AC10
+      statement: "Aucun nombre magique : CST_SyncEscalationMs (et tout seuil introduit) est une constante nommee avec unite en commentaire, placee dans le VAR CONSTANT du FB ou une struct Cfg."
+      verified_by: "Revue nommage NAMING_CONVENTION.md."
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+      - CODE/H_TREUILS_BENNE/FB_WinchSync.st
+      - CODE/H_TREUILS_BENNE/_TYPES/
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/J_SUPERVISION/_TYPES/
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T225_SYNCCONTACTOR_ESCALADE_PRG06.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/AGENT_WORKFLOW/scripts/
+    forbidden:
+      - CODE/B_AU_SECURITE/
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - GVL_PERSISTENT.st
+      - ARCHIVES/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "FB_SyncContactor reste independant des codeurs (surveillable codeurs bypasses)."
+      - "Le debounce 500 ms existant (ContactorMismatch) est conserve tel quel ; l'escalade s'ajoute PAR-DESSUS, elle ne le remplace pas."
+      - "SafeStop = arret par rampe, puissance maintenue ; seul l'escalade (PowerCutOff) coupe la chaine."
+      - "L'instance existante dans FB_WinchSync (PRG_04) reste en place ; l'instance PRG_06 s'ajoute (2 points d'observation : requetes amont + sorties physiques)."
+      - "Aucun rearmement automatique : Reset front, seulement si discordance resorbee."
+      - "Le bypass reste GVL_IHM.M1M2Sync.Bypass.Global (pas de nouveau bit)."
+
+  dropped_on_purpose:
+    - "Le zeroage binaire instantane du §2ter (remplace par la reponse graduee du FB)."
+
+  evidence_required:
+    - test_fix_guard
+    - af_update
+    - check_linkage
+    - bundle
+    - run_all_gates
+    - human_design_validation
+    - naming_convention_review
+    - code_quality_review
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    STOP et alerte avant implementation si : l'instance PRG_06 doit forcer SafeStop
+    des instSafetyWinchM1/M2 mais aucun chemin propre n'existe depuis PRG_06 (la safety
+    est en amont, PRG_04) ; si l'escalade PowerCutOff doit passer par la chaine AU et
+    que le cablage n'est pas trivial ; si un nouveau bit de bypass s'avere necessaire ;
+    si retirer le §2ter laisse une fenetre non couverte.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Demande operateur 2026-09-02 : reponse graduee sur la concordance contacteurs
+    M1/M2, sans masque hexa, une instance dans PRG_06 sur les vecteurs physiques,
+    escalade SafeStop -> PowerCutOff, remontee erreur decodee vers IHM/troubleshooting,
+    neutralisable par le bypass groupe synchro treuils. Lot safety MES-035.
+    Meme protocole que T222 : 2 revues separees (nommage + qualite/effets de bord)
+    avant validation ; l'orchestrateur relit le git diff.
+    Points d'arbitrage ouverts : (1) chemin de forcage SafeStop depuis PRG_06 ;
+    (2) cablage escalade -> PowerCutOff / chaine AU ; (3) forme exacte du champ
+    diagnostic (enum vs mot de bits nommes).
