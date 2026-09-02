@@ -255,6 +255,14 @@ Diagnostic et erreurs de la chaîne AU</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion envoyee mais contacteur puissance non confirme sous 2s (Reset requis)</xhtml>
               </documentation>
             </variable>
+            <variable name="WasArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = AU armee au moins une fois (contacteur confirme) ; maintien PowerKeepAlive a travers un appui AU pur — retombe sur raison metier (coupure/redondance/Enable OFF)</xhtml>
+              </documentation>
+            </variable>
             <variable name="LockoutActive">
               <type>
                 <BOOL />

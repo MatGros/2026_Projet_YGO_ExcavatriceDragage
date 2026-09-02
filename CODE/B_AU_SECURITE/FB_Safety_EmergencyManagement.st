@@ -62,6 +62,7 @@ VAR
     RedundancyTestFailed      : BOOL; // . [LOC] Defaut auto-test affiche (Cause lissee OR NOT Ack)
     EmergencyArmingFailed     : BOOL; // . [LOC] Defaut rearmement affiche (Cause lissee OR NOT Ack)
     Armable                   : BOOL; // . [LOC] Rearmement possible actuellement (source unique, aligne IHM/armement)
+    WasArmed                  : BOOL; // . [LOC] AU armee au moins une fois (contacteur confirme) ; maintien PowerKeepAlive a travers un appui AU pur — retombe sur raison metier
     ArmingBusy                : BOOL; // . [LOC] Sequence ou lockout en cours
     LastAbortStep             : INT;  // . [LOC] Etape sequence lors du dernier abandon (0 a 6)
     LastAbortCause            : WORD; // . [LOC] Bitfield cause abandon (voir constantes CST_ABORT_*)
@@ -223,7 +224,12 @@ IF Enable THEN
     //    réellement possible (et sûr) tant que les autres préconditions sont réunies. Afficher
     //    le bouton « Armable » sur cette cause seule bloquait le réarmement après acquittement
     //    (Reset ne purge pas la Cause, cf. §4) alors que l'armement était permis.
-    Armable_ChainOk := EmergencyChainClosed AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+    // Armable ne dépend PAS de EmergencyChainClosed : c'est la séquence d'armement qui
+    //   referme la chaîne (PowerKeepAlive en série dans la boucle). Un armement gaté sur
+    //   « chaîne fermée » serait impossible chaîne ouverte alors que c'est exactement l'état
+    //   à récupérer. NOT BtnEmergencyCutOff / NOT PowerCutOffRequest couvrent les cas où la
+    //   chaîne est ouverte pour une vraie raison (coup-de-poing, coupure métier).
+    Armable_ChainOk := NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
     Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
     // 🛠️ BypassArmingPreconditions (MES trace) : lève ChainOk + NoBlock ; la séquence doit
@@ -331,7 +337,9 @@ IF Enable THEN
             ForceTestB := FALSE;
             TonArmingConfirm(IN := TRUE, PT := CST_ArmingConfirmTimeout);
 
-            IF PowerContactorEngaged THEN
+            // 🛠️ BypassArmingPreconditions (MES trace) : pas de contacteur réel au banc →
+            //    on considère la confirmation acquise, sans alarme ni lockout. ⛔ NON SECURISE.
+            IF PowerContactorEngaged OR BypassArmingPreconditions THEN
                 EmergencyArmingLockoutActive := FALSE;
                 ArmingSeqStep := CST_STEP_IDLE;
             ELSIF TonArmingConfirm.Q THEN
@@ -423,7 +431,22 @@ Status.Fault := instFault.Fault; // source de verite = socle
 // 🛡️ Maintien conditionné sur (chaîne fermée OU séquence en cours) : hors séquence, une
 // boucle AU ouverte (coup-de-poing) coupe le maintien (fail-safe). Pendant la séquence, la
 // chaîne est volontairement ouverte par ForceTestA/B -> le maintien reste autorisé (restauration).
-Maintain_ChainOk := (EmergencyChainClosed OR (ArmingSeqStep <> CST_STEP_IDLE));
+// Latch « AU armée » : PowerKeepAlive maintenu à travers un appui AU pur (chaîne
+//   physiquement ouverte par le coup-de-poing) tant qu'aucune raison MÉTIER ne demande la
+//   coupure. Relâchement AU → chaîne se referme instantanément (contacts PLC restés fermés),
+//   pas de réarmement. Retombe sur : coupure métier, coupure IHM, Enable OFF, défaut
+//   redondance. Non RETAIN : démarrage à froid = non armé.
+IF EnableRising.Q THEN
+    WasArmed := FALSE;
+END_IF;
+IF PowerContactorEngaged THEN
+    WasArmed := TRUE;
+END_IF;
+IF PowerCutOffRequest OR BtnEmergencyCutOff OR NOT Enable OR RedundancyTestFailedCause THEN
+    WasArmed := FALSE;
+END_IF;
+
+Maintain_ChainOk := (EmergencyChainClosed OR (ArmingSeqStep <> CST_STEP_IDLE) OR WasArmed);
 Maintain_NoCutOff := NOT PowerCutOffRequest AND NOT BtnEmergencyCutOff;
 MaintainA_NoFault := NOT ForceTestA AND NOT RedundancyTestFailedCause;
 MaintainB_NoFault := NOT ForceTestB AND NOT RedundancyTestFailedCause;
@@ -449,6 +472,7 @@ Status.Diag.Error                := Status.Fault.Error;
 Status.Diag.ErrorId              := Status.Fault.ErrorId;
 Status.Diag.RedundancyTestFailed := RedundancyTestFailed;
 Status.Diag.ArmFailed            := EmergencyArmingFailed;
+Status.Diag.WasArmed             := WasArmed;
 Status.Diag.LockoutActive        := EmergencyArmingLockoutActive;
 Status.Diag.LastAbortStep        := LastAbortStep;
 Status.Diag.LastAbortCause       := LastAbortCause;
