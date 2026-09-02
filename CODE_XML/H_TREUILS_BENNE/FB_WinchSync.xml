@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T19:46:56.864168" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T19:46:56.864168">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T13:16:19.858404" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T13:16:19.858404">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -545,6 +545,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Ecart seuil 2 critique (block signal)</xhtml>
               </documentation>
             </variable>
+            <variable name="ContactorMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Discordance contacteurs M1/M2 confirmee (miroir instContactor, nom -&gt; plus de masque hexa cote PRG_04)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -709,6 +717,10 @@ Fault := instFault.Fault;
 
 SyncWarn := Fault.Error;
 Ready := Enable AND NOT Fault.Latched;
+
+// Miroir nomme de la discordance contacteurs (le consommateur lit ce booleen,
+// plus le masque hexa sur Fault.ErrorId). BypassGlobal deja gere dans instContactor.
+ContactorMismatch := instContactor.ContactorMismatch;
 {endregion}
 </xhtml>
           </ST>

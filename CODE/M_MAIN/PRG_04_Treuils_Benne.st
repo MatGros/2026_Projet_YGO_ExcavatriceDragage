@@ -130,6 +130,7 @@ VAR
 
     SafeStopM1_Raw          : BOOL;
     SafeStopM2_Raw          : BOOL;
+    WinchContactorMismatchLvl1 : BOOL;   // . [LOC] niveau 1 : discordance contacteurs M1/M2 confirmee (amont OU vecteurs finaux) -> SafeStop
     SafeStopM1_Active       : BOOL;
     SafeStopM2_Active       : BOOL;
     // Taxonomie permit (D-P1 à D-P11) : SafetyPermit (safety pure), ProcessPermit (process pur),
@@ -565,9 +566,14 @@ END_IF;
 // Perte d'une reference auparavant valide en mouvement : arret controle des
 // deux treuils, sans PowerCutOff additionnel. Le cycle libere la demande
 // seulement apres le composite d'arret mecanique confirme.
-SafeStopM1_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) <> 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModules.Fault
+// Discordance contacteurs M1/M2 = niveau 1 (SafeStop) sans masque hexa.
+//   - instWinchSync.ContactorMismatch : sur les requetes amont (FB_Winch).
+//   - PRG_06_Outputs.Data.ContactorMismatch : sur les vecteurs PHYSIQUES finaux
+//     (scan N-1, PRG_06 s'execute apres PRG_04). Escalade -> ExternalSyncEscalation ci-dessous.
+WinchContactorMismatchLvl1 := instWinchSync.ContactorMismatch OR PRG_06_Outputs.Data.ContactorMismatch;
+SafeStopM1_Raw      := WinchContactorMismatchLvl1 OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModules.Fault
                        OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
-SafeStopM2_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) <> 16#0000) OR PRG_02_Acquisition.Data.InputModules.Fault
+SafeStopM2_Raw      := WinchContactorMismatchLvl1 OR PRG_02_Acquisition.Data.InputModules.Fault
                        OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
 
 // Surveillance Kobold descente normale (hors FB_DiveSearch)
@@ -765,7 +771,8 @@ instSafetyWinchM1(
     BypassMecaB            := GVL_IHM.M1TreuilRetenue.Bypass.MecaB,
     BypassMecaC            := GVL_IHM.M1TreuilRetenue.Bypass.MecaC,
     BypassMecaD            := BypassM1MecaDEff,
-    BypassMecaE            := GVL_IHM.M1TreuilRetenue.Bypass.MecaE
+    BypassMecaE            := GVL_IHM.M1TreuilRetenue.Bypass.MecaE,
+    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
 );
 
 instSafetyWinchM2(
@@ -823,7 +830,8 @@ instSafetyWinchM2(
     BypassMecaB            := GVL_IHM.M2TreuilBenne.Bypass.MecaB,
     BypassMecaC            := GVL_IHM.M2TreuilBenne.Bypass.MecaC,
     BypassMecaD            := BypassM2MecaDEff,
-    BypassMecaE            := GVL_IHM.M2TreuilBenne.Bypass.MecaE
+    BypassMecaE            := GVL_IHM.M2TreuilBenne.Bypass.MecaE,
+    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
 );
 
 SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;

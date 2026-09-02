@@ -57,6 +57,9 @@ VAR_INPUT
     OppositeDirectionTimeout        : TIME := T#500ms;                // --> [CFG] Delai confirmation sens oppose
     NoMovementTimeout               : TIME := T#3s;                   // --> [CFG] Delai confirmation absence mouvement
 
+    // === ESCALADE EXTERNE ===
+    ExternalSyncEscalation          : BOOL := FALSE;                  // --> [SAFE] Discordance contacteurs M1/M2 persistante (FB_SyncContactor niveau 2) -> latch MecaE escalade (bit13 -> PowerCutOff), meme routing/Reset/bypass que MecaE
+
     // === BYPASSES ET SIMULATION ===
     EncoderFaultBypass              : BOOL;                           // --> [TST] Bypass defaut codeur
     BypassGlobal                    : BOOL := FALSE;                  // --> [TST] Inhibe l'evaluation des causes + RAZ latches ; ne force pas ErrorId=0 (causes live deja posees restent visibles)
@@ -361,6 +364,12 @@ IF NOT BypassGlobal THEN
         PT := PostRampTimeout
     );
     IF TonMecaE.Q THEN MecaEEscaladeFaultLatched := TRUE; END_IF;
+    // Escalade discordance contacteurs M1/M2 (deja debouncee + tempo escalade
+    //   dans FB_SyncContactor, PRG_06) -> meme latch que MecaE escalade (bit13 -> PowerCutOff).
+    //   Meme neutralisation que MecaE : BypassSafety / BypassMecaE. Efface par le meme Reset.
+    IF ExternalSyncEscalation AND NOT (BypassSafety OR BypassMecaE) THEN
+        MecaEEscaladeFaultLatched := TRUE;
+    END_IF;
     instCauses[13].Active   := MecaEEscaladeFaultLatched;
     instCauses[13].Latching := TRUE;
     instCauses[13].Texte    := 'Escalade ecart synchronisation (Meca E)';

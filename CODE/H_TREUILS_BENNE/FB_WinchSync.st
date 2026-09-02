@@ -59,6 +59,7 @@ VAR_OUTPUT
     SyncWarn                        : BOOL;                           // <-- [DIAG] Avertissement IHM (Warn ou discordance)
     SyncDeviationWarn               : BOOL;                           // <-- [DIAG] Ecart seuil 1 depasse (force palier 1)
     SyncDeviationFault              : BOOL;                           // <-- [SAFE] Ecart seuil 2 critique (block signal)
+    ContactorMismatch              : BOOL;                           // <-- [SAFE] Discordance contacteurs M1/M2 confirmee (miroir instContactor, nom -> plus de masque hexa cote PRG_04)
 END_VAR
 VAR
     // === DETECTEURS ET TIMERS INTERNES ===
@@ -168,6 +169,10 @@ Fault := instFault.Fault;
 
 SyncWarn := Fault.Error;
 Ready := Enable AND NOT Fault.Latched;
+
+// Miroir nomme de la discordance contacteurs (le consommateur lit ce booleen,
+// plus le masque hexa sur Fault.ErrorId). BypassGlobal deja gere dans instContactor.
+ContactorMismatch := instContactor.ContactorMismatch;
 {endregion}
 
 END_FUNCTION_BLOCK

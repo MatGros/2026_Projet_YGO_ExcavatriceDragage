@@ -29,6 +29,11 @@ STRUCT
     M2SpeedContactor4     : BOOL; // 🔌 Ordre contacteur palier 4 treuil M2
     M2BrakeCmd            : BOOL; // 🔓 Ordre desserrage frein M2 (1=Desserrer)
 
+    // === 🔀 Concordance contacteurs M1/M2 (instance FB_SyncContactor sur vecteurs finaux) ===
+    ContactorMismatch          : BOOL;                  // Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-1)
+    ContactorMismatchEscalated : BOOL;                  // Niveau 2 persistant → escalade PowerCutOff via latch MecaE (PRG_04)
+    SyncContactorDiag          : ST_SyncContactorDiag;  // Détail : quel contacteur diverge + niveau atteint (IHM / troubleshooting)
+
     // === ↔️ Ordre actionneur final translation M3 ===
     TranslationBrakeCmd   : BOOL; // 🔓 Demande frein M3 arbitree
 

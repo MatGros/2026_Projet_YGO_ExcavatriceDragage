@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T12:09:08.173266" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T12:09:08.173266">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T13:20:41.546583" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T13:20:41.546583">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -844,11 +844,11 @@ IF NOT BypassGlobal THEN
     // ⚠️ Éval gardée par la comm drive (DriveOnline AND DriveOperational) : sans comm, le
     //    statusword / la fréquence remontés ne sont pas fiables. Une perte bus doit tomber en
     //    Cause 1 (DriveComm, bit1 -&gt; SafeStop acquittable), PAS en Méca B (bit4 -&gt; PowerCutOff
-    //    non-resettable). REX MES 2026-09-02 : DriveStatusWord.0 (= "ready to switch on")
+    //    non-resettable). DriveStatusWord.0 (= "ready to switch on")
     //    figé sur bus mort -&gt; coupure chaîne intempestive.
     // Déclencheur = preuve de rotation RÉELLE (fréquence de sortie mesurée) OU retour frein
     // encore ouvert. DriveStatusWord.0 ("ready to switch on") retiré : à 1 dès variateur
-    // alimenté, il ne prouve PAS un mouvement (REX MES 2026-09-02).
+    // alimenté, il ne prouve PAS un mouvement.
     IF NOT (BypassSafety OR BypassMecaB) AND DriveOnline AND DriveOperational THEN
         IF (NOT HeartbeatIhmOk) OR (NOT RunRequest AND NOT BrakeCmd) THEN
             UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; CST_StopFreqThresholdHz) OR BrakeFeedback;

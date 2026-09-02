@@ -3501,6 +3501,18 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai confirmation absence mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="ExternalSyncEscalation">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ESCALADE EXTERNE ===
+--&gt; [SAFE] Discordance contacteurs M1/M2 persistante (FB_SyncContactor niveau 2) -&gt; latch MecaE escalade (bit13 -&gt; PowerCutOff), meme routing/Reset/bypass que MecaE</xhtml>
+              </documentation>
+            </variable>
             <variable name="EncoderFaultBypass">
               <type>
                 <BOOL />
@@ -4397,6 +4409,12 @@ IF NOT BypassGlobal THEN
         PT := PostRampTimeout
     );
     IF TonMecaE.Q THEN MecaEEscaladeFaultLatched := TRUE; END_IF;
+    // Escalade discordance contacteurs M1/M2 (deja debouncee + tempo escalade
+    //   dans FB_SyncContactor, PRG_06) -&gt; meme latch que MecaE escalade (bit13 -&gt; PowerCutOff).
+    //   Meme neutralisation que MecaE : BypassSafety / BypassMecaE. Efface par le meme Reset.
+    IF ExternalSyncEscalation AND NOT (BypassSafety OR BypassMecaE) THEN
+        MecaEEscaladeFaultLatched := TRUE;
+    END_IF;
     instCauses[13].Active   := MecaEEscaladeFaultLatched;
     instCauses[13].Latching := TRUE;
     instCauses[13].Texte    := 'Escalade ecart synchronisation (Meca E)';

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T02:31:16.551237" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T02:31:16.551237">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T13:20:00.670432" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T13:20:00.670432">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -5159,6 +5159,14 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="WinchContactorMismatchLvl1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] niveau 1 : discordance contacteurs M1/M2 confirmee (amont OU vecteurs finaux) -&gt; SafeStop</xhtml>
+              </documentation>
+            </variable>
             <variable name="SafeStopM1_Active">
               <type>
                 <BOOL />
@@ -5933,9 +5941,14 @@ END_IF;
 // Perte d'une reference auparavant valide en mouvement : arret controle des
 // deux treuils, sans PowerCutOff additionnel. Le cycle libere la demande
 // seulement apres le composite d'arret mecanique confirme.
-SafeStopM1_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModules.Fault
+// Discordance contacteurs M1/M2 = niveau 1 (SafeStop) sans masque hexa.
+//   - instWinchSync.ContactorMismatch : sur les requetes amont (FB_Winch).
+//   - PRG_06_Outputs.Data.ContactorMismatch : sur les vecteurs PHYSIQUES finaux
+//     (scan N-1, PRG_06 s'execute apres PRG_04). Escalade -&gt; ExternalSyncEscalation ci-dessous.
+WinchContactorMismatchLvl1 := instWinchSync.ContactorMismatch OR PRG_06_Outputs.Data.ContactorMismatch;
+SafeStopM1_Raw      := WinchContactorMismatchLvl1 OR instBucket.M1SlipDetected OR PRG_02_Acquisition.Data.InputModules.Fault
                        OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
-SafeStopM2_Raw      := ((instWinchSync.Fault.ErrorId AND 16#0002) &lt;&gt; 16#0000) OR PRG_02_Acquisition.Data.InputModules.Fault
+SafeStopM2_Raw      := WinchContactorMismatchLvl1 OR PRG_02_Acquisition.Data.InputModules.Fault
                        OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss;
 
 // Surveillance Kobold descente normale (hors FB_DiveSearch)
@@ -6133,7 +6146,8 @@ instSafetyWinchM1(
     BypassMecaB            := GVL_IHM.M1TreuilRetenue.Bypass.MecaB,
     BypassMecaC            := GVL_IHM.M1TreuilRetenue.Bypass.MecaC,
     BypassMecaD            := BypassM1MecaDEff,
-    BypassMecaE            := GVL_IHM.M1TreuilRetenue.Bypass.MecaE
+    BypassMecaE            := GVL_IHM.M1TreuilRetenue.Bypass.MecaE,
+    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
 );
 
 instSafetyWinchM2(
@@ -6191,7 +6205,8 @@ instSafetyWinchM2(
     BypassMecaB            := GVL_IHM.M2TreuilBenne.Bypass.MecaB,
     BypassMecaC            := GVL_IHM.M2TreuilBenne.Bypass.MecaC,
     BypassMecaD            := BypassM2MecaDEff,
-    BypassMecaE            := GVL_IHM.M2TreuilBenne.Bypass.MecaE
+    BypassMecaE            := GVL_IHM.M2TreuilBenne.Bypass.MecaE,
+    ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
 );
 
 SafeStopM1_Raw := SafeStopM1_Raw OR instSafetyWinchM1.SafeStop;
@@ -8257,6 +8272,18 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai confirmation absence mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="ExternalSyncEscalation">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ESCALADE EXTERNE ===
+--&gt; [SAFE] Discordance contacteurs M1/M2 persistante (FB_SyncContactor niveau 2) -&gt; latch MecaE escalade (bit13 -&gt; PowerCutOff), meme routing/Reset/bypass que MecaE</xhtml>
+              </documentation>
+            </variable>
             <variable name="EncoderFaultBypass">
               <type>
                 <BOOL />
@@ -9153,6 +9180,12 @@ IF NOT BypassGlobal THEN
         PT := PostRampTimeout
     );
     IF TonMecaE.Q THEN MecaEEscaladeFaultLatched := TRUE; END_IF;
+    // Escalade discordance contacteurs M1/M2 (deja debouncee + tempo escalade
+    //   dans FB_SyncContactor, PRG_06) -&gt; meme latch que MecaE escalade (bit13 -&gt; PowerCutOff).
+    //   Meme neutralisation que MecaE : BypassSafety / BypassMecaE. Efface par le meme Reset.
+    IF ExternalSyncEscalation AND NOT (BypassSafety OR BypassMecaE) THEN
+        MecaEEscaladeFaultLatched := TRUE;
+    END_IF;
     instCauses[13].Active   := MecaEEscaladeFaultLatched;
     instCauses[13].Latching := TRUE;
     instCauses[13].Texte    := 'Escalade ecart synchronisation (Meca E)';
@@ -12208,6 +12241,14 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Ecart seuil 2 critique (block signal)</xhtml>
               </documentation>
             </variable>
+            <variable name="ContactorMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Discordance contacteurs M1/M2 confirmee (miroir instContactor, nom -&gt; plus de masque hexa cote PRG_04)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -12372,6 +12413,10 @@ Fault := instFault.Fault;
 
 SyncWarn := Fault.Error;
 Ready := Enable AND NOT Fault.Latched;
+
+// Miroir nomme de la discordance contacteurs (le consommateur lit ce booleen,
+// plus le masque hexa sur Fault.ErrorId). BypassGlobal deja gere dans instContactor.
+ContactorMismatch := instContactor.ContactorMismatch;
 {endregion}
 </xhtml>
           </ST>
