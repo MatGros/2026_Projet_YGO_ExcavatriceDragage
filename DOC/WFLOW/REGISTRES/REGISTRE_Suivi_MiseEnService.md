@@ -45,6 +45,30 @@
 
 ---
 
+### MES-034 — 🧭 Déblocage MES banc (bus HS) : séquence réelle + trous de conception AU
+- 📅 **Date** : 2026-09-02 | 📍 **Lieu** : Banc (EtherCAT + modules DI absents) | 🏷️ **Branche** : `backup/mes-septembre-20260902`
+- 🎯 **Périmètre** : chaîne défauts safety M1/M2/M3, bandeau modules E/S, armement AU
+- 🚦 **Statut** : 🟢 **Machine débloquée au banc** (codeurs + référence machine/benne faits) · 🟠 3 trous de conception AU à traiter
+- 🔍 **Séquence de déblocage constatée** (chaque download efface RETAIN + I/O forces) :
+  1. `GVL_BypassRetain.BypassNetworkGlobal := TRUE` → `Step1_InputModulesOk = TRUE` → `[IO]/[CAN]/[ECAT]` disparaissent (filtre TOF 1,5 s). ⚠️ `BypassCommunGlobal` **est un orphelin** (restauré/miroité mais lu par aucun interlock) — idem `BypassBucketGlobal`.
+  2. Force `M1_ContactorsReleased_DI` + `M2_ContactorsReleased_DI := TRUE` → lève MecaB (`FwdRevSpeedFeedbackOff`), `Step4` homing, `ModeChangeAllowed` (`FB_Modes:197`).
+  3. Force `PhaseRotationOk_DI` + `M1_M2_M3_BrakeThermalOk_DI := TRUE` → lève `PowerCutOff` **M3** (`FB_Safety_Translation` PhaseRotation+BrakeThermal, `ErrorId=12`).
+  4. `BtnFaultReset` → efface latches + `RedundancyTestFailedCause` (fix MES-034).
+- 🛠️ **Fixes committés (branche backup, NON testés automate)** :
+  - `43e2e7c8` — `FB_Safety_Winch` + `FB_Safety_Translation` : sous `BypassGlobal`, purge `instCauses[].Active` (sans ça, causes **figées** → `PowerCutOff`/`SafeStop` gelés → réarmement impossible malgré bypass).
+  - `36157233` — `FB_Safety_EmergencyManagement` : front `Reset` vide `RedundancyTestFailedCause` (avant : `[AU] ErrorID:01` jamais acquittable sans relancer un armement PLC ; contraire AF-01 §7.4 + §9 STD).
+  - `cac7387d` — **DÉROGATION MES** : bypass treuil M1/M2+benne **sans gate de mode** (effectifs tous modes SEMI_AUTO/AUTO inclus). Écart assumé Directive Machines / ISO 13849, tracé AF-05 §4bis. Gate `G483` en échec **attendu** (encode l'ancienne doctrine — à re-cadrer avec T181-14).
+  - `175f0a8c` — câblage orphelin `BypassNetworkGlobal` (miroir PRG_07) + guard `G491`.
+  - `8ec7a730` — `FB_Safety_EmergencyManagement` : 2 bypass **ingénierie MES** (`GVL_BypassRetain.BypassAuArmingPreconditions`, `BypassAuRedundancyTest`), RETAIN, **jamais IHM**, effacés au download → armer sans préconditions + sauter l'auto-test A/B, pour tracer le vrai timing chaîne/contacteur sans le shunt matériel. Bandeau `AU: BYPASS INGENIERIE MES ACTIF - NON SECURISE`.
+- 📌 **Trous de conception AU (investigation `INVESTIG-ETHERCAT-RECOVERY-POWERKEEPALIVE`)** :
+  1. **Deadlock armement** : `Armable` gaté sur `EmergencyChainClosed`, or `PowerKeepAlive_A/B_RQ` sont **en série dans le circuit chaîne** → boucle auto-latchée ouverte. La séquence d'armement (terme `ArmingSeqStep <> IDLE` de `Maintain_ChainOk`) est le SEUL mécanisme de récupération, mais injoignable. **Fix cible (C2)** : sortir `EmergencyChainClosed` de la condition bouton/armement, le garder comme contrôle *dans* la séquence. Nuance à trancher : test redondance voie A aveugle si départ chaîne ouverte (options 1/2/3, cf. investigation).
+  2. **Récup EtherCAT à chaud** : bouton « confirmer » actuel = pur soft (`FB_Diag_Ethercat`, `Reset` code mort AF-12 §9), ne touche jamais le maître → restart froid obligatoire. **Immédiat sans code** : cocher option maître « Automatically restart slaves » + vérifier que la coupure AU ne tombe pas sur le maître/coupleur. **Fix (C3)** : `FB_Recover_Ethercat` sur front bouton → `<Maître>.xRestart` (lib `IODrvEtherCAT`), gardé machine-arrêtée + freins serrés + `EncoderAvailable` regelé (re-homing obligatoire).
+  3. **Shunt externe `PowerKeepAlive`** : retrait du shunt → glitch chaîne + perte maintien (A et B retombent **toujours ensemble**, pas de divergence). **Fix (C3)** : entrée `ShuntPresent` lue par le PLC (maintien dérogé + réarmement explicite au front descendant) OU mode « MES puissance maintenue » dédié.
+- 📌 **Données manquantes à relever** : nom exact du nœud maître EtherCAT ; option « auto-restart slaves » cochée ? ; la coupure AU touche-t-elle le maître ? ; le shunt ponte-t-il aussi la boucle retour `EmergencyChainClosed` ? ; snapshot à l'instant du retrait du shunt (courbes trace).
+- 📌 **Suivi** : `INVESTIG-ETHERCAT-RECOVERY-POWERKEEPALIVE` (`TASKS_ORCHESTRATOR.yaml`). Après les traces opérateur → cadrer les 3 tâches C2/C3.
+
+---
+
 ### MES-032 — 🔴 Bandeau d'alarme VIDE malgré AnyFault + M1/M2 SafetyFault + coupure puissance active
 - 📅 **Date** : 2026-09-01 | 📍 **Lieu** : Terrain (début MES septembre) | 🏷️ **Version** : suite `v0.6.00`
 - 🎯 **Périmètre** : Bandeau alarme IHM (Supervision), chaîne PowerKeepAlive / PowerCutOff, safety M1/M2
