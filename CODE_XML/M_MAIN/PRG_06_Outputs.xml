@@ -4459,6 +4459,22 @@ SEULE la publication est homogénéisée sur Fault:ST_Fault (§6bis2).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Causes en clair pour le socle defaut</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_StepRampFloorDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#700ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher DUR de cadence de montee de palier a la barriere finale, INDEPENDANT
+de FB_WinchStepShaper (metier). Choisi PLUS COURT que la cadence nominale du
+shaper (1 s en montee) : en exploitation le shaper reste le rythme primaire,
+ce plancher n'ajoute qu'un leger retard borne par cran. Il ne devient decisif
+QUE si le shaper deraille (rampe a 0 -&gt; palier 5 instantane, decodage inverse) :
+la barriere ramene alors la montee a +1 cran / ce delai. Descente non limitee.</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -4487,7 +4503,7 @@ ResetEdge(CLK := Reset);
 // acquittement conscient puis une nouvelle demande opérateur.
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     RestartDelay(IN := FALSE, PT := T#1000ms);
     DeadTime(IN := FALSE);
     DeadTimePending := FALSE;
@@ -4689,13 +4705,13 @@ Contactor1 := FALSE; Contactor2 := FALSE; Contactor3 := FALSE; Contactor4 := FAL
 Busy := FALSE; Done := FALSE; Ready := NOT Error AND NOT ContactorStuckLatched;
 
 IF Error THEN
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.FAULT;
 ELSIF RestartInhibit THEN
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
@@ -4705,7 +4721,7 @@ ELSIF ContactorStuckLatched THEN
     // AC7 : T_max §3bis dépassé sans confirmation retombée -&gt; chute du sens FORCÉE.
     // RelayFwd/Rev et BrakeCmd (= RelayFwd OR RelayRev) retombent à FALSE ci-dessus.
     // Latch à acquittement conscient (ResetEdge) — jamais de redémarrage auto.
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
@@ -4714,7 +4730,7 @@ ELSIF ContactorStuckLatched THEN
 ELSIF ReleaseOrderActive AND NOT PermitFinalBlocked THEN
     // Ordre de relâchement : vitesse relâchée immédiatement, direction tenue
     // jusqu'à ReleaseOrderDelay, puis direction relâchée (AC1/AC2).
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
@@ -4735,7 +4751,7 @@ ELSIF SafeStop OR PermitFinalBlocked THEN
     // SafeStop n'est PAS un défaut : pas de FAULT, pas de latch, pas de Reset requis.
     // Les sorties sont coupées tant que l'une des causes est TRUE ; retour nominal dès sa retombée.
     // BrakeCmd (= RelayFwd OR RelayRev, §6) retombe à FALSE automatiquement.
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
@@ -4746,7 +4762,7 @@ ELSIF SenseHoldActive THEN
     // §3bis : RequestedStep retombé à 0 mais sens encore commandé -&gt; on TIENT le
     // contacteur de sens jusqu'à FwdRevSpeedFeedbackOff (debounced DropConfirmDelay)
     // OU T_max. AuthorizedStep=0 (aucun contacteur de vitesse), seul le sens est tenu.
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
@@ -4756,34 +4772,54 @@ ELSIF SenseHoldActive THEN
     Busy := TRUE;
 ELSIF NOT MotorRequest THEN
     // Toute annulation de demande annule la temporisation de hausse en cours.
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.READY;
 ELSIF RestartRequired OR DeadTimePending THEN
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
     StepDelayTarget := 0;
     AuthorizedStep := 0;
     State := E_WinchFinalInterlockState.WAIT_RESTART_DELAY;
     Busy := TRUE;
 ELSE
-    // ⚡ Progression de palier directe : la temporisation (tempo palier) est gérée
-    // par le métier (FB_Winch). La barrière finale transmet directement la consigne
-    // sans micro-coupure des contacteurs.
-    StepDelay(IN := FALSE, PT := T#1s250ms);
+    // ⚡ Progression de palier : la cadence NOMINALE est faite par le métier
+    // (FB_WinchStepShaper). La barrière finale ajoute un PLANCHER DUR indépendant :
+    // AuthorizedStep ne monte jamais de plus de +1 cran / CST_StepRampFloorDelay,
+    // quelle que soit la consigne amont. Descente immédiate. 1er cran immédiat
+    // (frein + sens). Si le shaper déraille (rampe à 0 -&gt; palier 5 instantané),
+    // l'interlock ramène quand même la montée en crans (défense en profondeur).
+    // NOT StepDelay.Q : un TON garde .Q TRUE tant que IN est TRUE (pas d'impulsion).
+    // Sans ce terme, une fois PT ecoule le +1 ci-dessous s'appliquerait a CHAQUE scan
+    // (1 -&gt; 5 en quelques scans, contacteurs relaches d'un coup). Ici le timer se re-arme
+    // apres chaque cran -&gt; les contacteurs de vitesse s'enclenchent EN CASCADE, 1 / PT.
+    StepDelay(IN := (RequestedStepClamped &gt; AuthorizedStep) AND (AuthorizedStep &gt; 0) AND NOT StepDelay.Q,
+              PT := CST_StepRampFloorDelay);
     StepDelayElapsed := StepDelay.ET;
-    StepDelayTarget := 0;
-    AuthorizedStep := RequestedStepClamped;
+    StepDelayTarget := RequestedStepClamped;
+
+    IF RequestedStepClamped = 0 THEN
+        AuthorizedStep := 0;
+    ELSIF RequestedStepClamped &lt; AuthorizedStep THEN
+        AuthorizedStep := RequestedStepClamped;        // descente : immédiate
+    ELSIF AuthorizedStep = 0 THEN
+        AuthorizedStep := 1;                           // 1er cran immédiat
+    ELSIF StepDelay.Q THEN
+        AuthorizedStep := AuthorizedStep + 1;          // +1 cran par CST_StepRampFloorDelay
+    END_IF;
 
     IF (AuthorizedStep &gt; 0) OR (RequestedStepClamped &gt; 0) THEN
         RelayFwd := RequestedRelayFwd;
         RelayRev := RequestedRelayRev;
-        Contactor1 := RequestedContactor1;
-        Contactor2 := RequestedContactor2;
-        Contactor3 := RequestedContactor3;
-        Contactor4 := RequestedContactor4;
+        // Contacteurs de vitesse MASQUÉS par AuthorizedStep (table cumulative :
+        // P1={} P2={K1} P3={K1,K2} P4={K1,K2,K3} P5={K1,K2,K3,K4}). La barrière ne
+        // laisse jamais fermer plus de contacteurs que son propre palier autorisé.
+        Contactor1 := RequestedContactor1 AND (AuthorizedStep &gt;= 2);
+        Contactor2 := RequestedContactor2 AND (AuthorizedStep &gt;= 3);
+        Contactor3 := RequestedContactor3 AND (AuthorizedStep &gt;= 4);
+        Contactor4 := RequestedContactor4 AND (AuthorizedStep &gt;= 5);
     END_IF;
 
     IF NOT BrakeFeedback THEN

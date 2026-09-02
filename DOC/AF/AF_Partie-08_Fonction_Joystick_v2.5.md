@@ -381,7 +381,7 @@ L'intention de vitesse issue du manche (`SpeedTgt` 0.0 à 100.0 %) est unifiée 
 |---|---|---|---|
 | `Enable` | `BOOL` | Active le bloc | `TRUE` fixe (`PRG_02_Acquisition`) |
 | `Reset` | `BOOL` | Acquittement défaut (front) | `PRG_07_Supervision.FaultMachineReset_IHM` |
-| `ArmingPermit` | `BOOL` | Seule permission d'armement — `FALSE` = armement bloqué + désarme un geste armé | ⚠️ `TRUE` câblé en dur, voir §10 Q1 |
+| `ArmingPermit` | `BOOL` | Seule permission d'armement — `FALSE` = armement bloqué + désarme un geste armé | Produit par PRG_04 = base honnête + dispo par axe/sens (T224), voir §10 Q1 |
 | `BusCanOpenOP` / `JoystickOP` | `ST_Diag_Device` | Présence nœud CAN / device esclave | `FB_Diag_CanOpen` |
 | `RawX` / `RawY` | `INT` | Axe brut (0..10000) | `HwIn.Operator` |
 | `RawButton` | `BOOL` | Bouton homme-mort brut | `HwIn.Operator` |
@@ -576,14 +576,24 @@ y est un `BOOL` "au neutre", vs `INT` valeur réelle dans `ST_JoystickState`) �
 
 ## 10 · ❓ TBD
 
-- ✅ **Q1 — `ArmingPermit` câblé** (résolu 2026-08-29, T176 ; **révisé 2026-08-31**) : producteur légitime = **PRG_04_Treuils_Benne**.
-  **Règle générale** : on ne peut armer QUE si au moins un axe (treuil M1/M2 ou translation M3) a un
-  **permis de mouvement effectif** — sinon aucun mouvement n'est possible, l'armement serait trompeur.
-  `ArmingPermit := (EffectivePermitM1_Ascent OR EffectivePermitM1_Descend OR EffectivePermitM2_Ascent
-  OR EffectivePermitM2_Descend OR NOT TranslationSafety.SafeStop) AND NOT instBucket.Lifecycle.Busy
-  AND NOT BenneBusyFallEdge.Q` (combiné interlock benne conservé). Publié via le bus `Data` et consommé
-  `PRG_02_Acquisition.st` (plus de littéral `TRUE` — gate anti-littéral **G461** en palier C).
-  Le désarmement par changement de mode (`Auth.Mode`, signal 1 de la v0.1) reste un point d'arbitrage ouvert
+- ✅ **Q1 — `ArmingPermit` câblé** (résolu 2026-08-29, T176 ; révisé 2026-08-31 ; **T224 2026-09-02**) : producteur légitime = **PRG_04_Treuils_Benne**.
+  **Règle générale** : on ne peut armer QUE si au moins une action sélectionnée peut RÉELLEMENT
+  partir — sinon l'armement serait trompeur.
+  `ArmingPermit := NOT ModeDisabled AND NOT ContactorOff AND NOT PowerCutOff AND NOT BucketBusy
+  AND ArmingAvailability.AnyAxisAvail` où `AnyAxisAvail` = OR des 6 disponibilités par axe×sens
+  (`M1/M2 Ascent/Descend` = `EffectivePermitM*_*` (process + safety + NOT SafeStop de cet axe +
+  verif couplage) `AND NOT instSafetyWinchM*.Fault.Latched` ; `M3 Tremie/Maintenance` =
+  `EffectivePermitM3_* AND NOT TranslationSafety.SafeStop AND NOT .PowerCutOff`, bus PRG_05 lag 1 scan).
+  Le struct `ST_ArmingAvailability` (6 dispo + `AnyAxisAvail` + `BlockedReason : E_ArmingBlockReason`)
+  est publié via `Data.ArmingAvailability` pour l'IHM / troubleshooting (« pourquoi ça n'arme pas »).
+  Consommé par `PRG_02_Acquisition.st` (plus de littéral `TRUE` — gate anti-littéral **G461**).
+  **Reprise après perte de disponibilité (T224)** : nouveau FRONT homme-mort GLOBAL — `FB_Joystick`
+  désarme le geste entier sur `NOT ArmingPermit` (`DeadmanArmed := FALSE; DeadmanArmPending := FALSE`),
+  et exige un nouvel appui bouton maintenu `DeadmanArmHoldTime`. Aucun réarmement ciblé par axe,
+  aucune reprise au neutre seul.
+  ⚠️ **Non couvert (arbitré T224, voie a)** : `RestartInhibit` / `WAIT_RESTART_DELAY` transitoires
+  de la barrière finale (`FB_WinchOutputInterlock`, exécutée en `PRG_06` hors périmètre) — armement
+  trompeur bref (~1,5 s) accepté, les fautes latchées et SafeStop sont eux couverts en amont.
   (voir `DOC/WFLOW/AUDITS/PRG02_20260824/`).
 - ✅ **Q2 — arbitré 2026-08-29** (validation humaine) : **ne pas confondre**. L'**armement** homme-mort
   (front bouton + 100ms + `ArmingPermit`) est géré par le **joystick** — c'est sa responsabilité,
