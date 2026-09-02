@@ -4931,11 +4931,12 @@ tasks:
   bloque_par: []
 - id: T224
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C4
   domaine: JOYSTICK / AUTORISATION MOUVEMENT
-  agent: ''
+  agent: 'CDX (exécution) — arbitrages tranchés : reprise=B (front homme-mort global) · forme=X (1 booléen + struct diag) · scope conflict AC2/AC3 flaggé (défaut : vues amont)'
   date: '2026-09-02T13:15:00+02:00'
+  locked_at: '2026-09-02T16:20:00+02:00'
   titre: ArmingPermit cohérent avec disponibilité réelle des actionneurs
   contexte: >
     ArmingPermit peut actuellement rester TRUE alors qu'un interlock final,
