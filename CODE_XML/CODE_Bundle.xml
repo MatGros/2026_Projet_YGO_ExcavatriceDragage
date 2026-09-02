@@ -9061,6 +9061,33 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
 🔓 Demande frein M3 arbitree</xhtml>
               </documentation>
             </variable>
+            <variable name="M1MovementInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚦 Disponibilite mouvement barriere finale ===
+TRUE = une tempo idle / inhibition de l'interlock final interdit REELLEMENT de bouger maintenant
+(FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien.
+🚦 Treuil M1 — mouvement inhibe par tempo interlock final</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2MovementInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Treuil M2 — mouvement inhibe par tempo interlock final</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3MovementInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Translation M3 — mouvement inhibe par tempo interlock final</xhtml>
+              </documentation>
+            </variable>
             <variable name="PowerKeepAliveACmd">
               <type>
                 <BOOL />
@@ -37235,6 +37262,15 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif</xhtml>
               </documentation>
             </variable>
+            <variable name="MovementInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04 via PRG_06) ===
+&lt;-- [STAT] TRUE = FB non pret ou inhibition redemarrage active : aucun mouvement M3 possible maintenant. N'arrete rien : retire la disponibilite.</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -37387,6 +37423,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
     Ready := FALSE;
+    MovementInhibited := TRUE;   // FB neutralise -&gt; aucun mouvement M3 possible, disponibilite retiree
     Reason := E_TranslationFinalInterlockReason.NONE;
     RETURN;
 END_IF;
@@ -37446,6 +37483,9 @@ DriveFreqCmdWord := 0;
 
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
+
+// Disponibilite mouvement M3 (signal de disponibilite, n'arrete rien).
+MovementInhibited := NOT Ready OR RestartInhibit;
 
 IF Fault.Error THEN
     BrakeCmd := FALSE;
@@ -41657,6 +41697,15 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
 &lt;-- [DIAG] Ecoule temporisation ordre de relachement</xhtml>
               </documentation>
             </variable>
+            <variable name="MovementInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04) ===
+&lt;-- [STAT] TRUE = une tempo idle / inhibition interdit reellement de bouger maintenant (FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien : retire la disponibilite.</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="PermitFinalBlocked">
@@ -41995,6 +42044,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Error := (ErrorId &lt;&gt; 16#0000);
     State := E_WinchFinalInterlockState.DISABLED;
     RestartRequired := TRUE;
+    MovementInhibited := TRUE;   // FB neutralise -&gt; aucun mouvement possible, disponibilite retiree
     // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
     // - ErrorId &amp; RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d'Enable, acquittement conscient requis)
     // - StateAtError &amp; Reason : snapshot d'état et cause de blocage préservés pour diagnostic IHM
@@ -42373,6 +42423,16 @@ IF Error THEN
     Busy := FALSE; Done := FALSE; Ready := FALSE;
     State := E_WinchFinalInterlockState.FAULT;
 END_IF;
+
+// ── 6quater. Disponibilite mouvement ──
+// Synthese des inhibitions qui interdisent REELLEMENT de bouger maintenant, pour
+// que la disponibilite d'armement (PRG_04) et le voyant joystick tombent pendant
+// ces fenetres. StepDelay EXCLU : il bride l'acceleration palier, il n'interdit
+// pas de bouger. N'ajoute aucune coupure : signal de disponibilite uniquement.
+MovementInhibited := NOT Ready
+                     OR RestartInhibit
+                     OR ContactorStuck
+                     OR (DeadTime.IN AND NOT DeadTime.Q);
 </xhtml>
           </ST>
         </body>
@@ -47618,16 +47678,26 @@ END_IF;
 // EffectivePermitM*_* couvre deja process + safety + NOT SafeStop de cet axe +
 // verif couplage ; on ajoute NOT Fault.Latched (faute finale) et, pour M3, le
 // permis effectif directionnel + SafeStop/PowerCutOff M3 (bus PRG_05, lag 1 scan).
-ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched;
-ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched;
-ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched;
-ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched;
+// On retire aussi la disponibilite tant qu'une tempo idle de la barriere
+// finale (PRG_06) interdit reellement de bouger (temps mort directionnel,
+// anti-court-cycle, contacteur colle, FB non pret). Lecture bus PRG_06 au scan
+// N-1 : signal de disponibilite, aucune coupure.
+ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched
+                     AND NOT PRG_06_Outputs.Data.M1MovementInhibited;
+ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched
+                     AND NOT PRG_06_Outputs.Data.M1MovementInhibited;
+ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched
+                     AND NOT PRG_06_Outputs.Data.M2MovementInhibited;
+ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched
+                     AND NOT PRG_06_Outputs.Data.M2MovementInhibited;
 ArmM3TremieAvail  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
-                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff
+                     AND NOT PRG_06_Outputs.Data.M3MovementInhibited;
 ArmM3MaintenanceAvail := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
-                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff
+                     AND NOT PRG_06_Outputs.Data.M3MovementInhibited;
 
 ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM2AscentAvail OR ArmM2DescendAvail
@@ -49855,6 +49925,13 @@ M3_SetpointFrequencyHz       := instTranslationOutputInterlockM3.DriveFreqCmdWor
 
 // ── Bus inter-PRG M3 ──
 Data.TranslationBrakeCmd   := TranslationBrakeCmd;
+
+// ── Bus inter-PRG : disponibilite mouvement barriere finale ──
+// Consomme par la disponibilite d'armement (PRG_04, scan N-1). Signal de
+// disponibilite uniquement : n'ajoute aucune coupure.
+Data.M1MovementInhibited := instWinchOutputInterlockM1.MovementInhibited;
+Data.M2MovementInhibited := instWinchOutputInterlockM2.MovementInhibited;
+Data.M3MovementInhibited := instTranslationOutputInterlockM3.MovementInhibited;
 
 // ═══════════════════════════════════════════════════════════════
 // 🪝 §4 KOBOLD (capteur fond) — commande + sortie

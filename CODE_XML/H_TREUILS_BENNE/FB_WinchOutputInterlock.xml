@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T14:01:18.929241" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T14:01:18.929241">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T15:40:44.448916" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T15:40:44.448916">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -644,6 +644,15 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
 &lt;-- [DIAG] Ecoule temporisation ordre de relachement</xhtml>
               </documentation>
             </variable>
+            <variable name="MovementInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04) ===
+&lt;-- [STAT] TRUE = une tempo idle / inhibition interdit reellement de bouger maintenant (FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien : retire la disponibilite.</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <localVars>
             <variable name="PermitFinalBlocked">
@@ -982,6 +991,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Error := (ErrorId &lt;&gt; 16#0000);
     State := E_WinchFinalInterlockState.DISABLED;
     RestartRequired := TRUE;
+    MovementInhibited := TRUE;   // FB neutralise -&gt; aucun mouvement possible, disponibilite retiree
     // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
     // - ErrorId &amp; RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d'Enable, acquittement conscient requis)
     // - StateAtError &amp; Reason : snapshot d'état et cause de blocage préservés pour diagnostic IHM
@@ -1360,6 +1370,16 @@ IF Error THEN
     Busy := FALSE; Done := FALSE; Ready := FALSE;
     State := E_WinchFinalInterlockState.FAULT;
 END_IF;
+
+// ── 6quater. Disponibilite mouvement ──
+// Synthese des inhibitions qui interdisent REELLEMENT de bouger maintenant, pour
+// que la disponibilite d'armement (PRG_04) et le voyant joystick tombent pendant
+// ces fenetres. StepDelay EXCLU : il bride l'acceleration palier, il n'interdit
+// pas de bouger. N'ajoute aucune coupure : signal de disponibilite uniquement.
+MovementInhibited := NOT Ready
+                     OR RestartInhibit
+                     OR ContactorStuck
+                     OR (DeadTime.IN AND NOT DeadTime.Q);
 </xhtml>
           </ST>
         </body>

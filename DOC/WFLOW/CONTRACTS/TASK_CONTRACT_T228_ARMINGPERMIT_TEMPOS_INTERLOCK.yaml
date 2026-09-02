@@ -1,0 +1,111 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T228 : ArmingPermit couvre les tempos idle de l'interlock (cloture T224)
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T228_ARMINGPERMIT_TEMPOS_INTERLOCK.yaml
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T228_ARMINGPERMIT_TEMPOS_INTERLOCK
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Faire tomber ArmingPermit et la disponibilite de l'axe/sens concerne des
+    qu'une temporisation idle de la barriere finale de sortie (temps mort
+    directionnel, inhibition anti-court-cycle, contacteur colle, FB non pret)
+    interdit reellement le mouvement, pour que le voyant d'armement joystick ne
+    reste plus a 1 alors que la commande ne peut pas atteindre les contacteurs.
+
+  acceptance:
+    - id: AC1
+      statement: "FB_WinchOutputInterlock expose une sortie unique MovementInhibited qui est TRUE tant que le FB n'est pas pret, qu'une inhibition de redemarrage est active, qu'un temps mort directionnel court, ou qu'un contacteur est signale colle."
+      verified_by: "Tests unitaires FB_WinchOutputInterlock : MovementInhibited suit RestartInhibit / DeadTime actif / NOT Ready / ContactorStuck."
+    - id: AC2
+      statement: "FB_TranslationOutputInterlock expose une sortie MovementInhibited de meme semantique (au minimum NOT Ready OR RestartInhibit)."
+      verified_by: "Tests unitaires FB_TranslationOutputInterlock."
+    - id: AC3
+      statement: "PRG_06 publie sur le bus ST_OutputsInterPrg l'etat MovementInhibited de M1, M2 et M3 ; PRG_04 et PRG_05 le lisent au scan N-1."
+      verified_by: "Grep producteur unique PRG_06 + lecture PRG_04/PRG_05 ; bundle frais."
+    - id: AC4
+      statement: "Un axe x sens dont l'interlock final est MovementInhibited n'est plus disponible : ArmMxSensAvail = FALSE et Data.ArmingAvailability le reflete."
+      verified_by: "Tests integration : DeadTime / RestartInhibit actif M1 -> ArmM1AscentAvail=FALSE et ArmM1DescendAvail=FALSE."
+    - id: AC5
+      statement: "Si toutes les actions selectionnees sont MovementInhibited, ArmingPermit passe a FALSE avec le motif ALL_AXES_BLOCKED ; un axe encore libre garde ArmingPermit a TRUE."
+      verified_by: "Scenarios croises M1 inhibe / M2 libre et M1+M2+M3 inhibes."
+    - id: AC6
+      statement: "A l'expiration des tempos, la disponibilite et ArmingPermit reviennent automatiquement sans exiger de re-selection, mais aucun mouvement ne repart sans geste conscient (front homme-mort)."
+      verified_by: "Chronogramme : MovementInhibited retombe -> Avail revient ; le geste reste desarme cote FB_Joystick."
+    - id: AC7
+      statement: "Le nom de fichier est identique au nom de POU et son suffixe est egal au langage ST du bundle genere pour chaque POU modifie."
+      verified_by: "Gate structurel dedie et bundle PLCopenXML frais."
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st
+      - CODE/J_SUPERVISION/_TYPES/
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T228_ARMINGPERMIT_TEMPOS_INTERLOCK.yaml
+      - DOC/WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService.md
+    forbidden:
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/D_JOYSTICK/FB_Joystick.st
+      - CODE/B_AU_SECURITE/
+      - CODE/GVL_PERSISTENT.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - DOC/AF/
+      - ARCHIVES/
+
+  conservation:
+    must_survive:
+      - "ArmingPermit reste UN SEUL booleen (forme X de T224) ; FB_Joystick inchange."
+      - "MovementInhibited est un signal de disponibilite, pas un SafeStop ni un PowerCutOff : il n'arrete rien par lui-meme, il retire seulement la disponibilite."
+      - "La lecture PRG_04/PRG_05 <- PRG_06 se fait au scan N-1, doctrine de bus existante."
+      - "Aucun redemarrage automatique : la reprise reste un front homme-mort conscient (T222/T224)."
+      - "Les paliers et le rate-limit de StepDelay ne sont pas confondus avec une inhibition de mouvement : StepDelay seul ne met pas MovementInhibited (il bride l'acceleration, il n'interdit pas de bouger)."
+    dropped_on_purpose:
+      - "L'acceptation T224 d'un armement trompeur bref (~1,5 s) pendant RestartInhibit / WAIT_RESTART_DELAY : desormais couvert."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  design_decisions:
+    - "Agregat MovementInhibited (treuil) = NOT Ready OR RestartInhibit OR ContactorStuck OR (DeadTime.IN AND NOT DeadTime.Q). StepDelay EXCLU (rate-limit, pas blocage). PermitFinalBlocked interne peut etre inclus s'il traduit un refus directionnel persistant hors simple transitoire de calcul."
+    - "Cablage : ST_OutputsInterPrg gagne M1MovementInhibited / M2MovementInhibited / M3MovementInhibited. PRG_06 producteur unique. PRG_04 : ArmMx{Ascent,Descend}Avail AND NOT Data.MxMovementInhibited. PRG_05 : idem pour la disponibilite M3 publiee vers PRG_04 si c'est la voie retenue, sinon PRG_04 lit directement Data.M3MovementInhibited."
+    - "Reprise (AC6) = automatique sur la DISPONIBILITE (le voyant repasse a 1 quand la tempo tombe) mais le geste homme-mort reste desarme cote FB_Joystick tant que l'operateur n'a pas relache + re-arme. Coherent T222/T224 reprise=B."
+
+  alert_duty: >
+    STOP si : inclure DeadTime rend un axe indisponible en permanence (boucle),
+    si MovementInhibited cree un cycle de dependance PRG_04<->PRG_06, si la
+    lecture N-1 provoque un clignotement du voyant a chaque changement de palier
+    (signe que StepDelay a ete inclus par erreur), ou si un axe reellement libre
+    est desarme par l'inhibition d'un autre axe.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Cloture le scope_conflict_flagged de T224 (voie b retenue sur demande
+    operateur 2026-09-02 : "le permit armement doit etre = 0 si j'ai des tempos
+    idle qui m'interdisent de bouger").

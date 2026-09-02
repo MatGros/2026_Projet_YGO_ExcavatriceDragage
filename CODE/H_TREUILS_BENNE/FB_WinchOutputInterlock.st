@@ -79,6 +79,9 @@ VAR_OUTPUT
 
     // === DIAGNOSTICS ORDRE DE RELACHEMENT (AC1/AC2) ===
     ReleaseOrderElapsed             : TIME;                           // <-- [DIAG] Ecoule temporisation ordre de relachement
+
+    // === DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04) ===
+    MovementInhibited              : BOOL;                            // <-- [STAT] TRUE = une tempo idle / inhibition interdit reellement de bouger maintenant (FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien : retire la disponibilite.
 END_VAR
 VAR
     PermitFinalBlocked              : BOOL;                           // . [LOC] Demande directionnelle refusee au dernier niveau
@@ -167,6 +170,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Error := (ErrorId <> 16#0000);
     State := E_WinchFinalInterlockState.DISABLED;
     RestartRequired := TRUE;
+    MovementInhibited := TRUE;   // FB neutralise -> aucun mouvement possible, disponibilite retiree
     // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
     // - ErrorId & RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d'Enable, acquittement conscient requis)
     // - StateAtError & Reason : snapshot d'état et cause de blocage préservés pour diagnostic IHM
@@ -545,3 +549,13 @@ IF Error THEN
     Busy := FALSE; Done := FALSE; Ready := FALSE;
     State := E_WinchFinalInterlockState.FAULT;
 END_IF;
+
+// ── 6quater. Disponibilite mouvement ──
+// Synthese des inhibitions qui interdisent REELLEMENT de bouger maintenant, pour
+// que la disponibilite d'armement (PRG_04) et le voyant joystick tombent pendant
+// ces fenetres. StepDelay EXCLU : il bride l'acceleration palier, il n'interdit
+// pas de bouger. N'ajoute aucune coupure : signal de disponibilite uniquement.
+MovementInhibited := NOT Ready
+                     OR RestartInhibit
+                     OR ContactorStuck
+                     OR (DeadTime.IN AND NOT DeadTime.Q);
