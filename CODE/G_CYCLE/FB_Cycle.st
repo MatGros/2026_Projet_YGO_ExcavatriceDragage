@@ -104,15 +104,8 @@ VAR
     AbortEdge               : R_TRIG;       // . [LOC] Detecteur front montant AbortCycle
     ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
 
-    // === GATE CONTINU HOMME-MORT (permis par action hardware) ===
-    ProcessPermitM1_Ascent   : BOOL; // . [LOC] Permis ascending treuil M1 = JoystickDeflected AND DeadmanArmed
-    ProcessPermitM1_Descend  : BOOL; // . [LOC] Permis descending treuil M1 = JoystickDeflected AND DeadmanArmed
-    ProcessPermitM2_Ascent   : BOOL; // . [LOC] Permis ascending treuil M2 = JoystickDeflected AND DeadmanArmed
-    ProcessPermitM2_Descend  : BOOL; // . [LOC] Permis descending treuil M2 = JoystickDeflected AND DeadmanArmed
-    ProcessPermitBucket_Open   : BOOL; // . [LOC] Permis ouverture benne = JoystickDeflected AND DeadmanArmed
-    ProcessPermitBucket_Close   : BOOL; // . [LOC] Permis fermeture benne = JoystickDeflected AND DeadmanArmed
-    ProcessPermitM3_Tremie          : BOOL; // . [LOC] Permis translation M3 cote tremie = JoystickDeflected AND DeadmanArmed
-    ProcessPermitM3_Maintenance     : BOOL; // . [LOC] Permis translation M3 cote maintenance = JoystickDeflected AND DeadmanArmed
+    // === GATE CONTINU HOMME-MORT ===
+    CycleMotionPermit       : BOOL; // . [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme) ; gate commun a toutes les commandes d'actionneur du sequenceur. Le sens du mouvement reste porte par ReqAscent/ReqDescend de chaque etape.
 
     // === COMPTEUR PRELEVEMENTS (garde de front) ===
     SampleCountDone         : BOOL := FALSE; // . [LOC] F2: front de comptage SampleCount (1 seul increment par cycle)
@@ -144,6 +137,12 @@ VAR
     // === SOCLE DEFAUT TRANSVERSE ===
     instFault               : FB_FaultCore;                  // * [INST] Socle defaut transverse
     instCauses              : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes de defaut
+END_VAR
+VAR CONSTANT
+    // Paliers de vitesse treuil par etape (StepTgt des demandes WinchMxCmd, 1..5 ; 0 = arret).
+    CST_StepSlow   : INT := 1;   // Palier lent : referencement X1, remontee X5, controle X7, vidage X11
+    CST_StepDive   : INT := 3;   // Palier plongee Kobold X4 : debit mini requis pour la mesure de fond
+    CST_StepLoaded : INT := 4;   // Palier montee en charge X8 (bridage strict <= 4, jamais palier 5)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -267,14 +266,7 @@ Ready := Enable AND NOT Fault.Latched;
 // défléchi (JoystickDeflected) ET l'homme-mort est armé (DeadmanArmed). Chaque
 // commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par JoystickDeflected.
-ProcessPermitM1_Ascent        := JoystickDeflected AND DeadmanArmed;
-ProcessPermitM1_Descend      := JoystickDeflected AND DeadmanArmed;
-ProcessPermitM2_Ascent        := JoystickDeflected AND DeadmanArmed;
-ProcessPermitM2_Descend      := JoystickDeflected AND DeadmanArmed;
-ProcessPermitBucket_Open := JoystickDeflected AND DeadmanArmed;
-ProcessPermitBucket_Close := JoystickDeflected AND DeadmanArmed;
-ProcessPermitM3_Tremie        := JoystickDeflected AND DeadmanArmed;
-ProcessPermitM3_Maintenance   := JoystickDeflected AND DeadmanArmed;
+CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
 IF WaitingResume THEN
@@ -366,30 +358,29 @@ CASE State OF
 
     E_CycleStep.X1_HOMING:
         CycleStep := E_CycleStep.X1_HOMING;
-        CycleStateStr := 'X1 - Referencement codeurs (vitesses lentes)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
-        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
-        ExpectedDirection := 1;
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
-        OperatorActionId := 16#0401;
-        OperatorAction := 'Maintenir la montee lente vers les capteurs de referencement.';
+        ExpectedDirection := 0;
 
-        // Vitesses lentes pour chercher capteur top + référencement
-        IF NOT HomedM1 OR NOT HomedM2 THEN
-            WinchM1Cmd.RunRequest := ProcessPermitM1_Ascent;
-            WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;   // montée lente vers capteur top
-            WinchM1Cmd.StepTgt := 1;
-            WinchM2Cmd.RunRequest := ProcessPermitM2_Ascent;
-            WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-            WinchM2Cmd.StepTgt := 1;
-            IF HomingRequest THEN
-                State := E_CycleStep.X2_WORK_POS_SELECT;
-            END_IF;
+        // 🎯 Le referencement machine (datum M1/M2 + etat benne) est la responsabilite
+        // EXCLUSIVE de FB_MachineHomingCycle. SEMI_AUTO n'est cense etre accessible que si
+        // MachineHomed (gate FB_Modes). X1 ne fait donc QUE verifier la condition : elle
+        // n'emet AUCUN ordre de mouvement et ne contient aucun referencement.
+        IF HomedM1 AND HomedM2 THEN
+            CycleStateStr := 'X1 - Codeurs references : position validee';
+            ExpectedAxis := E_OperatorAxis.NONE;
+            WaitingForOperator := FALSE;
+            WaitingForProcess := TRUE;
+            OperatorActionId := 0;
+            OperatorAction := '';
+            State := E_CycleStep.X2_WORK_POS_SELECT;   // franchie sans mouvement
         ELSE
-            // déjà homé → passe vite
-            State := E_CycleStep.X2_WORK_POS_SELECT;
+            CycleStateStr := 'X1 - Machine non referencee';
+            ExpectedAxis := E_OperatorAxis.BUTTON;
+            WaitingForOperator := TRUE;
+            WaitingForProcess := FALSE;
+            OperatorActionId := 16#0401;
+            OperatorAction := 'Machine non referencee : passer en maintenance et lancer le cycle de referencement.';
         END_IF;
 
     E_CycleStep.X2_WORK_POS_SELECT:
@@ -407,7 +398,7 @@ CASE State OF
         IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
             SelectedWorkTarget := SelTarget;
             TranslationCmd.PositionTgt := SelTarget;
-            TranslationCmd.ReqStart := ProcessPermitM3_Tremie;
+            TranslationCmd.ReqStart := CycleMotionPermit;
             // Arrivée à la cible (Trémie/P1/Maintenance)
             IF JoystickDeflected AND (
                 (SelTarget = 1 AND Translation_At_Tremie) OR
@@ -433,7 +424,7 @@ CASE State OF
         IF Benne_IsOpen THEN
             State := E_CycleStep.X4_DESCEND_OPEN;
         ELSE
-            BucketCmd.ReqOpen := ProcessPermitBucket_Open;
+            BucketCmd.ReqOpen := CycleMotionPermit;
             IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
                 BucketCmd.ReqOpen := FALSE;
                 State := E_CycleStep.X4_DESCEND_OPEN;
@@ -453,13 +444,13 @@ CASE State OF
         OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
         // M1 et M2 descendent ensemble (synchro gérée en aval)
-        WinchM1Cmd.RunRequest := ProcessPermitM1_Descend;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
-        WinchM1Cmd.StepTgt  := 3;
-        WinchM2Cmd.RunRequest := ProcessPermitM2_Descend;
+        WinchM1Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.StepTgt  := 3;
-        BucketCmd.ReqKoboldMeasureEnable := ProcessPermitM1_Descend;
+        WinchM2Cmd.StepTgt  := CST_StepDive;
+        BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
 
         // Transition uniquement sur le retour dédié Kobold.
         IF JoystickDeflected AND KoboldContactFond THEN
@@ -487,12 +478,12 @@ CASE State OF
         OperatorActionId := 16#0405;
         OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
 
-        WinchM1Cmd.RunRequest := ProcessPermitM1_Ascent;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
-        WinchM1Cmd.StepTgt := 1;
-        WinchM2Cmd.RunRequest := ProcessPermitM2_Ascent;
+        WinchM1Cmd.StepTgt := CST_StepSlow;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-        WinchM2Cmd.StepTgt := 1;
+        WinchM2Cmd.StepTgt := CST_StepSlow;
 
         IF JoystickDeflected AND (M1_CablePosM >= RaiseTargetM) AND (M2_CablePosM >= RaiseTargetM) THEN
             WinchM1Cmd.RunRequest := FALSE;
@@ -515,7 +506,7 @@ CASE State OF
         WinchM1Cmd.RunRequest := FALSE;
         // L'ordre benne reste soumis au même homme-mort que le cycle : aucune
         // commande d'actionneur ne doit survivre à la perte du permis opérateur.
-        BucketCmd.ReqClose := ProcessPermitBucket_Close;
+        BucketCmd.ReqClose := CycleMotionPermit;
 
         IF JoystickDeflected AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.ReqClose := FALSE;
@@ -534,12 +525,12 @@ CASE State OF
         OperatorActionId := 16#0407;
         OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
 
-        WinchM1Cmd.RunRequest := ProcessPermitM1_Ascent;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
-        WinchM1Cmd.StepTgt  := 1;
-        WinchM2Cmd.RunRequest := ProcessPermitM2_Ascent;
+        WinchM1Cmd.StepTgt  := CST_StepSlow;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-        WinchM2Cmd.StepTgt  := 1;
+        WinchM2Cmd.StepTgt  := CST_StepSlow;
 
         IF JoystickDeflected
            AND (M1_CablePosM >= (TouchPositionM + CtrlAscentDistM))
@@ -560,12 +551,12 @@ CASE State OF
         OperatorActionId := 16#0408;
         OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
-        WinchM1Cmd.RunRequest := ProcessPermitM1_Ascent;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
-        WinchM1Cmd.StepTgt  := 4;
-        WinchM2Cmd.RunRequest := ProcessPermitM2_Ascent;
+        WinchM1Cmd.StepTgt  := CST_StepLoaded;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-        WinchM2Cmd.StepTgt  := 4;
+        WinchM2Cmd.StepTgt  := CST_StepLoaded;
 
         IF JoystickDeflected AND M1_CablePosM >= CableLimitM1AscentM THEN
             WinchM1Cmd.RunRequest := FALSE;
@@ -606,7 +597,7 @@ CASE State OF
         OperatorAction := 'Maintenir la translation vers la tremie de dechargement.';
 
         TranslationCmd.PositionTgt := 1; // Trémie
-        TranslationCmd.ReqStart := ProcessPermitM3_Tremie;
+        TranslationCmd.ReqStart := CycleMotionPermit;
 
         IF JoystickDeflected AND Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
@@ -629,13 +620,13 @@ CASE State OF
         // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
         // précédent). Les deux treuils restent synchrones et sous homme-mort.
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
-        WinchM1Cmd.RunRequest := ProcessPermitM1_Descend;
-        WinchM1Cmd.StepTgt  := 1;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.StepTgt  := CST_StepSlow;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.RunRequest := ProcessPermitM2_Descend;
-        WinchM2Cmd.StepTgt  := 1;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.StepTgt  := CST_StepSlow;
 
-        BucketCmd.ReqOpen := ProcessPermitBucket_Open AND WinchM1Cmd.ReqDescend;
+        BucketCmd.ReqOpen := CycleMotionPermit AND WinchM1Cmd.ReqDescend;
 
         IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
@@ -695,7 +686,7 @@ END_IF;
 // 🛑 Relâchement du manche (retour au centre) OU de l'homme-mort : neutralisation
 // des demandes actives. Gate continu : aucune commande d'actionneur ne survit à la
 // perte du permis opérateur (manche défléchi ET homme-mort armé).
-IF Lifecycle.Busy AND NOT ProcessPermitM1_Ascent THEN
+IF Lifecycle.Busy AND NOT CycleMotionPermit THEN
     WinchM1Cmd.RunRequest := FALSE;
     WinchM2Cmd.RunRequest := FALSE;
     TranslationCmd.ReqStart := FALSE;

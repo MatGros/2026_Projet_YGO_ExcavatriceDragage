@@ -2,6 +2,7 @@
 
 > **STUB** créé rapidement pendant la MES 2026-09-02. À compléter.
 > Contrat : `TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml`
+> État actuel figé (référence non-régression) : `BASELINE_SEQUENCEURS_HOMING_CYCLE_20260903.md`
 
 ---
 
