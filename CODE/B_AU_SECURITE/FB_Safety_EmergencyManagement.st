@@ -519,10 +519,14 @@ IF TonArmPulseInhibit.Q THEN
     ArmPulseInhibitActive := FALSE;
 END_IF;
 
+// ⚠️ PAS de `NOT ArmPulseInhibitActive` ici : cette garde est armée dès le départ de
+//    séquence (SeqRunStartEdge sur <> IDLE) et tiendrait 5 s -> elle étoufferait l'étape
+//    PULSE elle-même (contradiction : PULSE n'existe qu'après un départ qui a armé la garde).
+//    L'anti-réessai 5 s est appliqué en amont (garde départ IDLE) et en aval
+//    (FB_ContactorProtector Cfg_MinInterval sur la sortie physique, PRG_06).
 Cmd.ArmPulse_Cmd  := Enable AND (ArmingSeqStep = CST_STEP_PULSE)
                      AND NOT BtnEmergencyCutOff
-                     AND (NOT PowerCutOffRequest OR BypassArmingPreconditions OR BypassRedundancyTest)
-                     AND NOT ArmPulseInhibitActive;
+                     AND (NOT PowerCutOffRequest OR BypassArmingPreconditions OR BypassRedundancyTest);
 // 🧪 TestCutActive : signale à la simulation qu'un canal est coupé pour le test de
 // redondance A/B (ForceTestA/B). La simulation ouvre alors la boucle AU (SimChainOk=FALSE)
 // pour que le test valide la chute de chaîne — sans dépendre de PowerCutOff_A/B (cercle cassé).
