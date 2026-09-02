@@ -186,8 +186,8 @@ VAR
     DescendPermitDiveBucketOpen : BOOL; // mode Dive actif + benne ouverte = descente permise
     // pilotage unitaire M2 "sécurisé" -- bornes ouvert/fermé + palier 1
     ManualBucketLimitsActive : BOOL;
-    SlackCableAscentStep1    : BOOL; // mou de câble en récupération -- bride la montée au Palier 1
-    BucketNotClosedAscentStep1 : BOOL; // benne non fermée à 100% à la montée -- bride la montée au Palier 1
+    SlackCableAscentCapStep1    : BOOL; // mou de câble en récupération -- bride la montée au Palier 1
+    BucketNotClosedAscentCapStep1 : BOOL; // benne non fermée à 100% à la montée -- bride la montée au Palier 1
 
     // Bypass simplifié séquence FB_DiveSearch -- front montant
     // Kobold pendant une descente couplée confirme directement le fond, sans passer par les
@@ -353,13 +353,13 @@ instBucket(
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
 WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
-BucketNotClosedAscentStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
+BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
 // 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
 // au §5bis (lag d'un cycle automate nominal, sécurisé en amont par la lecture directe de M2_TensionedCable_DI).
-SlackCableAscentStep1 := NOT GVL_IHM.Commun.Bypass.SlackCable
+SlackCableAscentCapStep1 := NOT GVL_IHM.Commun.Bypass.SlackCable
     AND NOT PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND (
     ((instSafetyWinchM1.Fault.ErrorId AND 16#0008) <> 16#0000) OR
     ((instSafetyWinchM2.Fault.ErrorId AND 16#0008) <> 16#0000) OR
@@ -1008,7 +1008,7 @@ END_IF;
 // Brider M2 seul (bloc M2-propre ci-dessous) laisserait M1 monter plus vite -> vecteurs
 // contacteurs M1<>M2 -> FB_SyncContactor (PRG_06) -> ContactorMismatch -> SafeStop.
 // En couple les 2 treuils sont lies : la limite benne s'applique aux 2.
-IF CoupledBoth AND (BucketNotClosedAscentStep1 OR SlackCableAscentStep1) THEN
+IF CoupledBoth AND (BucketNotClosedAscentCapStep1 OR SlackCableAscentCapStep1) THEN
     CommonMaxStepAscent := 1;
 END_IF;
 
@@ -1029,7 +1029,7 @@ IF instBucket.M2_BucketJogLimit OR ManualBucketLimitsActive THEN
     M2MaxStepUp   := 1;
     M2MaxStepDown := 1;
 END_IF;
-IF BucketNotClosedAscentStep1 OR SlackCableAscentStep1 THEN
+IF BucketNotClosedAscentCapStep1 OR SlackCableAscentCapStep1 THEN
     M2MaxStepUp := 1;
 END_IF;
 M2MinStepUp   := CommonMinStepUp;
@@ -1141,8 +1141,10 @@ ReqM2Winch.ReqAscent                := M2LogicReqAscent;
 ReqM2Winch.ReqDescend               := M2LogicReqDescend;
 ReqM2Winch.SpeedStepReq             := M2LogicRequestStepTgt;
 // Clamp de palier agrégé en §5ter : bornes communes M1=M2 (CommonMaxStep*) puis
-// M2-propre (M2MaxStep*) — M2_BucketJogLimit, ManualBucketLimitsActive,
-// BucketNotClosedAscentStep1, SlackCableAscentStep1 ne réduisent jamais M1.
+// M2-propre (M2MaxStep*) — M2_BucketJogLimit / ManualBucketLimitsActive ne réduisent
+// jamais M1 (pilotage unitaire M2). BucketNotClosedAscentCapStep1 /
+// SlackCableAscentCapStep1 : réduisent M1 aussi UNIQUEMENT en pilotage couplé
+// (CoupledBoth) — les 2 treuils liés doivent rester au même palier.
 // D13 : reconstruction de table M2 supprimée — le clamp M2MaxStep* := 1 suffit
 // (StepNumber ≤ 1 → seuls les états P1 sont commandés).
 ReqM2Winch.MaxStepUp                := M2MaxStepUp;
