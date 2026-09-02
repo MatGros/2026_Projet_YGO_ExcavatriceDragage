@@ -79,6 +79,7 @@ VAR
     MaintainB_NoBlock         : BOOL; // . [LOC] Maintien B autorise (pas de coupure ni defaut)
 
     // === TEMPORISATEURS LOGIQUES ===
+    TonPreArm               : TON; // . [LOC] Delai avant assertion PowerKeepAlive (evite le claquement simultane des contacteurs)
     TonTestA                : TON; // . [LOC] Timer auto-test canal A
     TonRestoreA             : TON; // . [LOC] Timer restauration canal A
     TonTestB                : TON; // . [LOC] Timer auto-test canal B
@@ -91,6 +92,7 @@ VAR
     TonArmingFailedDisplay  : TON; // . [LOC] Timer debounce affichage IHM rearmement
     SeqRunStartEdge         : R_TRIG; // . [LOC] Front montant "sequence en cours" (arme la garde anti-chatter)
     ArmPulseInhibitActive   : BOOL;   // . [LOC] Garde anti-chatter : aucune nouvelle tentative d'armement (test A/B ou impulsion)
+    PreArmDelayActive       : BOOL;   // . [LOC] Delai pre-armement en cours (appui pris en compte, PowerKeepAlive pas encore asserte)
 
     // === SOCLE DEFAUT STANDARD (FB_FaultCore) ===
     instFault               : FB_FaultCore;                  // * [INST] Socle defaut (liste de causes -> ST_Fault)
@@ -98,7 +100,10 @@ VAR
 END_VAR
 VAR CONSTANT
     // === TEMPORISATIONS NORMATIVES DE SECURITE (FIXES) ===
-    CST_TestDuration         : TIME := T#200ms; // Duree auto-test canal A ou B
+    CST_PreArmDelay          : TIME := T#500ms; // Delai appui -> assertion PowerKeepAlive (staccato des contacteurs)
+    CST_TestDuration         : TIME := T#1s;    // Duree coupure canal A puis canal B pendant le test de redondance
+    CST_RestoreSettle        : TIME := T#500ms; // Temps d'etablissement apres restauration d'un canal (settle contacteur)
+    CST_KeepAliveHold        : TIME := T#1s;    // Maintien PowerKeepAlive etabli avant la demande contacteur de puissance
     CST_ArmingPulseDuration  : TIME := T#1s;    // Duree impulsion rearmement contacteur
     CST_ArmingConfirmTimeout : TIME := T#2s;    // Timeout confirmation engagement contacteur
     CST_ArmingLockout        : TIME := T#5s;    // Duree verrouillage anti-reessai apres echec
@@ -190,6 +195,7 @@ IF Enable THEN
         EmergencyArmingFailedAck := TRUE;
         EmergencyArmingLockoutActive := FALSE;
         StartupFail := FALSE;
+        PreArmDelayActive := FALSE;
     END_IF;
 END_IF;
 {endregion}
@@ -241,7 +247,11 @@ IF Enable THEN
     Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
     // 🛠️ BypassArmingPreconditions (MES trace) : lève ChainOk + NoBlock ; la séquence doit
     //    toujours partir du repos (Armable_Idle conservé). ⛔ NON SECURISE.
-    Armable := (BypassArmingPreconditions OR (Armable_ChainOk AND Armable_NoBlock)) AND Armable_Idle;
+    // NOT ArmPulseInhibitActive inclus ici : Status.State.Armable reflète alors la vérité
+    //   « on peut appuyer maintenant » — FALSE pendant les 5 s de garde dure post-séquence
+    //   (même après un armement réussi), TRUE de nouveau à l'échéance. Source unique pour l'IHM.
+    Armable := (BypassArmingPreconditions OR (Armable_ChainOk AND Armable_NoBlock))
+               AND Armable_Idle AND NOT ArmPulseInhibitActive;
     // CASE à étiquettes littérales : 0..6 = CST_STEP_* (GVL_Safety_Emergency).
     // La CI STruCpp exige ces littéraux pour les étiquettes CASE.
     CASE ArmingSeqStep OF
@@ -249,9 +259,9 @@ IF Enable THEN
             ForceTestA := FALSE;
             ForceTestB := FALSE;
             TonTestA(IN := FALSE, PT := CST_TestDuration);
-            TonRestoreA(IN := FALSE, PT := CST_TestDuration);
+            TonRestoreA(IN := FALSE, PT := CST_RestoreSettle);
             TonTestB(IN := FALSE, PT := CST_TestDuration);
-            TonRestoreB(IN := FALSE, PT := CST_TestDuration);
+            TonRestoreB(IN := FALSE, PT := CST_KeepAliveHold);
             TonArmingPulse(IN := FALSE, PT := CST_ArmingPulseDuration);
             TonArmingConfirm(IN := FALSE, PT := CST_ArmingConfirmTimeout);
 
@@ -259,13 +269,29 @@ IF Enable THEN
             //    ArmingSeqStep passe non-IDLE 1 scan -> Maintain_ChainOk TRUE -> PowerKeepAlive
             //    (contacteur CHAIN OK) colle puis lâche à l'abandon -> mitraillage. On ne
             //    démarre que si la cause est levée. Non contournable par les bypass MES.
+            // ⏱️ Délai pré-armement (CST_PreArmDelay) : l'appui est mémorisé mais on TEMPORISE
+            //    avant de passer non-IDLE, pour que PowerKeepAlive (contacteur CHAIN OK) ne
+            //    claque pas dans le même cycle que le reste -> contacteurs espacés, audibles un
+            //    par un. Pendant ce délai on reste en IDLE : aucun maintien asserté.
             IF ArmReqEdge.Q AND Armable AND NOT ArmPulseInhibitActive AND NOT BtnEmergencyCutOff
                AND (NOT PowerCutOffRequest OR BypassArmingPreconditions OR BypassRedundancyTest) THEN
+                PreArmDelayActive := TRUE;
+            END_IF;
+            IF BtnEmergencyCutOff
+               OR (PowerCutOffRequest AND NOT (BypassArmingPreconditions OR BypassRedundancyTest)) THEN
+                PreArmDelayActive := FALSE; // coupure pendant le délai -> on annule
+            END_IF;
+            TonPreArm(IN := PreArmDelayActive, PT := CST_PreArmDelay);
+            IF PreArmDelayActive AND TonPreArm.Q THEN
+                PreArmDelayActive := FALSE;
                 RedundancyTestFailedCause := FALSE;
                 EmergencyArmingFailedCause := FALSE;
-                // 🛠️ BypassRedundancyTest (MES trace) : saute TEST_A..RESTORE_B, va au pulse.
+                // 🛠️ BypassRedundancyTest (MES trace) : saute la coupure test A/B. On passe par
+                //    RESTORE_B (maintien PowerKeepAlive A+B établi CST_KeepAliveHold) AVANT la
+                //    demande contacteur de puissance -> CHAIN OK puis, 1 s plus tard, le gros
+                //    contacteur. Pas de claquement simultané.
                 IF BypassRedundancyTest THEN
-                    ArmingSeqStep := CST_STEP_PULSE;
+                    ArmingSeqStep := CST_STEP_RESTORE_B;
                 ELSE
                     ArmingSeqStep := CST_STEP_TEST_A;
                 END_IF;
@@ -278,7 +304,7 @@ IF Enable THEN
 
             IF TonTestA.Q THEN
                 ForceTestA := FALSE;
-                IF EmergencyChainClosed THEN
+                IF EmergencyChainClosed AND NOT (BypassArmingPreconditions OR BypassRedundancyTest) THEN
                     RedundancyTestFailedCause := TRUE;
                     LastAbortStep := CST_STEP_TEST_A;
                     LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_A);
@@ -291,10 +317,10 @@ IF Enable THEN
         2: // CST_STEP_RESTORE_A
             ForceTestA := FALSE;
             ForceTestB := FALSE;
-            TonRestoreA(IN := TRUE, PT := CST_TestDuration);
+            TonRestoreA(IN := TRUE, PT := CST_RestoreSettle);
 
             IF TonRestoreA.Q THEN
-                IF EmergencyChainClosed THEN
+                IF EmergencyChainClosed OR BypassArmingPreconditions OR BypassRedundancyTest THEN
                     ArmingSeqStep := CST_STEP_TEST_B;
                 ELSE
                     LastAbortStep := CST_STEP_RESTORE_A;
@@ -310,7 +336,7 @@ IF Enable THEN
 
             IF TonTestB.Q THEN
                 ForceTestB := FALSE;
-                IF EmergencyChainClosed THEN
+                IF EmergencyChainClosed AND NOT (BypassArmingPreconditions OR BypassRedundancyTest) THEN
                     RedundancyTestFailedCause := TRUE;
                     LastAbortStep := CST_STEP_TEST_B;
                     LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_B);
@@ -321,12 +347,15 @@ IF Enable THEN
             END_IF;
 
         4: // CST_STEP_RESTORE_B
+            // 🟰 Point d'entrée du chemin bypass : les deux canaux PowerKeepAlive sont
+            //    (ré)établis et TENUS CST_KeepAliveHold avant la demande contacteur de
+            //    puissance -> CHAIN OK s'entend d'abord, le gros contacteur 1 s après.
             ForceTestA := FALSE;
             ForceTestB := FALSE;
-            TonRestoreB(IN := TRUE, PT := CST_TestDuration);
+            TonRestoreB(IN := TRUE, PT := CST_KeepAliveHold);
 
             IF TonRestoreB.Q THEN
-                IF EmergencyChainClosed THEN
+                IF EmergencyChainClosed OR BypassArmingPreconditions OR BypassRedundancyTest THEN
                     ArmingSeqStep := CST_STEP_PULSE;
                 ELSE
                     LastAbortStep := CST_STEP_RESTORE_B;
@@ -462,6 +491,7 @@ END_IF;
 IF ((PowerCutOffRequest AND NOT (BypassArmingPreconditions OR BypassRedundancyTest))
     OR BtnEmergencyCutOff OR NOT Enable OR RedundancyTestFailedCause) THEN
     WasArmed := FALSE;
+    PreArmDelayActive := FALSE; // coupure/Enable OFF pendant le délai pré-armement -> annule
 END_IF;
 
 Maintain_ChainOk := (EmergencyChainClosed OR (ArmingSeqStep <> CST_STEP_IDLE) OR WasArmed);
@@ -570,7 +600,13 @@ ELSE
     //    symbolique vit ici : 0..6 = CST_STEP_* (GVL_Safety_Emergency).
     CASE ArmingSeqStep OF
         0: // IDLE (= CST_STEP_IDLE)
-            Status.OperatorMessage := 'AU: repos - pret a rearmer';
+            IF ArmPulseInhibitActive THEN
+                Status.OperatorMessage := 'AU: temporisation 5s en cours - patienter';
+            ELSIF PreArmDelayActive THEN
+                Status.OperatorMessage := 'AU: appui pris en compte - etablissement chaine';
+            ELSE
+                Status.OperatorMessage := 'AU: repos - pret a rearmer';
+            END_IF;
         1: // TEST_A (= CST_STEP_TEST_A)
             Status.OperatorMessage := 'AU: autotest canal A en cours';
         2: // RESTORE_A (= CST_STEP_RESTORE_A)
