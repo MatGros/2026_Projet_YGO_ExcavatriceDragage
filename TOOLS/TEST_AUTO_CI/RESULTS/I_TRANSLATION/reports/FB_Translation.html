@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Rapport de test — FB_Translation [PASS]</title>
+<title>Rapport de test — FB_Translation [FAIL]</title>
 <style>
     :root {
         --bg: #0b0f19; --bg-grid: rgba(255, 255, 255, 0.035); --surface: #131b2e; --surface-card: #182238; --border: #23304d; --text: #f1f5f9; --muted: #94a3b8;
@@ -87,6 +87,9 @@
     .table-export-actions { display: inline-flex; align-items: center; gap: 6px; }
     .btn-export { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; user-select: none; }
     .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
+    /* Bouton discret "retour à l'index" (les rapports vivent dans RESULTS/<domaine>/reports/) */
+    .btn-index { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--btn-border); color: var(--muted); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.15s ease; user-select: none; white-space: nowrap; }
+    .btn-index:hover { border-color: var(--accent); color: var(--accent); background: var(--surface-card); }
     .btn-export.btn-copied { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
     .failure { margin-top: 10px; padding: 12px 16px; background: var(--red-bg);
         border-left: 4px solid var(--red-text); border-radius: 6px; font-size: 13px; }
@@ -239,6 +242,10 @@
         padding: 12px 18px; margin: 14px 0; box-sizing: border-box; width: 100%; }
     .encaps-details summary, .pin-diagram-details summary { font-weight: 600; color: var(--text); font-size: 13px; cursor: pointer; user-select: text; }
     .encaps-details summary:hover, .pin-diagram-details summary:hover { color: var(--accent); }
+    .wiring-pastille { display: inline-block; margin-left: 8px; padding: 1px 9px; border-radius: 999px;
+        font-size: 11px; font-weight: 700; letter-spacing: 0.3px; vertical-align: 1px; }
+    .wiring-pastille-ok { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
+    .wiring-pastille-warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); }
     .encaps-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
     .encaps-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; }
     .encaps-table td { padding: 6px 10px; border-top: 1px solid var(--border); }
@@ -303,15 +310,16 @@
             <h1>FB_Translation</h1>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
+            <a class="btn-index" href="../../../index.html" title="Retour à l'index général (tous les tests)">⬅ Index</a>
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️ Mode Clair</button>
-            <span class="badge badge-pass">PASS</span>
+            <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-08-29 17:21:05</div>
+    <div class="exec-time">2026-09-03 01:16:48</div>
     
     <details class="toc-details" open>
-        <summary>📋 Sommaire (17 tests)</summary>
-        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-1">TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-2">TC-P11-010 Translation : commande variateur nominale</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-3">TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-4">TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-5">TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-6">TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-7">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-8">TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-9">TC-P11-006 Watchdog frein 500ms : frontiere 499/500</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-10">TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-11">TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-12">TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-13">TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-14">TC-P11-011.1 Meca B variante perte IHM : condition elargie</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-15">TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-16">TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)</a></li></ul>
+        <summary>📋 Sommaire (37 tests)</summary>
+        <ul class='toc-list'><li class="toc-item toc-pass"><a href="#test-fb-translation-0">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-1">TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-2">TC-P11-010 Translation : commande variateur nominale</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-3">TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-4">TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-5">TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-6">TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-7">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-8">TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-9">TC-P11-006 Watchdog frein 500ms : frontiere 499/500</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-10">TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-11">TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-12">TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-13">TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-14">TC-P11-011.1 Meca B variante perte IHM : condition elargie</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-15">TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-16">TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-17">TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-18">TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-19">TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-20">TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-21">TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-22">TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-23">TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-24">TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-25">TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-26">TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-27">TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-28">TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-29">TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-30">TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-31">TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-32">TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-33">TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0)</a></li><li class="toc-item toc-pass"><a href="#test-fb-translation-34">TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe)</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-35">TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise</a></li><li class="toc-item toc-fail"><a href="#test-fb-translation-36">TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise</a></li></ul>
     </details>
     
     <div class="subtitle" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;">
@@ -320,12 +328,12 @@
             <span style="margin-left:10px;font-size:12.5px;color:var(--muted);">(Bloc Fonctionnel (FB))</span>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:var(--text);">
-            17/17 vérifications validées
+            32/37 vérifications validées
         </div>
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 14 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 15 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -410,6 +418,14 @@
                 <td>Aucune erreur</td>
             </tr>
             <tr class="compil-row-pass">
+                <td><code>ST_fbTranslation_Cfg.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
                 <td><code>FB_Translation_PositionDecoder.st</code></td>
                 <td>FB</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -446,39 +462,14 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Translation</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 37 flux entrants · 9 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>FB_Translation</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 24 flux entrants · 9 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ Brake <span style="color:var(--muted);font-weight:500;">(FB_Brake)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CycleTimeCalc <span style="color:var(--muted);font-weight:500;">(FB_CycleTime)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ SpeedRamp <span style="color:var(--muted);font-weight:500;">(FB_Ramp)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ResetEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ DirectionChangeDelay <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ CaptorDebounceTon <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ ArrivalEdge <span style="color:var(--muted);font-weight:500;">(R_TRIG)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ TonBrakeRealFreqTimeout <span style="color:var(--muted);font-weight:500;">(TON)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instFault <span style="color:var(--muted);font-weight:500;">(FB_FaultCore)</span></span></div>
         </div>
         
         <div class="pin-diagram" style="background: var(--card-sub); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
-            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Mode <span class="pin-type" style="color:var(--muted);">E_Mode</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">StartStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SafeStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Direction <span class="pin-type" style="color:var(--muted);">INT</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTgt_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PositionSensorTarget <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorP1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitSwitchFwd <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitSwitchRev <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveStatusWord <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveActualFreqHz <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassContactorCheck <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassLimitSwitch <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFeedback <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InvertDriveDirection <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgRampAccelRate <span class="pin-type" style="color:var(--muted);">REAL := 20.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgRampDecelNormalRate <span class="pin-type" style="color:var(--muted);">REAL := 40.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CfgRampDecelFastRate <span class="pin-type" style="color:var(--muted);">REAL := 100.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DirectionInterlockDelay <span class="pin-type" style="color:var(--muted);">TIME := T#200ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ApproachSpeedTremieHz <span class="pin-type" style="color:var(--muted);">REAL := 10.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ApproachSpeedMaintenanceHz <span class="pin-type" style="color:var(--muted);">REAL := 10.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ApproachSpeedP1Hz <span class="pin-type" style="color:var(--muted);">REAL := 10.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveFreqScaleMaxHz <span class="pin-type" style="color:var(--muted);">REAL := 60.0</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">CaptorDebounce <span class="pin-type" style="color:var(--muted);">TIME := T#100ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeDelayContactClose <span class="pin-type" style="color:var(--muted);">TIME := T#100ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeDelayMagnetise <span class="pin-type" style="color:var(--muted);">TIME := T#300ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeDelayMotorDecel <span class="pin-type" style="color:var(--muted);">TIME := T#500ms</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFeedbackTimeout <span class="pin-type" style="color:var(--muted);">TIME := T#300ms</span></div></div>
-        <details style="margin:4px 0;">
-            <summary style="list-style:none;cursor:pointer;">
-                <div class="pin-row pin-row-unwired" style="background:rgba(225,29,72,0.18);border:1px solid #9f1239;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#fecdd3;font-weight:700;font-size:12px;">❓ Inconnues / Non Déclarées</span> <span style="font-size:11px;color:#fda4af;">(4 identifiants ▾)</span></div>
-                    <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.3);color:#ffe4e6;">Alerte</span></div>
-                </div>
-            </summary>
-            <div style="margin-top:2px;">
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">AccelRate</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">CycleTimeS</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">DecelRate</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
-            </div>
-            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #e11d48;margin-top:2px;">
-                <div class="pin-expr"><code style="color:#fda4af;background:rgba(225,29,72,0.2);font-size:11px;">Target</code></div>
-                <div class="pin-name"><span class="pin-tag" style="background:rgba(225,29,72,0.25);color:#fecdd3;font-size:10px;">❓ Non Déclaré</span></div>
-            </div></div>
-        </details></div>
+            <div class="pin-col pin-col-in"><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Enable <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Reset <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PowerContactorEngaged <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Mode <span class="pin-type" style="color:var(--muted);">E_Mode</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">RunRequest <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SafeStop <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">ReqMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SpeedTgt_Pct <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">PositionSensorTarget <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">SlowdownSensorP1 <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitSwitchTremie <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">LimitSwitchMaintenance <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EffectivePermitM3_Tremie <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">EffectivePermitM3_Maintenance <span class="pin-type" style="color:var(--muted);">BOOL := FALSE</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveStatusWord <span class="pin-type" style="color:var(--muted);">WORD</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">DriveActualFreqHz <span class="pin-type" style="color:var(--muted);">REAL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassContactorCheck <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BypassLimitSwitch <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">BrakeFeedback <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">InvertDriveDirection <span class="pin-type" style="color:var(--muted);">BOOL</span></div></div><div class="pin-row pin-row-wired" style="background:var(--surface);border:1px solid var(--border);margin:3px 0;"><div class="pin-expr"><span style="color:#38bdf8;font-weight:700;font-size:11px;font-family:monospace;">[VAR_INPUT]</span></div><div class="pin-name">Cfg <span class="pin-type" style="color:var(--muted);">ST_fbTranslation_Cfg</span></div></div></div>
             <div class="pin-block" style="min-width: 220px; background: var(--surface-card); border: 2px solid var(--accent); color: var(--text); font-size: 13px; letter-spacing: 0.3px; padding: 14px 10px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                 <span style="font-weight:900;font-size:15px;color:#c7d2fe;font-family:monospace;">FB_Translation</span>
                 
@@ -487,7 +478,7 @@
                 
                 <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;width:100%;font-size:11.5px;text-align:left;color:#e2e8f0;font-weight:normal;">
                     <div style="color:var(--accent);font-weight:800;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px;font-size:12px;">📊 Métriques I/O :</div>
-                    <div>• Entrées Formelles : <b style="color:#ffffff;">33</b></div>
+                    <div>• Entrées Formelles : <b style="color:#ffffff;">24</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">0</b></div>
                     <div>• Retours PRG : <b style="color:#ffffff;">0</b></div>
@@ -495,7 +486,7 @@
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">8</b></div>
                     <div>• Champs Out : <b style="color:#ffffff;">2</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">0</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">37 IN</b> / <b style="color:#ffffff;">9 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">24 IN</b> / <b style="color:#ffffff;">9 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -556,137 +547,111 @@
     </details>
     
     <details class="pin-diagram-details">
-        <summary>🔌 Interface & câblage production</summary>
+        <summary>🔌 Interface & câblage production <span class="wiring-pastille wiring-pastille-warn" title="Écart(s) interface ↔ câblage production — informatif, n'impacte pas le résultat du rapport">⚠️ 32 écarts</span></summary>
         <div class="af-warning-banner">
-            <div class="af-warning-title">⚠️ 41 écart(s) interface ↔ câblage production</div>
-            <ul><li>Pin <code>APPROACHSPEEDMAINTENANCEHZ</code> jamais câblé en production</li><li>Pin <code>APPROACHSPEEDP1HZ</code> jamais câblé en production</li><li>Pin <code>APPROACHSPEEDTREMIEHZ</code> jamais câblé en production</li><li>Pin <code>BRAKECOMMANDOPENCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BRAKECONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BRAKEDELAYCONTACTCLOSE</code> jamais câblé en production</li><li>Pin <code>BRAKEDELAYMAGNETISE</code> jamais câblé en production</li><li>Pin <code>BRAKEDELAYMOTORDECEL</code> jamais câblé en production</li><li>Pin <code>BRAKEFEEDBACK</code> jamais câblé en production</li><li>Pin <code>BRAKEFEEDBACKTIMEOUT</code> jamais câblé en production</li><li>Pin <code>BRAKERELEASEREQUEST</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BYPASSLIMITSWITCH</code> jamais câblé en production</li><li>Pin <code>CAPTORDEBOUNCE</code> jamais câblé en production</li><li>Pin <code>CFGRAMPACCELRATE</code> jamais câblé en production</li><li>Pin <code>CFGRAMPDECELFASTRATE</code> jamais câblé en production</li><li>Pin <code>CFGRAMPDECELNORMALRATE</code> jamais câblé en production</li><li>Pin <code>DIRECTION</code> jamais câblé en production</li><li>Pin <code>DIRECTIONINTERLOCKDELAY</code> jamais câblé en production</li><li>Pin <code>DRIVEACTUALFREQHZ</code> jamais câblé en production</li><li>Pin <code>DRIVEFREQSCALEMAXHZ</code> jamais câblé en production</li><li>Pin <code>DRIVESTATUSWORD</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>INVERTDRIVEDIRECTION</code> jamais câblé en production</li><li>Pin <code>LIMITSWITCHFWD</code> jamais câblé en production</li><li>Pin <code>LIMITSWITCHREV</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>POSITIONSENSORTARGET</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>REQUESTEDDRIVECONTROLWORD</code> jamais câblé en production</li><li>Pin <code>REQUESTEDDRIVEFREQHZ</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>SAFESTOP</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORP1</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORTREMIE</code> jamais câblé en production</li><li>Pin <code>SPEEDTGT_PCT</code> jamais câblé en production</li><li>Pin <code>STARTSTOP</code> jamais câblé en production</li><li>Pin <code>TARGETREACHED</code> jamais câblé en production</li></ul>
+            <div class="af-warning-title">⚠️ 32 écart(s) interface ↔ câblage production</div>
+            <ul><li>Pin <code>BRAKECOMMANDOPENCONFIRMED</code> jamais câblé en production</li><li>Pin <code>BRAKECONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BRAKEFEEDBACK</code> jamais câblé en production</li><li>Pin <code>BRAKERELEASEREQUEST</code> jamais câblé en production</li><li>Pin <code>BYPASSCONTACTORCHECK</code> jamais câblé en production</li><li>Pin <code>BYPASSLIMITSWITCH</code> jamais câblé en production</li><li>Pin <code>CFG</code> jamais câblé en production</li><li>Pin <code>DRIVEACTUALFREQHZ</code> jamais câblé en production</li><li>Pin <code>DRIVESTATUSWORD</code> jamais câblé en production</li><li>Pin <code>EFFECTIVEPERMITM3_MAINTENANCE</code> jamais câblé en production</li><li>Pin <code>EFFECTIVEPERMITM3_TREMIE</code> jamais câblé en production</li><li>Pin <code>ENABLE</code> jamais câblé en production</li><li>Pin <code>FAULT</code> jamais câblé en production</li><li>Pin <code>INVERTDRIVEDIRECTION</code> jamais câblé en production</li><li>Pin <code>LIMITSWITCHMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>LIMITSWITCHTREMIE</code> jamais câblé en production</li><li>Pin <code>MODE</code> jamais câblé en production</li><li>Pin <code>POSITIONSENSORTARGET</code> jamais câblé en production</li><li>Pin <code>POWERCONTACTORENGAGED</code> jamais câblé en production</li><li>Pin <code>READY</code> jamais câblé en production</li><li>Pin <code>REQMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>REQTREMIE</code> jamais câblé en production</li><li>Pin <code>REQUESTEDDRIVECONTROLWORD</code> jamais câblé en production</li><li>Pin <code>REQUESTEDDRIVEFREQHZ</code> jamais câblé en production</li><li>Pin <code>RESET</code> jamais câblé en production</li><li>Pin <code>RUNREQUEST</code> jamais câblé en production</li><li>Pin <code>SAFESTOP</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORMAINTENANCE</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORP1</code> jamais câblé en production</li><li>Pin <code>SLOWDOWNSENSORTREMIE</code> jamais câblé en production</li><li>Pin <code>SPEEDTGT_PCT</code> jamais câblé en production</li><li>Pin <code>TARGETREACHED</code> jamais câblé en production</li></ul>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 220px 1fr;gap:0;padding:0 8px 3px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;"><div style="text-align:right;padding-right:10px;">Source production → Entrées FB</div><div style="text-align:center;">Composant</div><div style="padding-left:10px;">Sorties FB → Consommateurs</div></div>
         <div class="pin-diagram">
             <div class="pin-col pin-col-in"><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">ENABLE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN ENABLE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">RESET <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN RESET <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN POWERCONTACTORENGAGED <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">MODE <span class="pin-type">IEC_E_MODE</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN MODE <span class="pin-type">IEC_E_MODE</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">STARTSTOP <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN RUNREQUEST <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SAFESTOP <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SAFESTOP <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIRECTION <span class="pin-type">IEC_INT</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN REQTREMIE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SPEEDTGT_PCT <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN REQMAINTENANCE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">POSITIONSENSORTARGET <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SPEEDTGT_PCT <span class="pin-type">IEC_REAL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SLOWDOWNSENSORTREMIE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN POSITIONSENSORTARGET <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SLOWDOWNSENSORMAINTENANCE <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SLOWDOWNSENSORTREMIE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">SLOWDOWNSENSORP1 <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SLOWDOWNSENSORMAINTENANCE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">LIMITSWITCHFWD <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN SLOWDOWNSENSORP1 <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">LIMITSWITCHREV <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN LIMITSWITCHTREMIE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DRIVESTATUSWORD <span class="pin-type">IEC_WORD</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN LIMITSWITCHMAINTENANCE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DRIVEACTUALFREQHZ <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN EFFECTIVEPERMITM3_TREMIE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSCONTACTORCHECK <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN EFFECTIVEPERMITM3_MAINTENANCE <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BYPASSLIMITSWITCH <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN DRIVESTATUSWORD <span class="pin-type">IEC_WORD</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BRAKEFEEDBACK <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN DRIVEACTUALFREQHZ <span class="pin-type">IEC_REAL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">INVERTDRIVEDIRECTION <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN BYPASSCONTACTORCHECK <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CFGRAMPACCELRATE <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN BYPASSLIMITSWITCH <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CFGRAMPDECELNORMALRATE <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN BRAKEFEEDBACK <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CFGRAMPDECELFASTRATE <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN INVERTDRIVEDIRECTION <span class="pin-type">IEC_BOOL</span></div>
         </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DIRECTIONINTERLOCKDELAY <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">APPROACHSPEEDTREMIEHZ <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">APPROACHSPEEDMAINTENANCEHZ <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">APPROACHSPEEDP1HZ <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">DRIVEFREQSCALEMAXHZ <span class="pin-type">IEC_REAL</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">CAPTORDEBOUNCE <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BRAKEDELAYCONTACTCLOSE <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BRAKEDELAYMAGNETISE <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BRAKEDELAYMOTORDECEL <span class="pin-type">IEC_TIME</span></div>
-        </div><div class="pin-row pin-row-unwired">
-            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span></div>
-            <div class="pin-name">BRAKEFEEDBACKTIMEOUT <span class="pin-type">IEC_TIME</span></div>
+            <div class="pin-expr"><span class='pin-missing'>⚠ non câblé en production</span> <span style="color:var(--muted);">→</span></div>
+            <div class="pin-name">IN CFG <span class="pin-type">ST_FBTRANSLATION_CFG</span></div>
         </div></div>
             <div class="pin-block">FB_Translation</div>
             <div class="pin-col pin-col-out"><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">READY <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT READY <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">FAULT <span class="pin-type">ST_FAULT</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT FAULT <span class="pin-type">ST_FAULT</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">TARGETREACHED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT TARGETREACHED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">REQUESTEDDRIVECONTROLWORD <span class="pin-type">IEC_WORD</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT REQUESTEDDRIVECONTROLWORD <span class="pin-type">IEC_WORD</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">REQUESTEDDRIVEFREQHZ <span class="pin-type">IEC_REAL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT REQUESTEDDRIVEFREQHZ <span class="pin-type">IEC_REAL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BRAKERELEASEREQUEST <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT BRAKERELEASEREQUEST <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BRAKECOMMANDOPENCONFIRMED <span class="pin-type">IEC_BOOL</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT BRAKECOMMANDOPENCONFIRMED <span class="pin-type">IEC_BOOL</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div><div class="pin-row pin-row-unwired pin-row-out">
-            <div class="pin-name">BRAKECONTACTORCHECK <span class="pin-type">ST_CONTACTORCHECK</span></div>
-            <div class="pin-expr"><span class='pin-missing'>⚠ jamais lu en production</span></div>
+            <div class="pin-name">OUT BRAKECONTACTORCHECK <span class="pin-type">ST_CONTACTORCHECK</span></div>
+            <div class="pin-expr"><span style="color:var(--muted);">→ Consommateur :</span> <span class='pin-missing'>⚠ jamais lu en production</span></div>
         </div></div>
         </div>
     </details>
@@ -794,23 +759,23 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_TranslationOutputInterlock</code></td>
-                <td>8</td><td>9</td>
-                <td>0</td><td>12</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (12 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>10</td><td>9</td>
+                <td>0</td><td>13</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (13 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Safety_Translation</code></td>
-                <td>30</td><td>12</td>
-                <td>0</td><td>17</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (17 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>32</td><td>14</td>
+                <td>0</td><td>19</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Translation</code></td>
-                <td>33</td><td>8</td>
-                <td>0</td><td>19</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (19 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>24</td><td>8</td>
+                <td>0</td><td>23</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (23 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr></tbody>
         </table>
     </details>
@@ -844,7 +809,7 @@
     </details>
     
     <details class="encaps-details" open style="margin-top: 16px;">
-        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 16 scénario(s) métier & sécurité machine</summary>
+        <summary>🎯 Tests Fonctionnels Métier & Procédé AF / TC <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — 36 scénario(s) métier & sécurité machine</summary>
         <div style="margin-top: 12px;">
             
         <article id="test-fb-translation-1" class="test-card test-card-pass test-card-collapsed">
@@ -969,9 +934,9 @@
                 
             </div>
         </article>
-        <article id="test-fb-translation-7" class="test-card test-card-pass test-card-collapsed">
+        <article id="test-fb-translation-7" class="test-card test-card-fail">
             <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
-                <span class="badge badge-pass">PASS</span>
+                <span class="badge badge-fail">FAIL</span>
                 <h3 style="flex: 1;">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate) </h3>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
@@ -986,7 +951,7 @@
                 <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
                 <ul class="checks-list"><li>mouvement Fwd -&gt; mot 1</li><li>inversion pas immediate (interlock)</li></ul>
             </details>
-                
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0</div><div class='failure-loc'>test_fb_translation.st:200</div><div class='failure-msg'>mouvement Fwd -&gt; mot 1</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
                 
             </div>
         </article>
@@ -1185,14 +1150,418 @@
                 
             </div>
         </article>
+        <article id="test-fb-translation-17" class="test-card test-card-fail">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-fail">FAIL</span>
+                <h3 style="flex: 1;">TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>Scan 1 : warmup (CycleTimeS=0.004) + démarrage rampe</li><li>500ms</li><li>Scan 5 : 400ms -&gt; frein desserré -&gt; mot FWD</li><li>Scan 6 : rampe à 50% -&gt; fréquence pleine 30Hz</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (8)</span></summary>
+                <ul class="checks-list"><li>frein non desserré -&gt; mot 0</li><li>magnétisation en cours -&gt; mot 1 (FWD)</li><li>magnétisation en cours -&gt; mot 1 (FWD)</li><li>magnétisation en cours -&gt; mot 1 (FWD)</li><li>frein desserré -&gt; mot 1 (FWD)</li><li>fréquence ~24Hz</li><li>mouvement FWD maintenu</li><li>fréquence pleine ~30Hz</li></ul>
+            </details>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0</div><div class='failure-loc'>test_fb_translation.st:466</div><div class='failure-msg'>magnétisation en cours -&gt; mot 1 (FWD)</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-18" class="test-card test-card-fail">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-fail">FAIL</span>
+                <h3 style="flex: 1;">TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Scan 1 : warmup + démarrage rampe vers Maintenance (Direction=-1)</li><li>Scan 5 : 400ms -&gt; frein desserré -&gt; mot REV</li><li>Scan 6 : rampe à 50% -&gt; fréquence pleine 30Hz</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (8)</span></summary>
+                <ul class="checks-list"><li>frein non desserré -&gt; mot 0</li><li>magnétisation en cours -&gt; mot 2 (REV)</li><li>magnétisation en cours -&gt; mot 2 (REV)</li><li>magnétisation en cours -&gt; mot 2 (REV)</li><li>frein desserré -&gt; mot 2 (REV)</li><li>fréquence ~24Hz</li><li>mouvement REV maintenu</li><li>fréquence pleine ~30Hz</li></ul>
+            </details>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — FB_T.REQUESTEDDRIVECONTROLWORD expected 2, got 0</div><div class='failure-loc'>test_fb_translation.st:520</div><div class='failure-msg'>magnétisation en cours -&gt; mot 2 (REV)</div><div class='failure-diff'>attendu <code class='val-expected'>2</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-19" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (4)</span></summary>
+                <ul class="scenario-list"><li>Monter à 50% FWD (6 scans, cf. TC-P11-016)</li><li>Capteur cible activé -&gt; debounce 100ms</li><li>Scan 8 : debounce écoulé -&gt; TargetReached + ArrivalLock -&gt; rampe à 0</li><li>Décélération normale 100%/s -&gt; 10%/100ms ; frein collé quand Current&lt;0.1</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (8)</span></summary>
+                <ul class="checks-list"><li>mouvement FWD établi</li><li>pas encore de capteur cible</li><li>debounce 100ms pas encore écoulé</li><li>debounce écoulé -&gt; TargetReached=TRUE</li><li>décélération en cours</li><li>arrêt sur capteur -&gt; frein collé, mot 0</li><li>arrêt sur capteur -&gt; freq 0</li><li>arrêt sur capteur -&gt; frein non desserré</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-20" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (5)</span></summary>
+                <ul class="scenario-list"><li>Monter à 50% FWD (6 scans)</li><li>Inversion demandée Direction=-1 -&gt; pas immédiate, décélération d&#x27;abord</li><li>Décélération à 0 puis délai 200ms -&gt; bascule REV</li><li>Scan 10 : délai 200ms écoulé -&gt; CommandedDirection=-1 -&gt; rampe REV</li><li>Scan 13 : 400ms de magnétisation -&gt; frein desserré -&gt; mot REV</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>mouvement FWD établi</li><li>inversion pas immédiate (interlock)</li><li>vitesse nulle, délai interlock en cours -&gt; mot 0</li><li>bascule REV, magnétisation en cours -&gt; mot 0</li><li>inversion complète -&gt; mot 2 (REV)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-21" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Monter à 50% FWD (6 scans)</li><li>SafeStop=TRUE -&gt; rampe rapide</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>mouvement FWD établi</li><li>SafeStop -&gt; décélération en cours</li><li>SafeStop -&gt; fréquence chute rapide</li><li>SafeStop -&gt; frein collé, mot 0</li><li>SafeStop -&gt; freq 0</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-22" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Monter à 50% FWD (6 scans)</li><li>StartStop=FALSE -&gt; rampe normale 40%/s</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
+                <ul class="checks-list"><li>mouvement FWD établi</li><li>décélération normale -&gt; freq encore élevée</li><li>décélération normale -&gt; freq ~18Hz</li><li>décélération normale -&gt; freq ~12Hz</li><li>arrêt normal -&gt; frein collé, mot 0</li><li>arrêt normal -&gt; freq 0</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-23" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>Warmup 3s nominal</li><li>3s warmup</li><li>Perte comm drive</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>nominal -&gt; pas de SafeStop</li><li>perte comm drive -&gt; bit1</li><li>SafeStop</li><li>bit1 -&gt; pas de PowerCutOff (comms ne coupent pas la puissance)</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-24" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Warmup 3s nominal</li><li>Perte heartbeat IHM</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (4)</span></summary>
+                <ul class="checks-list"><li>nominal -&gt; pas de SafeStop</li><li>perte heartbeat IHM -&gt; bit0</li><li>SafeStop</li><li>bit0 -&gt; pas de PowerCutOff</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-25" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>mauvaise rotation phases -&gt; bit2</li><li>SafeStop</li><li>bit2 -&gt; pas de PowerCutOff</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-26" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>thermique frein -&gt; bit3</li><li>SafeStop</li><li>bit3 -&gt; PowerCutOff</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-27" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Direction=0, BrakeCmd=FALSE, DriveActualFreqHz=1.0 -&gt; mouvement résiduel non commandé</li><li>1s -&gt; MecaA timeout</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>mouvement non commandé -&gt; bit5</li><li>SafeStop</li><li>bit5 -&gt; PowerCutOff</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-28" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Direction=1 + LimitSwitchTremie + fréquence &gt;0.5 -&gt; escalade Fdc</li><li>1.5s -&gt; overrun timeout</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>escalade Fdc -&gt; bit6</li><li>SafeStop</li><li>bit6 -&gt; PowerCutOff</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-29" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (3)</span></summary>
+                <ul class="scenario-list"><li>TremiePermit = NOT LimitSwitchTremie ; MaintenancePermit = MaintenanceM3TargetEnable AND NOT LimitSwitchMaintenance</li><li>Fdc Trémie atteinte -&gt; TremiePermit=FALSE</li><li>Fdc Maintenance atteinte -&gt; MaintenancePermit=FALSE</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (6)</span></summary>
+                <ul class="checks-list"><li>Fdc Trémie libre -&gt; TremiePermit=TRUE</li><li>cible MAINT autorisée + Fdc libre -&gt; MaintenancePermit=TRUE</li><li>Fdc Trémie -&gt; TremiePermit=FALSE</li><li>MaintenancePermit inchangé</li><li>TremiePermit inchangé</li><li>Fdc Maintenance -&gt; MaintenancePermit=FALSE</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-30" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>PowerContactorEngaged=FALSE -&gt; SafeStop</li><li>pas de défaut -&gt; pas de PowerCutOff</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-31" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Défaut laté : BrakeThermal</li><li>Cause disparue + Reset front -&gt; acquittement</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>thermique -&gt; bit3</li><li>bit3 -&gt; PowerCutOff</li><li>Reset -&gt; bit3 effacé</li><li>Reset -&gt; SafeStop levé</li><li>Reset -&gt; PowerCutOff levé</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-32" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (2)</span></summary>
+                <ul class="scenario-list"><li>Monter à 50% FWD (6 scans)</li><li>Fdc Trémie atteinte pendant mouvement FWD -&gt; Fault.Error -&gt; coupure</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (5)</span></summary>
+                <ul class="checks-list"><li>mouvement FWD établi</li><li>Fdc Trémie -&gt; défaut</li><li>défaut -&gt; mot 0</li><li>défaut -&gt; freq 0</li><li>défaut -&gt; frein non desserré</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-33" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>TremiePermit=FALSE (defaut) -&gt; EffectiveSafeStop=TRUE -&gt; rampe bloquee</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>TremiePermit=FALSE -&gt; mot 0</li><li>TremiePermit=FALSE -&gt; freq 0</li><li>TremiePermit=FALSE -&gt; frein non desserre</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-34" class="test-card test-card-pass test-card-collapsed">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-pass">PASS</span>
+                <h3 style="flex: 1;">TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe) </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (3)</span></summary>
+                <ul class="checks-list"><li>MaintenancePermit=FALSE -&gt; mot 0</li><li>MaintenancePermit=FALSE -&gt; freq 0</li><li>MaintenancePermit=FALSE -&gt; frein non desserre</li></ul>
+            </details>
+                
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-35" class="test-card test-card-fail">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-fail">FAIL</span>
+                <h3 style="flex: 1;">TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>TremiePermit=TRUE -&gt; EffectiveSafeStop=FALSE -&gt; rampe monte, mot FWD</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>TremiePermit=TRUE -&gt; mot 1 (FWD)</li><li>TremiePermit=TRUE -&gt; freq &gt; 0</li></ul>
+            </details>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0</div><div class='failure-loc'>test_fb_translation.st:1240</div><div class='failure-msg'>TremiePermit=TRUE -&gt; mot 1 (FWD)</div><div class='failure-diff'>attendu <code class='val-expected'>1</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
+            </div>
+        </article>
+        <article id="test-fb-translation-36" class="test-card test-card-fail">
+            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+                <span class="badge badge-fail">FAIL</span>
+                <h3 style="flex: 1;">TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise </h3>
+                <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
+            </header>
+            <div class="test-card-body">
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">📝 Scénario & Déroulé (1)</span></summary>
+                <ul class="scenario-list"><li>MaintenancePermit=TRUE -&gt; EffectiveSafeStop=FALSE -&gt; rampe monte, mot REV</li></ul>
+            </details>
+                
+            <details class="checks-details">
+                <summary class="checks-summary"><span class="checks-label">🔍 Vérifié (2)</span></summary>
+                <ul class="checks-list"><li>MaintenancePermit=TRUE -&gt; mot 2 (REV)</li><li>MaintenancePermit=TRUE -&gt; freq &gt; 0</li></ul>
+            </details>
+                <div class='failure'><div class='failure-head'>ASSERT_EQ — FB_T.REQUESTEDDRIVECONTROLWORD expected 2, got 0</div><div class='failure-loc'>test_fb_translation.st:1257</div><div class='failure-msg'>MaintenancePermit=TRUE -&gt; mot 2 (REV)</div><div class='failure-diff'>attendu <code class='val-expected'>2</code> · obtenu <code class='val-actual'>0</code></div></div>
+                
+            </div>
+        </article>
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (14)</summary>
-        <ul><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/I_TRANSLATION/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st</code></li><li><code>CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st</code></li><li><code>CODE/I_TRANSLATION/FB_Safety_Translation.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation.st</code></li></ul>
+        <summary>Fichiers source compilés (15)</summary>
+        <ul><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/A_COMMUN/FB_CycleTime.st</code></li><li><code>CODE/A_COMMUN/FB_Ramp.st</code></li><li><code>CODE/A_COMMUN/FB_Brake.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/I_TRANSLATION/_TYPES/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/I_TRANSLATION/_TYPES/ST_fbTranslation_Cfg.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation_PositionDecoder.st</code></li><li><code>CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st</code></li><li><code>CODE/I_TRANSLATION/FB_Safety_Translation.st</code></li><li><code>CODE/I_TRANSLATION/FB_Translation.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (14)</summary>
+        <summary>Code source ST original (15)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\A_COMMUN\_TYPES\E_State.st</code></summary>
@@ -1211,7 +1580,8 @@ ENUM
     READY    := 2,   (* Prêt, attend ordre *)
     BUSY     := 3,   (* Action en cours *)
     DONE     := 4,   (* Action terminée *)
-    STOPPING := 5    (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    STOPPING := 5,   (* Décél rampe avant arrêt (StartStop=FALSE ou SafeStop=TRUE) *)
+    ERROR    := 6    (* Défaut actif non acquitté (FB en erreur — HMI non aveugle) *)
 END_ENUM
 END_TYPE
 </pre>
@@ -1685,7 +2055,7 @@ END_TYPE
 </pre>
             </details>
             <details>
-                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\E_TranslationFinalInterlockReason.st</code></summary>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\_TYPES\E_TranslationFinalInterlockReason.st</code></summary>
                 <pre>(* =======================================================================
    🛡️ E_TranslationFinalInterlockReason — Raisons d&#x27;interlock M3
    ───────────────────────────────────────────────────────────────
@@ -1699,6 +2069,47 @@ TYPE E_TranslationFinalInterlockReason :
     BRAKE_COMMAND_NOT_CONFIRMED := 1,
     RESTART_INHIBITED := 2
 );
+END_TYPE
+</pre>
+            </details>
+            <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\I_TRANSLATION\_TYPES\ST_fbTranslation_Cfg.st</code></summary>
+                <pre>(* ═══════════════════════════════════════════════════════════════
+   ⚙️ ST_fbTranslation_Cfg — Configuration regroupée de FB_Translation
+   ───────────────────────────────────────────────────────────────
+   📐 NC-110 / G380 : pattern « Cfg : ST_fb&lt;Fb&gt;_Cfg » (comme FB_Winch
+      avec Config : ST_fbWinch_Cfg). Regroupe en UN point d&#x27;interface les
+      ~13 scalaires `[CFG]` qui étaient des VAR_INPUT plates de FB_Translation.
+   🎯 Un seul sourcing : PRG_05_Translation assemble ce struct depuis la
+      source unique GVL_PERSISTENT (§ source propre documentée ci-dessous).
+   📤 Producteur : PRG_05_Translation (câblage).
+   📥 Consommateur : FB_Translation (Cfg, lecture seule).
+   📄 Doc : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+   ═══════════════════════════════════════════════════════════════ *)
+
+TYPE ST_fbTranslation_Cfg :
+STRUCT
+    // === RAMPES VITESSE (%/s) ===
+    CfgRampAccelRate            : REAL := 20.0;   // --&gt; [CFG] Accélération
+    CfgRampDecelNormalRate      : REAL := 40.0;   // --&gt; [CFG] Décélération normale
+    CfgRampDecelFastRate        : REAL := 100.0;  // --&gt; [CFG] Décélération RAPIDE (SafeStop)
+    DirectionInterlockDelay     : TIME := T#200ms; // --&gt; [CFG] Délai avant changement de sens à l&#x27;arrêt
+
+    // === VITESSES RÉDUITES D&#x27;APPROCHE (Hz) ===
+    ApproachSpeedTremieHz       : REAL := 10.0;   // --&gt; [CFG] Approche Trémie (Direction=1)
+    ApproachSpeedMaintenanceHz  : REAL := 10.0;   // --&gt; [CFG] Approche Maintenance (Direction=-1)
+    ApproachSpeedP1Hz           : REAL := 10.0;   // --&gt; [CFG] Approche P1 (Direction=-1)
+
+    // === ÉCHELLE VARIATEUR ===
+    DriveFreqScaleMaxHz         : REAL := 60.0;   // --&gt; [CFG] Échelle 0..100 % → MaxHz
+
+    // === COMMUN / FREIN ===
+    CaptorDebounce              : TIME := T#100ms; // --&gt; [CFG] Filtrage capteur position cible
+    BrakeDelayContactClose      : TIME := T#100ms; // --&gt; [CFG] Voir FB_Brake
+    BrakeDelayMagnetise         : TIME := T#100ms; // --&gt; [CFG] Voir FB_Brake
+    BrakeDelayMotorDecel        : TIME := T#500ms; // --&gt; [CFG] Voir FB_Brake
+    BrakeFeedbackTimeout        : TIME := T#300ms; // --&gt; [CFG] Strictement sous watchdog final 500 ms
+END_STRUCT
 END_TYPE
 </pre>
             </details>
@@ -1727,8 +2138,8 @@ VAR_INPUT
     SensorMaintenance : BOOL;   // --&gt; [HW] Capteur extrême droite (Maintenance, accès MAINT_N2 uniquement)
 END_VAR
 VAR_OUTPUT
-    LimitSwitchFwd    : BOOL;   // &lt;-- [STAT] Extrême Trémie confirmé (mot = 11111)
-    LimitSwitchRev    : BOOL;   // &lt;-- [STAT] Extrême Maintenance confirmé (mot = 00000)
+    LimitSwitchTremie    : BOOL;   // &lt;-- [STAT] Extrême Trémie confirmé (mot = 11111) (ex-LimitSwitchFwd)
+    LimitSwitchMaintenance : BOOL; // &lt;-- [STAT] Extrême Maintenance confirmé (mot = 00000) (ex-LimitSwitchRev)
     Incoherent        : BOOL;   // &lt;-- [DIAG] Mot hors des 6 combinaisons valides -&gt; défaut sécurité (SafeStop+PowerCutOff, voir FB_Safety_Translation)
     SensorsWord       : BYTE;   // &lt;-- [DIAG] Diagnostic (bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance)
 
@@ -1790,8 +2201,8 @@ CASE SensorsWord OF
 END_CASE;
 
 // 🚧 Limites extrêmes — uniquement sur mot valide (évite un Fdc fantôme déclenché par une incohérence)
-LimitSwitchFwd := (NOT Incoherent) AND (SensorsWord = 2#11111);
-LimitSwitchRev := (NOT Incoherent) AND (SensorsWord = 2#00000);
+LimitSwitchTremie := (NOT Incoherent) AND (SensorsWord = 2#11111);
+LimitSwitchMaintenance := (NOT Incoherent) AND (SensorsWord = 2#00000);
 {endregion}
 
 {region &quot;§2 Reprise capteurs&quot;}
@@ -1842,6 +2253,8 @@ VAR_INPUT
     Reset                        : BOOL;   // --&gt; [CMD] Acquittement defaut sur front
     SafeStop                     : BOOL;   // --&gt; [SAFE] Entree securite pour interface standard
     PowerContactorEngaged        : BOOL;   // --&gt; [SAFE] Chaine AU rearmee et puissance OK
+    EffectivePermitM3_Tremie     : BOOL;   // --&gt; [SAFE] Permis Tremie
+    EffectivePermitM3_Maintenance: BOOL;   // --&gt; [SAFE] Permis Maintenance
 
     // === DEMANDES DE COMMANDE AMONT ===
     BrakeReleaseRequest          : BOOL;   // --&gt; [CMD] Demande de desserrage frein
@@ -1876,6 +2289,7 @@ VAR
 
     // === VARIABLES LOCALES INTERNES ===
     MovementRequested            : BOOL;   // . [LOC] Demande de mouvement active
+    PermitFinalBlocked           : BOOL;   // . [LOC] Veto directionnel final
     NeutralRequestSeen           : BOOL;   // . [LOC] Demande neutre (mot 0) observee
     ResetRequired                : BOOL;   // . [LOC] Front Reset obligatoire avant nouvelle marche
     BrakeTimeoutCause            : BOOL;   // . [LOC] Cause brute timeout desserrage frein
@@ -1907,6 +2321,8 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
 END_IF;
 
 MovementRequested := (RequestedDriveControlWord = 1) OR (RequestedDriveControlWord = 2);
+PermitFinalBlocked := ((RequestedDriveControlWord = 1) AND NOT EffectivePermitM3_Tremie)
+                   OR ((RequestedDriveControlWord = 2) AND NOT EffectivePermitM3_Maintenance);
 
 // ── 2. Watchdog : exclusivement après ordre effectif de desserrage ──────
 BrakeTimeout(
@@ -1966,7 +2382,7 @@ ELSIF RequestedDriveControlWord = 7 THEN
     DriveControlWord := 7;
 ELSIF RestartInhibit THEN
     Reason := E_TranslationFinalInterlockReason.RESTART_INHIBITED;
-ELSIF MovementRequested THEN
+ELSIF MovementRequested AND NOT PermitFinalBlocked THEN
     IF BrakeReleaseRequest AND BrakeCommandOpenConfirmed THEN
         DriveControlWord := RequestedDriveControlWord;
         DriveFreqCmd_Hz := MAX(0.0, RequestedDriveFreqHz);
@@ -2012,9 +2428,11 @@ VAR_INPUT
     DriveActualFreqHz   : REAL;        // --&gt; [HW] Vitesse réelle variateur (Hz)
     BrakeFeedback       : BOOL;        // --&gt; [HW] Retour d&#x27;état bobine frein (TRUE = ouvert/desserré)
     BrakeCmd            : BOOL;        // --&gt; [HW] Commande frein
-    Direction           : INT;         // --&gt; [CMD] Direction commandée
-    LimitSwitchFwd      : BOOL;        // --&gt; [HW] Fin de course extrême avant
-    LimitSwitchRev      : BOOL;        // --&gt; [HW] Fin de course extrême arrière
+    RunRequest          : BOOL;        // --&gt; [CMD] Demande de marche maintenue
+    ReqTremie           : BOOL;        // --&gt; [CMD] Demande explicite vers Trémie
+    ReqMaintenance      : BOOL;        // --&gt; [CMD] Demande explicite vers Maintenance
+    LimitSwitchTremie   : BOOL;        // --&gt; [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)
+    LimitSwitchMaintenance : BOOL;     // --&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)
     SensorWordIncoherent: BOOL;        // --&gt; [HW] Mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)
 
     // 🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass)
@@ -2044,6 +2462,8 @@ VAR_OUTPUT
     ErrorMecaA          : BOOL;        // &lt;-- [DIAG] Mouvement non commandé (Méca A - bit5)
     ErrorLimitSwitch    : BOOL;        // &lt;-- [DIAG] Limite extrême Translation atteinte (bit6)
     ErrorSensorIncoherent: BOOL;       // &lt;-- [DIAG] Incohérence mot capteurs position (bit7)
+    TremieLimitClear        : BOOL;        // &lt;-- [STAT] Fin de course Trémie libre (condition interne du permis M3)
+    MaintenanceLimitClear   : BOOL;        // &lt;-- [STAT] Fin de course Maintenance/P1 libre (condition interne du permis M3)
 END_VAR
 VAR
     ResetEdge           : R_TRIG;   // . [LOC] Front Reset
@@ -2052,6 +2472,7 @@ VAR
     TonLimitSwitchOverrun : TON;       // . [LOC] Surveillance poussée anormale / escalade fin de course
     OverrunCondition    : BOOL;   // . [LOC] Condition escalade fin de course
     PostRampTimeout     : TIME := T#3S;   // . [LOC] Délai Méca B
+    CST_StopFreqThresholdHz : REAL := 0.5; // . [LOC] Seuil |fréquence sortie| au-dessus duquel le moteur est considéré en rotation (Méca A/B)
     UncommandedActiveB  : BOOL;   // . [LOC] Méca B active
     UncommandedActiveA  : BOOL;   // . [LOC] Méca A active
     FirstScanDone       : BOOL;   // . [LOC] Initialisation premier scan
@@ -2067,6 +2488,7 @@ VAR
     // Socle défaut
     instFault           : FB_FaultCore;                  // * [INST] Socle défaut transverse
     instCauses          : ARRAY[0..15] OF ST_FaultCause; // . [LOC] Table des causes nommées
+    CauseIdx            : INT;                            // . [LOC] Index de boucle — purge des causes vives sous BypassGlobal
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -2130,11 +2552,17 @@ IF NOT BypassGlobal THEN
     instCauses[3].Texte    := &#x27;Surchauffe thermique frein translation&#x27;;
 
     // Cause 4 : Méca B (latched)
-    IF NOT (BypassSafety OR BypassMecaB) THEN
-        IF NOT HeartbeatIhmOk THEN
-            UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
-        ELSIF (Direction = 0) AND NOT BrakeCmd THEN
-            UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
+    // ⚠️ Éval gardée par la comm drive (DriveOnline AND DriveOperational) : sans comm, le
+    //    statusword / la fréquence remontés ne sont pas fiables. Une perte bus doit tomber en
+    //    Cause 1 (DriveComm, bit1 -&gt; SafeStop acquittable), PAS en Méca B (bit4 -&gt; PowerCutOff
+    //    non-resettable). DriveStatusWord.0 (= &quot;ready to switch on&quot;)
+    //    figé sur bus mort -&gt; coupure chaîne intempestive.
+    // Déclencheur = preuve de rotation RÉELLE (fréquence de sortie mesurée) OU retour frein
+    // encore ouvert. DriveStatusWord.0 (&quot;ready to switch on&quot;) retiré : à 1 dès variateur
+    // alimenté, il ne prouve PAS un mouvement.
+    IF NOT (BypassSafety OR BypassMecaB) AND DriveOnline AND DriveOperational THEN
+        IF (NOT HeartbeatIhmOk) OR (NOT RunRequest AND NOT BrakeCmd) THEN
+            UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; CST_StopFreqThresholdHz) OR BrakeFeedback;
         ELSE
             UncommandedActiveB := FALSE;
         END_IF;
@@ -2149,7 +2577,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 5 : Méca A (latched)
     IF NOT (BypassSafety OR BypassMecaA) THEN
-        IF (Direction = 0) AND NOT BrakeCmd THEN
+        IF NOT RunRequest AND NOT BrakeCmd THEN
             UncommandedActiveA := ABS(DriveActualFreqHz) &gt; 0.5;
         ELSE
             UncommandedActiveA := FALSE;
@@ -2165,8 +2593,8 @@ IF NOT BypassGlobal THEN
 
     // Cause 6 : Limite extrême escalade (live)
     IF NOT (BypassSafety OR BypassLimitSwitch) THEN
-        OverrunCondition := (LimitSwitchFwd AND (Direction = 1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
-                         OR (LimitSwitchRev AND (Direction = -1) AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
+        OverrunCondition := (LimitSwitchTremie AND ReqTremie AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchMaintenance AND ReqMaintenance AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
         instCauses[6].Active := TonLimitSwitchOverrun.Q;
     ELSE
@@ -2188,6 +2616,13 @@ ELSE
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
+
+    // 🧪 BypassGlobal : l&#x27;évaluation des causes ci-dessus est sautée. Purge de la vue LIVE
+    // pour que instCauses[i].Active ne reste pas FIGÉ (sinon PowerCutOff / SafeStop gelés,
+    // réarmement impossible malgré le bypass). Latches déjà effacés au § FRONTS &amp; REARMENT.
+    FOR CauseIdx := 0 TO 15 DO
+        instCauses[CauseIdx].Active := FALSE;
+    END_FOR;
 END_IF;
 
 // Appel du socle de défaut
@@ -2208,6 +2643,8 @@ IF NOT Enable THEN
     ErrorMecaA := FALSE;
     ErrorLimitSwitch := FALSE;
     ErrorSensorIncoherent := FALSE;
+    TremieLimitClear := FALSE;
+    MaintenanceLimitClear := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
@@ -2234,6 +2671,19 @@ ErrorMecaB            := instCauses[4].Active;
 ErrorMecaA            := instCauses[5].Active;
 ErrorLimitSwitch      := instCauses[6].Active;
 ErrorSensorIncoherent := instCauses[7].Active;
+
+// 🛡️ Permis directionnels M3 — NIVEAU SAFETY (polarité fail-safe : TRUE = autorisé)
+// ⚠️ Ces sorties sont des permits directionnels SAFETY (pur directionnel), PAS le permit
+// EFFECTIF « pouvoir bouger ». Le permit effectif (prêt à fonctionner) est calculé en
+// PRG_05_Translation §1ter : Safety directionnel AND NOT M3_SafeStop_Aggregate AND NOT
+// PowerCutOff. C&#x27;est LUI qui reflète la sémantique « pouvoir bouger » : quand l&#x27;axe est en
+// défaut (SafeStop/PowerCutOff), TOUS les sens sont bloqués ; au retour en condition, un sens
+// La décision des huit permis est produite en PRG_05. Ce FB ne produit que les faits
+// de sécurité nécessaires à cette décision : les deux fins de course sont-elles libres ?
+// Le droit d&#x27;accès à la zone Maintenance (MaintenanceM3TargetEnable) est volontairement
+// séparé : il ne doit pas empêcher le déplacement légal jusqu&#x27;à P1.
+TremieLimitClear := NOT LimitSwitchTremie;
+MaintenanceLimitClear := NOT LimitSwitchMaintenance;
 {endregion}
 
 END_FUNCTION_BLOCK
@@ -2245,9 +2695,12 @@ END_FUNCTION_BLOCK
    ⚙️ FB_Translation — Directeur de l&#x27;axe transversal M3 (variateur AC600)
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
-   🔌 FB DE MOUVEMENT : porte StartStop + SafeStop en plus de l&#x27;interface
+   🔌 FB DE MOUVEMENT : porte RunRequest + SafeStop en plus de l&#x27;interface
       standard. Précédence Enable &gt; SafeStop &gt; StartStop.
    Pilotage exclusivement ETHERCAT nominal (mot de commande, consigne fréquence).
+   🔧 Interface plate → structs : configuration regroupée en `Cfg : ST_fbTranslation_Cfg`
+      (pattern NC-110/G380, comme FB_Winch `Config : ST_fbWinch_Cfg`). Source unique
+      GVL_PERSISTENT (câblée par PRG_05_Translation).
    🧩 Compose FB_Brake (réutilisé TEL QUEL depuis COMMUN).
    🎯 Invariant : toute inversion de sens force la cible de rampe à 0.0 tant que le
       changement de sens est en attente, pour garantir le croisement du seuil d&#x27;arrêt
@@ -2260,16 +2713,21 @@ VAR_INPUT
     Reset                       : BOOL;        // --&gt; [CMD] Acquittement défaut (front)
     PowerContactorEngaged       : BOOL;        // --&gt; [SAFE] Chaîne AU réarmée + conditions globales OK
     Mode                        : E_Mode;      // --&gt; [CMD] Mode courant
-    StartStop                   : BOOL;        // --&gt; [CMD] TRUE = rampe accélération, FALSE = rampe décélération NORMALE
+    RunRequest                  : BOOL;        // --&gt; [CMD] Demande de marche maintenue (FALSE = décélération/arrêt)
     SafeStop                    : BOOL;        // --&gt; [SAFE] Sortie FB_Safety_Translation : TRUE = rampe décélération RAPIDE (Enable maintenu)
-    Direction                   : INT;         // --&gt; [CMD] -1 = Rev, 0 = Neutre, +1 = Fwd (source d&#x27;autorité du sens)
+    ReqTremie                   : BOOL;        // --&gt; [CMD] Demande explicite vers Trémie
+    ReqMaintenance              : BOOL;        // --&gt; [CMD] Demande explicite vers Maintenance
     SpeedTgt_Pct                : REAL;        // --&gt; [CMD] Magnitude de la consigne (de 0 à 100%)
     PositionSensorTarget        : BOOL;        // --&gt; [HW] Capteur position cible courante
     SlowdownSensorTremie        : BOOL;        // --&gt; [HW] Capteur PV — ralentissement avant Trémie (Direction=1)
     SlowdownSensorMaintenance   : BOOL;        // --&gt; [HW] Capteur P1 — ralentissement avant Maintenance (Direction=-1)
     SlowdownSensorP1            : BOOL;        // --&gt; [HW] Capteur P2 — ralentissement avant P1 (Direction=-1)
-    LimitSwitchFwd              : BOOL;        // --&gt; [HW] Fin de course extrême avant
-    LimitSwitchRev              : BOOL;        // --&gt; [HW] Fin de course extrême arrière
+    LimitSwitchTremie           : BOOL;        // --&gt; [HW] Fin de course extrême Trémie (ex-LimitSwitchFwd)
+    LimitSwitchMaintenance      : BOOL;        // --&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)
+
+    // 🛡️ Permis directionnels canoniques M3 — gate de sens (TRUE = autorisé)
+    EffectivePermitM3_Tremie    : BOOL := FALSE;  // --&gt; [SAFE] Permis effectif vers Trémie
+    EffectivePermitM3_Maintenance : BOOL := FALSE; // --&gt; [SAFE] Permis effectif vers Maintenance/P1
 
     // 🔌 Spécifique ETHERCAT
     DriveStatusWord             : WORD;       // --&gt; [HW] Mot d&#x27;état AC600 lu depuis l&#x27;image d&#x27;entrée EtherCAT
@@ -2280,24 +2738,8 @@ VAR_INPUT
     BrakeFeedback               : BOOL;       // --&gt; [HW] Retour physique direct : TRUE = frein OUVERT (desserré)
     InvertDriveDirection        : BOOL;
 
-    // Réglages rampe
-    CfgRampAccelRate            : REAL := 20.0;    // --&gt; [CFG] %/s — accélération
-    CfgRampDecelNormalRate      : REAL := 40.0;    // --&gt; [CFG] %/s — décélération normale
-    CfgRampDecelFastRate        : REAL := 100.0;   // --&gt; [CFG] %/s — décélération RAPIDE
-    DirectionInterlockDelay     : TIME := T#200ms; // --&gt; [CFG] Délai avant d&#x27;autoriser un changement de sens à l&#x27;arrêt
-
-    // Réglages ETHERCAT
-    ApproachSpeedTremieHz       : REAL := 10.0;    // --&gt; [CFG] Vitesse réduite d&#x27;approche Trémie en Hz
-    ApproachSpeedMaintenanceHz  : REAL := 10.0;    // --&gt; [CFG] Vitesse réduite d&#x27;approche Maintenance en Hz
-    ApproachSpeedP1Hz           : REAL := 10.0;    // --&gt; [CFG] Vitesse réduite d&#x27;approche P1 en Hz
-    DriveFreqScaleMaxHz         : REAL := 60.0;    // --&gt; [CFG] Échelle 0..100 % → MaxHz
-
-    // Réglages communs
-    CaptorDebounce              : TIME := T#100ms; // --&gt; [CFG] Filtrage capteur de position cible
-    BrakeDelayContactClose      : TIME := T#100ms; // --&gt; [CFG] Voir FB_Brake
-    BrakeDelayMagnetise         : TIME := T#300ms; // --&gt; [CFG] Voir FB_Brake
-    BrakeDelayMotorDecel        : TIME := T#500ms; // --&gt; [CFG] Voir FB_Brake
-    BrakeFeedbackTimeout        : TIME := T#300ms; // --&gt; [CFG] Strictement sous watchdog final 500 ms
+    // 🔧 Configuration regroupée (pattern NC-110/G380 — un seul point d&#x27;interface)
+    Cfg                         : ST_fbTranslation_Cfg; // --&gt; [CFG] Rampe, vitesses d&#x27;approche, échelle, frein (source GVL_PERSISTENT)
 END_VAR
 VAR_OUTPUT
     Ready                       : BOOL;   // &lt;-- [STAT] FB prêt (sortie libre, hors ST_Status)
@@ -2316,17 +2758,21 @@ VAR
     SpeedRamp                   : FB_Ramp;       // * [INST] Rampe de vitesse logicielle (PLC)
     ResetEdge                   : R_TRIG;   // . [LOC] Front Reset
     DirectionChangeDelay        : TON;            // . [LOC] Interlock changement de sens
-    CommandedDirection          : INT;            // . [LOC] Sens réellement appliqué
+    CommandedTremie             : BOOL;           // . [LOC] Sens Trémie réellement appliqué
+    CommandedMaintenance        : BOOL;           // . [LOC] Sens Maintenance réellement appliqué
     DirectionChangePending      : BOOL;         // . [LOC] Force la rampe à 0 pendant une inversion de sens en attente
-    PhysicalDriveDirection      : INT;          // . [LOC] CommandedDirection compensé câblage
+    PhysicalTremie               : BOOL;         // . [LOC] Sens physique Trémie après inversion câblage
+    PhysicalMaintenance          : BOOL;         // . [LOC] Sens physique Maintenance après inversion câblage
     RampTargetPct               : REAL;   // . [LOC] Cible rampe en %
     CaptorDebounceTon           : TON;    // . [LOC] Debounce capteur cible
     ArrivalEdge                 : R_TRIG;   // . [LOC] Front arrivée sur capteur
-    DirectionAtArrival           : INT;    // . [LOC] Sens d&#x27;arrivée mémorisé
+    ArrivalWasTremie             : BOOL;  // . [LOC] Sens d&#x27;arrivée mémorisé
+    ArrivalWasMaintenance        : BOOL;  // . [LOC] Sens d&#x27;arrivée mémorisé
     ArrivalLock                 : BOOL;        // . [LOC] Arrêt exact sur capteur cible
     MovementRequested           : BOOL;         // . [LOC] Pilote FB_Brake
     FirstScanDone               : BOOL;   // . [LOC] Initialisation premier scan
     TonBrakeRealFreqTimeout     : TON;
+    EffectiveSafeStop           : BOOL;   // . [LOC] SafeStop effectif = SafeStop OR sens non permis (gate de sens)
 
     // Défauts
     DriveFaultLatching          : BOOL;   // . [LOC] Latch défaut variateur
@@ -2356,7 +2802,7 @@ instCauses[3].Active   := DriveFaultLatching;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := &#x27;Defaut variateur translation AC600&#x27;;
 
-IF NOT BypassLimitSwitch AND ((CommandedDirection = 1 AND LimitSwitchFwd) OR (CommandedDirection = -1 AND LimitSwitchRev)) THEN
+IF NOT BypassLimitSwitch AND ((CommandedTremie AND LimitSwitchTremie) OR (CommandedMaintenance AND LimitSwitchMaintenance)) THEN
     instCauses[6].Active := TRUE;
 ELSE
     instCauses[6].Active := FALSE;
@@ -2380,9 +2826,12 @@ IF NOT Enable THEN
     BrakeCommandOpenConfirmed := FALSE;
     BrakeContactorCheck.Command := FALSE;
     BrakeContactorCheck.Feedback := BrakeFeedback;
-    CommandedDirection := 0;
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
     ArrivalLock := FALSE;
+    ArrivalWasTremie := FALSE;
+    ArrivalWasMaintenance := FALSE;
     TargetReached := FALSE;
     DirectionChangeDelay(IN := FALSE);
     CaptorDebounceTon(IN := FALSE);
@@ -2397,51 +2846,74 @@ Ready := Enable AND NOT Fault.Latched;
 {region &quot;§3 Premier scan et temps de cycle&quot;}
 IF NOT FirstScanDone THEN
     FirstScanDone := TRUE;
-    CommandedDirection := Direction;
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
 END_IF;
 
 CycleTimeCalc();
 {endregion}
 
 {region &quot;§4 Arrivée sur cible et interlock direction&quot;}
-CaptorDebounceTon(IN := PositionSensorTarget, PT := CaptorDebounce);
+CaptorDebounceTon(IN := PositionSensorTarget, PT := Cfg.CaptorDebounce);
 TargetReached := CaptorDebounceTon.Q;
 ArrivalEdge(CLK := TargetReached);
 
 IF ArrivalEdge.Q THEN
     ArrivalLock := TRUE;
-    DirectionAtArrival := CommandedDirection;
+    ArrivalWasTremie := CommandedTremie;
+    ArrivalWasMaintenance := CommandedMaintenance;
 END_IF;
 
-IF ArrivalLock AND (Direction &lt;&gt; 0) AND (Direction &lt;&gt; DirectionAtArrival) THEN
+IF ArrivalLock AND ((ReqTremie AND NOT ArrivalWasTremie) OR (ReqMaintenance AND NOT ArrivalWasMaintenance)) THEN
     ArrivalLock := FALSE;
 END_IF;
 
 DirectionChangeDelay(
-    IN := (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) AND (ABS(SpeedRamp.Current) &lt;= 0.1) AND (ABS(DriveActualFreqHz) &lt;= 0.5),
-    PT := DirectionInterlockDelay
+    IN := (ReqTremie OR ReqMaintenance)
+          AND ((ReqTremie AND NOT CommandedTremie) OR (ReqMaintenance AND NOT CommandedMaintenance))
+          AND (ABS(SpeedRamp.Current) &lt;= 0.1)
+          AND (ABS(DriveActualFreqHz) &lt;= 0.5),
+    PT := Cfg.DirectionInterlockDelay
 );
 
-IF (CommandedDirection = 0) AND (Direction &lt;&gt; 0) THEN
-    CommandedDirection := Direction;
+IF NOT (CommandedTremie OR CommandedMaintenance) AND (ReqTremie OR ReqMaintenance) THEN
+    CommandedTremie := ReqTremie;
+    CommandedMaintenance := ReqMaintenance;
     DirectionChangePending := FALSE;
 ELSIF DirectionChangeDelay.Q THEN
-    CommandedDirection := Direction;
+    CommandedTremie := ReqTremie;
+    CommandedMaintenance := ReqMaintenance;
     DirectionChangePending := FALSE;
-ELSIF (Direction &lt;&gt; 0) AND (Direction &lt;&gt; CommandedDirection) THEN
+ELSIF (ReqTremie OR ReqMaintenance)
+      AND ((ReqTremie AND NOT CommandedTremie) OR (ReqMaintenance AND NOT CommandedMaintenance)) THEN
     DirectionChangePending := TRUE;
 ELSE
     DirectionChangePending := FALSE;
 END_IF;
 
-IF Direction = 0 THEN
-    CommandedDirection := 0;
+IF NOT (ReqTremie OR ReqMaintenance) THEN
+    CommandedTremie := FALSE;
+    CommandedMaintenance := FALSE;
     DirectionChangePending := FALSE;
 END_IF;
 {endregion}
 
+{region &quot;§4bis Permis directionnels et EffectiveSafeStop&quot;}
+// 🛡️ 4bis. GATE DE SENS (permis directionnels SAFETY) — modèle treuils FB_Winch
+// RampStopActive = SafeStop OR demande vers un sens non permis. Bloque la RAMPE
+// (arrêt réel) vers un sens non autorisé sans fabriquer de sens numérique.
+// Consommé dans la gate de rampe (§5) et le choix de décélération.
+// Le permis Maintenance représente la possibilité de rejoindre P1/maintenance physique ;
+// l&#x27;interdiction d&#x27;accès à la zone Maintenance est gérée séparément par la cible P1 et sa
+// coupure dure, sans couper le déplacement légal jusqu&#x27;à P1.
+EffectiveSafeStop := SafeStop
+                      OR (ReqTremie AND NOT EffectivePermitM3_Tremie)
+                      OR (ReqMaintenance AND NOT EffectivePermitM3_Maintenance)
+                      OR (ReqTremie AND ReqMaintenance);
+{endregion}
+
 {region &quot;§5 Consigne et rampe de vitesse&quot;}
-IF DirectionChangePending OR (Direction = 0) OR ArrivalLock OR SafeStop OR NOT StartStop THEN
+IF DirectionChangePending OR NOT (ReqTremie OR ReqMaintenance) OR ArrivalLock OR EffectiveSafeStop OR NOT RunRequest THEN
     RampTargetPct := 0.0;
 ELSE
     RampTargetPct := LIMIT(0.0, SpeedTgt_Pct, 100.0);
@@ -2449,8 +2921,8 @@ END_IF;
 
 SpeedRamp(
     Target := RampTargetPct,
-    AccelRate := CfgRampAccelRate,
-    DecelRate := SEL(SafeStop, CfgRampDecelNormalRate, CfgRampDecelFastRate),
+    AccelRate := Cfg.CfgRampAccelRate,
+    DecelRate := SEL(EffectiveSafeStop, Cfg.CfgRampDecelNormalRate, Cfg.CfgRampDecelFastRate),
     CycleTimeS := CycleTimeCalc.CycleTimeS
 );
 {endregion}
@@ -2470,39 +2942,40 @@ Brake(
     MovementRequested := MovementRequested,
     ContactorFeedback := BrakeFeedback,
     BypassContactorCheck := BypassContactorCheck,
-    DelayContactClose := BrakeDelayContactClose,
-    DelayMagnetise := BrakeDelayMagnetise,
-    DelayMotorDecel := BrakeDelayMotorDecel,
-    FeedbackTimeout := BrakeFeedbackTimeout
+    DelayContactClose := Cfg.BrakeDelayContactClose,
+    DelayMagnetise := Cfg.BrakeDelayMagnetise,
+    DelayMotorDecel := Cfg.BrakeDelayMotorDecel,
+    FeedbackTimeout := Cfg.BrakeFeedbackTimeout
 );
 
 BrakeReleaseRequest := Brake.BrakeCmd;
 BrakeCommandOpenConfirmed := Brake.BrakeCommandOpenConfirmed;
 BrakeContactorCheck := Brake.ContactorCheck;
 
+PhysicalTremie := CommandedTremie;
+PhysicalMaintenance := CommandedMaintenance;
 IF InvertDriveDirection THEN
-    PhysicalDriveDirection := -CommandedDirection;
-ELSE
-    PhysicalDriveDirection := CommandedDirection;
+    PhysicalTremie := CommandedMaintenance;
+    PhysicalMaintenance := CommandedTremie;
 END_IF;
 
-IF (PhysicalDriveDirection = 1) AND Brake.BrakeCmd THEN
+IF PhysicalTremie AND Brake.BrakeCmd THEN
     RequestedDriveControlWord := 1; // FWD
-ELSIF (PhysicalDriveDirection = -1) AND Brake.BrakeCmd THEN
+ELSIF PhysicalMaintenance AND Brake.BrakeCmd THEN
     RequestedDriveControlWord := 2; // REV
 ELSE
     RequestedDriveControlWord := 0;
 END_IF;
 
-RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * DriveFreqScaleMaxHz;
+RequestedDriveFreqHz := (SpeedRamp.Current / 100.0) * Cfg.DriveFreqScaleMaxHz;
 
 // Ralentissements d&#x27;approche
-IF (CommandedDirection = 1) AND SlowdownSensorTremie THEN
-    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedTremieHz);
-ELSIF (CommandedDirection = -1) AND SlowdownSensorMaintenance THEN
-    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedMaintenanceHz);
-ELSIF (CommandedDirection = -1) AND SlowdownSensorP1 THEN
-    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, ApproachSpeedP1Hz);
+IF CommandedTremie AND SlowdownSensorTremie THEN
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedTremieHz);
+ELSIF CommandedMaintenance AND SlowdownSensorMaintenance THEN
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedMaintenanceHz);
+ELSIF CommandedMaintenance AND SlowdownSensorP1 THEN
+    RequestedDriveFreqHz := MIN(RequestedDriveFreqHz, Cfg.ApproachSpeedP1Hz);
 END_IF;
 
 IF Fault.Error THEN
@@ -2528,7 +3001,10 @@ test_fb_translation.st
   [PASS] TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff
   [PASS] TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop
   [PASS] TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)
-  [PASS] TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)
+         ASSERT_EQ failed: FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0
+         at test_fb_translation.st:200
+         Message: mouvement Fwd -&gt; mot 1
+  [FAIL] TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)
   [PASS] TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub)
   [PASS] TC-P11-006 Watchdog frein 500ms : frontiere 499/500
   [PASS] TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation
@@ -2538,9 +3014,41 @@ test_fb_translation.st
   [PASS] TC-P11-011.1 Meca B variante perte IHM : condition elargie
   [PASS] TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut
   [PASS] TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)
+         ASSERT_EQ failed: FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0
+         at test_fb_translation.st:466
+         Message: magnétisation en cours -&gt; mot 1 (FWD)
+  [FAIL] TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)
+         ASSERT_EQ failed: FB_T.REQUESTEDDRIVECONTROLWORD expected 2, got 0
+         at test_fb_translation.st:520
+         Message: magnétisation en cours -&gt; mot 2 (REV)
+  [FAIL] TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine
+  [PASS] TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé
+  [PASS] TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle)
+  [PASS] TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide)
+  [PASS] TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale)
+  [PASS] TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff
+  [PASS] TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff
+  [PASS] TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff
+  [PASS] TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff
+  [PASS] TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff
+  [PASS] TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff
+  [PASS] TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe)
+  [PASS] TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop
+  [PASS] TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal)
+  [PASS] TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)
+  [PASS] TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0)
+  [PASS] TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe)
+         ASSERT_EQ failed: FB_T.REQUESTEDDRIVECONTROLWORD expected 1, got 0
+         at test_fb_translation.st:1240
+         Message: TremiePermit=TRUE -&gt; mot 1 (FWD)
+  [FAIL] TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise
+         ASSERT_EQ failed: FB_T.REQUESTEDDRIVECONTROLWORD expected 2, got 0
+         at test_fb_translation.st:1257
+         Message: MaintenancePermit=TRUE -&gt; mot 2 (REV)
+  [FAIL] TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise
 
 -----------------------------------------
-17 tests, 17 passed, 0 failed
+37 tests, 32 passed, 5 failed
 </pre>
     </details>
 </div>

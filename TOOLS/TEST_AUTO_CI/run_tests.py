@@ -542,14 +542,14 @@ def main() -> int:
         timings = res.get("timings")
         if timings:
             print("  -- [PROFILING] Temps des etapes --")
-            print(f"    * Conversion ST->IEC        : {timings['conversion']:.2f}s")
-            print(f"    * Compilation STruCpp/g++   : {timings['compilation']:.2f}s (CPU)")
-            print(f"    * Execution binaire ASSERTs : {timings['execution']:.2f}s")
-            if timings['chronogram'] > 0:
-                print(f"    * Chronogramme (recomp g++) : {timings['chronogram']:.2f}s")
-            print(f"    * Cablage production        : {timings['wiring']:.2f}s")
-            print(f"    * Rapport HTML / JSON       : {timings['report_generation']:.2f}s")
-            print(f"    * Total FB                  : {timings['total']:.2f}s")
+            print(f"    * Conversion ST->IEC        : {timings.get('conversion', 0.0):.2f}s")
+            print(f"    * Compilation STruCpp/g++   : {timings.get('compilation', 0.0):.2f}s (CPU)")
+            print(f"    * Execution binaire ASSERTs : {timings.get('execution', 0.0):.2f}s")
+            if timings.get('chronogram', 0.0) > 0:
+                print(f"    * Chronogramme (recomp g++) : {timings.get('chronogram', 0.0):.2f}s")
+            print(f"    * Cablage production        : {timings.get('wiring', 0.0):.2f}s")
+            print(f"    * Rapport HTML / JSON       : {timings.get('report_generation', 0.0):.2f}s")
+            print(f"    * Total FB                  : {timings.get('total', 0.0):.2f}s")
         if res["report"] and not res.get("report_group"):
             try:
                 uri = pathlib.Path(res["report"]).resolve().as_uri()

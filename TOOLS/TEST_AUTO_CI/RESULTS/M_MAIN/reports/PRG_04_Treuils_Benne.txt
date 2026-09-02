@@ -1,8 +1,6 @@
-STruC++ Test Runner v1.0
+Error compiling source files:
 
-test_prg_04_treuils_benne.st
-  [PASS] PRG_04_Treuils_Benne : Commande Montee M1 via Bus AcqData + ModesAuth
-  [PASS] PRG_04_Treuils_Benne : SafeStop Treuil M1 sur Defaut Codeur (Bus AcqData)
+FB_TestHarness_PRG_04.st:113:32: error: Undeclared variable 'CFGCABLELIMITASCENTM'
+ 113 |     TopLimitM               := CfgCableLimitAscentM,
+     |                                ^
 
------------------------------------------
-2 tests, 2 passed, 0 failed

@@ -9,11 +9,15 @@
     {
       "name": "MAIN_GLOBAL : Coupure Puissance AU Propagee a tous les Actionneurs",
       "passed": true
+    },
+    {
+      "name": "MAIN_GLOBAL : Relachement homme-mort en contexte cycle -> etape sequencage maintenue (T169-A S3, diag e2e)",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 2,
-    "passed": 2,
+    "total": 3,
+    "passed": 3,
     "failed": 0
   }
 }

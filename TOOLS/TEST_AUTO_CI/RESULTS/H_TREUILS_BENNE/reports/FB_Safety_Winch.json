@@ -4,7 +4,14 @@
   "results": [
     {
       "name": "TC-P10-001 Meca A : derive >2.0m a l arret (joystick neutre) -> SafeStop + PowerCutOff",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.SAFESTOP expected TRUE, got FALSE",
+        "file": "test_fb_safety_winch.st",
+        "line": 46,
+        "message": "Derive >2.0m -> SafeStop"
+      }
     },
     {
       "name": "TC-P10-002 Meca B : non confirmation arret 3s -> SafeStop + PowerCutOff",
@@ -24,11 +31,25 @@
     },
     {
       "name": "TC-P10-005 Meca E bit12 : ecart >2.5m -> SafeStop SEUL (pas PowerCutOff)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.SAFESTOP expected TRUE, got FALSE",
+        "file": "test_fb_safety_winch.st",
+        "line": 202,
+        "message": "Ecart critique -> SafeStop (bit12 dans masque SafeStop)"
+      }
     },
     {
       "name": "TC-P10-006 Meca E bit13 : bit12 non confirme 3s -> escalade PowerCutOff",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.POWERCUTOFF expected TRUE, got FALSE",
+        "file": "test_fb_safety_winch.st",
+        "line": 239,
+        "message": "Escalade bit13 -> PowerCutOff (bit13 dans masque 16#2F84)"
+      }
     },
     {
       "name": "TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -> SafeStop SEUL",
@@ -52,7 +73,14 @@
     },
     {
       "name": "TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves, re-Enable exige Reset",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.FAULT.ERROR expected TRUE, got FALSE",
+        "file": "test_fb_safety_winch.st",
+        "line": 448,
+        "message": "Precondition : Meca A latchee"
+      }
     },
     {
       "name": "TC-P10-044.1 Mou cable : SyncEnable=FALSE -> DescendPermit=FALSE, AscentPermit autorise, blocage leve au retension",
@@ -60,7 +88,14 @@
     },
     {
       "name": "TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chaine PRG_04->PRG_06->AU = essai site",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.POWERCUTOFF expected TRUE, got FALSE",
+        "file": "test_fb_safety_winch.st",
+        "line": 538,
+        "message": "Cause masque 16#2F84 -> PowerCutOff produit (brique amont de la chaine)"
+      }
     },
     {
       "name": "TC-P10-052 Limite legale : BypassProcess simu ne leve pas le verrou sous -15m",
@@ -73,7 +108,7 @@
   ],
   "summary": {
     "total": 17,
-    "passed": 17,
-    "failed": 0
+    "passed": 12,
+    "failed": 5
   }
 }

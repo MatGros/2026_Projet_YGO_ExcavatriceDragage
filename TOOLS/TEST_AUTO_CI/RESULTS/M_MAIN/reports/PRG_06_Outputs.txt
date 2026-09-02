@@ -4,12 +4,20 @@ ST_WinchState.st:23:31: error: Undefined type 'E_WINCHTRACEBLOCKREASON' in STRUC
   23 |     AxisBlockReason         : E_WinchTraceBlockReason; (* 🧩 Cause prioritaire de blocage (miroir de TraceMx.BlockReason) *)
      |                               ^
 
-ST_WinchInterPrg.st:56:36: error: Undefined type 'ST_TRACEWINCH' in STRUCT 'ST_WINCHINTERPRG'
-  56 |     TraceM1                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M1 (cause priorisée + horodatage)
+ST_WinchInterPrg.st:65:36: error: Undefined type 'ST_TRACEWINCH' in STRUCT 'ST_WINCHINTERPRG'
+  65 |     TraceM1                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M1 (cause priorisée + horodatage)
      |                                    ^
 
-ST_WinchInterPrg.st:57:36: error: Undefined type 'ST_TRACEWINCH' in STRUCT 'ST_WINCHINTERPRG'
-  57 |     TraceM2                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M2 (cause priorisée + horodatage)
+ST_WinchInterPrg.st:66:36: error: Undefined type 'ST_TRACEWINCH' in STRUCT 'ST_WINCHINTERPRG'
+  66 |     TraceM2                      : ST_TraceWinch;      // 🕵️ Trace blocage treuil M2 (cause priorisée + horodatage)
+     |                                    ^
+
+ST_WinchInterPrg.st:73:36: error: Undefined type 'E_WINCHTRACEBLOCKREASON' in STRUCT 'ST_WINCHINTERPRG'
+  73 |     BothBlockReason              : E_WinchTraceBlockReason; // 🔗 Cause priorisée du blocage Both
+     |                                    ^
+
+ST_WinchInterPrg.st:78:36: error: Undefined type 'ST_ARMINGAVAILABILITY' in STRUCT 'ST_WINCHINTERPRG'
+  78 |     ArmingAvailability           : ST_ArmingAvailability;
      |                                    ^
 
 ST_TranslationState.st:10:31: error: Undefined type 'E_TRANSLATIONTRACEBLOCKREASON' in STRUCT 'ST_TRANSLATIONSTATE'
@@ -19,4 +27,8 @@ ST_TranslationState.st:10:31: error: Undefined type 'E_TRANSLATIONTRACEBLOCKREAS
 ST_TranslationInterPrg.st:34:36: error: Undefined type 'ST_TRACETRANSLATION' in STRUCT 'ST_TRANSLATIONINTERPRG'
   34 |     TranslationTrace             : ST_TraceTranslation; // 🕵️ Trace blocage translation M3 (cause priorisée + horodatage)
      |                                    ^
+
+ST_OutputsInterPrg.st:35:34: error: Undefined type 'ST_SYNCCONTACTORDIAG' in STRUCT 'ST_OUTPUTSINTERPRG'
+  35 |     SyncContactorDiag          : ST_SyncContactorDiag;  // Détail : quel contacteur diverge + niveau atteint (IHM / troubleshooting)
+     |                                  ^
 

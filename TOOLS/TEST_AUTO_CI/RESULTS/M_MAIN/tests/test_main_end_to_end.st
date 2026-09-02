@@ -65,7 +65,7 @@ TEST 'MAIN_GLOBAL : Chaine Complete - Qualification Neutre vers Montee Treuils C
     
     // 3. Vérification des flux à travers toute la machine (PRG_02 -> PRG_07)
     // - Bus PRG_02 : Joystick armé et qualifié
-    ASSERT_TRUE(mainMachine.BusAcq.JoystickDeadmanArmed, 'PRG_02: Homme-mort qualifie');
+    ASSERT_TRUE(mainMachine.BusAcq.Joystick.DeadmanArmed, 'PRG_02: Homme-mort qualifie');
     
     // - Bus PRG_03 : Mode Manuel N1 arbitré
     ASSERT_EQ(mainMachine.BusModes.Mode, E_Mode.MAINT_N1, 'PRG_03: Mode MAINT_N1 arbitre');

@@ -61,10 +61,10 @@ TEST 'TC-P13-012 SimBench polarite frein M1 : M1_BrakeIsOpen_DI := M1_BrakeCmd'
 END_TEST
 
 TEST 'TC-P13-013 SimBench M3_StatusWordSim bit0 retombe a l arret'
-    FB_Bench(Enable := TRUE, M3_Direction := 1, M3_SpeedCmd_Pct := 50.0, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FB_Bench(Enable := TRUE, M3_ReqTremie := TRUE, M3_ReqMaintenance := FALSE, M3_SpeedCmd_Pct := 50.0, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_EQ(FB_Bench.Translation.M3_StatusWord, 16#0087, 'M3 en mouvement -> StatusWord 0x0087');
     ADVANCE_TIME(10000000);
-    FB_Bench(Enable := TRUE, M3_Direction := 0, M3_SpeedCmd_Pct := 0.0, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    FB_Bench(Enable := TRUE, M3_ReqTremie := FALSE, M3_ReqMaintenance := FALSE, M3_SpeedCmd_Pct := 0.0, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_EQ(FB_Bench.Translation.M3_StatusWord, 16#0080, 'M3 a l arret -> StatusWord 0x0080 (bit0 retombe)');
 END_TEST
 
@@ -80,19 +80,16 @@ TEST 'T196-003 Capteur haut manuel et polarite Free_DI correcte'
                 'TopPositionActive=FALSE -> Free_DI=TRUE (butée libre)');
 END_TEST
 
-TEST 'T196-004 Capteur haut auto : seuil M1 atteint sans forçage manuel'
-    RawPosM1 := 99;
-    RawPosM2 := 0;
-    FB_Bench(Enable := TRUE, CfgTopSensorRawPos := 100, SimTopPositionActive := FALSE,
+TEST 'T196-004 Capteur haut auto : forçage manuel SimTopPositionActive'
+    FB_Bench(Enable := TRUE, SimTopPositionActive := FALSE,
              RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_TRUE(FB_Bench.Winch.M1M2_TopPositionFree_DI,
-                'M1 sous seuil -> capteur haut libre');
+                'SimTopPositionActive=FALSE -> capteur haut libre');
     ADVANCE_TIME(10000000);
-    RawPosM1 := 100;
-    FB_Bench(Enable := TRUE, CfgTopSensorRawPos := 100, SimTopPositionActive := FALSE,
+    FB_Bench(Enable := TRUE, SimTopPositionActive := TRUE,
              RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
     ASSERT_FALSE(FB_Bench.Winch.M1M2_TopPositionFree_DI,
-                 'M1 au seuil -> capteur haut actif sans forçage');
+                 'SimTopPositionActive=TRUE -> capteur haut actif');
 END_TEST
 
 (* =========================================================================
@@ -100,27 +97,49 @@ END_TEST
    ========================================================================= *)
 
 TEST 'TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop'
-    FB_SimSafe(Enable := TRUE, PowerCutOff_A := TRUE, PowerCutOff_B := TRUE, BtnEmergencyStop := FALSE);
-    ASSERT_TRUE(FB_SimSafe.SimChainOk, 'A et B maintenus -> SimChainOk=TRUE');
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := TRUE, BtnEmergencyStop := FALSE);
+    ADVANCE_TIME(60000000); (* Delai retombe relais 50ms *)
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := TRUE, BtnEmergencyStop := FALSE);
+    ASSERT_TRUE(FB_SimSafe.SimChainOk, 'SimChainOkBit=TRUE -> SimChainOk=TRUE apres 50ms');
+
     ADVANCE_TIME(10000000);
-    FB_SimSafe(Enable := TRUE, PowerCutOff_A := FALSE, PowerCutOff_B := TRUE, BtnEmergencyStop := FALSE);
-    ASSERT_FALSE(FB_SimSafe.SimChainOk, 'canal A coupe -> SimChainOk=FALSE');
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := FALSE, BtnEmergencyStop := FALSE);
+    ADVANCE_TIME(60000000);
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := FALSE, BtnEmergencyStop := FALSE);
+    ASSERT_FALSE(FB_SimSafe.SimChainOk, 'SimChainOkBit=FALSE -> SimChainOk=FALSE');
+
     ADVANCE_TIME(10000000);
-    FB_SimSafe(Enable := TRUE, PowerCutOff_A := TRUE, PowerCutOff_B := TRUE, BtnEmergencyStop := TRUE);
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := TRUE, BtnEmergencyStop := TRUE);
+    ADVANCE_TIME(60000000);
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := TRUE, BtnEmergencyStop := TRUE);
     ASSERT_FALSE(FB_SimSafe.SimChainOk, 'BtnEmergencyStop -> SimChainOk=FALSE');
 END_TEST
 
 TEST 'TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming'
-    FB_SimSafe(Enable := TRUE, PowerCutOff_A := TRUE, PowerCutOff_B := TRUE, EmergencyArming := FALSE, BtnEmergencyStop := FALSE);
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := TRUE, EmergencyArming := FALSE, BtnEmergencyStop := FALSE);
+    ADVANCE_TIME(60000000);
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := TRUE, EmergencyArming := FALSE, BtnEmergencyStop := FALSE);
     ASSERT_FALSE(FB_SimSafe.SimContactorOk, 'pas encore arme -> contacteur FALSE');
+
+    (* Impulsion armement tenue 100ms *)
     ADVANCE_TIME(10000000);
-    FB_SimSafe(Enable := TRUE, PowerCutOff_A := TRUE, PowerCutOff_B := TRUE, EmergencyArming := TRUE, BtnEmergencyStop := FALSE);
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := TRUE, EmergencyArming := TRUE, BtnEmergencyStop := FALSE);
+    ADVANCE_TIME(110000000);
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := TRUE, EmergencyArming := TRUE, BtnEmergencyStop := FALSE);
     ASSERT_TRUE(FB_SimSafe.SimContactorOk, 'EmergencyArming -> contacteur engage');
+
+    (* Relachement impulsion -> auto-maintien *)
     ADVANCE_TIME(10000000);
-    FB_SimSafe(Enable := TRUE, PowerCutOff_A := TRUE, PowerCutOff_B := TRUE, EmergencyArming := FALSE, BtnEmergencyStop := FALSE);
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := TRUE, EmergencyArming := FALSE, BtnEmergencyStop := FALSE);
     ASSERT_TRUE(FB_SimSafe.SimContactorOk, 'auto-maintien : contacteur reste engage');
+
+    (* Coupure chaine -> retombe apres chaine (50ms) + contacteur (50ms) *)
     ADVANCE_TIME(10000000);
-    FB_SimSafe(Enable := TRUE, PowerCutOff_A := FALSE, PowerCutOff_B := TRUE, EmergencyArming := FALSE, BtnEmergencyStop := FALSE);
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := FALSE, EmergencyArming := FALSE, BtnEmergencyStop := FALSE);
+    ADVANCE_TIME(60000000); (* Chaine s ouvre *)
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := FALSE, EmergencyArming := FALSE, BtnEmergencyStop := FALSE);
+    ADVANCE_TIME(60000000); (* Contacteur retombe *)
+    FB_SimSafe(Enable := TRUE, SimChainOkBit := FALSE, EmergencyArming := FALSE, BtnEmergencyStop := FALSE);
     ASSERT_FALSE(FB_SimSafe.SimContactorOk, 'SimChainOk=FALSE -> contacteur retombe');
 END_TEST
 
@@ -187,104 +206,104 @@ END_TEST
 
 TEST 'TC-P13-040 Sim_Translation progression publie des mots thermometre valides'
     (* Direction=0 : reste sur Tremie (11111) *)
-    FB_SimTrans(Enable := TRUE, Direction := 0, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_TRUE(FB_SimTrans.PosTremie, 'init Tremie -> PosTremie=TRUE');
     ASSERT_TRUE(FB_SimTrans.PosMaintenance, 'init Tremie -> PosMaintenance=TRUE');
     ADVANCE_TIME(10000000);
     (* Direction=-1 : progresse vers Maintenance *)
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_FALSE(FB_SimTrans.PosTremie, 'pos 6m -> PosTremie=FALSE');
     ASSERT_TRUE(FB_SimTrans.PosP2, 'pos 6m -> PosP2=TRUE');
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_FALSE(FB_SimTrans.PosP2, 'pos 18m -> PosP2=FALSE');
     ASSERT_TRUE(FB_SimTrans.PosP1, 'pos 18m -> PosP1=TRUE');
 END_TEST
 
 TEST 'TC-P13-041 Sim_Translation Direction +1/-1/0'
     (* Direction=0 : maintient la position (Tremie) *)
-    FB_SimTrans(Enable := TRUE, Direction := 0, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_TRUE(FB_SimTrans.PosTremie, 'Direction=0 -> reste sur Tremie');
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := 0, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_TRUE(FB_SimTrans.PosTremie, 'Direction=0 -> position maintenue');
     (* Direction=-1 : progresse vers Maintenance *)
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_FALSE(FB_SimTrans.PosTremie, 'Direction=-1 -> quitte Tremie');
     (* Direction=+1 : revient vers Tremie *)
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := 1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := TRUE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := 1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := TRUE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_TRUE(FB_SimTrans.PosTremie, 'Direction=+1 -> retour vers Tremie');
 END_TEST
 
 TEST 'TC-P13-042 Sim_Translation position bornee [Tremie, Maintenance]'
     (* Direction=-1 longtemps -> atteint Maintenance et s y bloque (00000) *)
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_FALSE(FB_SimTrans.PosMaintenance, 'a Maintenance -> PosMaintenance=FALSE (00000)');
     (* Encore des scans -> reste a Maintenance, pas de depassement *)
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_FALSE(FB_SimTrans.PosMaintenance, 'reste a Maintenance, pas de depassement');
     (* Direction=+1 : revient vers Tremie *)
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := 1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := TRUE, ReqMaintenance := FALSE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_TRUE(FB_SimTrans.PosMaintenance, 'retour vers Tremie -> PosMaintenance=TRUE');
 END_TEST
 
 TEST 'TC-P13-043 Sim_Translation Enable=FALSE reinitialise sur Tremie'
     (* Progresse vers Maintenance *)
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_FALSE(FB_SimTrans.PosTremie, 'a P2 -> PosTremie=FALSE');
     (* Enable=FALSE -> reinit interne sur Tremie, sorties neutralisees *)
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := FALSE, Direction := -1, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := FALSE, ReqTremie := FALSE, ReqMaintenance := TRUE, SpeedTgt_Pct := 100.0, FullTravelTimeS := 0.1);
     ASSERT_FALSE(FB_SimTrans.PosTremie, 'Enable=FALSE -> sorties neutralisees');
     (* Re-Enable -> demarre proprement sur Tremie (11111) *)
     ADVANCE_TIME(10000000);
-    FB_SimTrans(Enable := TRUE, Direction := 0, SpeedTgt_Pct := 0.0, FullTravelTimeS := 0.1);
+    FB_SimTrans(Enable := TRUE, ReqTremie := FALSE, ReqMaintenance := FALSE, SpeedTgt_Pct := 0.0, FullTravelTimeS := 0.1);
     ASSERT_TRUE(FB_SimTrans.PosTremie, 're-Enable -> reinit sur Tremie (PosTremie=TRUE)');
     ASSERT_TRUE(FB_SimTrans.PosMaintenance, 're-Enable -> reinit sur Tremie (PosMaintenance=TRUE)');
 END_TEST

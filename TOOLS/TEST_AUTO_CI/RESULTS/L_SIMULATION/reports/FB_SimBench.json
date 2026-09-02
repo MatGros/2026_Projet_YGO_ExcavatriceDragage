@@ -31,30 +31,16 @@
       "passed": true
     },
     {
-      "name": "T196-004 Capteur haut auto : seuil M1 atteint sans for\u00e7age manuel",
+      "name": "T196-004 Capteur haut auto : for\u00e7age manuel SimTopPositionActive",
       "passed": true
     },
     {
       "name": "TC-P13-020 Sim_Safety SimChainOk = A AND B AND NOT BtnEmergencyStop",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_FALSE",
-        "detail": "FB_SIMSAFE.SIMCHAINOK expected FALSE, got TRUE",
-        "file": "test_fb_simbench.st",
-        "line": 107,
-        "message": "canal A coupe -> SimChainOk=FALSE"
-      }
+      "passed": true
     },
     {
       "name": "TC-P13-021 Sim_Safety SimContactorOk s auto-maintient sur EmergencyArming",
-      "passed": false,
-      "failure": {
-        "assertType": "ASSERT_TRUE",
-        "detail": "FB_SIMSAFE.SIMCONTACTOROK expected TRUE, got FALSE",
-        "file": "test_fb_simbench.st",
-        "line": 118,
-        "message": "EmergencyArming -> contacteur engage"
-      }
+      "passed": true
     },
     {
       "name": "TC-P13-022 Sim_Safety Enable=FALSE neutralise tout",
@@ -111,7 +97,7 @@
   ],
   "summary": {
     "total": 23,
-    "passed": 21,
-    "failed": 2
+    "passed": 23,
+    "failed": 0
   }
 }

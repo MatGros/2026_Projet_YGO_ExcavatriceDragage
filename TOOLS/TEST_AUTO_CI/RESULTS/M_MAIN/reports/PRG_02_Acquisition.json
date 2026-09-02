@@ -1,23 +1,15 @@
 {
   "version": 1,
-  "file": "test_prg_06_outputs.st",
+  "file": "test_prg_02_acquisition.st",
   "results": [
     {
-      "name": "PRG_06_Outputs : Transmission Ordres M1 et M3 en Marche Normale",
-      "passed": true
-    },
-    {
-      "name": "PRG_06_Outputs : Transmission Ordre M2 en Marche Normale",
-      "passed": true
-    },
-    {
-      "name": "PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1",
+      "name": "PRG_02_Acquisition : Qualification joystick (neutre -> armement -> consigne X)",
       "passed": true
     }
   ],
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 1,
+    "passed": 1,
     "failed": 0
   }
 }

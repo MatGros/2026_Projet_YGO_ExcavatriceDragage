@@ -22,15 +22,15 @@ TEST 'TC-P02-001 Un seul producteur par donnee : bus Data qualifie et complet (e
     (* Architecture F02.03 : chaque image/bus/commande a un proprietaire unique. En boite
        noire, on verifie que PRG_02 (via le harnais) peuple le bus Data de facon coherente
        et complete : diagnostics DI, qualification codeurs, mesures. *)
-    harness();
+    harness(COD1_PosValue := 1008192, COD2_PosValue := 1008192);
     ADVANCE_TIME(10000000);
-    harness();
-    ASSERT_TRUE(harness.Data.LocalDigitalIoOk, 'Diagnostic module LocalDigitalIoOk publie (producteur unique)');
-    ASSERT_TRUE(harness.Data.Vh0800EndOk, 'Diagnostic module VH0800 publie');
-    ASSERT_TRUE(harness.Data.Vh0808EtpOk, 'Diagnostic module VH0808 publie');
-    ASSERT_FALSE(harness.Data.InputModuleFault, 'Pas de defaut module E/S (nominal)');
-    ASSERT_TRUE(harness.Data.M1_HomedAndReliable, 'Codeur M1 qualifie publie');
-    ASSERT_EQ(harness.Data.Encoders.M1.CablePosM, 2.0, 'Mesure cable M1 publiee (2.0 m)');
+    harness(COD1_PosValue := 1008192, COD2_PosValue := 1008192);
+    ASSERT_TRUE(harness.Data.InputModules.LocalDigitalIoOk, 'Diagnostic module LocalDigitalIoOk publie (producteur unique)');
+    ASSERT_TRUE(harness.Data.InputModules.Vh0800EndOk, 'Diagnostic module VH0800 publie');
+    ASSERT_TRUE(harness.Data.InputModules.Vh0808EtpOk, 'Diagnostic module VH0808 publie');
+    ASSERT_FALSE(harness.Data.InputModules.Fault, 'Pas de defaut module E/S (nominal)');
+    ASSERT_TRUE(harness.Data.EncoderM1.Homed, 'Codeur M1 qualifie publie');
+    ASSERT_EQ(harness.Data.EncoderM1.Measurement.CablePosM, 2.0, 'Mesure cable M1 publiee (2.0 m)');
 END_TEST
 
 TEST 'TC-P02-002 Orchestration ST sans logique cachee : qualification joystick et codeurs (essai d architecture - validation partielle boite noire)'
@@ -42,9 +42,9 @@ TEST 'TC-P02-002 Orchestration ST sans logique cachee : qualification joystick e
     harness(JoyRawX := 5000, JoyRawY := 5000, JoyBtnRaw := TRUE);
     ADVANCE_TIME(150000000);
     harness(JoyRawX := 5000, JoyRawY := 5000, JoyBtnRaw := TRUE);
-    ASSERT_TRUE(harness.Data.JoystickDeadmanArmed, 'Homme-mort arme (qualification joystick)');
-    ASSERT_TRUE(harness.Data.JoystickXNeutral, 'Axe X au neutre');
-    ASSERT_EQ(harness.Data.Encoders.M1.CablePosM, 2.0, 'Mesure codeur M1 publiee');
+    ASSERT_TRUE(harness.Data.Joystick.DeadmanArmed, 'Homme-mort arme (qualification joystick)');
+    ASSERT_TRUE((harness.Data.Joystick.AxisX.Direction = 0), 'Axe X au neutre');
+    ASSERT_EQ(harness.Data.EncoderM1.Measurement.CablePosM, 2.0, 'Mesure codeur M1 publiee');
 END_TEST
 
 TEST 'TC-P02-003 Sorties physiques via PRG_06 : PRG_02 ne produit aucune commande actionneur (essai d architecture - validation partielle boite noire)'
@@ -74,11 +74,11 @@ TEST 'TC-P02-005 Troubleshooting lecture seule : PRG_02 produit les diagnostics 
     (* Architecture F02.06 : la vue troubleshooting observe seulement. PRG_02 produit les faits
        diagnostiques (InputModuleFault, etats modules) consommes par la vue. En boite noire, on
        verifie que ces diagnostics sont publies sur le bus Data. *)
-    harness();
+    harness(COD1_PosValue := 1008192, COD2_PosValue := 1008192);
     ADVANCE_TIME(10000000);
-    harness();
-    ASSERT_FALSE(harness.Data.InputModuleFault, 'Diagnostic InputModuleFault publie (FALSE nominal)');
-    ASSERT_TRUE(harness.Data.LocalDigitalIoOk, 'Diagnostic module LocalDigitalIoOk publie');
+    harness(COD1_PosValue := 1008192, COD2_PosValue := 1008192);
+    ASSERT_FALSE(harness.Data.InputModules.Fault, 'Diagnostic InputModuleFault publie (FALSE nominal)');
+    ASSERT_TRUE(harness.Data.InputModules.LocalDigitalIoOk, 'Diagnostic module LocalDigitalIoOk publie');
     (* (essai d architecture - validation partielle boite noire) : la lecture seule stricte de la
        vue troubleshooting est couverte en AF-14 (TC-P14-TSV-01..05). *)
 END_TEST

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "file": "test_fb_synccontactor.st",
+  "results": [
+    {
+      "name": "TC-P10-SYNC-01 Discordance Niveau 1 SafeStop",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-SYNC-02 Escalade Niveau 2 PowerCutOff",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-SYNC-03 Jog unitaire Inhibition",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-SYNC-04 Bypass Global",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0
+  }
+}

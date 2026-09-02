@@ -44,7 +44,7 @@ END_VAR
 
 VAR_OUTPUT
     // === 🎚️ Bus d'Autorisations Produit vers PRG_04/05/06/07 ===
-    Auth                    : ST_fbModes_Autorisations;
+    Auth                    : ST_Modes_Autorisations;
     
     // === 🔄 Séquenceur de Cycle Semi-Auto ===
     CycleStep               : E_CycleStep;

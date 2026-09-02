@@ -256,7 +256,7 @@ TEST 'TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -> SafeStop SEU
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
        CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
-       Direction := 1, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
        MeasuredSpeedSignedMps := -0.1);
     ASSERT_FALSE(fb.PowerCutOff, 'Avant 500ms : pas de PowerCutOff');
     (* Scan 3 : apres OppositeDirectionTimeout=500ms -> Meca F latchee *)
@@ -267,7 +267,7 @@ TEST 'TC-P10-007 Meca F : sens mesure oppose a la commande 500ms -> SafeStop SEU
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
        CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
-       Direction := 1, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
        MeasuredSpeedSignedMps := -0.1);
     ASSERT_TRUE(fb.SafeStop, 'Sens oppose 500ms -> SafeStop (bit14 dans masque)');
     ASSERT_FALSE(fb.PowerCutOff, 'Sens oppose -> PAS de PowerCutOff (bit14 hors masque 16#2F84)');
@@ -290,7 +290,7 @@ TEST 'TC-P10-008 Meca G : vitesse nulle malgre commande 3s -> SafeStop SEUL'
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
        CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
-       Direction := 1, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
        MeasuredSpeedSignedMps := 0.0);
     ASSERT_FALSE(fb.PowerCutOff, 'Avant 3s : pas de PowerCutOff');
     (* Scan 3 : apres NoMovementTimeout=3s -> Meca G latchee *)
@@ -301,7 +301,7 @@ TEST 'TC-P10-008 Meca G : vitesse nulle malgre commande 3s -> SafeStop SEUL'
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
        CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
-       Direction := 1, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
        MeasuredSpeedSignedMps := 0.0);
     ASSERT_TRUE(fb.SafeStop, 'Absence mouvement 3s -> SafeStop (bit15 dans masque)');
     ASSERT_FALSE(fb.PowerCutOff, 'Absence mouvement -> PAS de PowerCutOff (bit15 hors masque 16#2F84)');
@@ -352,7 +352,7 @@ TEST 'TC-P10-009 Masque PowerCutOff : bit2 (surchauffe moteur) coupe, bit14 (sen
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
        CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
-       Direction := 1, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
        MeasuredSpeedSignedMps := -0.1);
     ADVANCE_TIME(500000000);
     fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
@@ -361,7 +361,7 @@ TEST 'TC-P10-009 Masque PowerCutOff : bit2 (surchauffe moteur) coupe, bit14 (sen
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
        CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5,
-       Direction := 1, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
+       ReqAscent := TRUE, ReqDescend := FALSE, MovementCommanded := TRUE, MeasuredSpeedValid := TRUE,
        MeasuredSpeedSignedMps := -0.1);
     ASSERT_TRUE(fb.SafeStop, 'Sens oppose -> SafeStop');
     ASSERT_FALSE(fb.PowerCutOff, 'Sens oppose (bit14) -> PAS de PowerCutOff (hors masque 16#2F84)');

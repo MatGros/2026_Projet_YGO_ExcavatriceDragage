@@ -1,10 +1,29 @@
-Error compiling source files:
-
-ST_AcquisitionJoystickQualified.st:12:27: error: Undefined type 'ST_FBJOYSTICK_AXISCMD' in STRUCT 'ST_ACQUISITIONJOYSTICKQUALIFIED'
-  12 |     AxisX               : ST_fbJoystick_AxisCmd; // 📊 Commande et direction qualifiée axe X
-     |                           ^
-
-ST_AcquisitionJoystickQualified.st:13:27: error: Undefined type 'ST_FBJOYSTICK_AXISCMD' in STRUCT 'ST_ACQUISITIONJOYSTICKQUALIFIED'
-  13 |     AxisY               : ST_fbJoystick_AxisCmd; // 📊 Commande et direction qualifiée axe Y
-     |                           ^
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_07_Supervision_ox2_qlz6\strucpp-test-jRe8oO\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_07_Supervision_ox2_qlz6\strucpp-test-jRe8oO\test_main.cpp:28:19: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'JOYSTICKDEADMANARMED'
+   28 |         s.ACQDATA.JOYSTICKDEADMANARMED = true;
+      |                   ^~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_07_Supervision_ox2_qlz6\strucpp-test-jRe8oO\test_main.cpp:29:19: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'JOYSTICKYNEUTRAL'
+   29 |         s.ACQDATA.JOYSTICKYNEUTRAL = true;
+      |                   ^~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_07_Supervision_ox2_qlz6\strucpp-test-jRe8oO\generated.cpp: In member function 'void strucpp::FB_TESTHARNESS_PRG_07::operator()()':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_07_Supervision_ox2_qlz6\strucpp-test-jRe8oO\generated.cpp:13579:28: error: 'class strucpp::FB_HMI_BANNERFORMATTER' has no member named 'HOMINGACTIVE'
+13579 |     INSTHMIBANNERFORMATTER.HOMINGACTIVE = false;
+      |                            ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_07_Supervision_ox2_qlz6\strucpp-test-jRe8oO\generated.cpp:13580:28: error: 'class strucpp::FB_HMI_BANNERFORMATTER' has no member named 'HOMINGSTEPM1'
+13580 |     INSTHMIBANNERFORMATTER.HOMINGSTEPM1 = 0;
+      |                            ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_07_Supervision_ox2_qlz6\strucpp-test-jRe8oO\generated.cpp:13581:28: error: 'class strucpp::FB_HMI_BANNERFORMATTER' has no member named 'HOMINGSTEPM2'
+13581 |     INSTHMIBANNERFORMATTER.HOMINGSTEPM2 = 0;
+      |                            ^~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_07_Supervision_ox2_qlz6\strucpp-test-jRe8oO\generated.cpp:13599:28: error: 'class strucpp::FB_HMI_BANNERFORMATTER' has no member named 'COUPLEDUSERREQUESTDIRECTION'; did you mean 'CYCLEREQUESTDIRECTION'?
+13599 |     INSTHMIBANNERFORMATTER.COUPLEDUSERREQUESTDIRECTION = 0;
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                            CYCLEREQUESTDIRECTION
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_07_Supervision_ox2_qlz6\strucpp-test-jRe8oO\generated.cpp:13603:51: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'JOYSTICKDEADMANARMED'
+13603 |     INSTHMIBANNERFORMATTER.DEADMANARMED = ACQDATA.JOYSTICKDEADMANARMED;
+      |                                                   ^~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_PRG_07_Supervision_ox2_qlz6\strucpp-test-jRe8oO\generated.cpp:13604:56: error: 'struct strucpp::ST_ACQUISITIONINTERPRG' has no member named 'JOYSTICKYNEUTRAL'
+13604 |     INSTHMIBANNERFORMATTER.JOYSTICKATNEUTRAL = ACQDATA.JOYSTICKYNEUTRAL;
+      |                                                        ^~~~~~~~~~~~~~~~
 

@@ -3,19 +3,19 @@
   "file": "test_fb_winchstepshaper.st",
   "results": [
     {
-      "name": "TC-P10-T181-18a Depart immediat 0 vers 1",
+      "name": "TC-P10-SHAPER-01 Montee nominale 1000ms",
       "passed": true
     },
     {
-      "name": "TC-P10-T181-18b Montee 1 vers 2 seulement apres StepRampDelay",
+      "name": "TC-P10-SHAPER-02 Descente nominale 500ms",
       "passed": true
     },
     {
-      "name": "TC-P10-T181-18c Descente immediate : aucune rampe descendante",
+      "name": "TC-P10-SHAPER-03 Asymetrie arret direct",
       "passed": true
     },
     {
-      "name": "TC-P10-T181-18d Enable FALSE force le palier 0",
+      "name": "TC-P10-SHAPER-04 Rejet hors plage",
       "passed": true
     }
   ],

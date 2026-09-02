@@ -1,38 +1,10 @@
 Error compiling source files:
 
-FB_Joystick.st:76:33: error: Undefined type 'FB_HYSTERESIS_UTIL' in FUNCTION_BLOCK 'FB_JOYSTICK'
-  76 |     SpeedStepHyst1            : FB_Hysteresis_Util;          // * [INST] Decodage % -> palier, seuil 1 (logique FB_Winch §5)
-     |                                 ^
+FB_TestHarness_PRG_02.st:166:25: error: Cannot assign BOOL to ST_FAULT
+ 166 | Data.EncoderM1.Fault := instEncoderM1.EncoderFault;
+     |                         ^
 
-FB_Joystick.st:77:33: error: Undefined type 'FB_HYSTERESIS_UTIL' in FUNCTION_BLOCK 'FB_JOYSTICK'
-  77 |     SpeedStepHyst2            : FB_Hysteresis_Util;          // * [INST] Decodage % -> palier, seuil 2
-     |                                 ^
-
-FB_Joystick.st:78:33: error: Undefined type 'FB_HYSTERESIS_UTIL' in FUNCTION_BLOCK 'FB_JOYSTICK'
-  78 |     SpeedStepHyst3            : FB_Hysteresis_Util;          // * [INST] Decodage % -> palier, seuil 3
-     |                                 ^
-
-FB_Joystick.st:79:33: error: Undefined type 'FB_HYSTERESIS_UTIL' in FUNCTION_BLOCK 'FB_JOYSTICK'
-  79 |     SpeedStepHyst4            : FB_Hysteresis_Util;          // * [INST] Decodage % -> palier, seuil 4
-     |                                 ^
-
-ST_fbJoystick_Cfg.st:22:28: error: Undefined type 'ST_SPEEDSTEPTABLE' in STRUCT 'ST_FBJOYSTICK_CFG'
-  22 |     SpeedStepTable       : ST_SpeedStepTable; // 🪜 Table seuils % -> palier (conversion au joystick, logique FB_Winch §5)
-     |                            ^
-
-ST_AcquisitionInterPrg.st:22:36: error: Undefined type 'ST_MACHINEHOMING' in STRUCT 'ST_ACQUISITIONINTERPRG'
-  22 |     MachineHoming                : ST_MachineHoming;                   // 🎯 État homing conjoint machine (M1/M2/benne)
-     |                                    ^
-
-ST_AcquisitionInterPrg.st:25:36: error: Undefined type 'ST_IOMODULEDIAG' in STRUCT 'ST_ACQUISITIONINTERPRG'
-  25 |     InputModules                 : ST_IOModuleDiag; // 🩺 Diagnostic carte des 5 modules E/S (AF06 §3bis)
-     |                                    ^
-
-ST_AcquisitionInterPrg.st:28:36: error: Undefined type 'ST_INPUTSOURCE' in STRUCT 'ST_ACQUISITIONINTERPRG'
-  28 |     InputSource                  : ST_InputSource; // 🔀 Flags de bascule de source (réel/simu) par domaine
-     |                                    ^
-
-ST_AcquisitionInterPrg.st:29:36: error: Undefined type 'ST_M3DRIVEFEEDBACK' in STRUCT 'ST_ACQUISITIONINTERPRG'
-  29 |     M3                           : ST_M3DriveFeedback; // ↔️ Retours variateur M3 filtrés (consommé PRG_05)
-     |                                    ^
+FB_TestHarness_PRG_02.st:185:25: error: Cannot assign BOOL to ST_FAULT
+ 185 | Data.EncoderM2.Fault := instEncoderM2.EncoderFault;
+     |                         ^
 

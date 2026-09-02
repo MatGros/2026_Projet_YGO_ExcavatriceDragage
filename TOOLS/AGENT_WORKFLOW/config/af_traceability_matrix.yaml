@@ -112,113 +112,150 @@ domains:
         ref: FB_Safety_EmergencyManagement
         etat: NV-I
       TC-P01-010:
-        intention: "⚡ Étape 1 : Impulsion de réarmement en cours (Step 5, ArmPulse_RQ=TRUE)\
+        intention: "⚡ Étape 1 : Impulsion de réarmement en cours (Step 5 PULSE, Cmd.ArmPulse_Cmd=TRUE).\
           \ \n        \U0001F6D1 Étape 2 : Appui volontaire opérateur sur BtnEmergencyCutOff\
-          \ pendant le pulse \n        ✅ Étape 3 : Coupure immédiate du pulse et du\
-          \ maintien sans lever d'alarme de collage (avortement propre)"
+          \ pendant le pulse. \n        ✅ Étape 3 : Coupure immédiate du pulse et\
+          \ du maintien sans lever d'alarme de contacteur (LastAbortCause=1 (CST_ABORT_CUT_IHM),\
+          \ avortement propre, message \"AU echec: coupure IHM en sequence\")."
         type: 💻 AUTO
         ref: §4.3
         etat: V-I
       TC-P01-SCEN-NOM:
-        intention: "\U0001F4A4 Étape 0 : Repos initial (boucle saine, contacteur au\
-          \ repos, Armable=TRUE) \n        \U0001F680 Étape 1 : Demande réarmement\
-          \ (ArmRequest ➔ lance TestA) \n        \U0001F50D Étape 2 : Réaction boucle\
-          \ à TestA (chute boucle ➔ RestoreA) \n        \U0001F50D Étape 3 : Restauration\
-          \ boucle A (refermeture ➔ lance TestB) \n        \U0001F50D Étape 4 : Réaction\
-          \ boucle à TestB (chute boucle ➔ RestoreB) \n        ⚡ Étape 5 : Impulsion\
-          \ collage contacteur 1s (ArmPulse_RQ=TRUE) \n        ⏱️ Étape 6 : Fin impulsion\
-          \ 1s ➔ Attente confirmation contacteur \n        ✅ Étape 7 : Confirmation\
-          \ collage (PowerContactorEngaged=TRUE ➔ Done=TRUE)"
+        intention: "\U0001F4A4 Étape 0 (Repos initial) : Machine hors tension (EmergencyChainClosed=FALSE\
+          \ ou TRUE, contacteur au repos, Armable=TRUE, message \"AU: repos - pret\
+          \ a rearmer\"). \n        ⏱️ Étape 0bis (Pré-armement 500 ms) : Front ArmRequest\
+          \ ➔ PreArmDelayActive=TRUE, reste en Step 0 IDLE pendant 500 ms (contacteurs\
+          \ espacés, message \"AU: appui pris en compte - etablissement chaine\").\
+          \ \n        \U0001F680 Étape 1 (Test Voie A 1 s) : Step 1 TEST_A, ForceTestA=TRUE\
+          \ ➔ MaintainA_Cmd=FALSE, MaintainB_Cmd=TRUE. Chaîne matérielle doit s'ouvrir\
+          \ (EmergencyChainClosed=FALSE). Message \"AU: autotest canal A en cours\"\
+          . \n        \U0001F50D Étape 2 (Restauration A 500 ms) : Step 2 RESTORE_A,\
+          \ ForceTestA=FALSE ➔ MaintainA_Cmd=TRUE. Chaîne se referme (EmergencyChainClosed=TRUE).\
+          \ Settle contacteur 500 ms. \n        \U0001F50D Étape 3 (Test Voie B 1\
+          \ s) : Step 3 TEST_B, ForceTestB=TRUE ➔ MaintainB_Cmd=FALSE, MaintainA_Cmd=TRUE.\
+          \ Chaîne matérielle doit s'ouvrir (EmergencyChainClosed=FALSE). Message\
+          \ \"AU: autotest canal B en cours\". \n        \U0001F50D Étape 4 (Restauration\
+          \ B & Hold 1 s) : Step 4 RESTORE_B, ForceTestB=FALSE ➔ MaintainA/B_Cmd=TRUE.\
+          \ Chaîne refermée et tenue 1 s avant pulse (relais PowerKeepAlive audibles,\
+          \ message \"AU: restauration canal B\"). \n        ⚡ Étape 5 (Pulse collage\
+          \ 1 s) : Step 5 PULSE, Cmd.ArmPulse_Cmd=TRUE pendant 1000 ms. Message \"\
+          AU: impulsion rearmement contacteur\". \n        ⏱️ Étape 6 (Confirmation\
+          \ contacteur ≤ 2 s) : Step 6 CONFIRM, Cmd.ArmPulse_Cmd=FALSE, attente PowerContactorEngaged=TRUE.\
+          \ Message \"AU: attente confirmation contacteur\". \n        ✅ Étape 7 (Succès\
+          \ & Verrouillage 5 s) : PowerContactorEngaged=TRUE ➔ WasArmed=TRUE, Done=TRUE,\
+          \ retour Step 0 IDLE. Garde anti-chatter active : Armable=FALSE pendant\
+          \ les 5 s suivant le départ (message \"AU: temporisation 5s en cours - patienter\"\
+          ), puis retour Armable=TRUE."
         type: ⚡ AUTO
         ref: §4.3
         etat: V-I
       TC-P01-SCEN-DYN:
-        intention: "\U0001F680 Phase 1 : Réarmement nominal réussi et mise en service\
-          \ (Done=TRUE) \n        ⚡ Phase 2 : Coupure métier en marche (PowerCutOffRequest=TRUE\
-          \ ➔ retombée A/B, Armable=FALSE) \n        \U0001F6E1️ Phase 3 : Tentative\
-          \ réarmement bloquée sous défaut (refus net, reste Step 0) \n        \U0001F504\
-          \ Phase 4 : Disparition dérive métier + Reset (retour Armable=TRUE) \n \
-          \       ⚠️ Phase 5 : Nouvel armement avec échec collage contacteur (timeout\
-          \ 2s Step 6 ➔ EmergencyArmingFailed + Lockout 5s) \n        \U0001F513 Phase\
-          \ 6 : Expiration lockout 5s + Reset (prêt pour nouvel essai)"
+        intention: "\U0001F680 Phase 1 (Mise en service) : Réarmement nominal complet\
+          \ abouti (Done=TRUE, WasArmed=TRUE). \n        ⚡ Phase 2 (Coupure procédé\
+          \ en marche) : Dérive treuil M1/M2/M3 ➔ PowerCutOffRequest=TRUE. Retombée\
+          \ immédiate MaintainA/B_Cmd=FALSE, contacteur retombe, WasArmed=FALSE, Armable=FALSE,\
+          \ message \"AU: coupure securite metier active - lever la cause puis rearmer\"\
+          . \n        \U0001F6E1️ Phase 3 (Tentative sous défaut) : Front ArmRequest\
+          \ sous PowerCutOffRequest=TRUE ➔ Refus net, reste Step 0 IDLE sans alarme\
+          \ parasite contacteur. \n        \U0001F504 Phase 4 (Acquittement défaut\
+          \ procédé) : Disparition dérive + Reset ➔ Armable redevient TRUE (si garde\
+          \ 5 s écoulée). \n        ⚠️ Phase 5 (Échec collage contacteur) : Nouvel\
+          \ armement, auto-tests A/B OK, pulse 1 s envoyé, mais contacteur ne colle\
+          \ pas (Step 6 timeout 2 s) ➔ Avortement LastAbortCause=128 (CST_ABORT_TIMEOUT_CONTACTOR),\
+          \ alarme EmergencyArmingFailed=TRUE, Lockout 5 s (EmergencyArmingLockoutActive=TRUE),\
+          \ message \"AU echec: contacteur non confirme\". \n        \U0001F513 Phase\
+          \ 6 (Reprise après échec) : Écoulement Lockout 5 s + impulsion Reset ➔ Alarme\
+          \ acquittée, Armable=TRUE, prêt pour nouvel essai."
         type: 💻 AUTO
         ref: §4.3
         etat: V-I
       TC-P01-001:
-        intention: "⚡ Étape 1 : Enfoncement coup de poing AU physique sur site \n\
-          \        \U0001F512 Étape 2 : Ouverture matérielle immédiate de la boucle\
-          \ 24V de sécurité \n        ⛔ Étape 3 : Retombée instantanée du contacteur\
-          \ de puissance ligne (API reste sous tension)"
+        intention: "⚡ Étape 1 : Enfoncement coup de poing AU physique sur site en\
+          \ production ➔ Ouverture matérielle boucle 24V (EmergencyChainClosed=FALSE).\
+          \ \n        \U0001F512 Étape 2 : Grâce au latch WasArmed=TRUE (aucune raison\
+          \ métier), les sorties PLC MaintainA/B_Cmd restent TRUE. \n        ⛔ Étape\
+          \ 3 : Retombée instantanée du contacteur de puissance ligne par coupure\
+          \ matérielle en série. \n        \U0001F504 Étape 4 : Relâchement coup de\
+          \ poing ➔ Boucle 24V se referme immédiatement (EmergencyChainClosed=TRUE),\
+          \ relais PLC étant restés fermés. Prêt pour réarmement sans rejouer les\
+          \ auto-tests PLC."
         type: 🟢 SITE
         ref: §6.1
         etat: V-I
       TC-P01-002:
         intention: "\U0001F50D Étape 1 : Surveillance indépendante des canaux A et\
-          \ B en régime nominal établi \n        ⚡ Étape 2 : Test de coupure unilatérale\
-          \ du canal A (MaintainA_RQ=FALSE, B maintenu) \n        \U0001F50D Étape\
-          \ 3 : Vérification réaction boucle ➔ Restauration immédiate canal A \n \
-          \       ⚡ Étape 4 : Test de coupure unilatérale du canal B (MaintainB_RQ=FALSE,\
-          \ A maintenu) ➔ Restauration canal B"
+          \ B en régime nominal établi. \n        ⚡ Étape 2 : Test de coupure unilatérale\
+          \ canal A (ForceTestA=TRUE ➔ MaintainA_Cmd=FALSE, B maintenu TRUE). \n \
+          \       \U0001F50D Étape 3 : Vérification réaction boucle ➔ Restauration\
+          \ canal A (500 ms settle). \n        ⚡ Étape 4 : Test de coupure unilatérale\
+          \ canal B (ForceTestB=TRUE ➔ MaintainB_Cmd=FALSE, A maintenu TRUE) ➔ Restauration\
+          \ canal B (1 s hold)."
         type: ⚡ MIXTE
         ref: §5
         etat: V-I
       TC-P01-003:
         intention: "\U0001F680 Étape 1 : Front montant ArmRequest sous préconditions\
-          \ saines (boucle OK, pas de défaut) \n        ⚡ Étape 2 : Auto-tests A/B\
-          \ croisés validés ➔ Génération impulsion collage contacteur 1.0s (ArmPulse_RQ=TRUE)\
-          \ \n        ⏱️ Étape 3 : Retombée du pulse à 1.0s (ArmPulse_RQ=FALSE) et\
-          \ passage en attente confirmation (Step 6)"
+          \ saines ➔ Délai pré-armement 500 ms. \n        ⚡ Étape 2 : Auto-tests A/B\
+          \ croisés validés ➔ Génération impulsion collage contacteur 1.0 s exacte\
+          \ (Cmd.ArmPulse_Cmd=TRUE). \n        ⏱️ Étape 3 : Retombée du pulse à 1.0\
+          \ s (Cmd.ArmPulse_Cmd=FALSE) et passage en Step 6 CONFIRM."
         type: ⚡ AUTO
         ref: §4.3
         etat: V-I
       TC-P01-004:
         intention: "⚠️ Étape 1 : Apparition d'un défaut de sécurité ou d'auto-test\
-          \ (Error=TRUE) \n        \U0001F504 Étape 2 : Front montant sur Reset ➔\
-          \ Effacement de l'affichage du défaut (Error=FALSE) \n        \U0001F6E1\
-          ️ Étape 3 : Verrouillage maintenu (aucun redémarrage automatique, séquence\
-          \ reste à IDLE Step 0)"
+          \ (Status.Fault.Error=TRUE, StartupFail=TRUE ou RedundancyTestFailed=TRUE).\
+          \ \n        \U0001F504 Étape 2 : Front montant sur Reset ➔ Effacement de\
+          \ l'affichage du défaut (Ack:=TRUE, StartupFail:=FALSE, RedundancyTestFailedCause:=FALSE).\
+          \ \n        \U0001F6E1️ Étape 3 : Verrouillage maintenu : aucun redémarrage\
+          \ automatique, séquence reste à IDLE Step 0."
         type: 💻 AUTO
         ref: §4.4
         etat: V-I
       TC-P01-005:
         intention: "\U0001F504 Temps 1 : Action 1 = Impulsion Reset opérateur pour\
-          \ acquitter et purger l'état de défaut \n        \U0001F680 Temps 2 : Action\
-          \ 2 = Impulsion ArmRequest distincte et consciente pour engager l'armement"
+          \ acquitter et purger l'état de défaut. \n        \U0001F680 Temps 2 : Action\
+          \ 2 = Impulsion ArmRequest distincte et consciente pour engager l'armement\
+          \ (rejet si tenté simultanément ou sans Reset préalable)."
         type: ⚡ MIXTE
         ref: §4.4
         etat: V-I
       TC-P01-006:
-        intention: "\U0001F680 Étape 1 : Front ArmRequest ➔ Lancement TestA (Step\
-          \ 1, coupure logicielle canal A) \n        ⚠️ Étape 2 : Détection canal\
-          \ collé (boucle reste fermée malgré coupure A) \n        \U0001F6A8 Étape\
-          \ 3 : Avortement immédiat ➔ Alarme RedundancyTestFailed, maintien neutralisé\
-          \ et retour IDLE Step 0"
+        intention: "\U0001F680 Étape 1 : Front ArmRequest ➔ Délai 500 ms ➔ Lancement\
+          \ TestA (Step 1, coupure 1 s canal A, MaintainA_Cmd=FALSE). \n        ⚠️\
+          \ Étape 2 : Détection canal collé : EmergencyChainClosed reste TRUE à l'échéance\
+          \ de TonTestA (1 s). \n        \U0001F6A8 Étape 3 : Avortement immédiat\
+          \ ➔ RedundancyTestFailedCause=TRUE, LastAbortCause=32 (CST_ABORT_REDUNDANCY_A),\
+          \ message \"AU echec: voie A collee\", retour IDLE Step 0."
         type: ⚡ AUTO
         ref: §4.3b
         etat: V-I
       TC-P01-007:
-        intention: "⚡ Étape 1 : Fin d'impulsion de collage 1s ➔ Entrée en Step 6 Attente\
-          \ confirmation \n        ⏱️ Étape 2 : Écoulement timeout 2.0s sans retour\
-          \ PowerContactorEngaged \n        \U0001F512 Étape 3 : Déclenchement alarme\
-          \ EmergencyArmingFailed + Activation Lockout anti-mitraillage 5.0s"
+        intention: "⚡ Étape 1 : Fin d'impulsion de collage 1 s ➔ Entrée en Step 6\
+          \ CONFIRM. \n        ⏱️ Étape 2 : Écoulement timeout 2.0 s sans retour PowerContactorEngaged.\
+          \ \n        \U0001F512 Étape 3 : Déclenchement alarme EmergencyArmingFailedCause=TRUE\
+          \ + LastAbortCause=128 (CST_ABORT_TIMEOUT_CONTACTOR) + Lockout 5.0 s (EmergencyArmingLockoutActive=TRUE,\
+          \ ArmPulseInhibitActive=TRUE), message \"AU echec: contacteur non confirme\"\
+          ."
         type: 💻 AUTO
         ref: §4.3
         etat: V-I
       TC-P01-008:
-        intention: "⚡ Étape 1 : Détection dérive métier critique (ex. dérive treuil\
-          \ M3 ➔ PowerCutOffRequest=TRUE) \n        ⛔ Étape 2 : Retombée immédiate\
-          \ et inconditionnelle des canaux A et B (MaintainA/B_RQ=FALSE) \n      \
-          \  \U0001F6E1️ Étape 3 : Verrouillage Armable=FALSE interdisant tout maintien\
-          \ de puissance"
+        intention: "⚡ Étape 1 : Détection dérive métier critique (ex. survitesse treuil\
+          \ ➔ PowerCutOffRequest=TRUE). \n        ⛔ Étape 2 : Retombée immédiate et\
+          \ inconditionnelle des canaux A et B (MaintainA/B_Cmd=FALSE, reset WasArmed=FALSE).\
+          \ \n        \U0001F6E1️ Étape 3 : Verrouillage Armable=FALSE (CutOffActive=TRUE),\
+          \ message \"AU: coupure securite metier active - lever la cause puis rearmer\"\
+          ."
         type: 💻 AUTO
         ref: §4.1
         etat: V-I
       TC-P01-009:
         intention: "\U0001F6E1️ Étape 1 : Présence active de PowerCutOffRequest=TRUE\
-          \ (ou défaut non résolu) \n        \U0001F6AB Étape 2 : Tentative d'armement\
-          \ ArmRequest ➔ Refus net, interdiction de transition hors Step 0 \n    \
-          \    \U0001F504 Étape 3 : Persistance de l'alarme si Reset sans disparition\
-          \ de la cause brute"
+          \ (ou BtnEmergencyCutOff=TRUE). \n        \U0001F6AB Étape 2 : Tentative\
+          \ d'armement ArmRequest ➔ Refus net, interdiction de transition hors Step\
+          \ 0 (Armable=FALSE). \n        \U0001F504 Étape 3 : Persistance du blocage\
+          \ si Reset sans disparition de la cause brute."
         type: 💻 AUTO
         ref: §4.2
         etat: V-I
@@ -478,6 +515,22 @@ domains:
         intention: Fermeture $\rightarrow$ Décollage $\rightarrow$ Nominal sans à-coup
         type: 💻 AUTO
         ref: §3
+        etat: V-I
+      TC-P04-SCEN-NOM:
+        intention: "\U0001F3C1 Étape 0 : Départ à la trémie, treuils en position haute,\
+          \ homme-mort armé \n        \U0001F680 Étape 1 : Front StartCycle → X0→X1\
+          \ (référencement, déjà homé) \n        \U0001F3AF Étape 2 : X1→X2 (sélection\
+          \ cible P1) → X2→X3 (translation atteinte, ouverture benne) \n        \U0001F30A\
+          \ Étape 3 : X3→X4 (plongée benne ouverte, contacteur Kobold armé) → X4→X5\
+          \ (contact fond) \n        ⬆️ Étape 4 : X5→X6 (remontée à hauteur fermeture)\
+          \ → X6→X7 (benne fermée, remontée contrôle) \n        ⚡ Étape 5 : X7→X8\
+          \ (palier contrôle franchi) → X8→X9 (limite haute, égouttage) \n       \
+          \ \U0001F69A Étape 6 : X9→X10 (égouttage 5s, translation trémie) → X10→X11\
+          \ (ouverture vidange) \n        ✅ Étape 7 : X11→X13 (cycle terminé, SampleCount\
+          \ +1 strict) \n        \U0001F504 Étape 8 : X13→X0 (rebouclage sur StartCycle),\
+          \ Done retombe"
+        type: 💻 AUTO
+        ref: §4
         etat: V-I
   AF-05:
     file: AF_Partie-05_Modes_Maintenance_v2.1.md
@@ -830,6 +883,53 @@ domains:
         type: 💻 AUTO
         ref: §4
         etat: NV-I
+      TC-P08-JOY-01:
+        intention: "\U0001F4A4 Étape 0 (Repos neutre) : Joystick au centre (RawX=5000,\
+          \ AtNeutralXY=TRUE, StepTgt=0, SpeedTgt=0%). \n        \U0001F512 Étape\
+          \ 1 (Armement homme-mort) : Appui bouton RawButton=TRUE sous ArmingPermit=TRUE\
+          \ pendant 500 ms ➔ DeadmanArmed=TRUE. \n        \U0001F680 Étape 2 (Zone\
+          \ morte & Palier 1) : Déflexion +5% (dans zone morte) ➔ StepTgt=0 ; déflexion\
+          \ +15% ➔ StepTgt=1, RelayFwd=TRUE (vitesse minimale résistances rotoriques\
+          \ max). \n        ⚡ Étape 3 (Montée progressive P2..P5) : Déflexion +30%\
+          \ ➔ StepTgt=2 ; +50% ➔ StepTgt=3 ; +75% ➔ StepTgt=4 ; +95% ➔ StepTgt=5,\
+          \ SpeedTgt=100% (contacteurs K1..K4 validés). \n        \U0001F504 Étape\
+          \ 4 (Hystérésis en descente) : Relâchement progressif ➔ Le palier 4 reste\
+          \ tenu jusqu'à la limite basse de l'hystérésis (pas de battement autour\
+          \ du seuil)."
+        type: ⚡ AUTO
+        ref: §4.1
+        etat: V-I
+      TC-P08-JOY-02:
+        intention: "⛔ Étape 1 (Permis refusé) : Interlock en cours de tempo ou défaut\
+          \ machine ➔ ArmingPermit=FALSE. \n        \U0001F680 Étape 2 (Tentative\
+          \ opérateur) : Appui RawButton=TRUE maintenu au neutre. \n        \U0001F6E1\
+          ️ Étape 3 (Blocage strict & Warning) : DeadmanArmed reste STRICTEMENT FALSE,\
+          \ levée de ArmingPermitDenied=TRUE (warning IHM non latché), aucune consigne\
+          \ générée lors de l'inclinaison."
+        type: 💻 AUTO
+        ref: §4.2
+        etat: V-I
+      TC-P08-JOY-03:
+        intention: "⚡ Étape 1 (Déflexion positive établie) : Joystick à +80% (Montée\
+          \ Palier 4). \n        \U0001F4A5 Étape 2 (Bascule brutale inter-scan) :\
+          \ Passage instantané à -80% (Descente) en 1 scan sans échantillon dans la\
+          \ zone morte neutre. \n        \U0001F512 Étape 3 (Verrouillage sûreté)\
+          \ : Détection FlipX=TRUE ➔ Activation InversionLockActive=TRUE, consignes\
+          \ forcées à StepTgt=0 et SpeedTgt=0%. \n        \U0001F513 Étape 4 (Libération\
+          \ au neutre) : Retour physique du joystick au neutre (AtNeutralXY=TRUE)\
+          \ ➔ Réarmement, autorisation de repartir dans le nouveau sens."
+        type: ⚡ AUTO
+        ref: §4.3
+        etat: V-I
+      TC-P08-JOY-04:
+        intention: "\U0001F6A8 Étape 1 (Déconnexion CAN) : Perte nœud joystick (BusCanOpenOP.NodePresent=FALSE\
+          \ ou JoystickOP.DeviceOperational=FALSE). \n        ⛔ Étape 2 (Repli immédiat)\
+          \ : Ready=FALSE, DeadmanArmed=FALSE, retombée immédiate de toutes les consignes\
+          \ AxisCmdX/Y à zéro. \n        \U0001F4CA Étape 3 (Publication défaut) :\
+          \ Levée du défaut standard Fault.Error=TRUE via le socle FB_FaultCore."
+        type: 💻 AUTO
+        ref: §4.4
+        etat: V-I
   AF-09:
     file: AF_Partie-09_Fonction_Encoder_v2.4.md
     functions:
@@ -1699,6 +1799,50 @@ domains:
         type: ⚡ AUTO
         ref: §6
         etat: NV
+      TC-P10-SYNC-01:
+        intention: "\U0001F4A4 Étape 0 (Régime symétrique) : M1 et M2 en montée Palier\
+          \ 2 (RelayFwdM1=RelayFwdM2=TRUE, Contactor1_M1=Contactor1_M2=TRUE), ContactorMismatch=FALSE,\
+          \ Diag.MismatchLevel=0. \n        \U0001F680 Étape 1 (Apparition discordance)\
+          \ : M1 passe en Palier 3 (Contactor2_M1=TRUE) alors que M2 reste en Palier\
+          \ 2 (Contactor2_M2=FALSE) ➔ Diag.Step2Mismatch=TRUE, MismatchActive=TRUE.\
+          \ \n        ⏱️ Étape 2 (Filtrage transitoire 500 ms) : À $t=250\\text{ ms}$,\
+          \ MismatchTimer.ET=250ms, ContactorMismatch=FALSE (aucun arrêt sur transitoire).\
+          \ \n        ⚡ Étape 3 (Déclenchement SafeStop) : À $t=500\\text{ ms}$, MismatchTimer.Q=TRUE\
+          \ ➔ ContactorMismatch=TRUE, Diag.MismatchLevel=1 (déclenchement SafeStop\
+          \ amont sans coupure AU)."
+        type: ⚡ AUTO
+        ref: §4.1
+        etat: V-I
+      TC-P10-SYNC-02:
+        intention: "⚡ Étape 1 (Niveau 1 actif) : ContactorMismatch=TRUE établi depuis\
+          \ $t=500\\text{ ms}$, EscalationTimer armé (PT = 3000 ms). \n        ⏱️\
+          \ Étape 2 (Persistance discordance) : Maintien de l'asymétrie sans rétablissement\
+          \ pendant 3.0 s supplémentaires. \n        \U0001F6A8 Étape 3 (Escalade\
+          \ PowerCutOff) : À $t=3500\\text{ ms}$ total, EscalationTimer.Q=TRUE ➔ ContactorMismatchEscalated=TRUE,\
+          \ Diag.MismatchLevel=2 (escalade bit 13 MecaEEscaladeFaultLatched, chute\
+          \ immédiate AU)."
+        type: ⚡ AUTO
+        ref: §4.2
+        etat: V-I
+      TC-P10-SYNC-03:
+        intention: "\U0001F527 Étape 1 (Sélection unitaire M1) : Mode Maintenance\
+          \ N2 ou jog M1 seul (SyncEnable=FALSE, M1 commandé RelayFwdM1=TRUE, M2 au\
+          \ repos RelayFwdM2=FALSE). \n        ✅ Étape 2 (Vérification neutralisation)\
+          \ : BothCommanded=FALSE ➔ MismatchActive=FALSE, ContactorMismatch=FALSE.\
+          \ \n        \U0001F513 Étape 3 (Mouvement libre M1) : M1 monte librement\
+          \ tous paliers sans générer d'alarme de synchronisme pour permettre le recalage\
+          \ mécanique."
+        type: 💻 AUTO
+        ref: §4.3
+        etat: V-I
+      TC-P10-SYNC-04:
+        intention: "\U0001F6E0️ Étape 1 (Activation bypass banc) : BypassGlobal:=TRUE.\
+          \ \n        ⚡ Étape 2 (Injection discordance totale) : M1 en montée P5,\
+          \ M2 en descente P1. \n        ✅ Étape 3 (Neutralisation immédiate) : Sorties\
+          \ forcées ContactorMismatch=FALSE, ContactorMismatchEscalated=FALSE, Diag.MismatchLevel=0."
+        type: 💻 AUTO
+        ref: §4.4
+        etat: V-I
       TC-P10-012:
         intention: "\U0001F4A4 Étape 0 : BrakeCmd=TRUE, BrakeFeedback=FALSE, RestartInhibit=FALSE\
           \ — watchdog armé \n        \U0001F680 Étape 1 : Maintien 500ms sans confirmation\
@@ -1755,6 +1899,51 @@ domains:
         type: 💻 AUTO
         ref: §2bis
         etat: NV-I
+      TC-P10-SHAPER-01:
+        intention: "\U0001F4A4 Étape 0 (Repos) : Enable=TRUE, TargetStep=0, ShapedStep=0,\
+          \ StepDelay.Q=FALSE. \n        \U0001F680 Étape 1 (Départ immédiat Palier\
+          \ 1) : Injection consigne TargetStep=5, StepRampDelay=T#1000ms ➔ Au scan\
+          \ 0 exact ($t=0\\text{ ms}$), ShapedStep=1 immédiatement (aucun contacteur\
+          \ vitesse, frein/sens autorisés). \n        ⏱️ Étape 2 (Attente P1➔P2) :\
+          \ À $t=500\\text{ ms}$, StepDelayElapsed=500ms, ShapedStep=1. \n       \
+          \ ⚡ Étape 3 (Franchissement P2) : À $t=1000\\text{ ms}$, StepDelay.Q=TRUE\
+          \ ➔ ShapedStep=2. \n        \U0001F504 Étape 4 (Réarmement timer) : Au scan\
+          \ suivant ($t=1010\\text{ ms}$), NOT StepDelay.Q réarme le timer TON, StepDelayElapsed=0ms.\
+          \ \n        ⚡ Étape 5 (Paliers P3..P5) : Passage ShapedStep=3 à $t=2000\\\
+          text{ ms}$, ShapedStep=4 à $t=3000\\text{ ms}$, ShapedStep=5 à $t=4000\\\
+          text{ ms}$ exacts."
+        type: ⚡ AUTO
+        ref: §4.1
+        etat: V-I
+      TC-P10-SHAPER-02:
+        intention: "\U0001F680 Étape 1 (Départ Palier 1) : TargetStep=5, StepRampDelay=T#500ms\
+          \ (sens descente) ➔ ShapedStep=1 à $t=0\\text{ ms}$. \n        ⚡ Étape 2\
+          \ (Cadence rapide 500 ms) : ShapedStep=2 à $t=500\\text{ ms}$, ShapedStep=3\
+          \ à $t=1000\\text{ ms}$, ShapedStep=4 à $t=1500\\text{ ms}$, ShapedStep=5\
+          \ à $t=2000\\text{ ms}$ exacts. \n        ✅ Étape 3 (Contrôle dynamique)\
+          \ : Temps total d'établissement = $2.0\\text{ s}$ (2× plus vif que la montée\
+          \ pour descente benne)."
+        type: ⚡ AUTO
+        ref: §4.2
+        etat: V-I
+      TC-P10-SHAPER-03:
+        intention: "⚡ Étape 1 (Régime établi P5) : TargetStep=5, ShapedStep=5. \n\
+          \        \U0001F6D1 Étape 2 (Chute partielle) : Réduction consigne TargetStep:=2\
+          \ ➔ Au scan 0 exact, ShapedStep:=2 immédiatement sans aucune temporisation.\
+          \ \n        ⛔ Étape 3 (Arrêt franc) : Annulation consigne TargetStep:=0\
+          \ ➔ Au scan 0 exact, ShapedStep:=0, StepDelay(IN:=FALSE) remis à zéro."
+        type: 💻 AUTO
+        ref: §4.3
+        etat: V-I
+      TC-P10-SHAPER-04:
+        intention: "⚠️ Étape 1 (Consigne négative) : Injection TargetStep:=-3 ➔ ShapedStep=0\
+          \ (aucun palier négatif). \n        ⚠️ Étape 2 (Consigne supérieure à 5)\
+          \ : Injection TargetStep:=9 ➔ Plafonnement strict à ShapedStep=5 après écoulement\
+          \ de la rampe nominale. \n        \U0001F512 Étape 3 (Coupure Enable) :\
+          \ Enable:=FALSE en pleine rampe ➔ Forçage immédiat ShapedStep=0 et StepDelay(IN:=FALSE)."
+        type: 💻 AUTO
+        ref: §4.4
+        etat: V-I
       TC-P10-014:
         intention: "\U0001F4A4 Étape 0 : M1/M2 synchronisés, écart < CfgSyncTolerance_M=0.8m\
           \ (Zone 1) \n        \U0001F680 Étape 1 : Injection écart M1/M2 > 0.8m (_SyncCfgPersist,\
@@ -2084,10 +2273,10 @@ domains:
         type: 💻 AUTO
         etat: NV
   AF-13:
-    file: AF_Partie-13_Fonction_Simulation_v2.4.md
+    file: AF_Partie-13_Fonction_Simulation_v2.5.md
     functions: {}
     validation_points:
-      TC-P13-010..013:
+      TC-P13-010..014:
         intention: "\U0001F4A4 Étape 0 : SimulationModeActive=FALSE, banc inactif\
           \ \n        \U0001F680 Étape 1 : Front montant SimulationModeActive=TRUE\
           \ → 4 domaines activés \n        ⚡ Étape 2 : Décalage 1 scan entre sortie\
@@ -2221,6 +2410,12 @@ domains:
       TC-P13-013:
         intention: 🆕 M3_StatusWordSim bit0 retombe à l'arrêt (Direction=0) — ne déclenche
           plus FB_Safety_Translation Méca B en continu
+        type: 💻 AUTO
+        etat: NV
+      TC-P13-014:
+        intention: 🆕 Capteur haut TOP simulé libre (TRUE) par défaut, cohérent avec
+          le mou de câble (M2_TensionedCable_DI := TRUE) ; ne dépend plus de la position
+          M1 ; seul SimTopPositionActive injecte un fait capteur
         type: 💻 AUTO
         etat: NV
   AF-14:

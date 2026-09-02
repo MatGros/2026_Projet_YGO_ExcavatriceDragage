@@ -13,7 +13,7 @@ VAR_INPUT
     AcqData                 : ST_AcquisitionInterPrg;
     
     // === 📥 Bus d'Entrée issus de PRG_03 (Modes & Cycle) ===
-    ModesAuth               : ST_fbModes_Autorisations;
+    ModesAuth               : ST_Modes_Autorisations;
     
     // === 📥 Bus d'Entrée issus de PRG_04 (Treuils & Benne) ===
     WinchData               : ST_WinchInterPrg;
@@ -54,11 +54,11 @@ instHmiBannerFormatter(
     CycleErrorId          := 16#0000,
     CycleStepAtError      := E_CycleStep.X0_PREPARATION,
     DiveState             := E_DiveSearchState.WAIT_PRECONDITIONS,
-    ExtractionState       := E_ExtractionSequenceState.WAIT_BOTTOM_CONFIRMATION,
-    HomingActive          := FALSE,
+    ExtractionState       := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION,
+    MachineHomingStep     := 0,
+    MachineHomingInstruction := '',
 
-    HomingStepM1          := 0,
-    HomingStepM2          := 0,
+    
     BypassGlobalActive    := FALSE,
     BypassWinchM1Active   := FALSE,
     BypassWinchM2Active   := FALSE,
@@ -76,12 +76,12 @@ instHmiBannerFormatter(
     BucketIsClosed        := WinchData.BucketState.MechState.IsClosed,
     DiveActive            := FALSE,
     TopLimitReached       := FALSE,
-    CoupledUserRequestDirection := 0,
+    WinchBothMotionDirection := 0,
     M1LogicRequestDirection     := 0,
     M2LogicRequestDirection     := 0,
     CycleRequestDirection       := 0,
-    DeadmanArmed          := AcqData.JoystickDeadmanArmed,
-    JoystickAtNeutral     := AcqData.JoystickYNeutral,
+    DeadmanArmed          := AcqData.Joystick.DeadmanArmed,
+    JoystickAtNeutral     := AcqData.Joystick.AtNeutralXY,
     CycleAutoBusy         := FALSE,
     WinchM1Safety         := WinchData.WinchM1Safety,
     WinchM2Safety         := WinchData.WinchM2Safety,
