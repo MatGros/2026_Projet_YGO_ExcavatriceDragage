@@ -551,15 +551,18 @@ IF Error THEN
 END_IF;
 
 // ── 6quater. Disponibilite mouvement ──
-// TRUE tant que l'etat autoritaire du FB interdit REELLEMENT une nouvelle demande
-// de mouvement ce scan : WAIT_RESTART_DELAY (anti-court-cycle RestartDelay 1,5 s
-// + temps mort directionnel, RestartDelayElapsed s'ecoule dans cet etat) ou FAULT,
-// plus les latches RestartInhibit / ContactorStuck et le FB non pret. L'etat se
-// purge seul des le retour au neutre 1,5 s. WAIT_STEP_DELAY EXCLU : il bride la
-// hausse de palier, il n'interdit pas de partir. Aucune coupure ajoutee : signal
-// de disponibilite uniquement (consomme par la dispo d'armement PRG_04).
+// TRUE tant qu'une nouvelle demande de mouvement est REELLEMENT impossible ce scan :
+//  - RestartRequired : anti-court-cycle RestartDelay (1,5 s) ; TRUE des le retour
+//    au neutre (State=READY) ET pendant le deadlock manche deflechi (WAIT_RESTART_DELAY,
+//    ou RestartDelayElapsed est fige). Se purge seul via RestartDelay.Q.
+//  - DeadTimePending : temps mort directionnel (~1 s apres arret). Se purge via DeadTime.Q.
+//  - RestartInhibit / ContactorStuck : latches a acquittement conscient.
+//  - NOT Ready / State FAULT : FB non operationnel.
+// WAIT_STEP_DELAY EXCLU (bride la hausse de palier, n'interdit pas de partir).
+// Aucune coupure ajoutee : signal de disponibilite consomme par la dispo d'armement PRG_04.
 MovementInhibited := NOT Ready
                      OR RestartInhibit
                      OR ContactorStuck
-                     OR (State = E_WinchFinalInterlockState.WAIT_RESTART_DELAY)
+                     OR RestartRequired
+                     OR DeadTimePending
                      OR (State = E_WinchFinalInterlockState.FAULT);
