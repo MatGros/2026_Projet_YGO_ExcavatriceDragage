@@ -18700,20 +18700,12 @@ END_IF;
             </variable>
           </outputVars>
           <localVars>
-            <variable name="ReqRise">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Request</xhtml>
-              </documentation>
-            </variable>
             <variable name="ReqFall">
               <type>
                 <derived name="F_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant Request</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant Request (arme l'intervalle)</xhtml>
               </documentation>
             </variable>
             <variable name="TonInterval">
@@ -18767,7 +18759,6 @@ IF NOT Enable THEN
     TonInterval(IN := FALSE);
 ELSE
     Ready := TRUE;
-    ReqRise(CLK := Request);
     ReqFall(CLK := Request);
 
     // Intervalle : arme a la retombee d'une activation, tient Cfg_MinInterval
@@ -18779,9 +18770,10 @@ ELSE
         InhibitActive := FALSE;
     END_IF;
 
-    // Nouvelle activation autorisee seulement hors intervalle ; ensuite elle passe
-    // integralement (non decoupee) tant que Request est maintenu.
-    IF ReqRise.Q AND NOT InhibitActive THEN
+    // Une demande passe integralement (non decoupee) tant qu'elle est maintenue, mais ne
+    // peut (re)demarrer que hors intervalle. Test de niveau : robuste si Request est deja
+    // TRUE au demarrage (pas de front observe).
+    IF Request AND NOT InhibitActive THEN
         ActivationLatched := TRUE;
     END_IF;
     IF NOT Request THEN
@@ -29789,7 +29781,11 @@ IF Enable THEN
             TonArmingPulse(IN := FALSE, PT := CST_ArmingPulseDuration);
             TonArmingConfirm(IN := FALSE, PT := CST_ArmingConfirmTimeout);
 
-            IF ArmReqEdge.Q AND Armable AND NOT ArmPulseInhibitActive THEN
+            // ⛔ Ne JAMAIS démarrer la séquence si une coupure métier est active : sinon
+            //    ArmingSeqStep passe non-IDLE 1 scan -&gt; Maintain_ChainOk TRUE -&gt; PowerKeepAlive
+            //    (contacteur CHAIN OK) colle puis lâche à l'abandon -&gt; mitraillage. On ne
+            //    démarre que si la cause est levée. Non contournable par les bypass MES.
+            IF ArmReqEdge.Q AND Armable AND NOT ArmPulseInhibitActive AND NOT PowerCutOffRequest AND NOT BtnEmergencyCutOff THEN
                 RedundancyTestFailedCause := FALSE;
                 EmergencyArmingFailedCause := FALSE;
                 // 🛠️ BypassRedundancyTest (MES trace) : saute TEST_A..RESTORE_B, va au pulse.
@@ -48437,7 +48433,23 @@ creerait une collision avec la globale homonyme du mapping E/S.
                 <derived name="FB_ContactorProtector" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Garde anti-chatter sur l'impulsion contacteur AU (EmergencyArming_RQ)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Garde anti-chatter impulsion contacteur AU (EmergencyArming_RQ)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instKeepAliveAProtector">
+              <type>
+                <derived name="FB_ContactorProtector" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Garde anti-chatter contacteur CHAIN OK voie A (PowerKeepAlive_A_RQ)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instKeepAliveBProtector">
+              <type>
+                <derived name="FB_ContactorProtector" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Garde anti-chatter contacteur CHAIN OK voie B (PowerKeepAlive_B_RQ)</xhtml>
               </documentation>
             </variable>
             <variable name="M1RelayFwd">
@@ -48938,8 +48950,22 @@ instSafetyEmergencyManagement(
 );
 
 // ── Ordres AU (logique) — sorties structurées Status : ST_Safety_Emergency_Status + Cmd : ST_Safety_Emergency_Cmd ──
-PowerKeepAliveACmd := instSafetyEmergencyManagement.Cmd.MaintainA_Cmd;
-PowerKeepAliveBCmd := instSafetyEmergencyManagement.Cmd.MaintainB_Cmd;
+// 🛡️ Garde anti-chatter sur les 2 contacteurs CHAIN OK (PowerKeepAlive A/B) : chaque
+//    ré-enclenchement est espacé d'au moins Cfg_MinInterval. Intervalle court (100 ms) :
+//    inférieur à la durée du test de redondance (CST_TestDuration 200 ms) pour ne pas bloquer
+//    RESTORE_A/B, mais suffisant pour tuer un mitraillage. La retombée reste instantanée.
+instKeepAliveAProtector(
+    Enable          := TRUE,
+    Request         := instSafetyEmergencyManagement.Cmd.MaintainA_Cmd,
+    Cfg_MinInterval := T#100ms
+);
+instKeepAliveBProtector(
+    Enable          := TRUE,
+    Request         := instSafetyEmergencyManagement.Cmd.MaintainB_Cmd,
+    Cfg_MinInterval := T#100ms
+);
+PowerKeepAliveACmd := instKeepAliveAProtector.Cmd;
+PowerKeepAliveBCmd := instKeepAliveBProtector.Cmd;
 // 🛡️ Garde anti-chatter generique sur l'impulsion contacteur AU : une impulsion passe
 //    integralement, puis aucune nouvelle avant 5s (redondant avec la garde interne du FB AU,
 //    au plus pres de la sortie physique). Un cyclage rapide du contacteur casse le materiel.

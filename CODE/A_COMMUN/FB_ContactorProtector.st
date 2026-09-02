@@ -20,8 +20,7 @@ VAR_OUTPUT
     Cmd             : BOOL; // <-- [ACT]  Commande filtree a cabler au contacteur
 END_VAR
 VAR
-    ReqRise         : R_TRIG; // . [LOC] Front montant Request
-    ReqFall         : F_TRIG; // . [LOC] Front descendant Request
+    ReqFall         : F_TRIG; // . [LOC] Front descendant Request (arme l'intervalle)
     TonInterval     : TON;    // . [LOC] Tempo intervalle mini (armee a la retombee)
     InhibitActive   : BOOL;   // . [LOC] Intervalle en cours -> nouvelle activation bloquee
     ActivationLatched : BOOL; // . [LOC] Activation autorisee en cours (passe toute la duree de Request)
@@ -36,7 +35,6 @@ IF NOT Enable THEN
     TonInterval(IN := FALSE);
 ELSE
     Ready := TRUE;
-    ReqRise(CLK := Request);
     ReqFall(CLK := Request);
 
     // Intervalle : arme a la retombee d'une activation, tient Cfg_MinInterval
@@ -48,9 +46,10 @@ ELSE
         InhibitActive := FALSE;
     END_IF;
 
-    // Nouvelle activation autorisee seulement hors intervalle ; ensuite elle passe
-    // integralement (non decoupee) tant que Request est maintenu.
-    IF ReqRise.Q AND NOT InhibitActive THEN
+    // Une demande passe integralement (non decoupee) tant qu'elle est maintenue, mais ne
+    // peut (re)demarrer que hors intervalle. Test de niveau : robuste si Request est deja
+    // TRUE au demarrage (pas de front observe).
+    IF Request AND NOT InhibitActive THEN
         ActivationLatched := TRUE;
     END_IF;
     IF NOT Request THEN

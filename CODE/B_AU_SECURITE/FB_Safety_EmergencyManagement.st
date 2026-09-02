@@ -251,7 +251,11 @@ IF Enable THEN
             TonArmingPulse(IN := FALSE, PT := CST_ArmingPulseDuration);
             TonArmingConfirm(IN := FALSE, PT := CST_ArmingConfirmTimeout);
 
-            IF ArmReqEdge.Q AND Armable AND NOT ArmPulseInhibitActive THEN
+            // ⛔ Ne JAMAIS démarrer la séquence si une coupure métier est active : sinon
+            //    ArmingSeqStep passe non-IDLE 1 scan -> Maintain_ChainOk TRUE -> PowerKeepAlive
+            //    (contacteur CHAIN OK) colle puis lâche à l'abandon -> mitraillage. On ne
+            //    démarre que si la cause est levée. Non contournable par les bypass MES.
+            IF ArmReqEdge.Q AND Armable AND NOT ArmPulseInhibitActive AND NOT PowerCutOffRequest AND NOT BtnEmergencyCutOff THEN
                 RedundancyTestFailedCause := FALSE;
                 EmergencyArmingFailedCause := FALSE;
                 // 🛠️ BypassRedundancyTest (MES trace) : saute TEST_A..RESTORE_B, va au pulse.
