@@ -110,6 +110,7 @@ VAR
     TonMecaE                        : TON;                            // . [LOC] Delai confirmation arret ecart synchro
     TonOppositeDirection            : TON;                            // . [LOC] Delai confirmation sens oppose
     TonNoMovement                   : TON;                            // . [LOC] Delai confirmation absence mouvement
+    TonNoMoveContactor              : TON;                            // . [LOC] Chemin rapide : contacteur de sens commande mais retour "tous retombes"
     TonStartupWarmup                : TON;                            // . [LOC] Inhibition transitoire boot (3s)
     TonRefSettle                    : TON;                            // . [LOC] Garde de stabilisation apres referencement/benne (saut de position codeur)
 
@@ -166,6 +167,7 @@ VAR
 END_VAR
 VAR CONSTANT
     CST_RefPosStepM                 : REAL := 0.5;                    // Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur) — la course reelle d'un treuil par scan 10ms reste sous ~0.01 m
+    CST_ContactorConfirmDelay      : TIME := T#500ms;                // Delai avant NoMovement quand un contacteur de sens est commande mais que le retour dit "tous retombes" (pickup contacteur + marge)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -385,12 +387,22 @@ IF NOT BypassGlobal THEN
     instCauses[14].Texte    := 'Sens reel oppose a la commande treuil';
 
     // Cause 15 : Absence mouvement (latched)
+    // Chemin nominal : commande presente mais vitesse mesuree quasi nulle (NoMovementTimeout).
     TonNoMovement(
         IN := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
               AND (ABS(MeasuredSpeedSignedMps) < MovementSpeedThresholdMps)),
         PT := NoMovementTimeout
     );
     IF TonNoMovement.Q THEN NoMovementFaultLatched := TRUE; END_IF;
+    // Chemin rapide (independant de la mesure vitesse) : un contacteur de sens est
+    // commande mais le retour materiel dit "tous les contacteurs retombes" -> le
+    // contacteur n'a pas engage / a chute. Inutile d'attendre NoMovementTimeout.
+    TonNoMoveContactor(
+        IN := NOT BypassProcess AND MovementCommanded AND NOT InReferencingMode
+              AND FwdRevSpeedFeedbackOff,
+        PT := CST_ContactorConfirmDelay
+    );
+    IF TonNoMoveContactor.Q THEN NoMovementFaultLatched := TRUE; END_IF;
     instCauses[15].Active   := NoMovementFaultLatched;
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
@@ -409,6 +421,7 @@ ELSE
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
+    TonNoMoveContactor(IN := FALSE);
     TonRefSettle(IN := FALSE);
     RefWindowActive := FALSE;
     PosStepDetected := FALSE;
@@ -486,6 +499,7 @@ IF NOT Enable THEN
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
+    TonNoMoveContactor(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
     MecaBElapsedTime := T#0s;
     Ready := FALSE;
