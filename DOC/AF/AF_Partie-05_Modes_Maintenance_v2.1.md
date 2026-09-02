@@ -176,14 +176,29 @@ Diving et Extraction sont utilisables en maintenance et reutilises par le cycle 
 
 ### Principe
 
-Un bypass de sécurité n'est **effectif que si `Mode = MAINT_N2`** (doctrine `ST_BypassWinch` /
-`ST_BypassCommun` / `ST_BypassBucket`). Un bypass IHM activé hors N2 est **ignoré** (affiché
-« inactif — passer en N2 »). Exception unique : l'**override FDC haut logiciel** est possible en
-`MAINT_N1` via un **bouton maintenu** (momentané), borné par le capteur physique haut (≈ 8,5 m),
-jamais franchi.
+> 🚨 **DÉROGATION MES septembre 2026 (décision opérateur, tracée)** : le conditionnement de mode
+> sur les bypass sécurité treuil M1/M2 + benne a été **retiré**. Un bypass IHM armé est désormais
+> **effectif dans TOUS les modes**, `SEMI_AUTO` et `AUTO` inclus.
+> - **Motif** : incohérence de conception signalée en MES — un bypass réglable partout mais
+>   silencieusement sans effet 3 modes sur 4, et affiché « actif » alors qu'il ne l'était pas
+>   (piège de blocage : machine non ré-armable au banc, bus HS, hors `MAINT_N2`).
+> - **Écart assumé** vis-à-vis de la Directive Machines / ISO 13849 (neutralisation d'une
+>   protection normalement réservée à un mode maintenance contrôlé). Traçabilité : RETAIN
+>   `GVL_BypassRetain` + journal de bypass IHM.
+> - **Implémentation** : `PRG_04_Treuils_Benne.st` — tous les `MaintN2 AND <bypass>` remplacés
+>   par `<bypass>` seul ; variable locale `MaintN2` supprimée. Translation M3 (`PRG_05`) était
+>   **déjà** sans gate de mode.
+> - **À revoir** : réintroduire un conditionnement propre (voir correctif « Armé vs Actif » +
+>   interlock sur cause live, rapport diag 2026-09-02) une fois la MES stabilisée.
+
+Historique (avant dérogation) : un bypass de sécurité n'était **effectif que si `Mode = MAINT_N2`**
+(doctrine `ST_BypassWinch` / `ST_BypassCommun` / `ST_BypassBucket`) ; un bypass IHM activé hors N2
+était ignoré. L'**override FDC haut logiciel** reste, lui, propre à `MAINT_N1` via un **bouton
+maintenu** (momentané), borné par le capteur physique haut (≈ 8,5 m), jamais franchi — inchangé.
 
 ```
-bypass_effectif := bypass_IHM AND (Mode = MAINT_N2)   (* pour tous les bypass, sauf override FDC N1 *)
+bypass_effectif := bypass_IHM_armé          (* dérogation MES 2026 — plus de gate de mode *)
+override_FDC_N1 := bouton_maintenu AND (Mode = MAINT_N1) AND Homed AND NOT HomingSuspect
 ```
 
 ### Matrice mode × bypass
@@ -197,8 +212,13 @@ bypass_effectif := bypass_IHM AND (Mode = MAINT_N2)   (* pour tous les bypass, s
 | Méca A-E | `MecaB` | ❌ | ✅ | latché + bandeau d'avertissement fort |
 | Groupés | `Safety`, `Process`, `Global` (axe / commun / benne) | ❌ | ✅ | latché (RETAIN) — **conservés** (homogène projet, idem translation M3) |
 
+> ⚠️ Colonnes **N1 / N2 ci-dessus périmées depuis la dérogation MES 2026** : tous ces bypass
+> sont maintenant effectifs dans **tous** les modes si armés (sauf `TopLimitSoftware` en N1 qui
+> garde son override momentané bouton-tenu). Table conservée pour l'historique de conception.
+
 > **Total : 25 bascules** (18 axe `ST_BypassWinch` + 6 commun `ST_BypassCommun` + 1 benne
-> `ST_BypassBucket`), toutes RETAIN, toutes mode-gated sur `MAINT_N2`. Aucun retrait de DUT
+> `ST_BypassBucket`), toutes RETAIN. ~~toutes mode-gated sur `MAINT_N2`~~ → **sans gate de mode
+> depuis la dérogation MES 2026**. Aucun retrait de DUT
 > (aucun impact IHM/SCADA). `MecaB` et `LimitLegal` restent bypassables en N2 (homogène) ; la
 > traçabilité est assurée par le RETAIN + le journal de bypass existant.
 
