@@ -5025,3 +5025,62 @@ tasks:
   bloque_par:
   - Phase P0 (etude & cadrage, aucun code) a valider par l'humain avant P1
   - Sous-tache T227 (differee) : MAJ AF-04/05/09 + tests CI AC1..AC10
+- id: T173-C
+  parent_id: T173
+  statut: ✅
+  criticite: C2
+  domaine: B_AU_SECURITE / TESTS CI
+  agent: Antigravity
+  date: '2026-09-02T18:07:00+02:00'
+  titre: Tests unitaires ST & non-régression réarmement AU (AF01 v1.4)
+  contexte: >
+    Validation par la preuve du réarmement AU sous cinématique et temporisations réelles
+    (500ms pré-armement, 1s test voies A/B, 500ms/1s rétablissement, 1s pulse, 2s confirmation,
+    garde 5s anti-chatter, 3 bypass MES orthogonaux).
+  description: >
+    Harnais de 12 tests unitaires ST FB_Safety_EmergencyManagement (12/12 PASS).
+    Élimination totale des sorties silencieuses et validation de la table de messages IHM.
+  objectifs:
+  - Nominal : armement réussi en 1 essai (séquence complète 0->6->0, WasArmed=TRUE, Done=TRUE)
+  - Échec contacteur : PowerContactorEngaged reste FALSE après le pulse -> timeout 2s -> message explicite
+  - Coupure volontaire : BtnEmergencyCutOff pendant la séquence -> arrêt immédiat sans alarme
+  - 1er boot : preuve des préconditions au repos hors tension (Armable=TRUE)
+  - Table de vérité : 12 cas d'essais réels sans sortie silencieuse
+  - Non-régression : Bundle frais, liaison G200 0 erreur
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-C_TESTS.yaml
+  bloque_par: []
+
+- id: T229
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: SEQUENCEUR SEMI_AUTO / FB_CYCLE
+  agent: ''
+  date: '2026-09-02T19:45:00+02:00'
+  titre: FB_Cycle - une config treuil unique par etape (split X11, sequenceur au propre avant MES)
+  contexte: >
+    Le sequenceur SEMI_AUTO (FB_Cycle) et le homing machine ne sont PAS encore en
+    service. L'etape X11_OPEN_DUMP melange descente couplee M1+M2 et ouverture
+    benne differentielle dans le meme scan -> FB_WinchSync entierement coupe
+    (via instBucket.Lifecycle.Busy) -> perte de la surveillance d'ecart grossier
+    pendant une descente couplee reelle. Occasion de mettre le sequenceur au
+    propre avant mise en service.
+  description: >
+    Decouper X11 en sous-etapes a configuration treuil UNIQUE : arrivee tremie
+    (arret), ouverture benne (M2 pilote seul), repositionnement couple optionnel
+    (montee/descente synchro validee operateur), retour ouverture. Generaliser le
+    principe "1 config treuil par etape" a tout le cycle. FB_SyncDeviation reste
+    actif pendant les descentes reellement couplees ; seul FB_SyncContactor est
+    neutralise pendant l'ouverture/fermeture benne differentielle.
+    Scope FB_Cycle + E_CycleStep + PRG_03 uniquement — PRG_04/05/FB_Modes non
+    touches (ils restent consommateurs de WinchMxCmd / Auth).
+  objectifs:
+  - Split X11 en sous-etapes a config treuil unique
+  - Table etape -> config treuil (M1 seul / M2 seul / couple) explicite pour X0..X13
+  - Conserver l'anti-telescopage (ecart position) pendant les phases couplees
+  - Aucune modification PRG_04 / PRG_05 / FB_Modes
+  - Cycle SEMI_AUTO complet rejoue sans faux SafeStop synchro
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml
+  bloque_par:
+  - STUB rapide cree pendant MES - a completer (sous-etapes detaillees, chronogrammes, arbitrage bit IHM)
+  - Lien a clarifier avec T226 (refonte homing <-> SEMI_AUTO)
