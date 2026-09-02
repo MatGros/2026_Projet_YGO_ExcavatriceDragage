@@ -1,7 +1,7 @@
 (* =======================================================================
    🎯 FB_MachineHomingCycle — Guide de referencement machine M1/M2/benne
    ───────────────────────────────────────────────────────────────
-   🎯 Role : Qualifier le datum machine (2 codeurs cales + etat benne
+   Role : Qualifier le datum machine (2 codeurs cales + etat benne
              confirme) et guider le homing conjoint M1/M2 + le commit
              atomique de l'etat benne. N'emet AUCUN ordre de mouvement.
    🔒 Securite : SEMI_AUTO interdit tant que MachineHomed=FALSE. Perte de
@@ -66,18 +66,19 @@ END_VAR
 VAR
     // === SOUS-INSTANCES FB ===
     instFault                   : FB_FaultCore;                             // * [INST] Socle defaut transverse
-    ResetEdge                   : R_TRIG;                                   // * [INST] Front montant Reset
-    ConfirmOpenEdge             : R_TRIG;                                   // * [INST] Front montant ConfirmOpenPosition
-    ConfirmCloseEdge            : R_TRIG;                                   // * [INST] Front montant ConfirmClosePosition
-    LatchedEdge                 : R_TRIG;                                   // * [INST] Front montant Fault.Latched (capture R9)
+    ResetEdge                   : R_TRIG;                                   // . [LOC] Detecteur front montant Reset
+    ConfirmOpenEdge             : R_TRIG;                                   // . [LOC] Detecteur front montant ConfirmOpenPosition
+    ConfirmCloseEdge            : R_TRIG;                                   // . [LOC] Detecteur front montant ConfirmClosePosition
+    LatchedEdge                 : R_TRIG;                                   // . [LOC] Detecteur front montant Fault.Latched (capture R9)
 
     // === TABLE DES CAUSES DE DEFAUT ===
     instCauses                  : ARRAY[0..15] OF ST_FaultCause;            // . [LOC] Causes en clair pour FB_FaultCore
 
     // === ETATS INTERNES TRANSACTION ===
+    TxState                     : E_MachineHomingTxState := E_MachineHomingTxState.IDLE; // . [LOC] Etat de la machine a etats transaction (§4)
     PendingOpen                 : BOOL;                                     // . [LOC] Confirmation "ouverte" en attente de commit
     PendingClose                : BOOL;                                     // . [LOC] Confirmation "fermee" en attente de commit
-    HomingStarted               : BOOL;                                     // . [LOC] Transaction homing conjoint armee
+    HomingStarted               : BOOL;                                     // . [LOC] Miroir booleen de (TxState <> IDLE) ; lu par §1 cause-table et §6 guide/Lifecycle
     HomingBusyObserved          : BOOL;                                     // . [LOC] Au moins un Busy observe depuis le debut de la transaction
     CommitPublished             : BOOL;                                     // . [LOC] Commit benne deja publie sur ce datum
     MachineWasHomed             : BOOL;                                     // . [LOC] Memorise un datum valide (detection de perte)
@@ -105,8 +106,7 @@ VAR CONSTANT
     CST_CAUSE_CONFIRM_WHILE_HOMING  : INT := 6;                             // Confirmation pendant un homing d'axe en cours (Latching) — C-4.3
 END_VAR
 
-// === 🔑 §1 FRONTS, CIBLE DYNAMIQUE, CAUSES ET SOCLE DEFAUT ===
-{region "§1 Fronts & causes"}
+{region "§1 Fronts & cible dynamique M2"}
 
 // Sorties impulsionnelles remises a FALSE en tete de scan (1 scan actif au commit / a la demande).
 M1Demand.HomeReq := FALSE;
@@ -131,6 +131,7 @@ LatchedEdge(CLK := Fault.Latched);
 
 // Purge sur front Reset (inclut C-1 : ReHomingAckRequired).
 IF ResetEdge.Q THEN
+    TxState             := E_MachineHomingTxState.IDLE;
     PendingOpen         := FALSE;
     PendingClose        := FALSE;
     HomingStarted       := FALSE;
@@ -142,6 +143,9 @@ IF ResetEdge.Q THEN
     ReHomingAckRequired := FALSE;
 END_IF;
 
+{endregion}
+
+{region "§1bis Conditions intermediaires & detection de perte de datum"}
 // Conditions intermediaires nommees (std 2quater).
 DoubleConfirmRequested := ConfirmOpenEdge.Q AND ConfirmCloseEdge.Q;
 SingleConfirm          := ConfirmOpenEdge.Q XOR ConfirmCloseEdge.Q;
@@ -175,6 +179,9 @@ IF HomingLossLatched AND NOT ReHomingAckRequired THEN
     ReHomingAckRequired := TRUE;
 END_IF;
 
+{endregion}
+
+{region "§1ter Table des causes & socle defaut"}
 // Table des causes (toutes Latching : acquittables au front Reset).
 instCauses[CST_CAUSE_HOMING_LOST_IN_MOTION].Active   := HomingLossLatched OR ReHomingAckRequired;
 instCauses[CST_CAUSE_HOMING_LOST_IN_MOTION].Latching := TRUE;
@@ -211,16 +218,14 @@ instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
 Fault := instFault.Fault;
 {endregion}
 
-// === 🔑 §2 DEMANDE SAFESTOP SUR PERTE DE DATUM ===
-{region "§2 Perte datum"}
+{region "§2 Demande SafeStop sur perte de datum"}
 // Demande d'arret controle tant que la perte n'est pas mecaniquement resolue.
 // La qualification de sortie MachineHomed est calculee en §6, APRES le deroule de
 // transaction (commit ou abandon du meme scan pris en compte) — calcul unique.
 MachineHomingLossSafeStop := HomingLossLatched;
 {endregion}
 
-// === 🔑 §3 GATE D'INITIALISATION (NOT Enable) ===
-{region "§3 Gate init NOT Enable"}
+{region "§3 Gate initialisation (NOT Enable)"}
 IF NOT Enable THEN
     MachineHomingStep         := E_MachineHomingStep.IDLE;
     MachineHomingInstruction  := 'Referencement indisponible';
@@ -239,71 +244,123 @@ IF NOT Enable THEN
 END_IF;
 {endregion}
 
-// === 🔑 §4 OUVERTURE DE LA TRANSACTION DE REFERENCEMENT CONJOINT ===
-{region "§4 Ouverture transaction"}
-(* C : jamais "au vol" par-dessus un homing d'axe deja en cours.
-   Demande acceptee uniquement dans la fenetre mecanique sure, front unique, hors double. *)
-IF SingleConfirm AND NOT HomingStarted AND NOT DoubleConfirmRequested AND NOT ConfirmWhileHoming
-   AND WindowSafe
-   AND NOT M1Status.HomingBusy AND NOT M2Status.HomingBusy THEN
-    PendingOpen        := ConfirmOpenEdge.Q;
-    PendingClose       := ConfirmCloseEdge.Q;
-    HomingStarted      := TRUE;
-    HomingBusyObserved := FALSE;
-    CommitPublished    := FALSE;
-    MachineHomingFailed := FALSE;
-    M1Demand.HomeReq          := TRUE;
-    M2Demand.HomeReq          := TRUE;
+{region "§4 Transaction de referencement conjoint (machine a etats)"}
+// ======================================================================
+//  TRANSACTION DE REFERENCEMENT CONJOINT M1/M2  —  CASE E_MachineHomingTxState
+//
+//  IDLE
+//    --[ SingleConfirm ET WindowSafe (MAINT_N2 + capteur haut + arret meca)
+//        ET aucun axe HomingBusy ET hors double-confirm / confirm-while-homing ]-->  ARMED
+//        action : HomeReq M1+M2, memorise PendingOpen/Close, cible dynamique M2
+//  ARMED
+//    --[ TransactionAbort : capteur haut perdu OU treuil bouge OU HomingError M1/M2 ]--> FAILED (-> IDLE)
+//    --[ un axe HomingBusy ]-->  BUSY_OBSERVED
+//  BUSY_OBSERVED
+//    --[ TransactionAbort ]-->  FAILED (-> IDLE)
+//    --[ 2x HomedAndReliable ET 2x HomingDone ]-->  COMMIT atomique BucketCommit -> IDLE
+//
+//  HomingStarted est maintenu en miroir de (TxState <> IDLE) — lu par §1 (cause-table,
+//  M2Demand.UseDynamicTarget) et §6 (guide operateur, Lifecycle).
+// ======================================================================
+
+// Cible dynamique M2 + condition d'abandon : recalculees chaque scan tant que la
+// transaction est active (idempotent). Hors transaction : abandon neutre.
+IF TxState <> E_MachineHomingTxState.IDLE THEN
     M2Demand.UseDynamicTarget := TRUE;
     IF PendingClose THEN
         M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
     ELSE
         M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
     END_IF;
-END_IF;
-{endregion}
-
-// === 🔑 §5 DEROULE DE LA TRANSACTION & COMMIT ATOMIQUE ===
-{region "§5 Deroule transaction & commit atomique"}
-IF HomingStarted THEN
-    M2Demand.UseDynamicTarget := TRUE;
-    IF PendingClose THEN
-        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
-    ELSE
-        M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
-    END_IF;
-
     TransactionAbort := (NOT TopPositionActive) OR (NOT WinchesMechanicallyStopped)
                         OR M1Status.HomingError OR M2Status.HomingError;
-
-    IF TransactionAbort THEN
-        MachineHomingFailed := TRUE;
-        HomingStarted       := FALSE;
-        PendingOpen         := FALSE;
-        PendingClose        := FALSE;
-    ELSIF M1Status.HomingBusy OR M2Status.HomingBusy THEN
-        HomingBusyObserved := TRUE;
-    ELSIF HomingBusyObserved AND M1Status.HomedAndReliable AND M2Status.HomedAndReliable
-          AND M1Status.HomingDone AND M2Status.HomingDone THEN
-        (* Publication atomique : les deux etats benne ecrits par FB_Bucket dans le meme
-           scan, uniquement apres les deux succes observes. *)
-        BucketCommit.CommitOpen  := PendingOpen;
-        BucketCommit.CommitClose := PendingClose;
-        CommitPublished := TRUE;
-        HomingStarted   := FALSE;
-        PendingOpen     := FALSE;
-        PendingClose    := FALSE;
-    END_IF;
+ELSE
+    TransactionAbort := FALSE;
 END_IF;
+
+CASE TxState OF
+
+    E_MachineHomingTxState.IDLE:
+        (* C : jamais "au vol" par-dessus un homing d'axe deja en cours. Demande acceptee
+           uniquement dans la fenetre mecanique sure, sur front unique, hors double. *)
+        // --[ IDLE -> ARMED ]--
+        IF SingleConfirm AND NOT DoubleConfirmRequested AND NOT ConfirmWhileHoming
+           AND WindowSafe
+           AND NOT M1Status.HomingBusy AND NOT M2Status.HomingBusy THEN
+            PendingOpen         := ConfirmOpenEdge.Q;
+            PendingClose        := ConfirmCloseEdge.Q;
+            HomingBusyObserved  := FALSE;
+            CommitPublished     := FALSE;
+            MachineHomingFailed := FALSE;
+            M1Demand.HomeReq          := TRUE;
+            M2Demand.HomeReq          := TRUE;
+            M2Demand.UseDynamicTarget := TRUE;
+            IF PendingClose THEN
+                M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
+            ELSE
+                M2Demand.DynamicTarget_M := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetOpen_M;
+            END_IF;
+            // --[ IDLE -> FAILED ]-- HomingError present des le scan d'ouverture :
+            // abandon fail-safe LE MEME SCAN (l'axe emet HomeReq une impulsion puis echec),
+            // sans transiter par ARMED. Sans ce test, l'abort serait differe de 1 scan et
+            // MachineHomed (gate SEMI_AUTO) pourrait pulser TRUE 1 scan.
+            IF M1Status.HomingError OR M2Status.HomingError THEN
+                MachineHomingFailed := TRUE;
+                PendingOpen   := FALSE;
+                PendingClose  := FALSE;
+                TxState       := E_MachineHomingTxState.IDLE;
+                HomingStarted := FALSE;
+            ELSE
+                TxState       := E_MachineHomingTxState.ARMED;
+                HomingStarted := TRUE;
+            END_IF;
+        END_IF;
+
+    E_MachineHomingTxState.ARMED:
+        // --[ ARMED -> FAILED ]-- abandon fail-safe
+        IF TransactionAbort THEN
+            MachineHomingFailed := TRUE;
+            PendingOpen  := FALSE;
+            PendingClose := FALSE;
+            TxState       := E_MachineHomingTxState.IDLE;
+            HomingStarted := FALSE;
+        // --[ ARMED -> BUSY_OBSERVED ]-- au moins un axe en homing
+        ELSIF M1Status.HomingBusy OR M2Status.HomingBusy THEN
+            HomingBusyObserved := TRUE;
+            TxState := E_MachineHomingTxState.BUSY_OBSERVED;
+        END_IF;
+
+    E_MachineHomingTxState.BUSY_OBSERVED:
+        // --[ BUSY_OBSERVED -> FAILED ]-- abandon fail-safe
+        IF TransactionAbort THEN
+            MachineHomingFailed := TRUE;
+            PendingOpen  := FALSE;
+            PendingClose := FALSE;
+            TxState       := E_MachineHomingTxState.IDLE;
+            HomingStarted := FALSE;
+        // --[ BUSY_OBSERVED -> IDLE ]-- les 2 axes homes+fiables+done -> COMMIT atomique
+        ELSIF M1Status.HomedAndReliable AND M2Status.HomedAndReliable
+              AND M1Status.HomingDone AND M2Status.HomingDone THEN
+            (* Publication atomique : les deux etats benne ecrits par FB_Bucket dans le meme
+               scan, uniquement apres les deux succes observes. *)
+            BucketCommit.CommitOpen  := PendingOpen;
+            BucketCommit.CommitClose := PendingClose;
+            CommitPublished := TRUE;
+            PendingOpen  := FALSE;
+            PendingClose := FALSE;
+            TxState       := E_MachineHomingTxState.IDLE;
+            HomingStarted := FALSE;
+        END_IF;
+
+END_CASE;
 {endregion}
 
-// === 🔑 §6 CYCLE DE VIE, R9 ET GUIDE OPERATEUR ===
-{region "§6 Guide operateur & sorties"}
+{region "§6 Guide operateur & cycle de vie"}
 MachineHomingActive := HomingStarted;
 Lifecycle.Busy      := HomingStarted;
 Lifecycle.Done      := CommitPublished;
 
-// Qualification de sortie — calcul UNIQUE, apres le deroule de transaction (§5) : un commit
+// Qualification de sortie — calcul UNIQUE, apres le deroule de transaction (§4) : un commit
 // atomique OU un abandon du meme scan est immediatement reflete (comportement d'origine).
 CommitOrOffsetValid := CommitPublished OR BucketOffsetValid;
 MachineHomed := AxisHomed AND CommitOrOffsetValid
@@ -315,7 +372,10 @@ IF LatchedEdge.Q THEN
     MachineHomingStepAtError := MachineHomingStep;
 END_IF;
 
-// Guide operateur — priorite decroissante, textes conserves a l'identique.
+// Guide operateur : ECHELLE DE PRIORITE, pas une machine d'etat. MachineHomingStep est
+// RECALCULE chaque scan a partir des conditions courantes (l'etape est le resultat, pas
+// l'etat ou l'on dispatche) -> IF/ELSIF en priorite decroissante, pas de CASE.
+// La vraie machine d etat du FB est la transaction de referencement (§4, CASE TxState).
 IF MachineHomingFailed THEN
     MachineHomingStep := E_MachineHomingStep.FAILED;
     MachineHomingInstruction := 'Referencement incomplet : rester en N2 et recommencer';

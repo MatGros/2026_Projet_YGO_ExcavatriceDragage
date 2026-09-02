@@ -166,6 +166,22 @@ TEST 'TC-T185-041 : abandon si erreur homing M1 pendant la transaction'
     ASSERT_TRUE(Fb.Fault.Latched, 'Cause erreur homing latchee');
 END_TEST
 
+TEST 'TC-T185-043 : HomingError present au scan exact du front de confirmation => abandon LE MEME SCAN, MachineHomed jamais TRUE'
+    Cfg.CfgTopHomingTarget_M := 8.5; Cfg.CfgOffsetClose_M := 3.0;
+    // Scan 1 : fenetre sure, pas de confirmation encore.
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
+       WinchesMechanicallyStopped := TRUE, M1Status := StatusNone, M2Status := StatusNone,
+       BucketOffsetValid := TRUE, ConfirmClosePosition := FALSE, Cfg := Cfg);
+    ADVANCE_TIME(10000000);
+    // Scan 2 : front de confirmation ET HomingError M1 au MEME scan.
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
+       WinchesMechanicallyStopped := TRUE, M1Status := StatusErr, M2Status := StatusNone,
+       BucketOffsetValid := TRUE, ConfirmClosePosition := TRUE, Cfg := Cfg);
+    ASSERT_TRUE(Fb.MachineHomingFailed, 'Abandon des le scan d ouverture (pas de defer)');
+    ASSERT_FALSE(Fb.MachineHomed, 'MachineHomed ne pulse jamais TRUE (gate SEMI_AUTO)');
+    ASSERT_FALSE(Fb.MachineHomingActive, 'Pas de transaction active affichee');
+END_TEST
+
 TEST 'TC-T185-042 : abandon si mouvement pendant la transaction'
     Cfg.CfgTopHomingTarget_M := 8.5; Cfg.CfgOffsetOpen_M := 1.0;
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionActive := TRUE,
