@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T06:45:43.193799" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T06:45:43.193799">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T14:42:17.200848" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T14:42:17.200848">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -8624,9 +8624,8 @@ instHmiBannerFormatter(
     CycleStepAtError      := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
     DiveState             := GVL_IHM.CycleDiveSearch.State.DiveState,
     ExtractionState       := GVL_IHM.CycleExtraction.State.ExtractionState,
-    HomingActive          := (NOT PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed) OR (NOT PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed),
-    HomingStepM1          := SEL(PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy, 0, 1),
-    HomingStepM2          := SEL(PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy, 0, 1),
+    MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
+    MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
@@ -10147,28 +10146,20 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] État extraction</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Référencement en cours</xhtml>
-              </documentation>
-            </variable>
-            <variable name="HomingStepM1">
+            <variable name="MachineHomingStep">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Étape homing M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Étape guide homing machine (E_MachineHomingStep : 0..70, 60 = valide)</xhtml>
               </documentation>
             </variable>
-            <variable name="HomingStepM2">
+            <variable name="MachineHomingInstruction">
               <type>
-                <INT />
+                <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Étape homing M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Consigne opérateur en clair produite par FB_MachineHomingCycle</xhtml>
               </documentation>
             </variable>
             <variable name="BypassGlobalActive">
@@ -11109,14 +11100,10 @@ Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 // 2. PROGRESSION — le numéro et l'étape restent exclusivement ici
 // Format (AF-07 §5.1) : Macro: &lt;Cycle&gt; &gt; Sous-cycle: &lt;Étape&gt;
 // ═══════════════════════════════════════════════════════════════
-IF HomingActive THEN
-    IF HomingStepM1 &gt; 0 THEN
-        Banner.SequenceProgressText := 'Homing: INDEX HAUT M1';
-    ELSIF HomingStepM2 &gt; 0 THEN
-        Banner.SequenceProgressText := 'Homing: INDEX HAUT M2';
-    ELSE
-        Banner.SequenceProgressText := 'Homing: ATTENTE CAPTEUR HAUT';
-    END_IF;
+// Guide homing machine : source unique = FB_MachineHomingCycle (1 texte par étape).
+// Prioritaire tant que non valide (SEMI_AUTO est de toute façon interdit sans MachineHomed).
+IF (MachineHomingStep &gt; 0) AND (MachineHomingStep &lt;&gt; 60) THEN
+    Banner.SequenceProgressText := CONCAT('Homing: ', MachineHomingInstruction);
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // Détail de l'étape (FB_Cycle.CycleStateStr) prioritaire ; label court en fallback.
     IF CycleStateStr &lt;&gt; '' THEN

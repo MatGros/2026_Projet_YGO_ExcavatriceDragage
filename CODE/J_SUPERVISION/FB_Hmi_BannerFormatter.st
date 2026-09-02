@@ -23,9 +23,8 @@ VAR_INPUT
     CycleStepAtError     : E_CycleStep;   // --> [DIAG] Dernière étape avant le défaut (FB_Cycle.CycleStepAtError)
     DiveState            : E_DiveSearchState;   // --> [HW] État plongée
     ExtractionState      : E_ExtractionAssistState;   // --> [HW] État extraction
-    HomingActive         : BOOL;   // --> [HW] Référencement en cours
-    HomingStepM1         : INT;   // --> [HW] Étape homing M1
-    HomingStepM2         : INT;   // --> [HW] Étape homing M2
+    MachineHomingStep        : INT;   // --> [HW] Étape guide homing machine (E_MachineHomingStep : 0..70, 60 = valide)
+    MachineHomingInstruction : STRING(120);   // --> [HW] Consigne opérateur en clair produite par FB_MachineHomingCycle
 
     // 🛡️ Dérogations & particularités
     BypassGlobalActive   : BOOL;   // --> [TST] Bypass global
@@ -236,14 +235,10 @@ Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 // 2. PROGRESSION — le numéro et l'étape restent exclusivement ici
 // Format (AF-07 §5.1) : Macro: <Cycle> > Sous-cycle: <Étape>
 // ═══════════════════════════════════════════════════════════════
-IF HomingActive THEN
-    IF HomingStepM1 > 0 THEN
-        Banner.SequenceProgressText := 'Homing: INDEX HAUT M1';
-    ELSIF HomingStepM2 > 0 THEN
-        Banner.SequenceProgressText := 'Homing: INDEX HAUT M2';
-    ELSE
-        Banner.SequenceProgressText := 'Homing: ATTENTE CAPTEUR HAUT';
-    END_IF;
+// Guide homing machine : source unique = FB_MachineHomingCycle (1 texte par étape).
+// Prioritaire tant que non valide (SEMI_AUTO est de toute façon interdit sans MachineHomed).
+IF (MachineHomingStep > 0) AND (MachineHomingStep <> 60) THEN
+    Banner.SequenceProgressText := CONCAT('Homing: ', MachineHomingInstruction);
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // Détail de l'étape (FB_Cycle.CycleStateStr) prioritaire ; label court en fallback.
     IF CycleStateStr <> '' THEN
