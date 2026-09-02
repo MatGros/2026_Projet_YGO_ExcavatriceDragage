@@ -146,9 +146,9 @@ VAR
     ArmContactorOff         : BOOL;
     ArmPowerCutOff          : BOOL;
     // Tempo idle de la barriere finale (PRG_06, scan N-1) levee par le bypass groupe du treuil
-    ArmM1MoveInhibited      : BOOL;
-    ArmM2MoveInhibited      : BOOL;
-    ArmM3MoveInhibited      : BOOL;
+    ArmM1MovementInhibited      : BOOL;
+    ArmM2MovementInhibited      : BOOL;
+    ArmM3MovementInhibited      : BOOL;
     // Taxonomie permit (D-P1 à D-P11) : SafetyPermit (safety pure), ProcessPermit (process pur),
     // ProcessAndSafetyPermit (= Safety AND Process), EffectivePermit (= couplage synchro).
     SafetyPermitM1_Descend   : BOOL;
@@ -951,26 +951,26 @@ END_IF;
 // En couplage M1/M2, les DEUX tempos doivent etre ecoulees (meme croisement que
 // SafeStopM*_Active / EffectivePermitM*) : un treuil encore en WAIT_RESTART_DELAY
 // interdit l'armement de l'axe couple.
-ArmM1MoveInhibited := PRG_06_Outputs.Data.M1MovementInhibited;
-ArmM2MoveInhibited := PRG_06_Outputs.Data.M2MovementInhibited;
-ArmM3MoveInhibited := PRG_06_Outputs.Data.M3MovementInhibited;
+ArmM1MovementInhibited := PRG_06_Outputs.Data.M1MovementInhibited;
+ArmM2MovementInhibited := PRG_06_Outputs.Data.M2MovementInhibited;
+ArmM3MovementInhibited := PRG_06_Outputs.Data.M3MovementInhibited;
 
 ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched
-                     AND NOT ArmM1MoveInhibited AND (NOT CoupledBoth OR NOT ArmM2MoveInhibited);
+                     AND NOT ArmM1MovementInhibited AND (NOT CoupledBoth OR NOT ArmM2MovementInhibited);
 ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched
-                     AND NOT ArmM1MoveInhibited AND (NOT CoupledBoth OR NOT ArmM2MoveInhibited);
+                     AND NOT ArmM1MovementInhibited AND (NOT CoupledBoth OR NOT ArmM2MovementInhibited);
 ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched
-                     AND NOT ArmM2MoveInhibited AND (NOT CoupledBoth OR NOT ArmM1MoveInhibited);
+                     AND NOT ArmM2MovementInhibited AND (NOT CoupledBoth OR NOT ArmM1MovementInhibited);
 ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched
-                     AND NOT ArmM2MoveInhibited AND (NOT CoupledBoth OR NOT ArmM1MoveInhibited);
+                     AND NOT ArmM2MovementInhibited AND (NOT CoupledBoth OR NOT ArmM1MovementInhibited);
 ArmM3TremieAvail  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
                      AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff
-                     AND NOT ArmM3MoveInhibited;
+                     AND NOT ArmM3MovementInhibited;
 ArmM3MaintenanceAvail := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
                      AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff
-                     AND NOT ArmM3MoveInhibited;
+                     AND NOT ArmM3MovementInhibited;
 
 ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM2AscentAvail OR ArmM2DescendAvail
