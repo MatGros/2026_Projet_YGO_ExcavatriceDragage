@@ -25782,6 +25782,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut synchro M1/M2 (FB_WinchSync.ErrorId)</xhtml>
               </documentation>
             </variable>
+            <variable name="SyncContactorDiag">
+              <type>
+                <derived name="ST_SyncContactorDiag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Discordance contacteurs M1/M2 décodée (FB_SyncContactor PRG_06 §2quinquies)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DiveErrorId">
               <type>
                 <WORD />
@@ -26088,6 +26096,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Nombre de messages actifs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BannerSyncContactorWhich">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Libellé du contacteur M1/M2 en discordance</xhtml>
               </documentation>
             </variable>
             <variable name="AlarmIndex">
@@ -26963,6 +26979,23 @@ IF ((SyncErrorId AND 16#0001) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AN
 END_IF;
 IF ((SyncErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[SYNC] ErrorID:02 - incoherence commande'; AlarmCount := AlarmCount + 1;
+END_IF;
+// Discordance contacteurs M1/M2 decodee (FB_SyncContactor PRG_06 §2quinquies) : quel contacteur + niveau.
+IF (SyncContactorDiag.MismatchLevel &gt;= 1) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    IF    SyncContactorDiag.RelayFwdMismatch THEN BannerSyncContactorWhich := 'relais montee';
+    ELSIF SyncContactorDiag.RelayRevMismatch THEN BannerSyncContactorWhich := 'relais descente';
+    ELSIF SyncContactorDiag.Step1Mismatch   THEN BannerSyncContactorWhich := 'palier 1';
+    ELSIF SyncContactorDiag.Step2Mismatch   THEN BannerSyncContactorWhich := 'palier 2';
+    ELSIF SyncContactorDiag.Step3Mismatch   THEN BannerSyncContactorWhich := 'palier 3';
+    ELSIF SyncContactorDiag.Step4Mismatch   THEN BannerSyncContactorWhich := 'palier 4';
+    ELSE  BannerSyncContactorWhich := '';
+    END_IF;
+    IF SyncContactorDiag.MismatchLevel &gt;= 2 THEN
+        AlarmArray[AlarmCount] := CONCAT('[SYNC] discordance M1/M2 persistante -&gt; coupure : ', BannerSyncContactorWhich);
+    ELSE
+        AlarmArray[AlarmCount] := CONCAT('[SYNC] discordance contacteurs M1/M2 -&gt; arret : ', BannerSyncContactorWhich);
+    END_IF;
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionAssist)
@@ -49754,7 +49787,8 @@ M2BrakeCmd := M2RelayFwd OR M2RelayRev;
 // FB_SyncContactor : niveau 1 (debounce 500 ms) -&gt; Data.ContactorMismatch -&gt; SafeStop
 // des 2 treuils (PRG_04, scan N+1) ; niveau 2 (persistance CST_SyncEscalationTime) -&gt;
 // Data.ContactorMismatchEscalated -&gt; latch MecaE escalade -&gt; PowerCutOff.
-// Bypass : GVL_IHM.M1M2Sync.Bypass.Global (groupe synchro treuils, pas de nouveau bit).
+// Bypass : groupe synchro treuils OU l'un des 2 bypass groupe treuil (l'operateur
+// qui bypasse un treuil en MES neutralise aussi la concordance).
 instSyncContactorFinal(
     Enable        := TRUE,
     Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -49766,6 +49800,8 @@ instSyncContactorFinal(
     Contactor3_M1 := M1SpeedContactor3, Contactor3_M2 := M2SpeedContactor3,
     Contactor4_M1 := M1SpeedContactor4, Contactor4_M2 := M2SpeedContactor4,
     BypassGlobal  := GVL_IHM.M1M2Sync.Bypass.Global
+                     OR GVL_IHM.M1TreuilRetenue.Bypass.Global
+                     OR GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 Data.ContactorMismatch          := instSyncContactorFinal.ContactorMismatch;
 Data.ContactorMismatchEscalated := instSyncContactorFinal.ContactorMismatchEscalated;
@@ -50994,6 +51030,7 @@ instHmiBannerFormatter(
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
     BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
     SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
+    SyncContactorDiag           := PRG_06_Outputs.Data.SyncContactorDiag,
     DiveErrorId                 := GVL_IHM.CycleDiveSearch.State.DiveErrorId,
     ExtractionErrorId           := GVL_IHM.CycleExtraction.State.ExtractionErrorId,
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
