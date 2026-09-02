@@ -45,6 +45,17 @@
 
 ---
 
+### MES-036 — 🔧 `FB_Safety_EmergencyManagement` phase 1 (avant traces) — commit `4080df6b`
+- 📅 **2026-09-02 ~09:30** | 📍 Banc | 🏷️ `backup/mes-septembre-20260902` | 🚦 🟠 **NON testé automate**
+- **Fait** :
+  - `Armable` **découplé** de `EmergencyChainClosed` (la séquence referme la chaîne — `PowerKeepAlive` en série). Gardes : `NOT BtnEmergencyCutOff`, `NOT PowerCutOffRequest`.
+  - Latch interne **`WasArmed`** : `PowerKeepAlive` maintenu à travers un appui AU pur ; retombe sur raison métier (coupure métier/IHM, `Enable` OFF, redondance). `Maintain_ChainOk += WasArmed`.
+  - Étape CONFIRM : `BypassArmingPreconditions` ⇒ contacteur considéré confirmé (banc) → armement aboutit **sans alarme ni lockout**.
+  - `WasArmed` publié : `ST_Safety_Emergency_Diag` + `ST_SafetyChecklist` + `GVL_Troubleshooting.C_Safety.WasArmed`.
+- **Reste (phase 2)** : départ chaîne ouverte → TEST_A ne prouve pas la voie A (TEST_B OK) → re-tester A après RESTORE_A. Puis MecaE/sync (MES-035 D3).
+
+---
+
 ### MES-035 — 🧩 Lot C2 conception AU/Safety : décisions issues de la séance trace 2026-09-02
 - 📅 **Date** : 2026-09-02 | 📍 **Lieu** : Banc (trace CODESYS `Suivi_20260902_1.trace`) | 🏷️ **Branche** : `backup/mes-septembre-20260902`
 - 🎯 **Périmètre** : `FB_Safety_EmergencyManagement` (maintien `PowerKeepAlive` + armement) · `FB_Safety_Winch` (classement Meca)
@@ -66,7 +77,7 @@
 - **MecaB** (retours contacteur/frein, `UncommandedActiveB`) : **NE PAS TOUCHER** — pas de déplacement en jeu ; le PowerCutOff à l'arrêt est ce qui interdit d'armer avec un **contacteur soudé** (danger réel : variateur vif + charge gravité + frein seul). Le faux-défaut au banc = `ContactorsReleased_DI` mort (bus HS) → traité par **bypass**, pas par changement de logique safety.
 - **MecaE** :
   - `MecaEFaultLatched` (base, cause 12) latche sur `ABS(CablePosM - ExpectedOtherWinchPosM) > tol` **sans garde de plausibilité** → latche sur delta figé (`SyncDelta = -9.32 m` REX DIAG-SYNCHRO) ou garbage (`-235 m`, codeurs `NOT_FOUND`). **Décision** : ajouter précondition `MeasuredSpeedValid AND NOT EncoderIncoherent` sur **les 2 treuils**.
-  - `MecaEEscalade` (cause 13) → PowerCutOff : garde actuelle `NOT (ContactorsReleased_DI AND frein serré)` défaite par le bus HS. **Décision** : remplacer par preuve de mouvement réel `(ABS(speed) > seuil) OR NOT MeasuredSpeedValid` (codeur perdu → coupure dure conservée, côté sûr).
+  - `MecaEEscalade` (cause 13) → PowerCutOff : **décision révisée** — plus de garde « pas à l'arrêt + PostRampTimeout ». Désormais **2 seuils** : cause 12 = écart > `CriticalSyncToleranceM` (petit) → **SafeStop seul** ; cause 13 = écart > **`SyncEscalationToleranceM`** (nouveau seuil, plusieurs mètres, valeur à fixer ~3 m) → **PowerCutOff**. Condition : `MecaEFaultLatched AND (ABS(CablePosM - ExpectedOtherWinchPosM) > SyncEscalationToleranceM) AND (JoystickWinchSelectArbitrated = 0) AND NOT (BypassSafety OR BypassMecaE)` + `TON` court anti-transitoire. `SyncEscalationToleranceM` = **constante de config nommée** (seuil sécurité, §STD « zéro nombre magique »), placée avec `CriticalSyncToleranceM`.
   - MecaE base **reste SafeStop** (déjà volontaire, `:455`) → bloque le mouvement couplé sur un vrai desync à l'arrêt (correct) ; l'opérateur garde les moves unitaires pour re-synchroniser en MAINT.
   - **Message IHM à rendre actionnable** : `SafeStop` MecaE n'est pas directionnel (force vitesse 0, tout sens) → l'opérateur ne peut pas « revenir dans l'autre sens » pour rattraper l'écart en couplé, et le Reset re-latche tant que l'écart > tolérance. Le texte `instCauses[12].Texte` doit guider : *« écart synchro M1/M2 > tolérance — Reset sans effet tant que l'écart persiste : passer unitaire (sync décochée), rapprocher M1/M2, puis Reset »*. Gate MecaE = `SyncEnable` (couplé/both toujours, MAINT si case sync cochée).
 - **Écarté** : downgrade générique « toute Meca à l'arrêt → SafeStop » — effet de bord contacteur-soudé (MecaB) ; et `MeasuredSpeedValid = FALSE` défaisait le gate (codeur perdu + contacteur soudé). Le gate ne s'applique qu'aux causes **comparant un déplacement** (MecaA, MecaE), avec `NOT MeasuredSpeedValid → coupure dure`.
