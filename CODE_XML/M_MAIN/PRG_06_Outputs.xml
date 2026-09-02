@@ -2053,10 +2053,15 @@ END_IF;
 
 {region "§4 Acquittement defauts"}
 // 🔍 ACQUITTEMENT DES DÉFAUTS (pattern Cause/Ack — §3.4bis AF01, §9 STD)
-// ⚠️ Reset acquitte l'affichage (Ack:=TRUE). La cause de redondance reste verrouillée
-// jusqu'au prochain test physique. L'échec d'armement précédent est réinitialisé pour autoriser un réessai.
+// ⚠️ Reset acquitte l'affichage (Ack:=TRUE) ET vide la cause d'auto-test redondance figée.
+// Conforme AF-01 §7.4 (« échec auto-test voies → diagnostiquer, puis ACQUITTER, puis réarmer » :
+// acquitter est une action distincte du réarmement) et §9 STD (le Reset n'est jamais conditionné).
+// Le réarmement réel de la chaîne AU se fait par bouton matériel externe, hors PLC ; la redondance
+// électrique reste un étage hardware indépendant (Partie 01). Si l'auto-test PLC rejoue plus tard
+// et qu'une voie est réellement collée, il re-détecte et re-latch la cause.
 IF Enable THEN
     IF ResetEdge.Q THEN
+        RedundancyTestFailedCause := FALSE;
         RedundancyTestFailedAck := TRUE;
         EmergencyArmingFailedCause := FALSE;
         EmergencyArmingFailedAck := TRUE;
