@@ -56,16 +56,23 @@ VAR
     instArmContactorProtector        : FB_ContactorProtector;            // * [INST] Garde anti-chatter impulsion contacteur AU (EmergencyArming_RQ)
     instKeepAliveAProtector          : FB_ContactorProtector;            // * [INST] Garde anti-chatter contacteur CHAIN OK voie A (PowerKeepAlive_A_RQ)
     instKeepAliveBProtector          : FB_ContactorProtector;            // * [INST] Garde anti-chatter contacteur CHAIN OK voie B (PowerKeepAlive_B_RQ)
-    // Garde anti-chatter DURE, au plus près des sorties mouvement : relais de SENS M1/M2
-    // + FREINS M1/M2/M3. PAS sur les contacteurs de vitesse (descente de palier immédiate
-    // -> un intervalle mini y bloquerait le réenclenchement, cf. §2quater).
-    // Cfg_MinInterval (CST_ContactorMinInterval) < plus courte tempo de séquencement
-    // interlock (BrakeTimeout 0,5 s) : transparent en exploitation.
+    // Garde anti-chatter DURE, au plus près des sorties mouvement M1/M2 + frein M3.
+    // Cfg_MinInterval (CST_ContactorMinInterval) < TOUTE tempo de séquencement des interlocks
+    // (DeadTime 1 s, RestartDelay 1,5 s, StepDelay 1,25 s, BrakeTimeout 0,5 s) : transparent
+    // en exploitation normale, n'agit qu'en cas de re-commande anormalement rapide (bug, bypass, glitch).
     instM1FwdProtector               : FB_ContactorProtector;            // * [INST] Anti-chatter relais montée M1
     instM1RevProtector               : FB_ContactorProtector;            // * [INST] Anti-chatter relais descente M1
+    instM1Sc1Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 1 M1
+    instM1Sc2Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 2 M1
+    instM1Sc3Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 3 M1
+    instM1Sc4Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 4 M1
     instM1BrakeProtector             : FB_ContactorProtector;            // * [INST] Anti-chatter desserrage frein M1
     instM2FwdProtector               : FB_ContactorProtector;            // * [INST] Anti-chatter relais montée/fermeture M2
     instM2RevProtector               : FB_ContactorProtector;            // * [INST] Anti-chatter relais descente/ouverture M2
+    instM2Sc1Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 1 M2
+    instM2Sc2Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 2 M2
+    instM2Sc3Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 3 M2
+    instM2Sc4Protector               : FB_ContactorProtector;            // * [INST] Anti-chatter contacteur palier 4 M2
     instM2BrakeProtector             : FB_ContactorProtector;            // * [INST] Anti-chatter desserrage frein M2
     instM3BrakeProtector             : FB_ContactorProtector;            // * [INST] Anti-chatter desserrage frein translation M3
 
@@ -271,28 +278,37 @@ M2BrakeCmd := M2RelayFwd OR M2RelayRev;
 // ═══════════════════════════════════════════════════════════════
 // 🛡️ §2quater GARDE ANTI-CHATTER DURE — au plus près des sorties contacteurs
 // ═══════════════════════════════════════════════════════════════
-// Dernier rempart avant l'écriture hardware : relais de SENS et FREINS passent par un
-// FB_ContactorProtector. À la retombée d'une commande, aucune ré-activation avant
-// CST_ContactorMinInterval (400 ms). Les interlocks amont planchèrent le sens à >= 1 s
-// (DeadTime) et le frein à 0,5 s -> transparent en exploitation ; n'agit qu'en cas de
+// Dernier rempart avant l'écriture hardware : chaque contacteur de sens, de palier
+// et de frein passe par un FB_ContactorProtector. À la retombée d'une commande,
+// aucune ré-activation avant CST_ContactorMinInterval (400 ms). Les interlocks amont
+// séquencent déjà à >= 500 ms -> transparent en exploitation ; n'agit qu'en cas de
 // re-commande anormalement rapide (bug logique, bypass, glitch concordance §2ter).
 // Enable=TRUE fixe : sécurité positive assurée par le FB (Cmd=FALSE si non autorisé).
-//
-// ⚠️ PAS sur les contacteurs de VITESSE : la descente de palier est IMMÉDIATE
-//    (FB_WinchStepShaper) -> un balayage manche rapide fait retomber les 4 contacteurs
-//    dans le même scan, et l'intervalle 400 ms bloquerait alors le réenclenchement au
-//    balayage suivant (contacteurs de vitesse morts, REX trace Suivi_BugJOY1). L'anti-
-//    chatter palier, s'il est un jour nécessaire, doit être un compteur de bascules à
-//    cible stable, pas un simple intervalle.
 instM1FwdProtector(Enable := TRUE, Request := M1RelayFwd, Cfg_MinInterval := CST_ContactorMinInterval);
 instM1RevProtector(Enable := TRUE, Request := M1RelayRev, Cfg_MinInterval := CST_ContactorMinInterval);
-M1RelayFwd := instM1FwdProtector.Cmd;
-M1RelayRev := instM1RevProtector.Cmd;
+instM1Sc1Protector(Enable := TRUE, Request := M1SpeedContactor1, Cfg_MinInterval := CST_ContactorMinInterval);
+instM1Sc2Protector(Enable := TRUE, Request := M1SpeedContactor2, Cfg_MinInterval := CST_ContactorMinInterval);
+instM1Sc3Protector(Enable := TRUE, Request := M1SpeedContactor3, Cfg_MinInterval := CST_ContactorMinInterval);
+instM1Sc4Protector(Enable := TRUE, Request := M1SpeedContactor4, Cfg_MinInterval := CST_ContactorMinInterval);
+M1RelayFwd        := instM1FwdProtector.Cmd;
+M1RelayRev        := instM1RevProtector.Cmd;
+M1SpeedContactor1 := instM1Sc1Protector.Cmd;
+M1SpeedContactor2 := instM1Sc2Protector.Cmd;
+M1SpeedContactor3 := instM1Sc3Protector.Cmd;
+M1SpeedContactor4 := instM1Sc4Protector.Cmd;
 
 instM2FwdProtector(Enable := TRUE, Request := M2RelayFwd, Cfg_MinInterval := CST_ContactorMinInterval);
 instM2RevProtector(Enable := TRUE, Request := M2RelayRev, Cfg_MinInterval := CST_ContactorMinInterval);
-M2RelayFwd := instM2FwdProtector.Cmd;
-M2RelayRev := instM2RevProtector.Cmd;
+instM2Sc1Protector(Enable := TRUE, Request := M2SpeedContactor1, Cfg_MinInterval := CST_ContactorMinInterval);
+instM2Sc2Protector(Enable := TRUE, Request := M2SpeedContactor2, Cfg_MinInterval := CST_ContactorMinInterval);
+instM2Sc3Protector(Enable := TRUE, Request := M2SpeedContactor3, Cfg_MinInterval := CST_ContactorMinInterval);
+instM2Sc4Protector(Enable := TRUE, Request := M2SpeedContactor4, Cfg_MinInterval := CST_ContactorMinInterval);
+M2RelayFwd        := instM2FwdProtector.Cmd;
+M2RelayRev        := instM2RevProtector.Cmd;
+M2SpeedContactor1 := instM2Sc1Protector.Cmd;
+M2SpeedContactor2 := instM2Sc2Protector.Cmd;
+M2SpeedContactor3 := instM2Sc3Protector.Cmd;
+M2SpeedContactor4 := instM2Sc4Protector.Cmd;
 
 // Frein recalculé APRÈS filtrage des relais de sens, puis filtré à son tour.
 M1BrakeCmd := M1RelayFwd OR M1RelayRev;
