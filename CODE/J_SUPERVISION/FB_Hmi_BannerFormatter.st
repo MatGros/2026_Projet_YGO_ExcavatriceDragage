@@ -63,6 +63,7 @@ VAR_INPUT
     TranslationSafety    : ST_SafetyTranslation; // --> [SAFE] Diagnostic sécurité translation M3
     BucketErrorId        : WORD;   // --> [DIAG] Code défaut benne (FB_Bucket.ErrorId)
     SyncErrorId          : WORD;   // --> [DIAG] Code défaut synchro M1/M2 (FB_WinchSync.ErrorId)
+    SyncContactorDiag    : ST_SyncContactorDiag;   // --> [DIAG] Discordance contacteurs M1/M2 décodée (FB_SyncContactor, vecteurs finaux PRG_06)
     DiveErrorId          : WORD;   // --> [DIAG] Code défaut plongée (FB_DiveSearch.ErrorId)
     ExtractionErrorId    : WORD;   // --> [DIAG] Code défaut extraction (FB_ExtractionAssist.ErrorId)
     EmergencyErrorId     : WORD;   // --> [DIAG] Code défaut chaîne AU (FB_Safety_EmergencyManagement.Diag.ErrorId)
@@ -104,6 +105,7 @@ VAR
     TonAlarmBanner       : TON; // . [LOC] §5 Tempo de maintien par message du carrousel
     AlarmArray           : ARRAY[0..49] OF STRING(120); // . [LOC] §5 Messages actifs collectés ce scan
     AlarmCount           : INT; // . [LOC] §5 Nombre de messages actifs
+    BannerSyncContactorWhich : STRING(80); // . [LOC] §5 Libellé du/des contacteur(s) M1/M2 en discordance
     AlarmIndex           : INT; // . [LOC] §5 Index courant du carrousel (0-based)
     i                    : INT; // . [LOC] Index de boucle
     TonBootInhibit       : TON; // . [LOC] Garde au démarrage (inhibition fausses alarmes réseau 4s)
@@ -586,6 +588,16 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
 // ═══════════════════════════════════════════════════════════════
 AlarmCount := 0;
 
+// Libellé compact du 1er contacteur M1/M2 en discordance (priorité relais > paliers).
+IF    SyncContactorDiag.RelayFwdMismatch THEN BannerSyncContactorWhich := 'relais montee';
+ELSIF SyncContactorDiag.RelayRevMismatch THEN BannerSyncContactorWhich := 'relais descente';
+ELSIF SyncContactorDiag.Step1Mismatch   THEN BannerSyncContactorWhich := 'palier 1';
+ELSIF SyncContactorDiag.Step2Mismatch   THEN BannerSyncContactorWhich := 'palier 2';
+ELSIF SyncContactorDiag.Step3Mismatch   THEN BannerSyncContactorWhich := 'palier 3';
+ELSIF SyncContactorDiag.Step4Mismatch   THEN BannerSyncContactorWhich := 'palier 4';
+ELSE  BannerSyncContactorWhich := '';
+END_IF;
+
 // 5.0 Collecte — Défauts matériels parents (priorité absolue carrousel)
 IF NOT LocalIoValid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[IO] Defaut module Local IO (DI8/DO8)'; AlarmCount := AlarmCount + 1;
@@ -737,6 +749,14 @@ IF ((SyncErrorId AND 16#0001) <> 16#0000) AND EncM1Valid AND EncM2Valid AND (Ala
 END_IF;
 IF ((SyncErrorId AND 16#0002) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[SYNC] ErrorID:02 - incoherence commande'; AlarmCount := AlarmCount + 1;
+END_IF;
+// Discordance contacteurs M1/M2 décodée (FB_SyncContactor).
+IF (SyncContactorDiag.MismatchLevel >= 2) AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := CONCAT('[SYNC] discordance M1/M2 persistante -> coupure : ', BannerSyncContactorWhich);
+    AlarmCount := AlarmCount + 1;
+ELSIF (SyncContactorDiag.MismatchLevel = 1) AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := CONCAT('[SYNC] discordance M1/M2 -> arret : ', BannerSyncContactorWhich);
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionAssist)

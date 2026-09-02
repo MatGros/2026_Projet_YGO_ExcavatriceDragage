@@ -3716,6 +3716,79 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ascending M2 ON | 0 = OFF</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx310_ContactorMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== Discordance contacteurs M1/M2 (FB_SyncContactor sur vecteurs finaux PRG_06) ===
+1 = discordance confirmee (debounce 500 ms) -&gt; SafeStop des 2 treuils</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx311_ContactorMismatchEscalated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = discordance persistante -&gt; escalade PowerCutOff</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx312_ContactorMismatchLevel">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 aucun / 1 confirme (SafeStop) / 2 escalade (PowerCutOff)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx313_Mismatch_RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = relais montee M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx314_Mismatch_RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = relais descente M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx315_Mismatch_SpeedContactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 1 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx316_Mismatch_SpeedContactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 2 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx317_Mismatch_SpeedContactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 3 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx318_Mismatch_SpeedContactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 4 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -25809,6 +25882,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut synchro M1/M2 (FB_WinchSync.ErrorId)</xhtml>
               </documentation>
             </variable>
+            <variable name="SyncContactorDiag">
+              <type>
+                <derived name="ST_SyncContactorDiag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Discordance contacteurs M1/M2 décodée (FB_SyncContactor, vecteurs finaux PRG_06)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DiveErrorId">
               <type>
                 <WORD />
@@ -26115,6 +26196,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Nombre de messages actifs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BannerSyncContactorWhich">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] §5 Libellé du/des contacteur(s) M1/M2 en discordance</xhtml>
               </documentation>
             </variable>
             <variable name="AlarmIndex">
@@ -26839,6 +26928,16 @@ Banner.OperatorActionText := AntiFlickOperator.Text;
 // ═══════════════════════════════════════════════════════════════
 AlarmCount := 0;
 
+// Libellé compact du 1er contacteur M1/M2 en discordance (priorité relais &gt; paliers).
+IF    SyncContactorDiag.RelayFwdMismatch THEN BannerSyncContactorWhich := 'relais montee';
+ELSIF SyncContactorDiag.RelayRevMismatch THEN BannerSyncContactorWhich := 'relais descente';
+ELSIF SyncContactorDiag.Step1Mismatch   THEN BannerSyncContactorWhich := 'palier 1';
+ELSIF SyncContactorDiag.Step2Mismatch   THEN BannerSyncContactorWhich := 'palier 2';
+ELSIF SyncContactorDiag.Step3Mismatch   THEN BannerSyncContactorWhich := 'palier 3';
+ELSIF SyncContactorDiag.Step4Mismatch   THEN BannerSyncContactorWhich := 'palier 4';
+ELSE  BannerSyncContactorWhich := '';
+END_IF;
+
 // 5.0 Collecte — Défauts matériels parents (priorité absolue carrousel)
 IF NOT LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[IO] Defaut module Local IO (DI8/DO8)'; AlarmCount := AlarmCount + 1;
@@ -26990,6 +27089,14 @@ IF ((SyncErrorId AND 16#0001) &lt;&gt; 16#0000) AND EncM1Valid AND EncM2Valid AN
 END_IF;
 IF ((SyncErrorId AND 16#0002) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[SYNC] ErrorID:02 - incoherence commande'; AlarmCount := AlarmCount + 1;
+END_IF;
+// Discordance contacteurs M1/M2 décodée (FB_SyncContactor).
+IF (SyncContactorDiag.MismatchLevel &gt;= 2) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := CONCAT('[SYNC] discordance M1/M2 persistante -&gt; coupure : ', BannerSyncContactorWhich);
+    AlarmCount := AlarmCount + 1;
+ELSIF (SyncContactorDiag.MismatchLevel = 1) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := CONCAT('[SYNC] discordance M1/M2 -&gt; arret : ', BannerSyncContactorWhich);
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5f. Collecte — plongée / extraction (FB_DiveSearch / FB_ExtractionAssist)
@@ -51105,6 +51212,7 @@ instHmiBannerFormatter(
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
     BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
     SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
+    SyncContactorDiag           := PRG_06_Outputs.Data.SyncContactorDiag,
     DiveErrorId                 := GVL_IHM.CycleDiveSearch.State.DiveErrorId,
     ExtractionErrorId           := GVL_IHM.CycleExtraction.State.ExtractionErrorId,
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
@@ -51243,6 +51351,18 @@ instTroubleshootingView(
     WinchM2Trace         := PRG_04_Treuils_Benne.Data.TraceM2,
     TranslationTrace     := PRG_05_Translation.Data.TranslationTrace
 );
+
+// Remontee decodee discordance contacteurs M1/M2 (FB_SyncContactor sur vecteurs
+// finaux PRG_06) vers le troubleshooting — quel contacteur diverge + niveau.
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx310_ContactorMismatch          := PRG_06_Outputs.Data.ContactorMismatch;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx311_ContactorMismatchEscalated := PRG_06_Outputs.Data.ContactorMismatchEscalated;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx312_ContactorMismatchLevel     := PRG_06_Outputs.Data.SyncContactorDiag.MismatchLevel;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx313_Mismatch_RelayFwd          := PRG_06_Outputs.Data.SyncContactorDiag.RelayFwdMismatch;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx314_Mismatch_RelayRev          := PRG_06_Outputs.Data.SyncContactorDiag.RelayRevMismatch;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx315_Mismatch_SpeedContactor1   := PRG_06_Outputs.Data.SyncContactorDiag.Step1Mismatch;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx316_Mismatch_SpeedContactor2   := PRG_06_Outputs.Data.SyncContactorDiag.Step2Mismatch;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx317_Mismatch_SpeedContactor3   := PRG_06_Outputs.Data.SyncContactorDiag.Step3Mismatch;
+GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx318_Mismatch_SpeedContactor4   := PRG_06_Outputs.Data.SyncContactorDiag.Step4Mismatch;
 
 {endregion}
 </xhtml>
