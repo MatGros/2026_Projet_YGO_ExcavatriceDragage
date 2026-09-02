@@ -45,6 +45,35 @@
 
 ---
 
+### MES-035 — 🧩 Lot C2 conception AU/Safety : décisions issues de la séance trace 2026-09-02
+- 📅 **Date** : 2026-09-02 | 📍 **Lieu** : Banc (trace CODESYS `Suivi_20260902_1.trace`) | 🏷️ **Branche** : `backup/mes-septembre-20260902`
+- 🎯 **Périmètre** : `FB_Safety_EmergencyManagement` (maintien `PowerKeepAlive` + armement) · `FB_Safety_Winch` (classement Meca)
+- 🚦 **Statut** : 🟠 **Décisions actées, non implémentées** — lot C2 à cadrer (contrat + plan), pas à chaud
+- 📊 **Constat trace** : bypass ingénierie MES actifs (`BypassAuArmingPreconditions`/`BypassAuRedundancyTest` 0→1 au pt 104) → `Emergency.State.Armable` 0→1 simultané ✅ code implémenté. `PowerKeepAlive_A_RQ` et `_B_RQ` **strictement identiques** (montent/tombent ensemble) → confirme : aucune divergence A/B produite par ce code. `ContactorOk` toujours 0 (pas de contacteur au banc).
+
+#### D1 — Deadlock armement (bouton gaté sur `EmergencyChainClosed`)
+- **Constat** : `Armable_ChainOk := EmergencyChainClosed AND ...` ; or `PowerKeepAlive_A/B_RQ` sont **en série dans le circuit chaîne** → boucle auto-latchée : chaîne ouverte → `Maintain_ChainOk` FALSE → KeepAlive retombe → PLC ouvre AUSSI ses contacts → au relâchement AU, boucle ne se referme pas → réarmement obligatoire. La séquence d'armement (terme `ArmingSeqStep <> IDLE`) est le SEUL mécanisme de récup, mais injoignable (`Armable` exige la chaîne fermée).
+- **Décision** : sortir `EmergencyChainClosed` de la condition bouton/armement → `ArmingCanStart := Idle AND NOT Lockout AND NOT PowerContactorEngaged AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest`. `EmergencyChainClosed` devient contrôle **dans** la séquence (confirmation contacteur après pulse). Aucun danger : `NOT BtnCutOff` / `NOT PowerCutOffRequest` couvrent « vraie raison que la chaîne soit ouverte ».
+- **Nuance à trancher** : test redondance voie A aveugle si départ chaîne ouverte (option 1 = signaler + contrôle A séparé ; option 2 = re-jouer TEST_A après RESTORE_A ; option 3 = PULSE puis test complet). Reco = **option 2**.
+
+#### D2 — `PowerKeepAlive` doit rester actif sur appui AU pur
+- **Règle métier (opérateur)** : au repos, AU appuyé sans défaut métier → `PowerKeepAlive_A/B_RQ` doit **rester TRUE** (l'AU coupe la chaîne physiquement seul ; relâchement = fermeture instantanée, energized-to-run). Cohérent `AGENTS.md` (« chaîne matérielle AU indépendante »).
+- **Décision** : latch `WasArmed` — posé quand `PowerContactorEngaged` confirmé, effacé sur `PowerCutOffRequest OR BtnEmergencyCutOff OR NOT Enable OR RedundancyTestFailedCause`. `Maintain_ChainOk := EmergencyChainClosed OR (ArmingSeqStep <> IDLE) OR WasArmed`. `WasArmed` non RETAIN + init FALSE sur `EnableRising`.
+- **Écarté** : réutiliser `EmergencyArmingLockoutActive` (5s) — ne couvre que le cas « échec armement, réessai rapide », pas l'appui AU sur machine armée stable.
+- **Question doctrine ouverte** : relâchement AU = restauration instantanée (`WasArmed`) **OU** réarmement conscient obligatoire après tout appui AU (defense-in-depth). ➡️ **arbitrage opérateur requis.**
+
+#### D3 — Classement Meca : dynamique (déplacement) vs statique
+- **MecaB** (retours contacteur/frein, `UncommandedActiveB`) : **NE PAS TOUCHER** — pas de déplacement en jeu ; le PowerCutOff à l'arrêt est ce qui interdit d'armer avec un **contacteur soudé** (danger réel : variateur vif + charge gravité + frein seul). Le faux-défaut au banc = `ContactorsReleased_DI` mort (bus HS) → traité par **bypass**, pas par changement de logique safety.
+- **MecaE** :
+  - `MecaEFaultLatched` (base, cause 12) latche sur `ABS(CablePosM - ExpectedOtherWinchPosM) > tol` **sans garde de plausibilité** → latche sur delta figé (`SyncDelta = -9.32 m` REX DIAG-SYNCHRO) ou garbage (`-235 m`, codeurs `NOT_FOUND`). **Décision** : ajouter précondition `MeasuredSpeedValid AND NOT EncoderIncoherent` sur **les 2 treuils**.
+  - `MecaEEscalade` (cause 13) → PowerCutOff : garde actuelle `NOT (ContactorsReleased_DI AND frein serré)` défaite par le bus HS. **Décision** : remplacer par preuve de mouvement réel `(ABS(speed) > seuil) OR NOT MeasuredSpeedValid` (codeur perdu → coupure dure conservée, côté sûr).
+  - MecaE base **reste SafeStop** (déjà volontaire, `:455`) → bloque le mouvement couplé sur un vrai desync à l'arrêt (correct) ; l'opérateur garde les moves unitaires pour re-synchroniser en MAINT.
+- **Écarté** : downgrade générique « toute Meca à l'arrêt → SafeStop » — effet de bord contacteur-soudé (MecaB) ; et `MeasuredSpeedValid = FALSE` défaisait le gate (codeur perdu + contacteur soudé). Le gate ne s'applique qu'aux causes **comparant un déplacement** (MecaA, MecaE), avec `NOT MeasuredSpeedValid → coupure dure`.
+
+- 📌 **Suivi** : lot C2 « Découplage `PowerKeepAlive`/chaîne + classement Meca dynamique/statique » à créer dans `TASKS.yaml` (contrat + plan + garde-fous). Lien `INVESTIG-ETHERCAT-RECOVERY-POWERKEEPALIVE`, REX `DIAG-SYNCHRO`. Bloqué sur : arbitrage doctrine D2 (relâchement AU) + traces opérateur complémentaires.
+
+---
+
 ### MES-034 — 🧭 Déblocage MES banc (bus HS) : séquence réelle + trous de conception AU
 - 📅 **Date** : 2026-09-02 | 📍 **Lieu** : Banc (EtherCAT + modules DI absents) | 🏷️ **Branche** : `backup/mes-septembre-20260902`
 - 🎯 **Périmètre** : chaîne défauts safety M1/M2/M3, bandeau modules E/S, armement AU
