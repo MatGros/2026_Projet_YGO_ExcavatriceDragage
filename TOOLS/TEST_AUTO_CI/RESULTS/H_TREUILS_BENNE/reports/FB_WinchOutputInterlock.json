@@ -53,7 +53,14 @@
     },
     {
       "name": "TC-P10-023a \u00a73bis : sens maintenu apres chute de palier a 0 tant que contacteurs non confirmes, puis chute sur DropConfirmDelay",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_FALSE",
+        "detail": "FB.RELAYFWD expected FALSE, got TRUE",
+        "file": "test_fb_winchoutputinterlock.st",
+        "line": 463,
+        "message": "Confirmation retombee -> chute du sens (\u00a73bis)"
+      }
     },
     {
       "name": "TC-P10-023b \u00a73bis : T_max atteint sans confirmation -> chute du sens FORCEE + latch ContactorStuck",
@@ -62,11 +69,15 @@
     {
       "name": "TC-P10-023c \u00a73bis : coupure dure (Enable=FALSE) pendant le maintien -> RelayFwd=FALSE immediat",
       "passed": true
+    },
+    {
+      "name": "TC-T216-FINAL-PERMIT Direction refusee coupe la barriere finale, direction autorisee passe",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 10,
+    "total": 11,
     "passed": 7,
-    "failed": 3
+    "failed": 4
   }
 }

@@ -1,0 +1,5 @@
+12:28:08 [Codex] cadrage -> en_cours Préambule, contrat et référentiels en lecture
+12:29:37 [Codex] analyse -> ok Chaîne PRG02->PRG04/05 et rampes FB_Winch/FB_Translation vérifiées ; aucun contournement
+12:30:14 [Codex] implementation -> en_cours Patch FB_Joystick appliqué ; ajout tests, gate et AF en cours
+12:33:19 [Codex] verification -> en_cours Bundle frais et G200 PASS ; G492 PASS ; tests STruCpp bloqués WinError 5 temporaire
+12:33:38 [Codex] termine -> attente_validation Implémentation et garde-fou terminés ; bundle/G200/G492 PASS ; validation CI STruCpp bloquée par WinError 5

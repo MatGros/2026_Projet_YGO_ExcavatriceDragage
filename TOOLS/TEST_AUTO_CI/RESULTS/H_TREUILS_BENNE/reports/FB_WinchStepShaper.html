@@ -315,7 +315,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-01 01:27:09</div>
+    <div class="exec-time">2026-09-02 16:01:57</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (4 tests)</summary>
@@ -750,9 +750,13 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-// Temporisation : compte quand la cible est au-dessus du palier courant
+// Temporisation : compte quand la cible est au-dessus du palier courant.
+// NOT StepDelay.Q : un TON garde .Q TRUE tant que IN est TRUE (pas d&#x27;impulsion).
+// Sans ce terme, une fois StepRampDelay ecoule le +1 ci-dessous s&#x27;appliquerait a
+// CHAQUE scan -&gt; montee 1 -&gt; N en quelques scans. Ici le timer se re-arme apres
+// chaque cran -&gt; une hausse de palier / StepRampDelay (cascade reelle).
 StepDelay(
-    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0),
+    IN := (TargetStep &gt; ShapedStep) AND (ShapedStep &gt; 0) AND NOT StepDelay.Q,
     PT := StepRampDelay
 );
 StepDelayElapsed := StepDelay.ET;
