@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T07:33:56.801367" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T07:33:56.801367">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T07:43:53.801595" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T07:43:53.801595">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1191,6 +1191,7 @@ IF Enable THEN
             //    on considère la confirmation acquise, sans alarme ni lockout. ⛔ NON SECURISE.
             IF PowerContactorEngaged OR BypassArmingPreconditions THEN
                 EmergencyArmingLockoutActive := FALSE;
+                WasArmed := TRUE; // séquence aboutie -&gt; maintien PowerKeepAlive (même sans retour contacteur, cas bypass MES)
                 ArmingSeqStep := CST_STEP_IDLE;
             ELSIF TonArmingConfirm.Q THEN
                 EmergencyArmingFailedCause := TRUE;
