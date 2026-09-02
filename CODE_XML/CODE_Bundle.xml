@@ -31953,6 +31953,17 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai confirmation absence mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="ContactorFeedbackTrusted">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] TRUE = le retour "tous contacteurs retombes" (FwdRevSpeedFeedbackOff) est reellement cable et fiable -&gt; autorise le chemin rapide NoMovement. FALSE (defaut, banc sans DI) = chemin rapide inerte.</xhtml>
+              </documentation>
+            </variable>
             <variable name="ExternalSyncEscalation">
               <type>
                 <BOOL />
@@ -32930,8 +32941,8 @@ IF NOT BypassGlobal THEN
     // commande mais le retour materiel dit "tous les contacteurs retombes" -&gt; le
     // contacteur n'a pas engage / a chute. Inutile d'attendre NoMovementTimeout.
     TonNoMoveContactor(
-        IN := NOT BypassProcess AND MovementCommanded AND NOT InReferencingMode
-              AND FwdRevSpeedFeedbackOff,
+        IN := ContactorFeedbackTrusted AND NOT BypassProcess AND MovementCommanded
+              AND NOT InReferencingMode AND FwdRevSpeedFeedbackOff,
         PT := CST_ContactorConfirmDelay
     );
     IF TonNoMoveContactor.Q THEN

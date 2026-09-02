@@ -56,6 +56,7 @@ VAR_INPUT
     SpeedBandMaxMps                 : REAL;                           // --> [CFG] Seuil survitesse (max bande apprise , m/s)
     OppositeDirectionTimeout        : TIME := T#500ms;                // --> [CFG] Delai confirmation sens oppose
     NoMovementTimeout               : TIME := T#3s;                   // --> [CFG] Delai confirmation absence mouvement
+    ContactorFeedbackTrusted       : BOOL := FALSE;                  // --> [CFG] TRUE = le retour "tous contacteurs retombes" (FwdRevSpeedFeedbackOff) est reellement cable et fiable -> autorise le chemin rapide NoMovement. FALSE (defaut, banc sans DI) = chemin rapide inerte.
 
     // === ESCALADE EXTERNE ===
     ExternalSyncEscalation          : BOOL := FALSE;                  // --> [SAFE] Discordance contacteurs M1/M2 persistante (FB_SyncContactor niveau 2) -> latch MecaE escalade (bit13 -> PowerCutOff), meme routing/Reset/bypass que MecaE
@@ -402,8 +403,8 @@ IF NOT BypassGlobal THEN
     // commande mais le retour materiel dit "tous les contacteurs retombes" -> le
     // contacteur n'a pas engage / a chute. Inutile d'attendre NoMovementTimeout.
     TonNoMoveContactor(
-        IN := NOT BypassProcess AND MovementCommanded AND NOT InReferencingMode
-              AND FwdRevSpeedFeedbackOff,
+        IN := ContactorFeedbackTrusted AND NOT BypassProcess AND MovementCommanded
+              AND NOT InReferencingMode AND FwdRevSpeedFeedbackOff,
         PT := CST_ContactorConfirmDelay
     );
     IF TonNoMoveContactor.Q THEN
