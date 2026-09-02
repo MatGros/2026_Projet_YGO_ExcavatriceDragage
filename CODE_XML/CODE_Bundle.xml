@@ -47717,6 +47717,13 @@ END_IF;
 IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ExtractionControlActive OR ExtractionControlActive THEN
     CommonMaxStepAscent := 1;
 END_IF;
+// Benne non fermee (ou mou de cable) EN PILOTAGE COUPLE : les DEUX treuils a palier 1.
+// Brider M2 seul (bloc M2-propre ci-dessous) laisserait M1 monter plus vite -&gt; vecteurs
+// contacteurs M1&lt;&gt;M2 -&gt; FB_SyncContactor (PRG_06) -&gt; ContactorMismatch -&gt; SafeStop.
+// En couple les 2 treuils sont lies : la limite benne s'applique aux 2.
+IF CoupledBoth AND (BucketNotClosedAscentStep1 OR SlackCableAscentStep1) THEN
+    CommonMaxStepAscent := 1;
+END_IF;
 
 // Planchers communs : 1 (neutre) en montée ; en descente, 0 hors plongée.
 // MinStepDown=0 signifie explicitement « aucun plancher » : seul FB_DiveSearch

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:02:16.684334" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:02:16.684334">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:24:12.702492" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:24:12.702492">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6585,6 +6585,13 @@ IF instWinchSync.SyncDeviationWarn THEN
     CommonMaxStepDescent := 1;
 END_IF;
 IF PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ExtractionControlActive OR ExtractionControlActive THEN
+    CommonMaxStepAscent := 1;
+END_IF;
+// Benne non fermee (ou mou de cable) EN PILOTAGE COUPLE : les DEUX treuils a palier 1.
+// Brider M2 seul (bloc M2-propre ci-dessous) laisserait M1 monter plus vite -&gt; vecteurs
+// contacteurs M1&lt;&gt;M2 -&gt; FB_SyncContactor (PRG_06) -&gt; ContactorMismatch -&gt; SafeStop.
+// En couple les 2 treuils sont lies : la limite benne s'applique aux 2.
+IF CoupledBoth AND (BucketNotClosedAscentStep1 OR SlackCableAscentStep1) THEN
     CommonMaxStepAscent := 1;
 END_IF;
 
