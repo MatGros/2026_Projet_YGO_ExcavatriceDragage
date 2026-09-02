@@ -31,9 +31,13 @@ IF NOT Enable THEN
     RETURN;
 END_IF;
 
-// Temporisation : compte quand la cible est au-dessus du palier courant
+// Temporisation : compte quand la cible est au-dessus du palier courant.
+// NOT StepDelay.Q : un TON garde .Q TRUE tant que IN est TRUE (pas d'impulsion).
+// Sans ce terme, une fois StepRampDelay ecoule le +1 ci-dessous s'appliquerait a
+// CHAQUE scan -> montee 1 -> N en quelques scans. Ici le timer se re-arme apres
+// chaque cran -> une hausse de palier / StepRampDelay (cascade reelle).
 StepDelay(
-    IN := (TargetStep > ShapedStep) AND (ShapedStep > 0),
+    IN := (TargetStep > ShapedStep) AND (ShapedStep > 0) AND NOT StepDelay.Q,
     PT := StepRampDelay
 );
 StepDelayElapsed := StepDelay.ET;
