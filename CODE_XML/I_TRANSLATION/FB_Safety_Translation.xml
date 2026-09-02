@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:09:33.192348" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:09:33.192348">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T03:15:28.320987" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T03:15:28.320987">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -742,6 +742,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
               </documentation>
             </variable>
+            <variable name="CauseIdx">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de boucle — purge des causes vives sous BypassGlobal</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -880,6 +888,13 @@ ELSE
     TonMecaB(IN := FALSE);
     TonMecaA(IN := FALSE);
     TonLimitSwitchOverrun(IN := FALSE);
+
+    // 🧪 BypassGlobal : l'évaluation des causes ci-dessus est sautée. Purge de la vue LIVE
+    // pour que instCauses[i].Active ne reste pas FIGÉ (sinon PowerCutOff / SafeStop gelés,
+    // réarmement impossible malgré le bypass). Latches déjà effacés au § FRONTS &amp; REARMENT.
+    FOR CauseIdx := 0 TO 15 DO
+        instCauses[CauseIdx].Active := FALSE;
+    END_FOR;
 END_IF;
 
 // Appel du socle de défaut

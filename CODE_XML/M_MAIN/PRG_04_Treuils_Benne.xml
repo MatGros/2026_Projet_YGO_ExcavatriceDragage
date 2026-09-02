@@ -8844,6 +8844,14 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Table des causes nommées</xhtml>
               </documentation>
             </variable>
+            <variable name="CauseIdx">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de boucle — purge des causes vives sous BypassGlobal</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_RefPosStepM">
               <type>
                 <REAL />
@@ -9110,6 +9118,16 @@ ELSE
     PosStepDetected := FALSE;
     CablePosMPrev := CablePosM;
     ExpectedOtherWinchPosMPrev := ExpectedOtherWinchPosM;
+
+    // 🧪 BypassGlobal : l'évaluation des causes ci-dessus est sautée. Sans cette purge,
+    // instCauses[i].Active resterait FIGÉ à sa dernière valeur (bug : PowerCutOff / SafeStop
+    // gelés à TRUE, réarmement impossible malgré le bypass). Les latches sont déjà effacés
+    // au § FRONTS &amp; REARMENT (IF ResetEdge.Q OR BypassGlobal). Ici on force la vue LIVE à
+    // « pas de cause » pour que CauseXxxActive / CausesPowerCutOffActive / CausesSafeStopActive
+    // retombent et que la sortie PowerCutOff/SafeStop puisse se lever.
+    FOR CauseIdx := 0 TO 15 DO
+        instCauses[CauseIdx].Active := FALSE;
+    END_FOR;
 END_IF;
 
 // ContactorStuck : proprietaire UNIQUE de la detection contacteur colle.

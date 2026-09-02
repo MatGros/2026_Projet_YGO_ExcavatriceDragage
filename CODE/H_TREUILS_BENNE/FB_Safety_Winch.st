@@ -159,6 +159,7 @@ VAR
     // Socle défaut
     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
     instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
+    CauseIdx                        : INT;                            // . [LOC] Index de boucle — purge des causes vives sous BypassGlobal
 END_VAR
 VAR CONSTANT
     CST_RefPosStepM                 : REAL := 0.5;                    // Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur) — la course reelle d'un treuil par scan 10ms reste sous ~0.01 m
@@ -404,6 +405,16 @@ ELSE
     PosStepDetected := FALSE;
     CablePosMPrev := CablePosM;
     ExpectedOtherWinchPosMPrev := ExpectedOtherWinchPosM;
+
+    // 🧪 BypassGlobal : l'évaluation des causes ci-dessus est sautée. Sans cette purge,
+    // instCauses[i].Active resterait FIGÉ à sa dernière valeur (bug : PowerCutOff / SafeStop
+    // gelés à TRUE, réarmement impossible malgré le bypass). Les latches sont déjà effacés
+    // au § FRONTS & REARMENT (IF ResetEdge.Q OR BypassGlobal). Ici on force la vue LIVE à
+    // « pas de cause » pour que CauseXxxActive / CausesPowerCutOffActive / CausesSafeStopActive
+    // retombent et que la sortie PowerCutOff/SafeStop puisse se lever.
+    FOR CauseIdx := 0 TO 15 DO
+        instCauses[CauseIdx].Active := FALSE;
+    END_FOR;
 END_IF;
 
 // ContactorStuck : proprietaire UNIQUE de la detection contacteur colle.
