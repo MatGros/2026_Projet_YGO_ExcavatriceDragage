@@ -2062,6 +2062,14 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = Échec de la séquence d'armement</xhtml>
               </documentation>
             </variable>
+            <variable name="WasArmed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = AU armée au moins une fois ; PowerKeepAlive maintenu à travers un appui AU pur</xhtml>
+              </documentation>
+            </variable>
             <variable name="LastAbortStep">
               <type>
                 <INT />

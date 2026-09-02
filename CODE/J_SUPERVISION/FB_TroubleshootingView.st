@@ -529,6 +529,7 @@ GVL_Troubleshooting.C_Safety.SafetyError          := EmergencyDiag.Error;
 GVL_Troubleshooting.C_Safety.ArmingErrorId       := EmergencyDiag.ErrorId;
 GVL_Troubleshooting.C_Safety.RedundancyTestFailed := EmergencyDiag.RedundancyTestFailed;
 GVL_Troubleshooting.C_Safety.ArmingFailed         := EmergencyDiag.ArmFailed;
+GVL_Troubleshooting.C_Safety.WasArmed             := EmergencyDiag.WasArmed;
 GVL_Troubleshooting.C_Safety.LastAbortStep        := EmergencyDiag.LastAbortStep;
 GVL_Troubleshooting.C_Safety.LastAbortCause       := EmergencyDiag.LastAbortCause;
 
