@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T07:53:30.930892" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T07:53:30.930892">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T08:11:27.552145" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T08:11:27.552145">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -870,12 +870,12 @@ shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer debounce affichage IHM rearmement</xhtml>
               </documentation>
             </variable>
-            <variable name="PulseStepEndEdge">
+            <variable name="SeqRunStartEdge">
               <type>
-                <derived name="F_TRIG" />
+                <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant sortie etape PULSE (arme la garde anti-chatter)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant "sequence en cours" (arme la garde anti-chatter)</xhtml>
               </documentation>
             </variable>
             <variable name="ArmPulseInhibitActive">
@@ -883,7 +883,7 @@ shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde anti-chatter contacteur active (aucune nouvelle impulsion)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde anti-chatter : aucune nouvelle tentative d'armement (test A/B ou impulsion)</xhtml>
               </documentation>
             </variable>
             <variable name="instFault">
@@ -1329,12 +1329,12 @@ MaintainA_NoBlock := Maintain_NoCutOff AND MaintainA_NoFault;
 MaintainB_NoBlock := Maintain_NoCutOff AND MaintainB_NoFault;
 Cmd.MaintainA_Cmd := Enable AND Maintain_ChainOk AND MaintainA_NoBlock;
 Cmd.MaintainB_Cmd := Enable AND Maintain_ChainOk AND MaintainB_NoBlock;
-// 🛡️ Garde DURE anti-chatter contacteur principal : après CHAQUE impulsion d'armement,
-//    aucune nouvelle impulsion avant CST_ArmingLockout — quel que soit l'état séquence,
-//    succès ou échec, ET les bypass ingénierie MES. Un cyclage rapide du contacteur casse
-//    le matériel. Garde inconditionnelle, au plus près de la sortie.
-PulseStepEndEdge(CLK := (ArmingSeqStep = CST_STEP_PULSE));
-IF PulseStepEndEdge.Q THEN
+// 🛡️ Garde DURE anti-chatter : dès qu'une séquence d'armement DÉMARRE (IDLE -&gt; non-IDLE),
+//    aucune nouvelle tentative avant CST_ArmingLockout. Bloque aussi bien le test redondance
+//    (ForceTestA/B ouvre PowerKeepAlive A puis B) que l'impulsion contacteur. Inconditionnel :
+//    succès, échec, bypass ingénierie MES. Un cyclage rapide du contacteur casse le matériel.
+SeqRunStartEdge(CLK := (ArmingSeqStep &lt;&gt; CST_STEP_IDLE));
+IF SeqRunStartEdge.Q THEN
     ArmPulseInhibitActive := TRUE;
 END_IF;
 IF NOT Enable OR EnableRising.Q THEN
