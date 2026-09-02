@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T06:45:29.175879" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T06:45:29.175879">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T09:39:46.974927" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T09:39:46.974927">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -130,7 +130,18 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute l'auto-test A/B : IDLE -&gt; PULSE</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute UNIQUEMENT l'auto-test A/B (IDLE -&gt; RESTORE_B)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassAuPowerCutOff">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">neutralise PowerCutOffRequest dans l'AU : le PLC ne fait plus chuter la chaine (coup-de-poing reste dur)</xhtml>
           </documentation>
         </variable>
         <variable name="BypassLimitLegal">

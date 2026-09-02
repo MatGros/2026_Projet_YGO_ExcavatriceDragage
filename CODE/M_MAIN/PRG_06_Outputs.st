@@ -361,7 +361,8 @@ instSafetyEmergencyManagement(
     BtnEmergencyCutOff := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff,
     // 🛠️ Bypass ingenierie MES (RETAIN, jamais IHM) — trace timing chaine/contacteur
     BypassArmingPreconditions := GVL_BypassRetain.BypassAuArmingPreconditions,
-    BypassRedundancyTest := GVL_BypassRetain.BypassAuRedundancyTest
+    BypassRedundancyTest := GVL_BypassRetain.BypassAuRedundancyTest,
+    BypassPowerCutOff := GVL_BypassRetain.BypassAuPowerCutOff
 );
 
 // ── Ordres AU (logique) — sorties structurées Status : ST_Safety_Emergency_Status + Cmd : ST_Safety_Emergency_Cmd ──

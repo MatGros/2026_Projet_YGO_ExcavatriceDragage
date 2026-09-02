@@ -25,8 +25,10 @@ VAR_INPUT
     // === BYPASS INGENIERIE MES (jamais IHM, jamais production) ===
     // Outils de TRACE mise en service : observer le vrai timing chaine/contacteur sans le
     // shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
-    BypassArmingPreconditions : BOOL := FALSE; // --> [TST] Arme sans les preconditions (chaine fermee, contacteur au repos, lockout, coupure metier/IHM)
-    BypassRedundancyTest      : BOOL := FALSE; // --> [TST] Saute l'auto-test A/B : IDLE -> PULSE directement
+    // 3 bypass ORTHOGONAUX — chacun a un perimetre strict, ne pas melanger :
+    BypassArmingPreconditions : BOOL := FALSE; // --> [TST] Arme malgre chaine ouverte / contacteur engage / lockout / coupure ; CONFIRM acquis sans retour contacteur ; leve CHAIN_DROP
+    BypassRedundancyTest      : BOOL := FALSE; // --> [TST] Saute UNIQUEMENT l'auto-test A/B (IDLE -> RESTORE_B, pas de latch RedundancyTestFailed). Armable, CONFIRM, aborts ET exigence chaine fermee restent normaux. Chaine ouverte -> + BypassArmingPreconditions.
+    BypassPowerCutOff         : BOOL := FALSE; // --> [TST] Neutralise PowerCutOffRequest DANS ce FB : le PLC ne fait plus chuter la chaine par coupure metier. BtnEmergencyCutOff reste dur.
 END_VAR
 VAR_OUTPUT
     // === SORTIES STRUCTUREES (2 DUT) ===
@@ -93,6 +95,7 @@ VAR
     SeqRunStartEdge         : R_TRIG; // . [LOC] Front montant "sequence en cours" (arme la garde anti-chatter)
     ArmPulseInhibitActive   : BOOL;   // . [LOC] Garde anti-chatter : aucune nouvelle tentative d'armement (test A/B ou impulsion)
     PreArmDelayActive       : BOOL;   // . [LOC] Delai pre-armement en cours (appui pris en compte, PowerKeepAlive pas encore asserte)
+    CutOffActive            : BOOL;   // . [LOC] Coupure metier effective = PowerCutOffRequest ET pas de bypass PowerCutOff / preconditions
 
     // === SOCLE DEFAUT STANDARD (FB_FaultCore) ===
     instFault               : FB_FaultCore;                  // * [INST] Socle defaut (liste de causes -> ST_Fault)
@@ -201,6 +204,14 @@ END_IF;
 {endregion}
 
 {region "§5 Sequence rearmement AU"}
+// Coupure métier effective : c'est la SEULE forme sous laquelle PowerCutOffRequest agit
+// dans ce FB (abort séquence, gate Armable, chute Maintain, blocage ArmPulse).
+//  - BypassPowerCutOff : bypass MES dédié « le PLC ne fait jamais chuter l'AU ».
+//  - BypassArmingPreconditions : bypass MES large (arme malgré tout) — inclut la coupure.
+//  - BypassRedundancyTest : n'a AUCUN effet ici (il ne touche que l'auto-test A/B).
+//  - BtnEmergencyCutOff (coup-de-poing / IHM) reste traité à part et reste TOUJOURS dur.
+CutOffActive := PowerCutOffRequest AND NOT BypassPowerCutOff AND NOT BypassArmingPreconditions;
+
 IF Enable THEN
     // 🛑 Coupure immédiate de toute séquence en cours
     IF ArmingSeqStep <> CST_STEP_IDLE THEN
@@ -209,9 +220,9 @@ IF Enable THEN
             LastAbortStep := ArmingSeqStep;
             LastAbortCause := INT_TO_WORD(CST_ABORT_CUT_IHM);
             ArmingSeqStep := CST_STEP_IDLE;
-        ELSIF PowerCutOffRequest AND NOT (BypassArmingPreconditions OR BypassRedundancyTest) THEN
+        ELSIF CutOffActive THEN
             // Avortement sécurité d'urgence : coupure métier (PAS un défaut d'armement).
-            // Lockout 5s + interlock (Armable/Maintain* bloqués par PowerCutOffRequest).
+            // Lockout 5s + interlock (Armable/Maintain* bloqués par CutOffActive).
             // Ne pose PAS EmergencyArmingFailedCause : pas de fausse alarme "échec armement".
             EmergencyArmingLockoutActive := TRUE;
             LastAbortStep := ArmingSeqStep;
@@ -219,10 +230,12 @@ IF Enable THEN
             ArmingSeqStep := CST_STEP_IDLE;
         ELSIF (ArmingSeqStep = CST_STEP_PULSE OR ArmingSeqStep = CST_STEP_CONFIRM)
               AND NOT EmergencyChainClosed
-              AND NOT (BypassArmingPreconditions OR BypassRedundancyTest) THEN
+              AND NOT BypassArmingPreconditions THEN
             // Chute boucle matérielle : alarme d'échec + verrouillage 5s.
-            // ⛔ Levé sous bypass ingénierie MES (trace sans chaîne réelle au banc) :
-            //    aucun ArmFailed ne doit s'allumer quand un bypass est actif.
+            // ⛔ Levé UNIQUEMENT sous BypassArmingPreconditions. BypassRedundancyTest ne
+            //    touche PAS cet abort : EmergencyChainClosed=FALSE peut aussi être un vrai
+            //    coup-de-poing physique (même DI) — on ne pulse jamais le contacteur dans
+            //    ce cas. Pour armer chaîne réellement ouverte : + BypassArmingPreconditions.
             EmergencyArmingFailedCause := TRUE;
             EmergencyArmingLockoutActive := TRUE;
             LastAbortStep := ArmingSeqStep;
@@ -240,9 +253,9 @@ IF Enable THEN
     // Armable ne dépend PAS de EmergencyChainClosed : c'est la séquence d'armement qui
     //   referme la chaîne (PowerKeepAlive en série dans la boucle). Un armement gaté sur
     //   « chaîne fermée » serait impossible chaîne ouverte alors que c'est exactement l'état
-    //   à récupérer. NOT BtnEmergencyCutOff / NOT PowerCutOffRequest couvrent les cas où la
+    //   à récupérer. NOT BtnEmergencyCutOff / NOT CutOffActive couvrent les cas où la
     //   chaîne est ouverte pour une vraie raison (coup-de-poing, coupure métier).
-    Armable_ChainOk := NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+    Armable_ChainOk := NOT BtnEmergencyCutOff AND NOT CutOffActive;
     Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
     Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
     // 🛠️ BypassArmingPreconditions (MES trace) : lève ChainOk + NoBlock ; la séquence doit
@@ -274,11 +287,10 @@ IF Enable THEN
             //    claque pas dans le même cycle que le reste -> contacteurs espacés, audibles un
             //    par un. Pendant ce délai on reste en IDLE : aucun maintien asserté.
             IF ArmReqEdge.Q AND Armable AND NOT ArmPulseInhibitActive AND NOT BtnEmergencyCutOff
-               AND (NOT PowerCutOffRequest OR BypassArmingPreconditions OR BypassRedundancyTest) THEN
+               AND NOT CutOffActive THEN
                 PreArmDelayActive := TRUE;
             END_IF;
-            IF BtnEmergencyCutOff
-               OR (PowerCutOffRequest AND NOT (BypassArmingPreconditions OR BypassRedundancyTest)) THEN
+            IF BtnEmergencyCutOff OR CutOffActive THEN
                 PreArmDelayActive := FALSE; // coupure pendant le délai -> on annule
             END_IF;
             TonPreArm(IN := PreArmDelayActive, PT := CST_PreArmDelay);
@@ -304,7 +316,7 @@ IF Enable THEN
 
             IF TonTestA.Q THEN
                 ForceTestA := FALSE;
-                IF EmergencyChainClosed AND NOT (BypassArmingPreconditions OR BypassRedundancyTest) THEN
+                IF EmergencyChainClosed AND NOT BypassArmingPreconditions THEN
                     RedundancyTestFailedCause := TRUE;
                     LastAbortStep := CST_STEP_TEST_A;
                     LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_A);
@@ -320,7 +332,7 @@ IF Enable THEN
             TonRestoreA(IN := TRUE, PT := CST_RestoreSettle);
 
             IF TonRestoreA.Q THEN
-                IF EmergencyChainClosed OR BypassArmingPreconditions OR BypassRedundancyTest THEN
+                IF EmergencyChainClosed OR BypassArmingPreconditions THEN
                     ArmingSeqStep := CST_STEP_TEST_B;
                 ELSE
                     LastAbortStep := CST_STEP_RESTORE_A;
@@ -336,7 +348,7 @@ IF Enable THEN
 
             IF TonTestB.Q THEN
                 ForceTestB := FALSE;
-                IF EmergencyChainClosed AND NOT (BypassArmingPreconditions OR BypassRedundancyTest) THEN
+                IF EmergencyChainClosed AND NOT BypassArmingPreconditions THEN
                     RedundancyTestFailedCause := TRUE;
                     LastAbortStep := CST_STEP_TEST_B;
                     LastAbortCause := INT_TO_WORD(CST_ABORT_REDUNDANCY_B);
@@ -347,15 +359,16 @@ IF Enable THEN
             END_IF;
 
         4: // CST_STEP_RESTORE_B
-            // 🟰 Point d'entrée du chemin bypass : les deux canaux PowerKeepAlive sont
-            //    (ré)établis et TENUS CST_KeepAliveHold avant la demande contacteur de
+            // 🟰 Point d'entrée du chemin BypassRedundancyTest : les deux canaux PowerKeepAlive
+            //    sont (ré)établis et TENUS CST_KeepAliveHold avant la demande contacteur de
             //    puissance -> CHAIN OK s'entend d'abord, le gros contacteur 1 s après.
+            //    La boucle DOIT s'être refermée pour passer au pulse (sauf BypassArmingPreconditions).
             ForceTestA := FALSE;
             ForceTestB := FALSE;
             TonRestoreB(IN := TRUE, PT := CST_KeepAliveHold);
 
             IF TonRestoreB.Q THEN
-                IF EmergencyChainClosed OR BypassArmingPreconditions OR BypassRedundancyTest THEN
+                IF EmergencyChainClosed OR BypassArmingPreconditions THEN
                     ArmingSeqStep := CST_STEP_PULSE;
                 ELSE
                     LastAbortStep := CST_STEP_RESTORE_B;
@@ -378,9 +391,10 @@ IF Enable THEN
             ForceTestB := FALSE;
             TonArmingConfirm(IN := TRUE, PT := CST_ArmingConfirmTimeout);
 
-            // 🛠️ BypassArmingPreconditions (MES trace) : pas de contacteur réel au banc →
-            //    on considère la confirmation acquise, sans alarme ni lockout. ⛔ NON SECURISE.
-            IF PowerContactorEngaged OR BypassArmingPreconditions OR BypassRedundancyTest THEN
+            // 🛠️ CONFIRM exige le VRAI retour contacteur. Seul BypassArmingPreconditions le
+            //    fausse (banc sans contacteur). BypassRedundancyTest n'a PAS d'effet ici :
+            //    le contacteur de puissance n'est pas la redondance A/B. ⛔ NON SECURISE.
+            IF PowerContactorEngaged OR BypassArmingPreconditions THEN
                 EmergencyArmingLockoutActive := FALSE;
                 WasArmed := TRUE; // séquence aboutie -> maintien PowerKeepAlive (même sans retour contacteur, cas bypass MES)
                 ArmingSeqStep := CST_STEP_IDLE;
@@ -484,19 +498,17 @@ END_IF;
 IF PowerContactorEngaged THEN
     WasArmed := TRUE;
 END_IF;
-// ⛔ Sous bypass ingénierie MES : PowerCutOffRequest (défauts HW banc) ne doit PAS
-//    lâcher le maintien — sinon PowerKeepAlive clignote et le tracé est inexploitable.
-//    BtnEmergencyCutOff (coup-de-poing physique), Enable OFF et défaut redondance
-//    restent des retombées dures.
-IF ((PowerCutOffRequest AND NOT (BypassArmingPreconditions OR BypassRedundancyTest))
-    OR BtnEmergencyCutOff OR NOT Enable OR RedundancyTestFailedCause) THEN
+// ⛔ CutOffActive = coupure métier effective (cf. §5). Sous BypassPowerCutOff ou
+//    BypassArmingPreconditions, PowerCutOffRequest ne lâche PAS le maintien.
+//    BtnEmergencyCutOff (coup-de-poing / IHM), Enable OFF et défaut redondance
+//    restent des retombées dures. BypassRedundancyTest n'a aucun effet ici.
+IF (CutOffActive OR BtnEmergencyCutOff OR NOT Enable OR RedundancyTestFailedCause) THEN
     WasArmed := FALSE;
     PreArmDelayActive := FALSE; // coupure/Enable OFF pendant le délai pré-armement -> annule
 END_IF;
 
 Maintain_ChainOk := (EmergencyChainClosed OR (ArmingSeqStep <> CST_STEP_IDLE) OR WasArmed);
-Maintain_NoCutOff := (NOT PowerCutOffRequest OR BypassArmingPreconditions OR BypassRedundancyTest)
-                     AND NOT BtnEmergencyCutOff;
+Maintain_NoCutOff := NOT CutOffActive AND NOT BtnEmergencyCutOff;
 MaintainA_NoFault := NOT ForceTestA AND NOT RedundancyTestFailedCause;
 MaintainB_NoFault := NOT ForceTestB AND NOT RedundancyTestFailedCause;
 MaintainA_NoBlock := Maintain_NoCutOff AND MaintainA_NoFault;
@@ -526,7 +538,7 @@ END_IF;
 //    (FB_ContactorProtector Cfg_MinInterval sur la sortie physique, PRG_06).
 Cmd.ArmPulse_Cmd  := Enable AND (ArmingSeqStep = CST_STEP_PULSE)
                      AND NOT BtnEmergencyCutOff
-                     AND (NOT PowerCutOffRequest OR BypassArmingPreconditions OR BypassRedundancyTest);
+                     AND NOT CutOffActive;
 // 🧪 TestCutActive : signale à la simulation qu'un canal est coupé pour le test de
 // redondance A/B (ForceTestA/B). La simulation ouvre alors la boucle AU (SimChainOk=FALSE)
 // pour que le test valide la chute de chaîne — sans dépendre de PowerCutOff_A/B (cercle cassé).
@@ -560,8 +572,8 @@ Status.Done  := PowerContactorEngaged;
 // opérateurs (FB_Hmi_BannerFormatter lit Diag.ErrorId / scalaires).
 IF NOT Enable THEN
     Status.OperatorMessage := 'AU neutralisee (Enable=FALSE)';
-ELSIF (BypassArmingPreconditions OR BypassRedundancyTest) THEN
-    Status.OperatorMessage := 'AU: BYPASS INGENIERIE MES ACTIF - controles/auto-test desactives - NON SECURISE';
+ELSIF (BypassArmingPreconditions OR BypassRedundancyTest OR BypassPowerCutOff) THEN
+    Status.OperatorMessage := 'AU: BYPASS INGENIERIE MES ACTIF - NON SECURISE - retirer avant exploitation';
 ELSIF StartupFail THEN
     Status.OperatorMessage := 'AU: autotest demarrage echoue - verifier boucle/contacteur puis Reset';
 ELSIF RedundancyTestFailed THEN
