@@ -4990,3 +4990,38 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T225_SYNCCONTACTOR_ESCALADE_PRG06.yaml
   bloque_par:
   - Arbitrage humain (design safety, lot MES-035) : chemin forcage SafeStop depuis PRG_06, cablage escalade -> PowerCutOff, forme du champ diagnostic
+- id: T226
+  parent_id: ''
+  statut: ⬜
+  criticite: C4
+  domaine: MODES / REFERENCEMENT MACHINE / SEQUENCEUR SEMI_AUTO
+  agent: 'Claude (execution directe prevue) — phasage P0..P5, revues 3 agents + visa orchestrateur'
+  date: '2026-09-02T17:30:00+02:00'
+  titre: Refonte de la frontiere Referencement machine <-> SEMI_AUTO
+  contexte: >
+    Aujourd'hui SEMI_AUTO reste selectionnable sans machine referencee (le
+    re-homing est seulement publie a l'IHM et le cycle ne progresse pas), et
+    l'etape X1_HOMING de FB_Cycle realise elle-meme une recherche de capteur et
+    un referencement codeur. La frontiere entre le referencement machine (datum
+    M1/M2 + benne, du ressort de la maintenance) et le cycle de production est
+    floue. Idee operateur 2026-09-02 : durcir cette frontiere.
+  description: >
+    SEMI_AUTO devient homed-only : selection refusee et expulsion forcee vers
+    MAINT_N1 si NOT MachineHomed. Le referencement se fait par une sequence de
+    maintenance robuste et guidee au joystick : fermeture benne sans FDC dans une
+    fenetre bornee -> confirmation operateur = reference benne fermee -> montee
+    des deux treuils au joystick -> au front montant du capteur haut, reference
+    M1+M2 dans le meme scan et stop dur des treuils -> redemarrage possible en
+    descente seule sous le FDC logiciel haut. L'init SEMI_AUTO est reduite a une
+    mise en position haute + placement M3, sans referencement.
+  objectifs:
+  - Durcir la selection SEMI_AUTO sur MachineHomed et expulser vers MAINT_N1 en cas de perte
+  - Sortir tout referencement codeur du cycle SEMI_AUTO
+  - Sequence de referencement maintenance robuste, guidee, au joystick, avec textes par etape
+  - Reference benne fermee sur confirmation operateur ; reference M1/M2 au front capteur haut, stop dur
+  - Init SEMI_AUTO simplifiee : position haute + M3, puis start boucle cycle
+  - Reprise consciente sur les 3 cas (arret capteur, perte datum, expulsion mode)
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml
+  bloque_par:
+  - Phase P0 (etude & cadrage, aucun code) a valider par l'humain avant P1
+  - Sous-tache T227 (differee) : MAJ AF-04/05/09 + tests CI AC1..AC10

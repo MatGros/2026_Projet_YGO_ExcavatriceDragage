@@ -1,0 +1,219 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T226 : Refonte de la frontiere Referencement machine <-> SEMI_AUTO
+# ═══════════════════════════════════════════════════════════════════════════
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T226_REFONTE_HOMING_SEMIAUTO
+  criticality: C4
+  strategy: patch
+
+  # ── 1. Objectif metier ──────────────────────────────────────────────────
+  objective: >
+    Separer nettement le referencement machine (datum M1/M2 + benne) du cycle
+    SEMI_AUTO : SEMI_AUTO devient un mode "homed-only" (selection refusee et
+    expulsion forcee vers MAINT_N1 si la machine n'est pas referencee), le
+    referencement se fait par une sequence de maintenance robuste et guidee au
+    joystick (benne fermee sur confirmation operateur, M1/M2 references au front
+    montant du capteur haut, treuils stoppes et redemarrage possible seulement
+    en descente sous le FDC logiciel haut), et l'initialisation SEMI_AUTO est
+    reduite a une mise en position haute + placement M3, sans recherche de
+    capteur ni referencement.
+
+  # ── 2. Criteres testables ───────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "SEMI_AUTO n'est selectionnable que si les codeurs M1 et M2 sont fiables ET l'offset benne est valide (MachineHomed) ; sinon la selection est refusee avec un motif IHM explicite."
+      verified_by: "Tests FB_Modes (selection SEMI_AUTO homed / non homed) + observation Auth.Mode et Auth.ModeChangeBlockReason."
+    - id: AC2
+      statement: "Si le mode courant est SEMI_AUTO et que MachineHomed retombe a FALSE, le mode bascule automatiquement vers MAINT_N1 avec un motif IHM, sans redemarrage automatique du cycle et sans coupure brutale non justifiee."
+      verified_by: "Scenario integration PRG_03 : perte de datum en SEMI_AUTO -> Auth.Mode = MAINT_N1, cycle a l'arret, chronogramme de la transition."
+    - id: AC3
+      statement: "La sequence de referencement maintenance demande d'abord la fermeture benne ; pendant cette phase seule, la benne est manoeuvrable au joystick sans fin de course benne, dans une fenetre bornee et tracee ; hors de cette phase la benne retrouve ses fins de course."
+      verified_by: "Tests FB_MachineHomingCycle + route benne : commande benne acceptee sans FDC uniquement a l'etape 'fermer benne', refusee ailleurs ; chronogramme de la fenetre."
+    - id: AC4
+      statement: "A la confirmation operateur 'benne fermee', la reference benne fermee est publiee (CommitClose) une seule fois, atomiquement, et seulement a cette confirmation."
+      verified_by: "Test FB_MachineHomingCycle : un seul CommitClose au front de confirmation, aucun commit hors confirmation."
+    - id: AC5
+      statement: "Apres reference benne, la sequence demande la montee des deux treuils au joystick jusqu'au capteur haut ; si un treuil est deja au capteur haut, son etape est franchie sans mouvement."
+      verified_by: "Tests sequence : etape montee active tant que capteur haut non atteint, sautee si deja atteint."
+    - id: AC6
+      statement: "Au front montant du capteur haut, M1 et M2 sont references dans le meme scan et les deux treuils sont stoppes immediatement (arret dur, au plus pres de l'action)."
+      verified_by: "Chronogramme front capteur -> HomeReq M1+M2 + ordre stop treuils dans le meme scan ; test unitaire dedie."
+    - id: AC7
+      statement: "Une fois M1/M2 references au capteur haut, tout mouvement treuil suivant n'est autorise qu'en descente, sous le FDC logiciel haut, jusqu'a ce que la position repasse dans la plage nominale."
+      verified_by: "Test permis directionnel post-reference : AscentPermit refuse, DescendPermit autorise tant que CablePosM >= seuil ; chronogramme."
+    - id: AC8
+      statement: "L'initialisation SEMI_AUTO ne contient plus de referencement codeurs : elle demande une mise des treuils au FDC logiciel haut au joystick (sautee si deja en position), puis un placement M3 (P1 ou tremie) au joystick, puis autorise le demarrage de la boucle de cycle."
+      verified_by: "Tests FB_Cycle : etape init sans HomeReq codeur, franchissement conditionne position haute + M3 place ; scenario integration."
+    - id: AC9
+      statement: "Chaque etape de la sequence de referencement expose une consigne operateur en clair (MachineHomingInstruction) et un numero d'etape ; ces textes sont l'unique source affichee a l'IHM pour le referencement (pas de texte homing concurrent code en dur ailleurs)."
+      verified_by: "Grep : aucun libelle homing en dur hors FB_MachineHomingCycle ; observation GVL_IHM (bandeau et/ou champ dedie) sur snapshot par etape."
+    - id: AC10
+      statement: "Aucun mouvement ne repart automatiquement apres un arret, une perte de datum ou un changement de mode : toute reprise exige un geste conscient (front Reset ou re-armement homme-mort)."
+      verified_by: "Chronogrammes de reprise sur les 3 cas (arret capteur haut, perte datum, expulsion mode)."
+    - id: AC11
+      statement: "Le nom de fichier est identique au nom de POU et son suffixe est egal au langage ST du bundle genere, pour chaque POU modifie."
+      verified_by: "Gate structurel dedie et bundle PLCopenXML frais."
+    - id: AC12
+      statement: "La sequence de referencement complete (fermer benne -> confirmer -> monter au capteur haut -> reference M1/M2) rejouee de bout en bout amene MachineHomed a TRUE et rend SEMI_AUTO selectionnable, sans intervention hors joystick et confirmation operateur."
+      verified_by: "Scenario integration end-to-end : etat initial non homed -> deroule sequence -> MachineHomed TRUE, Auth.Mode passe a SEMI_AUTO sur selection."
+
+  # ── 3. Perimetre ────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/F_MODES/FB_Modes.st
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/G_CYCLE/FB_MachineHomingCycle.st
+      - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+      - CODE/G_CYCLE/_TYPES/E_MachineHomingStep.st
+      - CODE/G_CYCLE/_TYPES/ST_MachineHoming.st
+      - CODE/G_CYCLE/_TYPES/
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml
+      - DOC/WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService.md
+      - DOC/WFLOW/TROUBLESHOOTING/
+    forbidden:
+      - CODE/M_MAIN/PRG_02_Acquisition.st        # code utilisateur en cours — delta fourni en diff, applique par l'humain
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/B_AU_SECURITE/
+      - CODE/GVL_PERSISTENT.st
+      - CODE/L_SIMULATION/GVL_BypassRetain.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - DOC/AF/                                   # MAJ documentaire = sous-tache T227 (phase 2)
+      - TOOLS/TEST_AUTO_CI/                       # design + implementation tests = sous-tache T227 (phase 2)
+      - ARCHIVES/
+
+  # ── 4. Contrat de conservation ─────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "FB_MachineHomingCycle reste le producteur UNIQUE de MachineHomed (aucune requalification concurrente en aval)."
+      - "MachineHomed reste le gate de SEMI_AUTO ; le referencement des codeurs n'a jamais lieu a l'interieur du cycle SEMI_AUTO."
+      - "La perte de datum en mouvement continue de demander un arret controle (SafeStop) et une reprise sur front Reset conscient."
+      - "Le referencement M1/M2 reste declenche par le capteur haut physique (M1M2_TopPositionFree_DI), pas par une position calculee."
+      - "La commande benne sans fin de course reste STRICTEMENT limitee a l'etape 'fermer benne' de la sequence de referencement ; partout ailleurs les FDC benne sont actifs."
+      - "Aucun redemarrage automatique apres defaut, arret ou changement de mode."
+      - "Enable > SafeStop > StartStop : une expulsion de mode ne doit pas se traduire par une coupure de puissance non justifiee."
+    dropped_on_purpose:
+      - "L'etape X1_HOMING de FB_Cycle ne realise plus de recherche de capteur ni de referencement codeur (reduite a la mise en position haute)."
+      - "Les diagnostics SemiAutoCycleNotReadyHoming / SemiAutoCycleNotReadyMachineHoming de FB_Modes deviennent sans objet si la selection SEMI_AUTO est durcie (a confirmer en P0 : suppression ou conservation en garde-fou)."
+      - "Les 3 libelles homing codes en dur de FB_Hmi_BannerFormatter (INDEX HAUT M1/M2, ATTENTE CAPTEUR HAUT) sont supprimes au profit de MachineHomingInstruction."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  # ── 6. Modeles autorises ─────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Phasage impose (execution sequencee, arret humain entre P0 et P1) ─
+  phases:
+    - id: P0
+      name: "Etude & cadrage (AUCUN code)"
+      deliverable: >
+        Note d'etude versionnee (DOC/WFLOW/TROUBLESHOOTING/ ou section de ce
+        contrat) : cartographie de l'existant (FB_Modes gate SEMI_AUTO, FB_Cycle
+        X0/X1, FB_MachineHomingCycle, route joystick en maintenance, route benne,
+        FDC benne, FDC logiciel haut treuil, capteur haut commun), decoupage FB
+        fige, reponses aux open_questions, liste des effets de bord et des
+        modifications PRG_02 a fournir en diff. VALIDATION HUMAINE OBLIGATOIRE
+        avant P1.
+    - id: P1
+      name: "Gate SEMI_AUTO homed-only + expulsion vers MAINT_N1"
+      touches: [FB_Modes.st, PRG_03_Modes_Cycle.st]
+      acceptance: [AC1, AC2, AC10]
+    - id: P2
+      name: "Sequence de referencement maintenance robuste"
+      touches: [FB_MachineHomingCycle.st, E_MachineHomingStep.st, FB_Bucket.st, PRG_04_Treuils_Benne.st, ST_MachineHoming.st]
+      acceptance: [AC3, AC4, AC5, AC6, AC7, AC10]
+      notes: >
+        Reprend les bonnes idees de FB_Cycle X1 (montee lente joystick, texte
+        operateur, garde WindowSafe). Referencement M1+M2 au meme scan sur front
+        montant capteur haut, stop dur immediat. Bypass FDC benne interne borne a
+        l'etape 'fermer benne'. Permis directionnel post-reference = descente seule
+        sous FDC logiciel haut.
+    - id: P3
+      name: "Initialisation SEMI_AUTO simplifiee"
+      touches: [FB_Cycle.st, E_CycleStep.st, PRG_03_Modes_Cycle.st]
+      acceptance: [AC8, AC10]
+    - id: P4
+      name: "Remontee IHM des consignes de referencement"
+      touches: [FB_Hmi_BannerFormatter.st, PRG_07_Supervision.st, GVL_IHM.st, _TYPES]
+      acceptance: [AC9]
+      notes: >
+        Integre la modification en pause (bandeau <- Data.MachineHoming). Choix
+        A (bandeau seul) / B (champ GVL_IHM dedie) / A+B a trancher avec l'humain
+        en P0.
+    - id: P5
+      name: "Revues & consolidation"
+      deliverable: >
+        3 revues d'agents distincts + visa orchestrateur :
+        (1) nommage NC-xxx (NAMING_CONVENTION) ;
+        (2) qualite du code + effets de bord directs ET indirects (interlocks,
+            ordre d'execution PRG, lag de bus, datum, reprise consciente) ;
+        (3) chronogrammes / temps de travail + GIF des sequences (expulsion mode,
+            referencement complet, init SEMI_AUTO) ;
+        (4) l'orchestrateur relit le git diff reel avant toute proposition de commit.
+
+  # ── 8. Points d'etude a trancher en P0 ────────────────────────────────
+  open_questions:
+    - id: Q1
+      q: "Expulsion SEMI_AUTO -> MAINT_N1 : immediate, ou precedee d'un SafeStop des treuils s'ils sont en mouvement au moment de la perte de datum ?"
+    - id: Q2
+      q: "Bypass FDC benne pendant 'fermer benne' : automatique et borne en interne du FB (fenetre + garde WindowSafe), ou exige un bypass IHM explicite coche par l'operateur ?"
+    - id: Q3
+      q: "Front montant capteur haut : le capteur est commun M1M2_TopPositionFree_DI. On reference M1 et M2 au meme front unique (archi actuelle) — confirmer qu'aucun cas separe M1 seul / M2 seul n'est attendu."
+    - id: Q4
+      q: "Permis 'descente seule sous FDC logiciel haut' post-reference : on reutilise le gate AscentPermit existant (CablePosM >= TopLimitM) ou on ajoute un latch dedie arme au referencement et purge au retour en plage nominale ?"
+    - id: Q5
+      q: "Init SEMI_AUTO : si un treuil est deja au-dessus du FDC logiciel haut (override N1/N2 actif), comportement de l'etape 'mise en position haute' ?"
+    - id: Q6
+      q: "Entree HomingRequest de FB_Cycle X1 (transition vers X2) : qui la produit apres la refonte, ou est-elle supprimee au profit d'une condition position + M3 place ?"
+    - id: Q7
+      q: "FB_MachineHomingCycle est instancie dans PRG_02 (forbidden). Enrichir son interface impose un delta PRG_02 : (a) garder l'interface stable et n'utiliser que les entrees existantes, ou (b) fournir le patch PRG_02 exact en diff pour application humaine. Defaut retenu sans contre-ordre : (b)."
+
+  # ── 9. Devoir d'alerte ───────────────────────────────────────────────
+  alert_duty: >
+    STOP et remontee immediate a l'orchestrateur si : une reponse d'open_question
+    reste indeterminee au moment de coder la phase concernee ; le durcissement de
+    la selection SEMI_AUTO cree un verrou de mode inattendu (machine coincee en
+    MAINT sans chemin de sortie) ; le bypass FDC benne deborde de l'etape 'fermer
+    benne' ; le referencement M1/M2 au front capteur n'est pas garanti dans le
+    meme scan ; une modification touche PRG_02 / PRG_06 / B_AU_SECURITE (forbidden) ;
+    un effet de bord indirect apparait sur un interlock, le datum machine ou la
+    reprise consciente. Signaler n'est pas elargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Sous-tache T227 (phase 2, differee, decidee par l'humain) : mise a jour
+    documentaire AF (AF-04 sequenceur SEMI_AUTO, AF-05 modes maintenance, AF-09
+    encoder/homing) + design et implementation des tests CI
+    (TOOLS/TEST_AUTO_CI/) couvrant AC1..AC10.
