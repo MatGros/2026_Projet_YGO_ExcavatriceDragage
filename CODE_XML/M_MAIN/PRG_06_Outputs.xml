@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T06:45:37.174220" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T06:45:37.174220">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T08:16:14.427946" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T08:16:14.427946">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -957,6 +957,14 @@ creerait une collision avec la globale homonyme du mapping E/S.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Gestionnaire de rearmement AU</xhtml>
               </documentation>
             </variable>
+            <variable name="instArmContactorProtector">
+              <type>
+                <derived name="FB_ContactorProtector" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Garde anti-chatter sur l'impulsion contacteur AU (EmergencyArming_RQ)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M1RelayFwd">
               <type>
                 <BOOL />
@@ -1457,7 +1465,15 @@ instSafetyEmergencyManagement(
 // ── Ordres AU (logique) — sorties structurées Status : ST_Safety_Emergency_Status + Cmd : ST_Safety_Emergency_Cmd ──
 PowerKeepAliveACmd := instSafetyEmergencyManagement.Cmd.MaintainA_Cmd;
 PowerKeepAliveBCmd := instSafetyEmergencyManagement.Cmd.MaintainB_Cmd;
-EmergencyArmingCmd := instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd;
+// 🛡️ Garde anti-chatter generique sur l'impulsion contacteur AU : une impulsion passe
+//    integralement, puis aucune nouvelle avant 5s (redondant avec la garde interne du FB AU,
+//    au plus pres de la sortie physique). Un cyclage rapide du contacteur casse le materiel.
+instArmContactorProtector(
+    Enable          := TRUE,
+    Request         := instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd,
+    Cfg_MinInterval := T#5s
+);
+EmergencyArmingCmd := instArmContactorProtector.Cmd;
 
 // ── Sorties physiques AU ──
 PowerKeepAlive_A_RQ          := PowerKeepAliveACmd;
@@ -1485,6 +1501,164 @@ PowerCutOffActive := PowerCutOffReq;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>05d4e055-dfa2-5611-9ab0-bc0216a3f645</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="FB_ContactorProtector" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="Enable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation (FALSE =&gt; Cmd=FALSE, Ready=FALSE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Request">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Demande de commande contacteur (niveau)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg_MinInterval">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Intervalle mini entre deux activations</xhtml>
+              </documentation>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="Ready">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Garde active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Allowed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE = nouvelle activation possible (hors intervalle)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [ACT]  Commande filtree a cabler au contacteur</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="ReqRise">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant Request</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqFall">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant Request</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonInterval">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo intervalle mini (armee a la retombee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InhibitActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Intervalle en cours -&gt; nouvelle activation bloquee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActivationLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Activation autorisee en cours (passe toute la duree de Request)</xhtml>
+              </documentation>
+            </variable>
+          </localVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛡️ FB_ContactorProtector — Garde anti-chatter avant sortie contacteur
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : à placer juste avant une sortie contacteur puissance (comme un
+      interlock). Une activation autorisée passe intégralement ; à sa retombée,
+      aucune nouvelle activation avant Cfg_MinInterval. Empêche le cyclage
+      rapide destructif quelle que soit la source (bug logique, spam, bypass).
+   🔒 Sécurité positive : Enable=FALSE =&gt; Cmd=FALSE. Ne force jamais une sortie.
+   📄 Doc métier : DOC/STDS/CODE_QUALITY_STANDARDS.md §2quinquies
+   ═══════════════════════════════════════════════════════════════</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+IF NOT Enable THEN
+    Cmd := FALSE;
+    Ready := FALSE;
+    Allowed := FALSE;
+    InhibitActive := FALSE;
+    ActivationLatched := FALSE;
+    TonInterval(IN := FALSE);
+ELSE
+    Ready := TRUE;
+    ReqRise(CLK := Request);
+    ReqFall(CLK := Request);
+
+    // Intervalle : arme a la retombee d'une activation, tient Cfg_MinInterval
+    IF ReqFall.Q THEN
+        InhibitActive := TRUE;
+    END_IF;
+    TonInterval(IN := InhibitActive, PT := Cfg_MinInterval);
+    IF TonInterval.Q THEN
+        InhibitActive := FALSE;
+    END_IF;
+
+    // Nouvelle activation autorisee seulement hors intervalle ; ensuite elle passe
+    // integralement (non decoupee) tant que Request est maintenu.
+    IF ReqRise.Q AND NOT InhibitActive THEN
+        ActivationLatched := TRUE;
+    END_IF;
+    IF NOT Request THEN
+        ActivationLatched := FALSE;
+    END_IF;
+
+    Allowed := NOT InhibitActive;
+    Cmd := ActivationLatched;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>62d11bc5-2324-56a7-b0b1-b48c4ce1dea7</ObjectId>
           </data>
         </addData>
       </pou>
@@ -4170,6 +4344,14 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
         <Folder Name="M_MAIN">
           <Object Name="PRG_06_Outputs" ObjectId="05d4e055-dfa2-5611-9ab0-bc0216a3f645" />
         </Folder>
+        <Folder Name="A_COMMUN">
+          <Object Name="FB_ContactorProtector" ObjectId="62d11bc5-2324-56a7-b0b1-b48c4ce1dea7" />
+          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
+          </Folder>
+        </Folder>
         <Folder Name="B_AU_SECURITE">
           <Object Name="FB_Safety_EmergencyManagement" ObjectId="fec28e54-c2e9-52ff-aa9e-cdc3b3341d91" />
           <Folder Name="_TYPES">
@@ -4191,13 +4373,6 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
             <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
             <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
           </Folder>
-        </Folder>
-        <Folder Name="A_COMMUN">
-          <Folder Name="_TYPES">
-            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
-            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
-          </Folder>
-          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">

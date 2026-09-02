@@ -53,6 +53,7 @@ VAR
     instWinchOutputInterlockM2       : FB_WinchOutputInterlock;       // * [INST] Barriere finale treuil M2
     instTranslationOutputInterlockM3 : FB_TranslationOutputInterlock; // * [INST] Barriere finale translation M3
     instSafetyEmergencyManagement    : FB_Safety_EmergencyManagement;    // * [INST] Gestionnaire de rearmement AU
+    instArmContactorProtector        : FB_ContactorProtector;            // * [INST] Garde anti-chatter sur l'impulsion contacteur AU (EmergencyArming_RQ)
 
     // === ⚡ ORDRES ACTIONNEURS (publiés via Data) ===
     M1RelayFwd                   : BOOL; // . [LOC] Ordre contacteur montee treuil M1
@@ -364,7 +365,15 @@ instSafetyEmergencyManagement(
 // ── Ordres AU (logique) — sorties structurées Status : ST_Safety_Emergency_Status + Cmd : ST_Safety_Emergency_Cmd ──
 PowerKeepAliveACmd := instSafetyEmergencyManagement.Cmd.MaintainA_Cmd;
 PowerKeepAliveBCmd := instSafetyEmergencyManagement.Cmd.MaintainB_Cmd;
-EmergencyArmingCmd := instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd;
+// 🛡️ Garde anti-chatter generique sur l'impulsion contacteur AU : une impulsion passe
+//    integralement, puis aucune nouvelle avant 5s (redondant avec la garde interne du FB AU,
+//    au plus pres de la sortie physique). Un cyclage rapide du contacteur casse le materiel.
+instArmContactorProtector(
+    Enable          := TRUE,
+    Request         := instSafetyEmergencyManagement.Cmd.ArmPulse_Cmd,
+    Cfg_MinInterval := T#5s
+);
+EmergencyArmingCmd := instArmContactorProtector.Cmd;
 
 // ── Sorties physiques AU ──
 PowerKeepAlive_A_RQ          := PowerKeepAliveACmd;
