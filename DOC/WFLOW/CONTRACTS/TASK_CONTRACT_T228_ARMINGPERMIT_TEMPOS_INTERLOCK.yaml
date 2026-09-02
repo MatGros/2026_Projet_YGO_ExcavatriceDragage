@@ -58,8 +58,11 @@ contract:
       - CODE/GVL_PERSISTENT.st
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - DOC/STDS/NAMING_CONVENTION.md
-      - DOC/AF/
       - ARCHIVES/
+    note_af: >
+      DOC/AF/AF_Partie-08 §I/O ArmingPermit : 1 phrase de coherence ajoutee
+      (restart-inhibit = cause de ArmingPermit=FALSE). La MAJ documentaire
+      complete (TC dediee, §10) reste sous-tache T227.
 
   conservation:
     must_survive:
@@ -81,7 +84,9 @@ contract:
     - "omni/cx/gpt-5.6-terra"
 
   design_decisions:
-    - "Agregat MovementInhibited (treuil) = NOT Ready OR RestartInhibit OR ContactorStuck OR (DeadTime.IN AND NOT DeadTime.Q). StepDelay EXCLU (rate-limit, pas blocage). PermitFinalBlocked interne peut etre inclus s'il traduit un refus directionnel persistant hors simple transitoire de calcul."
+    - "Agregat MovementInhibited (treuil) = NOT Ready OR RestartInhibit OR RestartRequired OR DeadTimePending OR ContactorStuck. Corrige apres trace Suivi_JOY_permit_bug_13 : la version initiale (DeadTime.IN AND NOT DeadTime.Q) ratait RestartRequired (anti-court-cycle RestartDelay 1,5 s, branche §5 WAIT_RESTART_DELAY) -> fenetre ou l'operateur re-arme et re-defleche sans passer au neutre = deadlock silencieux (contacteurs OFF indefiniment). StepDelay reste EXCLU (rate-limit palier, pas blocage)."
+    - "OPTION 1 retenue (operateur, apres trace) : ArmingPermit DOIT tomber a 0 pendant la fenetre anti-court-cycle pour empecher le re-armement dans le deadlock. Pas de conflit F08.08 : un re-arm frais bloque = deja ArmingPermitDenied ; un geste encore arme desarme par la perte de dispo transitoire = deja T224-B (toute perte de dispo desarme). Le restart-inhibit EST une perte de dispo transitoire. AUCUNE modif FB_Joystick. AF08 F08.08 : note ajoutee (restart-inhibit = cause de ArmingPermit=FALSE)."
+    - "MES : le terme MovementInhibited dans la dispo d'armement est leve par le bypass groupe du treuil (GVL_IHM.MxTreuil*.Bypass.Global, GVL_IHM.TranslationM3.Bypass.Global) — feedbacks HW non cables sur banc, la tempo interlock ne doit pas figer la dispo."
     - "Cablage : ST_OutputsInterPrg gagne M1MovementInhibited / M2MovementInhibited / M3MovementInhibited. PRG_06 producteur unique. PRG_04 : ArmMx{Ascent,Descend}Avail AND NOT Data.MxMovementInhibited. PRG_05 : idem pour la disponibilite M3 publiee vers PRG_04 si c'est la voie retenue, sinon PRG_04 lit directement Data.M3MovementInhibited."
     - "Reprise (AC6) = automatique sur la DISPONIBILITE (le voyant repasse a 1 quand la tempo tombe) mais le geste homme-mort reste desarme cote FB_Joystick tant que l'operateur n'a pas relache + re-arme. Coherent T222/T224 reprise=B."
 

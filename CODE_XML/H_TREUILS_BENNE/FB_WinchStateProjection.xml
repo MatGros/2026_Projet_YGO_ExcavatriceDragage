@@ -6419,14 +6419,18 @@ IF Error THEN
 END_IF;
 
 // ── 6quater. Disponibilite mouvement ──
-// Synthese des inhibitions qui interdisent REELLEMENT de bouger maintenant, pour
+// TRUE tant qu'une temporisation d'attente ou une inhibition interdit REELLEMENT
+// une nouvelle demande de mouvement ce scan (meme condition que la branche §5
+// "ELSIF RestartRequired OR DeadTimePending THEN ... WAIT_RESTART_DELAY"), pour
 // que la disponibilite d'armement (PRG_04) et le voyant joystick tombent pendant
-// ces fenetres. StepDelay EXCLU : il bride l'acceleration palier, il n'interdit
-// pas de bouger. N'ajoute aucune coupure : signal de disponibilite uniquement.
+// ces fenetres. Toutes ces variables se purgent seules (RestartDelay.Q 1,5 s,
+// DeadTime.Q). StepDelay EXCLU : il bride la hausse de palier, il n'interdit pas
+// de partir. N'ajoute aucune coupure : signal de disponibilite uniquement.
 MovementInhibited := NOT Ready
                      OR RestartInhibit
-                     OR ContactorStuck
-                     OR (DeadTime.IN AND NOT DeadTime.Q);
+                     OR RestartRequired
+                     OR DeadTimePending
+                     OR ContactorStuck;
 </xhtml>
           </ST>
         </body>

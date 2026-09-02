@@ -1,12 +1,12 @@
 (* =======================================================================
-   🛡️ FB_Safety_EmergencyManagement — Spec composant (v1.2)
+   🛡️ FB_Safety_EmergencyManagement — Spec composant (v1.4)
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Répond au besoin fonctionnel F01.01-F01.08 (AF01 §1, Table des fonctions) : gère la coupure de puissance amont (canaux PLC redondants fail-safe) et la séquence explicite de réarmement du contacteur général, avec auto-test A/B.
    🔒 Sécurité : fronts Reset/Arm (jamais de redémarrage auto), interlock
       sur Cause brute (jamais sur l'Ack), fail-safe Enable=FALSE.
    📤 Sorties structurées (2 DUT) : Status (ST_Safety_Emergency_Status) +
       Cmd (ST_Safety_Emergency_Cmd).
-   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.2.md (F01.01-F01.08)
+   📄 Doc métier : DOC/AF/AF_Partie-01_Analyse_Fonctionnelle/FB_Safety_EmergencyManagement_v1.4.md (F01.01-F01.08)
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_Safety_EmergencyManagement

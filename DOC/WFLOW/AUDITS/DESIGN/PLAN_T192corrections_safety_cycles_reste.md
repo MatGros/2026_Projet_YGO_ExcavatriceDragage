@@ -89,7 +89,7 @@
 | `DOC/VERSION_HISTORY.md` | entrée pour la revue T192 + clôture | édité (si diff réel) |
 | `DOC/WFLOW/TASKS.yaml` | T192 → `✅` + `completed_at` ISO (clôture) | édité |
 
-> **Registres** : respecter `NAMING_CONVENTION` (PascalCase) et NC-100 (fail-safe) dans toute relecture. Aucune règle `DOC/NAMING_CONVENTION.md` n'est modifiée.
+> **Registres** : respecter `NAMING_CONVENTION` (PascalCase) et NC-100 (fail-safe) dans toute relecture. Aucune règle `DOC/STDS/NAMING_CONVENTION.md` n'est modifiée.
 
 ---
 

@@ -4,6 +4,14 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `AF01_v1.4_EMERGENCY_MANAGEMENT_T173C` — 2026-09-02 — alignement physique, 3 bypass MES & validation CI
+- **Spec AF01 v1.3→v1.4 (`FB_Safety_EmergencyManagement_v1.4.md`)** :
+  - **3 Bypass MES orthogonaux** : `BypassArmingPreconditions`, `BypassRedundancyTest`, `BypassPowerCutOff` (décomposition `CutOffActive`).
+  - **Anti-mitraillage & Staccato** : Formalisation du délai `CST_PreArmDelay = 500ms`, de la garde dure 5s `ArmPulseInhibitActive` et de la tenue `CST_KeepAliveHold = 1s`.
+  - **Élimination des sorties silencieuses** : Table des messages opérateur `Status.OperatorMessage` par cause d'échec `LastAbortCause`.
+  - **Harnais CI & Chronogrammes réels** : Alignement des tests temporels sur les durées physiques normatives (500ms / 1s / 2s / 5s).
+- **Code ST & GVL** : Cartouche ST mis à jour vers `v1.4`, constances `CST_ABORT_*` complètes.
+
 ### `AF09_v2.4_CENTRE_PLAGE_PRESET` — 2026-08-30 — exigence preset centre-plage (spec seule, code non modifié)
 - **Diagnostic C0** : `TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md` — le preset neutre (`PresetValue := RawPos`, commit `73fa758d`) a perdu la garde anti-dépassement du design d'origine (`26217dd9`) : référencement près d'une borne → wrap-around UDINT → `CablePosM` aberrant (~±8192 m) + défauts en cascade.
 - **Spec AF09 v2.3→v2.4** : fonction `F09.08` + `TC-P09-070` — tout homing écrit le centre de plage `(8192×4096)/2 = 16#1000000` au codeur ET grave `HomingRefRaw` dans le référentiel post-preset ; gate `HomedAndReliable` M1 sur cible dynamique benne M2 ; gel consommateurs pendant la fenêtre de saut. Sous-fiche `FB_Encoder_Homing` v1.1→v1.2 (TC-P09-070.1/.2/.3, invariant anti-régression `PresetValue := RawPos`).
