@@ -5084,3 +5084,36 @@ tasks:
   bloque_par:
   - STUB rapide cree pendant MES - a completer (sous-etapes detaillees, chronogrammes, arbitrage bit IHM)
   - Lien a clarifier avec T226 (refonte homing <-> SEMI_AUTO)
+
+- id: T230
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: SEQUENCEUR SEMI_AUTO / KOBOLD / PROTECTION MOTEUR
+  agent: ''
+  date: '2026-09-03T00:00:00+02:00'
+  titre: Protection thermique moteur / contacteur Kobold (temps maxi + repos impose + bypass)
+  contexte: >
+    Le moteur du capteur de fond Kobold chauffe et risque de griller. Le contacteur
+    est active dans le cycle a l'approche de l'eau et coupe peu apres detection du
+    fond, mais rien ne borne aujourd'hui la duree d'activation ni n'impose de repos.
+  description: >
+    Ajouter une garde thermique au point unique de commande du contacteur Kobold
+    (apres arbitrage cycle + assistant plongee) : temps maxi d'activation borne
+    (~60 s cfg IHM) -> coupure + defaut latche + arret du cycle avec defaut si en
+    plongee (X4) ; temps de repos impose (~15 s) apres une activation cumulee
+    (~30 s) avant reactivation ; tempos configurables IHM ; bypass dedie comme les
+    autres equipements (politique sous bypass a trancher - Q2). Conserve la coupure
+    immediate au front de detection de fond (AF-04 3bis H1) et l'interdiction
+    Palier 5 sous l'eau.
+  objectifs:
+  - Borne de duree d'activation contacteur Kobold (MaxOnTime) avec coupure + defaut
+  - Defaut thermique en plongee -> STABILIZING, pas de redemarrage auto
+  - Temps de repos impose apres usage avant reactivation (duty-cycle)
+  - Tempos exposees en config IHM avec defauts surs
+  - Un seul FB de garde, instancie une fois - FB_Cycle / FB_DiveSearch non dupliques
+  - Bypass dedie coherent avec la matrice de bypass (G483)
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T230_KOBOLD_PROTECTION_THERMIQUE.yaml
+  bloque_par:
+  - STUB rapide cree pendant MES - a completer (valeurs tempo, placement Q1, politique bypass Q2, remontee IHM Q4)
+  - Lien avec T229 (FB_Cycle X4) et AF-04 3bis H1

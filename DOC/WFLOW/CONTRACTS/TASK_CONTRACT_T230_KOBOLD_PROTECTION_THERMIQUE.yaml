@@ -1,0 +1,110 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T230 : Protection thermique moteur / contacteur Kobold
+# ═══════════════════════════════════════════════════════════════════════════
+# STUB rapide cree 2026-09-03 pendant MES — a completer.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T230_KOBOLD_PROTECTION_THERMIQUE
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Le moteur du capteur de fond Kobold chauffe et risque de griller : ajouter une
+    protection thermique par limitation du temps d'activation du contacteur Kobold.
+    Temps maxi d'activation borne (coupure + defaut + arret du cycle avec defaut si
+    en plongee), temps de repos impose apres usage avant reactivation, tempos
+    configurables IHM, et possibilite de bypass comme les autres equipements.
+
+  acceptance:
+    - id: AC1
+      statement: "Le contacteur Kobold n'est jamais alimente plus de CfgKoboldMaxOnTime en continu (defaut ~60 s, configurable IHM) : au-dela, l'ordre contacteur est coupe le scan meme."
+      verified_by: "Scenario : contacteur maintenu ON -> a t = CfgKoboldMaxOnTime, ordre physique Kobold retombe a 0."
+    - id: AC2
+      statement: "Depassement de CfgKoboldMaxOnTime pendant une plongee (cycle SEMI_AUTO en X4) : un defaut latche est leve et le cycle bascule en STABILIZING (arret avec defaut), pas de redemarrage automatique."
+      verified_by: "Scenario integration : plongee X4, contacteur Kobold force > MaxOnTime -> Fault.Latched + CycleStep = STABILIZING + acquittement conscient requis."
+    - id: AC3
+      statement: "Apres une activation cumulee d'au moins CfgKoboldRestTriggerOnTime (defaut ~30 s), une pause OFF d'au moins CfgKoboldRestTime (defaut ~15 s) est imposee avant que le contacteur puisse etre reactive ; toute demande d'activation pendant la pause est ignoree sans defaut."
+      verified_by: "Scenario : ON 30 s -> OFF -> demande ON immediate refusee pendant 15 s puis acceptee ; observation de l'ordre contacteur et d'un etat 'repos thermique en cours'."
+    - id: AC4
+      statement: "Un bypass IHM dedie (comme les autres equipements) neutralise la temporisation de repos et la coupure MaxOnTime ; le comportement sous bypass est explicite et documente (operateur responsable, surveillance visuelle directe)."
+      verified_by: "Scenario : bypass actif -> contacteur suit la demande cycle/plongee sans coupure MaxOnTime ni pause ; bypass inactif -> AC1/AC3 de nouveau appliques. Comportement sous bypass trace dans l'AF."
+    - id: AC5
+      statement: "Les temporisations CfgKoboldMaxOnTime / CfgKoboldRestTriggerOnTime / CfgKoboldRestTime sont exposees en configuration IHM (GVL_IHM), avec des valeurs par defaut sures si l'IHM ne les fournit pas (0 ou aberrant -> defaut interne)."
+      verified_by: "Test : cfg absente/0 -> valeurs internes par defaut appliquees ; cfg IHM -> valeurs prises en compte."
+    - id: AC6
+      statement: "La protection s'applique au point unique de commande du contacteur Kobold (apres arbitrage cycle + assistant plongee), sans dupliquer la logique cote FB_Cycle et cote FB_DiveSearch."
+      verified_by: "git diff : un seul FB de garde thermique, instancie une fois dans la chaine de commande Kobold ; FB_Cycle / FB_DiveSearch inchanges sur la logique de commande Kobold (hors consommation d'un eventuel etat 'inhibe thermique')."
+    - id: AC7
+      statement: "Le nom de fichier est identique au nom de POU et son suffixe est egal au langage ST du bundle genere, pour chaque POU cree ou modifie."
+      verified_by: "Gate structurel dedie et bundle PLCopenXML frais."
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/               # nouveau FB_KoboldThermalGuard + _TYPES
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st # instanciation au point d'arbitrage Kobold (a confirmer)
+      - CODE/M_MAIN/PRG_06_Outputs.st       # alternative de placement (a trancher P0)
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/
+      - CODE/G_CYCLE/FB_Cycle.st            # consommation d'un etat 'inhibe thermique' -> defaut X4 (AC2)
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T230_KOBOLD_PROTECTION_THERMIQUE.yaml
+      - DOC/WFLOW/REGISTRES/
+      - TOOLS/TEST_AUTO_CI/
+    forbidden:
+      - CODE/B_AU_SECURITE/
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - ARCHIVES/
+
+  conservation:
+    must_survive:
+      - "Coupure immediate du contacteur Kobold au front de detection de fond (AF-04 3bis H1) conservee : la garde thermique s'ajoute, ne remplace pas."
+      - "Interdiction Palier 5 sous l'eau et coupure anti-chauffe existante restent actives, y compris sous bypass thermique."
+      - "Aucun redemarrage automatique du cycle apres un defaut thermique Kobold."
+      - "Producteur unique de l'ordre contacteur Kobold physique (pas de double chemin)."
+    dropped_on_purpose:
+      - "L'activation du contacteur Kobold sans aucune borne de duree ni de repos."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  open_questions:
+    - id: Q1
+      q: "Placement du FB de garde : dans FB_BucketCmdArbitration / PRG_04 (point d'arbitrage) ou dans PRG_06 juste avant la sortie physique ?"
+    - id: Q2
+      q: "Sous bypass thermique : on neutralise AUSSI la coupure absolue MaxOnTime, ou on garde MaxOnTime comme garde-fou inviolable (comme Palier5 sous bypass plongee) ?"
+    - id: Q3
+      q: "CfgKoboldRestTriggerOnTime compte le temps ON cumule (fenetre glissante) ou le temps ON continu de la derniere activation ? Valeurs par defaut exactes (60 / 30 / 15 s ?)."
+    - id: Q4
+      q: "L'etat 'repos thermique en cours' / 'defaut thermique Kobold' doit-il remonter au bandeau IHM et au troubleshooting (ST_Chain*) ?"
+    - id: Q5
+      q: "Le bypass Kobold reutilise-t-il un slot Bypass existant (GVL_IHM) ou en cree un nouveau ? Coherence avec la matrice de bypass MAINT_N2 (G483)."
+
+  alert_duty: >
+    STOP si le placement impose de toucher B_AU_SECURITE, si la garde thermique
+    peut empecher une coupure de securite existante, si le bypass rend la coupure
+    MaxOnTime contournable sans decision explicite (Q2), ou si une reponse
+    d'open_question reste indeterminee au moment de coder.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    STUB cree 2026-09-03 pendant MES (demande operateur : risque de griller le moteur
+    Kobold). A completer : valeurs de tempo par defaut, placement (Q1), politique bypass
+    (Q2), remontee IHM/troubleshooting (Q4). Lien avec T229 (FB_Cycle X4) et AF-04 3bis H1.
