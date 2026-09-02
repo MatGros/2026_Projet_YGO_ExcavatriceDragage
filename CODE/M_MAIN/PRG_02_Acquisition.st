@@ -45,6 +45,7 @@ VAR
     BucketReferenceCloseEdge : R_TRIG; // . [LOC] Front confirmation benne fermee
     BucketReferenceRequested : BOOL;   // . [LOC] Homing materiel M2 requis par confirmation benne
     BucketReferenceTargetM   : REAL;   // . [LOC] Cible M2 calculee depuis la position M1
+    JoystickCfgEffective     : ST_fbJoystick_Cfg; // . [LOC] Reglages joystick avec table de paliers centrale
 
     WinchInputSourceSimulated         : BOOL; // . [LOC] Source Winch simulee active
     TranslationInputSourceSimulated   : BOOL; // . [LOC] Source Translation simulee active
@@ -369,6 +370,11 @@ HwIn.Machine     := SEL(MachineInputSourceSimulated, HwReal.Machine, HwSim.Machi
 {region "§3 Traitement joystick"}
 // === 🕹️ §3 TRAITEMENT JOYSTICK ===
 
+// La table des paliers est une source unique commune M1/M2. Les autres
+// reglages restent ceux propres au joystick et a son pont IHM/persistant.
+JoystickCfgEffective := GVL_PERSISTENT._JoystickCfgPersist;
+JoystickCfgEffective.SpeedStepTable := GVL_PERSISTENT._WinchSpeedStepTable;
+
 instJoystick(
     Enable                    := TRUE,
     Reset                     := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -382,7 +388,7 @@ instJoystick(
     RawY                      := HwIn.Operator.JoyYRaw_ANA2,
     RawButton                 := HwIn.Operator.JoyBtnRaw,
     Calibrate                 := GVL_IHM.JOY1Joystick.Cmd.Calibrate,
-    Cfg                       := GVL_PERSISTENT._JoystickCfgPersist,
+    Cfg                       := JoystickCfgEffective,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
 );

@@ -1,0 +1,125 @@
+contract:
+  task_id: T222_JOYSTICK_INVERSION_NEUTRE
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Empêcher tout ordre de mouvement dans le sens opposé lorsqu'un axe joystick
+    passe de +1 à -1 ou de -1 à +1 entre deux scans sans neutre observé : le
+    geste est désarmé, les deux consignes joystick sont nulles et un retour au
+    neutre puis un nouvel appui conscient de l'homme-mort sont exigés.
+
+  acceptance:
+    - id: AC1
+      statement: "Un passage direct X +1 vers -1 ou -1 vers +1 entre deux appels consécutifs de FB_Joystick désarme DeadmanArmed dans le même scan que l'inversion."
+      verified_by: "Test CI FB_Joystick avec deux appels successifs, sans scan AtNeutralXY, et assertion DeadmanArmed=FALSE."
+    - id: AC2
+      statement: "Un passage direct Y +1 vers -1 ou -1 vers +1 désarme également le geste entier, y compris si l'autre axe reste dévié."
+      verified_by: "Test CI FB_Joystick couvrant X maintenu hors neutre et inversion Y, puis assertion DeadmanArmed=FALSE."
+    - id: AC3
+      statement: "Au scan d'inversion, AxisCmdX et AxisCmdY publient chacun SpeedTgt=0, StartStop=FALSE et Direction=0 ; aucun ordre opposé ne quitte FB_Joystick."
+      verified_by: "Assertions CI sur les deux ST_fbJoystick_AxisCmd au scan de l'inversion directe."
+    - id: AC4
+      statement: "Après une inversion directe, un nouvel appui homme-mort alors qu'aucun neutre X+Y n'a été observé ne réarme pas DeadmanArmed et les sorties joystick restent nulles."
+      verified_by: "Test CI : inversion, relâchement puis nouvel appui 100 ms avec axe inverse maintenu ; assertions DeadmanArmed=FALSE et SpeedTgt=0."
+    - id: AC5
+      statement: "Le premier scan où AtNeutralXY=TRUE lève uniquement le verrou de retour au neutre ; le geste reste désarmé jusqu'à un nouveau front RawButton maintenu DeadmanArmHoldTime."
+      verified_by: "Test CI : inversion, retour X+Y au neutre, maintien bouton sans front puis relâchement/front + 100 ms ; assertions successives FALSE puis TRUE de DeadmanArmed."
+    - id: AC6
+      statement: "Une variation normale dans le même sens, le maintien d'un axe au neutre et l'arrêt opérateur sans inversion ne créent pas de désarmement additionnel."
+      verified_by: "Tests de non-régression FB_Joystick existants plus trois scénarios CI dédiés même sens, neutre simple et arrêt sans changement de signe."
+    - id: AC7
+      statement: "La détection utilise les directions qualifiées de chaque axe après zone morte et ne dépend pas de NeutralHoldTime ; le cas +1 vers -1 sans échantillon central reste bloqué."
+      verified_by: "Revue du code et test CI avec valeurs brutes sautant directement d'un côté de DeadbandRaw à l'autre."
+    - id: AC8
+      statement: "Le désarmement d'inversion ne modifie ni ArmingPermit, ni SafeStop, ni PowerCutOff : il demande exclusivement un arrêt normal via les commandes joystick à zéro."
+      verified_by: "Assertions CI de non-écriture des signaux safety publics et revue de la chaîne FB_Joystick vers PRG_04/PRG_05."
+    - id: AC9
+      statement: "Les consommateurs M1/M2 en joystick maître et M3 dans tous les modes reçoivent le geste désarmé et ne peuvent pas produire un mouvement opposé après l'inversion détectée."
+      verified_by: "G375, revue de raccordement PRG_02 -> PRG_04/PRG_05 et test d'intégration ciblé si les tests FB seuls ne prouvent pas les gates consommateurs."
+    - id: AC10
+      statement: "Pour chaque PROGRAM modifié, le nom de fichier est identique au nom de POU et son suffixe est égal au langage ST du bundle généré."
+      verified_by: "Inspection des déclarations PROGRAM et du bundle PLCopenXML régénéré."
+
+  scope:
+    allowed:
+      - CODE/D_JOYSTICK/FB_Joystick.st
+      - CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st
+      - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T222_JOYSTICK_INVERSION_NEUTRE.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/D_JOYSTICK/tests/test_fb_joystick.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/AGENT_WORKFLOW/scripts/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/
+      - CODE/B_AU_SECURITE/
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - GVL_PERSISTENT.st
+
+  conservation:
+    must_survive:
+      - "RawButton reste un homme-mort à rappel ressort : l'armement normal exige un front puis DeadmanArmHoldTime, indépendamment de la position initiale des axes hors verrou post-inversion."
+      - "ArmingPermit reste le permis positif machine produit par PRG_04 ; une inversion joystick ne doit ni le forcer à FALSE ni contourner un permis FALSE."
+      - "AtNeutralXY conserve sa définition : X et Y simultanément dans DeadbandRaw autour des neutres calibrés."
+      - "Le désarmement joystick conduit à une décélération normale des FB de mouvement ; seul PowerCutOff/AU peut produire une coupure brutale."
+      - "Aucun réarmement automatique n'est admis après une inversion directe : retour au neutre observé puis nouveau front RawButton obligatoire."
+      - "Les comportements existants de perte ArmingPermit, perte bus, calibration et limites de zone morte restent inchangés."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - test_fix_guard
+    - af_update
+    - check_linkage
+    - bundle
+    - run_all_gates
+    - human_design_validation
+    - naming_convention_review   # passe dediee NAMING_CONVENTION.md (NC-xxx) sur tout nouveau symbole
+    - code_quality_review        # passe dediee qualite + effets de bord (diff vs must_survive, latch/Reset, anti-bruit Hall, non-regression consommateurs)
+
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+
+  alert_duty: >
+    STOP et alerte avant implémentation si la règle « retour au neutre » doit être
+    appliquée par axe plutôt que sur AtNeutralXY, si un consommateur contourne
+    DeadmanArmed, ou si le nouvel état exige une interface publique non prévue.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Règle de conception demandée sur machine : inversion directe détectée entre
+    deux scans sans neutre observé -> désarmement + sortie joystick nulle ;
+    réarmement interdit avant passage X+Y au neutre puis nouvel appui conscient.
+
+    Protocole de délégation (exigence opérateur 2026-09-02) : après exécution,
+    DEUX revues séparées obligatoires avant validation -
+    (1) convention de nommage (NAMING_CONVENTION.md, NC-xxx, préfixes Req/Tgt/Cmd/Act,
+        polarité, zéro nombre magique) sur tout nouveau symbole ;
+    (2) qualité code + effets de bord (diff réel vs must_survive, interaction
+        NeutralHoldTimer / DeadmanArmGraceTimer / ArmingPermit, latch inversion NON
+        effacé par Reset, qualification anti-bruit Hall, non-régression consommateurs
+        PRG_04 / PRG_05).
+    L'orchestrateur relit le git diff ; l'agent exécutant ne s'auto-valide jamais.
+
+    Bloqué avant délégation sur 3 arbitrages : (A) comportement des FB mouvement
+    (FB_Winch / FB_Translation) sur inversion de sens - rampent-ils au travers de
+    zéro ? ; (C) le latch InversionLockActive survit-il au Reset et au cycle
+    ArmingPermit (doctrine : Reset n'ouvre jamais un interlock) ? ; (D) libération
+    du verrou sur AtNeutralXY (2 axes) ou par axe ?

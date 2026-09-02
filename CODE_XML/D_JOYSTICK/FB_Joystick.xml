@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T00:16:29.075922" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T00:16:29.075922">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T10:50:32.968620" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T10:50:32.968620">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -859,6 +859,28 @@ Seuils de changement de palier (0..100%)</xhtml>
             </variable>
           </inOutVars>
           <localVars>
+            <variable name="CST_DirectionQualificationThreshold_Pct">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil % : axe actif (StartStop / bits sens / palier 0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_InversionFlipThreshold_Pct">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil % : sens RETENU pour la détection d'inversion inter-scan.</xhtml>
+              </documentation>
+            </variable>
             <variable name="ScaleX">
               <type>
                 <derived name="FB_AxisScale" />
@@ -882,6 +904,14 @@ Seuils de changement de palier (0..100%)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front montant bouton homme-mort</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralXYEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front retour simultane X+Y au neutre (libere verrou inversion)</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralHoldTimer">
@@ -979,6 +1009,62 @@ Seuils de changement de palier (0..100%)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Armement en cours d'attente de la temporisation maintien</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InversionLockActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Verrou retour neutre apres inversion inter-scan directe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevDirX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Sens X qualifie au scan precedent (-1, 0, +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevDirY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Sens Y qualifie au scan precedent (-1, 0, +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Sens X qualifie au scan courant (-1, 0, +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Sens Y qualifie au scan courant (-1, 0, +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FlipX">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Inversion X directe sans echantillon neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FlipY">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Inversion Y directe sans echantillon neutre</xhtml>
               </documentation>
             </variable>
             <variable name="RawOutOfRange">
@@ -1104,7 +1190,11 @@ IF NOT Enable OR BusLost THEN
     AtNeutralXY := TRUE;
     DeadmanArmed := FALSE;
     DeadmanArmPending := FALSE;
+    InversionLockActive := FALSE;
+    PrevDirX := 0;
+    PrevDirY := 0;
     ArmingPermitDenied := FALSE;
+    NeutralXYEdge(CLK := FALSE);
     NeutralHoldTimer(IN := FALSE, PT := Cfg.NeutralHoldTime);
     DeadmanArmTimer(IN := FALSE, PT := Cfg.DeadmanArmHoldTime);
     DeadmanArmGraceTimer(IN := FALSE, PT := Cfg.DeadmanArmGraceTime);
@@ -1122,13 +1212,48 @@ AtNeutralXY := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // les 2 axes 
 {endregion}
 
 {region "§4 Armement homme mort"}
+// 🔀 Inversion inter-scan : le sens n'est RETENU que si la déflexion dépasse
+// CST_InversionFlipThreshold_Pct (&gt;&gt; bruit Hall / bord de deadband). Un aller-retour
+// +1&lt;-&gt;-1 sans échantillon 0 pose le verrou. Levé exclusivement au front AtNeutralXY.
+// RawOutOfRange : lecture capteur non fiable -&gt; aucun sens retenu (le geste est déjà forcé à 0
+// par le SEL du pipeline). Une reprise capteur-défaut -&gt; valide ne compte donc pas comme flip.
+DirX := 0;
+DirY := 0;
+IF NOT RawOutOfRange THEN
+    IF ScaleX.OutPct &gt; CST_InversionFlipThreshold_Pct THEN
+        DirX := 1;
+    ELSIF ScaleX.OutPct &lt; -CST_InversionFlipThreshold_Pct THEN
+        DirX := -1;
+    END_IF;
+    IF ScaleY.OutPct &gt; CST_InversionFlipThreshold_Pct THEN
+        DirY := 1;
+    ELSIF ScaleY.OutPct &lt; -CST_InversionFlipThreshold_Pct THEN
+        DirY := -1;
+    END_IF;
+END_IF;
+FlipX := ((PrevDirX = 1) AND (DirX = -1)) OR ((PrevDirX = -1) AND (DirX = 1));
+FlipY := ((PrevDirY = 1) AND (DirY = -1)) OR ((PrevDirY = -1) AND (DirY = 1));
+
+NeutralXYEdge(CLK := AtNeutralXY);
+IF NeutralXYEdge.Q THEN
+    InversionLockActive := FALSE;
+END_IF;
+
+IF FlipX OR FlipY THEN
+    InversionLockActive := TRUE;
+    DeadmanArmed := FALSE;
+    DeadmanArmPending := FALSE;
+END_IF;
+
 // Bouton homme-mort : armement par MAINTIEN (Cfg.DeadmanArmHoldTime), independant de la position.
+// ⚠️ Un appui PENDANT le verrou d'inversion n'arme PAS de demande : le nouveau front conscient
+//    doit survenir APRÈS le retour au neutre (sinon on "pré-charge" le réarmement stick inversé).
 DeadmanEdge(CLK := RawButton);
-IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
+IF DeadmanEdge.Q AND NOT InversionLockActive THEN DeadmanArmPending := TRUE; END_IF;
 IF NOT RawButton THEN DeadmanArmPending := FALSE; END_IF;
 
 // Securite : armage UNIQUEMENT si DeadmanArmPending ET ArmingPermit.
-DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit, PT := Cfg.DeadmanArmHoldTime);
+DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit AND NOT InversionLockActive, PT := Cfg.DeadmanArmHoldTime);
 IF DeadmanArmTimer.Q THEN
     DeadmanArmed := TRUE;
     DeadmanArmPending := FALSE;
@@ -1155,10 +1280,10 @@ CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdX.SpeedTgt := ABS(CmdXVal);   // NON signee (le sens = bits DirectionPositive/Negative + AxisCmdX.Direction)
-AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
+AxisCmdX.StartStop := (ABS(CmdXVal) &gt; CST_DirectionQualificationThreshold_Pct);
 
-AxisCmdX.DirectionPositive := (CmdXVal &gt; 0.1);
-AxisCmdX.DirectionNegative := (CmdXVal &lt; -0.1);
+AxisCmdX.DirectionPositive := (CmdXVal &gt; CST_DirectionQualificationThreshold_Pct);
+AxisCmdX.DirectionNegative := (CmdXVal &lt; -CST_DirectionQualificationThreshold_Pct);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
 IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
@@ -1174,10 +1299,10 @@ CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdY.SpeedTgt := ABS(CmdYVal);   // NON signee (le sens = bits DirectionPositive/Negative + AxisCmdY.Direction)
-AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
+AxisCmdY.StartStop := (ABS(CmdYVal) &gt; CST_DirectionQualificationThreshold_Pct);
 
-AxisCmdY.DirectionPositive := (CmdYVal &gt; 0.1);
-AxisCmdY.DirectionNegative := (CmdYVal &lt; -0.1);
+AxisCmdY.DirectionPositive := (CmdYVal &gt; CST_DirectionQualificationThreshold_Pct);
+AxisCmdY.DirectionNegative := (CmdYVal &lt; -CST_DirectionQualificationThreshold_Pct);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
 IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
 
@@ -1190,7 +1315,7 @@ SpeedStepHyst4(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.Spe
 
 // Algorithme ASCENDANT : OUT=TRUE quand IN&gt;HIGH (au-dessus du seuil) → palier supérieur.
 // Petite déflexion → palier bas ; grande déflexion → palier haut (borne haute du palier).
-IF AxisCmdY.SpeedTgt &lt;= 0.1 THEN
+IF AxisCmdY.SpeedTgt &lt;= CST_DirectionQualificationThreshold_Pct THEN
     AxisCmdY.StepTgt := 0;
 ELSE
     AxisCmdY.StepTgt := 1;
@@ -1205,6 +1330,10 @@ IF AxisCmdY.DirectionPositive THEN AxisCmdY.Direction := 1;
 ELSIF AxisCmdY.DirectionNegative THEN AxisCmdY.Direction := -1;
 ELSE AxisCmdY.Direction := 0; END_IF;
 AxisCmdY.Deflection := REAL_TO_INT(CmdYVal);   // deflexion signee -100..+100 % (anim IHM)
+
+// Memorisation apres traitement : l'inversion suivante compare deux scans qualifies successifs.
+PrevDirX := DirX;
+PrevDirY := DirY;
 
 // Miroirs point neutre courant
 NeutralXAct := NeutralXMem;

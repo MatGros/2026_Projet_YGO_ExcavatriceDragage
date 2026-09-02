@@ -1,4 +1,4 @@
-# FB_Safety_EmergencyManagement — Spec composant (v1.2)
+# FB_Safety_EmergencyManagement — Spec composant (v1.3)
 
 > Rôle machine : [`AF_Partie-01_Analyse_Fonctionnelle_v2.1.md`](../AF_Partie-01_Analyse_Fonctionnelle_v2.1.md)
 > §7 — couvre `F01.01`…`F01.08` (Table des fonctions).
@@ -134,13 +134,14 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Nominal</b><br>Réarm.</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         💤 <b>Étape 0</b> : Repos initial (boucle saine, contacteur au repos, <code>Armable=TRUE</code>)<br>
-        🚀 <b>Étape 1</b> : Demande réarmement (<code>ArmRequest</code> ➔ lance TestA)<br>
-        🔍 <b>Étape 2</b> : Réaction boucle à TestA (chute boucle ➔ RestoreA)<br>
-        🔍 <b>Étape 3</b> : Restauration boucle A (refermeture ➔ lance TestB)<br>
-        🔍 <b>Étape 4</b> : Réaction boucle à TestB (chute boucle ➔ RestoreB)<br>
-        ⚡ <b>Étape 5</b> : Impulsion collage contacteur 1s (<code>ArmPulse_RQ=TRUE</code>)<br>
-        ⏱️ <b>Étape 6</b> : Fin impulsion 1s ➔ Attente confirmation contacteur<br>
-        ✅ <b>Étape 7</b> : Confirmation collage (<code>PowerContactorEngaged=TRUE</code> ➔ <code>Done=TRUE</code>)
+        ⏱️ <b>Étape 0bis</b> : Demande réarmement (<code>ArmRequest</code> ➔ Délai pré-armement 500 ms <code>PreArmDelayActive</code> en IDLE, contacteurs espacés)<br>
+        🚀 <b>Étape 1</b> : Auto-test canal A (Step 1 <code>TEST_A</code> 1 s ➔ chute boucle)<br>
+        🔍 <b>Étape 2</b> : Restauration canal A (Step 2 <code>RESTORE_A</code> 500 ms settle ➔ refermeture boucle)<br>
+        🔍 <b>Étape 3</b> : Auto-test canal B (Step 3 <code>TEST_B</code> 1 s ➔ chute boucle)<br>
+        🔍 <b>Étape 4</b> : Restauration canal B & Hold (Step 4 <code>RESTORE_B</code> 1 s ➔ PowerKeepAlive A+B tenus avant pulse)<br>
+        ⚡ <b>Étape 5</b> : Impulsion collage contacteur 1 s (Step 5 <code>PULSE</code>, <code>ArmPulse_RQ=TRUE</code>)<br>
+        ⏱️ <b>Étape 6</b> : Fin impulsion 1 s ➔ Attente confirmation contacteur max 2 s (Step 6 <code>CONFIRM</code>)<br>
+        ✅ <b>Étape 7</b> : Confirmation collage (<code>PowerContactorEngaged=TRUE</code> ➔ <code>WasArmed=TRUE</code>, <code>Done=TRUE</code>, retour IDLE)
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
@@ -150,11 +151,11 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold; letter-spacing: 0.5px;">TC-P01-SCEN-DYN</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small><b>Dynamique</b><br>Perturb.</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
-        🚀 <b>Phase 1</b> : Réarmement nominal réussi et mise en service (<code>Done=TRUE</code>)<br>
-        ⚡ <b>Phase 2</b> : Coupure métier en marche (<code>PowerCutOffRequest=TRUE</code> ➔ retombée A/B, <code>Armable=FALSE</code>)<br>
+        🚀 <b>Phase 1</b> : Réarmement nominal réussi et mise en service (<code>Done=TRUE</code>, <code>WasArmed=TRUE</code>)<br>
+        ⚡ <b>Phase 2</b> : Coupure métier en marche (<code>PowerCutOffRequest=TRUE</code> ➔ retombée A/B, <code>WasArmed=FALSE</code>, <code>Armable=FALSE</code>)<br>
         🛡️ <b>Phase 3</b> : Tentative réarmement bloquée sous défaut (refus net, reste Step 0)<br>
         🔄 <b>Phase 4</b> : Disparition dérive métier + <code>Reset</code> (retour <code>Armable=TRUE</code>)<br>
-        ⚠️ <b>Phase 5</b> : Nouvel armement avec échec collage contacteur (timeout 2s Step 6 ➔ <code>EmergencyArmingFailed</code> + Lockout 5s)<br>
+        ⚠️ <b>Phase 5</b> : Nouvel armement avec échec collage contacteur (timeout 2s Step 6 ➔ <code>EmergencyArmingFailed</code> + Lockout 5s, garde <code>ArmPulseInhibitActive</code>)<br>
         🔓 <b>Phase 6</b> : Expiration lockout 5s + <code>Reset</code> (prêt pour nouvel essai)
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
@@ -165,9 +166,10 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold;">TC-P01-001</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Coupure AU<br>physique</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
-        ⚡ <b>Étape 1</b> : Enfoncement coup de poing AU physique sur site<br>
-        🔒 <b>Étape 2</b> : Ouverture matérielle immédiate de la boucle 24V de sécurité<br>
-        ⛔ <b>Étape 3</b> : Retombée instantanée du contacteur de puissance ligne (API reste sous tension)
+        ⚡ <b>Étape 1</b> : Enfoncement coup de poing AU physique sur site (ouverture boucle 24V)<br>
+        🔒 <b>Étape 2</b> : Maintien PLC <code>PowerKeepAlive_A/B</code> préservé grâce au latch <code>WasArmed=TRUE</code> (pas de raison métier)<br>
+        ⛔ <b>Étape 3</b> : Retombée instantanée du contacteur de puissance ligne par coupure série matérielle<br>
+        🔄 <b>Étape 4</b> : Relâchement coup de poing ➔ Boucle se referme immédiatement sans rejouer de réarmement PLC
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>🟢 SITE</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§6.1</small></td>
@@ -178,9 +180,9 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Perte maintien<br>A/B</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         🔍 <b>Étape 1</b> : Surveillance indépendante des canaux A et B en régime nominal établi<br>
-        ⚡ <b>Étape 2</b> : Test de coupure unilatérale du canal A (<code>MaintainA_RQ=FALSE</code>, B maintenu)<br>
-        🔍 <b>Étape 3</b> : Vérification réaction boucle ➔ Restauration immédiate canal A<br>
-        ⚡ <b>Étape 4</b> : Test de coupure unilatérale du canal B (<code>MaintainB_RQ=FALSE</code>, A maintenu) ➔ Restauration canal B
+        ⚡ <b>Étape 2</b> : Test de coupure unilatérale du canal A (<code>MaintainA_RQ=FALSE</code> 1 s, B maintenu)<br>
+        🔍 <b>Étape 3</b> : Vérification réaction boucle ➔ Restauration canal A (500 ms settle)<br>
+        ⚡ <b>Étape 4</b> : Test de coupure unilatérale du canal B (<code>MaintainB_RQ=FALSE</code> 1 s, A maintenu) ➔ Restauration canal B (1 s hold)
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>⚡ MIXTE</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§5</small></td>
@@ -190,7 +192,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold;">TC-P01-003</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Impulsion<br>réarm.</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
-        🚀 <b>Étape 1</b> : Front montant <code>ArmRequest</code> sous préconditions saines (boucle OK, pas de défaut)<br>
+        🚀 <b>Étape 1</b> : Front montant <code>ArmRequest</code> sous préconditions saines (boucle OK, pas de défaut) ➔ Délai pré-armement 500 ms<br>
         ⚡ <b>Étape 2</b> : Auto-tests A/B croisés validés ➔ Génération impulsion collage contacteur 1.0s (<code>ArmPulse_RQ=TRUE</code>)<br>
         ⏱️ <b>Étape 3</b> : Retombée du pulse à 1.0s (<code>ArmPulse_RQ=FALSE</code>) et passage en attente confirmation (Step 6)
       </td>
@@ -203,7 +205,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Acquittement<br>Reset</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         ⚠️ <b>Étape 1</b> : Apparition d'un défaut de sécurité ou d'auto-test (<code>Error=TRUE</code>)<br>
-        🔄 <b>Étape 2</b> : Front montant sur <code>Reset</code> ➔ Effacement de l'affichage du défaut (<code>Error=FALSE</code>)<br>
+        🔄 <b>Étape 2</b> : Front montant sur <code>Reset</code> ➔ Effacement de l'affichage du défaut (<code>Error=FALSE</code>, <code>StartupFail=FALSE</code>)<br>
         🛡️ <b>Étape 3</b> : Verrouillage maintenu (aucun redémarrage automatique, séquence reste à IDLE Step 0)
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
@@ -225,7 +227,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold;">TC-P01-006</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Auto-test<br>A/B croisé</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
-        🚀 <b>Étape 1</b> : Front <code>ArmRequest</code> ➔ Lancement TestA (Step 1, coupure logicielle canal A)<br>
+        🚀 <b>Étape 1</b> : Front <code>ArmRequest</code> ➔ Délai 500 ms ➔ Lancement TestA (Step 1, coupure 1 s canal A)<br>
         ⚠️ <b>Étape 2</b> : Détection canal collé (boucle reste fermée malgré coupure A)<br>
         🚨 <b>Étape 3</b> : Avortement immédiat ➔ Alarme <code>RedundancyTestFailed</code>, maintien neutralisé et retour IDLE Step 0
       </td>
@@ -239,7 +241,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 6px 8px; line-height: 1.55;">
         ⚡ <b>Étape 1</b> : Fin d'impulsion de collage 1s ➔ Entrée en Step 6 Attente confirmation<br>
         ⏱️ <b>Étape 2</b> : Écoulement timeout 2.0s sans retour <code>PowerContactorEngaged</code><br>
-        🔒 <b>Étape 3</b> : Déclenchement alarme <code>EmergencyArmingFailed</code> + Activation Lockout anti-mitraillage 5.0s
+        🔒 <b>Étape 3</b> : Déclenchement alarme <code>EmergencyArmingFailed</code> + Activation Lockout anti-mitraillage 5.0s (garde dure <code>ArmPulseInhibitActive</code>)
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.3</small></td>
@@ -250,7 +252,7 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Coupure métier<br>active</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
         ⚡ <b>Étape 1</b> : Détection dérive métier critique (ex. dérive treuil M3 ➔ <code>PowerCutOffRequest=TRUE</code>)<br>
-        ⛔ <b>Étape 2</b> : Retombée immédiate et inconditionnelle des canaux A et B (<code>MaintainA/B_RQ=FALSE</code>)<br>
+        ⛔ <b>Étape 2</b> : Retombée immédiate et inconditionnelle des canaux A et B (<code>MaintainA/B_RQ=FALSE</code>, reset <code>WasArmed</code>)<br>
         🛡️ <b>Étape 3</b> : Verrouillage <code>Armable=FALSE</code> interdisant tout maintien de puissance
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
@@ -261,9 +263,9 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><span style="writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; font-family: monospace; font-size: 11.5px; font-weight: bold;">TC-P01-009</span></td>
       <td style="padding: 4px 1px; text-align: center; vertical-align: middle;"><small>Interlock<br>PowerCutOff</small></td>
       <td style="padding: 6px 8px; line-height: 1.55;">
-        🛡️ <b>Étape 1</b> : Présence active de <code>PowerCutOffRequest=TRUE</code> (ou défaut non résolu)<br>
-        🚫 <b>Étape 2</b> : Tentative d'armement <code>ArmRequest</code> ➔ Refus net, interdiction de transition hors Step 0<br>
-        🔄 <b>Étape 3</b> : Persistance de l'alarme si <code>Reset</code> sans disparition de la cause brute
+        🛡️ <b>Étape 1</b> : Présence active de <code>PowerCutOffRequest=TRUE</code> (ou coupure IHM)<br>
+        🚫 <b>Étape 2</b> : Tentative d'armement <code>ArmRequest</code> ➔ Refus net, interdiction de transition hors Step 0 (<code>Armable=FALSE</code>)<br>
+        🔄 <b>Étape 3</b> : Persistance du blocage si <code>Reset</code> sans disparition de la cause brute
       </td>
       <td style="padding: 4px 1px; text-align: center;"><small><code>💻 AUTO</code></small></td>
       <td style="padding: 4px 1px; text-align: center;"><small>§4.2</small></td>
@@ -294,54 +296,39 @@ Profil AF03 : **barrière puissance / safety transverse** — pas de `StartStop`
 |---|---|---|
 | `Enable` | `Outputs` = TRUE fixe | Active surveillance ; FALSE = neutralisation totale |
 | `Reset` | `Supervision.FaultMachineReset_IHM` ← `BtnFaultReset` | Front acquittement défauts FB |
-| `ArmRequest` | `GVL_IHM.Modes.Cmd.BtnEmergencyArming` | Front demande réarmement |
+| `ArmRequest` | `GVL_IHM.Emergency.Cmd.BtnEmergencyArming` | Front demande réarmement |
 | `EmergencyChainClosed` | `Acquisition.EmergencyChainClosed` ← `EmergencyChainClosed_DI` | Boucle AU fermée |
 | `PowerContactorEngaged` | `Acquisition.PowerContactorEngaged` ← `PowerContactorEngaged_DI` | Contacteur engagé |
 | `PowerCutOffRequest` | OR local M1/M2/M3 `.PowerCutOff` dans `Outputs` | Coupure demandée par safety domaine |
-| `BtnEmergencyCutOff` | `GVL_IHM.Modes.Cmd.BtnEmergencyCutOff` | **Coupure IHM maintenue** : bouton IHM (ou supervision) qui force l'ouverture des deux canaux A/B tant que maintenu — **pas** un bouton physique AU (celui-ci est dans la boucle hardware). Ne déclenche **pas** de séquence de réarmement. |
+| `BtnEmergencyCutOff` | `GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff` | **Coupure IHM maintenue** : bouton IHM (ou supervision) qui force l'ouverture des deux canaux A/B tant que maintenu — **pas** un bouton physique AU (celui-ci est dans la boucle hardware). Ne déclenche **pas** de séquence de réarmement. |
+| `BypassArmingPreconditions` | `GVL_BypassRetain.BypassAuArmingPreconditions` | `[TST]` Bypass ingénierie MES (défaut FALSE, RETAIN, jamais IHM) : arme sans les préconditions (boucle fermée, contacteur au repos, lockout, coupure métier/IHM) et fait aboutir CONFIRM sans contacteur réel. ⛔ **NON SÉCURISÉ — MES uniquement**. |
+| `BypassRedundancyTest` | `GVL_BypassRetain.BypassAuRedundancyTest` | `[TST]` Bypass ingénierie MES (défaut FALSE, RETAIN, jamais IHM) : saute l'auto-test A/B (passe de IDLE via PreArmDelay directement à RESTORE_B puis PULSE). ⛔ **NON SÉCURISÉ — MES uniquement**. |
 
-### Sorties logiques / diag
+### Sorties structurées (2 DUT)
 
-| Port | Sémantique |
-|---|---|
-| `Ready` | `= Enable AND NOT StartupFail` |
-| `Busy` | Séquence active ou lockout en cours |
-| `Done` | `= PowerContactorEngaged` |
-| `Error` / `ErrorId` | bit0=Redundancy, bit1=ArmFailed, bit3=StartupFail |
-| `ArmingSeqStep` | 0…6 diagnostic |
-| `RedundancyTestFailed` | Latch auto-test |
-| `EmergencyArmingFailed` | Latch non-confirmation contacteur |
-| `EmergencyArmingLockoutActive` | Fenêtre 5 s anti-réessai |
+Le FB expose deux structures publiques en `VAR_OUTPUT` :
+- `Status : ST_Safety_Emergency_Status` : Regroupe les états publics IEC (`Ready`/`Done`), le bus d'état (`State`), le bus de diagnostic (`Diag`), la synthèse défaut (`Fault : ST_Fault`, socle `FB_FaultCore`) et le message opérateur (`OperatorMessage : STRING(120)`).
+- `Cmd : ST_Safety_Emergency_Cmd` : Regroupe les consignes logiques de pilotage (`MaintainA_Cmd`, `MaintainB_Cmd`, `ArmPulse_Cmd`, `TestCutActive`).
 
 ### Bus d'état et diagnostic (structurés, depuis composite)
 
 | DUT | Champs | Rôle |
 |---|---|---|
 | `ST_Safety_Emergency_State` | `ChainOk`, `ContactorOk`, `Step`, `Armable`, `ArmingBusy` | État public chaîne AU — consommé par Supervision, Troubleshooting |
-| `ST_Safety_Emergency_Diag` | `Error`, `ErrorId`, `RedundancyTestFailed`, `ArmFailed`, `LockoutActive`, `LastAbortStep`, `LastAbortCause` | Diagnostic chaîne AU — consommé par Supervision, IHM State |
+| `ST_Safety_Emergency_Diag` | `Error`, `ErrorId`, `RedundancyTestFailed`, `ArmFailed`, `WasArmed`, `LockoutActive`, `LastAbortStep`, `LastAbortCause` | Diagnostic chaîne AU — consommé par Supervision, IHM State, Troubleshooting |
+| `ST_Fault` (socle `FB_FaultCore`) | `Error`, `ErrorId`, `Warning`, `WarningId`, `Texte`, `Causes` | Synthèse défaut standardisée (bit0=Redundancy, bit1=ArmFailed, bit3=StartupFail) |
 
-**Producteur unique** : `FB_Safety_EmergencyManagement` (sorties `State`/`Diag`).
-Mappés dans `GVL_IHM.Modes.State.*` par Supervision (L2, ✅ fait).
+**Producteur unique** : `FB_Safety_EmergencyManagement` (sorties `Status.State`/`Status.Diag`/`Status.Fault`).
+Mappés dans `PRG_06_Outputs` (bus de sortie) et `PRG_07_Supervision` (L2, ✅ fait).
 
-### Sorties vers actionneurs (via Output)
+### Sorties vers actionneurs (pilotées via Cmd dans Outputs)
 
-| Port FB | Q physique actuelle | Polarité |
-|---|---|---|
-| `PowerCutOff_A_RQ` | `PowerKeepAlive_A_RQ` | TRUE = maintien voie A |
-| `PowerCutOff_B_RQ` | `PowerKeepAlive_B_RQ` | TRUE = maintien voie B |
-| `EmergencyArming_RQ` | `EmergencyArming_RQ` | TRUE = impulsion réarmement |
-
-### DUT interne
-
-```text
-ST_Safety_Emergency_InternalCmd
-  MaintainA_Cmd : BOOL   // TRUE = maintien canal A (ex-PowerCutOff_A_Cmd)
-  MaintainB_Cmd : BOOL   // TRUE = maintien canal B (ex-PowerCutOff_B_Cmd)
-  ArmPulse_Cmd : BOOL   // TRUE = pulse réarmement (ex-EmergencyArming_Cmd)
-```
-
-🏷️ Renommage 2026-07-30 : `PowerCutOff_*` → `Maintain*` (polarité maintien explicite,
-conforme règle C1 : le nom répond à « que signifie TRUE ? »).
+| Port Cmd FB | Sortie protégée dans PRG_06 | Q physique | Polarité |
+|---|---|---|---|
+| `Cmd.MaintainA_Cmd` | `PowerKeepAliveACmd` (via `instKeepAliveAProtector`, 100 ms) | `PowerKeepAlive_A_RQ` | TRUE = maintien voie A |
+| `Cmd.MaintainB_Cmd` | `PowerKeepAliveBCmd` (via `instKeepAliveBProtector`, 100 ms) | `PowerKeepAlive_B_RQ` | TRUE = maintien voie B |
+| `Cmd.ArmPulse_Cmd` | `EmergencyArmingCmd` (via `instArmContactorProtector`, 5 s) | `EmergencyArming_RQ` | TRUE = impulsion réarmement |
+| `Cmd.TestCutActive` | `Data.TestCutActive` (bus inter-PRG) | Consommé par `FB_Sim_Safety` | TRUE = coupure auto-test A ou B active |
 
 ---
 
@@ -349,81 +336,96 @@ conforme règle C1 : le nom répond à « que signifie TRUE ? »).
 
 ### 4.1 Formules de maintien (état armé ou idle)
 
-Hors neutralisation :
+Hors neutralisation (`Enable = TRUE`), le maintien des relais fail-safe `MaintainA/B_Cmd` est calculé par décomposition :
 
-```text
-PowerCutOff_A_Cmd = NOT PowerCutOffRequest
-                  AND NOT ForceTestA          // seulement pendant étape 1
-                  AND NOT BtnEmergencyCutOff
-                  AND NOT RedundancyTestFailed
+```pascal
+// Latch « AU armée » (non RETAIN) : posé dès que PowerContactorEngaged (ou bypass en CONFIRM).
+// Retombe sur coupure métier hors bypass, BtnEmergencyCutOff, Enable=FALSE, défaut redondance.
+Maintain_ChainOk := EmergencyChainClosed OR (ArmingSeqStep <> CST_STEP_IDLE) OR WasArmed;
 
-PowerCutOff_B_Cmd = NOT PowerCutOffRequest
-                  AND NOT ForceTestB          // seulement pendant étape 3
-                  AND NOT BtnEmergencyCutOff
-                  AND NOT RedundancyTestFailed
+Maintain_NoCutOff := (NOT PowerCutOffRequest OR BypassArmingPreconditions OR BypassRedundancyTest)
+                     AND NOT BtnEmergencyCutOff;
+
+MaintainA_NoFault := NOT ForceTestA AND NOT RedundancyTestFailedCause;
+MaintainB_NoFault := NOT ForceTestB AND NOT RedundancyTestFailedCause;
+
+Cmd.MaintainA_Cmd := Enable AND Maintain_ChainOk AND Maintain_NoCutOff AND MaintainA_NoFault;
+Cmd.MaintainB_Cmd := Enable AND Maintain_ChainOk AND Maintain_NoCutOff AND MaintainB_NoFault;
 ```
+
+> 🛡️ **Rôle du Latch `WasArmed`** : Permet de maintenir `PowerKeepAlive` à travers un appui AU pur (chaîne matérielle physiquement ouverte par le coup-de-poing 24V) tant qu'aucune raison **métier** ne demande la coupure. Au relâchement de l'AU, la chaîne se referme instantanément (les contacts PLC étant restés fermés), sans nécessiter une séquence de réarmement complète.
 
 ### 4.2 Formule d'éligibilité au réarmement (`Armable`)
 
-Le réarmement n'est autorisé (`Armable = TRUE`) **que si toutes** les conditions de sécurité physique sont réunies :
+Le réarmement n'est autorisé (`State.Armable = TRUE`) **que si toutes** les conditions suivantes sont réunies :
 
 ```pascal
-Armable := EmergencyChainClosed
-           AND NOT BtnEmergencyCutOff
-           AND NOT PowerCutOffRequest
-           AND (ArmingSeqStep = 0)
-           AND NOT EmergencyArmingLockoutActive
-           AND NOT RedundancyTestFailedCause
-           AND NOT PowerContactorEngaged;
+// 1. Pas d'arrêt d'urgence IHM ni de demande de coupure métier
+// ⚠️ PLUS de EmergencyChainClosed : c'est la séquence d'armement qui referme la chaîne
+//    via PowerKeepAlive en série. Gater sur chaîne fermée rendait le réarmement impossible chaîne ouverte.
+Armable_ChainOk := NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+
+// 2. Séquence au repos
+Armable_Idle := (ArmingSeqStep = CST_STEP_IDLE);
+
+// 3. Pas de lockout actif et contacteur principal au repos
+Armable_NoBlock := NOT EmergencyArmingLockoutActive AND NOT PowerContactorEngaged;
+
+// 4. Formule globale (avec bypass ingénierie MES et garde dure anti-chatter 5s)
+Armable := (BypassArmingPreconditions OR (Armable_ChainOk AND Armable_NoBlock))
+           AND Armable_Idle AND NOT ArmPulseInhibitActive;
 ```
 
-Conditions **toutes** requises également sur front `ArmRequest` pour lancer la séquence (Steps 1 à 6).
-Pas d'auto-réarmement sur simple retour boucle saine.
+> 🚦 **Source unique IHM** : `State.Armable` reflète la vérité « on peut appuyer maintenant » — `FALSE` pendant les 5 s de garde dure post-séquence (`ArmPulseInhibitActive`), même après un armement réussi, puis `TRUE` à l'échéance. C'est LA source pour savoir quand réappuyer.
 
 ### 4.3 Étapes de la séquence d'armement
 
-| Step | Nom | Durée | Action | Échec |
+| Step | Nom (Constante GVL) | Durée / Timer | Action | Comportement nominal & Échec |
 |---|---|---|---|---|
-| 1 | TestA | 200 ms | Ouvre A seul | Si chain encore TRUE → `RedundancyTestFailed`, retour 0 |
-| 2 | RestoreA | 200 ms | Rétablit A | Si chain FALSE en fin → retour 0 |
-| 3 | TestB | 200 ms | Ouvre B seul | Idem redondance → 0 |
-| 4 | RestoreB | 200 ms | Rétablit B | Si chain FALSE → 0 ; sinon → 5 |
-| 5 | Pulse | 1 s | `Cmd.ArmPulse_Cmd := TRUE` | Coupure / chute boucle ➔ Avortement immédiat |
-| 6 | Confirm | ≤ 2 s | Attend `PowerContactorEngaged` | Timeout ➔ `EmergencyArmingFailed` + lockout 5 s |
-
-Succès étape 6 : retour IDLE (`ArmingSeqStep = 0`), lockout off, `Done = TRUE`.
+| - | **PreArmDelay** *(en Step 0)* | 500 ms (`CST_PreArmDelay`) | Mémorise l'appui (`PreArmDelayActive := TRUE`) sans asserter aucun maintien (reste en IDLE). | Évite le claquement simultané des contacteurs (staccato audible). Annulé si coupure IHM/métier. |
+| 1 | `CST_STEP_TEST_A` | 1 s (`CST_TestDuration`) | `ForceTestA := TRUE` (ouvre canal A seul, `MaintainA_Cmd := FALSE`). | Si `EmergencyChainClosed` reste TRUE (hors bypass) ➔ `RedundancyTestFailedCause := TRUE`, avortement `CST_ABORT_REDUNDANCY_A`, retour IDLE. |
+| 2 | `CST_STEP_RESTORE_A` | 500 ms (`CST_RestoreSettle`) | Rétablit canal A (`ForceTestA := FALSE`). Settle contacteur. | Si `EmergencyChainClosed` FALSE à l'échéance (hors bypass) ➔ avortement `CST_ABORT_TIMEOUT_RESTORE_A`, retour IDLE. |
+| 3 | `CST_STEP_TEST_B` | 1 s (`CST_TestDuration`) | `ForceTestB := TRUE` (ouvre canal B seul, `MaintainB_Cmd := FALSE`). | Si `EmergencyChainClosed` reste TRUE (hors bypass) ➔ `RedundancyTestFailedCause := TRUE`, avortement `CST_ABORT_REDUNDANCY_B`, retour IDLE. |
+| 4 | `CST_STEP_RESTORE_B` | 1 s (`CST_KeepAliveHold`) | Rétablit canal B (`ForceTestB := FALSE`). Maintient A+B établis 1 s. *(Point d'entrée direct sous `BypassRedundancyTest`)*. | Si `EmergencyChainClosed` FALSE à l'échéance (hors bypass) ➔ avortement `CST_ABORT_TIMEOUT_RESTORE_B`, retour IDLE. Sinon ➔ Step 5. |
+| 5 | `CST_STEP_PULSE` | 1 s (`CST_ArmingPulseDuration`) | `Cmd.ArmPulse_Cmd := TRUE`. *(Non gaté par `ArmPulseInhibitActive`)*. | Chute boucle AU / coupure métier ➔ Avortement (hors bypass). |
+| 6 | `CST_STEP_CONFIRM` | ≤ 2 s (`CST_ArmingConfirmTimeout`) | Attend `PowerContactorEngaged` (ou bypass actif). | Si retour contacteur (ou bypass) ➔ `WasArmed := TRUE`, `Done := TRUE`, retour IDLE. Si timeout ➔ `EmergencyArmingFailedCause := TRUE`, lockout 5 s, retour IDLE. |
 
 ### 4.3bis Gestion des avortements en cours de séquence
 
 1. **Avortement volontaire** (`BtnEmergencyCutOff = TRUE`) :
-   - Arrêt immédiat de la séquence (`ArmingSeqStep := 0`).
-   - `LastAbortCause := 16#0001` (Bit0: Demande coupure manuelle IHM).
-   - **Aucune alarme d'échec ni verrouillage** (décision consciente opérateur).
-2. **Avortement sécurité / coupure** (`PowerCutOffRequest = TRUE` ou chute `EmergencyChainClosed`) :
-   - Arrêt immédiat de la séquence (`ArmingSeqStep := 0`).
-   - `EmergencyArmingFailedCause := TRUE` (alarme affichée sur l'IHM).
-   - `EmergencyArmingLockoutActive := TRUE` (verrouillage 5s anti-réessai).
-   - `LastAbortCause := 16#0010` (Bit4: Coupure sécurité métier) ou `16#0002` (Bit1: Chute boucle AU).
+   - Arrêt immédiat de la séquence (`ArmingSeqStep := CST_STEP_IDLE`).
+   - `LastAbortStep := ArmingSeqStep`, `LastAbortCause := CST_ABORT_CUT_IHM` (1).
+   - **Aucune alarme d'échec ni verrouillage** (décision consciente opérateur, inconditionnel même sous bypass).
+2. **Avortement sécurité / coupure métier** (`PowerCutOffRequest = TRUE`) :
+   - *Hors bypass* : Arrêt immédiat (`ArmingSeqStep := CST_STEP_IDLE`), `EmergencyArmingLockoutActive := TRUE`, `LastAbortCause := CST_ABORT_POWER_CUTOFF` (16). Ne pose **pas** `EmergencyArmingFailedCause` (coupure métier ≠ défaut d'armement).
+   - *Sous bypass* (`BypassArmingPreconditions` OU `BypassRedundancyTest`) : ignoré pendant la séquence.
+3. **Chute de boucle matérielle en Step PULSE ou CONFIRM** (`NOT EmergencyChainClosed`) :
+   - *Hors bypass* : `EmergencyArmingFailedCause := TRUE`, `EmergencyArmingLockoutActive := TRUE`, `LastAbortCause := CST_ABORT_CHAIN_DROP` (2), retour IDLE.
+   - *Sous bypass* : ignoré, pas d'alarme.
+4. **Tolérance Bypass MES globale** :
+   - Sous `BypassRedundancyTest` ou `BypassArmingPreconditions`, aucun défaut `EmergencyArmingFailed` ni `RedundancyTestFailed` ne peut être généré.
 
 ### 4.3ter Chronogramme d'Essai Global (Scénarios Temporels & Déroulés)
 
 ```text
   Phase 0 : 💤 [REPOS INITIAL] Machine prête au réarmement
-  ├── Préconditions : Boucle matérielle fermée (EmergencyChainClosed=TRUE), aucun défaut actif.
+  ├── Préconditions : Boucle matérielle prête, coupure relâchée, aucun défaut actif.
   └── Résultat attendu : Armable = TRUE, PowerContactorEngaged = FALSE, Done = FALSE.
   │
   Phase 1 : 🚀 [RÉARMEMENT NOMINAL] Cycle complet d'armement sans accroc (TC-P01-SCEN-NOM)
-  ├── Étape 1.1 : Front montant ArmRequest ➔ Lancement séquence (ArmingSeqStep = 1).
-  ├── Étape 1.2 : Auto-test Voie A (200ms) ➔ Coupure canal A, vérification chute boucle ➔ Restauration A.
-  ├── Étape 1.3 : Auto-test Voie B (200ms) ➔ Coupure canal B, vérification chute boucle ➔ Restauration B.
-  ├── Étape 1.4 : Impulsion Contacteur (1s) ➔ ArmPulse_RQ = TRUE pendant 1000ms (ArmingSeqStep = 5).
-  ├── Étape 1.5 : Confirmation Contacteur ➔ PowerContactorEngaged = TRUE (ArmingSeqStep = 6 ➔ 0).
-  └── Résultat attendu : Puissance engagée (Done = TRUE, Busy = FALSE, Error = FALSE).
+  ├── Étape 1.0 : Front montant ArmRequest ➔ Mémorisation et Délai pré-armement 500ms (PreArmDelayActive=TRUE, Step 0 IDLE).
+  ├── Étape 1.1 : Auto-test Voie A (1s) ➔ Step 1 TEST_A, coupure canal A, vérification ouverture chaîne.
+  ├── Étape 1.2 : Restauration Voie A (500ms) ➔ Step 2 RESTORE_A, refermeture canal A, settle contacteur.
+  ├── Étape 1.3 : Auto-test Voie B (1s) ➔ Step 3 TEST_B, coupure canal B, vérification ouverture chaîne.
+  ├── Étape 1.4 : Restauration Voie B & Hold (1s) ➔ Step 4 RESTORE_B, canaux A+B tenus (CHAIN OK audible).
+  ├── Étape 1.5 : Impulsion Contacteur (1s) ➔ Step 5 PULSE, ArmPulse_Cmd = TRUE pendant 1000ms.
+  ├── Étape 1.6 : Confirmation Contacteur ➔ Step 6 CONFIRM, PowerContactorEngaged = TRUE (WasArmed=TRUE, Done=TRUE).
+  └── Résultat attendu : Puissance engagée (Done = TRUE, Busy = FALSE, Error = FALSE, retour Step 0 IDLE).
   │
   Phase 2 : ⚡ [PERTURBATION 1] Coupure sécurité métier en pleine marche (TC-P01-008)
-  ├── Contexte : Machine armée en production (Done=TRUE).
+  ├── Contexte : Machine armée en production (Done=TRUE, WasArmed=TRUE).
   ├── Événement : Dérive treuil M1/M2/M3 détectée (PowerCutOffRequest = TRUE).
-  └── Résultat attendu : Retombée immédiate MaintainA/B_RQ = FALSE, contacteur ouvert, Armable = FALSE.
+  └── Résultat attendu : Retombée immédiate MaintainA/B_Cmd = FALSE, contacteur ouvert, WasArmed = FALSE, Armable = FALSE.
   │
   Phase 3 : 🛡️ [PERTURBATION 2] Tentative de réarmement sous défaut & acquittement (TC-P01-009)
   ├── Événement : L'opérateur appuie sur ArmRequest alors que PowerCutOffRequest est toujours actif.
@@ -434,81 +436,66 @@ Succès étape 6 : retour IDLE (`ArmingSeqStep = 0`), lockout off, `Done = TRUE`
   Phase 4 : ⚠️ [PERTURBATION 3] Échec mécanique du contacteur & Lockout 5s (TC-P01-007)
   ├── Événement : Lancement réarmement, auto-test A/B réussi, impulsion 1s envoyée, mais le contacteur ne colle pas.
   ├── Étape 4.1 : Timeout confirmation 2s écoulé à l'étape 6 sans retour PowerContactorEngaged.
-  ├── Résultat attendu : Alarme EmergencyArmingFailed levée + Lockout 5s actif (Armable = FALSE, Busy = TRUE).
-  ├── Étape 4.2 : Écoulement du lockout 5s + impulsion Reset.
+  ├── Résultat attendu : Alarme EmergencyArmingFailed levée + Lockout 5s actif + garde dure ArmPulseInhibitActive (Armable = FALSE, Busy = TRUE).
+  ├── Étape 4.2 : Écoulement du lockout 5s (garde dure retombe) + impulsion Reset.
   └── Résultat attendu : Lockout purgé ➔ Armable redevient TRUE, machine prête pour un nouvel essai.
 ```
 
-Si `PowerContactorEngaged` ne passe pas TRUE avant timeout 2s à t4 : `EmergencyArmingFailed`
-et `EmergencyArmingLockoutActive` 5s, retour direct à `ArmingSeqStep=0`.
+### 4.3quater Auto-test A/B = essai `AUTO_PLC` intégré
 
-### 4.3bis Auto-test A/B = essai `AUTO_PLC` intégré
-
-À chaque réarmement réussi jusqu'au pulse, le FB **teste les deux sorties de maintien
-sans procédure manuelle séparée** :
+À chaque réarmement réussi jusqu'au pulse, le FB **teste les deux sorties de maintien sans procédure manuelle séparée** :
 
 | Phase | `PowerKeepAlive_A` | `PowerKeepAlive_B` | Attendu sur `EmergencyChainClosed` |
 |---|---|---|---|
-| TestA (200 ms) | **FALSE** (forcé) | TRUE (maintenu) | doit **ouvrir** (FALSE) |
-| RestoreA | TRUE | TRUE | doit **refermer** (TRUE) |
-| TestB (200 ms) | TRUE | **FALSE** (forcé) | doit **ouvrir** |
-| RestoreB | TRUE | TRUE | doit **refermer** |
+| Step 1 TEST_A (1 s) | **FALSE** (forcé) | TRUE (maintenu) | doit **ouvrir** (FALSE) |
+| Step 2 RESTORE_A (500 ms) | TRUE | TRUE | doit **refermer** (TRUE) |
+| Step 3 TEST_B (1 s) | TRUE | **FALSE** (forcé) | doit **ouvrir** (FALSE) |
+| Step 4 RESTORE_B (1 s) | TRUE | TRUE | doit **refermer** et **tenir** |
 
-- Un seul canal est ouvert à la fois : l'autre reste en maintien — ce n'est pas une coupure
-  AU opérateur, c'est la **preuve runtime** que chaque voie commande bien la boucle.
-- Si la chain ne suit pas la voie testée ⇒ collé/shunté ⇒ `RedundancyTestFailed` (latch).
-- Déclencheur : le même front `ArmRequest` que le réarmement (pas un bouton « test » dédié).
-- Observable : `ArmingSeqStep` 1…4, puis 5 (pulse) si OK.
-- Couvert par **TC-P01-006** (`AUTO_PLC`) ; rejouable aussi en sim (`AUTO`) si SimBench
-  câblé correctement (§8).
+- Un seul canal est ouvert à la fois : l'autre reste en maintien.
+- Si la chaîne ne suit pas la voie testée ⇒ collé/shunté ⇒ `RedundancyTestFailedCause` (latch).
+- 🛠️ **Chemin Bypass Redondance** : sous `BypassRedundancyTest := TRUE`, les étapes 1..3 sont sautées ; la séquence entre directement en `CST_STEP_RESTORE_B` (1 s hold), puis `PULSE` et `CONFIRM`.
 
 ### 4.4 Acquittements
 
-> ⚠️ **REX 2026-08** : la règle initiale ("Reset **et** `PowerContactorEngaged=TRUE`") créait une
-> impasse opérateur — le contacteur ne peut justement pas s'engager tant que le défaut est actif,
-> donc le Reset restait bloqué en boucle. Corrigée par le pattern `Cause`/`Ack`
-> (`DOC/STDS/CODE_QUALITY_STANDARDS.md §9`) : le Reset **acquitte toujours**, sans condition.
+> ⚠️ **REX 2026-08** : Le pattern `Cause`/`Ack` (`DOC/STDS/CODE_QUALITY_STANDARDS.md §9`) garantit que le Reset **acquitte toujours**, sans condition.
 
 | Défaut | Catégorie | Condition d'effacement |
 |---|---|---|
-| `RedundancyTestFailed` | Fault | Front `Reset` (toujours effectif) ; re-latch si un nouvel échec d'auto-test survient |
-| `EmergencyArmingFailed` | Fault | Front `Reset` (toujours effectif, **non conditionné** par `PowerContactorEngaged`) ; re-latch si une nouvelle tentative échoue à nouveau |
-
-**Ce qui débloque reellement une tentative echouee** : ce n'est pas le Reset, c'est un nouveau
-front `ArmRequest` (§4.4bis) — le Reset acquitte seulement l'affichage IHM/diag du defaut passé.
-
-**Comportement code retenu** : après expiration du lockout 5 s, un nouvel `ArmRequest` peut
-toujours relancer la séquence, que `EmergencyArmingFailed` ait été acquitté ou non —
-l'acquittement n'est jamais une condition de redémarrage (§4.4bis, `CODE_QUALITY_STANDARDS.md §9`).
+| `RedundancyTestFailed` | Fault | Front `Reset` (vide `RedundancyTestFailedCause` et remet `Ack := TRUE`) ; re-latch si un nouvel échec d'auto-test survient |
+| `EmergencyArmingFailed` | Fault | Front `Reset` (vide `EmergencyArmingFailedCause` et remet `Ack := TRUE`, **non conditionné** par `PowerContactorEngaged`) |
+| `StartupFail` | Fault (bit3) | Front `Reset` |
 
 ### 4.4bis Pattern Cause / Ack appliqué à ce composant
 
-Application concrète du pattern général (`CODE_QUALITY_STANDARDS.md §9`) aux deux Fault de ce FB :
+Application concrète du pattern général (`CODE_QUALITY_STANDARDS.md §9`) aux Faults de ce FB :
 
-- `EmergencyArmingFailedCause` : latch brut de l'échec de confirmation contacteur (positionné à
-  l'étape 6, jamais effacé par Reset — seulement par une nouvelle tentative reussie).
-- `EmergencyArmingFailedAck` : accusé opérateur, mis à `TRUE` sur front `Reset` (toujours), remis
-  à `FALSE` automatiquement au prochain échec (nouveau front de `EmergencyArmingFailedCause`).
-- Affiché/expose en diagnostic (`ErrorId` bit1) : `Cause OR NOT Ack`.
-- L'interlock de sécurité (blocage nouvel armement pendant le lockout 5s) reste basé sur
-  `EmergencyArmingLockoutActive`, jamais sur `Ack` — l'acquittement n'ouvre aucun interlock.
-- Même construction pour `RedundancyTestFailedCause`/`RedundancyTestFailedAck`.
-- Affichage IHM : lissage anti-clignotement optionnel via `TON` court (`CST_FaultDisplayDebounce`,
-  `T#0ms`…`T#500ms`) sur la sortie affichée uniquement — l'action de sécurité (blocage,
-  `SafeStop`, coupure) reste instantanée sur la `Cause` brute, jamais retardée.
+- `EmergencyArmingFailedCause` : latch brut de l'échec de confirmation contacteur (posé en étape 6 ou chute chaîne). Effacé par `Reset` ou nouvelle séquence réussie.
+- `EmergencyArmingFailedAck` : accusé opérateur, mis à `TRUE` sur front `Reset`, remis à `FALSE` automatiquement sur front montant de la Cause.
+- Affiché en diagnostic / IHM : `Cause OR NOT Ack` lissé par debounce `CST_FaultDisplayDebounce` (200 ms).
+- L'interlock de sécurité (blocage pendant lockout 5s) reste basé sur `EmergencyArmingLockoutActive`, jamais sur `Ack`.
 
-### 4.5 Temporisations nommées
+### 4.5 Temporisations et Gardes Anti-Chatter
 
-| Timer | Valeur |
-|---|---|
-| Test / restore A ou B | `T#200ms` |
-| Pulse armement | `T#1s` |
-| Confirm contacteur | `T#2s` |
-| Lockout | `T#5s` |
+| Constante / Timer | Valeur | Rôle |
+|---|---|---|
+| `CST_PreArmDelay` | `T#500ms` | Délai avant assertion `PowerKeepAlive` (espacement audible contacteurs) |
+| `CST_TestDuration` | `T#1s` | Durée coupure canal A puis canal B pendant l'auto-test |
+| `CST_RestoreSettle` | `T#500ms` | Temps d'établissement / settle contacteur après restauration voie A |
+| `CST_KeepAliveHold` | `T#1s` | Maintien `PowerKeepAlive` A+B établi en Step 4 avant le pulse gros contacteur |
+| `CST_ArmingPulseDuration` | `T#1s` | Durée impulsion réarmement contacteur puissance |
+| `CST_ArmingConfirmTimeout` | `T#2s` | Timeout d'attente confirmation collage contacteur |
+| `CST_ArmingLockout` | `T#5s` | Durée de verrouillage anti-réessai après échec ou départ séquence |
+| `CST_FaultDisplayDebounce`| `T#200ms`| Anti-clignotement affichage IHM |
+
+#### 🛡️ Garde DURE anti-chatter `ArmPulseInhibitActive` (interne FB)
+Dès qu'une séquence d'armement **démarre** (`SeqRunStartEdge` sur passage IDLE ➔ non-IDLE), `ArmPulseInhibitActive := TRUE` pour 5 s (`CST_ArmingLockout`). Inconditionnel (succès, échec, bypass).
+- Bloque tout nouveau départ de séquence en amont (`Armable = FALSE` et garde en IDLE).
+- **IMPORTANT** (fix b56d0844) : `Cmd.ArmPulse_Cmd` n'est **PAS** gaté par `NOT ArmPulseInhibitActive` (car le pulse intervient en cours de séquence pendant que la garde 5s du départ est déjà active).
 
 ---
 
-## 5 · 📡 Polarités et E/S physiques
+## 5 · 📡 Polarités, E/S physiques et Protections Matérielles
 
 | Rôle | Signal acquisition / Q | TRUE signifie |
 |---|---|---|
@@ -517,12 +504,12 @@ Application concrète du pattern général (`CODE_QUALITY_STANDARDS.md §9`) aux
 | Maintien A/B | `PowerKeepAlive_A/B_RQ` | Relais maintien excité (fail-safe) |
 | Pulse réarmement | `EmergencyArming_RQ` | Commande mécanique de réarmement active |
 
-Double dénomination FB `PowerCutOff_*_RQ` vs Q `PowerKeepAlive_*_RQ` : **même polarité maintien**.
-Voir écart normalisation §9.
+### 🛡️ Gardes anti-chatter `FB_ContactorProtector` en sortie de PRG_06_Outputs
+Pour éviter tout claquement destructif en sortie physique :
+1. `instArmContactorProtector` sur `EmergencyArming_RQ` (`Cfg_MinInterval = T#5s`) : garantit qu'une impulsion passe intégralement, puis bloque toute réactivation pendant 5 s.
+2. `instKeepAliveAProtector` et `instKeepAliveBProtector` sur `PowerKeepAlive_A_RQ` et `PowerKeepAlive_B_RQ` (`Cfg_MinInterval = T#100ms`) : espacement minimum entre coupure et ré-enclenchement pour supprimer le mitraillage sans gêner les temps de test (1 s).
 
-Filtre acquisition : anti-rebond 20 ms à confirmer sur le matériel ; sinon filtrage équivalent à
-porter dans `PRG_02_Acquisition`. `FB_Input`/`PRG_01_Inputs_LD` sont en retrait et ne doivent plus
-être cités comme producteur cible.
+Filtre acquisition : anti-rebond 20 ms à confirmer sur le matériel ; sinon filtrage équivalent à porter dans `PRG_02_Acquisition`.
 
 ---
 
@@ -580,11 +567,13 @@ Sortie du composite (`PRG_06_Outputs`) : `PowerKeepAlive_A/B_RQ`, `EmergencyArmi
 
 ### 6.2 Câblage de l'instance (Outputs)
 
-| Élément | Emplacement |
+| Élément | Emplacement / Câblage |
 |---|---|
-| Instance | `PRG_06_Outputs.instSafetyEmergencyManagement` |
-| Agrégation PowerCutOff | Bus `ST_Safety_PowerCutOffRequest` depuis Safety |
-| Publication Q | Juste après l'appel FB dans `PRG_06_Outputs` |
+| Instance FB AU | `PRG_06_Outputs.instSafetyEmergencyManagement` |
+| Bypass Ingénierie MES | `GVL_BypassRetain.BypassAuArmingPreconditions` et `GVL_BypassRetain.BypassAuRedundancyTest` |
+| Protections Contacteurs | `instArmContactorProtector` (5 s), `instKeepAliveAProtector` (100 ms), `instKeepAliveBProtector` (100 ms) |
+| Agrégation PowerCutOff | `PowerCutOffReq := PRG_04... OR PRG_05...` |
+| Publication Q physiques | `PowerKeepAlive_A_RQ`, `PowerKeepAlive_B_RQ`, `EmergencyArming_RQ` filtrées par les protectors |
 | Portail mouvement | `PowerContactorEngaged` (**lu** par le FB, pas produit par lui) |
 
 Conformité AF02 : AU en **chaîne sortie**, pas de page AU orpheline.
@@ -597,22 +586,14 @@ un **autotest de cohérence** avant d'autoriser toute séquence de réarmement :
 
 | Étape | Vérification | Comportement si échec |
 |---|---|---|
-| 1 | `EmergencyChainClosed = TRUE` (boucle AU fermée) | Bloque toute séquence ; `ErrorId` bit0 si boucle ouverte sans demande |
+| 1 | `EmergencyChainClosed = TRUE` (boucle AU fermée) | Bloque toute séquence ; `StartupFail := TRUE` (bit3 `Fault`) |
 | 2 | `PowerContactorEngaged = FALSE` (contacteur au repos) | Bloque ; contacteur déjà engagé = anomalie câblage/retour |
 | 3 | Pas de séquence en cours (`ArmingSeqStep = 0`) | Bloque si séquence résiduelle |
 
 Ces vérifications sont **synchrones, déterministes, non bloquantes** (1 cycle). Si tout est OK,
 le FB passe en `Ready=TRUE` et attend un front `ArmRequest`.
 
-> ⚠️ **Retiré (2026-08-22)** : une étape "`PowerKeepAlive_A = TRUE` ET `PowerKeepAlive_B = TRUE`"
-> figurait ici. Retirée car incohérente à double titre : (1) au premier cycle après boot, les
-> sorties de maintien sont **forcément** au repos (fail-safe) — le contrôle échouerait
-> systématiquement par construction, sans rapport avec un défaut réel ; (2) `PowerKeepAlive_A/B`
-> ne sont pas des retours matériels mais les **propres sorties calculées** par ce FB
-> (`Cmd.MaintainA/B_Cmd`) — les vérifier reviendrait à comparer le FB avec lui-même, pas à
-> constater un état physique. La vérification réelle de la redondance des canaux existe déjà et
-> est correcte : c'est l'autotest dynamique §4.3bis (steps 1-4, `TC-P01-002/003/006`), qui coupe
-> **réellement** chaque canal et observe la réaction de `EmergencyChainClosed`.
+> 🛠️ **Note Bypass MES** : Sous `BypassRedundancyTest`, le premier `ArmRequest` de l'opérateur saute l'auto-test dynamique A/B (`TEST_A`..`RESTORE_B`) et applique directement le maintien puis l'impulsion de collage. Sous `BypassArmingPreconditions`, le réarmement aboutit même sans retour matériel contacteur.
 
 ---
 
@@ -625,10 +606,7 @@ le FB passe en `Ready=TRUE` et attend un front `ArmRequest`.
 | Sortie logique interne | `MaintainA/B_Cmd` (ex-`PowerCutOff_A/B_Cmd`) | **Maintien** fail-safe (TRUE = maintien sain) |
 | Q physique device | `PowerKeepAlive_A/B_RQ` | **Maintien** (TRUE = relais excité) — nom matériel clair |
 
-Cohérence rétablie : `Maintain*` porte la polarité réelle (maintien), `PowerKeepAlive_*_RQ`
-reste le nom matériel historique (identique).
-
-### Commandes (`ST_ModesCmd`)
+### Commandes (`ST_ModesCmd` / `GVL_IHM.Emergency.Cmd`)
 
 | Champ | Usage |
 |---|---|
@@ -636,21 +614,53 @@ reste le nom matériel historique (identique).
 | `BtnEmergencyCutOff` | → `BtnEmergencyCutOff` (niveau) — **commande IHM** (arrêt à distance), **pas** un bouton hardware ; les boutons hardware sont sur la chaîne AU physique (entrées `EmergencyChainClosed_DI`) |
 | `BtnFaultReset` | → chaîne `FaultMachineReset_IHM` → `Reset` (avec autres défauts métier) |
 
-### États déclarés (`ST_ModesState`) — contrat attendu
+### États déclarés (`ST_ModesState` / `ST_Safety_Emergency_State` / `ST_Safety_Emergency_Diag`)
 
-| Champ | Source attendue |
-|---|---|
-| `PowerContactorEngaged` | `Acquisition` (mappé) |
-| `EmergencyChainOk` | `Acquisition.EmergencyChainClosed` |
-| `PowerContactorOk` | miroir contacteur |
-| `PowerCutOffActive` | OR safety domaines (polarité alarme) |
-| `EmergencyArmable` | chain OK ∧ step0 ∧ ¬lockout ∧ ¬RedundancyFail ∧ ¬PowerContactorEngaged |
-| `EmergencyArmingBusy` | Busy ∨ lockout |
-| `RedundancyTestFailed` | sortie FB |
-| `EmergencyArmingFailed` | sortie FB |
+| Champ | Source attendue | Rôle |
+|---|---|---|
+| `PowerContactorEngaged` | `Acquisition.PowerContactorEngaged` | Contacteur puissance engagé |
+| `EmergencyChainOk` | `Acquisition.EmergencyChainClosed` | Boucle matérielle fermée |
+| `PowerContactorOk` | miroir contacteur | Maintien contacteur OK |
+| `PowerCutOffActive` | OR safety domaines | Demande de coupure active |
+| `EmergencyArmable` | `Status.State.Armable` | Réarmement possible maintenant (`NOT ArmPulseInhibitActive`, etc.) |
+| `EmergencyArmingBusy` | `Status.State.ArmingBusy` | Séquence ou lockout en cours |
+| `WasArmed` | `Status.Diag.WasArmed` | AU armée au moins une fois ; maintien chaîne à travers appui AU |
+| `RedundancyTestFailed` | `Status.Diag.RedundancyTestFailed` | Défaut voie collée à l'auto-test |
+| `EmergencyArmingFailed` | `Status.Diag.ArmFailed` | Échec réarmement (timeout contacteur 2 s) |
 
-**✅ État 2026-07-30** : les 7 champs manquants de `ST_ModesState` sont désormais alimentés
-depuis `ST_Safety_Emergency_State`/`ST_Safety_Emergency_Diag` (via `PRG_07_Supervision`). Écart résolu.
+### 💬 Messages Opérateur (`Status.OperatorMessage`)
+
+Le FB publie un message textuel explicite (`STRING(120)`) priorisé selon la gravité :
+1. **Bypass Ingénierie MES actif** (Priorité haute) :
+   `'AU: BYPASS INGENIERIE MES ACTIF - controles/auto-test desactives - NON SECURISE'`
+2. **Défauts / Autotest démarrage** :
+   - `StartupFail` ➔ `'AU: autotest demarrage echoue - verifier boucle/contacteur puis Reset'`
+   - `RedundancyTestFailed` ➔ `'AU: defaut redondance contacteurs - verifier puis Reset'`
+   - `EmergencyArmingFailed` ➔ Message court décodé sur `LastAbortCause` :
+     - `CST_ABORT_TIMEOUT_CONTACTOR` (128) ➔ `'AU echec: contacteur non confirme'`
+     - `CST_ABORT_REDUNDANCY_A` (32) ➔ `'AU echec: voie A collee'`
+     - `CST_ABORT_REDUNDANCY_B` (64) ➔ `'AU echec: voie B collee'`
+     - `CST_ABORT_TIMEOUT_RESTORE_A` (4) ➔ `'AU echec: chaine non refermee (voie A)'`
+     - `CST_ABORT_TIMEOUT_RESTORE_B` (8) ➔ `'AU echec: chaine non refermee (voie B)'`
+     - `CST_ABORT_CHAIN_DROP` (2) ➔ `'AU echec: chaine ouverte pendant pulse'`
+     - `CST_ABORT_POWER_CUTOFF` (16) ➔ `'AU echec: coupure metier en sequence'`
+     - `CST_ABORT_CUT_IHM` (1) ➔ `'AU echec: coupure IHM en sequence'`
+     - `CST_ABORT_INVALID_STEP` (256) ➔ `'AU echec: etape invalide - Reset'`
+3. **Coupures actives / Attente** :
+   - `PowerCutOffRequest` ➔ `'AU: coupure securite metier active - lever la cause puis rearmer'`
+   - `BtnEmergencyCutOff` ➔ `'AU: coupure urgence IHM active - relacher puis rearmer'`
+   - `NOT EmergencyChainClosed` ➔ `'AU: boucle urgence ouverte - verifier coup-de-poing'`
+   - `EmergencyArmingLockoutActive` ➔ `'AU: verrouillage 5s actif - attendre puis rearmer'`
+4. **Déroulement de séquence** :
+   - Step 0 IDLE + `ArmPulseInhibitActive` ➔ `'AU: temporisation 5s en cours - patienter'`
+   - Step 0 IDLE + `PreArmDelayActive` ➔ `'AU: appui pris en compte - etablissement chaine'`
+   - Step 0 IDLE nominal ➔ `'AU: repos - pret a rearmer'`
+   - Step 1 `TEST_A` ➔ `'AU: autotest canal A en cours'`
+   - Step 2 `RESTORE_A` ➔ `'AU: restauration canal A'`
+   - Step 3 `TEST_B` ➔ `'AU: autotest canal B en cours'`
+   - Step 4 `RESTORE_B` ➔ `'AU: restauration canal B'`
+   - Step 5 `PULSE` ➔ `'AU: impulsion rearmement contacteur'`
+   - Step 6 `CONFIRM` ➔ `'AU: attente confirmation contacteur'`
 
 ---
 
@@ -692,7 +702,7 @@ Alignement AF02/AF03 + synthèse 5 bus. **À valider avant implémentation.**
 | `ST_Safety_PowerCutOffRequest` | Safety (`PRG_04`/`PRG_05`) | `Request : BOOL`, optionnel masque sources | `PRG_06_Outputs` → `PowerCutOffRequest` |
 | `ST_HwMachine` (sous-image de `ST_HardwareImage`) | Acquisition | DI chain + contactor déjà dans `ST_HwMachine` | FB via Acquisition qualifiée |
 | `ST_Safety_Emergency_State` | Outputs / composite | Step, Busy, Armable, ChainOk, ContactorOk | Supervision, troubleshooting |
-| `ST_Safety_Emergency_Diag` | Outputs / composite | Error, ErrorId, RedundancyFail, ArmingFail, Lockout | Supervision, IHM State |
+| `ST_Safety_Emergency_Diag` | Outputs / composite | Error, ErrorId, RedundancyFail, ArmingFail, WasArmed, Lockout | Supervision, IHM State |
 
 ### 9.3 Lots d'implémentation — état courant
 
@@ -731,6 +741,7 @@ Les résultats d'exécution restent hors AF (scripts / checklists / registres).
 
 | Version | Date | Changement |
 |---|---|---|
+| v1.3 | 2026-09-02 | Mise à jour intégrale selon code réel ST (commits `0f08a0ad`, `6892bb31`, `b56d0844`) : ajout des entrées `BypassArmingPreconditions` / `BypassRedundancyTest` (MES uniquement) ; formule `Armable` sans `EmergencyChainClosed` + inclusion de `NOT ArmPulseInhibitActive` ; latch `WasArmed` pour maintien `PowerKeepAlive` à travers coup-de-poing physique pur ; délai pré-armement 500 ms (`CST_PreArmDelay`) ; révision des timings étapes (`CST_TestDuration = 1s`, `CST_RestoreSettle = 500ms`, `CST_KeepAliveHold = 1s`) ; gardes anti-chatter `FB_ContactorProtector` dans PRG_06 ; fix `ArmPulse_Cmd` non gaté par la garde 5s interne ; messages opérateur enrichis. |
 | v1.2 | 2026-08-25 | Mise en conformité `GUIDE_EDITION_AF_v1.0` : composition POO §1 et chaîne d'appels §6.1 en Mermaid `flowchart TD` stylisés avec `linkStyle` (remplacent le schéma HTML/SVG et le diagramme ASCII), chronogramme texte ajouté pour le réarmement nominal (§4.3), lien AF01 repointé v2.1, section « 7 · IHM et diagnostics » dédoublonnée, table de points de validation déplacée en §2 (juste après §1) avec numérotation complète des sections, liste de fichiers code dédupliquée |
 | v1.1 | — | Version précédente (voir `ARCHIVES/Doc/`) |
 
@@ -748,16 +759,12 @@ Les résultats d'exécution restent hors AF (scripts / checklists / registres).
 Fichiers code de référence :
 
 - `CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st` (FB fusionné)
-- `ARCHIVES/Code/AU/FB_Safety_EmergencyManagementLogic_v2.1_OLD.st` (archivé, fusionné)
-- `ARCHIVES/Code/AU/FB_Safety_EmergencyManagementOutput_v2.1_OLD.st` (archivé, fusionné)
+- `CODE/A_COMMUN/FB_ContactorProtector.st` (garde anti-chatter contacteurs)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Status.st` (DUT état/diagnostic)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Cmd.st` (DUT commandes de pilotage)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st` (bus état public)
 - `CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st` (bus diagnostic)
-- `ARCHIVES/Code/SUPERVISION/ST_Safety_Emergency_HmiCmd.st` (bus commande IHM, test archivé T99)
-- `ARCHIVES/Code/SUPERVISION/ST_Safety_Emergency_HmiState.st` (bus état IHM, test archivé T99)
-- `ARCHIVES/Code/SUPERVISION/GVL_IHM_AU.st` (interface IHM archivée T99)
+- `CODE/B_AU_SECURITE/GVL_Safety_Emergency.st` (constantes étapes CST_STEP_* et causes CST_ABORT_*)
 - `CODE/M_MAIN/PRG_02_Acquisition.st` (ST pur)
-- `CODE/M_MAIN/PRG_06_Outputs.st` (sorties)
-- `ARCHIVES/Code/TESTS/PRG_AU_TestBench.st` (banc de test manuel, archivé 2026-08-01 — voir `DOC/WFLOW/TASKS.yaml`)
+- `CODE/M_MAIN/PRG_06_Outputs.st` (sorties et protecteurs)
 - `CODE/L_SIMULATION/FB_Sim_Safety.st`

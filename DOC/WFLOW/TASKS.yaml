@@ -4875,3 +4875,57 @@ tasks:
   - "Bundle frais + G200 PASS + gates PASS + compilation 0 avertissement"
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T220_ENRICHIR_BANDEAU.yaml
   bloque_par: []
+- id: T222
+  parent_id: ''
+  statut: ⏳
+  criticite: C4
+  domaine: JOYSTICK / SÉCURITÉ MOUVEMENT
+  agent: 'CDX (exécution) — décisions A/C/D/B tranchées orchestrateur ; revues nommage + qualité obligatoires avant validation'
+  date: '2026-09-02T11:35:00+02:00'
+  locked_at: '2026-09-02T12:05:00+02:00'
+  titre: Désarmement joystick sur inversion inter-scan sans neutre observé
+  contexte: >
+    Retour terrain : à vitesse de manipulation élevée, les axes Hall peuvent
+    être lus directement dans le signe opposé au scan suivant sans qu'aucun
+    scan n'observe le centre. NeutralHoldTime ne détecte pas cette traversée.
+  description: >
+    Détecter toute transition qualifiée +1↔-1 de l'axe X ou Y entre deux scans
+    lorsque le geste est armé. Désarmer le geste dans le scan d'inversion,
+    forcer les deux commandes joystick à 0 %, interdire le réarmement tant que
+    X et Y n'ont pas été observés simultanément au neutre, puis exiger un nouveau
+    front homme-mort maintenu. ArmingPermit, SafeStop et PowerCutOff restent
+    hors de cette logique : le résultat est un arrêt normal par rampe.
+  objectifs:
+  - Détecter le saut +1↔-1 inter-scan sans échantillon neutre sur X ou Y
+  - Désarmer DeadmanArmed et publier 0 % / StartStop FALSE / Direction 0 sur les deux axes au scan fautif
+  - Exiger AtNeutralXY puis un nouveau front RawButton avant tout réarmement
+  - Préserver ArmingPermit et les chaînes SafeStop/PowerCutOff
+  - Ajouter les tests CI du fix et un garde-fou contre la régression
+  - Mettre à jour AF08 et valider bundle, G200 et gates
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T222_JOYSTICK_INVERSION_NEUTRE.yaml
+  bloque_par: []
+- id: T223
+  parent_id: ''
+  statut: ⏳
+  criticite: C4
+  domaine: JOYSTICK / COMMANDE VITESSE
+  agent: Codex
+  date: '2026-09-02T12:45:00+02:00'
+  locked_at: '2026-09-02T12:45:00+02:00'
+  titre: Liaison table paliers centrale vers configuration effective joystick
+  contexte: >
+    Diagnostic terrain : deflexion joystick Y a -96 % mais palier demande 1.
+    La table _WinchSpeedStepTable est pleine tandis que la table portee dans
+    _JoystickCfgPersist et recue par instJoystick est vide.
+  description: >
+    Deriver localement la configuration effective de l'instance joystick :
+    conserver les reglages joystick persistants et injecter uniquement la table
+    centrale persistante des paliers treuil. Aucun ecrivain supplementaire dans
+    GVL_PERSISTENT, aucune modification de FB_Joystick.
+  objectifs:
+  - InstJoystick recoit la table centrale des paliers
+  - Aucun ecrasement cyclique de la persistance
+  - Test de la liaison et garde-fou automatique
+  - Non-regression arming, safety et sorties
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T223_JOYSTICK_SPEEDSTEP_TABLE_LINK.yaml
+  bloque_par: []

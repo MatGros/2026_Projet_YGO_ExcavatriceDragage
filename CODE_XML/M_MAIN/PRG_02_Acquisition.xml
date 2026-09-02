@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T22:06:46.279819" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T22:06:46.279819">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T10:55:31.715778" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T10:55:31.715778">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -234,6 +234,117 @@
       câblé à FALSE tant qu'aucun bit n'est identifié (aucun signal absent
       ne confirme implicitement le preset).
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_fbJoystick_Cfg">
+        <baseType>
+          <struct>
+            <variable name="DeadbandRaw">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="300" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Zone morte en points ADC bruts (0..10000)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien continu au neutre avant désarmement homme-mort</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmHoldTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Appui continu bouton requis pour armer le geste</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeadmanArmGraceTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#3S" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai de grâce post-armement avant désarmement neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawOutOfRangeMargin">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="500" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les initialiseurs imbriqués de STRUCT (notamment les ARRAY) ne sont pas
+acceptés par STruCpp/CODESYS dans une déclaration de type. La table est
+fournie par la configuration persistante de l'appelant.
+🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepHystMargin">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge d'hystérésis palier (%) autour des seuils (anti-oscillation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (interne pont FB_CfgPersistBridge_fbJoystick_Cfg)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>15265f47-4d56-5d85-af5c-415e86b1194e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ⚙️ ST_fbJoystick_Cfg — Réglages regroupés de FB_Joystick
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : porter en un bloc les 5 paramètres de conditionnement du geste
+      (zone morte, temporisations homme-mort, marge défaut capteur).
+      Passé à FB_Joystick via l'entrée `Cfg` — échange bloc IHM / persistant.
+   🧬 Pattern cfg : aligné sur ST_CycleCfg / ST_WinchCfg (préfixe ST_&lt;Domaine&gt;Cfg,
+      instance persistante dans GVL_PERSISTENT, pont FB_CfgPersistBridge_* à venir).
+   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (§5bis)
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -879,117 +990,6 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
    📤 Champs : Enable, StartStop, SpeedTgt (%) + StepTgt (palier 1..5) + direction en bits
                (DirectionPositive/Negative, AtNeutral). SpeedTgt reste pour l'IHM, StepTgt pour la logique.
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
-   =======================================================================</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_fbJoystick_Cfg">
-        <baseType>
-          <struct>
-            <variable name="DeadbandRaw">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="300" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Zone morte en points ADC bruts (0..10000)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="NeutralHoldTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#100MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Maintien continu au neutre avant désarmement homme-mort</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeadmanArmHoldTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#100MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Appui continu bouton requis pour armer le geste</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DeadmanArmGraceTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#3S" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Délai de grâce post-armement avant désarmement neutre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawOutOfRangeMargin">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="500" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge ADC autour des bornes [0..10000] avant défaut capteur (AF08 §5bis)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepTable">
-              <type>
-                <derived name="ST_SpeedStepTable" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Les initialiseurs imbriqués de STRUCT (notamment les ARRAY) ne sont pas
-acceptés par STruCpp/CODESYS dans une déclaration de type. La table est
-fournie par la configuration persistante de l'appelant.
-🪜 Table seuils % -&gt; palier (conversion au joystick, logique FB_Winch §5)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SpeedStepHystMargin">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Marge d'hystérésis palier (%) autour des seuils (anti-oscillation)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Flag restauration boot (interne pont FB_CfgPersistBridge_fbJoystick_Cfg)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>15265f47-4d56-5d85-af5c-415e86b1194e</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ ST_fbJoystick_Cfg — Réglages regroupés de FB_Joystick
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : porter en un bloc les 5 paramètres de conditionnement du geste
-      (zone morte, temporisations homme-mort, marge défaut capteur).
-      Passé à FB_Joystick via l'entrée `Cfg` — échange bloc IHM / persistant.
-   🧬 Pattern cfg : aligné sur ST_CycleCfg / ST_WinchCfg (préfixe ST_&lt;Domaine&gt;Cfg,
-      instance persistante dans GVL_PERSISTENT, pont FB_CfgPersistBridge_* à venir).
-   📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (§5bis)
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -2165,115 +2165,6 @@ fournie par la configuration persistante de l'appelant.
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="E_Diag_State">
-        <baseType>
-          <enum>
-            <values>
-              <value name="DISABLED" value="0" />
-              <value name="READY" value="1" />
-              <value name="INIT" value="2" />
-              <value name="MONITORING" value="3" />
-              <value name="ERROR" value="4" />
-              <value name="SIMULATED" value="5" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>DISABLED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désactivé (surveillance non active)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Opérationnel réel, pas de défaut</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>INIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisation / Recherche de réseau</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MONITORING</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Surveillance active (états transitoires)</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>ERROR</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Anomalie de communication</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SIMULATED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simulation ou bypass réseau IHM — pas le bus réel</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>e56e22b9-6e46-55bd-973d-b226ca7d1e70</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_PresetConfirmMode">
-        <baseType>
-          <enum>
-            <values>
-              <value name="READBACK_ONLY" value="0" />
-              <value name="READBACK_AND_STATUSBIT" value="1" />
-              <value name="STATUSBIT_ONLY" value="2" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>READBACK_ONLY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation par relecture de position</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READBACK_AND_STATUSBIT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Relecture et bit d'état matériel</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>STATUSBIT_ONLY</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit d'état matériel uniquement</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>57a2dfc8-cdc9-581a-8092-09f21d5e6939</ObjectId>
-          </data>
-        </addData>
-      </dataType>
       <dataType name="ST_SpeedStepTable">
         <baseType>
           <struct>
@@ -2472,6 +2363,115 @@ Seuils de changement de palier (0..100%)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="E_Diag_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="READY" value="1" />
+              <value name="INIT" value="2" />
+              <value name="MONITORING" value="3" />
+              <value name="ERROR" value="4" />
+              <value name="SIMULATED" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désactivé (surveillance non active)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Opérationnel réel, pas de défaut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisation / Recherche de réseau</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MONITORING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Surveillance active (états transitoires)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Anomalie de communication</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SIMULATED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simulation ou bypass réseau IHM — pas le bus réel</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e56e22b9-6e46-55bd-973d-b226ca7d1e70</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_PresetConfirmMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="READBACK_ONLY" value="0" />
+              <value name="READBACK_AND_STATUSBIT" value="1" />
+              <value name="STATUSBIT_ONLY" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>READBACK_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation par relecture de position</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READBACK_AND_STATUSBIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Relecture et bit d'état matériel</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>STATUSBIT_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bit d'état matériel uniquement</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>57a2dfc8-cdc9-581a-8092-09f21d5e6939</ObjectId>
+          </data>
+        </addData>
+      </dataType>
     </dataTypes>
     <pous>
       <pou name="PRG_02_Acquisition" pouType="program">
@@ -2650,6 +2650,14 @@ Seuils de changement de palier (0..100%)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible M2 calculee depuis la position M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickCfgEffective">
+              <type>
+                <derived name="ST_fbJoystick_Cfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Reglages joystick avec table de paliers centrale</xhtml>
               </documentation>
             </variable>
             <variable name="WinchInputSourceSimulated">
@@ -3103,6 +3111,11 @@ HwIn.Machine     := SEL(MachineInputSourceSimulated, HwReal.Machine, HwSim.Machi
 {region "§3 Traitement joystick"}
 // === 🕹️ §3 TRAITEMENT JOYSTICK ===
 
+// La table des paliers est une source unique commune M1/M2. Les autres
+// reglages restent ceux propres au joystick et a son pont IHM/persistant.
+JoystickCfgEffective := GVL_PERSISTENT._JoystickCfgPersist;
+JoystickCfgEffective.SpeedStepTable := GVL_PERSISTENT._WinchSpeedStepTable;
+
 instJoystick(
     Enable                    := TRUE,
     Reset                     := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -3116,7 +3129,7 @@ instJoystick(
     RawY                      := HwIn.Operator.JoyYRaw_ANA2,
     RawButton                 := HwIn.Operator.JoyBtnRaw,
     Calibrate                 := GVL_IHM.JOY1Joystick.Cmd.Calibrate,
-    Cfg                       := GVL_PERSISTENT._JoystickCfgPersist,
+    Cfg                       := JoystickCfgEffective,
     NeutralXMem               := _JoystickNeutralX,
     NeutralYMem               := _JoystickNeutralY
 );
@@ -4679,6 +4692,28 @@ Ready := Enable AND NOT Fault.Latched;
             </variable>
           </inOutVars>
           <localVars>
+            <variable name="CST_DirectionQualificationThreshold_Pct">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil % : axe actif (StartStop / bits sens / palier 0)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_InversionFlipThreshold_Pct">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="10" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil % : sens RETENU pour la détection d'inversion inter-scan.</xhtml>
+              </documentation>
+            </variable>
             <variable name="ScaleX">
               <type>
                 <derived name="FB_AxisScale" />
@@ -4702,6 +4737,14 @@ Ready := Enable AND NOT Fault.Latched;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Detecteur front montant bouton homme-mort</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralXYEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Front retour simultane X+Y au neutre (libere verrou inversion)</xhtml>
               </documentation>
             </variable>
             <variable name="NeutralHoldTimer">
@@ -4799,6 +4842,62 @@ Ready := Enable AND NOT Fault.Latched;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Armement en cours d'attente de la temporisation maintien</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InversionLockActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Verrou retour neutre apres inversion inter-scan directe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevDirX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Sens X qualifie au scan precedent (-1, 0, +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PrevDirY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Sens Y qualifie au scan precedent (-1, 0, +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirX">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Sens X qualifie au scan courant (-1, 0, +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DirY">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Sens Y qualifie au scan courant (-1, 0, +1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FlipX">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Inversion X directe sans echantillon neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FlipY">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Inversion Y directe sans echantillon neutre</xhtml>
               </documentation>
             </variable>
             <variable name="RawOutOfRange">
@@ -4924,7 +5023,11 @@ IF NOT Enable OR BusLost THEN
     AtNeutralXY := TRUE;
     DeadmanArmed := FALSE;
     DeadmanArmPending := FALSE;
+    InversionLockActive := FALSE;
+    PrevDirX := 0;
+    PrevDirY := 0;
     ArmingPermitDenied := FALSE;
+    NeutralXYEdge(CLK := FALSE);
     NeutralHoldTimer(IN := FALSE, PT := Cfg.NeutralHoldTime);
     DeadmanArmTimer(IN := FALSE, PT := Cfg.DeadmanArmHoldTime);
     DeadmanArmGraceTimer(IN := FALSE, PT := Cfg.DeadmanArmGraceTime);
@@ -4942,13 +5045,48 @@ AtNeutralXY := (ScaleX.OutPct = 0.0) AND (ScaleY.OutPct = 0.0);   // les 2 axes 
 {endregion}
 
 {region "§4 Armement homme mort"}
+// 🔀 Inversion inter-scan : le sens n'est RETENU que si la déflexion dépasse
+// CST_InversionFlipThreshold_Pct (&gt;&gt; bruit Hall / bord de deadband). Un aller-retour
+// +1&lt;-&gt;-1 sans échantillon 0 pose le verrou. Levé exclusivement au front AtNeutralXY.
+// RawOutOfRange : lecture capteur non fiable -&gt; aucun sens retenu (le geste est déjà forcé à 0
+// par le SEL du pipeline). Une reprise capteur-défaut -&gt; valide ne compte donc pas comme flip.
+DirX := 0;
+DirY := 0;
+IF NOT RawOutOfRange THEN
+    IF ScaleX.OutPct &gt; CST_InversionFlipThreshold_Pct THEN
+        DirX := 1;
+    ELSIF ScaleX.OutPct &lt; -CST_InversionFlipThreshold_Pct THEN
+        DirX := -1;
+    END_IF;
+    IF ScaleY.OutPct &gt; CST_InversionFlipThreshold_Pct THEN
+        DirY := 1;
+    ELSIF ScaleY.OutPct &lt; -CST_InversionFlipThreshold_Pct THEN
+        DirY := -1;
+    END_IF;
+END_IF;
+FlipX := ((PrevDirX = 1) AND (DirX = -1)) OR ((PrevDirX = -1) AND (DirX = 1));
+FlipY := ((PrevDirY = 1) AND (DirY = -1)) OR ((PrevDirY = -1) AND (DirY = 1));
+
+NeutralXYEdge(CLK := AtNeutralXY);
+IF NeutralXYEdge.Q THEN
+    InversionLockActive := FALSE;
+END_IF;
+
+IF FlipX OR FlipY THEN
+    InversionLockActive := TRUE;
+    DeadmanArmed := FALSE;
+    DeadmanArmPending := FALSE;
+END_IF;
+
 // Bouton homme-mort : armement par MAINTIEN (Cfg.DeadmanArmHoldTime), independant de la position.
+// ⚠️ Un appui PENDANT le verrou d'inversion n'arme PAS de demande : le nouveau front conscient
+//    doit survenir APRÈS le retour au neutre (sinon on "pré-charge" le réarmement stick inversé).
 DeadmanEdge(CLK := RawButton);
-IF DeadmanEdge.Q THEN DeadmanArmPending := TRUE; END_IF;
+IF DeadmanEdge.Q AND NOT InversionLockActive THEN DeadmanArmPending := TRUE; END_IF;
 IF NOT RawButton THEN DeadmanArmPending := FALSE; END_IF;
 
 // Securite : armage UNIQUEMENT si DeadmanArmPending ET ArmingPermit.
-DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit, PT := Cfg.DeadmanArmHoldTime);
+DeadmanArmTimer(IN := DeadmanArmPending AND NOT DeadmanArmed AND ArmingPermit AND NOT InversionLockActive, PT := Cfg.DeadmanArmHoldTime);
 IF DeadmanArmTimer.Q THEN
     DeadmanArmed := TRUE;
     DeadmanArmPending := FALSE;
@@ -4975,10 +5113,10 @@ CmdXVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleX.OutPct);
 
 AxisCmdX.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdX.SpeedTgt := ABS(CmdXVal);   // NON signee (le sens = bits DirectionPositive/Negative + AxisCmdX.Direction)
-AxisCmdX.StartStop := (ABS(CmdXVal) &gt; 0.1);
+AxisCmdX.StartStop := (ABS(CmdXVal) &gt; CST_DirectionQualificationThreshold_Pct);
 
-AxisCmdX.DirectionPositive := (CmdXVal &gt; 0.1);
-AxisCmdX.DirectionNegative := (CmdXVal &lt; -0.1);
+AxisCmdX.DirectionPositive := (CmdXVal &gt; CST_DirectionQualificationThreshold_Pct);
+AxisCmdX.DirectionNegative := (CmdXVal &lt; -CST_DirectionQualificationThreshold_Pct);
 AxisCmdX.AtNeutral := NOT AxisCmdX.DirectionPositive AND NOT AxisCmdX.DirectionNegative;
 IF AxisCmdX.AtNeutral THEN AxisCmdX.SpeedTgt := 0.0; END_IF;
 
@@ -4994,10 +5132,10 @@ CmdYVal := SEL(DeadmanArmed AND NOT RawOutOfRange, 0.0, ScaleY.OutPct);
 
 AxisCmdY.Enable := NOT RawOutOfRange AND ArmingPermit;
 AxisCmdY.SpeedTgt := ABS(CmdYVal);   // NON signee (le sens = bits DirectionPositive/Negative + AxisCmdY.Direction)
-AxisCmdY.StartStop := (ABS(CmdYVal) &gt; 0.1);
+AxisCmdY.StartStop := (ABS(CmdYVal) &gt; CST_DirectionQualificationThreshold_Pct);
 
-AxisCmdY.DirectionPositive := (CmdYVal &gt; 0.1);
-AxisCmdY.DirectionNegative := (CmdYVal &lt; -0.1);
+AxisCmdY.DirectionPositive := (CmdYVal &gt; CST_DirectionQualificationThreshold_Pct);
+AxisCmdY.DirectionNegative := (CmdYVal &lt; -CST_DirectionQualificationThreshold_Pct);
 AxisCmdY.AtNeutral := NOT AxisCmdY.DirectionPositive AND NOT AxisCmdY.DirectionNegative;
 IF AxisCmdY.AtNeutral THEN AxisCmdY.SpeedTgt := 0.0; END_IF;
 
@@ -5010,7 +5148,7 @@ SpeedStepHyst4(IN := REAL_TO_INT(AxisCmdY.SpeedTgt), HIGH := REAL_TO_INT(Cfg.Spe
 
 // Algorithme ASCENDANT : OUT=TRUE quand IN&gt;HIGH (au-dessus du seuil) → palier supérieur.
 // Petite déflexion → palier bas ; grande déflexion → palier haut (borne haute du palier).
-IF AxisCmdY.SpeedTgt &lt;= 0.1 THEN
+IF AxisCmdY.SpeedTgt &lt;= CST_DirectionQualificationThreshold_Pct THEN
     AxisCmdY.StepTgt := 0;
 ELSE
     AxisCmdY.StepTgt := 1;
@@ -5025,6 +5163,10 @@ IF AxisCmdY.DirectionPositive THEN AxisCmdY.Direction := 1;
 ELSIF AxisCmdY.DirectionNegative THEN AxisCmdY.Direction := -1;
 ELSE AxisCmdY.Direction := 0; END_IF;
 AxisCmdY.Deflection := REAL_TO_INT(CmdYVal);   // deflexion signee -100..+100 % (anim IHM)
+
+// Memorisation apres traitement : l'inversion suivante compare deux scans qualifies successifs.
+PrevDirX := DirX;
+PrevDirY := DirY;
 
 // Miroirs point neutre courant
 NeutralXAct := NeutralXMem;
@@ -10522,9 +10664,9 @@ TimeLast := TimeCurrent;
         </Folder>
         <Folder Name="D_JOYSTICK">
           <Object Name="FB_Joystick" ObjectId="a4d06470-35ad-55a9-9871-fdd3a74327dd" />
+          <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />
           <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />
           <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
-          <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />
         </Folder>
         <Folder Name="G_CYCLE">
           <Object Name="FB_MachineHomingCycle" ObjectId="107b39d9-e311-549c-ac0a-91b020a05df9" />

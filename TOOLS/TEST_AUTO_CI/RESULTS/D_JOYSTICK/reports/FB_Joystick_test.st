@@ -426,6 +426,16 @@ TEST 'TC-P08-007 SpeedRef sature a +/-100 meme avec RawX/RawY hors plage nominal
     ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 100.0, 0.01, 'meme comportement sur l axe Y');
     ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'Direction coherente avec le signe de la consigne');
 
+    (* Passage au neutre AVANT l inversion : un stick a ressort ne saute pas +100 -> -100 en un
+       scan (physiquement impossible). Sans ce scan neutre, le verrou T222 d inversion se declenche
+       (comportement voulu, cf. TC-P08-070). Ici on teste la mise a l echelle, pas l inversion. *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg,
+       NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+
     (* RawX/RawY au minimum nominal (0) : saturation -100 *)
     ADVANCE_TIME(10000000);
     fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
@@ -749,6 +759,15 @@ TEST 'TC-P08-010.3 Saturation stricte : RawIn=10000->+100, RawIn=0->-100, jamais
        CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 100.0, 0.01, 'RawX=10000 : saturation +100');
     ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'sens avant');
+
+    (* Scan neutre entre les deux saturations opposees : un stick a ressort passe par le centre.
+       Sans ce scan, le verrou T222 d inversion se declenche (cf. TC-P08-070). Ici on teste
+       la saturation d echelle, pas l inversion inter-scan. *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE,
+       BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
+       CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
 
     (* RawX=0 -> -100 (saturation basse) *)
     ADVANCE_TIME(10000000);
@@ -1112,4 +1131,111 @@ TEST 'TC-P08-060 Armement refuse : ArmingPermitDenied=TRUE pendant appui bouton 
        RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE,
        CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
     ASSERT_FALSE(fb.ARMINGPERMITDENIED, 'bouton relache : pas de refus (niveau, pas front)');
+END_TEST
+
+TEST 'TC-P08-070 T222 Inversion X directe : desarme et neutralise les deux axes au scan fautif'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* Front + maintien : geste armé. Puis +X est mémorisé comme sens précédent qualifié. *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'précondition : armement + X qualifié');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 1, 'précondition : X positif');
+
+    (* +X -> -X sans scan neutre : arrêt normal demandé sur les DEUX axes au même scan. *)
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 2000, RAWY := 8000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'AC1 : inversion X désarme dans le scan fautif');
+    ASSERT_FALSE(fb.AXISCMDX.STARTSTOP, 'AC3 : X StartStop=FALSE');
+    ASSERT_FALSE(fb.AXISCMDY.STARTSTOP, 'AC3 : Y StartStop=FALSE');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'AC3 : X SpeedTgt=0');
+    ASSERT_NEAR(fb.AXISCMDY.SPEEDTGT, 0.0, 0.01, 'AC3 : Y SpeedTgt=0');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 0, 'AC3 : X Direction=0');
+    ASSERT_EQ(fb.AXISCMDY.DIRECTION, 0, 'AC3 : Y Direction=0');
+
+    (* Relâchement puis nouvel appui hors neutre : verrou actif, aucun réarmement. *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 2000, RAWY := 8000, RAWBUTTON := FALSE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 2000, RAWY := 8000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 2000, RAWY := 8000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'AC4 : nouvel appui hors neutre ne réarme pas');
+    ASSERT_NEAR(fb.AXISCMDX.SPEEDTGT, 0.0, 0.01, 'AC4 : X reste nul sous verrou');
+
+    (* Seul le retour X+Y simultané libère ; bouton maintenu sans nouveau front reste refusé. *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'AC5 : neutre libère le verrou mais pas sans nouveau front');
+
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'AC5 : nouveau front + maintien réarme après neutre XY');
+END_TEST
+
+TEST 'TC-P08-071 T222 Inversion Y directe et flick pendant grace : verrou meme geste entier'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    (* Armement puis flick immédiat pendant DeadmanArmGraceTime : la grâce ne masque jamais l'inversion. *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 8000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'précondition : armé, X et Y positifs');
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 2000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'AC2/grâce : Y +1->-1 désarme même X maintenu positif');
+    ASSERT_EQ(fb.AXISCMDX.DIRECTION, 0, 'AC2 : X est aussi neutralisé');
+    ASSERT_EQ(fb.AXISCMDY.DIRECTION, 0, 'AC2 : Y est neutralisé');
+END_TEST
+
+TEST 'TC-P08-072 T222 Qualification anti-bruit et non-regression sans inversion'
+    diagOk.ONLINE := TRUE; diagOk.OPERATIONAL := TRUE; diagOk.ERROR := FALSE;
+    diagOk.ERRORID := 0; diagOk.STATE := E_DIAG_STATE.READY; diagOk.STATEATERROR := E_DIAG_STATE.DISABLED;
+    nx := 5000; ny := 5000;
+
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(110000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 8000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ADVANCE_TIME(10000000);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 7000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'AC6 : variation X même sens ne désarme pas');
+
+    (* Sauts autour de la deadband : OutPct reste très sous CST_InversionFlipThreshold_Pct (10 %),
+       aucun sens retenu pour la détection d'inversion -> pas de flip. *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5301, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 4699, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'AC7 : bruit Hall autour du neutre ne crée pas de flip');
+
+    (* Neutre simple et arrêt opérateur existant : ni inversion ni écriture safety publique. *)
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := TRUE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := TRUE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_TRUE(fb.DEADMANARMED, 'AC6 : retour neutre simple ne désarme pas pendant grâce');
+    fb(ENABLE := TRUE, RESET := FALSE, ARMINGPERMIT := FALSE, BUSCANOPENOP := diagOk, JOYSTICKOP := diagOk,
+       RAWX := 5000, RAWY := 5000, RAWBUTTON := FALSE, CALIBRATE := FALSE, CFG := cfg, NEUTRALXMEM := nx, NEUTRALYMEM := ny);
+    ASSERT_FALSE(fb.DEADMANARMED, 'AC6 : arrêt opérateur existant par retrait ArmingPermit conservé');
 END_TEST
