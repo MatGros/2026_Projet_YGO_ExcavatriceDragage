@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-22T23:40:33.231098" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-22T23:40:33.231098">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T06:45:29.175879" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T06:45:29.175879">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -106,6 +106,31 @@
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Bypass Global Commun M1+M2 (GVL_IHM.Commun.Bypass.Global)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassAuArmingPreconditions">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛠️ BYPASS INGENIERIE AU — TRACE mise en service uniquement (jamais IHM, jamais production).
+Observer le vrai timing chaine/contacteur sans le shunt materiel de PowerKeepAlive_A/B_RQ.
+⛔ NON SECURISE tant qu'actif — consommes directement par PRG_06 (instSafetyEmergencyManagement).
+arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassAuRedundancyTest">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute l'auto-test A/B : IDLE -&gt; PULSE</xhtml>
           </documentation>
         </variable>
         <variable name="BypassLimitLegal">

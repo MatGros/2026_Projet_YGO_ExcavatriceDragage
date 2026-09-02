@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T07:23:19.349556" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T07:23:19.349556">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T06:45:42.881938" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T06:45:42.881938">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -457,6 +457,14 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">4. Action attendue : [ORGANE] Action physique &gt; Fin</xhtml>
               </documentation>
             </variable>
+            <variable name="PositionM3Text">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">5. État stable M3 : position utilisateur, hors priorités bandeau</xhtml>
+              </documentation>
+            </variable>
             <variable name="AlarmBanner">
               <type>
                 <derived name="ST_AlarmBanner" />
@@ -477,8 +485,8 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    🖥️ ST_HmiBanner — Bandeau d'information et messages opérateur
    ───────────────────────────────────────────────────────────────
    📄 Doc : DOC/AF/AF_Partie-07_Interface_IHM_v2.3.md §4, §4bis
-   🎯 Responsabilité : regroupe les 4 champs de guidage et contexte
-      IHM à responsabilités disjointes (Macro, Micro, Dérogations, Action).
+   🎯 Responsabilité : regroupe les 4 champs de guidage et contexte, plus
+      un état position M3 dédié, à responsabilités disjointes.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -7249,7 +7257,7 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
             <derived name="ST_HmiBanner" />
           </type>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Bandeau d'information et messages opérateur à 4 champs (AF-07 §4) — OperatorActionText = unique consigne conduite</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Bandeau : 4 champs de conduite + état position M3 dédié (AF-07 §4)</xhtml>
           </documentation>
         </variable>
         <variable name="Network">
