@@ -300,7 +300,8 @@ M2BrakeCmd := M2RelayFwd OR M2RelayRev;
 // FB_SyncContactor : niveau 1 (debounce 500 ms) -> Data.ContactorMismatch -> SafeStop
 // des 2 treuils (PRG_04, scan N+1) ; niveau 2 (persistance CST_SyncEscalationTime) ->
 // Data.ContactorMismatchEscalated -> latch MecaE escalade -> PowerCutOff.
-// Bypass : GVL_IHM.M1M2Sync.Bypass.Global (groupe synchro treuils, pas de nouveau bit).
+// Bypass : groupe synchro treuils OU l'un des 2 bypass groupe treuil (l'operateur
+// qui bypasse un treuil en MES neutralise aussi la concordance).
 instSyncContactorFinal(
     Enable        := TRUE,
     Reset         := PRG_07_Supervision.FaultMachineReset_IHM,
@@ -312,6 +313,8 @@ instSyncContactorFinal(
     Contactor3_M1 := M1SpeedContactor3, Contactor3_M2 := M2SpeedContactor3,
     Contactor4_M1 := M1SpeedContactor4, Contactor4_M2 := M2SpeedContactor4,
     BypassGlobal  := GVL_IHM.M1M2Sync.Bypass.Global
+                     OR GVL_IHM.M1TreuilRetenue.Bypass.Global
+                     OR GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 Data.ContactorMismatch          := instSyncContactorFinal.ContactorMismatch;
 Data.ContactorMismatchEscalated := instSyncContactorFinal.ContactorMismatchEscalated;

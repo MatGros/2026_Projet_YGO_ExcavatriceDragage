@@ -657,6 +657,7 @@ instHmiBannerFormatter(
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
     BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
     SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
+    SyncContactorDiag           := PRG_06_Outputs.Data.SyncContactorDiag,
     DiveErrorId                 := GVL_IHM.CycleDiveSearch.State.DiveErrorId,
     ExtractionErrorId           := GVL_IHM.CycleExtraction.State.ExtractionErrorId,
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
