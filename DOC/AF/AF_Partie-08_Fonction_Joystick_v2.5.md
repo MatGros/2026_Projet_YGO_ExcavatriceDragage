@@ -381,7 +381,7 @@ L'intention de vitesse issue du manche (`SpeedTgt` 0.0 à 100.0 %) est unifiée 
 |---|---|---|---|
 | `Enable` | `BOOL` | Active le bloc | `TRUE` fixe (`PRG_02_Acquisition`) |
 | `Reset` | `BOOL` | Acquittement défaut (front) | `PRG_07_Supervision.FaultMachineReset_IHM` |
-| `ArmingPermit` | `BOOL` | Seule permission d'armement — `FALSE` = armement bloqué + désarme un geste armé | Produit par PRG_04 = base honnête + dispo par axe/sens (T224), voir §10 Q1 |
+| `ArmingPermit` | `BOOL` | Seule permission d'armement — `FALSE` = armement bloqué + désarme un geste armé | Produit par PRG_04 = base honnête + dispo par axe/sens (T224), voir §10 Q1. Passe aussi à `FALSE` tant qu'une **temporisation d'attente de la barrière finale** (anti-court-cycle `RestartRequired`/`RestartDelay` ~1,5 s après chaque arrêt, temps mort directionnel `DeadTimePending`, `RestartInhibit`, contacteur collé) interdit un redémarrage : l'opérateur ne peut pas ré-armer dans cette fenêtre (cohérent avec l'anti-court-cycle imposé par l'interlock). Levé par le bypass groupe du treuil en mise en service. |
 | `BusCanOpenOP` / `JoystickOP` | `ST_Diag_Device` | Présence nœud CAN / device esclave | `FB_Diag_CanOpen` |
 | `RawX` / `RawY` | `INT` | Axe brut (0..10000) | `HwIn.Operator` |
 | `RawButton` | `BOOL` | Bouton homme-mort brut | `HwIn.Operator` |

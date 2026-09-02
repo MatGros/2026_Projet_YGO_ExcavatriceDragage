@@ -145,6 +145,10 @@ VAR
     ArmModeDisabled         : BOOL;
     ArmContactorOff         : BOOL;
     ArmPowerCutOff          : BOOL;
+    // Tempo idle de la barriere finale (PRG_06, scan N-1) levee par le bypass groupe du treuil
+    ArmM1MoveInhibited      : BOOL;
+    ArmM2MoveInhibited      : BOOL;
+    ArmM3MoveInhibited      : BOOL;
     // Taxonomie permit (D-P1 à D-P11) : SafetyPermit (safety pure), ProcessPermit (process pur),
     // ProcessAndSafetyPermit (= Safety AND Process), EffectivePermit (= couplage synchro).
     SafetyPermitM1_Descend   : BOOL;
@@ -942,22 +946,29 @@ END_IF;
 // finale (PRG_06) interdit reellement de bouger (temps mort directionnel,
 // anti-court-cycle, contacteur colle, FB non pret). Lecture bus PRG_06 au scan
 // N-1 : signal de disponibilite, aucune coupure.
+// Le bypass groupe du treuil (Bypass.Global, deja utilise pour purger les causes
+// safety) leve aussi ce terme : en mise en service, feedbacks HW non cables, la
+// tempo interlock ne doit pas figer la disponibilite d'armement.
+ArmM1MoveInhibited := PRG_06_Outputs.Data.M1MovementInhibited AND NOT GVL_IHM.M1TreuilRetenue.Bypass.Global;
+ArmM2MoveInhibited := PRG_06_Outputs.Data.M2MovementInhibited AND NOT GVL_IHM.M2TreuilBenne.Bypass.Global;
+ArmM3MoveInhibited := PRG_06_Outputs.Data.M3MovementInhibited AND NOT GVL_IHM.TranslationM3.Bypass.Global;
+
 ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched
-                     AND NOT PRG_06_Outputs.Data.M1MovementInhibited;
+                     AND NOT ArmM1MoveInhibited;
 ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched
-                     AND NOT PRG_06_Outputs.Data.M1MovementInhibited;
+                     AND NOT ArmM1MoveInhibited;
 ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched
-                     AND NOT PRG_06_Outputs.Data.M2MovementInhibited;
+                     AND NOT ArmM2MoveInhibited;
 ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched
-                     AND NOT PRG_06_Outputs.Data.M2MovementInhibited;
+                     AND NOT ArmM2MoveInhibited;
 ArmM3TremieAvail  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
                      AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff
-                     AND NOT PRG_06_Outputs.Data.M3MovementInhibited;
+                     AND NOT ArmM3MoveInhibited;
 ArmM3MaintenanceAvail := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
                      AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff
-                     AND NOT PRG_06_Outputs.Data.M3MovementInhibited;
+                     AND NOT ArmM3MoveInhibited;
 
 ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM2AscentAvail OR ArmM2DescendAvail

@@ -156,7 +156,7 @@ Bandeaux de restitution obligatoires (bundle frais + gates verts, cf. AGENTS.md)
 | `DOC/AF/AF_Partie-10_Fonction_Winch/FB_Bucket_v1.0.md` | Description `StateIncoherent` / `BucketStateCoherent`, **correction mapping ErrorId (FAUX actuellement)**, `CoherenceLimitM` unique (viser 1.0, visa V2) |
 | `DOC/AF/AF_Partie-14_Fonction_Troubleshooting_v1.4.md` + `FB_TroubleshootingView_v1.2.md` | Message IHM StateIncoherent + action re-confirmation ouvert/fermé |
 | `DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md` | Gating FB_Cycle X3/X6 sur l'état benne cohérent |
-| `DOC/NAMING_CONVENTION.md` | **Lecture seule** (norme transverse, ne pas modifier par la tâche) — vérifier le vocabulaire `StateIncoherent`/`BucketStateCoherent` (PascalCase, NC-xxx) |
+| `DOC/STDS/NAMING_CONVENTION.md` | **Lecture seule** (norme transverse, ne pas modifier par la tâche) — vérifier le vocabulaire `StateIncoherent`/`BucketStateCoherent` (PascalCase, NC-xxx) |
 | Registres | `DOC/WFLOW/TASKS.yaml` (T208 : statut, date ISO) ; éventuel registre des décisions `DOC/WFLOW/AUDITS/DESIGN/` (fichier design T208 à créer si besoin) |
 | Contrat | `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T208.yaml` (ce document) |
 
