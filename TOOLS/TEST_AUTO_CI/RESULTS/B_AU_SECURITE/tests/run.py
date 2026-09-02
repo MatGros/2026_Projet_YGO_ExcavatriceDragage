@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Raccourci : lance les tests du domaine B_AU_SECURITE avec mesure du temps et calibrage multithread.
 """
 import pathlib
@@ -15,5 +15,8 @@ if __name__ == "__main__":
     minutes = int(elapsed // 60)
     seconds = elapsed % 60
     t_str = f"{minutes}m {seconds:.2f}s" if minutes > 0 else f"{seconds:.2f}s"
-    print(f"\n⏱️  Duree totale domaine B_AU_SECURITE : {t_str}")
+    try:
+        print(f"\n⏱️  Duree totale domaine B_AU_SECURITE : {t_str}")
+    except UnicodeEncodeError:
+        print(f"\n[TIME] Duree totale domaine B_AU_SECURITE : {t_str}")
     sys.exit(code)
