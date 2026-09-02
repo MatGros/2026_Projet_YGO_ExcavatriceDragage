@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T13:20:00.576008" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T13:20:00.576008">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T15:40:44.472704" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T15:40:44.472704">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -172,6 +172,33 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ↔️ Ordre actionneur final translation M3 ===
 🔓 Demande frein M3 arbitree</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1MovementInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚦 Disponibilite mouvement barriere finale ===
+TRUE = une tempo idle / inhibition de l'interlock final interdit REELLEMENT de bouger maintenant
+(FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien.
+🚦 Treuil M1 — mouvement inhibe par tempo interlock final</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2MovementInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Treuil M2 — mouvement inhibe par tempo interlock final</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3MovementInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 Translation M3 — mouvement inhibe par tempo interlock final</xhtml>
               </documentation>
             </variable>
             <variable name="PowerKeepAliveACmd">

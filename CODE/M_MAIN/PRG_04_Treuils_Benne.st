@@ -938,16 +938,26 @@ END_IF;
 // EffectivePermitM*_* couvre deja process + safety + NOT SafeStop de cet axe +
 // verif couplage ; on ajoute NOT Fault.Latched (faute finale) et, pour M3, le
 // permis effectif directionnel + SafeStop/PowerCutOff M3 (bus PRG_05, lag 1 scan).
-ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched;
-ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched;
-ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched;
-ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched;
+// On retire aussi la disponibilite tant qu'une tempo idle de la barriere
+// finale (PRG_06) interdit reellement de bouger (temps mort directionnel,
+// anti-court-cycle, contacteur colle, FB non pret). Lecture bus PRG_06 au scan
+// N-1 : signal de disponibilite, aucune coupure.
+ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched
+                     AND NOT PRG_06_Outputs.Data.M1MovementInhibited;
+ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched
+                     AND NOT PRG_06_Outputs.Data.M1MovementInhibited;
+ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched
+                     AND NOT PRG_06_Outputs.Data.M2MovementInhibited;
+ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched
+                     AND NOT PRG_06_Outputs.Data.M2MovementInhibited;
 ArmM3TremieAvail  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
-                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff
+                     AND NOT PRG_06_Outputs.Data.M3MovementInhibited;
 ArmM3MaintenanceAvail := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
-                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff
+                     AND NOT PRG_06_Outputs.Data.M3MovementInhibited;
 
 ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM2AscentAvail OR ArmM2DescendAvail
