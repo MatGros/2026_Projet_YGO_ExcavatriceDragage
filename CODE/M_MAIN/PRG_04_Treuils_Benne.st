@@ -1050,6 +1050,11 @@ M1WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
 M1WinchCfg.SlowdownDistanceTop_M  := _CommunCfgPersist.WinchSlowdownDistanceTop_M;
 M1WinchCfg.SlowdownDistanceBottom_M := _CommunCfgPersist.WinchSlowdownDistanceBottom_M;
 M1WinchCfg.SlowdownMaxStep        := _CommunCfgPersist.WinchSlowdownMaxStep;
+// Cadence de rampe palier (FB_WinchStepShaper) : montee +1 cran / delai, descente immediate.
+// Champs non portes par la persistante -> assignes explicitement (le defaut de type n'est
+// pas applique au runtime pour ce VAR local de struct). 1 s montee / 0,5 s descente.
+M1WinchCfg.StepRampDelayAscent    := T#1000ms;
+M1WinchCfg.StepRampDelayDescent   := T#500ms;
 
 instWinchM1(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
@@ -1100,6 +1105,9 @@ M2WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
 M2WinchCfg.SlowdownDistanceTop_M  := _CommunCfgPersist.WinchSlowdownDistanceTop_M;
 M2WinchCfg.SlowdownDistanceBottom_M := _CommunCfgPersist.WinchSlowdownDistanceBottom_M;
 M2WinchCfg.SlowdownMaxStep        := _CommunCfgPersist.WinchSlowdownMaxStep;
+// Cadence de rampe palier (FB_WinchStepShaper) : montee +1 cran / delai, descente immediate.
+M2WinchCfg.StepRampDelayAscent    := T#1000ms;
+M2WinchCfg.StepRampDelayDescent   := T#500ms;
 
 instWinchM2(
     Enable                  := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
