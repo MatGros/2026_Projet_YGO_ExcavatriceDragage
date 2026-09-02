@@ -73,6 +73,7 @@ VAR
     TonLimitSwitchOverrun : TON;       // . [LOC] Surveillance poussée anormale / escalade fin de course
     OverrunCondition    : BOOL;   // . [LOC] Condition escalade fin de course
     PostRampTimeout     : TIME := T#3S;   // . [LOC] Délai Méca B
+    CST_StopFreqThresholdHz : REAL := 0.5; // . [LOC] Seuil |fréquence sortie| au-dessus duquel le moteur est considéré en rotation (Méca A/B)
     UncommandedActiveB  : BOOL;   // . [LOC] Méca B active
     UncommandedActiveA  : BOOL;   // . [LOC] Méca A active
     FirstScanDone       : BOOL;   // . [LOC] Initialisation premier scan
@@ -157,11 +158,12 @@ IF NOT BypassGlobal THEN
     //    Cause 1 (DriveComm, bit1 -> SafeStop acquittable), PAS en Méca B (bit4 -> PowerCutOff
     //    non-resettable). REX MES 2026-09-02 : DriveStatusWord.0 (= "ready to switch on")
     //    figé sur bus mort -> coupure chaîne intempestive.
+    // Déclencheur = preuve de rotation RÉELLE (fréquence de sortie mesurée) OU retour frein
+    // encore ouvert. DriveStatusWord.0 ("ready to switch on") retiré : à 1 dès variateur
+    // alimenté, il ne prouve PAS un mouvement (REX MES 2026-09-02).
     IF NOT (BypassSafety OR BypassMecaB) AND DriveOnline AND DriveOperational THEN
-        IF NOT HeartbeatIhmOk THEN
-            UncommandedActiveB := (ABS(DriveActualFreqHz) > 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
-        ELSIF NOT RunRequest AND NOT BrakeCmd THEN
-            UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
+        IF (NOT HeartbeatIhmOk) OR (NOT RunRequest AND NOT BrakeCmd) THEN
+            UncommandedActiveB := (ABS(DriveActualFreqHz) > CST_StopFreqThresholdHz) OR BrakeFeedback;
         ELSE
             UncommandedActiveB := FALSE;
         END_IF;

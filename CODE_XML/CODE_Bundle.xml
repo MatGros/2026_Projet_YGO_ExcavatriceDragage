@@ -30830,6 +30830,17 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Délai Méca B</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_StopFreqThresholdHz">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Seuil |fréquence sortie| au-dessus duquel le moteur est considéré en rotation (Méca A/B)</xhtml>
+              </documentation>
+            </variable>
             <variable name="UncommandedActiveB">
               <type>
                 <BOOL />
@@ -31018,11 +31029,12 @@ IF NOT BypassGlobal THEN
     //    Cause 1 (DriveComm, bit1 -&gt; SafeStop acquittable), PAS en Méca B (bit4 -&gt; PowerCutOff
     //    non-resettable). REX MES 2026-09-02 : DriveStatusWord.0 (= "ready to switch on")
     //    figé sur bus mort -&gt; coupure chaîne intempestive.
+    // Déclencheur = preuve de rotation RÉELLE (fréquence de sortie mesurée) OU retour frein
+    // encore ouvert. DriveStatusWord.0 ("ready to switch on") retiré : à 1 dès variateur
+    // alimenté, il ne prouve PAS un mouvement (REX MES 2026-09-02).
     IF NOT (BypassSafety OR BypassMecaB) AND DriveOnline AND DriveOperational THEN
-        IF NOT HeartbeatIhmOk THEN
-            UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
-        ELSIF NOT RunRequest AND NOT BrakeCmd THEN
-            UncommandedActiveB := DriveStatusWord.0 OR BrakeFeedback;
+        IF (NOT HeartbeatIhmOk) OR (NOT RunRequest AND NOT BrakeCmd) THEN
+            UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; CST_StopFreqThresholdHz) OR BrakeFeedback;
         ELSE
             UncommandedActiveB := FALSE;
         END_IF;
