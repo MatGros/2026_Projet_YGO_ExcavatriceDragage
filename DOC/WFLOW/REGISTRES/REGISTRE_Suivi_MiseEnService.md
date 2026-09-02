@@ -45,6 +45,21 @@
 
 ---
 
+### MES-038 — 🕹️ Joystick / paliers vitesse M1-M2 + concordance contacteurs + garde palier interlock
+- 📅 **2026-09-02 ~14:00-16:00** | 📍 Banc (traces `Suivi_JOY_*_8/9`, snapshots `133950` / `153640`) | 🏷️ `backup/mes-septembre-20260902` | 🚦 🟠 **non testé après derniers commits**
+- **Bugs corrigés** :
+  - `dfa94557` : polarité hystérésis décodage `%→palier` **inversée** (`FB_Joystick`) — `HYSTERESIS` Util = hystérésis bas (`OUT=TRUE si IN<LOW`), le code testait `IF .OUT` en croyant l'inverse → faible déflexion = palier 5. Fix : `IF NOT .OUT`. + `T222`/`T223` : table paliers joystick vide → `_WinchSpeedStepTable`.
+  - `03e88d0d` : `M1/M2WinchCfg.StepRampDelayAscent`/`Descent` **jamais câblés** dans `PRG_04` → cadence de rampe = 0 au runtime → `FB_WinchStepShaper` monte 1→5 en qq scans → 4 contacteurs enclenchés d'un coup. Fix : assignation explicite `T#1000ms` / `T#500ms`. (même classe que la table paliers vide.)
+  - `03xxxxxx` (commit en cours) : garde palier **DURE dans `FB_WinchOutputInterlock`** — le `StepDelay : TON` était mort (`IN:=FALSE` partout). Ré-armé comme plancher indépendant : `AuthorizedStep` +1 cran / `CST_StepRampFloorDelay` (T#700ms, **< 1 s métier** → transparent en nominal), contacteurs masqués par `AuthorizedStep` (table cumulative). Défense en profondeur si le shaper métier déraille.
+- **Autres commits safety** (banc, bus HS) :
+  - `6dd8f3cb` + `7f32a0fe` : M3 Méca B gardée par `DriveOnline AND DriveOperational` + `DriveStatusWord.0` retiré du déclencheur (« ready to switch on » à 1 dès variateur alimenté → coupure chaîne non-resettable sur bus mort).
+  - `d3be2c6e` : §2quater — protecteur anti-chatter **retiré des freins** M1/M2/M3 (re-desserrage immédiat requis, sinon moteur contre frein serré, REX snapshot `133950`).
+  - `f2268430` : revert du retrait sur contacteurs de vitesse (garde conservée : le séquenceur limite le chemin, ne jamais réenclencher aussi vite).
+- **T225 (contrat `1a6b3d31`)** — concordance contacteurs M1/M2 **graduée** : `FB_SyncContactor` étendu (`ContactorMismatchEscalated` + `ST_SyncContactorDiag`), instance `PRG_06` sur vecteurs physiques finaux, remplace le §2ter binaire. Niveau 1 → SafeStop des 2 (via bus PRG_06→PRG_04) ; niveau 2 → `MecaEEscaladeFaultLatched` (bit13 → PowerCutOff). Bypass `M1M2Sync.Bypass.Global`. Zéro masque hexa. **Reste** : remontée décodée IHM/troubleshooting, test CI escalade, renommages revue (`CST_MismatchDebounce`, enum niveau, `ST_fbSyncContactor_Diag`).
+- **Point safety à cadrer** : M3 Méca B / réponse graduée SafeStop→PowerCutOff (lot MES-035).
+
+---
+
 ### MES-037 — 🔧 `FB_Safety_EmergencyManagement` phase 2 : staccato contacteurs + 3 bypass MES orthogonaux
 - 📅 **2026-09-02 ~11:30** | 📍 Banc (traces `Suivi_AUSTEP_20260902_6/7`) | 🏷️ `backup/mes-septembre-20260902` | 🚦 🟢 **Testé banc (traces)**, 🟠 non testé machine
 - **Fait** :
