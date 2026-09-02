@@ -19,16 +19,5 @@ STRUCT
 
     Idx501_M1_CmdRelayFwd_DQ     : BOOL; // 1 = Ascending M1 ON | 0 = OFF
     Idx502_M2_CmdRelayFwd_DQ     : BOOL; // 1 = Ascending M2 ON | 0 = OFF
-
-    // === Discordance contacteurs M1/M2 (FB_SyncContactor sur vecteurs finaux PRG_06) ===
-    Idx310_ContactorMismatch          : BOOL; // 1 = discordance confirmee (debounce 500 ms) -> SafeStop des 2 treuils
-    Idx311_ContactorMismatchEscalated : BOOL; // 1 = discordance persistante -> escalade PowerCutOff
-    Idx312_ContactorMismatchLevel     : INT;  // 0 aucun / 1 confirme (SafeStop) / 2 escalade (PowerCutOff)
-    Idx313_Mismatch_RelayFwd          : BOOL; // 1 = relais montee M1 <> M2
-    Idx314_Mismatch_RelayRev          : BOOL; // 1 = relais descente M1 <> M2
-    Idx315_Mismatch_SpeedContactor1   : BOOL; // 1 = contacteur palier 1 M1 <> M2
-    Idx316_Mismatch_SpeedContactor2   : BOOL; // 1 = contacteur palier 2 M1 <> M2
-    Idx317_Mismatch_SpeedContactor3   : BOOL; // 1 = contacteur palier 3 M1 <> M2
-    Idx318_Mismatch_SpeedContactor4   : BOOL; // 1 = contacteur palier 4 M1 <> M2
 END_STRUCT
 END_TYPE

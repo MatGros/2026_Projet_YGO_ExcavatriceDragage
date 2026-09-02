@@ -37,13 +37,6 @@ STRUCT
     // === ↔️ Ordre actionneur final translation M3 ===
     TranslationBrakeCmd   : BOOL; // 🔓 Demande frein M3 arbitree
 
-    // === 🚦 Disponibilite mouvement barriere finale ===
-    // TRUE = une tempo idle / inhibition de l'interlock final interdit REELLEMENT de bouger maintenant
-    // (FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien.
-    M1MovementInhibited   : BOOL; // 🚦 Treuil M1 — mouvement inhibe par tempo interlock final
-    M2MovementInhibited   : BOOL; // 🚦 Treuil M2 — mouvement inhibe par tempo interlock final
-    M3MovementInhibited   : BOOL; // 🚦 Translation M3 — mouvement inhibe par tempo interlock final
-
     // === 🚨 Chaîne réarmement puissance AU ===
     PowerKeepAliveACmd    : BOOL; // 🔒 Maintien puissance voie A (1=Maintenu)
     PowerKeepAliveBCmd    : BOOL; // 🔒 Maintien puissance voie B (1=Maintenu)

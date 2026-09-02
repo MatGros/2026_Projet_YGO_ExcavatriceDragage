@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:57:04.469012" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:57:04.469012">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:02:16.674488" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:02:16.674488">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -560,17 +560,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai confirmation absence mouvement</xhtml>
               </documentation>
             </variable>
-            <variable name="ContactorFeedbackTrusted">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] TRUE = le retour "tous contacteurs retombes" (FwdRevSpeedFeedbackOff) est reellement cable et fiable -&gt; autorise le chemin rapide NoMovement. FALSE (defaut, banc sans DI) = chemin rapide inerte.</xhtml>
-              </documentation>
-            </variable>
             <variable name="ExternalSyncEscalation">
               <type>
                 <BOOL />
@@ -861,14 +850,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Survitesse latchée (acquittée au Reset)</xhtml>
               </documentation>
             </variable>
-            <variable name="NoMovementContactorSuspect">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] NoMovement (bit15) declenche par le retour "tous contacteurs retombes" alors qu'un contacteur de sens etait commande</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <localVars>
             <variable name="DriftGuardA">
@@ -935,14 +916,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Delai confirmation absence mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TonNoMoveContactor">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Chemin rapide : contacteur de sens commande mais retour "tous retombes"</xhtml>
               </documentation>
             </variable>
             <variable name="TonStartupWarmup">
@@ -1235,14 +1208,6 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <BOOL />
               </type>
             </variable>
-            <variable name="NoMovementContactorSuspectLatched">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Latch : NoMovement declenche par le retour "tous contacteurs retombes"</xhtml>
-              </documentation>
-            </variable>
             <variable name="OverspeedFaultLatched">
               <type>
                 <BOOL />
@@ -1292,17 +1257,6 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur) — la course reelle d'un treuil par scan 10ms reste sous ~0.01 m</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_ContactorConfirmDelay">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#500ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai avant NoMovement quand un contacteur de sens est commande mais que le retour dit "tous retombes" (pickup contacteur + marge)</xhtml>
-              </documentation>
-            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -1337,7 +1291,6 @@ IF ResetEdge.Q OR BypassGlobal THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
-    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -1357,7 +1310,6 @@ IF NOT FirstScanDone THEN
     MecaEEscaladeFaultLatched     := FALSE;
     OppositeDirectionFaultLatched := FALSE;
     NoMovementFaultLatched        := FALSE;
-    NoMovementContactorSuspectLatched := FALSE;
     OverspeedFaultLatched         := FALSE;
 END_IF;
 
@@ -1537,25 +1489,12 @@ IF NOT BypassGlobal THEN
     instCauses[14].Texte    := 'Sens reel oppose a la commande treuil';
 
     // Cause 15 : Absence mouvement (latched)
-    // Chemin nominal : commande presente mais vitesse mesuree quasi nulle (NoMovementTimeout).
     TonNoMovement(
         IN := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
               AND (ABS(MeasuredSpeedSignedMps) &lt; MovementSpeedThresholdMps)),
         PT := NoMovementTimeout
     );
     IF TonNoMovement.Q THEN NoMovementFaultLatched := TRUE; END_IF;
-    // Chemin rapide (independant de la mesure vitesse) : un contacteur de sens est
-    // commande mais le retour materiel dit "tous les contacteurs retombes" -&gt; le
-    // contacteur n'a pas engage / a chute. Inutile d'attendre NoMovementTimeout.
-    TonNoMoveContactor(
-        IN := ContactorFeedbackTrusted AND NOT BypassProcess AND MovementCommanded
-              AND NOT InReferencingMode AND FwdRevSpeedFeedbackOff,
-        PT := CST_ContactorConfirmDelay
-    );
-    IF TonNoMoveContactor.Q THEN
-        NoMovementFaultLatched := TRUE;
-        NoMovementContactorSuspectLatched := TRUE;
-    END_IF;
     instCauses[15].Active   := NoMovementFaultLatched;
     instCauses[15].Latching := TRUE;
     instCauses[15].Texte    := 'Absence mouvement malgre commande treuil';
@@ -1574,7 +1513,6 @@ ELSE
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
-    TonNoMoveContactor(IN := FALSE);
     TonRefSettle(IN := FALSE);
     RefWindowActive := FALSE;
     PosStepDetected := FALSE;
@@ -1598,7 +1536,6 @@ END_IF;
 // FALSE (Phase 0) ; la re-alimentation IHM/Troubleshooting se fera depuis cette sortie.
 ContactorStuck := MecaBFaultLatched;
 OverspeedFault := OverspeedFaultLatched;
-NoMovementContactorSuspect := NoMovementContactorSuspectLatched;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -1653,7 +1590,6 @@ IF NOT Enable THEN
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
-    TonNoMoveContactor(IN := FALSE);
     TonStartupWarmup(IN := FALSE);
     MecaBElapsedTime := T#0s;
     Ready := FALSE;

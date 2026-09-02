@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:21:45.543533" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:21:45.543533">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:02:16.679804" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:02:16.679804">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -144,79 +144,6 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Ascending M2 ON | 0 = OFF</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx310_ContactorMismatch">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== Discordance contacteurs M1/M2 (FB_SyncContactor sur vecteurs finaux PRG_06) ===
-1 = discordance confirmee (debounce 500 ms) -&gt; SafeStop des 2 treuils</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx311_ContactorMismatchEscalated">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = discordance persistante -&gt; escalade PowerCutOff</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx312_ContactorMismatchLevel">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 aucun / 1 confirme (SafeStop) / 2 escalade (PowerCutOff)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx313_Mismatch_RelayFwd">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = relais montee M1 &lt;&gt; M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx314_Mismatch_RelayRev">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = relais descente M1 &lt;&gt; M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx315_Mismatch_SpeedContactor1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 1 M1 &lt;&gt; M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx316_Mismatch_SpeedContactor2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 2 M1 &lt;&gt; M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx317_Mismatch_SpeedContactor3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 3 M1 &lt;&gt; M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Idx318_Mismatch_SpeedContactor4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = contacteur palier 4 M1 &lt;&gt; M2</xhtml>
               </documentation>
             </variable>
           </struct>

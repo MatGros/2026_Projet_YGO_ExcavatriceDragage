@@ -145,8 +145,6 @@ VAR
     ArmModeDisabled         : BOOL;
     ArmContactorOff         : BOOL;
     ArmPowerCutOff          : BOOL;
-    // Un axe en tempo anti-court-cycle (WAIT_RESTART_DELAY, barriere finale PRG_06, scan N-1)
-    ArmMovementInhibitedAny     : BOOL;
     // Taxonomie permit (D-P1 à D-P11) : SafetyPermit (safety pure), ProcessPermit (process pur),
     // ProcessAndSafetyPermit (= Safety AND Process), EffectivePermit (= couplage synchro).
     SafetyPermitM1_Descend   : BOOL;
@@ -955,13 +953,6 @@ ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM2AscentAvail OR ArmM2DescendAvail
                OR ArmM3TremieAvail OR ArmM3MaintenanceAvail;
 
-// Tempo anti-court-cycle : un axe en WAIT_RESTART_DELAY / FAULT (barriere finale
-// PRG_06, scan N-1) fait tomber ArmingPermit -> l'operateur ne peut pas re-armer
-// dans le deadlock. Se leve seul (retour neutre 1,5 s), pas de bypass.
-ArmMovementInhibitedAny := PRG_06_Outputs.Data.M1MovementInhibited
-                        OR PRG_06_Outputs.Data.M2MovementInhibited
-                        OR PRG_06_Outputs.Data.M3MovementInhibited;
-
 // Conditions de base (AC1) — priorite decroissante pour le motif.
 ArmBucketBusy := instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q;
 ArmModeDisabled := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE);
@@ -979,15 +970,12 @@ ELSIF ArmBucketBusy THEN
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.BUCKET_BUSY;
 ELSIF NOT ArmAnyAxisAvail THEN
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.ALL_AXES_BLOCKED;
-ELSIF ArmMovementInhibitedAny THEN
-    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.MOVEMENT_TEMPO;
 ELSE
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.NONE;
 END_IF;
 
 ArmingPermit := NOT ArmModeDisabled AND NOT ArmContactorOff AND NOT ArmPowerCutOff
-             AND NOT ArmBucketBusy AND ArmAnyAxisAvail
-             AND NOT ArmMovementInhibitedAny;
+             AND NOT ArmBucketBusy AND ArmAnyAxisAvail;
 
 Data.ArmingAvailability.M1AscentAvail      := ArmM1AscentAvail;
 Data.ArmingAvailability.M1DescendAvail     := ArmM1DescendAvail;

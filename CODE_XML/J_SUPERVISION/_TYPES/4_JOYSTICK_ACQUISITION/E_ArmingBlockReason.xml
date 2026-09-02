@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:26:26.083199" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:26:26.083199">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:02:16.682334" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:02:16.682334">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -33,7 +33,6 @@
               <value name="CONTACTOR_OFF" value="3" />
               <value name="BUCKET_BUSY" value="4" />
               <value name="ALL_AXES_BLOCKED" value="5" />
-              <value name="MOVEMENT_TEMPO" value="6" />
             </values>
           </enum>
         </baseType>
@@ -74,12 +73,6 @@
                 <Name>ALL_AXES_BLOCKED</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Base OK mais aucun axe x sens sélectionné n'est disponible</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MOVEMENT_TEMPO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Base OK mais un axe est en tempo anti-court-cycle (WAIT_RESTART_DELAY) — se lève seul</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T15:40:52.023560" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T15:40:52.023560">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:02:16.677577" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:02:16.677577">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -319,15 +319,6 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif</xhtml>
               </documentation>
             </variable>
-            <variable name="MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04 via PRG_06) ===
-&lt;-- [STAT] TRUE = FB non pret ou inhibition redemarrage active : aucun mouvement M3 possible maintenant. N'arrete rien : retire la disponibilite.</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <localVars>
             <variable name="ResetEdge">
@@ -480,7 +471,6 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeCmd := FALSE;
     BrakeTimeoutElapsed := T#0ms;
     Ready := FALSE;
-    MovementInhibited := TRUE;   // FB neutralise -&gt; aucun mouvement M3 possible, disponibilite retiree
     Reason := E_TranslationFinalInterlockReason.NONE;
     RETURN;
 END_IF;
@@ -540,9 +530,6 @@ DriveFreqCmdWord := 0;
 
 BrakeCmd := BrakeReleaseRequest AND NOT Fault.Error AND NOT RestartInhibit;
 Ready := NOT Fault.Error AND NOT RestartInhibit;
-
-// Disponibilite mouvement M3 (signal de disponibilite, n'arrete rien).
-MovementInhibited := NOT Ready OR RestartInhibit;
 
 IF Fault.Error THEN
     BrakeCmd := FALSE;

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:27:11.610616" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:27:11.610616">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:02:16.684334" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:02:16.684334">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -4722,7 +4722,6 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
               <value name="CONTACTOR_OFF" value="3" />
               <value name="BUCKET_BUSY" value="4" />
               <value name="ALL_AXES_BLOCKED" value="5" />
-              <value name="MOVEMENT_TEMPO" value="6" />
             </values>
           </enum>
         </baseType>
@@ -4763,12 +4762,6 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <Name>ALL_AXES_BLOCKED</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Base OK mais aucun axe x sens sélectionné n'est disponible</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>MOVEMENT_TEMPO</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Base OK mais un axe est en tempo anti-court-cycle (WAIT_RESTART_DELAY) — se lève seul</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -5403,14 +5396,6 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
               <type>
                 <BOOL />
               </type>
-            </variable>
-            <variable name="ArmMovementInhibitedAny">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Un axe en tempo anti-court-cycle (WAIT_RESTART_DELAY, barriere finale PRG_06, scan N-1)</xhtml>
-              </documentation>
             </variable>
             <variable name="SafetyPermitM1_Descend">
               <type>
@@ -6551,13 +6536,6 @@ ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM2AscentAvail OR ArmM2DescendAvail
                OR ArmM3TremieAvail OR ArmM3MaintenanceAvail;
 
-// Tempo anti-court-cycle : un axe en WAIT_RESTART_DELAY / FAULT (barriere finale
-// PRG_06, scan N-1) fait tomber ArmingPermit -&gt; l'operateur ne peut pas re-armer
-// dans le deadlock. Se leve seul (retour neutre 1,5 s), pas de bypass.
-ArmMovementInhibitedAny := PRG_06_Outputs.Data.M1MovementInhibited
-                        OR PRG_06_Outputs.Data.M2MovementInhibited
-                        OR PRG_06_Outputs.Data.M3MovementInhibited;
-
 // Conditions de base (AC1) — priorite decroissante pour le motif.
 ArmBucketBusy := instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q;
 ArmModeDisabled := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE);
@@ -6575,15 +6553,12 @@ ELSIF ArmBucketBusy THEN
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.BUCKET_BUSY;
 ELSIF NOT ArmAnyAxisAvail THEN
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.ALL_AXES_BLOCKED;
-ELSIF ArmMovementInhibitedAny THEN
-    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.MOVEMENT_TEMPO;
 ELSE
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.NONE;
 END_IF;
 
 ArmingPermit := NOT ArmModeDisabled AND NOT ArmContactorOff AND NOT ArmPowerCutOff
-             AND NOT ArmBucketBusy AND ArmAnyAxisAvail
-             AND NOT ArmMovementInhibitedAny;
+             AND NOT ArmBucketBusy AND ArmAnyAxisAvail;
 
 Data.ArmingAvailability.M1AscentAvail      := ArmM1AscentAvail;
 Data.ArmingAvailability.M1DescendAvail     := ArmM1DescendAvail;
@@ -13970,15 +13945,6 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
 &lt;-- [DIAG] Ecoule temporisation ordre de relachement</xhtml>
               </documentation>
             </variable>
-            <variable name="MovementInhibited">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== DISPONIBILITE MOUVEMENT (consomme par la disponibilite d'armement, PRG_04) ===
-&lt;-- [STAT] TRUE = une tempo idle / inhibition interdit reellement de bouger maintenant (FB non pret, anti-court-cycle, temps mort directionnel, contacteur colle). N'arrete rien : retire la disponibilite.</xhtml>
-              </documentation>
-            </variable>
           </outputVars>
           <localVars>
             <variable name="PermitFinalBlocked">
@@ -14317,7 +14283,6 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     Error := (ErrorId &lt;&gt; 16#0000);
     State := E_WinchFinalInterlockState.DISABLED;
     RestartRequired := TRUE;
-    MovementInhibited := TRUE;   // FB neutralise -&gt; aucun mouvement possible, disponibilite retiree
     // 🔒 Sorties de diagnostic et latches de sûreté VOLONTAIREMENT conservés hors Enable (AC3 / §9) :
     // - ErrorId &amp; RestartInhibit : latches défaut et anti-redémarrage auto (doivent survivre à la perte d'Enable, acquittement conscient requis)
     // - StateAtError &amp; Reason : snapshot d'état et cause de blocage préservés pour diagnostic IHM
@@ -14696,23 +14661,6 @@ IF Error THEN
     Busy := FALSE; Done := FALSE; Ready := FALSE;
     State := E_WinchFinalInterlockState.FAULT;
 END_IF;
-
-// ── 6quater. Disponibilite mouvement ──
-// TRUE tant qu'une nouvelle demande de mouvement est REELLEMENT impossible ce scan :
-//  - RestartRequired : anti-court-cycle RestartDelay (1,5 s) ; TRUE des le retour
-//    au neutre (State=READY) ET pendant le deadlock manche deflechi (WAIT_RESTART_DELAY,
-//    ou RestartDelayElapsed est fige). Se purge seul via RestartDelay.Q.
-//  - DeadTimePending : temps mort directionnel (~1 s apres arret). Se purge via DeadTime.Q.
-//  - RestartInhibit / ContactorStuck : latches a acquittement conscient.
-//  - NOT Ready / State FAULT : FB non operationnel.
-// WAIT_STEP_DELAY EXCLU (bride la hausse de palier, n'interdit pas de partir).
-// Aucune coupure ajoutee : signal de disponibilite consomme par la dispo d'armement PRG_04.
-MovementInhibited := NOT Ready
-                     OR RestartInhibit
-                     OR ContactorStuck
-                     OR RestartRequired
-                     OR DeadTimePending
-                     OR (State = E_WinchFinalInterlockState.FAULT);
 </xhtml>
           </ST>
         </body>

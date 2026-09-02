@@ -657,7 +657,6 @@ instHmiBannerFormatter(
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
     BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
     SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
-    SyncContactorDiag           := PRG_06_Outputs.Data.SyncContactorDiag,
     DiveErrorId                 := GVL_IHM.CycleDiveSearch.State.DiveErrorId,
     ExtractionErrorId           := GVL_IHM.CycleExtraction.State.ExtractionErrorId,
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
@@ -796,18 +795,6 @@ instTroubleshootingView(
     WinchM2Trace         := PRG_04_Treuils_Benne.Data.TraceM2,
     TranslationTrace     := PRG_05_Translation.Data.TranslationTrace
 );
-
-// Remontee decodee discordance contacteurs M1/M2 (FB_SyncContactor sur vecteurs
-// finaux PRG_06) vers le troubleshooting — quel contacteur diverge + niveau.
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx310_ContactorMismatch          := PRG_06_Outputs.Data.ContactorMismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx311_ContactorMismatchEscalated := PRG_06_Outputs.Data.ContactorMismatchEscalated;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx312_ContactorMismatchLevel     := PRG_06_Outputs.Data.SyncContactorDiag.MismatchLevel;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx313_Mismatch_RelayFwd          := PRG_06_Outputs.Data.SyncContactorDiag.RelayFwdMismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx314_Mismatch_RelayRev          := PRG_06_Outputs.Data.SyncContactorDiag.RelayRevMismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx315_Mismatch_SpeedContactor1   := PRG_06_Outputs.Data.SyncContactorDiag.Step1Mismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx316_Mismatch_SpeedContactor2   := PRG_06_Outputs.Data.SyncContactorDiag.Step2Mismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx317_Mismatch_SpeedContactor3   := PRG_06_Outputs.Data.SyncContactorDiag.Step3Mismatch;
-GVL_Troubleshooting.H_LevageSynchroniseM1M2.Idx318_Mismatch_SpeedContactor4   := PRG_06_Outputs.Data.SyncContactorDiag.Step4Mismatch;
 
 {endregion}
 END_PROGRAM

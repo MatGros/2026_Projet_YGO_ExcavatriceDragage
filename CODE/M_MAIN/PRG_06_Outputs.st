@@ -402,13 +402,6 @@ M3_SetpointFrequencyHz       := instTranslationOutputInterlockM3.DriveFreqCmdWor
 // ── Bus inter-PRG M3 ──
 Data.TranslationBrakeCmd   := TranslationBrakeCmd;
 
-// ── Bus inter-PRG : disponibilite mouvement barriere finale ──
-// Consomme par la disponibilite d'armement (PRG_04, scan N-1). Signal de
-// disponibilite uniquement : n'ajoute aucune coupure.
-Data.M1MovementInhibited := instWinchOutputInterlockM1.MovementInhibited;
-Data.M2MovementInhibited := instWinchOutputInterlockM2.MovementInhibited;
-Data.M3MovementInhibited := instTranslationOutputInterlockM3.MovementInhibited;
-
 // ═══════════════════════════════════════════════════════════════
 // 🪝 §4 KOBOLD (capteur fond) — commande + sortie
 // ═══════════════════════════════════════════════════════════════
