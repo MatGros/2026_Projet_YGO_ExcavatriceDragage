@@ -12,6 +12,7 @@ TYPE E_ArmingBlockReason :
     POWER_CUTOFF    := 2,   // Coupure puissance amont (M1/M2/M3)
     CONTACTOR_OFF   := 3,   // Chaîne AU non réarmée (PowerContactorEngaged FALSE)
     BUCKET_BUSY     := 4,   // Action benne en cours (+ 1 scan de fin d'action)
-    ALL_AXES_BLOCKED := 5   // Base OK mais aucun axe x sens sélectionné n'est disponible
+    ALL_AXES_BLOCKED := 5,  // Base OK mais aucun axe x sens sélectionné n'est disponible
+    MOVEMENT_TEMPO  := 6    // Base OK mais un axe est en tempo anti-court-cycle (WAIT_RESTART_DELAY) — se lève seul
 ) INT;
 END_TYPE

@@ -145,10 +145,8 @@ VAR
     ArmModeDisabled         : BOOL;
     ArmContactorOff         : BOOL;
     ArmPowerCutOff          : BOOL;
-    // Tempo idle de la barriere finale (PRG_06, scan N-1) levee par le bypass groupe du treuil
-    ArmM1MovementInhibited      : BOOL;
-    ArmM2MovementInhibited      : BOOL;
-    ArmM3MovementInhibited      : BOOL;
+    // Un axe en tempo anti-court-cycle (WAIT_RESTART_DELAY, barriere finale PRG_06, scan N-1)
+    ArmMovementInhibitedAny     : BOOL;
     // Taxonomie permit (D-P1 à D-P11) : SafetyPermit (safety pure), ProcessPermit (process pur),
     // ProcessAndSafetyPermit (= Safety AND Process), EffectivePermit (= couplage synchro).
     SafetyPermitM1_Descend   : BOOL;
@@ -942,39 +940,27 @@ END_IF;
 // EffectivePermitM*_* couvre deja process + safety + NOT SafeStop de cet axe +
 // verif couplage ; on ajoute NOT Fault.Latched (faute finale) et, pour M3, le
 // permis effectif directionnel + SafeStop/PowerCutOff M3 (bus PRG_05, lag 1 scan).
-// On retire aussi la disponibilite tant que la barriere finale (PRG_06) est en
-// WAIT_RESTART_DELAY / FAULT (ou latch RestartInhibit / ContactorStuck) : nouvelle
-// demande de mouvement reellement impossible. Lecture bus PRG_06 au scan N-1,
-// signal de disponibilite, aucune coupure.
-// Pas de bypass ici : l'etat WAIT_RESTART_DELAY se purge seul (retour neutre 1,5 s)
-// donc aucun risque de figeage, meme en mise en service.
-// En couplage M1/M2, les DEUX tempos doivent etre ecoulees (meme croisement que
-// SafeStopM*_Active / EffectivePermitM*) : un treuil encore en WAIT_RESTART_DELAY
-// interdit l'armement de l'axe couple.
-ArmM1MovementInhibited := PRG_06_Outputs.Data.M1MovementInhibited;
-ArmM2MovementInhibited := PRG_06_Outputs.Data.M2MovementInhibited;
-ArmM3MovementInhibited := PRG_06_Outputs.Data.M3MovementInhibited;
-
-ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched
-                     AND NOT ArmM1MovementInhibited AND (NOT CoupledBoth OR NOT ArmM2MovementInhibited);
-ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched
-                     AND NOT ArmM1MovementInhibited AND (NOT CoupledBoth OR NOT ArmM2MovementInhibited);
-ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched
-                     AND NOT ArmM2MovementInhibited AND (NOT CoupledBoth OR NOT ArmM1MovementInhibited);
-ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched
-                     AND NOT ArmM2MovementInhibited AND (NOT CoupledBoth OR NOT ArmM1MovementInhibited);
+ArmM1AscentAvail  := EffectivePermitM1_Ascent  AND NOT instSafetyWinchM1.Fault.Latched;
+ArmM1DescendAvail := EffectivePermitM1_Descend AND NOT instSafetyWinchM1.Fault.Latched;
+ArmM2AscentAvail  := EffectivePermitM2_Ascent  AND NOT instSafetyWinchM2.Fault.Latched;
+ArmM2DescendAvail := EffectivePermitM2_Descend AND NOT instSafetyWinchM2.Fault.Latched;
 ArmM3TremieAvail  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
-                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff
-                     AND NOT ArmM3MovementInhibited;
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
 ArmM3MaintenanceAvail := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance
                      AND NOT PRG_05_Translation.Data.TranslationSafety.SafeStop
-                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff
-                     AND NOT ArmM3MovementInhibited;
+                     AND NOT PRG_05_Translation.Data.TranslationSafety.PowerCutOff;
 
 ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM2AscentAvail OR ArmM2DescendAvail
                OR ArmM3TremieAvail OR ArmM3MaintenanceAvail;
+
+// Tempo anti-court-cycle : un axe en WAIT_RESTART_DELAY / FAULT (barriere finale
+// PRG_06, scan N-1) fait tomber ArmingPermit -> l'operateur ne peut pas re-armer
+// dans le deadlock. Se leve seul (retour neutre 1,5 s), pas de bypass.
+ArmMovementInhibitedAny := PRG_06_Outputs.Data.M1MovementInhibited
+                        OR PRG_06_Outputs.Data.M2MovementInhibited
+                        OR PRG_06_Outputs.Data.M3MovementInhibited;
 
 // Conditions de base (AC1) — priorite decroissante pour le motif.
 ArmBucketBusy := instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q;
@@ -993,12 +979,15 @@ ELSIF ArmBucketBusy THEN
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.BUCKET_BUSY;
 ELSIF NOT ArmAnyAxisAvail THEN
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.ALL_AXES_BLOCKED;
+ELSIF ArmMovementInhibitedAny THEN
+    Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.MOVEMENT_TEMPO;
 ELSE
     Data.ArmingAvailability.BlockedReason := E_ArmingBlockReason.NONE;
 END_IF;
 
 ArmingPermit := NOT ArmModeDisabled AND NOT ArmContactorOff AND NOT ArmPowerCutOff
-             AND NOT ArmBucketBusy AND ArmAnyAxisAvail;
+             AND NOT ArmBucketBusy AND ArmAnyAxisAvail
+             AND NOT ArmMovementInhibitedAny;
 
 Data.ArmingAvailability.M1AscentAvail      := ArmM1AscentAvail;
 Data.ArmingAvailability.M1DescendAvail     := ArmM1DescendAvail;
