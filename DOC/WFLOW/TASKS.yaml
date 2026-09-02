@@ -4929,3 +4929,63 @@ tasks:
   - Non-regression arming, safety et sorties
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T223_JOYSTICK_SPEEDSTEP_TABLE_LINK.yaml
   bloque_par: []
+- id: T224
+  parent_id: ''
+  statut: ⬜
+  criticite: C4
+  domaine: JOYSTICK / AUTORISATION MOUVEMENT
+  agent: ''
+  date: '2026-09-02T13:15:00+02:00'
+  titre: ArmingPermit cohérent avec disponibilité réelle des actionneurs
+  contexte: >
+    ArmingPermit peut actuellement rester TRUE alors qu'un interlock final,
+    un délai de reprise, un défaut mouvement ou un actionneur M3 indisponible
+    empêche le mouvement demandé. L'opérateur peut donc armer sans pouvoir agir.
+  description: >
+    Requalifier ArmingPermit comme permission d'armement cohérente avec
+    l'action sélectionnée, le sens demandé et la disponibilité aval réelle.
+    Séparer la possibilité d'armer, la disponibilité par axe/sens et le motif
+    de blocage, sans confondre pause normale, SafeStop et PowerCutOff.
+  objectifs:
+  - Identifier toutes les conditions réelles de disponibilité M1, M2 et M3
+  - Interdire l'armement trompeur lorsque l'action sélectionnée ne peut pas partir
+  - Préserver les mouvements disponibles sur les autres axes
+  - Définir et tester la reprise consciente après pause/interlock
+  - Publier axe, sens et raison pour l'IHM/troubleshooting
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T224_ARMINGPERMIT_ACTIONNEUR_PRET.yaml
+  bloque_par:
+  - Arbitrage humain requis : politique au neutre et reprise consciente après pause
+- id: T225
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS M1/M2 / CONCORDANCE CONTACTEURS
+  agent: ''
+  date: '2026-09-02T13:45:00+02:00'
+  titre: Concordance contacteurs M1/M2 graduee (SafeStop -> escalade PowerCutOff) en PRG_06
+  contexte: >
+    §2ter (PRG_06) met INSTANTANEMENT toutes les sorties treuil a FALSE des qu'un
+    ecart de vecteur M1/M2 est vu : aucune tolerance ms, pas de gradation, aucune
+    remontee decodee. FB_SyncContactor existe (debounce 500 ms -> SafeStop via
+    FB_WinchSync) mais sans escalade et tourne AVANT PRG_06 (ne voit pas les
+    vecteurs physiques finaux post §2ter/§2quater). Remontee actuelle par masque
+    hexa 16#0002 (interdit AF03 §4). Demande operateur 2026-09-02.
+  description: >
+    Etendre FB_SyncContactor avec une 2e sortie ContactorMismatchEscalated
+    (timeout nomme CST_SyncEscalationMs). Ajouter une instance dans PRG_06_Outputs
+    sur les vecteurs M1/M2 EFFECTIFS (post §2quater), en remplacement du §2ter
+    binaire : niveau 1 = SafeStop des 2 treuils, niveau 2 = PowerCutOff. Supprimer
+    tout masque hexa lie a ContactorMismatch (miroirs de causes nommes). Remonter
+    l'info decodee (niveau + contacteur fautif) vers GVL_Troubleshooting et le
+    bandeau IHM. Neutralisable par GVL_IHM.M1M2Sync.Bypass.Global (bypass groupe
+    synchro treuils existant, aucun nouveau bit).
+  objectifs:
+  - FB_SyncContactor gagne l'escalade (2e sortie + seuil nomme), debounce 500 ms conserve
+  - Instance PRG_06 sur les vecteurs physiques finaux, remplace le §2ter binaire
+  - SafeStop puis escalade PowerCutOff, sans aucun masque hexadecimal
+  - Info erreur decodee (niveau + contacteur) vers IHM / troubleshooting
+  - Neutralisation par le bypass groupe synchro treuils existant, pas de nouveau bit
+  - Non-regression mode unitaire + bypass ; bundle + G200 + gates verts
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T225_SYNCCONTACTOR_ESCALADE_PRG06.yaml
+  bloque_par:
+  - Arbitrage humain (design safety, lot MES-035) : chemin forcage SafeStop depuis PRG_06, cablage escalade -> PowerCutOff, forme du champ diagnostic
