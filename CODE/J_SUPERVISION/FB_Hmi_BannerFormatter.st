@@ -666,7 +666,12 @@ IF WinchM1Safety.ErrorOppositeDir AND EncM1Valid AND (AlarmCount < CST_NbMaxAlar
     AlarmArray[AlarmCount] := '[M1] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorNoMovement AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
+    IF WinchM1Safety.NoMovementContactorSuspect THEN
+        AlarmArray[AlarmCount] := '[M1] ErrorID:16 - contacteur de sens non engage (retour tous retombes)';
+    ELSE
+        AlarmArray[AlarmCount] := '[M1] ErrorID:16 - absence mouvement';
+    END_IF;
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5b. Collecte — treuil M2 (mêmes bits que M1, tri bloquant/warning identique)
@@ -698,7 +703,12 @@ IF WinchM2Safety.ErrorOppositeDir AND EncM2Valid AND (AlarmCount < CST_NbMaxAlar
     AlarmArray[AlarmCount] := '[M2] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorNoMovement AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
+    IF WinchM2Safety.NoMovementContactorSuspect THEN
+        AlarmArray[AlarmCount] := '[M2] ErrorID:16 - contacteur de sens non engage (retour tous retombes)';
+    ELSE
+        AlarmArray[AlarmCount] := '[M2] ErrorID:16 - absence mouvement';
+    END_IF;
+    AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5c. Collecte — translation M3 (ST_SafetyTranslation, tri bloquant/warning identique)
