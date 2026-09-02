@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T03:15:28.320987" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T03:15:28.320987">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T12:04:25.183614" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T12:04:25.183614">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -830,7 +830,12 @@ IF NOT BypassGlobal THEN
     instCauses[3].Texte    := 'Surchauffe thermique frein translation';
 
     // Cause 4 : Méca B (latched)
-    IF NOT (BypassSafety OR BypassMecaB) THEN
+    // ⚠️ Éval gardée par la comm drive (DriveOnline AND DriveOperational) : sans comm, le
+    //    statusword / la fréquence remontés ne sont pas fiables. Une perte bus doit tomber en
+    //    Cause 1 (DriveComm, bit1 -&gt; SafeStop acquittable), PAS en Méca B (bit4 -&gt; PowerCutOff
+    //    non-resettable). REX MES 2026-09-02 : DriveStatusWord.0 (= "ready to switch on")
+    //    figé sur bus mort -&gt; coupure chaîne intempestive.
+    IF NOT (BypassSafety OR BypassMecaB) AND DriveOnline AND DriveOperational THEN
         IF NOT HeartbeatIhmOk THEN
             UncommandedActiveB := (ABS(DriveActualFreqHz) &gt; 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
         ELSIF NOT RunRequest AND NOT BrakeCmd THEN

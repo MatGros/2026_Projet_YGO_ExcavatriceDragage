@@ -152,7 +152,12 @@ IF NOT BypassGlobal THEN
     instCauses[3].Texte    := 'Surchauffe thermique frein translation';
 
     // Cause 4 : Méca B (latched)
-    IF NOT (BypassSafety OR BypassMecaB) THEN
+    // ⚠️ Éval gardée par la comm drive (DriveOnline AND DriveOperational) : sans comm, le
+    //    statusword / la fréquence remontés ne sont pas fiables. Une perte bus doit tomber en
+    //    Cause 1 (DriveComm, bit1 -> SafeStop acquittable), PAS en Méca B (bit4 -> PowerCutOff
+    //    non-resettable). REX MES 2026-09-02 : DriveStatusWord.0 (= "ready to switch on")
+    //    figé sur bus mort -> coupure chaîne intempestive.
+    IF NOT (BypassSafety OR BypassMecaB) AND DriveOnline AND DriveOperational THEN
         IF NOT HeartbeatIhmOk THEN
             UncommandedActiveB := (ABS(DriveActualFreqHz) > 0.5) OR DriveStatusWord.0 OR BrakeFeedback;
         ELSIF NOT RunRequest AND NOT BrakeCmd THEN
