@@ -2420,10 +2420,28 @@ ELSIF StartupFail THEN
 ELSIF RedundancyTestFailed THEN
     Status.OperatorMessage := 'AU: defaut redondance contacteurs - verifier puis Reset';
 ELSIF EmergencyArmingFailed THEN
-    IF LastAbortCause = INT_TO_WORD(CST_ABORT_INVALID_STEP) THEN
-        Status.OperatorMessage := 'AU: etape sequence invalide - verifier puis Reset';
+    // Échec d'armement — non bloquant (alarme seule). Message décodé sur la cause du dernier
+    // abandon pour que l'opérateur sache POURQUOI la séquence n'a pas abouti.
+    IF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR) THEN
+        Status.OperatorMessage := 'AU: armement echoue - contacteur non confirme (timeout) - relancer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_REDUNDANCY_A) THEN
+        Status.OperatorMessage := 'AU: armement echoue - voie A collee (test redondance) - verifier voie A';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_REDUNDANCY_B) THEN
+        Status.OperatorMessage := 'AU: armement echoue - voie B collee (test redondance) - verifier voie B';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A) THEN
+        Status.OperatorMessage := 'AU: armement echoue - chaine non refermee apres test voie A - verifier boucle';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B) THEN
+        Status.OperatorMessage := 'AU: armement echoue - chaine non refermee apres test voie B - verifier boucle';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_CHAIN_DROP) THEN
+        Status.OperatorMessage := 'AU: armement echoue - chaine ouverte pendant impulsion/confirmation - relancer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_POWER_CUTOFF) THEN
+        Status.OperatorMessage := 'AU: armement echoue - coupure securite metier pendant sequence - lever la cause';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_CUT_IHM) THEN
+        Status.OperatorMessage := 'AU: armement echoue - coupure urgence IHM en sequence - relacher, relancer';
+    ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_INVALID_STEP) THEN
+        Status.OperatorMessage := 'AU: armement echoue - etape sequence invalide - Reset puis relancer';
     ELSE
-        Status.OperatorMessage := 'AU: echec rearmement contacteur (timeout) - verifier puis rearmer';
+        Status.OperatorMessage := 'AU: armement echoue - relancer';
     END_IF;
 ELSIF PowerCutOffRequest THEN
     Status.OperatorMessage := 'AU: coupure securite metier active - lever la cause puis rearmer';
