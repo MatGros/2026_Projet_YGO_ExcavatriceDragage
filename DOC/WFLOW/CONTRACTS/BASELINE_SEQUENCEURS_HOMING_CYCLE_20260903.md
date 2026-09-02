@@ -124,6 +124,25 @@
   (joystick maintenu, ralenti auto — cf. C3). Le référencement M1/M2 reste 100 % la responsabilité
   de `FB_MachineHomingCycle` (AC8, D5, D6).
 - Échelle de priorité + transaction : rendre la transition **init → cycle** pilotée par **condition d'état** (D6 : plus de bouton `HomingRequest` / `ConfirmXxx` explicite).
+- **Joystick armé pour tout mouvement du homing** : dès que la séquence de référencement coordonne
+  un mouvement (montée couplée jusqu'au capteur haut, bootstrap datum), il faut le **même principe
+  que `CycleMotionPermit`** (manche défléchi + homme-mort armé) — aucun ordre treuil sans permis
+  opérateur maintenu. Aujourd'hui `FB_MachineHomingCycle` n'émet aucun ordre de mouvement (le
+  mouvement passe par le joystick maintenance) ; si T226 lui fait coordonner le mouvement, ajouter
+  ce gate.
+- **Transaction §4/§5** : ✅ **FAIT** (hors T226, passe conformité) — réécrite en
+  `CASE TxState OF` sur `E_MachineHomingTxState` (`IDLE` / `ARMED` / `BUSY_OBSERVED`),
+  iso-comportement (18/18 tests). `HomingStarted` conservé en miroir de `(TxState <> IDLE)`.
+  Le §6 (guide opérateur) **reste** en `IF/ELSIF` : échelle de priorité recalculée chaque scan,
+  pas une machine d'état (l'étape est le résultat, pas l'état où l'on dispatche). Précédent projet :
+  `FB_Modes.st:225-239` (échelle IF/ELSIF → `ModeChangeBlockReason`).
+- **Angle mort §6** (revue cohérence, à traiter T226 ou tâche diag) : l'échelle `§6` **n'a aucune
+  branche `Fault.Latched`**. Après un rejet `DOUBLE_CONFIRM` / `CONFIRM_WHILE_HOMING` (causes
+  latchées qui **ne posent pas** `MachineHomingFailed`), on a `Fault.Latched = TRUE`,
+  `MachineHomed = FALSE`, mais l'échelle affiche quand même `AWAIT_BUCKET_CONFIRM` / `VALID` —
+  l'opérateur ne voit pas de consigne « acquitter le défaut », et `MachineHomingStepAtError` (R9)
+  fige une étape non-défaut. Les causes `HOMING_ERROR_M1/M2` et `TransactionAbort` sont couvertes
+  (elles posent `MachineHomingFailed`).
 - Bootstrap datum : `M1 := 0`, `M2 := offset fermé`, montée couplée, capteur haut → réf config (~8,5 m) + `Homed`.
 - Réf M1 + M2 au **même front unique** capteur haut.
 - Perte datum SEMI_AUTO → SafeStop treuils **puis** bascule MAINT_N1.

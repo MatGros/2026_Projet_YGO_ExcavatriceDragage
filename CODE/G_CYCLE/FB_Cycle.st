@@ -380,7 +380,7 @@ CASE State OF
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'Machine non referencee : passer en maintenance et lancer le cycle de referencement.';
+            OperatorAction := 'Machine non referencee : passer en maintenance pour le referencement.';
         END_IF;
 
     E_CycleStep.X2_WORK_POS_SELECT:

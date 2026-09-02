@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T23:02:14.764627" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T23:02:14.764627">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T23:17:48.989291" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T23:17:48.989291">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1588,7 +1588,7 @@ CASE State OF
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'Machine non referencee : passer en maintenance et lancer le cycle de referencement.';
+            OperatorAction := 'Machine non referencee : passer en maintenance pour le referencement.';
         END_IF;
 
     E_CycleStep.X2_WORK_POS_SELECT:
