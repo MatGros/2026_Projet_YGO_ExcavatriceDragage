@@ -1920,6 +1920,14 @@ shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer lockout anti-reessai</xhtml>
               </documentation>
             </variable>
+            <variable name="TonArmPulseInhibit">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde DURE : intervalle mini entre 2 impulsions contacteur (anti-chatter, inconditionnel)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonRedundancyDisplay">
               <type>
                 <derived name="TON" />
@@ -1934,6 +1942,22 @@ shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Timer debounce affichage IHM rearmement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PulseStepEndEdge">
+              <type>
+                <derived name="F_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant sortie etape PULSE (arme la garde anti-chatter)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ArmPulseInhibitActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Garde anti-chatter contacteur active (aucune nouvelle impulsion)</xhtml>
               </documentation>
             </variable>
             <variable name="instFault">
@@ -2172,7 +2196,7 @@ IF Enable THEN
             TonArmingPulse(IN := FALSE, PT := CST_ArmingPulseDuration);
             TonArmingConfirm(IN := FALSE, PT := CST_ArmingConfirmTimeout);
 
-            IF ArmReqEdge.Q AND Armable THEN
+            IF ArmReqEdge.Q AND Armable AND NOT ArmPulseInhibitActive THEN
                 RedundancyTestFailedCause := FALSE;
                 EmergencyArmingFailedCause := FALSE;
                 // 🛠️ BypassRedundancyTest (MES trace) : saute TEST_A..RESTORE_B, va au pulse.
@@ -2379,7 +2403,25 @@ MaintainA_NoBlock := Maintain_NoCutOff AND MaintainA_NoFault;
 MaintainB_NoBlock := Maintain_NoCutOff AND MaintainB_NoFault;
 Cmd.MaintainA_Cmd := Enable AND Maintain_ChainOk AND MaintainA_NoBlock;
 Cmd.MaintainB_Cmd := Enable AND Maintain_ChainOk AND MaintainB_NoBlock;
-Cmd.ArmPulse_Cmd  := Enable AND (ArmingSeqStep = CST_STEP_PULSE) AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest;
+// 🛡️ Garde DURE anti-chatter contacteur principal : après CHAQUE impulsion d'armement,
+//    aucune nouvelle impulsion avant CST_ArmingLockout — quel que soit l'état séquence,
+//    succès ou échec, ET les bypass ingénierie MES. Un cyclage rapide du contacteur casse
+//    le matériel. Garde inconditionnelle, au plus près de la sortie.
+PulseStepEndEdge(CLK := (ArmingSeqStep = CST_STEP_PULSE));
+IF PulseStepEndEdge.Q THEN
+    ArmPulseInhibitActive := TRUE;
+END_IF;
+IF NOT Enable OR EnableRising.Q THEN
+    ArmPulseInhibitActive := FALSE;
+END_IF;
+TonArmPulseInhibit(IN := ArmPulseInhibitActive, PT := CST_ArmingLockout);
+IF TonArmPulseInhibit.Q THEN
+    ArmPulseInhibitActive := FALSE;
+END_IF;
+
+Cmd.ArmPulse_Cmd  := Enable AND (ArmingSeqStep = CST_STEP_PULSE)
+                     AND NOT BtnEmergencyCutOff AND NOT PowerCutOffRequest
+                     AND NOT ArmPulseInhibitActive;
 // 🧪 TestCutActive : signale à la simulation qu'un canal est coupé pour le test de
 // redondance A/B (ForceTestA/B). La simulation ouvre alors la boucle AU (SimChainOk=FALSE)
 // pour que le test valide la chute de chaîne — sans dépendre de PowerCutOff_A/B (cercle cassé).
@@ -2420,28 +2462,27 @@ ELSIF StartupFail THEN
 ELSIF RedundancyTestFailed THEN
     Status.OperatorMessage := 'AU: defaut redondance contacteurs - verifier puis Reset';
 ELSIF EmergencyArmingFailed THEN
-    // Échec d'armement — non bloquant (alarme seule). Message décodé sur la cause du dernier
-    // abandon pour que l'opérateur sache POURQUOI la séquence n'a pas abouti.
+    // Échec d'armement — non bloquant (alarme seule). Message court décodé sur LastAbortCause.
     IF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_CONTACTOR) THEN
-        Status.OperatorMessage := 'AU: armement echoue - contacteur non confirme (timeout) - relancer';
+        Status.OperatorMessage := 'AU echec: contacteur non confirme';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_REDUNDANCY_A) THEN
-        Status.OperatorMessage := 'AU: armement echoue - voie A collee (test redondance) - verifier voie A';
+        Status.OperatorMessage := 'AU echec: voie A collee';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_REDUNDANCY_B) THEN
-        Status.OperatorMessage := 'AU: armement echoue - voie B collee (test redondance) - verifier voie B';
+        Status.OperatorMessage := 'AU echec: voie B collee';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A) THEN
-        Status.OperatorMessage := 'AU: armement echoue - chaine non refermee apres test voie A - verifier boucle';
+        Status.OperatorMessage := 'AU echec: chaine non refermee (voie A)';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_B) THEN
-        Status.OperatorMessage := 'AU: armement echoue - chaine non refermee apres test voie B - verifier boucle';
+        Status.OperatorMessage := 'AU echec: chaine non refermee (voie B)';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_CHAIN_DROP) THEN
-        Status.OperatorMessage := 'AU: armement echoue - chaine ouverte pendant impulsion/confirmation - relancer';
+        Status.OperatorMessage := 'AU echec: chaine ouverte pendant pulse';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_POWER_CUTOFF) THEN
-        Status.OperatorMessage := 'AU: armement echoue - coupure securite metier pendant sequence - lever la cause';
+        Status.OperatorMessage := 'AU echec: coupure metier en sequence';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_CUT_IHM) THEN
-        Status.OperatorMessage := 'AU: armement echoue - coupure urgence IHM en sequence - relacher, relancer';
+        Status.OperatorMessage := 'AU echec: coupure IHM en sequence';
     ELSIF LastAbortCause = INT_TO_WORD(CST_ABORT_INVALID_STEP) THEN
-        Status.OperatorMessage := 'AU: armement echoue - etape sequence invalide - Reset puis relancer';
+        Status.OperatorMessage := 'AU echec: etape invalide - Reset';
     ELSE
-        Status.OperatorMessage := 'AU: armement echoue - relancer';
+        Status.OperatorMessage := 'AU echec armement - relancer';
     END_IF;
 ELSIF PowerCutOffRequest THEN
     Status.OperatorMessage := 'AU: coupure securite metier active - lever la cause puis rearmer';
