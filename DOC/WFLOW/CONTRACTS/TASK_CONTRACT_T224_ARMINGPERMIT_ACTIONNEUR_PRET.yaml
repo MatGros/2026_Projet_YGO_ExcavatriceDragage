@@ -1,0 +1,97 @@
+contract:
+  task_id: T224_ARMINGPERMIT_ACTIONNEUR_PRET
+  criticality: C4
+  strategy: patch
+  objective: >
+    Faire de ArmingPermit la permission honnete d'armer le joystick seulement
+    lorsqu'au moins une action selectionnee peut etre executee sans blocage aval,
+    et expliquer a l'operateur toute indisponibilite restante par axe et sens.
+  acceptance:
+    - id: AC1
+      statement: "ArmingPermit est FALSE en mode DISABLE, contacteur puissance absent, PowerCutOff, SafeStop, benne active ou front de fin d'action benne."
+      verified_by: "Tests unitaires et integration PRG_02/PRG_04/PRG_05."
+    - id: AC2
+      statement: "Un treuil en faute mouvement/finale, RestartInhibit ou WAIT_RESTART_DELAY ne rend pas disponible le mouvement treuil correspondant."
+      verified_by: "Tests FB_WinchOutputInterlock et integration trace/permit."
+    - id: AC3
+      statement: "Un M3 en SafeStop, PowerCutOff, drive non operationnel, interlock hauteur ou faute finale ne rend pas disponible le mouvement M3 correspondant."
+      verified_by: "Tests FB_TranslationOutputInterlock et integration PRG_05."
+    - id: AC4
+      statement: "En commande Both, un seul treuil indisponible interdit l'armement de l'intention Both dans le sens demande."
+      verified_by: "Scenario integration Both M1/M2 par sens."
+    - id: AC5
+      statement: "Une indisponibilite d'un axe ne desarme pas abusivement un autre axe reellement disponible ; le diagnostic publie l'axe, le sens et la raison."
+      verified_by: "Scenarios croises M1/M2/M3 et revue IHM/troubleshooting."
+    - id: AC6
+      statement: "Le nom de fichier est identique au nom de POU; le suffixe correspond au langage bundle PLCopenXML pour chaque PROGRAM modifie."
+      verified_by: "Gate structurel dedie et bundle frais."
+    - id: AC7
+      statement: "Aucun mouvement ne repart automatiquement a la fin d'une pause : la reprise consciente definie pour l'interlock est conservee ou explicitement renforcee apres arbitrage humain."
+      verified_by: "Chronogrammes et tests de reprise apres pause."
+  scope:
+    allowed:
+      - CODE/D_JOYSTICK/FB_Joystick.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/J_SUPERVISION/
+      - CODE/J_SUPERVISION/_TYPES/
+      - CODE/H_TREUILS_BENNE/
+      - DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch/
+      - DOC/AF/AF_Partie-11_Fonction_Translation/
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T224_ARMINGPERMIT_ACTIONNEUR_PRET.yaml
+    forbidden:
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/GVL_PERSISTENT.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - ARCHIVES/
+  conservation:
+    must_survive:
+      - "ArmingPermit reste le seul permis externe consomme par FB_Joystick."
+      - "SafeStop et PowerCutOff restent des mecanismes de mouvement/safety distincts de l'armement."
+      - "Un Reset reste un front conscient et aucun defaut ne provoque de redemarrage automatique."
+      - "Le joystick peut etre arme au neutre sans imposer que toutes les directions de tous les axes soient disponibles."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  design_decisions:
+    - "REPRISE APRES PAUSE (AC7) = B : nouveau FRONT homme-mort GLOBAL. Toute perte de disponibilite d'un axe fait ArmingPermit=FALSE -> FB_Joystick desarme le geste ENTIER (deja le comportement : IF NOT ArmingPermit THEN DeadmanArmed:=FALSE; DeadmanArmPending:=FALSE). La reprise exige relacher + re-appuyer le bouton + maintenir DeadmanArmHoldTime. Aucun rearmement cible par axe, aucune reprise au neutre seul. Coherent T222."
+    - "FORME ArmingPermit = X : reste UN SEUL BOOLEEN. ArmingPermit := (conditions de base AC1) AND (au moins 1 axe x sens selectionne disponible). FB_Joystick INCHANGE (must_survive : ArmingPermit reste le seul permis externe). Le blocage fin par axe/sens reste AVAL (arbitrages M1/M2/M3). Un struct diag ST_ArmingAvailability (M1Ascent/M1Descend/M2Ascent/M2Descend/M3Tremie/M3Maintenance : BOOL ; BlockedAxis ; BlockedReason) est publie vers GVL_Troubleshooting + GVL_IHM pour AC5."
+    - "AC1 : ArmingPermit gate explicitement sur Mode <> DISABLE, PowerContactorEngaged, NOT PowerCutOff agrege, NOT SafeStop global, NOT benne active, NOT BenneBusyFallEdge.Q (deja partiellement present §5-0)."
+  scope_conflict_flagged: >
+    AC2/AC3 demandent que RestartInhibit / WAIT_RESTART_DELAY / faute finale de
+    l'interlock (instWinchOutputInterlockM1/M2, instTranslationOutputInterlockM3)
+    rendent l'axe indisponible. Ces instances vivent dans PRG_06_Outputs
+    (forbidden) et PRG_06 s'execute APRES PRG_04/PRG_05. Deux voies possibles a
+    trancher par l'orchestrateur : (a) se contenter des vues deja disponibles en
+    amont (instSafetyWinchM1.SafeStop / .Fault.Latched, instSafetyTranslationM3.*)
+    -> RestartInhibit transitoire 1,5 s non couvert (armement trompeur bref
+    accepte) ; (b) exposer les etats interlock via un bus lu au scan N-1 (necessite
+    une exception de scope sur PRG_06 ou un relais dans PRG_07). Defaut retenu
+    sans contre-ordre : (a).
+
+  alert_duty: >
+    STOP si (a) ci-dessus laisse un cas AC2/AC3 non couvert juge critique, si la
+    forme ST_ArmingAvailability entre en collision avec un DUT existant, ou si
+    gater ArmingPermit sur les nouvelles conditions desarme un axe reellement
+    disponible (AC5 : pas de desarmement abusif croise).
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
