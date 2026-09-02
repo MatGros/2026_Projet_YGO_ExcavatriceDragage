@@ -27,26 +27,29 @@ contract:
       statement: "SEMI_AUTO n'est selectionnable que si les codeurs M1 et M2 sont fiables ET l'offset benne est valide (MachineHomed) ; sinon la selection est refusee avec un motif IHM explicite."
       verified_by: "Tests FB_Modes (selection SEMI_AUTO homed / non homed) + observation Auth.Mode et Auth.ModeChangeBlockReason."
     - id: AC2
-      statement: "Si le mode courant est SEMI_AUTO et que MachineHomed retombe a FALSE, le mode bascule automatiquement vers MAINT_N1 avec un motif IHM, sans redemarrage automatique du cycle et sans coupure brutale non justifiee."
-      verified_by: "Scenario integration PRG_03 : perte de datum en SEMI_AUTO -> Auth.Mode = MAINT_N1, cycle a l'arret, chronogramme de la transition."
+      statement: "Si le mode courant est SEMI_AUTO et que MachineHomed retombe a FALSE, les treuils passent d'abord en SafeStop (Enable maintenu, rampe rapide) PUIS le mode bascule vers MAINT_N1 avec un motif IHM, sans redemarrage automatique du cycle et sans coupure de puissance."
+      verified_by: "Scenario integration PRG_03 : perte de datum en SEMI_AUTO -> SafeStop treuils puis Auth.Mode = MAINT_N1, cycle a l'arret, chronogramme ordonne SafeStop->bascule."
     - id: AC3
-      statement: "La sequence de referencement maintenance demande d'abord la fermeture benne ; pendant cette phase seule, la benne est manoeuvrable au joystick sans fin de course benne, dans une fenetre bornee et tracee ; hors de cette phase la benne retrouve ses fins de course."
-      verified_by: "Tests FB_MachineHomingCycle + route benne : commande benne acceptee sans FDC uniquement a l'etape 'fermer benne', refusee ailleurs ; chronogramme de la fenetre."
+      statement: "Machine non homed : l'ouverture / fermeture benne se fait sans fin de course benne (position inconnue), uniquement pendant l'etape 'fermer benne' de la sequence homing, avec la vitesse plafonnee au palier 1 ; des que MachineHomed devient TRUE les FDC benne redeviennent actifs et bornent la benne."
+      verified_by: "Tests FB_MachineHomingCycle + route benne : commande benne sans FDC acceptee seulement a l'etape 'fermer benne', StepTgt <= 1 impose, refusee ailleurs ; test transition homed -> FDC benne actifs."
+    - id: AC3b
+      statement: "L'IHM offre une commande 'Reset etat homed M1+M2' qui remet MachineHomed (et les datums M1/M2) a non reference, ce qui rouvre l'ouverture/fermeture benne libre au palier 1 et impose un nouveau cycle homing avant tout SEMI_AUTO."
+      verified_by: "Test : action IHM -> MachineHomed FALSE, HomingRequired M1/M2 TRUE, SEMI_AUTO non selectionnable, benne manoeuvrable palier 1 sans FDC."
     - id: AC4
       statement: "A la confirmation operateur 'benne fermee', la reference benne fermee est publiee (CommitClose) une seule fois, atomiquement, et seulement a cette confirmation."
       verified_by: "Test FB_MachineHomingCycle : un seul CommitClose au front de confirmation, aucun commit hors confirmation."
     - id: AC5
-      statement: "Apres reference benne, la sequence demande la montee des deux treuils au joystick jusqu'au capteur haut ; si un treuil est deja au capteur haut, son etape est franchie sans mouvement."
-      verified_by: "Tests sequence : etape montee active tant que capteur haut non atteint, sautee si deja atteint."
+      statement: "Benne confirmee fermee, la sequence pose un datum provisoire coherent (M1 := 0, M2 := offset benne fermee recale a M2 relatif 0) puis demande la montee couplee des deux treuils au joystick (both winch = 0) jusqu'au capteur haut ; si le capteur haut est deja actif a l'entree, la montee est franchie sans mouvement."
+      verified_by: "Tests sequence : datum provisoire pose apres confirmation benne, montee couplee active tant que capteur haut non atteint, sautee si capteur deja actif."
     - id: AC6
-      statement: "Au front montant du capteur haut, M1 et M2 sont references dans le meme scan et les deux treuils sont stoppes immediatement (arret dur, au plus pres de l'action)."
-      verified_by: "Chronogramme front capteur -> HomeReq M1+M2 + ordre stop treuils dans le meme scan ; test unitaire dedie."
+      statement: "Au front montant du capteur haut, la position de reference config (CfgTopSensorPos_M, ~8,5 m) est ecrite sur M1 et M2 dans le meme scan, MachineHomed passe a TRUE et les deux treuils sont stoppes immediatement (arret dur, au plus pres de l'action)."
+      verified_by: "Chronogramme front capteur -> ecriture ref 8,5 m M1+M2 + Homed TRUE + stop treuils, tout dans le meme scan ; test unitaire dedie."
     - id: AC7
-      statement: "Une fois M1/M2 references au capteur haut, tout mouvement treuil suivant n'est autorise qu'en descente, sous le FDC logiciel haut, jusqu'a ce que la position repasse dans la plage nominale."
-      verified_by: "Test permis directionnel post-reference : AscentPermit refuse, DescendPermit autorise tant que CablePosM >= seuil ; chronogramme."
+      statement: "Une fois M1/M2 references au capteur haut, tout mouvement treuil suivant n'est autorise qu'en descente via le meme gate AscentPermit existant (CablePosM >= TopLimitM) ; aucune erreur n'est levee, seul un message d'information 'Descendre pour quitter la zone haute' est affiche."
+      verified_by: "Test permis directionnel : AscentPermit refuse, DescendPermit autorise tant que CablePosM >= TopLimitM ; aucun code defaut, message info present ; chronogramme."
     - id: AC8
-      statement: "L'initialisation SEMI_AUTO ne contient plus de referencement codeurs : elle demande une mise des treuils au FDC logiciel haut au joystick (sautee si deja en position), puis un placement M3 (P1 ou tremie) au joystick, puis autorise le demarrage de la boucle de cycle."
-      verified_by: "Tests FB_Cycle : etape init sans HomeReq codeur, franchissement conditionne position haute + M3 place ; scenario integration."
+      statement: "L'initialisation SEMI_AUTO ne contient plus de referencement codeurs ni de bouton HomingRequest : la transition vers la boucle de cycle est une condition d'etat = treuils au FDC logiciel haut ET M3 stable sur P1 (AtP1) OU sur P tremie ; l'etape 'mise en position haute' est franchie sans mouvement si les treuils y sont deja."
+      verified_by: "Tests FB_Cycle : etape init sans HomeReq codeur, transition conditionnee position haute + M3 place, pas d'entree HomingRequest ; scenario integration."
     - id: AC9
       statement: "Chaque etape de la sequence de referencement expose une consigne operateur en clair (MachineHomingInstruction) et un numero d'etape ; ces textes sont l'unique source affichee a l'IHM pour le referencement (pas de texte homing concurrent code en dur ailleurs)."
       verified_by: "Grep : aucun libelle homing en dur hors FB_MachineHomingCycle ; observation GVL_IHM (bandeau et/ou champ dedie) sur snapshot par etape."
@@ -100,9 +103,11 @@ contract:
       - "MachineHomed reste le gate de SEMI_AUTO ; le referencement des codeurs n'a jamais lieu a l'interieur du cycle SEMI_AUTO."
       - "La perte de datum en mouvement continue de demander un arret controle (SafeStop) et une reprise sur front Reset conscient."
       - "Le referencement M1/M2 reste declenche par le capteur haut physique (M1M2_TopPositionFree_DI), pas par une position calculee."
-      - "La commande benne sans fin de course reste STRICTEMENT limitee a l'etape 'fermer benne' de la sequence de referencement ; partout ailleurs les FDC benne sont actifs."
+      - "La commande benne sans fin de course reste STRICTEMENT limitee a l'etape 'fermer benne' de la sequence de referencement (machine non homed), vitesse plafonnee palier 1 ; des que homed, FDC benne actifs."
       - "Aucun redemarrage automatique apres defaut, arret ou changement de mode."
       - "Enable > SafeStop > StartStop : une expulsion de mode ne doit pas se traduire par une coupure de puissance non justifiee."
+      - "Le datum provisoire pose pendant le homing (M1:=0, M2:=offset ferme) n'est jamais considere comme un vrai referencement : MachineHomed ne passe TRUE qu'a l'ecriture de la ref config au capteur haut."
+      - "La montee de referencement reste couplee (both winch = 0), meme chemin que la conduite couplee habituelle."
     dropped_on_purpose:
       - "L'etape X1_HOMING de FB_Cycle ne realise plus de recherche de capteur ni de referencement codeur (reduite a la mise en position haute)."
       - "Les diagnostics SemiAutoCycleNotReadyHoming / SemiAutoCycleNotReadyMachineHoming de FB_Modes deviennent sans objet si la selection SEMI_AUTO est durcie (a confirmer en P0 : suppression ou conservation en garde-fou)."
@@ -127,24 +132,33 @@ contract:
         Note d'etude versionnee (DOC/WFLOW/TROUBLESHOOTING/ ou section de ce
         contrat) : cartographie de l'existant (FB_Modes gate SEMI_AUTO, FB_Cycle
         X0/X1, FB_MachineHomingCycle, route joystick en maintenance, route benne,
-        FDC benne, FDC logiciel haut treuil, capteur haut commun), decoupage FB
-        fige, reponses aux open_questions, liste des effets de bord et des
-        modifications PRG_02 a fournir en diff. VALIDATION HUMAINE OBLIGATOIRE
-        avant P1.
+        FDC benne, FDC logiciel haut treuil, capteur haut commun, ecriture des
+        datums codeur M1/M2), decoupage FB fige, effets de bord directs et
+        indirects. Livrables specifiques :
+        (a) D7 : recommandation argumentee PRG_02 vs PRG_03 pour
+            FB_MachineHomingCycle (flux de donnees, ordre de scan, lags de bus) ;
+        (b) mecanisme d'ecriture du datum provisoire puis de la ref config au
+            capteur (quel FB ecrit la position codeur, via quelle entree) ;
+        (c) emplacement et persistance de la commande IHM 'Reset etat homed
+            M1+M2' (impact GVL_PERSISTENT si les flags homing y vivent) ;
+        (d) delta PRG_02 exact si placement PRG_02 retenu.
+        VALIDATION HUMAINE OBLIGATOIRE avant P1.
     - id: P1
       name: "Gate SEMI_AUTO homed-only + expulsion vers MAINT_N1"
       touches: [FB_Modes.st, PRG_03_Modes_Cycle.st]
       acceptance: [AC1, AC2, AC10]
     - id: P2
       name: "Sequence de referencement maintenance robuste"
-      touches: [FB_MachineHomingCycle.st, E_MachineHomingStep.st, FB_Bucket.st, PRG_04_Treuils_Benne.st, ST_MachineHoming.st]
-      acceptance: [AC3, AC4, AC5, AC6, AC7, AC10]
+      touches: [FB_MachineHomingCycle.st, E_MachineHomingStep.st, FB_Bucket.st, PRG_04_Treuils_Benne.st, ST_MachineHoming.st, GVL_IHM.st]
+      acceptance: [AC3, AC3b, AC4, AC5, AC6, AC7, AC10]
       notes: >
-        Reprend les bonnes idees de FB_Cycle X1 (montee lente joystick, texte
-        operateur, garde WindowSafe). Referencement M1+M2 au meme scan sur front
-        montant capteur haut, stop dur immediat. Bypass FDC benne interne borne a
-        l'etape 'fermer benne'. Permis directionnel post-reference = descente seule
-        sous FDC logiciel haut.
+        Reprend les bonnes idees de FB_Cycle X1 (montee couplee joystick, texte
+        operateur, garde WindowSafe). Etapes : fermer benne (sans FDC, palier 1) ->
+        confirmation operateur = ref benne fermee + pose datum provisoire (M1:=0,
+        M2:=offset ferme, M2 relatif 0) -> montee couplee both winch=0 -> front
+        montant capteur haut : ecriture ref config ~8,5 m sur M1+M2 meme scan +
+        Homed TRUE + stop dur. Post-ref : descente seule via AscentPermit existant,
+        message info seul. Commande IHM 'Reset etat homed M1+M2'.
     - id: P3
       name: "Initialisation SEMI_AUTO simplifiee"
       touches: [FB_Cycle.st, E_CycleStep.st, PRG_03_Modes_Cycle.st]
@@ -168,33 +182,80 @@ contract:
             referencement complet, init SEMI_AUTO) ;
         (4) l'orchestrateur relit le git diff reel avant toute proposition de commit.
 
-  # ── 8. Points d'etude a trancher en P0 ────────────────────────────────
-  open_questions:
-    - id: Q1
-      q: "Expulsion SEMI_AUTO -> MAINT_N1 : immediate, ou precedee d'un SafeStop des treuils s'ils sont en mouvement au moment de la perte de datum ?"
-    - id: Q2
-      q: "Bypass FDC benne pendant 'fermer benne' : automatique et borne en interne du FB (fenetre + garde WindowSafe), ou exige un bypass IHM explicite coche par l'operateur ?"
-    - id: Q3
-      q: "Front montant capteur haut : le capteur est commun M1M2_TopPositionFree_DI. On reference M1 et M2 au meme front unique (archi actuelle) — confirmer qu'aucun cas separe M1 seul / M2 seul n'est attendu."
-    - id: Q4
-      q: "Permis 'descente seule sous FDC logiciel haut' post-reference : on reutilise le gate AscentPermit existant (CablePosM >= TopLimitM) ou on ajoute un latch dedie arme au referencement et purge au retour en plage nominale ?"
-    - id: Q5
-      q: "Init SEMI_AUTO : si un treuil est deja au-dessus du FDC logiciel haut (override N1/N2 actif), comportement de l'etape 'mise en position haute' ?"
-    - id: Q6
-      q: "Entree HomingRequest de FB_Cycle X1 (transition vers X2) : qui la produit apres la refonte, ou est-elle supprimee au profit d'une condition position + M3 place ?"
-    - id: Q7
-      q: "FB_MachineHomingCycle est instancie dans PRG_02 (forbidden). Enrichir son interface impose un delta PRG_02 : (a) garder l'interface stable et n'utiliser que les entrees existantes, ou (b) fournir le patch PRG_02 exact en diff pour application humaine. Defaut retenu sans contre-ordre : (b)."
+  # ── 8. Decisions tranchees (operateur, 2026-09-02) ───────────────────
+  resolved_decisions:
+    - id: D1   # ex-Q1
+      decision: >
+        Perte de datum en SEMI_AUTO = SafeStop des treuils PUIS basculement vers
+        MAINT_N1 (pas de coupure brutale : Enable maintenu, rampe rapide SafeStop,
+        puis changement de mode). L'ordre est SafeStop d'abord, bascule ensuite.
+    - id: D2   # ex-Q2
+      decision: >
+        Pas de bypass FDC benne "coche" : quand la machine n'est PAS homed, les FDC
+        logiciels benne n'existent pas (position inconnue), donc l'ouverture /
+        fermeture benne se fait forcement sans FDC. C'est intrinseque, pas une
+        derogation. Garde-fous : (a) uniquement pendant l'etape 'fermer benne' de
+        la sequence homing ; (b) vitesse plafonnee palier 1 max dans cet etat ;
+        (c) des que homed, les FDC benne redeviennent actifs et bornent la benne.
+        Ajout IHM : bouton "Reset etat homed M1+M2" — si une derive benne est
+        constatee, l'operateur remet la machine en non-homed, ce qui force un
+        nouveau cycle homing et redonne l'ouverture/fermeture benne libre (palier 1).
+    - id: D3   # ex-Q3
+      decision: >
+        M1 et M2 sont couples et references au MEME front unique du capteur haut
+        commun. Pre-condition : benne confirmee fermee => pas de brin mou => la
+        reference commune est valide. Aucun cas M1 seul / M2 seul.
+    - id: D4   # ex-Q4
+      decision: >
+        Post-reference : ce sont LES MEMES FDC (gate AscentPermit existant,
+        CablePosM >= TopLimitM). Pas de latch dedie. Aucune erreur affichee :
+        message d'information seul "Descendre pour quitter la zone haute".
+    - id: D5   # ex-Q5 + bootstrap datum
+      decision: >
+        Bootstrap du datum pendant le cycle homing (machine non homed, benne
+        confirmee fermee) : poser M1 := 0 et M2 := offset benne fermee (~15,
+        valeur CfgOffsetClose), recale pour que M2 relatif = 0 => les deux axes
+        ont un datum provisoire coherent, ce qui autorise la montee couplee
+        (both winch = 0) comme d'habitude. A l'atteinte du capteur haut : ecrire
+        la position de reference = valeur config CfgTopSensorPos_M (~8,5 m) sur
+        M1 et M2, Homed := TRUE.
+        Cas capteur haut deja actif a l'entree (+ benne fermee) : on considere
+        etre AU capteur => reference directe possible sans montee. Sinon (pas de
+        capteur, pas de FDC logiciel haut) : position inconnue => montee obligatoire.
+    - id: D6   # ex-Q6
+      decision: >
+        Plus de bouton HomingRequest. La transition init SEMI_AUTO -> boucle de
+        cycle est une CONDITION D'ETAT : treuils au FDC logiciel haut ET M3
+        stable sur P1 (AtP1) OU sur P tremie. C'est l'etape d'initialisation
+        du mode.
+    - id: D7   # ex-Q7 — challenge flux data effectue 2026-09-02
+      decision: >
+        FB_MachineHomingCycle RESTE en PRG_02. Analyse ordre de scan
+        PRG_02->03->04->05->06->07 : en PRG_02, la production critique
+        M1/M2Demand.HomeReq -> FB_Encoder est FRAICHE (meme PRG, meme scan), ce
+        qui est indispensable pour un traitement de front propre du declenchement
+        homing. Un deplacement en PRG_03 rendrait Mode frais (gain mineur, donnee
+        quasi-statique) mais degraderait HomeReq->FB_Encoder en N-1 (perte sur un
+        front transitoire sensible). Les lectures Mode<-PRG_03,
+        BucketOffsetValid<-PRG_04, Reset<-PRG_07 restent en N-1, conforme a la
+        doctrine du bus (deja le cas aujourd'hui). Consequence : le delta
+        d'interface FB (nouvelles entrees/sorties + cablage) est fourni en DIFF
+        pour application humaine dans PRG_02 (hors scope agent).
 
   # ── 9. Devoir d'alerte ───────────────────────────────────────────────
   alert_duty: >
-    STOP et remontee immediate a l'orchestrateur si : une reponse d'open_question
-    reste indeterminee au moment de coder la phase concernee ; le durcissement de
-    la selection SEMI_AUTO cree un verrou de mode inattendu (machine coincee en
-    MAINT sans chemin de sortie) ; le bypass FDC benne deborde de l'etape 'fermer
-    benne' ; le referencement M1/M2 au front capteur n'est pas garanti dans le
-    meme scan ; une modification touche PRG_02 / PRG_06 / B_AU_SECURITE (forbidden) ;
-    un effet de bord indirect apparait sur un interlock, le datum machine ou la
-    reprise consciente. Signaler n'est pas elargir le scope.
+    STOP et remontee immediate a l'orchestrateur si : un point d'etude P0
+    (D1..D7) reste indetermine au moment de coder la phase concernee ; le
+    durcissement de la selection SEMI_AUTO cree un verrou de mode inattendu
+    (machine coincee en MAINT sans chemin de sortie) ; la commande benne sans
+    FDC deborde de l'etape 'fermer benne' ou depasse le palier 1 ; le
+    referencement M1/M2 au front capteur (ecriture ref 8,5 m + Homed + stop)
+    n'est pas garanti dans le meme scan ; l'ecriture du datum codeur ou le
+    'Reset homed' impose de toucher GVL_PERSISTENT / PRG_02 / PRG_06 /
+    B_AU_SECURITE (forbidden) — fournir alors un diff pour application humaine ;
+    un effet de bord indirect apparait sur un interlock, le datum machine, le
+    brin mou (slack cable) ou la reprise consciente. Signaler n'est pas elargir
+    le scope.
 
 # ═══════════════════════════════════════════════════════════════════════════
 # 🚦 SUIVI
