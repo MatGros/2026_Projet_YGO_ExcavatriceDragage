@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:12:28.044022" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:12:28.044022">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T16:50:07.431045" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T16:50:07.431045">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1372,20 +1372,20 @@ IF Error THEN
 END_IF;
 
 // ── 6quater. Disponibilite mouvement ──
-// TRUE tant qu'une nouvelle demande de mouvement est REELLEMENT impossible ce scan :
-//  - RestartRequired : anti-court-cycle RestartDelay (1,5 s) ; TRUE des le retour
-//    au neutre (State=READY) ET pendant le deadlock manche deflechi (WAIT_RESTART_DELAY,
-//    ou RestartDelayElapsed est fige). Se purge seul via RestartDelay.Q.
-//  - DeadTimePending : temps mort directionnel (~1 s apres arret). Se purge via DeadTime.Q.
-//  - RestartInhibit / ContactorStuck : latches a acquittement conscient.
-//  - NOT Ready / State FAULT : FB non operationnel.
+// TRUE quand une demande de mouvement est REELLEMENT bloquee ce scan par la
+// machine d'etat : WAIT_RESTART_DELAY (anti-court-cycle : n'apparait QUE si un
+// mouvement est demande alors que RestartRequired/DeadTimePending est actif -&gt;
+// c'est le vrai deadlock manche deflechi) ou FAULT, plus les latches conscients
+// RestartInhibit / ContactorStuck et le FB non pret.
+// PAS de RestartRequired/DeadTimePending bruts : ils sont re-armes a CHAQUE scan
+// au neutre (pas seulement pendant 1,5 s) et ne se purgent que si RestartDelay
+// compte -&gt; sur banc, retour frein fige -&gt; ArmingPermit resterait bloque a 0.
 // WAIT_STEP_DELAY EXCLU (bride la hausse de palier, n'interdit pas de partir).
 // Aucune coupure ajoutee : signal de disponibilite consomme par la dispo d'armement PRG_04.
 MovementInhibited := NOT Ready
                      OR RestartInhibit
                      OR ContactorStuck
-                     OR RestartRequired
-                     OR DeadTimePending
+                     OR (State = E_WinchFinalInterlockState.WAIT_RESTART_DELAY)
                      OR (State = E_WinchFinalInterlockState.FAULT);
 </xhtml>
           </ST>
