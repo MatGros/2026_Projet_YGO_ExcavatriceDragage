@@ -5245,3 +5245,36 @@ tasks:
   - Documenter la nouvelle logique dans AF_Partie-09 v2.4
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T235_REFONTE_TRANSACTION_PRESET.yaml
   bloque_par: []
+
+- id: T237
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: SEQUENCEUR SEMI_AUTO / FB_CYCLE
+  agent: CC-01
+  date: '2026-09-03T12:00:00+02:00'
+  titre: FB_CycleSemiAuto - gel GRAFCET SEMI_AUTO + renommage FB_Cycle
+  contexte: >
+    Demande utilisateur (urgent, avant MES) : meme demarche que le homing machine
+    (T233) - figer le GRAFCET du sequenceur SEMI_AUTO sur papier (tableaux step /
+    actions / transitions), le faire valider, puis renommer FB_Cycle en
+    FB_CycleSemiAuto partout et appliquer les changements valides. Reprend le
+    perimetre contenu de T229 (split X11 deja livre en campagne).
+  description: >
+    P1 : GEL_GRAFCET_SEMIAUTO_20260903.md - etape initiale pure + steps X0..X13 +
+    STABILIZING + transitions + transverses, format tableaux comme le homing.
+    Validation humaine.
+    P2 : renommage FB_Cycle -> FB_CycleSemiAuto (fichier, POU, instance
+    instCycleSemiAuto, references FB_Modes / BannerFormatter / PRG_03/05/07,
+    registry, test_fb_cyclesemiauto.st, bundle XML).
+    P3 : ajout etape initiale pure a E_CycleStep + consommateurs + TC.
+    Scope : FB_Cycle + E_CycleStep + PRG_03 + types 3_CYCLE_ET_MODES + renommage
+    dans FB_Modes/PRG_05/PRG_07. PRG_04 / FB_MachineHomingCycle NON touches.
+  objectifs:
+  - GEL GRAFCET SEMI_AUTO valide (etape initiale pure, tableaux step/action/transition)
+  - Renommage FB_Cycle -> FB_CycleSemiAuto complet et coherent (nom fichier = nom POU)
+  - E_CycleStep + etape initiale pure + consommateurs symboliques a jour
+  - Contraintes C1 / C1e / C3 / homed-only preservees
+  - Bundle regenere, G200 PASS, gates palier C au niveau baseline
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T237_FB_CYCLESEMIAUTO_GEL_RENOMMAGE.yaml
+  bloque_par: []

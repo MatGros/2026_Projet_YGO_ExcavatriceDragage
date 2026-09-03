@@ -1,0 +1,118 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T237 : FB_CycleSemiAuto — gel GRAFCET + renommage
+# ═══════════════════════════════════════════════════════════════════════════
+# Meme demarche que le homing machine (T233) : figer le GRAFCET du sequenceur
+# SEMI_AUTO sur papier (steps + actions + transitions, tableaux), le faire
+# valider, puis renommer FB_Cycle -> FB_CycleSemiAuto et appliquer les
+# changements valides. Reprend / complete T229 (split X11, config treuil unique).
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T237_FB_CYCLESEMIAUTO_GEL_RENOMMAGE
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Figer le GRAFCET du sequenceur SEMI_AUTO (etape initiale pure ajoutee en amont
+    de X0_PREPARATION, steps X0..X13 + STABILIZING, split X11a/b/c deja fait,
+    transitions et transverses) dans un document de gel valide par l'humain, puis
+    renommer FB_Cycle en FB_CycleSemiAuto dans tout le code, les types, PRG_03/05/07,
+    le registre CI et les tests, et appliquer les ajustements GRAFCET valides.
+    Aucune modification PRG_04 / PRG_05 (hors renommage) / FB_Modes (hors renommage).
+
+  acceptance:
+    - id: AC1
+      statement: "Un document DOC/WFLOW/CONTRACTS/GEL_GRAFCET_SEMIAUTO_20260903.md fige le GRAFCET SEMI_AUTO : une etape initiale PURE (aucune action, aucune affectation) en amont de X0_PREPARATION ; pour chaque step X0..X13/STABILIZING un tableau step / actions (ordres treuil M1/M2, benne, translation, permis) / transitions (receptivite exacte) ; les transverses (perte permis, defaut, changement de mode, AbortCycle, Reset). Le doc porte l'etat 🟢 VALIDE avec visa humain."
+      verified_by: "Relecture du doc : chaque arme du CASE de FB_Cycle.st (commit courant) a une ligne correspondante ; champ validated_by non vide."
+    - id: AC2
+      statement: "Le renommage FB_Cycle -> FB_CycleSemiAuto est complet et coherent : le fichier CODE/G_CYCLE/FB_Cycle.st devient CODE/G_CYCLE/FB_CycleSemiAuto.st ; le nom de POU dans le fichier est identique au nom de fichier ; toutes les instances (instCycleSemiAuto dans PRG_03) et references de type (FB_Modes, FB_Hmi_BannerFormatter, PRG_05, PRG_07) pointent le nouveau nom ; le suffixe reste identique au langage genere dans le bundle (ST pur en .st) ; le bundle PLCopenXML est regenere."
+      verified_by: "grep -r 'FB_Cycle\\b' CODE/ ne renvoie plus que FB_CycleTime ; generate_codesys_bundle.py OK ; python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report : 0 erreur, instance instCycleSemiAuto reliee."
+    - id: AC3
+      statement: "Le registre CI (TOOLS/TEST_AUTO_CI/registry.yaml) et le harnais de test (RESULTS/G_CYCLE/tests/test_fb_cycle.st -> test_fb_cyclesemiauto.st) sont renommes et alignes ; run_tests.py --fb FB_CycleSemiAuto compile et execute ; la couverture TC pre-existante est conservee (aucun TC supprime sans justification)."
+      verified_by: "python TOOLS/TEST_AUTO_CI/run_tests.py --fb FB_CycleSemiAuto : compile + TC PASS au niveau baseline anterieur (ecarts documentes)."
+    - id: AC4
+      statement: "L'etape initiale pure est ajoutee a E_CycleStep (nom + valeur hors collision avec 0..16 ; strategie tranchee dans le gel) ; tous les consommateurs symboliques de E_CycleStep (FB_Hmi_BannerFormatter, FB_TroubleshootingView, PRG_03, PRG_07, ST_ChainCycleSemiAuto) couvrent la nouvelle valeur sans warning."
+      verified_by: "Relecture consommateurs + G200 ; TC : au boot / entree SEMI_AUTO le sequenceur est dans l'etape initiale pure (aucune sortie), transition vers X0_PREPARATION sur condition tranchee (gel)."
+    - id: AC5
+      statement: "Les contraintes non negociables reprises de la baseline sont preservees : continuite joystick C1 (CycleMotionPermit ne retombe jamais entre etapes ; pas de creux RunRequest hors arret voulu) ; C1e (X6->X7 sans temps mort) ; C3/C3.1 (translation M3 = jamais de deplacement autonome, depart toujours P1) ; SEMI_AUTO homed-only (T226-AC1, gate FB_Modes inchange)."
+      verified_by: "TC parcours X0->X13 a joystick constant (RunRequest sans trou aux frontieres) ; grep FB_Modes.st §3.2bis inchange ; relecture X2/X10 (consigne + surveillance arrivee, aucun TranslationCmd.ReqStart autonome)."
+    - id: AC6
+      statement: "Critere structurel CODE/MAIN : pour chaque POU touche le nom de fichier reste identique au nom de POU et le suffixe reste identique au langage genere dans le bundle ; aucun suffixe _CFC/_LD n'est appose."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G310_check_code_structure.py + inspection du bundle."
+    - id: AC7
+      statement: "Gates mecaniques : bundle regenere, G200 liaison PASS, gates palier C au niveau baseline (28/30 : G340 + G483 pre-existants), G405/G406 PASS (libelles CycleStateStr / OperatorAction), G430 PASS (aucun T-ref dans les .st)."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py --report + run_all_gates.py --palier C."
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+      - CODE/F_MODES/FB_Modes.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE_XML
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests
+      - DOC/WFLOW/CONTRACTS/GEL_GRAFCET_SEMIAUTO_20260903.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T237_FB_CYCLESEMIAUTO_GEL_RENOMMAGE.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - DOC/STDS/CODE_QUALITY_STANDARDS.md
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/H_TREUILS_BENNE
+      - CODE/G_CYCLE/FB_MachineHomingCycle.st
+
+  conservation:
+    must_survive:
+      - "Continuite joystick C1 : CycleMotionPermit ne retombe jamais entre etapes ; une transition ne force RunRequest:=FALSE que sur arret reellement voulu (fond, butee, fin)."
+      - "C1e : X6->X7 sans temps mort (M1 lance meme scan que sortie X6, pas de scan intermediaire RunRequest FALSE)."
+      - "C3/C3.1 : le cycle ne pilote jamais un deplacement autonome de M3 ; il affiche la consigne + surveille l'arrivee ; depart toujours P1."
+      - "SEMI_AUTO homed-only : gate FB_Modes §3.2bis (T226-AC1) et expulsion MAINT_N1 sur perte de datum inchanges."
+      - "Split X11a/b/c (X11A_DUMP_ARRIVE=11 / X11B_DUMP_OPEN=15 / X11C_DUMP_REPOSITION=16) et gap a 12 conserves."
+      - "Anti-telescopage (ecart position M1/M2 en phases couplees) conserve."
+      - "Compteur de vidages (SampleCount) + duree de cycle (CurrentCycleElapsed / LastCycleDuration) conserves."
+      - "Interface contrat standard Enable/Reset/Ready/Fault/Lifecycle ; consommation PRG_03 -> Data.ReqProgram / Data.SequenceState inchangee (hors renommage instance)."
+    dropped_on_purpose:
+      - "Le nom FB_Cycle (ambigu : ne dit pas SEMI_AUTO) au profit de FB_CycleSemiAuto."
+      - "L'absence d'etape initiale GRAFCET pure (X0_PREPARATION faisait du housekeeping) : une etape initiale pure est ajoutee en amont."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  alert_duty: >
+    STOP et remonter a l'orchestrateur : si le renommage impose de toucher un
+    fichier hors scope (PRG_04, FB_MachineHomingCycle, un FB treuil), si le gel
+    GRAFCET revele un ecart de comportement non trivial vs le code actuel (le
+    signaler, ne pas 'corriger' en silence), si une reponse de question ouverte du
+    gel reste indeterminee, ou si un fichier non prevu / une suppression apparait
+    dans le diff.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Demande utilisateur 2026-09-03 (urgent, avant MES) : meme demarche de gel +
+    validation que le homing machine (T233). Renommage FB_Cycle -> FB_CycleSemiAuto.
+    Reprend le perimetre contenu de T229 (split X11 deja livre en campagne).
