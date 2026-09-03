@@ -1906,7 +1906,29 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
                 <simpleValue value="TIME#5s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en X9 (configurable IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en AX13 (configurable IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RaiseOffBottom_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décollement du fond en AX8 : RaiseTarget = TouchPosition + ce champ (réglable essais, GEL Q16)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlAscentMaxStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Palier max montée contrôle AX11, borné [1..2] côté FB (GEL Q16)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">

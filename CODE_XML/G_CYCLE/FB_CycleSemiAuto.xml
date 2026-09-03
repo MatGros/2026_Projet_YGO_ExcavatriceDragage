@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:24:14.576395" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:24:14.576395">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:39:57.600430" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:39:57.600430">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1424,12 +1424,20 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-rebond relache joystick pendant diving (&gt;= 200 ms avant reprise)</xhtml>
               </documentation>
             </variable>
+            <variable name="PalierNot4Timer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation palier bloque &lt; 4 en plongee (tolere la rampe 1-&gt;4)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DivingRetryTrig">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Synthese GT-dive-retry (erreur Kobold / joystick relache / palier &lt;&gt; 4 en AX5..AX7)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Synthese GT-dive-retry (erreur Kobold / joystick relache / palier &lt; 4 confirme en AX5..AX7)</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentMaxStepEff">
@@ -1690,8 +1698,15 @@ KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 JoyDeflectedEdge(CLK := JoystickDeflected);
 
-// Config diving/extraction bornee (repli defaut interne si non reglee cote IHM).
-DiveStartMinEff := SEL(DiveStartMinM &gt; 0.0, 4.0, DiveStartMinM);
+// Config diving/extraction bornee (repli defaut interne si non reglee / valeur implausible).
+// DiveStartMinM = altimetrie de lancement Kobold dans le referentiel M1_CablePosM
+// (positif, ~7,5 m au FDC haut, decroissant a la descente). Plage plausible 0,5..8,0 m ;
+// hors plage -&gt; repli 4,0 m.
+IF (DiveStartMinM &gt;= 0.5) AND (DiveStartMinM &lt;= 8.0) THEN
+    DiveStartMinEff := DiveStartMinM;
+ELSE
+    DiveStartMinEff := 4.0;
+END_IF;
 RaiseOffBottomEff := SEL(CfgRaiseOffBottomM &gt; 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 
@@ -1747,13 +1762,22 @@ RetryJoyReleaseTimer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                              OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                             AND NOT JoystickDeflected,
                      PT := T#200ms);
+// Palier bloque SOUS 4 pendant la plongee : on TOLERE la rampe 1-&gt;4 (tempo contacteurs,
+// GEL AX4) ; seul un blocage confirme &gt; 4 s en AX5..AX7 declenche la reprise. Palier 5
+// (&gt; 4) est traite instantanement par la cause de defaut 8 (latche), pas ici.
+PalierNot4Timer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
+                        OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+                        OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
+                       AND JoystickDeflected
+                       AND ( ((M1_SpeedStepApplied &gt; 0) AND (M1_SpeedStepApplied &lt; CST_StepDive))
+                          OR ((M2_SpeedStepApplied &gt; 0) AND (M2_SpeedStepApplied &lt; CST_StepDive)) ),
+                PT := T#5s);
 DivingRetryTrig := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                      OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
                      OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                    AND ( (KoboldInitTimer.Q AND NOT KoboldContactorFeedback)
                          OR RetryJoyReleaseTimer.Q
-                         OR ((M1_SpeedStepApplied &gt; 0) AND (M1_SpeedStepApplied &lt;&gt; CST_StepDive))
-                         OR ((M2_SpeedStepApplied &gt; 0) AND (M2_SpeedStepApplied &lt;&gt; CST_StepDive)) );
+                         OR PalierNot4Timer.Q );
 
 // Table des causes de défaut
 instCauses[0].Active   := LimitLegalReached

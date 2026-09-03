@@ -21,7 +21,7 @@ VAR_INPUT
     CycleStateStr        : STRING(80);   // --> [HW] Libellé détaillé de l'étape cycle (FB_CycleSemiAuto.CycleStateStr)
     CycleErrorId         : WORD;   // --> [DIAG] Code défaut cycle (FB_CycleSemiAuto.ErrorId) — notifié à AX_STAB
     CycleStepAtError     : E_AutoCycleStep;   // --> [DIAG] Dernière étape avant le défaut (FB_CycleSemiAuto.CycleStepAtError)
-    DiveState            : E_DiveSearchState;   // --> [HW] État plongée
+    DiveState            : E_DiveSearchState;   // --> [HW] RESERVE : etat plongee FB_DiveSearch. Plus consomme depuis GRAFCET SEMI_AUTO 20 steps (diving = AX4..AX8). Conserve pour l'assistant hors SEMI_AUTO.
     ExtractionState      : E_ExtractionAssistState;   // --> [HW] État extraction
     MachineHomingStep        : INT;   // --> [HW] Étape guide homing machine (E_MachineHomingStep : 0..70, 60 = valide)
     MachineHomingInstruction : STRING(120);   // --> [HW] Consigne opérateur en clair produite par FB_MachineHomingCycle

@@ -1,0 +1,6 @@
+Error in test file 'test_prg_03_modes_cycle.st':
+
+test_prg_03_modes_cycle.st:91:34: error: Undeclared variable 'E_CYCLESTEP'
+  91 |     ASSERT_EQ(harness.CycleStep, E_CycleStep.X0_PREPARATION, 'Sequenceur a l etape X0_PREPARATION');
+     |                                  ^
+

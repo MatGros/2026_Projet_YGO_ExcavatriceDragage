@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:12:28.609427" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:12:28.609427">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:36:52.457260" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:36:52.457260">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -56,7 +56,29 @@
                 <simpleValue value="TIME#5s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en X9 (configurable IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en AX13 (configurable IHM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RaiseOffBottom_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décollement du fond en AX8 : RaiseTarget = TouchPosition + ce champ (réglable essais, GEL Q16)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlAscentMaxStep">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Palier max montée contrôle AX11, borné [1..2] côté FB (GEL Q16)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
