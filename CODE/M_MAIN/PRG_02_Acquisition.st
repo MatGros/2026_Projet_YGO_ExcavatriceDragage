@@ -450,7 +450,7 @@ MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
 instMachineHomingCycle(
     Enable                     := TRUE,
-    Reset                      := PRG_07_Supervision.FaultMachineReset_IHM OR GVL_IHM.MachineHomingCycle.Cmd.BtnAbort,
+    Reset                      := PRG_07_Supervision.FaultMachineReset_IHM OR GVL_IHM.CycleMachineHoming.Cmd.BtnAbort,
     Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
     TopPositionSensor          := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     WinchesMechanicallyStopped  := MachineHomingMechanicalStopOk,
@@ -465,11 +465,11 @@ instMachineHomingCycle(
     JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
     // Lancer / valider le cycle : BP joystick (= bouton homme-mort) pour le motif 3 appuis,
     // OU commande IHM dediee (front) pour le lancement direct.
-    BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.MachineHomingCycle.Cmd.BtnValidate,
-    StartRequest               := GVL_IHM.MachineHomingCycle.Cmd.BtnStart,
-    CfgCommissioningEnable     := GVL_IHM.MachineHomingCycle.Cmd.TglCommissioning,
-    CfgForceStepTarget         := GVL_IHM.MachineHomingCycle.Cfg.ForceStepTarget,
-    CfgForceStepApply          := GVL_IHM.MachineHomingCycle.Cmd.BtnForceStepApply,
+    BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.CycleMachineHoming.Cmd.BtnValidate,
+    StartRequest               := GVL_IHM.CycleMachineHoming.Cmd.BtnStart,
+    CfgCommissioningEnable     := GVL_IHM.CycleMachineHoming.Cmd.TglCommissioning,
+    CfgForceStepTarget         := GVL_IHM.CycleMachineHoming.Cfg.ForceStepTarget,
+    CfgForceStepApply          := GVL_IHM.CycleMachineHoming.Cmd.BtnForceStepApply,
     Cfg                        := MachineHomingCfg
 );
 Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;

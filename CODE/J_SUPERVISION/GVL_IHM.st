@@ -13,7 +13,7 @@ VAR_GLOBAL
     Emergency : ST_EmergencyHMI; (* 🛡️ Variables d'échange IHM chaîne AU / sécurité — sorties de Modes *)
     TranslationM3 : ST_TranslationHMI;(* ↔️ Variables d'échange IHM Translation M3 *)
     Cycle   : ST_CycleHMI;    (* 🔄 Commandes, états et diagnostic cycle semi-automatique *)
-    MachineHomingCycle : ST_MachineHomingHMI;     (* 🎯 Cycle de référencement machine (FB_MachineHomingCycle) — MAINT_N2 *)
+    CycleMachineHoming : ST_CycleMachineHomingHMI;     (* 🎯 Cycle de référencement machine (FB_MachineHomingCycle) — MAINT_N2 *)
     CycleDiveSearch   : ST_CycleDiveSearchHMI;   (* 🤿 Assistance plongée (DiveSearch) MAINT_N1/N2 *)
     CycleExtraction   : ST_CycleExtractionHMI;   (* ⛏️ Assistance extraction MAINT_N1/N2 *)
     CycleDumpAtTremie : ST_CycleDumpAtTremieHMI; (* 🚚 Vidage à la trémie (legacy) *)

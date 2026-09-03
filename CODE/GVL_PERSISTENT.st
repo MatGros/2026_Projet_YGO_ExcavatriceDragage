@@ -115,7 +115,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5, RaiseOffBottom_M := 0.5, CtrlAscentMaxStep := 1); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
 
     // 🎯 CYCLE REFERENCEMENT MACHINE (homing) — reglage mise en service
-    _MachineHomingCfgPersist : ST_MachineHomingCfg := (ForceStepTarget := 0); // 🌉 Pont FB_CfgPersistBridge_MachineHomingCfg
+    _CycleMachineHomingCfgPersist : ST_CycleMachineHomingCfg := (ForceStepTarget := 0); // 🌉 Pont FB_CfgPersistBridge_CycleMachineHomingCfg
 
     // 🤿 CYCLE PLONGÉE (DiveSearch)
     _CycleDiveSearchCfgPersist : ST_CycleDiveSearchCfg := (

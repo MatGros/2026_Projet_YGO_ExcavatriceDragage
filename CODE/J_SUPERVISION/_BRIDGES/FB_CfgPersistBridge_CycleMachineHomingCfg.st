@@ -1,19 +1,19 @@
 (* =======================================================================
-   💾 FB_CfgPersistBridge_MachineHomingCfg — Pont persistance pour ST_MachineHomingCfg
+   💾 FB_CfgPersistBridge_CycleMachineHomingCfg — Pont persistance pour ST_CycleMachineHomingCfg
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT <-> GVL_IHM sur Initialized
    📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
    ======================================================================= *)
-FUNCTION_BLOCK FB_CfgPersistBridge_MachineHomingCfg
+FUNCTION_BLOCK FB_CfgPersistBridge_CycleMachineHomingCfg
 VAR_OUTPUT
     // === ETATS RESTAURATION ===
     JustRestored            : BOOL;                     // <-- [STAT] Vrai sur le cycle de restauration initiale
 END_VAR
 VAR_IN_OUT
     // === BUS CONFIGURATION ET PERSISTANCE ===
-    Hmi                     : ST_MachineHomingCfg;      // <-> [BUS] Structure de configuration IHM
-    Persist                 : ST_MachineHomingCfg;      // <-> [BUS] Structure de configuration persistante
+    Hmi                     : ST_CycleMachineHomingCfg;      // <-> [BUS] Structure de configuration IHM
+    Persist                 : ST_CycleMachineHomingCfg;      // <-> [BUS] Structure de configuration persistante
 END_VAR
 
 JustRestored := FALSE;

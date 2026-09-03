@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:37:29.555356" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:37:29.555356">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:46:03.889667" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:46:03.889667">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -61,7 +61,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle de référencement machine -&gt; GVL_IHM.MachineHomingCycle (ST_MachineHomingHMI), plus dans Modes.
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle de référencement machine -&gt; GVL_IHM.CycleMachineHoming (ST_CycleMachineHomingHMI), plus dans Modes.
 Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement</xhtml>
               </documentation>

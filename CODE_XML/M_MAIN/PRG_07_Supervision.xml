@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:43:08.734941" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:43:08.734941">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:46:04.008562" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:46:04.008562">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -491,7 +491,7 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_MachineHomingCfg">
+      <dataType name="ST_CycleMachineHomingCfg">
         <baseType>
           <struct>
             <variable name="ForceStepTarget">
@@ -520,16 +520,16 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
         </baseType>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>f880fd6c-2d2e-5164-a545-6de3d9045768</ObjectId>
+            <ObjectId>892dec72-1fe2-5fad-a62f-d1ead6f61579</ObjectId>
           </data>
         </addData>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_MachineHomingCfg — Réglages IHM du cycle de référencement machine
+   ⚙️ ST_CycleMachineHomingCfg — Réglages IHM du cycle de référencement machine
    ───────────────────────────────────────────────────────────────
    🎯 Mise en service. Les réglages géométriques (positions capteur, offsets benne)
       restent portés par GVL_PERSISTENT (_WinchM1CfgPersist / _BucketCfgPersist).
-   💾 Ponté vers persist (_MachineHomingCfgPersist) via FB_CfgPersistBridge_MachineHomingCfg.
+   💾 Ponté vers persist (_CycleMachineHomingCfgPersist) via FB_CfgPersistBridge_CycleMachineHomingCfg.
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -7865,9 +7865,9 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle</xhtml>
               </documentation>
             </variable>
-            <variable name="instCfgPersistBridgeMachineHoming">
+            <variable name="instCfgPersistBridgeCycleMachineHoming">
               <type>
-                <derived name="FB_CfgPersistBridge_MachineHomingCfg" />
+                <derived name="FB_CfgPersistBridge_CycleMachineHomingCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle homing machine</xhtml>
@@ -8407,8 +8407,8 @@ IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-instCfgPersistBridgeMachineHoming(Hmi := GVL_IHM.MachineHomingCycle.Cfg, Persist := _MachineHomingCfgPersist);
-IF instCfgPersistBridgeMachineHoming.JustRestored THEN
+instCfgPersistBridgeCycleMachineHoming(Hmi := GVL_IHM.CycleMachineHoming.Cfg, Persist := _CycleMachineHomingCfgPersist);
+IF instCfgPersistBridgeCycleMachineHoming.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
@@ -8745,7 +8745,7 @@ GVL_IHM.Modes.State.M2SpeedLow := PRG_03_Modes_Cycle.Data.Auth.M2SpeedLow;
 GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;
 GVL_IHM.Modes.State.HomingRequiredM2 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM2;
 // Etat publie du cycle de referencement machine (visu IHM) - recopie whole-struct.
-GVL_IHM.MachineHomingCycle.State := PRG_02_Acquisition.Data.MachineHoming;
+GVL_IHM.CycleMachineHoming.State := PRG_02_Acquisition.Data.MachineHoming;
 
 // ---------- §3f. État joystick &amp; réseau (diagnostic bus) ----------
 GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;
@@ -9776,7 +9776,7 @@ END_IF;
           </data>
         </addData>
       </pou>
-      <pou name="FB_CfgPersistBridge_MachineHomingCfg" pouType="functionBlock">
+      <pou name="FB_CfgPersistBridge_CycleMachineHomingCfg" pouType="functionBlock">
         <interface>
           <inputVars />
           <outputVars>
@@ -9793,7 +9793,7 @@ END_IF;
           <inOutVars>
             <variable name="Hmi">
               <type>
-                <derived name="ST_MachineHomingCfg" />
+                <derived name="ST_CycleMachineHomingCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
@@ -9802,7 +9802,7 @@ END_IF;
             </variable>
             <variable name="Persist">
               <type>
-                <derived name="ST_MachineHomingCfg" />
+                <derived name="ST_CycleMachineHomingCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
@@ -9811,7 +9811,7 @@ END_IF;
           </inOutVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_MachineHomingCfg — Pont persistance pour ST_MachineHomingCfg
+   💾 FB_CfgPersistBridge_CycleMachineHomingCfg — Pont persistance pour ST_CycleMachineHomingCfg
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
@@ -9836,7 +9836,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a8062bc0-7fdb-5e62-a5e0-81e52d7b2b7e</ObjectId>
+            <ObjectId>c53fccdf-77fc-5d34-9ea6-2dba0c058397</ObjectId>
           </data>
         </addData>
       </pou>
@@ -14145,7 +14145,7 @@ TimeLast := TimeCurrent;
             <Object Name="FB_CfgPersistBridge_CycleDiveSearchCfg" ObjectId="a92cb09a-e287-5430-8474-ac8533ffbe1a" />
             <Object Name="FB_CfgPersistBridge_CycleDumpAtTremieCfg" ObjectId="958f5330-cfab-5326-8351-b214608cfa61" />
             <Object Name="FB_CfgPersistBridge_CycleExtractionCfg" ObjectId="99243b20-8012-5d76-ac19-bd7ef00af05b" />
-            <Object Name="FB_CfgPersistBridge_MachineHomingCfg" ObjectId="a8062bc0-7fdb-5e62-a5e0-81e52d7b2b7e" />
+            <Object Name="FB_CfgPersistBridge_CycleMachineHomingCfg" ObjectId="c53fccdf-77fc-5d34-9ea6-2dba0c058397" />
             <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
             <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
             <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
@@ -14203,7 +14203,7 @@ TimeLast := TimeCurrent;
             </Folder>
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
-              <Object Name="ST_MachineHomingCfg" ObjectId="f880fd6c-2d2e-5164-a545-6de3d9045768" />
+              <Object Name="ST_CycleMachineHomingCfg" ObjectId="892dec72-1fe2-5fad-a62f-d1ead6f61579" />
               <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
             </Folder>
             <Folder Name="2_TRANSLATION">
