@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T10:37:15.752919" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T10:37:15.752919">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T12:55:13.494400" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T12:55:13.494400">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -8253,6 +8253,13 @@ instCfgPersistBridgeWinchM2(Hmi := GVL_IHM.M2TreuilBenne.Cfg, Persist := _WinchM
 IF instCfgPersistBridgeWinchM2.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
+
+// M1 = MAITRE pour la position capteur haut : M1 et M2 montent lies au meme capteur,
+// on force donc M2 = M1 en continu (IHM + persistant). Regler CfgTopSensorPos_M cote M1
+// sur l'IHM ; le champ M2 suit automatiquement et le homing M2 (qui lit
+// _WinchM2CfgPersist.CfgTopSensorPos_M) prend la meme valeur. Aucun champ persistant neuf.
+GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
+_WinchM2CfgPersist.CfgTopSensorPos_M       := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
 
 instCfgPersistBridgeSync(Hmi := GVL_IHM.M1M2Sync.Cfg, Persist := _SyncCfgPersist);
 IF instCfgPersistBridgeSync.JustRestored THEN

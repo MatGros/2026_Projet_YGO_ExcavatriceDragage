@@ -51624,6 +51624,13 @@ IF instCfgPersistBridgeWinchM2.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
+// M1 = MAITRE pour la position capteur haut : M1 et M2 montent lies au meme capteur,
+// on force donc M2 = M1 en continu (IHM + persistant). Regler CfgTopSensorPos_M cote M1
+// sur l'IHM ; le champ M2 suit automatiquement et le homing M2 (qui lit
+// _WinchM2CfgPersist.CfgTopSensorPos_M) prend la meme valeur. Aucun champ persistant neuf.
+GVL_IHM.M2TreuilBenne.Cfg.CfgTopSensorPos_M := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
+_WinchM2CfgPersist.CfgTopSensorPos_M       := GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M;
+
 instCfgPersistBridgeSync(Hmi := GVL_IHM.M1M2Sync.Cfg, Persist := _SyncCfgPersist);
 IF instCfgPersistBridgeSync.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
