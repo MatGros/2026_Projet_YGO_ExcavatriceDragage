@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T09:05:25.776590" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T09:05:25.776590">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T12:23:22.863705" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T12:23:22.863705">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -124,6 +124,17 @@ pas une vitesse continue.
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTopSensorPos_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Position inscrite au homing sur capteur haut (m). M1 ET M2 montent liES au meme capteur -&gt; parametre COMMUN unique</xhtml>
               </documentation>
             </variable>
             <variable name="TglEnableKoboldAutoStopDescent">

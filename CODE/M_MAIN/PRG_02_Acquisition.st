@@ -40,7 +40,7 @@ VAR
     MachineHomingM1Status    : ST_fbMachineHomingCycle_AxisHomingStatus; // . [LOC] Statut homing M1
     MachineHomingM2Status    : ST_fbMachineHomingCycle_AxisHomingStatus; // . [LOC] Statut homing M2
     MachineHomingMechanicalStopOk : BOOL; // . [LOC] Arret mecanique conjoint M1/M2 confirme
-    MachineHomingCfg          : ST_fbMachineHomingCycle_Cfg; // . [LOC] Reglages geometriques referencement (cible haute M2/benne + ecarts + gardes)
+    MachineHomingCfg          : ST_fbMachineHomingCycle_Cfg; // . [LOC] Reglages geometriques referencement (cible haute commune M1/M2 + ecarts benne + gardes)
     BucketReferenceOpenEdge  : R_TRIG; // . [LOC] Front confirmation benne ouverte
     BucketReferenceCloseEdge : R_TRIG; // . [LOC] Front confirmation benne fermee
     BucketReferenceRequested : BOOL;   // . [LOC] Homing materiel M2 requis par confirmation benne
@@ -440,11 +440,11 @@ ELSIF BucketReferenceCloseEdge.Q THEN
     BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
 
-// Cible haute du homing machine = position capteur de M2 (benne) : seule la cible
-// DYNAMIQUE M2 du cycle (FB_MachineHomingCycle §7) consomme ce champ ; M1 y home sur
-// sa propre config (ligne CfgTopSensorPosM M1 ci-dessous). Geometrie de mouflage
-// benne differente -> jamais la position M1.
-MachineHomingCfg.CfgTopHomingTarget_M := _WinchM2CfgPersist.CfgTopSensorPos_M;
+// Cible haute du homing machine = position capteur haut COMMUNE M1/M2 : les deux
+// treuils montent liES mecaniquement vers le meme capteur -> parametre commun unique
+// (_CommunCfgPersist.CfgTopSensorPos_M). La cible DYNAMIQUE M2 du cycle
+// (FB_MachineHomingCycle §7) ajoute CfgOffsetClose_M pour la geometrie benne.
+MachineHomingCfg.CfgTopHomingTarget_M := _CommunCfgPersist.CfgTopSensorPos_M;
 MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
 MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
@@ -501,9 +501,11 @@ instEncoderM1(
                              OR instMachineHomingCycle.M1Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
+    // Cible capteur haut = parametre COMMUN M1/M2 (_CommunCfgPersist) : les deux
+    // treuils montent lies au meme capteur -> un seul reglage de mise en service.
     CfgHomingTargetM      := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
-                                 _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
-    CfgTopSensorPosM      := _WinchM1CfgPersist.CfgTopSensorPos_M,
+                                 _CommunCfgPersist.CfgTopSensorPos_M, 0.0),
+    CfgTopSensorPosM      := _CommunCfgPersist.CfgTopSensorPos_M,
     UseDynamicTarget      := FALSE,
     DynamicHomingTargetM  := 0.0,
     TopPositionSensor     := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
@@ -552,9 +554,12 @@ instEncoderM2(
                              OR instMachineHomingCycle.M2Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
+    // Cible capteur haut M2 = parametre COMMUN M1/M2 (_CommunCfgPersist.CfgTopSensorPos_M).
+    // M1 et M2 montent lies mecaniquement au meme capteur -> un seul reglage.
+    // _WinchM2CfgPersist.CfgTopSensorPos_M n'est plus consomme ici (restait fige a 8.5 NVRAM).
     CfgHomingTargetM      := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
-                                 _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
-    CfgTopSensorPosM      := _WinchM2CfgPersist.CfgTopSensorPos_M,
+                                 _CommunCfgPersist.CfgTopSensorPos_M, 0.0),
+    CfgTopSensorPosM      := _CommunCfgPersist.CfgTopSensorPos_M,
     UseDynamicTarget      := BucketReferenceRequested OR instMachineHomingCycle.M2Demand.UseDynamicTarget,
     DynamicHomingTargetM  := SEL(BucketReferenceRequested,
                                  instMachineHomingCycle.M2Demand.DynamicTarget_M, BucketReferenceTargetM),

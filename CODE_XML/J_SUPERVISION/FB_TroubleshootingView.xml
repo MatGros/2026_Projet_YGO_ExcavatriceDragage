@@ -1924,6 +1924,17 @@ pas une vitesse continue.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgTopSensorPos_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Position inscrite au homing sur capteur haut (m). M1 ET M2 montent liES au meme capteur -&gt; parametre COMMUN unique</xhtml>
+              </documentation>
+            </variable>
             <variable name="TglEnableKoboldAutoStopDescent">
               <type>
                 <BOOL />
