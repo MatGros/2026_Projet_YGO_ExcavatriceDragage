@@ -38,7 +38,8 @@ VAR_INPUT
     JoystickPush                : BOOL;                                      // --> [CMD] Manche pousse = sens descente treuils
 
     // === VALIDATION OPERATEUR (mecanisme homogene machine) ===
-    BtnValidation               : BOOL;                                      // --> [CMD] BP joystick — motif 3 appuis successifs (V_EXPLICITE)
+    BtnValidation               : BOOL;                                      // --> [CMD] BP joystick (homme-mort) — motif 3 appuis successifs (V_EXPLICITE)
+    StartRequest                : BOOL;                                      // --> [CMD] Lancer le cycle (front) — commande IHM dediee, alternative au motif joystick
 
     // === REGLAGES & CONFIGURATION ===
     Cfg                         : ST_fbMachineHomingCycle_Cfg;              // --> [CFG] Reglages geometriques + temporisations de garde
@@ -104,6 +105,7 @@ VAR
     // === MOTIF DE VALIDATION "3 APPUIS" (V_EXPLICITE) ===
     ValidationBtnEdgeR          : R_TRIG;                                   // . [LOC] Front montant BtnValidation
     ValidationBtnEdgeF          : F_TRIG;                                   // . [LOC] Front descendant BtnValidation
+    StartEdge                   : R_TRIG;                                   // . [LOC] Front montant StartRequest (commande IHM lancer cycle)
     ValidationHoldTimer         : TON;                                     // . [LOC] Maintien >= 300 ms d'un appui
     ValidationGapTimer          : TON;                                     // . [LOC] Fenetre <= 2 s entre appuis
     ValidationPressCount        : INT;                                     // . [LOC] Compteur d'appuis valides (0..3)
@@ -204,6 +206,7 @@ TransactionAbort := CycleRunning
 // Pre-conditions permanentes : joystick centre + aucun mouvement + homme-mort arme.
 ValidationBtnEdgeR(CLK := BtnValidation);
 ValidationBtnEdgeF(CLK := BtnValidation);
+StartEdge(CLK := StartRequest);
 ValidationHoldTimer(IN := BtnValidation, PT := CST_ValidationHold);
 ValidationGapTimer(IN := (ValidationPressCount > 0) AND NOT BtnValidation, PT := CST_ValidationGap);
 
@@ -213,7 +216,10 @@ IF BtnValidation AND ValidationHoldTimer.Q THEN
     ValidationHeldOk := TRUE;
 END_IF;
 
-IF JoystickDeflected OR NOT WinchesMechanicallyStopped OR NOT DeadmanArmed THEN
+// Motif = geste STANDALONE (3 appuis courts sur le BP joystick, joystick centre,
+// treuils arretes). Ne PAS exiger DeadmanArmed : le BP joystick EST le bouton
+// homme-mort ; on ne peut pas le maintenir arme ET faire des appuis courts.
+IF JoystickDeflected OR NOT WinchesMechanicallyStopped THEN
     ValidationPressCount := 0;
     ValidationHeldOk     := FALSE;
 ELSIF ValidationGapTimer.Q THEN
@@ -360,7 +366,9 @@ CASE SeqStep OF
 
     E_MachineHomingTxState.HX0_REPOS:
         // Etape initiale pure : aucune action de sortie ici.
-        IF (ExplicitValidationPulse OR (MachineWasHomed AND NOT MachineHomedRaw))
+        // Entree cycle (HT0) : commande IHM dediee OU motif 3 appuis joystick OU perte de
+        // datum ; toujours en MAINT_N2. HX1 = annonce + choix, aucun mouvement.
+        IF (StartEdge.Q OR ExplicitValidationPulse OR (MachineWasHomed AND NOT MachineHomedRaw))
            AND (Mode = E_Mode.MAINT_N2) THEN
             CommitPublished     := FALSE;   // datum invalide tant qu'il est refait
             CommitDone          := FALSE;

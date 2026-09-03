@@ -463,9 +463,10 @@ instMachineHomingCycle(
     JoystickDeflected          := NOT Data.Joystick.AtNeutralXY,
     JoystickPull               := Data.Joystick.AxisY.DirectionPositive,
     JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
-    // BP validation (motif 3 appuis) : source BP joystick a mapper en acquisition HW.
-    // En attente : forcable en Watch CODESYS pour la MES banc.
-    BtnValidation              := FALSE,
+    // Lancer / valider le cycle : BP joystick (= bouton homme-mort) pour le motif 3 appuis,
+    // OU commande IHM dediee (front) pour le lancement direct.
+    BtnValidation              := HwIn.Operator.JoyBtnRaw,
+    StartRequest               := GVL_IHM.Modes.Cmd.BtnMachineHomingStart,
     Cfg                        := MachineHomingCfg
 );
 Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
