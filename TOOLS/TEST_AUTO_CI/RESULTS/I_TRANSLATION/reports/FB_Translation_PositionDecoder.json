@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "file": "test_fb_translation_positiondecoder.st",
+  "results": [
+    {
+      "name": "TC-P11-DEC-001 Decodage extremite Tremie (mot 11111) et Maintenance (00000)",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-DEC-002 Detection mot incoherente (came defectueuse / capteur colle)",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-DEC-003 Mots de progression monotone intermediaires",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0
+  }
+}

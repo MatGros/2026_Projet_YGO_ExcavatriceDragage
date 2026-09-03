@@ -152,6 +152,53 @@
         display: block;
         text-align: center;
     }
+    /* Pastilles de provenance & typage des variables */
+    .var-prov-badge {
+        display: inline-block;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        margin-top: 3px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .badge-var-in { background: rgba(2, 132, 199, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .badge-var-out { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); }
+    .badge-var-inout { background: rgba(139, 92, 246, 0.18); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .badge-var-loc { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .badge-var-cst { background: rgba(217, 119, 6, 0.18); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+    .badge-var-hw { background: rgba(20, 184, 166, 0.18); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.35); }
+    .badge-var-gvl { background: rgba(14, 165, 233, 0.18); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.35); }
+    .badge-var-prg { background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.35); }
+    .badge-var-diag { background: rgba(217, 70, 239, 0.18); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.35); }
+    .badge-var-ext { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.35); }
+
+    [data-theme="light"] .badge-var-in { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-out { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .badge-var-inout { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+    [data-theme="light"] .badge-var-loc { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    [data-theme="light"] .badge-var-cst { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    [data-theme="light"] .badge-var-hw { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+    [data-theme="light"] .badge-var-gvl { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-prg { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .badge-var-diag { background: #fdf4ff; color: #a21caf; border-color: #fbcfe8; }
+    [data-theme="light"] .badge-var-ext { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+
+    .chrono-table th .th-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        pointer-events: auto;
+    }
+    .chrono-table th .var-name-lbl {
+        font-family: monospace;
+        font-weight: 700;
+        font-size: 11px;
+    }
     /* Mode Titres Verticaux (Compact) */
     .chrono-table.headers-vertical {
         width: max-content !important;
@@ -162,7 +209,7 @@
         width: 280px !important;
     }
     .chrono-table.headers-vertical th.var-th {
-        height: 155px;
+        height: 165px;
         vertical-align: bottom;
         padding-bottom: 10px;
         padding-top: 10px;
@@ -173,26 +220,36 @@
     .chrono-table.headers-vertical th.var-th .th-content {
         writing-mode: vertical-rl;
         transform: rotate(180deg);
-        display: inline-block;
+        display: inline-flex;
+        flex-direction: row-reverse;
+        align-items: center;
         white-space: nowrap;
         text-align: left;
-        max-height: 135px;
+        max-height: 145px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .chrono-table th .th-content {
-        display: inline-block;
-        pointer-events: auto;
+    .chrono-table.headers-vertical th.var-th .var-prov-badge {
+        margin-top: 0;
+        margin-left: 4px;
     }
     .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
     .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
     [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
     [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
-    .chrono-note-cell { text-align: left !important; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
-    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 310px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-cell { text-align: left !important; max-width: 360px; font-size: 11px; }
+    .chrono-note-container { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
     .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    .chrono-chk-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; padding: 2px 8px; font-weight: 600; font-size: 10.5px; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
+    .chrono-chk-pass { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .chrono-chk-fail { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .chrono-chk-chip .chk-icon { font-weight: 800; font-size: 11.5px; }
     [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
     [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    [data-theme="light"] .chrono-chk-pass { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .chrono-chk-fail { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .wf-check-marker { font-size: 12px; fill: #10b981; font-weight: 800; text-anchor: middle; font-family: monospace; cursor: help; }
     .v-true { color: #34d399; font-weight: 700; }
     .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
@@ -229,6 +286,7 @@
     .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
     [data-theme="light"] .wf-tt-head { color: #0284c7; }
     .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-meta { font-size: 10.5px; margin-bottom: 4px; }
     .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
     .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
     .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
@@ -315,7 +373,7 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-03 01:16:53</div>
+    <div class="exec-time">2026-09-03 12:21:32</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (17 tests)</summary>
@@ -333,7 +391,7 @@
     </div>
     
     <details class="encaps-details" >
-        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 148 composant(s) compilé(s) avec succès (0 erreur)</summary>
+        <summary>⚙️ État de Compilation STruCpp (ST → C++) <span class="badge badge-pass" style="margin-left:6px;">PASS</span> — ✅ 149 composant(s) compilé(s) avec succès (0 erreur)</summary>
         <table class="encaps-table">
             <thead><tr><th>Fichier / Bloc</th><th>Type</th><th>Conversion ST → C++</th><th>Compilation C++ (STruCpp)</th><th>Statut Global</th><th>Détail / Erreurs</th></tr></thead>
             <tbody>
@@ -427,6 +485,14 @@
             </tr>
             <tr class="compil-row-pass">
                 <td><code>ST_ArmingAvailability.st</code></td>
+                <td>DUT (Struct)</td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>Aucune erreur</td>
+            </tr>
+            <tr class="compil-row-pass">
+                <td><code>ST_ProgramWinchRequest.st</code></td>
                 <td>DUT (Struct)</td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
                 <td><span style="color:var(--green-text);font-weight:600;">OK</span></td>
@@ -1930,9 +1996,10 @@
         <div style="margin-top: 12px;">
             
         <article id="test-fb-hmi-bannerformatter-0" class="test-card test-card-pass test-card-collapsed test-card-contract">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3 style="flex: 1; user-select: text;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1958,9 +2025,10 @@
         <div style="margin-top: 12px;">
             
         <article id="test-fb-hmi-bannerformatter-1" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-001 BannerFormatter : formatage nominal bandeau synoptique IHM')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1975,9 +2043,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-2" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-010 AntiFlickerText : affichage instantane force </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-010 AntiFlickerText : affichage instantane force </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-010 AntiFlickerText : affichage instantane force')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1992,9 +2061,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-3" class="test-card test-card-fail">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-fail">FAIL</span>
-                <h3 style="flex: 1;">TC-P07-020 RootCause : alarme fille visible quand materiel sain </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-020 RootCause : alarme fille visible quand materiel sain </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-020 RootCause : alarme fille visible quand materiel sain')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2009,9 +2079,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-4" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-021 RootCause : masquage alarme fille sur panne module Local_Digital_IO')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2026,9 +2097,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-5" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-022 RootCause : masquage alarme fille sur panne module VH0800END')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2043,9 +2115,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-6" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-023 RootCause : masquage alarme fille sur perte codeur ECAT')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2060,9 +2133,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-7" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-024 Priorite absolue AU sur defaut module E/S </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-024 Priorite absolue AU sur defaut module E/S </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-024 Priorite absolue AU sur defaut module E/S')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2077,9 +2151,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-8" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-009 Aucun defaut actif -&gt; bandeau d alarme vide </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-009 Aucun defaut actif -&gt; bandeau d alarme vide </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-009 Aucun defaut actif -&gt; bandeau d alarme vide')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2094,9 +2169,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-9" class="test-card test-card-fail">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-fail">FAIL</span>
-                <h3 style="flex: 1;">TC-P07-008 Carrousel d alarmes : un message a la fois, index n/N coherent </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-008 Carrousel d alarmes : un message a la fois, index n/N coherent </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-008 Carrousel d alarmes : un message a la fois, index n/N coherent')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2111,9 +2187,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-10" class="test-card test-card-fail">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-fail">FAIL</span>
-                <h3 style="flex: 1;">TC-P07-006 Separation messages action/etat vs alarmes : alarme dans le carrousel, contexte dans le bandeau info </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-006 Separation messages action/etat vs alarmes : alarme dans le carrousel, contexte dans le bandeau info </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-006 Separation messages action/etat vs alarmes : alarme dans le carrousel, contexte dans le bandeau info')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2128,9 +2205,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-11" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-002 Structures Cmd/State/Cfg par domaine (invariant structurel) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-002 Structures Cmd/State/Cfg par domaine (invariant structurel) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-002 Structures Cmd/State/Cfg par domaine (invariant structurel)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2152,9 +2230,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-12" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-003 IHM limitee aux variables de GVL_IHM (invariant structurel) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-003 IHM limitee aux variables de GVL_IHM (invariant structurel) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-003 IHM limitee aux variables de GVL_IHM (invariant structurel)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2176,9 +2255,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-13" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-004 Producteur unique par champ State (invariant structurel) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-004 Producteur unique par champ State (invariant structurel) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-004 Producteur unique par champ State (invariant structurel)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2200,9 +2280,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-14" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-005 Page Troubleshooting en lecture seule (invariant structurel) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-005 Page Troubleshooting en lecture seule (invariant structurel) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-005 Page Troubleshooting en lecture seule (invariant structurel)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2225,9 +2306,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-15" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-007 Warning auto-effacable vs Fault sur Reset (invariant structurel) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-007 Warning auto-effacable vs Fault sur Reset (invariant structurel) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-007 Warning auto-effacable vs Fault sur Reset (invariant structurel)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2251,9 +2333,10 @@
             </div>
         </article>
         <article id="test-fb-hmi-bannerformatter-16" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P07-030 Abandon AU 16#0010 decode en cause explicite M3 MecaA (Bug A+B) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P07-030 Abandon AU 16#0010 decode en cause explicite M3 MecaA (Bug A+B) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P07-030 Abandon AU 16#0010 decode en cause explicite M3 MecaA (Bug A+B)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -2270,11 +2353,11 @@
         </div>
     </details>
     <details>
-        <summary>Fichiers source compilés (148)</summary>
-        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/B_AU_SECURITE/GVL_Safety_Emergency.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SyncContactorDiag.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/E_WinchTraceBlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_TraceWinch.st</code></li><li><code>CODE/I_TRANSLATION/_TYPES/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/E_TranslationTraceBlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TraceTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/E_ArmingBlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_ArmingAvailability.st</code></li><li><code>CODE/G_CYCLE/_TYPES/ST_MachineHoming.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_IOModuleDiag.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_InputSource.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_M3DriveFeedback.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Config.st</code></li><li><code>CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st</code></li><li><code>CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Outputs.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionAssistState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/I_TRANSLATION/_TYPES/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinchSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SyncContactorDiag.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/E_ArmingBlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_ArmingAvailability.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchBenneHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchSymmetryHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_BypassTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_ChainTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleAssistToggles.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_ChainContextGlobal.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_SafetyChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_PreflightHMI.st</code></li><li><code>CODE/J_SUPERVISION/FB_AntiFlickerText.st</code></li><li><code>CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st</code></li></ul>
+        <summary>Fichiers source compilés (149)</summary>
+        <ul><li><code>TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st</code></li><li><code>CODE/B_AU_SECURITE/GVL_Safety_Emergency.st</code></li><li><code>TOOLS/TEST_AUTO_CI/MOCKS/HYSTERESIS.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SyncContactorDiag.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/E_WinchTraceBlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_TraceWinch.st</code></li><li><code>CODE/I_TRANSLATION/_TYPES/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/E_TranslationTraceBlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TraceTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/E_ArmingBlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_ArmingAvailability.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st</code></li><li><code>CODE/G_CYCLE/_TYPES/ST_MachineHoming.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_IOModuleDiag.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_InputSource.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_M3DriveFeedback.st</code></li><li><code>CODE/A_COMMUN/_TYPES/E_State.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Fault.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_FaultCause.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_Lifecycle.st</code></li><li><code>CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st</code></li><li><code>CODE/A_COMMUN/FB_FaultCore.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_State.st</code></li><li><code>CODE/B_AU_SECURITE/_TYPES/ST_Safety_Emergency_Diag.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/E_PresetConfirmMode.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Cfg.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderHw.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st</code></li><li><code>CODE/F_MODES/E_Mode.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_CycleStep.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_DiveSearchState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Config.st</code></li><li><code>CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st</code></li><li><code>CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Outputs.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_ExtractionAssistState.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st</code></li><li><code>CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st</code></li><li><code>CODE/I_TRANSLATION/_TYPES/E_TranslationFinalInterlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BypassWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainBucket.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_ChainWinchSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st</code></li><li><code>CODE/H_TREUILS_BENNE/_TYPES/ST_SyncContactorDiag.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/E_ArmingBlockReason.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_ArmingAvailability.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_HwWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_SafetyWinch.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchBenneHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchSymmetryHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_BypassTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_ChainTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Control.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Demandes.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Inputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Outputs.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_Chain_Translation_Safety.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_HwTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_SafetyTranslation.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationFinalInterlockRequest.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/2_TRANSLATION/ST_TranslationState.st</code></li><li><code>CODE/G_CYCLE/_TYPES/E_OperatorAxis.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ChainCycleSemiAuto.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ModesState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st</code></li><li><code>CODE/D_JOYSTICK/ST_fbJoystick_AxisCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionJoystickQualified.st</code></li><li><code>CODE/C_DIAG_RESEAUX/E_Diag_State.st</code></li><li><code>CODE/C_DIAG_RESEAUX/ST_Diag_Device.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionNetworkDiagnostics.st</code></li><li><code>CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwOut.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionEncoderQualified.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_AcquisitionInterPrg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_EncoderHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwMachine.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HwOperator.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_JoystickState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_ChainDredgingAssist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleAssistToggles.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDiveSearchState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleDumpAtTremieState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/5_ASSISTANCE_DRAGAGE/ST_CycleExtractionState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_ChainContextGlobal.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_HomingChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_InputModuleDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_MotionChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_NetworkDiagHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_SafetyChecklist.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassCommun.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassNetwork.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_BypassSync.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCfg.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncCmd.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncHMI.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_SyncState.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_AlarmBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_HmiBanner.st</code></li><li><code>CODE/J_SUPERVISION/_TYPES/8_BANDEAU_ET_IHM/ST_PreflightHMI.st</code></li><li><code>CODE/J_SUPERVISION/FB_AntiFlickerText.st</code></li><li><code>CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st</code></li></ul>
     </details>
     <details>
-        <summary>Code source ST original (148)</summary>
+        <summary>Code source ST original (149)</summary>
         
             <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\TOOLS\TEST_AUTO_CI\MOCKS\DEVICE_STATE.st</code></summary>
@@ -2651,6 +2734,24 @@ END_TYPE
 </pre>
             </details>
             <details>
+                <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\J_SUPERVISION\_TYPES\3_CYCLE_ET_MODES\ST_ProgramWinchRequest.st</code></summary>
+                <pre>(* =======================================================================
+   🔌 ST_ProgramWinchRequest — Demande de mouvement treuil par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   ======================================================================= *)
+TYPE ST_ProgramWinchRequest :
+STRUCT
+    RunRequest   : BOOL; // Ordre marche demandé par le programme
+    ReqAscent    : BOOL; // Demande montée
+    ReqDescend   : BOOL; // Demande descente
+    StepTgt      : INT;  // Palier de vitesse cible demandé (1 à 5, 0 = arrêt)
+END_STRUCT
+END_TYPE
+</pre>
+            </details>
+            <details>
                 <summary><code>C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\CODE\G_CYCLE\_TYPES\ST_MachineHoming.st</code></summary>
                 <pre>(* =======================================================================
    🧭 ST_MachineHoming — Etat publie du homing conjoint machine (M1/M2/benne)
@@ -2668,9 +2769,15 @@ STRUCT
     SetPosBucketClose: BOOL;          (* Valider position actuelle = reference benne fermee *)
     Active           : BOOL;          (* Homing conjoint en cours *)
     HomingLoss       : BOOL;          (* Perte reference en mouvement : arret controle SafeStop *)
-    Step             : INT;           (* Etape guidee reference *)
+    Step             : INT;           (* Etape guidee reference (echelle de priorite E_MachineHomingStep) *)
     Instruction      : STRING(120);   (* Consigne IHM reference *)
     Failed           : BOOL;          (* Transaction reference abandonnee *)
+    SeqStep          : INT;           (* Step GRAFCET courant (E_MachineHomingTxState HX0..HXF) *)
+    M3Locked         : BOOL;          (* Translation M3 interdite pendant le cycle de homing machine *)
+    CmdWinchM1       : ST_ProgramWinchRequest; (* Ordre treuil M1 couple palier 1 (HX2 montee / HX3 descente) *)
+    CmdWinchM2       : ST_ProgramWinchRequest; (* Ordre treuil M2 couple palier 1 (HX2 montee / HX3 descente) *)
+    CmdBucketOpen    : BOOL;          (* Ordre ouverture benne palier 1 sans FDC soft (HX4) *)
+    CmdBucketClose   : BOOL;          (* Ordre fermeture benne palier 1 sans FDC soft (HX4) *)
 END_STRUCT
 END_TYPE
 </pre>
@@ -3255,11 +3362,13 @@ TYPE E_CycleStep :
   X6_CLOSE_BUCKET     := 6,   (* Fermeture benne — tolérance « à peu près fermé » *)
   X7_CTRL_ASCENT      := 7,   (* Remontée palier 1 de contrôle *)
   X8_ASCENT_LOADED    := 8,   (* Remontée nominale jusqu&#x27;à limite haute *)
-  X9_DRAIN_PAUSE      := 9,   (* Égouttage temporisé — temps affiché IHM *)
-  X10_TRANSLATE_DUMP  := 10,  (* Translation vers trémie + avertissements IHM *)
-  X11_OPEN_DUMP       := 11,  (* Ouverture benne = vidage ; montée possible, descente ouvre *)
-  X13_DONE_SYNC       := 13,  (* Fin de cycle, synchronisation finale (R4) + compteur *)
-  STABILIZING         := 14   (* État d&#x27;attente/stabilisation — pas une erreur *)
+  X9_DRAIN_PAUSE      := 9,   (* Égouttage temporisé — durée configurable / passable IHM *)
+  X10_TRANSLATE_DUMP  := 10,  (* Translation vers trémie (départ P1) + avertissements IHM *)
+  X11A_DUMP_ARRIVE    := 11,  (* Arrivée trémie : treuils à l&#x27;arrêt, attente geste opérateur (ex-X11) *)
+  X13_DONE_SYNC       := 13,  (* Fin de cycle, synchronisation finale (R4) + compteur + durée cycle *)
+  STABILIZING         := 14,  (* État d&#x27;attente/stabilisation — pas une erreur *)
+  X11B_DUMP_OPEN      := 15,  (* Vidage à la trémie : ouverture benne, LES DEUX treuils à l&#x27;arrêt (aucune descente couplée) *)
+  X11C_DUMP_REPOSITION := 16  (* Repositionnement couplé M1+M2 (option IHM maintenue) : descente lente pour dégager la vidange, retour X11b au relâchement *)
 );
 END_TYPE
 </pre>
@@ -4837,6 +4946,7 @@ TYPE ST_CycleCfg :
 STRUCT
     SetDepth_M  : REAL := -12.5; (* 📐 Profondeur de dragage cible (m, négative) *)
     SetOffset_M : REAL := 1.5;   (* 📐 Décalage cible de fermeture de la benne (m) *)
+    DrainTime   : TIME := T#5s;  (* ⏱️ Durée d&#x27;égouttage du godet en X9 (configurable IHM) *)
     Initialized : BOOL := FALSE; (* 🚦 flag restauration boot *)
 END_STRUCT
 END_TYPE
@@ -4853,6 +4963,8 @@ STRUCT
     BtnPause : BOOL; (* ⏸️ Pause cycle automatique *)
     BtnAbort : BOOL; (* ⏹️ Abandon / arrêt cycle automatique *)
     BtnReset : BOOL; (* 🔁 Reset dédié FB_Cycle, jamais mélangé au reset défauts général () *)
+    BtnSkipDrain : BOOL; (* ⏭️ Passer l&#x27;étape d&#x27;égouttage X9 (front) *)
+    BtnReposition : BOOL; (* ⬇️ Option maintenue : repositionnement couplé M1+M2 pendant le vidage trémie (X11b &lt;-&gt; X11c) *)
 END_STRUCT
 END_TYPE
 </pre>
@@ -4904,6 +5016,8 @@ STRUCT
     JoystickDeflected      : BOOL;        (* 🕹️ Joystick défléchi (non centré) — même signal que JoystickDeflected (FB_Cycle) ; SANS homme-mort *)
     CycleStepAtError       : E_CycleStep; (* 🧊 Étape spécifique au moment du défaut  *)
     SampleCount            : INT;         (* Compteur de prélèvements (RETAIN, Q3bis) *)
+    CurrentCycleElapsed    : TIME;        (* ⏱️ Durée écoulée du cycle en cours *)
+    LastCycleDuration      : TIME;        (* ⏱️ Durée du dernier cycle achevé (figée à X13) *)
 END_STRUCT
 END_TYPE
 </pre>
@@ -4918,6 +5032,7 @@ STRUCT
     SelMode            : E_Mode := E_Mode.MAINT_N1; (* 🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM () *)
     BtnFaultReset      : BOOL;   (* 🔔 Acquittement défauts/alarmes domaine sécurité/métier — jamais Modes/Cycle *)
     BtnModeReset       : BOOL;   (* 🔁 Acquittement défaut FB_Modes uniquement () *)
+    BtnMachineHomingStart : BOOL; (* 🎯 Lancer le cycle de homing machine (MAINT_N2, front) — alternative au motif 3 appuis joystick *)
 
     // Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
     SelJoystickWinch   : INT := 0; (* 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement *)
@@ -6450,7 +6565,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_CycleStep.X8_ASCENT_LOADED: Banner.SequenceProgressText := &#x27;Cycle: REMONTÉE CHARGÉE&#x27;;
             E_CycleStep.X9_DRAIN_PAUSE: Banner.SequenceProgressText := &#x27;Cycle: ÉGOUTTAGE&#x27;;
             E_CycleStep.X10_TRANSLATE_DUMP: Banner.SequenceProgressText := &#x27;Cycle: TRANSLATION TRÉMIE&#x27;;
-            E_CycleStep.X11_OPEN_DUMP: Banner.SequenceProgressText := &#x27;Cycle: VIDAGE BENNE&#x27;;
+            E_CycleStep.X11A_DUMP_ARRIVE, E_CycleStep.X11B_DUMP_OPEN: Banner.SequenceProgressText := &#x27;Cycle: VIDAGE BENNE&#x27;;
             E_CycleStep.X13_DONE_SYNC: Banner.SequenceProgressText := &#x27;Cycle: TERMINÉ&#x27;;
             E_CycleStep.STABILIZING: Banner.SequenceProgressText := &#x27;Cycle: STABILISATION&#x27;;
         ELSE
@@ -6701,7 +6816,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             OperatorActionCandidate := &#x27;[IHM] Attendre égouttage&#x27;;
         E_CycleStep.X10_TRANSLATE_DUMP:
             OperatorActionCandidate := &#x27;[JOYSTICK] Déplacer vers trémie&#x27;;
-        E_CycleStep.X11_OPEN_DUMP:
+        E_CycleStep.X11A_DUMP_ARRIVE, E_CycleStep.X11B_DUMP_OPEN:
             OperatorActionCandidate := &#x27;[IHM] Vidage benne&#x27;;
         E_CycleStep.X13_DONE_SYNC:
             OperatorActionCandidate := &#x27;[IHM] Cycle terminé&#x27;;
@@ -6719,7 +6834,8 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_CycleStep.X8_ASCENT_LOADED: StepAtErrorStr := &#x27;X8 (remontée chargée)&#x27;;
                 E_CycleStep.X9_DRAIN_PAUSE: StepAtErrorStr := &#x27;X9 (égouttage)&#x27;;
                 E_CycleStep.X10_TRANSLATE_DUMP: StepAtErrorStr := &#x27;X10 (translation trémie)&#x27;;
-                E_CycleStep.X11_OPEN_DUMP: StepAtErrorStr := &#x27;X11 (vidage benne)&#x27;;
+                E_CycleStep.X11A_DUMP_ARRIVE: StepAtErrorStr := &#x27;X11a (arrivee tremie)&#x27;;
+                E_CycleStep.X11B_DUMP_OPEN: StepAtErrorStr := &#x27;X11b (vidage benne)&#x27;;
                 E_CycleStep.X13_DONE_SYNC: StepAtErrorStr := &#x27;X13 (cycle terminé)&#x27;;
                 E_CycleStep.STABILIZING: StepAtErrorStr := &#x27;X14 (stabilisation)&#x27;;
                 ELSE
@@ -7201,6 +7317,24 @@ test_fb_hmi_bannerformatter.st
     </details>
 </div>
 <script>
+function copyTextToClipboard(btn, text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    var orig = btn.innerHTML;
+    btn.innerHTML = "✓ Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
 function copyPinExpr(el) {
     var text = el.getAttribute('title') || el.textContent;
     var ta = document.createElement('textarea');
@@ -7471,9 +7605,14 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier (sauf si sélection de texte en cours)
         var testHeader = e.target.closest('.test-card-header');
         if (testHeader) {
+            // Si l'utilisateur est en train de surligner / sélectionner du texte, ne pas replier
+            var selection = window.getSelection ? window.getSelection().toString() : '';
+            if (selection && selection.length > 0) {
+                return;
+            }
             var card = testHeader.closest('.test-card');
             if (card) {
                 card.classList.toggle('test-card-collapsed');
@@ -7512,6 +7651,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
         var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+        var metaData = JSON.parse(svg.getAttribute('data-meta') || '{}');
 
         var colIdx = Math.floor((svgX - left) / colw);
         var rowIdx = Math.floor((svgY - top) / laneh);
@@ -7541,12 +7681,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 cursorLine.style.display = '';
             }
 
+            var fMeta = metaData[f] || {};
+            var badgeCls = fMeta.cls || 'badge-var-loc';
+            var metaBadge = fMeta.badge ? '<span class="var-prov-badge ' + badgeCls + '" style="font-size:9.5px;padding:1px 5px;margin-right:4px;">[' + fMeta.badge + ']</span>' : '';
+            var typeStr = fMeta.type ? '<span style="color:var(--muted);font-size:11px;font-family:monospace;">' + fMeta.type + '</span>' : '';
+            var metaLineHtml = (metaBadge || typeStr) ? '<div class="wf-tt-meta">' + metaBadge + typeStr + '</div>' : '';
+
             var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+            var assertsHtml = '';
+            if (s.asserts && s.asserts.length > 0) {
+                var chkItems = s.asserts.map(function(c) {
+                    return '<div style="color:#34d399;font-size:10.5px;margin-top:2px;font-family:monospace;">✓ ' + c + '</div>';
+                }).join('');
+                assertsHtml = '<div style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px;"><strong style="color:var(--accent);font-size:10.5px;">Assertions vérifiées :</strong>' + chkItems + '</div>';
+            }
 
             tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
                            '<div class="wf-tt-var">' + f + '</div>' +
+                           metaLineHtml +
                            '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
-                           noteHtml;
+                           noteHtml +
+                           assertsHtml;
 
             tt.style.display = 'block';
             var ttX = e.clientX + 16;

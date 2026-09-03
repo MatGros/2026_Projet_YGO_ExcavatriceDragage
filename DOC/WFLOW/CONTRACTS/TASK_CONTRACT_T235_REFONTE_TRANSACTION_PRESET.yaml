@@ -1,0 +1,153 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# T235 — Refonte de la transaction de vérification preset homing
+#         (suppression de la latence fixe CST_PresetVerifyTime 500 ms)
+#         dans FB_Encoder_Homing.st.
+#
+# Bug terrain visé : le référencement homing M2 « benne fermée » (M2 reste à
+# 8.5 m au lieu de prendre la cible, cf. T213) est diagnostiqué dans la zone de
+# la transaction preset. La latence fixe de 500 ms (CST_PresetVerifyTime) est
+# une temporisation de sécurité transactionnelle : elle laisse le codeur
+# appliquer physiquement le preset avant la relecture de vérification. La
+# retirer n'est PAS un simple retrait de constante : c'est une refonte de la
+# logique de transaction preset (déclenchement de la vérification, fiabilité
+# du ReadbackOk, validation de Calib.Homed).
+#
+# Validation  : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T235_REFONTE_TRANSACTION_PRESET_HOMING
+  criticality: C4            # safety-relevant : fiabilité du référencement codeur
+  strategy: patch            # refonte localisée de la transaction preset, pas de rebuild
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Remplacer la latence fixe de 500 ms (CST_PresetVerifyTime) de la
+    transaction de vérification preset homing par une logique de vérification
+    déterministe et sans délai arbitraire, tout en garantissant que le preset
+    est réellement appliqué par le codeur avant la relecture (ReadbackOk) et
+    que Calib.Homed n'est validé que sur une position vérifiée. Le retrait du
+    délai ne doit en aucun cas valider un référencement sur une position non
+    encore appliquée (risque de référence erronée).
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        CST_PresetVerifyTime et PresetVerifyTimer (TON) sont supprimés de
+        FB_Encoder_Homing.st ; la transaction preset ne dépend plus d'aucune
+        latence fixe.
+      verified_by: >
+        grep de CST_PresetVerifyTime / PresetVerifyTimer dans FB_Encoder_Homing.st
+        = 0 occurrence ; bundle PLCopenXML régénéré sans ces symboles.
+
+    - id: AC2
+      statement: >
+        La vérification du preset (ReadbackOk / StatusBitOk / PresetConfirmed)
+        est déclenchée par un événement déterministe (ex. front de confirmation
+        d'application du preset, retour PDO, ou état codeur) et non par un
+        timeout.
+      verified_by: >
+        Revue du diff FB_Encoder_Homing.st §5 : le déclencheur de la
+        vérification est identifié et documenté ; aucun TON de garde ne
+        subsiste dans la transaction.
+
+    - id: AC3
+      statement: >
+        Calib.Homed n'est validé que si la position relue est dans la tolérance
+        CST_HomingVerifyToleranceM (0.010 m) — la garantie de non-validation
+        d'un preset non appliqué est conservée.
+      verified_by: >
+        TC unitaire (test_fb_encoder_homing.st) : scénario « preset non encore
+        appliqué » → ReadbackOk = FALSE, Calib.Homed reste FALSE, PresetFailError
+        levé ; scénario nominal → Calib.Homed = TRUE.
+
+    - id: AC4
+      statement: >
+        Aucun changement de comportement hors transaction preset : les sorties
+        Calib, Lifecycle, Fault et les causes nommées restent identiques en
+        sémantique.
+      verified_by: >
+        Bundle frais + G200 PASS + gates palier C PASS ; git diff de
+        FB_Encoder_Homing.st limité à la transaction preset (§5) et à la
+        suppression des symboles de latence.
+
+    - id: AC5
+      statement: >
+        La suppression de la latence est documentée dans AF_Partie-09
+        (Fonction Encoder) avec la justification de la nouvelle logique de
+        vérification.
+      verified_by: >
+        AF_Partie-09 v2.4 mise à jour ; G340 (liens doc) PASS.
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:                 # fichiers que la tache PEUT modifier
+      - CODE/E_CODEURS/FB_Encoder_Homing.st
+      - TOOLS/TEST_AUTO_CI/.../test_fb_encoder_homing.st   # TC de la transaction preset
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T235_REFONTE_TRANSACTION_PRESET.yaml
+    forbidden:               # explicitement hors scope — ne pas y toucher
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_MachineHomingCycle.st  # cycle homing conjoint — hors refactor
+      - CODE/E_CODEURS/FB_Encoder.st
+      - DOC/NAMING_CONVENTION.md
+      - ARCHIVES/**
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:            # comportements/donnees a preserver imperativement
+      - "La garantie de non-validation d'un preset non appliqué (ReadbackOk dans CST_HomingVerifyToleranceM avant Calib.Homed := TRUE)"
+      - "Le producteur unique des faits de calibration reste FB_Encoder_Homing (Calib.Homed / Calib.HomingRefRaw / Calib.HomingSuspect)"
+      - "Les sorties Calib, Lifecycle, Fault et les causes nommées (HomingModeError, TargetOutOfRangeError, PresetFailError, BootIncoherentError) restent sémantiquement identiques"
+      - "Le mode de confirmation preset (Cfg.PresetConfirmMode : READBACK_ONLY / READBACK_AND_STATUSBIT / STATUSBIT_ONLY) reste fonctionnel"
+    dropped_on_purpose:      # abandonne sciemment — decision humaine, tracee
+      - "La latence fixe CST_PresetVerifyTime (500 ms) et le TON PresetVerifyTimer associé — remplacés par une logique de vérification déterministe"
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - check_linkage          # bloc "Auto-verification liaison" (G200 PASS)
+    - run_all_gates          # resultat des gates (palier C)
+    - bundle                 # CODE/CODE_Bundle.xml regenere
+    - unit_tests             # TC transaction preset (test_fb_encoder_homing.st) verts
+    - diff_review            # FB_Encoder_Homing.st limité à la transaction preset
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty: >
+    Tout problème constaté en cours de route est remonté IMMEDIATEMENT à
+    l'orchestrateur, pas à la fin et jamais silencieusement : risque de
+    validation d'un preset non appliqué, dépendance du déclencheur de
+    vérification non disponible (retour PDO / état codeur), ou impact hors
+    transaction preset. Signaler n'est pas élargir le scope.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI DE L'ETAT D'AVANCEMENT & LISEUR HUMAIN (Où on en est)
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING               # PENDING (attente) | IN_PROGRESS (cours) | COMPLETED (fait agent) | VALIDATED (validé)
+
+# ── 1. Rapport d'exécution de l'agent (rempli en fin de travail par l'agent) ──
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING            # PENDING | COMPLETED | BLOCKED | ALERT_RAISED
+  summary: >
+    Contrat et Plan rédigés (travail pré-code). Implémenter après validation
+    humaine du plan (ARRET VALIDATION requis avant toute écriture CODE/).
+  evidence_submitted: []
+
+# ── 2. Visa de validation de l'orchestrateur / validateur ──────────────────
+validation:
+  status: PENDING            # PENDING | APPROVED | REJECTED
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Validation humaine du plan obligatoire avant toute modification de
+    CODE/ (criticité C4, machine réelle — fiabilité du référencement).

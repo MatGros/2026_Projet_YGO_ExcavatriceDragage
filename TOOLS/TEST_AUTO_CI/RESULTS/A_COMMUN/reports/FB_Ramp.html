@@ -152,6 +152,53 @@
         display: block;
         text-align: center;
     }
+    /* Pastilles de provenance & typage des variables */
+    .var-prov-badge {
+        display: inline-block;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        margin-top: 3px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .badge-var-in { background: rgba(2, 132, 199, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .badge-var-out { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); }
+    .badge-var-inout { background: rgba(139, 92, 246, 0.18); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .badge-var-loc { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .badge-var-cst { background: rgba(217, 119, 6, 0.18); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+    .badge-var-hw { background: rgba(20, 184, 166, 0.18); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.35); }
+    .badge-var-gvl { background: rgba(14, 165, 233, 0.18); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.35); }
+    .badge-var-prg { background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.35); }
+    .badge-var-diag { background: rgba(217, 70, 239, 0.18); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.35); }
+    .badge-var-ext { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.35); }
+
+    [data-theme="light"] .badge-var-in { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-out { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .badge-var-inout { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+    [data-theme="light"] .badge-var-loc { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    [data-theme="light"] .badge-var-cst { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    [data-theme="light"] .badge-var-hw { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+    [data-theme="light"] .badge-var-gvl { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-prg { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .badge-var-diag { background: #fdf4ff; color: #a21caf; border-color: #fbcfe8; }
+    [data-theme="light"] .badge-var-ext { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+
+    .chrono-table th .th-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        pointer-events: auto;
+    }
+    .chrono-table th .var-name-lbl {
+        font-family: monospace;
+        font-weight: 700;
+        font-size: 11px;
+    }
     /* Mode Titres Verticaux (Compact) */
     .chrono-table.headers-vertical {
         width: max-content !important;
@@ -162,7 +209,7 @@
         width: 280px !important;
     }
     .chrono-table.headers-vertical th.var-th {
-        height: 155px;
+        height: 165px;
         vertical-align: bottom;
         padding-bottom: 10px;
         padding-top: 10px;
@@ -173,26 +220,36 @@
     .chrono-table.headers-vertical th.var-th .th-content {
         writing-mode: vertical-rl;
         transform: rotate(180deg);
-        display: inline-block;
+        display: inline-flex;
+        flex-direction: row-reverse;
+        align-items: center;
         white-space: nowrap;
         text-align: left;
-        max-height: 135px;
+        max-height: 145px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .chrono-table th .th-content {
-        display: inline-block;
-        pointer-events: auto;
+    .chrono-table.headers-vertical th.var-th .var-prov-badge {
+        margin-top: 0;
+        margin-left: 4px;
     }
     .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
     .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
     [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
     [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
-    .chrono-note-cell { text-align: left !important; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
-    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 310px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-cell { text-align: left !important; max-width: 360px; font-size: 11px; }
+    .chrono-note-container { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
     .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    .chrono-chk-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; padding: 2px 8px; font-weight: 600; font-size: 10.5px; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
+    .chrono-chk-pass { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .chrono-chk-fail { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .chrono-chk-chip .chk-icon { font-weight: 800; font-size: 11.5px; }
     [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
     [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    [data-theme="light"] .chrono-chk-pass { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .chrono-chk-fail { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .wf-check-marker { font-size: 12px; fill: #10b981; font-weight: 800; text-anchor: middle; font-family: monospace; cursor: help; }
     .v-true { color: #34d399; font-weight: 700; }
     .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
@@ -229,6 +286,7 @@
     .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
     [data-theme="light"] .wf-tt-head { color: #0284c7; }
     .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-meta { font-size: 10.5px; margin-bottom: 4px; }
     .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
     .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
     .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
@@ -315,7 +373,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-03 01:16:00</div>
+    <div class="exec-time">2026-09-03 12:20:39</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (4 tests)</summary>
@@ -509,9 +567,10 @@
         <div style="margin-top: 12px;">
             
         <article id="test-fb-ramp-0" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">Accel : consigne progresse par pas de AccelRate*CycleTimeS vers la cible </h3>
+                <h3 style="flex: 1; user-select: text;">Accel : consigne progresse par pas de AccelRate*CycleTimeS vers la cible </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'Accel : consigne progresse par pas de AccelRate*CycleTimeS vers la cible')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -537,7 +596,7 @@
                     </span>
                 </div>
             </summary>
-            <div class="wf-scroll"><svg width="332" height="132" viewBox="0 0 332 132" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;TARGET&quot;: &quot;100&quot;, &quot;ACCELRATE&quot;: &quot;50&quot;, &quot;DECELRATE&quot;: &quot;200&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;CURRENT&quot;: &quot;5&quot;, &quot;STEPX&quot;: &quot;5&quot;, &quot;TARGETLIMITED&quot;: &quot;100&quot;}, &quot;note&quot;: &quot;&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;TARGET&quot;: &quot;100&quot;, &quot;ACCELRATE&quot;: &quot;50&quot;, &quot;DECELRATE&quot;: &quot;200&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;CURRENT&quot;: &quot;10&quot;, &quot;STEPX&quot;: &quot;5&quot;, &quot;TARGETLIMITED&quot;: &quot;100&quot;}, &quot;note&quot;: &quot;&quot;}]" data-fields="[&quot;CURRENT&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="114" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#64748b"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#ef4444"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#f97316"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#0284c7"/><text x="418" y="17" class="wf-legend">Voies actives</text><line x1="200" y1="56" x2="200" y2="114" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="126" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="114" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="126" class="wf-scan">#1</text><circle cx="192" cy="82.0" r="4" fill="#0284c7"/><text x="182" y="86.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 0)" title="Cliquer pour basculer Courbe / Chiffres">CURRENT</text><g class="wf-numeric-group" data-row="0"><g class="wf-analog-view"><text x="194" y="72" class="wf-scale">10.0</text><text x="194" y="98" class="wf-scale">5.00</text><path d="M200,96.0L256,96.0L256,68.0L312,68.0" class="wf-line" stroke="#0284c7" stroke-width="2.2"/><circle cx="256" cy="68.0" r="2.5" fill="#0284c7"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="219.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><rect x="275.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="284.0" y="77.0" class="wf-num-changed">10</text></g></g></svg></div>
+            <div class="wf-scroll"><svg width="362" height="132" viewBox="0 0 362 132" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;TARGET&quot;: &quot;100&quot;, &quot;ACCELRATE&quot;: &quot;50&quot;, &quot;DECELRATE&quot;: &quot;200&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;CURRENT&quot;: &quot;5&quot;, &quot;STEPX&quot;: &quot;5&quot;, &quot;TARGETLIMITED&quot;: &quot;100&quot;}, &quot;note&quot;: &quot;&quot;, &quot;asserts&quot;: [&quot;pas 1 : 0 -&gt; 5.0 (50%/s * 0.1s), s eloigne de zero donc AccelRate&quot;]}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;TARGET&quot;: &quot;100&quot;, &quot;ACCELRATE&quot;: &quot;50&quot;, &quot;DECELRATE&quot;: &quot;200&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;CURRENT&quot;: &quot;10&quot;, &quot;STEPX&quot;: &quot;5&quot;, &quot;TARGETLIMITED&quot;: &quot;100&quot;}, &quot;note&quot;: &quot;&quot;, &quot;asserts&quot;: [&quot;pas 2 : 5.0 -&gt; 10.0, meme taux tant que la cible n est pas atteinte&quot;]}]" data-fields="[&quot;CURRENT&quot;]" data-meta="{&quot;CURRENT&quot;: {&quot;badge&quot;: &quot;VAR_OUTPUT&quot;, &quot;cls&quot;: &quot;badge-var-out&quot;, &quot;type&quot;: &quot;REAL&quot;, &quot;tag&quot;: &quot;[VAR_OUTPUT] REAL&quot;, &quot;color&quot;: &quot;#34d399&quot;}}" data-left="230" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="114" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="230" cy="14" r="4" fill="#64748b"/><text x="238" y="17" class="wf-legend">Reset</text><circle cx="276" cy="14" r="4" fill="#ef4444"/><text x="284" y="17" class="wf-legend">Erreur / défaut</text><circle cx="382" cy="14" r="4" fill="#f97316"/><text x="390" y="17" class="wf-legend">Lockout</text><circle cx="440" cy="14" r="4" fill="#0284c7"/><text x="448" y="17" class="wf-legend">Voies actives</text><text x="258.0" y="34" class="wf-check-marker" title="1 assertion(s) vérifiée(s)">✓</text><line x1="230" y1="56" x2="230" y2="114" class="wf-grid"/><text x="258.0" y="52" class="wf-time">0ms</text><text x="258.0" y="126" class="wf-scan">#0</text><text x="314.0" y="34" class="wf-check-marker" title="1 assertion(s) vérifiée(s)">✓</text><line x1="286" y1="56" x2="286" y2="114" class="wf-grid"/><text x="314.0" y="52" class="wf-time">10ms</text><text x="314.0" y="126" class="wf-scan">#1</text><circle cx="222" cy="82.0" r="4" fill="#0284c7"/><text x="212" y="86.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 0)" title="CURRENT : REAL (Cliquer pour basculer Courbe / Chiffres)"><tspan fill="#34d399" font-weight="700" font-size="9.5px">[VAR_OUTPUT] </tspan><tspan>CURRENT</tspan></text><g class="wf-numeric-group" data-row="0"><g class="wf-analog-view"><text x="224" y="72" class="wf-scale">10.0</text><text x="224" y="98" class="wf-scale">5.00</text><path d="M230,96.0L286,96.0L286,68.0L342,68.0" class="wf-line" stroke="#0284c7" stroke-width="2.2"/><circle cx="286" cy="68.0" r="2.5" fill="#0284c7"/></g><g class="wf-digital-view" style="display:none;"><line x1="230" y1="82.0" x2="286" y2="82.0" class="wf-num-line"/><rect x="249.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="258.0" y="77.0" class="wf-num-changed">5</text><line x1="286" y1="82.0" x2="342" y2="82.0" class="wf-num-line"/><rect x="305.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="314.0" y="77.0" class="wf-num-changed">10</text></g></g></svg></div>
         </details>
         <details open>
             <summary class="chrono-table-summary">
@@ -551,22 +610,23 @@
                 </div>
             </summary>
             <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>CURRENT</span><div class='col-resizer'></div></th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td>5</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='changed'>10</td></tr></tbody>
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:240px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte & Points de contrôle (ASSERT)</span><div class='col-resizer'></div></th><th class='var-th' title='CURRENT : REAL (VAR_OUTPUT) — Double-cliquez pour replier'><div class='th-content'><span class='var-name-lbl'>CURRENT</span><span class='var-prov-badge badge-var-out' title='Type: REAL'>[VAR_OUTPUT]</span></div><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell'><div class='chrono-note-container'><span class='chrono-chk-chip chrono-chk-pass' title='ASSERT vérifié : pas 1 : 0 -&gt; 5.0 (50%/s * 0.1s), s eloigne de zero donc AccelRate'><span class='chk-icon'>✓</span> pas 1 : 0 -&gt; 5.0 (50%/s * 0.1s), s eloigne de zero donc AccelRate</span></div></td><td>5</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell'><div class='chrono-note-container'><span class='chrono-chk-chip chrono-chk-pass' title='ASSERT vérifié : pas 2 : 5.0 -&gt; 10.0, meme taux tant que la cible n est pas atteinte'><span class='chk-icon'>✓</span> pas 2 : 5.0 -&gt; 10.0, meme taux tant que la cible n est pas atteinte</span></div></td><td class='changed'>10</td></tr></tbody>
     </table></div>
         </details>
         
     <details class="chronogram-static">
         <summary>🔒 Valeurs constantes sur toute la séquence (6)</summary>
-        <table class="static-table"><tbody><tr><td><code>ACCELRATE</code></td><td>50</td></tr><tr><td><code>CYCLETIMES</code></td><td>0.100</td></tr><tr><td><code>DECELRATE</code></td><td>200</td></tr><tr><td><code>STEPX</code></td><td>5</td></tr><tr><td><code>TARGET</code></td><td>100</td></tr><tr><td><code>TARGETLIMITED</code></td><td>100</td></tr></tbody></table>
+        <table class="static-table"><tbody><tr><td><code>ACCELRATE</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>50</td></tr><tr><td><code>CYCLETIMES</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>0.100</td></tr><tr><td><code>DECELRATE</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>200</td></tr><tr><td><code>STEPX</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>5</td></tr><tr><td><code>TARGET</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>100</td></tr><tr><td><code>TARGETLIMITED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>100</td></tr></tbody></table>
     </details>
     </div>
             </div>
         </article>
         <article id="test-fb-ramp-1" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">Decel : retour vers zero utilise DecelRate (taux different d Accel) </h3>
+                <h3 style="flex: 1; user-select: text;">Decel : retour vers zero utilise DecelRate (taux different d Accel) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'Decel : retour vers zero utilise DecelRate (taux different d Accel)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -596,7 +656,7 @@
                     </span>
                 </div>
             </summary>
-            <div class="wf-scroll"><svg width="388" height="252" viewBox="0 0 388 252" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;TARGET&quot;: &quot;40&quot;, &quot;ACCELRATE&quot;: &quot;50&quot;, &quot;DECELRATE&quot;: &quot;10&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;CURRENT&quot;: &quot;5&quot;, &quot;STEPX&quot;: &quot;5&quot;, &quot;TARGETLIMITED&quot;: &quot;40&quot;}, &quot;note&quot;: &quot;monte a 40% avec Accel&quot;}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;TARGET&quot;: &quot;40&quot;, &quot;ACCELRATE&quot;: &quot;50&quot;, &quot;DECELRATE&quot;: &quot;10&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;CURRENT&quot;: &quot;10&quot;, &quot;STEPX&quot;: &quot;5&quot;, &quot;TARGETLIMITED&quot;: &quot;40&quot;}, &quot;note&quot;: &quot;monte a 40% avec Accel&quot;}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;TARGET&quot;: &quot;0&quot;, &quot;ACCELRATE&quot;: &quot;50&quot;, &quot;DECELRATE&quot;: &quot;10&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;CURRENT&quot;: &quot;9&quot;, &quot;STEPX&quot;: &quot;1&quot;, &quot;TARGETLIMITED&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;cible ramenee a 0 : retour vers zero -&gt; DecelRate, taux bien plus faible ici&quot;}]" data-fields="[&quot;CURRENT&quot;, &quot;STEPX&quot;, &quot;TARGET&quot;, &quot;TARGETLIMITED&quot;]" data-left="200" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="234" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="200" cy="14" r="4" fill="#64748b"/><text x="208" y="17" class="wf-legend">Reset</text><circle cx="246" cy="14" r="4" fill="#ef4444"/><text x="254" y="17" class="wf-legend">Erreur / défaut</text><circle cx="352" cy="14" r="4" fill="#f97316"/><text x="360" y="17" class="wf-legend">Lockout</text><circle cx="410" cy="14" r="4" fill="#0284c7"/><text x="418" y="17" class="wf-legend">Voies actives</text><line x1="200" y1="56" x2="200" y2="234" class="wf-grid"/><text x="228.0" y="52" class="wf-time">0ms</text><text x="228.0" y="246" class="wf-scan">#0</text><line x1="256" y1="56" x2="256" y2="234" class="wf-grid"/><text x="284.0" y="52" class="wf-time">10ms</text><text x="284.0" y="246" class="wf-scan">#1</text><line x1="312" y1="56" x2="312" y2="234" class="wf-grid"/><text x="340.0" y="52" class="wf-time">20ms</text><text x="340.0" y="246" class="wf-scan">#2</text><circle cx="192" cy="82.0" r="4" fill="#0284c7"/><text x="182" y="86.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 0)" title="Cliquer pour basculer Courbe / Chiffres">CURRENT</text><g class="wf-numeric-group" data-row="0"><g class="wf-analog-view"><text x="194" y="72" class="wf-scale">10.0</text><text x="194" y="98" class="wf-scale">5.00</text><path d="M200,96.0L256,96.0L256,68.0L312,68.0L312,73.6L368,73.6" class="wf-line" stroke="#0284c7" stroke-width="2.2"/><circle cx="256" cy="68.0" r="2.5" fill="#0284c7"/><circle cx="312" cy="73.6" r="2.5" fill="#0284c7"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="82.0" x2="256" y2="82.0" class="wf-num-line"/><rect x="219.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="228.0" y="77.0" class="wf-num-changed">5</text><line x1="256" y1="82.0" x2="312" y2="82.0" class="wf-num-line"/><rect x="275.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="284.0" y="77.0" class="wf-num-changed">10</text><line x1="312" y1="82.0" x2="368" y2="82.0" class="wf-num-line"/><rect x="331.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="340.0" y="77.0" class="wf-num-changed">9</text></g></g><circle cx="192" cy="122.0" r="4" fill="#16a34a"/><text x="182" y="126.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 1)" title="Cliquer pour basculer Courbe / Chiffres">STEPX</text><g class="wf-numeric-group" data-row="1"><g class="wf-analog-view"><text x="194" y="112" class="wf-scale">5.00</text><text x="194" y="138" class="wf-scale">1.00</text><path d="M200,108.0L256,108.0L312,108.0L312,136.0L368,136.0" class="wf-line" stroke="#16a34a" stroke-width="2.2"/><circle cx="312" cy="136.0" r="2.5" fill="#16a34a"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="122.0" x2="256" y2="122.0" class="wf-num-line"/><rect x="219.0" y="108.0" width="18" height="13" rx="3" fill="#16a34a" class="wf-chip"/><text x="228.0" y="117.0" class="wf-num-changed">5</text><line x1="256" y1="122.0" x2="312" y2="122.0" class="wf-num-line"/><text x="284.0" y="116.0" class="wf-num">5</text><line x1="312" y1="122.0" x2="368" y2="122.0" class="wf-num-line"/><rect x="331.0" y="108.0" width="18" height="13" rx="3" fill="#16a34a" class="wf-chip"/><text x="340.0" y="117.0" class="wf-num-changed">1</text></g></g><circle cx="192" cy="162.0" r="4" fill="#9333ea"/><text x="182" y="166.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 2)" title="Cliquer pour basculer Courbe / Chiffres">TARGET</text><g class="wf-numeric-group" data-row="2"><g class="wf-analog-view"><text x="194" y="152" class="wf-scale">40.0</text><text x="194" y="178" class="wf-scale">0</text><path d="M200,148.0L256,148.0L312,148.0L312,176.0L368,176.0" class="wf-line" stroke="#9333ea" stroke-width="2.2"/><circle cx="312" cy="176.0" r="2.5" fill="#9333ea"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="162.0" x2="256" y2="162.0" class="wf-num-line"/><rect x="219.0" y="148.0" width="18" height="13" rx="3" fill="#9333ea" class="wf-chip"/><text x="228.0" y="157.0" class="wf-num-changed">40</text><line x1="256" y1="162.0" x2="312" y2="162.0" class="wf-num-line"/><text x="284.0" y="156.0" class="wf-num">40</text><line x1="312" y1="162.0" x2="368" y2="162.0" class="wf-num-line"/><rect x="331.0" y="148.0" width="18" height="13" rx="3" fill="#9333ea" class="wf-chip"/><text x="340.0" y="157.0" class="wf-num-changed">0</text></g></g><circle cx="192" cy="202.0" r="4" fill="#ea580c"/><text x="182" y="206.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 3)" title="Cliquer pour basculer Courbe / Chiffres">TARGETLIMITED</text><g class="wf-numeric-group" data-row="3"><g class="wf-analog-view"><text x="194" y="192" class="wf-scale">40.0</text><text x="194" y="218" class="wf-scale">0</text><path d="M200,188.0L256,188.0L312,188.0L312,216.0L368,216.0" class="wf-line" stroke="#ea580c" stroke-width="2.2"/><circle cx="312" cy="216.0" r="2.5" fill="#ea580c"/></g><g class="wf-digital-view" style="display:none;"><line x1="200" y1="202.0" x2="256" y2="202.0" class="wf-num-line"/><rect x="219.0" y="188.0" width="18" height="13" rx="3" fill="#ea580c" class="wf-chip"/><text x="228.0" y="197.0" class="wf-num-changed">40</text><line x1="256" y1="202.0" x2="312" y2="202.0" class="wf-num-line"/><text x="284.0" y="196.0" class="wf-num">40</text><line x1="312" y1="202.0" x2="368" y2="202.0" class="wf-num-line"/><rect x="331.0" y="188.0" width="18" height="13" rx="3" fill="#ea580c" class="wf-chip"/><text x="340.0" y="197.0" class="wf-num-changed">0</text></g></g></svg></div>
+            <div class="wf-scroll"><svg width="418" height="252" viewBox="0 0 418 252" data-scans="[{&quot;scan&quot;: 0, &quot;t_ms&quot;: 0.0, &quot;fields&quot;: {&quot;TARGET&quot;: &quot;40&quot;, &quot;ACCELRATE&quot;: &quot;50&quot;, &quot;DECELRATE&quot;: &quot;10&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;CURRENT&quot;: &quot;5&quot;, &quot;STEPX&quot;: &quot;5&quot;, &quot;TARGETLIMITED&quot;: &quot;40&quot;}, &quot;note&quot;: &quot;monte a 40% avec Accel&quot;, &quot;asserts&quot;: [&quot;montee : AccelRate (50%/s)&quot;]}, {&quot;scan&quot;: 1, &quot;t_ms&quot;: 10.0, &quot;fields&quot;: {&quot;TARGET&quot;: &quot;40&quot;, &quot;ACCELRATE&quot;: &quot;50&quot;, &quot;DECELRATE&quot;: &quot;10&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;CURRENT&quot;: &quot;10&quot;, &quot;STEPX&quot;: &quot;5&quot;, &quot;TARGETLIMITED&quot;: &quot;40&quot;}, &quot;note&quot;: &quot;monte a 40% avec Accel&quot;, &quot;asserts&quot;: [&quot;montee : toujours AccelRate, cible pas encore atteinte&quot;]}, {&quot;scan&quot;: 2, &quot;t_ms&quot;: 20.0, &quot;fields&quot;: {&quot;TARGET&quot;: &quot;0&quot;, &quot;ACCELRATE&quot;: &quot;50&quot;, &quot;DECELRATE&quot;: &quot;10&quot;, &quot;CYCLETIMES&quot;: &quot;0.1&quot;, &quot;CURRENT&quot;: &quot;9&quot;, &quot;STEPX&quot;: &quot;1&quot;, &quot;TARGETLIMITED&quot;: &quot;0&quot;}, &quot;note&quot;: &quot;cible ramenee a 0 : retour vers zero -&gt; DecelRate, taux bien plus faible ici&quot;, &quot;asserts&quot;: [&quot;retour vers zero : DecelRate (10%/s), pas de 1.0 seulement -- pas AccelRate&quot;]}]" data-fields="[&quot;CURRENT&quot;, &quot;STEPX&quot;, &quot;TARGET&quot;, &quot;TARGETLIMITED&quot;]" data-meta="{&quot;CURRENT&quot;: {&quot;badge&quot;: &quot;VAR_OUTPUT&quot;, &quot;cls&quot;: &quot;badge-var-out&quot;, &quot;type&quot;: &quot;REAL&quot;, &quot;tag&quot;: &quot;[VAR_OUTPUT] REAL&quot;, &quot;color&quot;: &quot;#34d399&quot;}, &quot;STEPX&quot;: {&quot;badge&quot;: &quot;VAR&quot;, &quot;cls&quot;: &quot;badge-var-loc&quot;, &quot;type&quot;: &quot;REAL&quot;, &quot;tag&quot;: &quot;[VAR (Interne)] REAL&quot;, &quot;color&quot;: &quot;#94a3b8&quot;}, &quot;TARGET&quot;: {&quot;badge&quot;: &quot;VAR_INPUT&quot;, &quot;cls&quot;: &quot;badge-var-in&quot;, &quot;type&quot;: &quot;REAL&quot;, &quot;tag&quot;: &quot;[VAR_INPUT] REAL&quot;, &quot;color&quot;: &quot;#38bdf8&quot;}, &quot;TARGETLIMITED&quot;: {&quot;badge&quot;: &quot;VAR&quot;, &quot;cls&quot;: &quot;badge-var-loc&quot;, &quot;type&quot;: &quot;REAL&quot;, &quot;tag&quot;: &quot;[VAR (Interne)] REAL&quot;, &quot;color&quot;: &quot;#94a3b8&quot;}}" data-left="230" data-top="62" data-colw="56" data-laneh="40" xmlns="http://www.w3.org/2000/svg" class="waveform"><line class="wf-cursor-line" x1="0" y1="56" x2="0" y2="234" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8" style="display:none; pointer-events:none;"/><circle cx="230" cy="14" r="4" fill="#64748b"/><text x="238" y="17" class="wf-legend">Reset</text><circle cx="276" cy="14" r="4" fill="#ef4444"/><text x="284" y="17" class="wf-legend">Erreur / défaut</text><circle cx="382" cy="14" r="4" fill="#f97316"/><text x="390" y="17" class="wf-legend">Lockout</text><circle cx="440" cy="14" r="4" fill="#0284c7"/><text x="448" y="17" class="wf-legend">Voies actives</text><text x="258.0" y="34" class="wf-check-marker" title="1 assertion(s) vérifiée(s)">✓</text><line x1="230" y1="56" x2="230" y2="234" class="wf-grid"/><text x="258.0" y="52" class="wf-time">0ms</text><text x="258.0" y="246" class="wf-scan">#0</text><text x="314.0" y="34" class="wf-check-marker" title="1 assertion(s) vérifiée(s)">✓</text><line x1="286" y1="56" x2="286" y2="234" class="wf-grid"/><text x="314.0" y="52" class="wf-time">10ms</text><text x="314.0" y="246" class="wf-scan">#1</text><text x="370.0" y="34" class="wf-check-marker" title="1 assertion(s) vérifiée(s)">✓</text><line x1="342" y1="56" x2="342" y2="234" class="wf-grid"/><text x="370.0" y="52" class="wf-time">20ms</text><text x="370.0" y="246" class="wf-scan">#2</text><circle cx="222" cy="82.0" r="4" fill="#0284c7"/><text x="212" y="86.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 0)" title="CURRENT : REAL (Cliquer pour basculer Courbe / Chiffres)"><tspan fill="#34d399" font-weight="700" font-size="9.5px">[VAR_OUTPUT] </tspan><tspan>CURRENT</tspan></text><g class="wf-numeric-group" data-row="0"><g class="wf-analog-view"><text x="224" y="72" class="wf-scale">10.0</text><text x="224" y="98" class="wf-scale">5.00</text><path d="M230,96.0L286,96.0L286,68.0L342,68.0L342,73.6L398,73.6" class="wf-line" stroke="#0284c7" stroke-width="2.2"/><circle cx="286" cy="68.0" r="2.5" fill="#0284c7"/><circle cx="342" cy="73.6" r="2.5" fill="#0284c7"/></g><g class="wf-digital-view" style="display:none;"><line x1="230" y1="82.0" x2="286" y2="82.0" class="wf-num-line"/><rect x="249.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="258.0" y="77.0" class="wf-num-changed">5</text><line x1="286" y1="82.0" x2="342" y2="82.0" class="wf-num-line"/><rect x="305.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="314.0" y="77.0" class="wf-num-changed">10</text><line x1="342" y1="82.0" x2="398" y2="82.0" class="wf-num-line"/><rect x="361.0" y="68.0" width="18" height="13" rx="3" fill="#0284c7" class="wf-chip"/><text x="370.0" y="77.0" class="wf-num-changed">9</text></g></g><circle cx="222" cy="122.0" r="4" fill="#16a34a"/><text x="212" y="126.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 1)" title="STEPX : REAL (Cliquer pour basculer Courbe / Chiffres)"><tspan fill="#94a3b8" font-weight="700" font-size="9.5px">[VAR] </tspan><tspan>STEPX</tspan></text><g class="wf-numeric-group" data-row="1"><g class="wf-analog-view"><text x="224" y="112" class="wf-scale">5.00</text><text x="224" y="138" class="wf-scale">1.00</text><path d="M230,108.0L286,108.0L342,108.0L342,136.0L398,136.0" class="wf-line" stroke="#16a34a" stroke-width="2.2"/><circle cx="342" cy="136.0" r="2.5" fill="#16a34a"/></g><g class="wf-digital-view" style="display:none;"><line x1="230" y1="122.0" x2="286" y2="122.0" class="wf-num-line"/><rect x="249.0" y="108.0" width="18" height="13" rx="3" fill="#16a34a" class="wf-chip"/><text x="258.0" y="117.0" class="wf-num-changed">5</text><line x1="286" y1="122.0" x2="342" y2="122.0" class="wf-num-line"/><text x="314.0" y="116.0" class="wf-num">5</text><line x1="342" y1="122.0" x2="398" y2="122.0" class="wf-num-line"/><rect x="361.0" y="108.0" width="18" height="13" rx="3" fill="#16a34a" class="wf-chip"/><text x="370.0" y="117.0" class="wf-num-changed">1</text></g></g><circle cx="222" cy="162.0" r="4" fill="#9333ea"/><text x="212" y="166.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 2)" title="TARGET : REAL (Cliquer pour basculer Courbe / Chiffres)"><tspan fill="#38bdf8" font-weight="700" font-size="9.5px">[VAR_INPUT] </tspan><tspan>TARGET</tspan></text><g class="wf-numeric-group" data-row="2"><g class="wf-analog-view"><text x="224" y="152" class="wf-scale">40.0</text><text x="224" y="178" class="wf-scale">0</text><path d="M230,148.0L286,148.0L342,148.0L342,176.0L398,176.0" class="wf-line" stroke="#9333ea" stroke-width="2.2"/><circle cx="342" cy="176.0" r="2.5" fill="#9333ea"/></g><g class="wf-digital-view" style="display:none;"><line x1="230" y1="162.0" x2="286" y2="162.0" class="wf-num-line"/><rect x="249.0" y="148.0" width="18" height="13" rx="3" fill="#9333ea" class="wf-chip"/><text x="258.0" y="157.0" class="wf-num-changed">40</text><line x1="286" y1="162.0" x2="342" y2="162.0" class="wf-num-line"/><text x="314.0" y="156.0" class="wf-num">40</text><line x1="342" y1="162.0" x2="398" y2="162.0" class="wf-num-line"/><rect x="361.0" y="148.0" width="18" height="13" rx="3" fill="#9333ea" class="wf-chip"/><text x="370.0" y="157.0" class="wf-num-changed">0</text></g></g><circle cx="222" cy="202.0" r="4" fill="#ea580c"/><text x="212" y="206.0" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, 3)" title="TARGETLIMITED : REAL (Cliquer pour basculer Courbe / Chiffres)"><tspan fill="#94a3b8" font-weight="700" font-size="9.5px">[VAR] </tspan><tspan>TARGETLIMITED</tspan></text><g class="wf-numeric-group" data-row="3"><g class="wf-analog-view"><text x="224" y="192" class="wf-scale">40.0</text><text x="224" y="218" class="wf-scale">0</text><path d="M230,188.0L286,188.0L342,188.0L342,216.0L398,216.0" class="wf-line" stroke="#ea580c" stroke-width="2.2"/><circle cx="342" cy="216.0" r="2.5" fill="#ea580c"/></g><g class="wf-digital-view" style="display:none;"><line x1="230" y1="202.0" x2="286" y2="202.0" class="wf-num-line"/><rect x="249.0" y="188.0" width="18" height="13" rx="3" fill="#ea580c" class="wf-chip"/><text x="258.0" y="197.0" class="wf-num-changed">40</text><line x1="286" y1="202.0" x2="342" y2="202.0" class="wf-num-line"/><text x="314.0" y="196.0" class="wf-num">40</text><line x1="342" y1="202.0" x2="398" y2="202.0" class="wf-num-line"/><rect x="361.0" y="188.0" width="18" height="13" rx="3" fill="#ea580c" class="wf-chip"/><text x="370.0" y="197.0" class="wf-num-changed">0</text></g></g></svg></div>
         </details>
         <details open>
             <summary class="chrono-table-summary">
@@ -610,22 +670,23 @@
                 </div>
             </summary>
             <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>CURRENT</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>STEPX</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>TARGET</span><div class='col-resizer'></div></th><th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>TARGETLIMITED</span><div class='col-resizer'></div></th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell' title='monte a 40% avec Accel'><span class='chrono-note-chip'>monte a 40% avec Accel</span></td><td>5</td><td>5</td><td>40</td><td>40</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell' title='monte a 40% avec Accel'><span class='chrono-note-chip'>monte a 40% avec Accel</span></td><td class='changed'>10</td><td>5</td><td>40</td><td>40</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='chrono-note-cell' title='cible ramenee a 0 : retour vers zero -&gt; DecelRate, taux bien plus faible ici'><span class='chrono-note-chip'>cible ramenee a 0 : retour vers zero -&gt; DecelRate, taux bien plus faible ici</span></td><td class='changed'>9</td><td class='changed'>1</td><td class='changed'>0</td><td class='changed'>0</td></tr></tbody>
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:240px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte & Points de contrôle (ASSERT)</span><div class='col-resizer'></div></th><th class='var-th' title='CURRENT : REAL (VAR_OUTPUT) — Double-cliquez pour replier'><div class='th-content'><span class='var-name-lbl'>CURRENT</span><span class='var-prov-badge badge-var-out' title='Type: REAL'>[VAR_OUTPUT]</span></div><div class='col-resizer'></div></th><th class='var-th' title='STEPX : REAL (VAR) — Double-cliquez pour replier'><div class='th-content'><span class='var-name-lbl'>STEPX</span><span class='var-prov-badge badge-var-loc' title='Type: REAL'>[VAR]</span></div><div class='col-resizer'></div></th><th class='var-th' title='TARGET : REAL (VAR_INPUT) — Double-cliquez pour replier'><div class='th-content'><span class='var-name-lbl'>TARGET</span><span class='var-prov-badge badge-var-in' title='Type: REAL'>[VAR_INPUT]</span></div><div class='col-resizer'></div></th><th class='var-th' title='TARGETLIMITED : REAL (VAR) — Double-cliquez pour replier'><div class='th-content'><span class='var-name-lbl'>TARGETLIMITED</span><span class='var-prov-badge badge-var-loc' title='Type: REAL'>[VAR]</span></div><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell'><div class='chrono-note-container'><span class='chrono-note-chip'>monte a 40% avec Accel</span><span class='chrono-chk-chip chrono-chk-pass' title='ASSERT vérifié : montee : AccelRate (50%/s)'><span class='chk-icon'>✓</span> montee : AccelRate (50%/s)</span></div></td><td>5</td><td>5</td><td>40</td><td>40</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell'><div class='chrono-note-container'><span class='chrono-note-chip'>monte a 40% avec Accel</span><span class='chrono-chk-chip chrono-chk-pass' title='ASSERT vérifié : montee : toujours AccelRate, cible pas encore atteinte'><span class='chk-icon'>✓</span> montee : toujours AccelRate, cible pas encore atteinte</span></div></td><td class='changed'>10</td><td>5</td><td>40</td><td>40</td></tr><tr><td class='scan-idx'>#2</td><td class='scan-t'>20 ms</td><td class='chrono-note-cell'><div class='chrono-note-container'><span class='chrono-note-chip'>cible ramenee a 0 : retour vers zero -&gt; DecelRate, taux bien plus faible ici</span><span class='chrono-chk-chip chrono-chk-pass' title='ASSERT vérifié : retour vers zero : DecelRate (10%/s), pas de 1.0 seulement -- pas AccelRate'><span class='chk-icon'>✓</span> retour vers zero : DecelRate (10%/s), pas de 1.0 seulement -- pas AccelRate</span></div></td><td class='changed'>9</td><td class='changed'>1</td><td class='changed'>0</td><td class='changed'>0</td></tr></tbody>
     </table></div>
         </details>
         
     <details class="chronogram-static">
         <summary>🔒 Valeurs constantes sur toute la séquence (3)</summary>
-        <table class="static-table"><tbody><tr><td><code>ACCELRATE</code></td><td>50</td></tr><tr><td><code>CYCLETIMES</code></td><td>0.100</td></tr><tr><td><code>DECELRATE</code></td><td>10</td></tr></tbody></table>
+        <table class="static-table"><tbody><tr><td><code>ACCELRATE</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>50</td></tr><tr><td><code>CYCLETIMES</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>0.100</td></tr><tr><td><code>DECELRATE</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>10</td></tr></tbody></table>
     </details>
     </div>
             </div>
         </article>
         <article id="test-fb-ramp-2" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">Atteinte de la cible : la rampe s arrete pile dessus, pas de depassement </h3>
+                <h3 style="flex: 1; user-select: text;">Atteinte de la cible : la rampe s arrete pile dessus, pas de depassement </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'Atteinte de la cible : la rampe s arrete pile dessus, pas de depassement')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -665,22 +726,23 @@
                 </div>
             </summary>
             <div class="chrono-scroll"><table class="chrono-table">
-        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th></tr></thead>
-        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td></tr></tbody>
+        <thead><tr><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Scan</span><div class="col-resizer"></div></th><th title="Double-cliquez pour replier, glissez le bord pour redimensionner"><span class="th-content">Temps</span><div class="col-resizer"></div></th><th class='note-th' style='min-width:240px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte & Points de contrôle (ASSERT)</span><div class='col-resizer'></div></th></tr></thead>
+        <tbody><tr><td class='scan-idx'>#0</td><td class='scan-t'>0 ms</td><td class='chrono-note-cell'><div class='chrono-note-container'><span class='chrono-chk-chip chrono-chk-pass' title='ASSERT vérifié : le pas (5.0) depasserait la cible (3.0) : clampe exactement dessus, pas de depassement'><span class='chk-icon'>✓</span> le pas (5.0) depasserait la cible (3.0) : clampe exactement dessus, pas de depassement</span></div></td></tr><tr><td class='scan-idx'>#1</td><td class='scan-t'>10 ms</td><td class='chrono-note-cell'><div class='chrono-note-container'><span class='chrono-chk-chip chrono-chk-pass' title='ASSERT vérifié : cible deja atteinte : reste stable, aucune oscillation autour de la cible'><span class='chk-icon'>✓</span> cible deja atteinte : reste stable, aucune oscillation autour de la cible</span></div></td></tr></tbody>
     </table></div>
         </details>
         
     <details class="chronogram-static">
         <summary>🔒 Valeurs constantes sur toute la séquence (7)</summary>
-        <table class="static-table"><tbody><tr><td><code>ACCELRATE</code></td><td>50</td></tr><tr><td><code>CURRENT</code></td><td>3</td></tr><tr><td><code>CYCLETIMES</code></td><td>0.100</td></tr><tr><td><code>DECELRATE</code></td><td>200</td></tr><tr><td><code>STEPX</code></td><td>5</td></tr><tr><td><code>TARGET</code></td><td>3</td></tr><tr><td><code>TARGETLIMITED</code></td><td>3</td></tr></tbody></table>
+        <table class="static-table"><tbody><tr><td><code>ACCELRATE</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>50</td></tr><tr><td><code>CURRENT</code> <span class='var-prov-badge badge-var-out' style='font-size:10px;padding:1px 5px;'>[VAR_OUTPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>3</td></tr><tr><td><code>CYCLETIMES</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>0.100</td></tr><tr><td><code>DECELRATE</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>200</td></tr><tr><td><code>STEPX</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>5</td></tr><tr><td><code>TARGET</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>3</td></tr><tr><td><code>TARGETLIMITED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>3</td></tr></tbody></table>
     </details>
     </div>
             </div>
         </article>
         <article id="test-fb-ramp-3" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">Garde-fou : une valeur Current deja hors plage (etat corrompu) reste bornee a +/-100 </h3>
+                <h3 style="flex: 1; user-select: text;">Garde-fou : une valeur Current deja hors plage (etat corrompu) reste bornee a +/-100 </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'Garde-fou : une valeur Current deja hors plage (etat corrompu) reste bornee a +/-100')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -702,7 +764,7 @@
         <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
         <details class="chronogram-static">
             <summary>🔒 Valeurs du scan unique (7)</summary>
-            <table class="static-table"><tbody><tr><td><code>TARGET</code></td><td>500</td></tr><tr><td><code>ACCELRATE</code></td><td>1000</td></tr><tr><td><code>DECELRATE</code></td><td>1000</td></tr><tr><td><code>CYCLETIMES</code></td><td>1</td></tr><tr><td><code>CURRENT</code></td><td>100</td></tr><tr><td><code>STEPX</code></td><td>1000</td></tr><tr><td><code>TARGETLIMITED</code></td><td>100</td></tr></tbody></table>
+            <table class="static-table"><tbody><tr><td><code>TARGET</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>500</td></tr><tr><td><code>ACCELRATE</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>1000</td></tr><tr><td><code>DECELRATE</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>1000</td></tr><tr><td><code>CYCLETIMES</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>1</td></tr><tr><td><code>CURRENT</code> <span class='var-prov-badge badge-var-out' style='font-size:10px;padding:1px 5px;'>[VAR_OUTPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>100</td></tr><tr><td><code>STEPX</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>1000</td></tr><tr><td><code>TARGETLIMITED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(REAL)</span></td><td>100</td></tr></tbody></table>
         </details>
     </div>
             </div>
@@ -786,6 +848,24 @@ test_fb_ramp.st
     </details>
 </div>
 <script>
+function copyTextToClipboard(btn, text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    var orig = btn.innerHTML;
+    btn.innerHTML = "✓ Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
 function copyPinExpr(el) {
     var text = el.getAttribute('title') || el.textContent;
     var ta = document.createElement('textarea');
@@ -1056,9 +1136,14 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier (sauf si sélection de texte en cours)
         var testHeader = e.target.closest('.test-card-header');
         if (testHeader) {
+            // Si l'utilisateur est en train de surligner / sélectionner du texte, ne pas replier
+            var selection = window.getSelection ? window.getSelection().toString() : '';
+            if (selection && selection.length > 0) {
+                return;
+            }
             var card = testHeader.closest('.test-card');
             if (card) {
                 card.classList.toggle('test-card-collapsed');
@@ -1097,6 +1182,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
         var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+        var metaData = JSON.parse(svg.getAttribute('data-meta') || '{}');
 
         var colIdx = Math.floor((svgX - left) / colw);
         var rowIdx = Math.floor((svgY - top) / laneh);
@@ -1126,12 +1212,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 cursorLine.style.display = '';
             }
 
+            var fMeta = metaData[f] || {};
+            var badgeCls = fMeta.cls || 'badge-var-loc';
+            var metaBadge = fMeta.badge ? '<span class="var-prov-badge ' + badgeCls + '" style="font-size:9.5px;padding:1px 5px;margin-right:4px;">[' + fMeta.badge + ']</span>' : '';
+            var typeStr = fMeta.type ? '<span style="color:var(--muted);font-size:11px;font-family:monospace;">' + fMeta.type + '</span>' : '';
+            var metaLineHtml = (metaBadge || typeStr) ? '<div class="wf-tt-meta">' + metaBadge + typeStr + '</div>' : '';
+
             var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+            var assertsHtml = '';
+            if (s.asserts && s.asserts.length > 0) {
+                var chkItems = s.asserts.map(function(c) {
+                    return '<div style="color:#34d399;font-size:10.5px;margin-top:2px;font-family:monospace;">✓ ' + c + '</div>';
+                }).join('');
+                assertsHtml = '<div style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px;"><strong style="color:var(--accent);font-size:10.5px;">Assertions vérifiées :</strong>' + chkItems + '</div>';
+            }
 
             tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
                            '<div class="wf-tt-var">' + f + '</div>' +
+                           metaLineHtml +
                            '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
-                           noteHtml;
+                           noteHtml +
+                           assertsHtml;
 
             tt.style.display = 'block';
             var ttX = e.clientX + 16;

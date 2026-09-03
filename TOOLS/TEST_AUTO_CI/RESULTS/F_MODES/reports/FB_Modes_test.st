@@ -151,13 +151,27 @@ TEST 'TC-P05-004 SEMI_AUTO selectionnable sous defaut codeur (cycle non pret, no
     ASSERT_TRUE(FB.Ready, 'Pas de latch -> Ready reste TRUE');
 END_TEST
 
-TEST 'TC-P05-004bis SEMI_AUTO selectionnable sans reference machine (cycle non pret)'
-    (* T207 : l absence de reference machine ne refuse plus la SELECTION SEMI_AUTO. *)
+TEST 'TC-P05-004bis SEMI_AUTO homed-only : sans reference machine -> expulsion MAINT_N1 (T226 D1, AF-05 §4bis)'
+    (* T226 supersede la relaxation T207 pour le SEUL cas du datum machine : SEMI_AUTO
+       sans MachineHomed est REFUSE et le mode est force vers MAINT_N1. La relaxation T207
+       reste valable pour le defaut codeur (TC-P05-004) et l'AU (TC-P05-006/007). *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
        EncoderFaultPresent := FALSE, MachineHomed := FALSE);
-    ASSERT_EQ(FB.Auth.Mode, E_Mode.SEMI_AUTO, 'SEMI_AUTO sans reference -> mode reste SEMI_AUTO (T207)');
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.MAINT_N1, 'SEMI_AUTO sans reference -> expulsion vers MAINT_N1');
+    ASSERT_TRUE(FB.Auth.ModeChangePendingBlocked, 'Bascule signalee bloquee');
     ASSERT_TRUE(FB.Fault.Error, 'Reference incomplete -> diagnostic live visible');
-    ASSERT_TRUE(FB.Ready, 'Diagnostic non-bloquant -> Ready reste TRUE');
+END_TEST
+
+TEST 'TC-P05-004ter Perte de datum EN SEMI_AUTO -> expulsion MAINT_N1, motif distinct, sans coupure (T226 AC2)'
+    (* Scan 1 : on est en SEMI_AUTO, machine referencee -> mode = SEMI_AUTO. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.SEMI_AUTO, 'SEMI_AUTO etabli');
+    (* Scan 2 : MachineHomed retombe (perte de datum) -> bascule MAINT_N1, motif "datum perdu". *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, MachineHomed := FALSE);
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.MAINT_N1, 'Perte datum -> expulsion MAINT_N1');
+    ASSERT_TRUE(FB.Auth.ModeChangeBlockReason = 'Datum machine perdu : arret controle', 'Motif distinct de la simple selection refusee');
 END_TEST
 
 TEST 'TC-P05-005 Limite legale = blocage exploitation, pas safety (aucune sortie PowerCutOff)'

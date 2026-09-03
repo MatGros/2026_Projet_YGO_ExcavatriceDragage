@@ -1,0 +1,28 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Joystick_ldf8_524\strucpp-test-bx9yMe\test_main.cpp: In function 'bool test_1(strucpp::TestContext&)':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Joystick_ldf8_524\strucpp-test-bx9yMe\test_main.cpp:11:8: error: 'class strucpp::FB_SIM_JOYSTICK' has no member named 'TARGETDEFLECTIONX'
+   11 |     FB.TARGETDEFLECTIONX = 80.0;
+      |        ^~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Joystick_ldf8_524\strucpp-test-bx9yMe\test_main.cpp:12:8: error: 'class strucpp::FB_SIM_JOYSTICK' has no member named 'TARGETDEFLECTIONY'
+   12 |     FB.TARGETDEFLECTIONY = -50.0;
+      |        ^~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Joystick_ldf8_524\strucpp-test-bx9yMe\test_main.cpp:15:27: error: 'class strucpp::FB_SIM_JOYSTICK' has no member named 'SIMULATEDRAWX'
+   15 |     if (!ctx.assert_eq(FB.SIMULATEDRAWX, 0, "FB.SIMULATEDRAWX", "0", 12, "Enable FALSE -> RawX 0")) return false;
+      |                           ^~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Joystick_ldf8_524\strucpp-test-bx9yMe\test_main.cpp:16:27: error: 'class strucpp::FB_SIM_JOYSTICK' has no member named 'SIMULATEDRAWY'
+   16 |     if (!ctx.assert_eq(FB.SIMULATEDRAWY, 0, "FB.SIMULATEDRAWY", "0", 13, "Enable FALSE -> RawY 0")) return false;
+      |                           ^~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Joystick_ldf8_524\strucpp-test-bx9yMe\test_main.cpp: In function 'bool test_2(strucpp::TestContext&)':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Joystick_ldf8_524\strucpp-test-bx9yMe\test_main.cpp:24:8: error: 'class strucpp::FB_SIM_JOYSTICK' has no member named 'SIMULATEDEADMAN'
+   24 |     FB.SIMULATEDEADMAN = true;
+      |        ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Joystick_ldf8_524\strucpp-test-bx9yMe\test_main.cpp:25:8: error: 'class strucpp::FB_SIM_JOYSTICK' has no member named 'TARGETDEFLECTIONY'
+   25 |     FB.TARGETDEFLECTIONY = 75.0;
+      |        ^~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Joystick_ldf8_524\strucpp-test-bx9yMe\test_main.cpp:28:47: error: 'class strucpp::FB_SIM_JOYSTICK' has no member named 'DEADMANCONTACT1'
+   28 |     if (!ctx.assert_true(static_cast<bool>(FB.DEADMANCONTACT1), "FB.DEADMANCONTACT1", 24, "SimulateDeadman -> Contact1 TRUE")) return false;
+      |                                               ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Joystick_ldf8_524\strucpp-test-bx9yMe\test_main.cpp:29:47: error: 'class strucpp::FB_SIM_JOYSTICK' has no member named 'SIMULATEDRAWY'
+   29 |     if (!ctx.assert_true(static_cast<bool>(FB.SIMULATEDRAWY > 0), "FB.SIMULATEDRAWY > 0", 25, "Deflection positive -> RawY > 0")) return false;
+      |                                               ^~~~~~~~~~~~~
+

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "file": "test_fb_safety_translation.st",
+  "results": [
+    {
+      "name": "TC-P11-SAF-001 Dynamique Enable : neutralisation initiale, transition Ready, coupure",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-SAF-002 Defaut rotation de phase (defaut process sans PowerCutOff)",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-SAF-003 Surchauffe thermique frein -> SafeStop + PowerCutOff (defaut dur)",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0
+  }
+}

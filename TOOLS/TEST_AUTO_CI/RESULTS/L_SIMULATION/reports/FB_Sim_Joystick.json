@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_joystick.st",
+  "results": [
+    {
+      "name": "TC-P13-JOY-001 Enable FALSE -> positionne les axes au neutre (5000)",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-JOY-002 Simulation appui bouton directionnel et dynamique",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0
+  }
+}

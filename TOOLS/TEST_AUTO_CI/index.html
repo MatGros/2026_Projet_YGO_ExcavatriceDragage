@@ -152,6 +152,53 @@
         display: block;
         text-align: center;
     }
+    /* Pastilles de provenance & typage des variables */
+    .var-prov-badge {
+        display: inline-block;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        margin-top: 3px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .badge-var-in { background: rgba(2, 132, 199, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .badge-var-out { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); }
+    .badge-var-inout { background: rgba(139, 92, 246, 0.18); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .badge-var-loc { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .badge-var-cst { background: rgba(217, 119, 6, 0.18); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+    .badge-var-hw { background: rgba(20, 184, 166, 0.18); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.35); }
+    .badge-var-gvl { background: rgba(14, 165, 233, 0.18); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.35); }
+    .badge-var-prg { background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.35); }
+    .badge-var-diag { background: rgba(217, 70, 239, 0.18); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.35); }
+    .badge-var-ext { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.35); }
+
+    [data-theme="light"] .badge-var-in { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-out { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .badge-var-inout { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+    [data-theme="light"] .badge-var-loc { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    [data-theme="light"] .badge-var-cst { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    [data-theme="light"] .badge-var-hw { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+    [data-theme="light"] .badge-var-gvl { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-prg { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .badge-var-diag { background: #fdf4ff; color: #a21caf; border-color: #fbcfe8; }
+    [data-theme="light"] .badge-var-ext { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+
+    .chrono-table th .th-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        pointer-events: auto;
+    }
+    .chrono-table th .var-name-lbl {
+        font-family: monospace;
+        font-weight: 700;
+        font-size: 11px;
+    }
     /* Mode Titres Verticaux (Compact) */
     .chrono-table.headers-vertical {
         width: max-content !important;
@@ -162,7 +209,7 @@
         width: 280px !important;
     }
     .chrono-table.headers-vertical th.var-th {
-        height: 155px;
+        height: 165px;
         vertical-align: bottom;
         padding-bottom: 10px;
         padding-top: 10px;
@@ -173,26 +220,36 @@
     .chrono-table.headers-vertical th.var-th .th-content {
         writing-mode: vertical-rl;
         transform: rotate(180deg);
-        display: inline-block;
+        display: inline-flex;
+        flex-direction: row-reverse;
+        align-items: center;
         white-space: nowrap;
         text-align: left;
-        max-height: 135px;
+        max-height: 145px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .chrono-table th .th-content {
-        display: inline-block;
-        pointer-events: auto;
+    .chrono-table.headers-vertical th.var-th .var-prov-badge {
+        margin-top: 0;
+        margin-left: 4px;
     }
     .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
     .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
     [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
     [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
-    .chrono-note-cell { text-align: left !important; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
-    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 310px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-cell { text-align: left !important; max-width: 360px; font-size: 11px; }
+    .chrono-note-container { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
     .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    .chrono-chk-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; padding: 2px 8px; font-weight: 600; font-size: 10.5px; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
+    .chrono-chk-pass { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .chrono-chk-fail { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .chrono-chk-chip .chk-icon { font-weight: 800; font-size: 11.5px; }
     [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
     [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    [data-theme="light"] .chrono-chk-pass { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .chrono-chk-fail { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .wf-check-marker { font-size: 12px; fill: #10b981; font-weight: 800; text-anchor: middle; font-family: monospace; cursor: help; }
     .v-true { color: #34d399; font-weight: 700; }
     .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
@@ -229,6 +286,7 @@
     .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
     [data-theme="light"] .wf-tt-head { color: #0284c7; }
     .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-meta { font-size: 10.5px; margin-bottom: 4px; }
     .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
     .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
     .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
@@ -317,11 +375,11 @@
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:16px;margin:24px 0;">
         <div class="card-neon-blue" style="background:var(--surface);border-radius:12px;padding:18px;text-align:center;">
-            <div style="font-size:30px;font-weight:900;color:var(--accent);font-family:monospace;">43</div>
+            <div style="font-size:30px;font-weight:900;color:var(--accent);font-family:monospace;">51</div>
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">POU & Composants</div>
         </div>
         <div class="card-neon-ok" style="background:var(--surface);border-radius:12px;padding:18px;text-align:center;">
-            <div style="font-size:30px;font-weight:900;color:var(--green-text);font-family:monospace;">33</div>
+            <div style="font-size:30px;font-weight:900;color:var(--green-text);font-family:monospace;">41</div>
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Succès (PASS)</div>
         </div>
         <div class="card-neon-fail" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
@@ -329,7 +387,7 @@
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Échecs (FAIL)</div>
         </div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
-            <div style="font-size:16px;font-weight:800;color:var(--text);margin-top:8px;font-family:monospace;">2026-09-03 01:17:06</div>
+            <div style="font-size:16px;font-weight:800;color:var(--text);margin-top:8px;font-family:monospace;">2026-09-03 12:22:09</div>
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Horodatage Exécution</div>
         </div>
     </div>
@@ -346,66 +404,72 @@
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Acquisition_Preflight</a>
+                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_acquisition_preflight" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Acquisition_Preflight</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">12/12 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_acquisition_preflight" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Brake</a>
+                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_brake" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Brake</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">5/5 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_brake" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_CycleTime</a>
+                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_cycletime" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_CycleTime</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_cycletime" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_FaultCore</a>
+                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_faultcore" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_FaultCore</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">9/9 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_faultcore" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Filter</a>
+                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_filter" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Filter</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_filter" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Ramp</a>
+                        <a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_ramp" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Ramp</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/A_COMMUN/reports/A_COMMUN.html#fb-section-fb_ramp" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr></tbody>
             </table>
         </div>
@@ -423,6 +487,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/B_AU_SECURITE/reports/FB_Safety_EmergencyManagement.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Safety_EmergencyManagement</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">12/12 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/B_AU_SECURITE/reports/FB_Safety_EmergencyManagement.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -443,6 +508,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/C_DIAG_RESEAUX/reports/FB_Diag_CanOpen.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Diag_CanOpen</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/C_DIAG_RESEAUX/reports/FB_Diag_CanOpen.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -454,6 +520,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/C_DIAG_RESEAUX/reports/FB_Diag_Ethercat.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Diag_Ethercat</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/C_DIAG_RESEAUX/reports/FB_Diag_Ethercat.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -465,6 +532,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/C_DIAG_RESEAUX/reports/FB_Diag_IhmHeartbeat.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Diag_IhmHeartbeat</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/C_DIAG_RESEAUX/reports/FB_Diag_IhmHeartbeat.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -485,6 +553,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/D_JOYSTICK/reports/FB_Joystick.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Joystick</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">29/29 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/D_JOYSTICK/reports/FB_Joystick.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -505,6 +574,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/E_CODEURS/reports/FB_Encoder.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Encoder</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">40/40 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/E_CODEURS/reports/FB_Encoder.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -524,7 +594,8 @@
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/F_MODES/reports/FB_Modes.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Modes</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">13/13 test(s) OK</span>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">14/14 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/F_MODES/reports/FB_Modes.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -544,7 +615,8 @@
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/G_CYCLE/reports/FB_Cycle.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Cycle</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">11/11 test(s) OK</span>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">13/13 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_Cycle.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -556,6 +628,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/G_CYCLE/reports/FB_DiveSearch.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_DiveSearch</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">8/8 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_DiveSearch.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -567,6 +640,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/G_CYCLE/reports/FB_ExtractionAssist.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_ExtractionAssist</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">8/8 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_ExtractionAssist.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -577,7 +651,8 @@
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_MachineHomingCycle</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">18/18 test(s) OK</span>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">8/8 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -596,174 +671,237 @@
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_Bucket.txt" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Bucket</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_bucket" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Bucket</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/1 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_Bucket.txt" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_bucket" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_DriftGuard.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_DriftGuard</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_driftguard" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_DriftGuard</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_DriftGuard.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_driftguard" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_Safety_Winch.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Safety_Winch</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_safety_winch" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Safety_Winch</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">12/17 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_Safety_Winch.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_safety_winch" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_SpeedStep.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_SpeedStep</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_speedstep" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_SpeedStep</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_SpeedStep.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_speedstep" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_SyncContactor.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_SyncContactor</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_synccontactor" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_SyncContactor</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_SyncContactor.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_synccontactor" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_Winch.txt" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Winch</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winch" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Winch</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/1 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_Winch.txt" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winch" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchDirectionInterlock.txt" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchDirectionInterlock</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchdirectioninterlock" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchDirectionInterlock</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/1 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchDirectionInterlock.txt" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchdirectioninterlock" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchLoadEstimator.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchLoadEstimator</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchloadestimator" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchLoadEstimator</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">5/5 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchLoadEstimator.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchloadestimator" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchOutputInterlock.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchOutputInterlock</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchoutputinterlock" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchOutputInterlock</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">7/11 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchOutputInterlock.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchoutputinterlock" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchSpeedLearning.txt" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchSpeedLearning</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchspeedlearning" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchSpeedLearning</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/1 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchSpeedLearning.txt" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchspeedlearning" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchStepShaper.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchStepShaper</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchstepshaper" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchStepShaper</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchStepShaper.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchstepshaper" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchSync.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchSync</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchsync" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_WinchSync</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">4/4 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_WinchSync.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winchsync" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_Winch_Symmetry.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Winch_Symmetry</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winch_symmetry" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Winch_Symmetry</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_Winch_Symmetry.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_winch_symmetry" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/WINCH_INTEG.txt" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">WINCH_INTEG</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-winch_integ" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">WINCH_INTEG</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/1 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/WINCH_INTEG.txt" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-winch_integ" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr></tbody>
             </table>
         </div>
         <div class="card-neon-fail" style="background:var(--surface);border-radius:12px;padding:20px 24px;margin-bottom:22px;transition:all 0.2s ease;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
                 <h2 style="margin:0;font-size:19px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px;">📁 <span style="color:var(--accent);font-family:monospace;font-weight:800;">CODE/I_TRANSLATION</span></h2>
-                <div style="display:flex;align-items:center;gap:10px;"><span class="badge badge-fail">FAIL</span> <span style="font-size:14px;color:var(--muted);font-weight:700;">0/1 composant(s)</span></div>
+                <div style="display:flex;align-items:center;gap:10px;"><span class="badge badge-fail">FAIL</span> <span style="font-size:14px;color:var(--muted);font-weight:700;">4/5 composant(s)</span></div>
             </div>
             <table style="width:100%;border-collapse:collapse;font-size:14px;">
                 <tbody>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
+                        <a href="RESULTS/I_TRANSLATION/reports/I_TRANSLATION.html#fb-section-fb_safety_translation" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Safety_Translation</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/I_TRANSLATION/reports/I_TRANSLATION.html#fb-section-fb_safety_translation" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/I_TRANSLATION/reports/FB_Translation.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Translation</a>
+                        <a href="RESULTS/I_TRANSLATION/reports/I_TRANSLATION.html#fb-section-fb_translation" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Translation</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">32/37 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/I_TRANSLATION/reports/FB_Translation.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/I_TRANSLATION/reports/I_TRANSLATION.html#fb-section-fb_translation" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
+                        <a href="RESULTS/I_TRANSLATION/reports/I_TRANSLATION.html#fb-section-fb_translationoutputinterlock" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_TranslationOutputInterlock</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/I_TRANSLATION/reports/I_TRANSLATION.html#fb-section-fb_translationoutputinterlock" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
+                        <a href="RESULTS/I_TRANSLATION/reports/I_TRANSLATION.html#fb-section-fb_translation_positiondecoder" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Translation_PositionDecoder</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/I_TRANSLATION/reports/I_TRANSLATION.html#fb-section-fb_translation_positiondecoder" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
+                        <a href="RESULTS/I_TRANSLATION/reports/I_TRANSLATION.html#fb-section-fb_translation_positionestimator" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Translation_PositionEstimator</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">2/2 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/I_TRANSLATION/reports/I_TRANSLATION.html#fb-section-fb_translation_positionestimator" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr></tbody>
             </table>
         </div>
@@ -781,6 +919,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/J_SUPERVISION/reports/FB_Hmi_BannerFormatter.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Hmi_BannerFormatter</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">14/17 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/J_SUPERVISION/reports/FB_Hmi_BannerFormatter.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -792,6 +931,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/J_SUPERVISION/reports/FB_TroubleshootingView.txt" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_TroubleshootingView</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/1 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/J_SUPERVISION/reports/FB_TroubleshootingView.txt" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -801,7 +941,7 @@
         <div class="card-neon-ok" style="background:var(--surface);border-radius:12px;padding:20px 24px;margin-bottom:22px;transition:all 0.2s ease;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
                 <h2 style="margin:0;font-size:19px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px;">📁 <span style="color:var(--accent);font-family:monospace;font-weight:800;">CODE/L_SIMULATION</span></h2>
-                <div style="display:flex;align-items:center;gap:10px;"><span class="badge badge-pass">PASS</span> <span style="font-size:14px;color:var(--muted);font-weight:700;">1/1 composant(s)</span></div>
+                <div style="display:flex;align-items:center;gap:10px;"><span class="badge badge-pass">PASS</span> <span style="font-size:14px;color:var(--muted);font-weight:700;">5/5 composant(s)</span></div>
             </div>
             <table style="width:100%;border-collapse:collapse;font-size:14px;">
                 <tbody>
@@ -812,9 +952,58 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/L_SIMULATION/reports/FB_SimBench.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_SimBench</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">23/23 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/L_SIMULATION/reports/FB_SimBench.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
+                        <a href="RESULTS/L_SIMULATION/reports/FB_Sim_Encoder.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Sim_Encoder</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">2/2 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/L_SIMULATION/reports/FB_Sim_Encoder.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
+                        <a href="RESULTS/L_SIMULATION/reports/FB_Sim_Joystick.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Sim_Joystick</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">2/2 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/L_SIMULATION/reports/FB_Sim_Joystick.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
+                        <a href="RESULTS/L_SIMULATION/reports/FB_Sim_Safety.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Sim_Safety</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">2/2 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/L_SIMULATION/reports/FB_Sim_Safety.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-pass">PASS</span></td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
+                        <a href="RESULTS/L_SIMULATION/reports/FB_Sim_Translation.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Sim_Translation</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">2/2 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/L_SIMULATION/reports/FB_Sim_Translation.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr></tbody>
             </table>
         </div>
@@ -832,6 +1021,7 @@
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
                         <a href="RESULTS/M_MAIN/reports/MAIN_GLOBAL.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">MAIN_GLOBAL</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/M_MAIN/reports/MAIN_GLOBAL.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -843,6 +1033,7 @@
                         <span style="background:rgba(6,182,212,0.35);color:#ffffff;border:1.5px solid #22d3ee;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(6,182,212,0.4);">⚡ PRG</span>
                         <a href="RESULTS/M_MAIN/reports/PRG_02_Acquisition.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">PRG_02_Acquisition</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">1/1 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/M_MAIN/reports/PRG_02_Acquisition.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -854,6 +1045,7 @@
                         <span style="background:rgba(6,182,212,0.35);color:#ffffff;border:1.5px solid #22d3ee;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(6,182,212,0.4);">⚡ PRG</span>
                         <a href="RESULTS/M_MAIN/reports/PRG_02_Acquisition_Archi.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">PRG_02_Acquisition_Archi</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">5/5 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/M_MAIN/reports/PRG_02_Acquisition_Archi.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -865,6 +1057,7 @@
                         <span style="background:rgba(6,182,212,0.35);color:#ffffff;border:1.5px solid #22d3ee;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(6,182,212,0.4);">⚡ PRG</span>
                         <a href="RESULTS/M_MAIN/reports/PRG_03_Modes_Cycle.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">PRG_03_Modes_Cycle</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">5/5 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/M_MAIN/reports/PRG_03_Modes_Cycle.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -876,6 +1069,7 @@
                         <span style="background:rgba(6,182,212,0.35);color:#ffffff;border:1.5px solid #22d3ee;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(6,182,212,0.4);">⚡ PRG</span>
                         <a href="RESULTS/M_MAIN/reports/PRG_04_Treuils_Benne.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">PRG_04_Treuils_Benne</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">2/2 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/M_MAIN/reports/PRG_04_Treuils_Benne.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -887,6 +1081,7 @@
                         <span style="background:rgba(6,182,212,0.35);color:#ffffff;border:1.5px solid #22d3ee;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(6,182,212,0.4);">⚡ PRG</span>
                         <a href="RESULTS/M_MAIN/reports/PRG_05_Translation.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">PRG_05_Translation</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/M_MAIN/reports/PRG_05_Translation.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -898,6 +1093,7 @@
                         <span style="background:rgba(6,182,212,0.35);color:#ffffff;border:1.5px solid #22d3ee;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(6,182,212,0.4);">⚡ PRG</span>
                         <a href="RESULTS/M_MAIN/reports/PRG_06_Outputs.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">PRG_06_Outputs</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/M_MAIN/reports/PRG_06_Outputs.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -909,6 +1105,7 @@
                         <span style="background:rgba(6,182,212,0.35);color:#ffffff;border:1.5px solid #22d3ee;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(6,182,212,0.4);">⚡ PRG</span>
                         <a href="RESULTS/M_MAIN/reports/PRG_07_Supervision.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">PRG_07_Supervision</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">3/3 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 12:22:09</span>
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/M_MAIN/reports/PRG_07_Supervision.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
@@ -918,6 +1115,24 @@
     
 </div>
 <script>
+function copyTextToClipboard(btn, text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    var orig = btn.innerHTML;
+    btn.innerHTML = "✓ Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
 function copyPinExpr(el) {
     var text = el.getAttribute('title') || el.textContent;
     var ta = document.createElement('textarea');
@@ -1188,9 +1403,14 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier (sauf si sélection de texte en cours)
         var testHeader = e.target.closest('.test-card-header');
         if (testHeader) {
+            // Si l'utilisateur est en train de surligner / sélectionner du texte, ne pas replier
+            var selection = window.getSelection ? window.getSelection().toString() : '';
+            if (selection && selection.length > 0) {
+                return;
+            }
             var card = testHeader.closest('.test-card');
             if (card) {
                 card.classList.toggle('test-card-collapsed');
@@ -1229,6 +1449,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
         var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+        var metaData = JSON.parse(svg.getAttribute('data-meta') || '{}');
 
         var colIdx = Math.floor((svgX - left) / colw);
         var rowIdx = Math.floor((svgY - top) / laneh);
@@ -1258,12 +1479,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 cursorLine.style.display = '';
             }
 
+            var fMeta = metaData[f] || {};
+            var badgeCls = fMeta.cls || 'badge-var-loc';
+            var metaBadge = fMeta.badge ? '<span class="var-prov-badge ' + badgeCls + '" style="font-size:9.5px;padding:1px 5px;margin-right:4px;">[' + fMeta.badge + ']</span>' : '';
+            var typeStr = fMeta.type ? '<span style="color:var(--muted);font-size:11px;font-family:monospace;">' + fMeta.type + '</span>' : '';
+            var metaLineHtml = (metaBadge || typeStr) ? '<div class="wf-tt-meta">' + metaBadge + typeStr + '</div>' : '';
+
             var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+            var assertsHtml = '';
+            if (s.asserts && s.asserts.length > 0) {
+                var chkItems = s.asserts.map(function(c) {
+                    return '<div style="color:#34d399;font-size:10.5px;margin-top:2px;font-family:monospace;">✓ ' + c + '</div>';
+                }).join('');
+                assertsHtml = '<div style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px;"><strong style="color:var(--accent);font-size:10.5px;">Assertions vérifiées :</strong>' + chkItems + '</div>';
+            }
 
             tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
                            '<div class="wf-tt-var">' + f + '</div>' +
+                           metaLineHtml +
                            '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
-                           noteHtml;
+                           noteHtml +
+                           assertsHtml;
 
             tt.style.display = 'block';
             var ttX = e.clientX + 16;

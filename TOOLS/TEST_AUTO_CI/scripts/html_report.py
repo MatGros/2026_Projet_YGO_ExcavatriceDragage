@@ -25,9 +25,10 @@ def parse_test_checks(test_st_path) -> dict:
         checks = ASSERT_RE.findall(body)
         comments = [c.strip() for c in COMMENT_RE.findall(body) if c.strip()]
         
-        # Extraction contextuelle des notes par scan
+        # Extraction contextuelle des notes et assertions par scan
         scan_notes = {}
-        s_idx = 0
+        scan_asserts = {}
+        s_idx = -1
         last_comment = ""
         for line in body.splitlines():
             line_s = line.strip()
@@ -38,14 +39,22 @@ def parse_test_checks(test_st_path) -> dict:
                     last_comment = c_text
 
             if re.search(r"\bfb\s*\(", line_s, re.IGNORECASE) or re.search(r"\bharness\s*\(", line_s, re.IGNORECASE):
+                s_idx += 1
                 inline_cm = re.search(r"\(\*\s*(.*?)\s*\*\)", line_s)
                 if inline_cm:
                     scan_notes[s_idx] = inline_cm.group(1).strip()
                 elif last_comment:
                     scan_notes[s_idx] = last_comment
-                s_idx += 1
 
-        out[name] = {"checks": checks, "comments": comments, "scan_notes": scan_notes}
+            # Détection des ASSERT_* attachés au scan courant (ou scan 0 si avant tout appel)
+            asm = re.search(r"ASSERT_\w+\([^;]*?,\s*'([^']*)'\s*\)\s*;", line_s)
+            if asm:
+                cur_scan = max(0, s_idx)
+                if cur_scan not in scan_asserts:
+                    scan_asserts[cur_scan] = []
+                scan_asserts[cur_scan].append(asm.group(1).strip())
+
+        out[name] = {"checks": checks, "comments": comments, "scan_notes": scan_notes, "scan_asserts": scan_asserts}
     return out
 
 
@@ -88,6 +97,72 @@ def _fmt_val(v: str, is_bool: bool = True) -> str:
     except ValueError:
         pass
     return _html.escape(v)
+
+
+def _get_var_meta(field_name: str, st_decls: dict = None) -> tuple:
+    """Détermine la catégorie IEC, le type et le badge visuel d'une variable pour le chronogramme.
+    Retourne (category_key, badge_label, badge_class, type_str, full_tag_str, color_hex).
+    Categories :
+      - VAR_INPUT : [VAR_INPUT] (Bleu Cyan #38bdf8)
+      - VAR_OUTPUT : [VAR_OUTPUT] (Vert Émeraude #34d399)
+      - VAR_IN_OUT : [VAR_IN_OUT] (Violet #a78bfa)
+      - VAR_LOCAL : [VAR] Interne (Gris Ardoise #94a3b8)
+      - VAR_CONSTANT : [VAR CONSTANT] (Ambre / Orange #fbbf24)
+      - HW_IO : [HW] E/S Matérielle (Teal / Sarcelle #2dd4bf)
+      - GVL : [GVL] Global (Bleu Ciel #7dd3fc)
+      - PRG_Inter : [PRG] Inter-POU (Indigo #818cf8)
+      - DIAG : [DIAG] Diagnostic (Rose Fuchsia #f472b6)
+    """
+    st_decls = st_decls or {}
+    var_in = st_decls.get("VAR_INPUT", {})
+    var_out = st_decls.get("VAR_OUTPUT", {})
+    var_inout = st_decls.get("VAR_IN_OUT", {})
+    var_loc = st_decls.get("VAR_LOCAL", {})
+    var_cst = st_decls.get("VAR_CONSTANT", {})
+    var_ext = st_decls.get("VAR_EXTERNAL", {})
+
+    u = field_name.upper()
+
+    # 1. Vérification dans les déclarations ST directes (insensible à la casse)
+    for v, t in var_in.items():
+        if v.upper() == u or u == f"INPUT.{v.upper()}" or u == f"IN.{v.upper()}":
+            return ("VAR_INPUT", "VAR_INPUT", "badge-var-in", t, f"[VAR_INPUT] {t}", "#38bdf8")
+    for v, t in var_out.items():
+        if v.upper() == u or u == f"OUTPUT.{v.upper()}" or u == f"OUT.{v.upper()}":
+            return ("VAR_OUTPUT", "VAR_OUTPUT", "badge-var-out", t, f"[VAR_OUTPUT] {t}", "#34d399")
+    for v, t in var_inout.items():
+        if v.upper() == u:
+            return ("VAR_IN_OUT", "VAR_IN_OUT", "badge-var-inout", t, f"[VAR_IN_OUT] {t}", "#a78bfa")
+    for v, t in var_cst.items():
+        if v.upper() == u or u.startswith("CST_"):
+            return ("VAR_CONSTANT", "VAR CONSTANT", "badge-var-cst", t, f"[VAR CONSTANT] {t}", "#fbbf24")
+    for v, t in var_loc.items():
+        if v.upper() == u:
+            return ("VAR_LOCAL", "VAR", "badge-var-loc", t, f"[VAR (Interne)] {t}", "#94a3b8")
+    for v, t in var_ext.items():
+        if v.upper() == u:
+            return ("VAR_EXTERNAL", "VAR_EXTERNAL", "badge-var-ext", t, f"[VAR_EXTERNAL] {t}", "#93c5fd")
+
+    # 2. Inférence contextuelle et préfixes CODESYS / AF
+    if u.startswith("DIAG.") or "DIAG" in u:
+        return ("DIAG", "DIAG", "badge-var-diag", "STRUCT/DIAG", "[DIAG] Diagnostic", "#f472b6")
+    if u.startswith("HWIN.") or u.startswith("HWOUT.") or "HW_" in u:
+        return ("HW_IO", "HW", "badge-var-hw", "E/S Matérielle", "[HW] E/S Matérielle", "#2dd4bf")
+    if u.startswith("GVL_") or ".GVL_" in u:
+        return ("GVL", "GVL", "badge-var-gvl", "Global", "[GVL] Global", "#7dd3fc")
+    if u.startswith("PRG_"):
+        return ("PRG_Inter", "PRG", "badge-var-prg", "Inter-PRG", "[PRG] Inter-PRG", "#818cf8")
+    if u.startswith("CST_") or "DEBOUNCE" in u or "DELAY" in u or "TIMEOUT" in u:
+        return ("VAR_CONSTANT", "VAR CONSTANT", "badge-var-cst", "TIME/CST", "[VAR CONSTANT] Constante", "#fbbf24")
+    if u.startswith("OUT.") or u.startswith("CMD.") or u.startswith("MEASUREMENT.") or u.startswith("STATUS.") or u.startswith("LIFECYCLE."):
+        return ("VAR_OUTPUT", "VAR_OUTPUT", "badge-var-out", "Sortie", "[VAR_OUTPUT] Sortie", "#34d399")
+    if u in ("READY", "BUSY", "DONE", "ACTIVE", "ERROR", "FAULT", "ERRORID", "STATE", "CONTACTORMISMATCH", "CONTACTORMISMATCHESCALATED"):
+        return ("VAR_OUTPUT", "VAR_OUTPUT", "badge-var-out", "Sortie/Status", "[VAR_OUTPUT] Sortie", "#34d399")
+    if u in ("ENABLE", "RESET", "STARTSTOP", "SAFESTOP", "SYNCENABLE", "BYPASSGLOBAL") or u.startswith("TARGET.") or u.startswith("REQ.") or u.startswith("SET_") or "CONTACTOR" in u or "RELAY" in u:
+        return ("VAR_INPUT", "VAR_INPUT", "badge-var-in", "Entrée/Consigne", "[VAR_INPUT] Entrée", "#38bdf8")
+
+    # 3. Défaut : Interne
+    return ("VAR_LOCAL", "VAR", "badge-var-loc", "Interne/Calculée", "[VAR] Variable interne", "#94a3b8")
 
 
 def _sort_fields_for_chronogram(field_names: list) -> list:
@@ -142,20 +217,60 @@ def _sort_fields_for_chronogram(field_names: list) -> list:
 
 def _split_static_fields(scans: list, field_names: list) -> tuple:
     """Separe les champs qui changent au moins une fois de ceux qui restent constants sur
-    toute la sequence -- ces derniers n'apportent rien a une lecture temporelle."""
-    changed, static = [], []
+    toute la sequence -- ces derniers n'apportent rien a une lecture temporelle.
+    Exception d'ergonomie industrielle : si un signal M1 (ou M2) bouge, son homologue M2 (ou M1)
+    est automatiquement conservé dans le graphe actif pour permettre la comparaison de discordance."""
+    changed_set = set()
     for f in field_names:
         values = {s["fields"].get(f, "") for s in scans}
-        (changed if len(values) > 1 else static).append(f)
+        if len(values) > 1:
+            changed_set.add(f)
+
+    # Récupérer les partenaires symétriques (M1 <-> M2, etc.) pour comparaison visuelle
+    def get_counterpart(name: str) -> str:
+        u = name.upper()
+        if "M1" in u:
+            cand = name.replace("M1", "M2").replace("m1", "m2")
+            if cand in field_names: return cand
+        elif "M2" in u:
+            cand = name.replace("M2", "M1").replace("m2", "m1")
+            if cand in field_names: return cand
+        return None
+
+    paired_to_keep = set()
+    for f in changed_set:
+        cp = get_counterpart(f)
+        if cp:
+            paired_to_keep.add(cp)
+
+    all_active = changed_set | paired_to_keep
+    changed = [f for f in field_names if f in all_active]
+    static = [f for f in field_names if f not in all_active]
+
     return _sort_fields_for_chronogram(changed), _sort_fields_for_chronogram(static)
 
 
-def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_num=None, scan_notes=None) -> str:
+def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_num=None, scan_notes=None, st_decls: dict = None, scan_asserts: dict = None) -> str:
     scan_notes = scan_notes or {}
-    has_notes = any(bool(scan_notes.get(s["scan"])) for s in scans)
+    scan_asserts = scan_asserts or {}
+    has_notes = any(bool(scan_notes.get(s["scan"])) or bool(scan_asserts.get(s["scan"])) for s in scans)
 
-    note_th = "<th class='note-th' style='min-width:180px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte</span><div class='col-resizer'></div></th>" if has_notes else ""
-    header = "".join(f"<th class='var-th' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>{_html.escape(f)}</span><div class='col-resizer'></div></th>" for f in field_names)
+    note_th = "<th class='note-th' style='min-width:240px;' title='Double-cliquez pour replier, glissez le bord pour redimensionner'><span class='th-content'>Étape / Contexte & Points de contrôle (ASSERT)</span><div class='col-resizer'></div></th>" if has_notes else ""
+    
+    th_cells = []
+    for f in field_names:
+        _, badge_lbl, badge_cls, var_type, full_tag, _ = _get_var_meta(f, st_decls)
+        type_title = f"{_html.escape(f)} : {_html.escape(var_type)} ({_html.escape(badge_lbl)}) — Double-cliquez pour replier"
+        th_cells.append(
+            f"<th class='var-th' title='{type_title}'>"
+            f"<div class='th-content'>"
+            f"<span class='var-name-lbl'>{_html.escape(f)}</span>"
+            f"<span class='var-prov-badge {badge_cls}' title='Type: {_html.escape(var_type)}'>[{_html.escape(badge_lbl)}]</span>"
+            f"</div>"
+            f"<div class='col-resizer'></div>"
+            f"</th>"
+        )
+    header = "".join(th_cells)
     rows = []
     prev = None
     for s in scans:
@@ -171,8 +286,20 @@ def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_n
         note_td = ""
         if has_notes:
             note = scan_notes.get(s["scan"], "")
+            asserts = scan_asserts.get(s["scan"], [])
+            
+            note_content_parts = []
             if note:
-                note_td = f"<td class='chrono-note-cell' title='{_html.escape(note)}'><span class='chrono-note-chip'>{_html.escape(note)}</span></td>"
+                note_content_parts.append(f"<span class='chrono-note-chip'>{_html.escape(note)}</span>")
+            
+            for chk in asserts:
+                is_fail_scan = (s["scan"] == fail_scan_num)
+                chk_cls = "chrono-chk-fail" if is_fail_scan else "chrono-chk-pass"
+                chk_icon = "✗" if is_fail_scan else "✓"
+                note_content_parts.append(f"<span class='chrono-chk-chip {chk_cls}' title='ASSERT vérifié : {_html.escape(chk)}'><span class='chk-icon'>{chk_icon}</span> {_html.escape(chk)}</span>")
+
+            if note_content_parts:
+                note_td = f"<td class='chrono-note-cell'><div class='chrono-note-container'>{''.join(note_content_parts)}</div></td>"
             else:
                 note_td = "<td class='chrono-note-cell' style='color:var(--muted);'>—</td>"
 
@@ -187,18 +314,21 @@ def _render_table(scans: list, field_names: list, field_types: dict, fail_scan_n
     </table></div>"""
 
 
-def _render_static_table(scans: list, field_names: list, field_types: dict) -> str:
+def _render_static_table(scans: list, field_names: list, field_types: dict, st_decls: dict = None) -> str:
     if not field_names:
         return ""
-    rows = "".join(
-        f"<tr><td><code>{_html.escape(f)}</code></td>"
-        f"<td>{_fmt_val(scans[0]['fields'].get(f, ''), field_types.get(f, True))}</td></tr>"
-        for f in field_names
-    )
+    rows = []
+    for f in field_names:
+        _, badge_lbl, badge_cls, var_type, _, _ = _get_var_meta(f, st_decls)
+        val_str = _fmt_val(scans[0]['fields'].get(f, ''), field_types.get(f, True))
+        rows.append(
+            f"<tr><td><code>{_html.escape(f)}</code> <span class='var-prov-badge {badge_cls}' style='font-size:10px;padding:1px 5px;'>[{_html.escape(badge_lbl)}]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>({_html.escape(var_type)})</span></td>"
+            f"<td>{val_str}</td></tr>"
+        )
     return f"""
     <details class="chronogram-static">
         <summary>🔒 Valeurs constantes sur toute la séquence ({len(field_names)})</summary>
-        <table class="static-table"><tbody>{rows}</tbody></table>
+        <table class="static-table"><tbody>{"".join(rows)}</tbody></table>
     </details>"""
 
 
@@ -213,7 +343,7 @@ def _fmt_scale(v: float) -> str:
         return f"{v:.2f}"
 
 
-def _render_waveform(scans: list, field_names: list, field_types: dict, fail_scan_num=None, scan_notes: dict = None) -> str:
+def _render_waveform(scans: list, field_names: list, field_types: dict, fail_scan_num=None, scan_notes: dict = None, st_decls: dict = None, scan_asserts: dict = None) -> str:
     """Chronogramme graphique SVG : 1 ligne par variable, temps en abscisse (par index de
     scan -- espacement uniforme pour rester lisible meme quand les t_ns reels sont tres
     inegaux -- le temps simule reel est annote sous chaque colonne). BOOL = creneau
@@ -221,7 +351,7 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
     if not scans or not field_names:
         return ""
     col_w = 56
-    left_margin = 200
+    left_margin = 230
     top_margin = 62
     lane_h = 40
     n = len(scans)
@@ -271,20 +401,35 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
 
     legend = [("#64748b", "Reset"), ("#ef4444", "Erreur / défaut"), ("#f97316", "Lockout"), ("#0284c7", "Voies actives")]
     
+    # Meta dictionnaire pour SVG / Tooltip
+    vars_meta_dict = {}
+    for f in field_names:
+        _, badge_lbl, badge_cls, var_type, full_tag, col_hex = _get_var_meta(f, st_decls)
+        vars_meta_dict[f] = {
+            "badge": badge_lbl,
+            "cls": badge_cls,
+            "type": var_type,
+            "tag": full_tag,
+            "color": col_hex
+        }
+
     notes_dict = scan_notes or {}
+    asserts_dict = scan_asserts or {}
     scans_data = []
     for s in scans:
         scans_data.append({
             "scan": s["scan"],
             "t_ms": round(s["t_display_ms"], 1),
             "fields": s["fields"],
-            "note": notes_dict.get(s["scan"], "")
+            "note": notes_dict.get(s["scan"], ""),
+            "asserts": asserts_dict.get(s["scan"], [])
         })
     scans_json = _html.escape(json.dumps(scans_data))
     fields_json = _html.escape(json.dumps(field_names))
+    meta_json = _html.escape(json.dumps(vars_meta_dict))
 
     svg_parts = [f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
-                 f'data-scans="{scans_json}" data-fields="{fields_json}" '
+                 f'data-scans="{scans_json}" data-fields="{fields_json}" data-meta="{meta_json}" '
                  f'data-left="{left_margin}" data-top="{top_margin}" '
                  f'data-colw="{col_w}" data-laneh="{lane_h}" '
                  f'xmlns="http://www.w3.org/2000/svg" class="waveform">']
@@ -299,12 +444,14 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
         svg_parts.append(f'<text x="{lx + 8}" y="17" class="wf-legend">{_html.escape(label)}</text>')
         lx += 16 + len(label) * 6
 
-    # grille verticale + labels temps/scan + bande rouge sur le scan ou l'assertion a echoue
+    # grille verticale + labels temps/scan + bande rouge sur le scan ou l'assertion a echoue + indicateur de check ASSERT
     for i, s in enumerate(scans):
         x = left_margin + i * col_w
         if s["scan"] == fail_scan_num:
             svg_parts.append(f'<rect x="{x}" y="{top_margin - 6}" width="{col_w}" height="{height - 12 - top_margin}" class="wf-fail-band"/>')
             svg_parts.append(f'<text x="{x + col_w/2}" y="{top_margin - 28}" class="wf-fail-marker">⚠️ FAIL</text>')
+        elif asserts_dict.get(s["scan"]):
+            svg_parts.append(f'<text x="{x + col_w/2}" y="{top_margin - 28}" class="wf-check-marker" title="{len(asserts_dict[s["scan"]])} assertion(s) vérifiée(s)">✓</text>')
         svg_parts.append(f'<line x1="{x}" y1="{top_margin - 6}" x2="{x}" y2="{height - 18}" class="wf-grid"/>')
         svg_parts.append(f'<text x="{x + col_w/2}" y="{top_margin - 10}" class="wf-time">{s["t_display_ms"]:.0f}ms</text>')
         svg_parts.append(f'<text x="{x + col_w/2}" y="{height - 6}" class="wf-scan">#{s["scan"]}</text>')
@@ -315,8 +462,21 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
         color = wf_color(f, row)
         svg_parts.append(f'<circle cx="{left_margin - 8}" cy="{y_mid}" r="4" fill="{color}"/>')
 
+        meta_info = vars_meta_dict.get(f, {})
+        badge_txt = meta_info.get("badge", "VAR")
+        badge_col = meta_info.get("color", "#94a3b8")
+        var_type_txt = meta_info.get("type", "")
+
+        # Rendu du label avec provenance colorée à gauche
+        tag_display = f"[{badge_txt}]"
+        
         if is_bool(f):
-            svg_parts.append(f'<text x="{left_margin - 18}" y="{y_mid + 4}" class="wf-label">{_html.escape(f)}</text>')
+            svg_parts.append(
+                f'<text x="{left_margin - 18}" y="{y_mid + 4}" class="wf-label" title="{_html.escape(f)} : {_html.escape(var_type_txt)}">'
+                f'<tspan fill="{badge_col}" font-weight="700" font-size="9.5px">{_html.escape(tag_display)} </tspan>'
+                f'<tspan>{_html.escape(f)}</tspan>'
+                f'</text>'
+            )
             y_hi, y_lo = y_lane + 6, y_lane + lane_h - 8
             # echelle 0/1 sur la 1ere ligne uniquement
             if row == 0:
@@ -336,7 +496,12 @@ def _render_waveform(scans: list, field_names: list, field_types: dict, fail_sca
                 prev_v = v
             svg_parts.append(f'<path d="{"".join(path)}" class="wf-line" stroke="{color}"/>')
         else:
-            svg_parts.append(f'<text x="{left_margin - 18}" y="{y_mid + 4}" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, {row})" title="Cliquer pour basculer Courbe / Chiffres">{_html.escape(f)}</text>')
+            svg_parts.append(
+                f'<text x="{left_margin - 18}" y="{y_mid + 4}" class="wf-label wf-clickable active-curve" onclick="toggleWfLane(this, {row})" title="{_html.escape(f)} : {_html.escape(var_type_txt)} (Cliquer pour basculer Courbe / Chiffres)">'
+                f'<tspan fill="{badge_col}" font-weight="700" font-size="9.5px">{_html.escape(tag_display)} </tspan>'
+                f'<tspan>{_html.escape(f)}</tspan>'
+                f'</text>'
+            )
 
             vals = []
             for s in scans:
@@ -435,7 +600,7 @@ def _apply_realistic_time(scans: list, cycle_time_ms: float) -> list:
 
 
 def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, field_types: dict,
-                        test_passed: bool = True, scan_notes: dict = None) -> str:
+                        test_passed: bool = True, scan_notes: dict = None, st_decls: dict = None, scan_asserts: dict = None) -> str:
     scans = [e for e in entries if e.get("test") == test_name]
     if not scans:
         return ""
@@ -454,18 +619,21 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
         )
 
     if len(scans) == 1:
-        single_rows = "".join(
-            f"<tr><td><code>{_html.escape(f)}</code></td>"
-            f"<td>{_fmt_val(scans[0]['fields'].get(f, ''), field_types.get(f, True))}</td></tr>"
-            for f in all_fields
-        )
+        single_rows = []
+        for f in all_fields:
+            _, badge_lbl, badge_cls, var_type, _, _ = _get_var_meta(f, st_decls)
+            val_str = _fmt_val(scans[0]['fields'].get(f, ''), field_types.get(f, True))
+            single_rows.append(
+                f"<tr><td><code>{_html.escape(f)}</code> <span class='var-prov-badge {badge_cls}' style='font-size:10px;padding:1px 5px;'>[{_html.escape(badge_lbl)}]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>({_html.escape(var_type)})</span></td>"
+                f"<td>{val_str}</td></tr>"
+            )
         return f"""
     <div class="chronogram-group">
         {fail_note}
         <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
         <details class="chronogram-static">
             <summary>🔒 Valeurs du scan unique ({len(all_fields)})</summary>
-            <table class="static-table"><tbody>{single_rows}</tbody></table>
+            <table class="static-table"><tbody>{"".join(single_rows)}</tbody></table>
         </details>
     </div>"""
 
@@ -484,7 +652,7 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
                     </span>
                 </div>
             </summary>
-            <div class="wf-scroll">{_render_waveform(scans, changed_fields, field_types, fail_scan_num, scan_notes=scan_notes)}</div>
+            <div class="wf-scroll">{_render_waveform(scans, changed_fields, field_types, fail_scan_num, scan_notes=scan_notes, st_decls=st_decls, scan_asserts=scan_asserts)}</div>
         </details>
         <details open>
             <summary class="chrono-table-summary">
@@ -497,9 +665,9 @@ def _render_chronogram(test_name: str, entries: list, cycle_time_ms: float, fiel
                     </span>
                 </div>
             </summary>
-            {_render_table(scans, changed_fields, field_types, fail_scan_num, scan_notes=scan_notes)}
+            {_render_table(scans, changed_fields, field_types, fail_scan_num, scan_notes=scan_notes, st_decls=st_decls, scan_asserts=scan_asserts)}
         </details>
-        {_render_static_table(scans, static_fields, field_types)}
+        {_render_static_table(scans, static_fields, field_types, st_decls=st_decls)}
     </div>"""
 
 
@@ -525,6 +693,21 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
     failed = summary.get("failed", total - passed)
     all_pass = failed == 0
 
+    # Analyse des déclarations ST du FB ou PRG principal pour extraire types et provenances
+    st_decls = {}
+    if source_paths:
+        try:
+            import parse_st_io
+            for sp in source_paths:
+                p_cand = pathlib.Path(sp)
+                if ("FB_" in p_cand.name or "PRG_" in p_cand.name) and "TestHarness" not in p_cand.name and "MOCKS" not in str(p_cand):
+                    st_ana = parse_st_io.analyze_st_file(p_cand)
+                    if st_ana and "declarations" in st_ana:
+                        st_decls = st_ana["declarations"]
+                        break
+        except Exception:
+            pass
+
     checks_by_test = parse_test_checks(test_st_path) if test_st_path else {}
 
     fb_slug = re.sub(r"[^a-zA-Z0-9]+", "-", fb_name).strip("-").lower()
@@ -534,10 +717,10 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
     for i, r in enumerate(results):
         name = r.get("name", "")
         passed_r = r.get("passed", False)
-        info = checks_by_test.get(name, {"checks": [], "comments": [], "scan_notes": {}})
+        info = checks_by_test.get(name, {"checks": [], "comments": [], "scan_notes": {}, "scan_asserts": {}})
 
         checks_html = "".join(f"<li>{_html.escape(c)}</li>" for c in info["checks"])
-        chrono_html = _render_chronogram(name, trace_entries or [], cycle_time_ms, field_types, passed_r, scan_notes=info.get("scan_notes"))
+        chrono_html = _render_chronogram(name, trace_entries or [], cycle_time_ms, field_types, passed_r, scan_notes=info.get("scan_notes"), st_decls=st_decls, scan_asserts=info.get("scan_asserts"))
 
         is_p03_fb = (fb_name == "FB_FbStatus")
         is_contract_test = not is_p03_fb and name.upper().startswith("TC-P03-")
@@ -569,9 +752,10 @@ def _render_fb_section(fb_name: str, domain: str, sources: list,
 
         rendered_card = f"""
         <article id="{anchor}" class="{card_classes}">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 {_badge(passed_r)}
-                <h3 style="flex: 1;">{_html.escape(name)} {contract_tag}</h3>
+                <h3 style="flex: 1; user-select: text;">{_html.escape(name)} {contract_tag}</h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, '{_html.escape(name)}')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1056,6 +1240,53 @@ _CSS = """
         display: block;
         text-align: center;
     }
+    /* Pastilles de provenance & typage des variables */
+    .var-prov-badge {
+        display: inline-block;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        margin-top: 3px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .badge-var-in { background: rgba(2, 132, 199, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .badge-var-out { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); }
+    .badge-var-inout { background: rgba(139, 92, 246, 0.18); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .badge-var-loc { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .badge-var-cst { background: rgba(217, 119, 6, 0.18); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+    .badge-var-hw { background: rgba(20, 184, 166, 0.18); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.35); }
+    .badge-var-gvl { background: rgba(14, 165, 233, 0.18); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.35); }
+    .badge-var-prg { background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.35); }
+    .badge-var-diag { background: rgba(217, 70, 239, 0.18); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.35); }
+    .badge-var-ext { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.35); }
+
+    [data-theme="light"] .badge-var-in { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-out { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .badge-var-inout { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+    [data-theme="light"] .badge-var-loc { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    [data-theme="light"] .badge-var-cst { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    [data-theme="light"] .badge-var-hw { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+    [data-theme="light"] .badge-var-gvl { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-prg { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .badge-var-diag { background: #fdf4ff; color: #a21caf; border-color: #fbcfe8; }
+    [data-theme="light"] .badge-var-ext { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+
+    .chrono-table th .th-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        pointer-events: auto;
+    }
+    .chrono-table th .var-name-lbl {
+        font-family: monospace;
+        font-weight: 700;
+        font-size: 11px;
+    }
     /* Mode Titres Verticaux (Compact) */
     .chrono-table.headers-vertical {
         width: max-content !important;
@@ -1066,7 +1297,7 @@ _CSS = """
         width: 280px !important;
     }
     .chrono-table.headers-vertical th.var-th {
-        height: 155px;
+        height: 165px;
         vertical-align: bottom;
         padding-bottom: 10px;
         padding-top: 10px;
@@ -1077,26 +1308,36 @@ _CSS = """
     .chrono-table.headers-vertical th.var-th .th-content {
         writing-mode: vertical-rl;
         transform: rotate(180deg);
-        display: inline-block;
+        display: inline-flex;
+        flex-direction: row-reverse;
+        align-items: center;
         white-space: nowrap;
         text-align: left;
-        max-height: 135px;
+        max-height: 145px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .chrono-table th .th-content {
-        display: inline-block;
-        pointer-events: auto;
+    .chrono-table.headers-vertical th.var-th .var-prov-badge {
+        margin-top: 0;
+        margin-left: 4px;
     }
     .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
     .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
     [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
     [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
-    .chrono-note-cell { text-align: left !important; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
-    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 310px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-cell { text-align: left !important; max-width: 360px; font-size: 11px; }
+    .chrono-note-container { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
     .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    .chrono-chk-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; padding: 2px 8px; font-weight: 600; font-size: 10.5px; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
+    .chrono-chk-pass { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .chrono-chk-fail { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .chrono-chk-chip .chk-icon { font-weight: 800; font-size: 11.5px; }
     [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
     [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    [data-theme="light"] .chrono-chk-pass { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .chrono-chk-fail { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .wf-check-marker { font-size: 12px; fill: #10b981; font-weight: 800; text-anchor: middle; font-family: monospace; cursor: help; }
     .v-true { color: #34d399; font-weight: 700; }
     .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
@@ -1133,6 +1374,7 @@ _CSS = """
     .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
     [data-theme="light"] .wf-tt-head { color: #0284c7; }
     .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-meta { font-size: 10.5px; margin-bottom: 4px; }
     .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
     .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
     .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
@@ -1208,6 +1450,24 @@ _CSS = """
 
 
 _COPY_JS = """
+function copyTextToClipboard(btn, text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    var orig = btn.innerHTML;
+    btn.innerHTML = "✓ Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
 function copyPinExpr(el) {
     var text = el.getAttribute('title') || el.textContent;
     var ta = document.createElement('textarea');
@@ -1478,9 +1738,14 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier (sauf si sélection de texte en cours)
         var testHeader = e.target.closest('.test-card-header');
         if (testHeader) {
+            // Si l'utilisateur est en train de surligner / sélectionner du texte, ne pas replier
+            var selection = window.getSelection ? window.getSelection().toString() : '';
+            if (selection && selection.length > 0) {
+                return;
+            }
             var card = testHeader.closest('.test-card');
             if (card) {
                 card.classList.toggle('test-card-collapsed');
@@ -1519,6 +1784,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
         var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+        var metaData = JSON.parse(svg.getAttribute('data-meta') || '{}');
 
         var colIdx = Math.floor((svgX - left) / colw);
         var rowIdx = Math.floor((svgY - top) / laneh);
@@ -1548,12 +1814,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 cursorLine.style.display = '';
             }
 
+            var fMeta = metaData[f] || {};
+            var badgeCls = fMeta.cls || 'badge-var-loc';
+            var metaBadge = fMeta.badge ? '<span class="var-prov-badge ' + badgeCls + '" style="font-size:9.5px;padding:1px 5px;margin-right:4px;">[' + fMeta.badge + ']</span>' : '';
+            var typeStr = fMeta.type ? '<span style="color:var(--muted);font-size:11px;font-family:monospace;">' + fMeta.type + '</span>' : '';
+            var metaLineHtml = (metaBadge || typeStr) ? '<div class="wf-tt-meta">' + metaBadge + typeStr + '</div>' : '';
+
             var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+            var assertsHtml = '';
+            if (s.asserts && s.asserts.length > 0) {
+                var chkItems = s.asserts.map(function(c) {
+                    return '<div style="color:#34d399;font-size:10.5px;margin-top:2px;font-family:monospace;">✓ ' + c + '</div>';
+                }).join('');
+                assertsHtml = '<div style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px;"><strong style="color:var(--accent);font-size:10.5px;">Assertions vérifiées :</strong>' + chkItems + '</div>';
+            }
 
             tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
                            '<div class="wf-tt-var">' + f + '</div>' +
+                           metaLineHtml +
                            '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
-                           noteHtml;
+                           noteHtml +
+                           assertsHtml;
 
             tt.style.display = 'block';
             var ttX = e.clientX + 16;
@@ -2195,6 +2476,7 @@ def render_index_dashboard(results: dict, group_report_paths: dict) -> str:
             is_prg = name.startswith("PRG_")
 
             report_file = r.get("report")
+            report_group = r.get("report_group")
             if report_file:
                 p_rep = pathlib.Path(report_file)
                 if "RESULTS" in p_rep.parts:
@@ -2203,7 +2485,49 @@ def render_index_dashboard(results: dict, group_report_paths: dict) -> str:
                 else:
                     rel_link = f"RESULTS/{domain}/reports/{p_rep.name}"
             else:
-                rel_link = f"RESULTS/{domain}/reports/{name}.html"
+                if report_group:
+                    rel_link = f"RESULTS/{domain}/reports/{report_group}.html"
+                else:
+                    rel_link = f"RESULTS/{domain}/reports/{name}.html"
+
+            # Si le rapport est un rapport groupe partagé (plusieurs FB dans la même page),
+            # pointer directement sur la section d'ancrage du FB pour ne pas atterrir en haut de page
+            if (report_group or (report_file and p_rep.stem != name)):
+                fb_anchor = f"#fb-section-{name.lower()}"
+                if not rel_link.endswith(fb_anchor):
+                    rel_link += fb_anchor
+
+            updated_at = r.get("updated_at")
+            if not updated_at and report_file and pathlib.Path(report_file).exists():
+                try:
+                    mtime = pathlib.Path(report_file).stat().st_mtime
+                    updated_at = _dt.datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    updated_at = None
+
+            # Fraîcheur temporelle : < 1j (vert/subtil), > 1j (orange), > 3j (rouge)
+            if updated_at:
+                try:
+                    dt_test = _dt.datetime.strptime(updated_at, "%Y-%m-%d %H:%M:%S")
+                    age_days = (_dt.datetime.now() - dt_test).total_seconds() / 86400.0
+                    if age_days >= 3.0:
+                        age_str = f"{int(age_days)}j" if age_days >= 1 else ""
+                        chip_style = 'background:rgba(239,68,68,0.22);color:#fca5a5;border:1.5px solid #ef4444;box-shadow:0 0 8px rgba(239,68,68,0.3);'
+                        chip_icon = '🔴'
+                        chip_title = f'Rapport périmé ({int(age_days)} jours) — Réexécution recommandée'
+                    elif age_days >= 1.0:
+                        chip_style = 'background:rgba(245,158,11,0.22);color:#fde047;border:1.5px solid #f59e0b;box-shadow:0 0 8px rgba(245,158,11,0.3);'
+                        chip_icon = '🟠'
+                        chip_title = f'Rapport ancien ({int(age_days)} jour(s))'
+                    else:
+                        chip_style = 'background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);'
+                        chip_icon = '🟢'
+                        chip_title = 'Rapport récent (< 24h)'
+                    date_chip = f'<span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;{chip_style}" title="{chip_title}">{chip_icon} {updated_at}</span>'
+                except Exception:
+                    date_chip = f'<span style="font-size:12px;font-family:monospace;color:var(--muted);background:var(--card-sub);padding:3px 8px;border-radius:6px;border:1px solid var(--border);" title="Horodatage du dernier rapport">🕒 {updated_at}</span>'
+            else:
+                date_chip = '<span style="font-size:12px;font-family:monospace;color:#f87171;background:rgba(239,68,68,0.15);padding:3px 8px;border-radius:6px;border:1px solid #dc2626;font-weight:700;">⚪ Non exécuté</span>'
 
             type_badge = (
                 '<span style="background:rgba(6,182,212,0.35);color:#ffffff;border:1.5px solid #22d3ee;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(6,182,212,0.4);">⚡ PRG</span>'
@@ -2219,6 +2543,7 @@ def render_index_dashboard(results: dict, group_report_paths: dict) -> str:
                         {type_badge}
                         <a href="{rel_link}" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">{_html.escape(name)}</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">{n_t_pass}/{len(tests)} test(s) OK</span>
+                        {date_chip}
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="{rel_link}" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "file": "test_fb_translationoutputinterlock.st",
+  "results": [
+    {
+      "name": "TC-P11-INT-001 Enable FALSE coupe consignes variateur et ordre frein",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-INT-002 Blocage sens sans permis directionnel (fail-safe)",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-INT-003 Mouvement nominal autorise avec permis et confirmation frein",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0
+  }
+}

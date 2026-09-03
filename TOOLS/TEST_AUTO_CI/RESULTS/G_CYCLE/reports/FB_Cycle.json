@@ -39,6 +39,14 @@
       "passed": true
     },
     {
+      "name": "TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 60 s) sans STABILIZING",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-026 : backstop anti-telescopage - ecart position M1/M2 > 0,5 m en phase couplee X4 -> STABILIZING",
+      "passed": true
+    },
+    {
       "name": "TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pas de redemarrage) (T192-A S1)",
       "passed": true
     },
@@ -48,8 +56,8 @@
     }
   ],
   "summary": {
-    "total": 11,
-    "passed": 11,
+    "total": 13,
+    "passed": 13,
     "failed": 0
   }
 }

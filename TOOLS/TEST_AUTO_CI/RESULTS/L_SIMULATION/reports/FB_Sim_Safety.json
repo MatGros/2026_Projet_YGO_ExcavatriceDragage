@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_safety.st",
+  "results": [
+    {
+      "name": "TC-P13-SAF-001 Enable FALSE -> boucle AU ouverte",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-SAF-002 Pilotage boucle AU saine par SimChainOkBit et armement contacteur",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0
+  }
+}
