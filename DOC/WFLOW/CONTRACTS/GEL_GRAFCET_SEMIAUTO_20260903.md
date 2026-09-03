@@ -1,132 +1,131 @@
 # 🧊 GEL GRAFCET — Cycle SEMI_AUTO (`FB_Cycle` → `FB_CycleSemiAuto`)
 
-> **But** : figer **steps + actions + transitions** du séquenceur SEMI_AUTO AVANT le renommage
-> et l'ajout de l'étape initiale pure. Même démarche que le homing machine (T233).
-> Brouillon de travail — itéré avec l'utilisateur.
+> **But** : figer **steps + actions + transitions** du séquenceur SEMI_AUTO AVANT le renommage.
+> Même démarche + **même vocabulaire** que le homing machine (T233).
 >
 > - **Date** : 2026-09-03 · **Branche** : `backup/mes-septembre-20260902`
 > - **Contrat** : [T237](TASK_CONTRACT_T237_FB_CYCLESEMIAUTO_GEL_RENOMMAGE.yaml) · reprend [T229](TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml)
-> - **Source** : `CODE/G_CYCLE/FB_Cycle.st` (commit courant) · `CODE/G_CYCLE/_TYPES/E_CycleStep.st`
+> - **Source** : `CODE/G_CYCLE/FB_Cycle.st` · `CODE/G_CYCLE/_TYPES/E_CycleStep.st`
 > - **AF** : `DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md`
-> - **Statut** : 🟡 BROUILLON — questions ouvertes §4
+> - **Statut** : 🟡 BROUILLON — questions ouvertes §4 (Q1/Q5/Q6/Q7 tranchées, Q2/Q3/Q4 par défaut)
 
 ---
 
-## 0️⃣ Principes GRAFCET (tranchés)
+## 0️⃣ Convention de nommage (homogène projet)
 
-1. **Étape initiale = étape pure** : aucune action, aucune affectation. Les sorties retombent par
-   absence d'étape qui les commande. `X0_PREPARATION` **n'est pas** une étape initiale pure
-   (elle force treuils/translation/benne à 0, `WaitingForOperator`, `SampleCountDone := FALSE`) →
-   devient l'étape **1** (préparation active), une **`CX_INIT`** pure est ajoutée en amont *(Q1)*.
-2. **Coexistence** : GRAFCET SEMI_AUTO et GRAFCET homing tournent en parallèle ; être en étape
-   initiale de l'un pendant que l'autre bouge est normal.
-3. **Continuité joystick (C1)** : en nominal l'opérateur **maintient le manche défléchi + homme-mort
-   armé du début à la fin**. `CycleMotionPermit = JoystickDeflected AND DeadmanArmed` ne retombe
-   jamais entre étapes ; une transition ne force `RunRequest := FALSE` que sur **arrêt réellement
-   voulu** (fond, butée, fin). Une seule inversion de sens sur tout le cycle (pousser→tirer).
-4. **C1e** : X6→X7 sans temps mort (M1 lancé le même scan que la sortie de X6).
-5. **C3 / C3.1** : le cycle **ne pilote jamais** un déplacement autonome de M3. Il fournit la
-   consigne cible + surveille l'arrivée ; le ralenti PV et l'arrêt FDC sont assurés par `PRG_05`.
-   Départ **toujours P1**.
-6. **SEMI_AUTO homed-only** : gate `FB_Modes §3.2bis` (T226-AC1) — SEMI_AUTO refusé + expulsion
-   MAINT_N1 si `NOT MachineHomed`. Le cycle **présuppose** `HomedM1 AND HomedM2`.
-7. **Jamais de redémarrage auto après défaut** : `ErrorEdge → STABILIZING` ; sortie sur `Reset`
-   conscient. Reprise après pause (`WaitingResume`) sur `StartEdge` conscient uniquement.
+| Séquenceur | Type enum | Steps | Transitions |
+|---|---|---|---|
+| **Homing machine** | `E_MachineHomingTxState` | `HX0_REPOS`, `HX1_CHOICE` … `HXF_FAILED` | `HT0`, `HT1a` … |
+| **SEMI_AUTO** *(cible)* | **`E_AutoCycleStep`** *(ex-`E_CycleStep`)* | **`AX_REPOS`**, `AX0_PREPARATION`, `AX1_HOMING` … `AX13_DONE_SYNC`, `AX_STAB` | `AT0`, `AT2a` … |
+
+→ **P2 T237** : renommage `E_CycleStep` → `E_AutoCycleStep` + toutes les valeurs `X*` → `AX*`, + ajout
+`AX_REPOS := 99` (initiale pure). Ripple : `FB_Hmi_BannerFormatter`, `FB_TroubleshootingView`,
+`PRG_03`, `PRG_07`, `ST_ChainCycleSemiAuto`, XML, `test_fb_cyclesemiauto.st`.
 
 ---
 
-## 1️⃣ Séquence — steps 🟦🟩🟥 / transitions ⬇️⬆️
+## 1️⃣ Principes GRAFCET (tranchés)
+
+1. **Étape initiale = pure** : aucune action, aucune affectation. `AX0_PREPARATION` (ex-`X0`) fait du
+   housekeeping → reste l'étape **1** ; **`AX_REPOS`** (=99) pure est ajoutée en amont.
+2. **Coexistence** : GRAFCET SEMI_AUTO et homing tournent en parallèle.
+3. **Continuité joystick (C1)** : manche défléchi + homme-mort armé du début à la fin.
+   `CycleMotionPermit = JoystickDeflected AND DeadmanArmed` ne retombe jamais entre étapes ;
+   `RunRequest := FALSE` seulement sur arrêt réellement voulu (fond, butée, fin). Une seule
+   inversion de sens (pousser → tirer).
+4. **C1e** : AX6→AX7 sans temps mort (M1 lancé le même scan que la sortie AX6).
+5. **C3 / C3.1** : le cycle **ne pilote jamais** un déplacement autonome de M3 ; il fournit la
+   consigne cible + surveille l'arrivée ; ralenti PV + arrêt FDC par `PRG_05`. Départ **toujours P1**.
+6. **SEMI_AUTO homed-only** : gate `FB_Modes §3.2bis` (T226-AC1). Le cycle présuppose `HomedM1 AND HomedM2`.
+7. **Jamais de redémarrage auto après défaut** : `ErrorEdge → AX_STAB` ; sortie sur `Reset` conscient.
+   Reprise après pause (`WaitingResume`) sur `StartEdge` conscient uniquement.
+
+---
+
+## 2️⃣ Séquence — steps 🟦🟩🟥 / transitions ⬇️⬆️
 
 > Palier : `CST_StepSlow` = 1 · `CST_StepDive` = 3 · `CST_StepLoaded` = 4.
-> `CycleMotionPermit` = manche défléchi + homme-mort armé.
 
-| Rep. | 🎬 | Contenu (variables réelles `FB_Cycle`) |
+| Rep. | 🎬 | Contenu (variables réelles) |
 |---|---|---|
-| **CX_INIT** *(à ajouter — nom/valeur Q1)* | 🟦 step initiale pure | *rien* — aucune action, aucune affectation |
-| **CT_INIT** | ⬇️ | *(Q1)* : `Enable (= Mode SEMI_AUTO)` ? front d'entrée mode ? → **X0** |
-| **X0_PREPARATION** (0) | 🟩 step — housekeeping + vérif posture départ | treuils / translation / benne **0** · `Lifecycle.Busy/Done := FALSE` · `WaitingForOperator` · `SampleCountDone := FALSE` · vérifie la **posture de départ** : treuils M1/M2 au **capteur haut** (FDC haut, avec **plage d'acceptation** `CfgStartTopWindowM` *(Q7)*) |
-| **XT0-ok** | ⬇️ | `(StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Latched` **ET** treuils M1/M2 au capteur haut (dans la plage) → **X1** |
-| **XT0-nok** | *(hold)* | treuils PAS en position haute → msg « Amener les treuils en position haute (capteur haut) en maintenance avant de lancer le cycle » — reste X0, cycle non lancé |
-| **X1_HOMING** (1) | 🟩 step — 🚫 mvt, **vérif référence** | `Lifecycle.Busy := TRUE` · **aucun ordre mouvement, aucun référencement** (responsabilité `FB_MachineHomingCycle`) |
-| **XT1a** | ⬇️ | `HomedM1 AND HomedM2` → **X2** *(franchie sans mouvement — toujours vrai car homed-only, Q2)* |
-| **XT1b** | *(hold)* | sinon : msg « Machine non referencee : passer en maintenance » — reste X1 |
-| **X2_TRANSLATE_P1** (2) *(ex-X2_WORK_POS_SELECT)* | 🟩 step — 🚚 translation vers P1 | treuils **0** · **PAS de sélection de cible** : fonctionnellement identique à la maintenance — l'opérateur amène M3 à P1 au joystick, `PRG_05` assure le ralenti PV + l'arrêt FDC P1. Le cycle **ne fournit que** la surveillance d'arrivée `Translation_At_P1`. `TranslationCmd.PositionTgt := 3` (P1) sert de repère à `PRG_05`. |
-| **XT2a** | ⬇️ | `Translation_At_P1` → **X3** |
-| **XT2b** | *(hold)* | `Translation_At_Maintenance` (au-delà de P1) → msg « Abandon cycle, revenir a P1 en maintenance » (le cycle ne ramène pas M3) |
-| **XT2c** | *(maintien)* | sinon : consigne « joystick vers P1 », maintien requis |
-| **X3_OPEN_BUCKET** (3) | 🟩 step — 🪣 benne seule | treuils **0** · `BucketCmd.ReqOpen := CycleMotionPermit` |
-| **XT3** | ⬇️ | (`Benne_IsOpen`) **OU** (`JoystickDeflected AND Benne_Done AND Benne_IsOpen`) → `ReqOpen := FALSE` → **X4** |
-| **X4_DESCEND_OPEN** (4) | 🟩 step — 🌊 plongée couplée | M1+M2 `RunRequest := CycleMotionPermit`, `ReqDescend`, `StepTgt := CST_StepDive` · `BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit` · `ExpectedDirection := -1` |
-| **XT4** | ⬇️ | `JoystickDeflected AND KoboldContactFond` → treuils **0** · `TouchPositionM := M1_CablePosM` · `RaiseTargetM := TouchPositionM + 0,5` (borné legal) → **X5** |
-| **X5_BOTTOM_CONFIRMED** (5) | 🟩 step — ⬆️ montée lente | M1+M2 `RunRequest := CycleMotionPermit`, `ReqAscent`, `StepTgt := CST_StepSlow` · `ExpectedDirection := 1` *(inversion de sens)* |
-| **XT5** | ⬇️ | `JoystickDeflected AND M1_CablePosM ≥ RaiseTargetM AND M2_CablePosM ≥ RaiseTargetM` → treuils **0** → **X6** |
-| **X6_CLOSE_BUCKET** (6) | 🟩 step — 🪣 benne seule | M1+M2 **explicitement 0** (pas de résidu X5) · `BucketCmd.ReqClose := CycleMotionPermit` |
-| **XT6** | ⬇️ *(C1e : sans temps mort)* | `JoystickDeflected AND Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)` → `ReqClose := FALSE` → **X7** |
-| **X7_CTRL_ASCENT** (7) | 🟩 step — 🐌 montée contrôle | M1+M2 `RunRequest := CycleMotionPermit`, `ReqAscent`, `StepTgt := CST_StepSlow` · surveillance écart vitesse M1/M2 (§1) + tempo stabilisation |
-| **XT7** | ⬇️ | `JoystickDeflected AND M1&M2 ≥ TouchPositionM + CtrlAscentDistM AND ABS(M1−M2) ≤ CtrlAscentToleranceM` → **X8** |
-| **X8_ASCENT_LOADED** (8) | 🟩 step — ⬆️ montée en charge | M1+M2 `RunRequest := CycleMotionPermit`, `ReqAscent`, `StepTgt := CST_StepLoaded` |
-| **XT8** | ⬇️ | `JoystickDeflected AND M1_CablePosM ≥ CableLimitM1AscentM` → treuils **0** → **X9** |
-| **X9_DRAIN_PAUSE** (9) | 🟩 step — 💧 égouttage | treuils **0** · `WaitingForProcess` · tempo `DrainingTimer` (gate `State = X9`, `PT := DrainTimeEff`) |
-| **XT9** | ⬇️ | `JoystickDeflected AND (DrainingTimer.Q OR SkipDrainEdge.Q)` → **X10** |
-| **X10_TRANSLATE_DUMP** (10) | 🟩 step — 🚚 translation trémie | `TranslationCmd.PositionTgt := 1` (Trémie) · `TranslationCmd.ReqStart := CycleMotionPermit` · `ExpectedDirection := -1` |
-| **XT10** | ⬇️ | `JoystickDeflected AND Translation_At_Tremie` → `ReqStart := FALSE` → **X11A** |
-| **X11A_DUMP_ARRIVE** (11) | 🟩 step — 🛑 treuils arrêtés | M1+M2 **0** · attente geste |
-| **XT11A** | ⬇️ | `JoystickDeflected` → **X11B** |
-| **X11B_DUMP_OPEN** (15) | 🟩 step — 🪣 benne seule, treuils 0 | M1+M2 **0** · `BucketCmd.ReqOpen := CycleMotionPermit` |
-| **XT11B-c** | ⬇️ *(option)* | `RepositionRequest` → **X11C** |
-| **XT11B** | ⬇️ | `JoystickDeflected AND Benne_Done AND Benne_IsOpen` → `ReqOpen := FALSE` → **X13** |
-| **X11C_DUMP_REPOSITION** (16) | 🟩 step — 🔁 descente couplée option | M1+M2 `RunRequest := CycleMotionPermit`, `ReqDescend`, `StepTgt := CST_StepSlow` (symétrique) · `BucketCmd.ReqOpen := CycleMotionPermit AND NOT Benne_IsOpen` |
-| **XT11C** | ⬆️ | `NOT RepositionRequest` → treuils **0** → **X11B** |
-| **X13_DONE_SYNC** (13) | 🟩 step — ✅ fin | treuils / translation **0** · `Lifecycle.Done := TRUE`, `Busy := FALSE` · `SampleCount + 1` + `LastCycleDuration := CurrentCycleElapsed` (cadré `SampleCountDone`) |
-| **XT13** | ⬇️ | `StartEdge.Q` → `SampleCountDone := FALSE` → **X0** *(rebouclage)* |
-| **STABILIZING** (14) | 🟥 step — repli défaut | tout **0** · `BucketCmd.ReqKoboldMeasureEnable := FALSE` · msg « acquitter le defaut » |
+| **AX_REPOS** (99) | 🟦 step initiale pure | *rien* — aucune action, aucune affectation |
+| **AT_INIT** | ⬇️ | `Enable (= Mode SEMI_AUTO)` → **AX0** *(Q1)* |
+| **AX0_PREPARATION** (0) | 🟩 step — housekeeping + vérif posture départ | treuils / translation / benne **0** · `Lifecycle.Busy/Done := FALSE` · `WaitingForOperator` · `SampleCountDone := FALSE` · vérifie **posture de départ** : treuils M1/M2 au **capteur haut** (plage `CfgStartTopWindowM`, Q7) |
+| **AT0-ok** | ⬇️ | `(StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Latched` **ET** treuils M1/M2 au capteur haut (plage) → **AX1** |
+| **AT0-nok** | *(hold)* | treuils PAS en haut → msg « Amener les treuils en position haute (capteur haut) en maintenance avant de lancer » — reste AX0 |
+| **AX1_HOMING** (1) | 🟩 step — 🚫 mvt, vérif référence | `Lifecycle.Busy := TRUE` · **aucun ordre mouvement, aucun référencement** |
+| **AT1a** | ⬇️ | `HomedM1 AND HomedM2` → **AX2** *(toujours vrai car homed-only — Q2 : garde redondante)* |
+| **AT1b** | *(hold)* | sinon : msg « Machine non referencee : passer en maintenance » |
+| **AX2_TRANSLATE_P1** (2) *(ex-`X2_WORK_POS_SELECT`)* | 🟩 step — 🚚 translation P1 | treuils **0** · **PAS de sélection** — comme en maintenance : l'opérateur amène M3 à P1 au joystick, `PRG_05` fait ralenti PV + arrêt FDC. Le cycle **surveille** `Translation_At_P1`. `TranslationCmd.PositionTgt := 3` = repère `PRG_05`. `SelectedWorkTarget` **supprimé** (Q6). |
+| **AT2a** | ⬇️ | `Translation_At_P1` → **AX3** |
+| **AT2b** | *(hold)* | `Translation_At_Maintenance` → msg « Abandon cycle, revenir a P1 en maintenance » |
+| **AT2c** | *(maintien)* | sinon : consigne « joystick vers P1 », maintien requis |
+| **AX3_OPEN_BUCKET** (3) | 🟩 step — 🪣 benne seule | treuils **0** · `BucketCmd.ReqOpen := CycleMotionPermit` |
+| **AT3** | ⬇️ | `Benne_IsOpen` (ou `JoystickDeflected AND Benne_Done AND Benne_IsOpen`) → `ReqOpen := FALSE` → **AX4** |
+| **AX4_DESCEND_OPEN** (4) | 🟩 step — 🌊 plongée couplée | M1+M2 `RunRequest := CycleMotionPermit`, `ReqDescend`, `StepTgt := CST_StepDive` · `BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit` · `ExpectedDirection := -1` |
+| **AT4** | ⬇️ | `JoystickDeflected AND KoboldContactFond` → treuils **0** · `TouchPositionM := M1_CablePosM` · `RaiseTargetM := TouchPositionM + 0,5` (borné legal) → **AX5** |
+| **AX5_BOTTOM_CONFIRMED** (5) | 🟩 step — ⬆️ montée lente | M1+M2 `RunRequest := CycleMotionPermit`, `ReqAscent`, `StepTgt := CST_StepSlow` · `ExpectedDirection := 1` *(inversion de sens)* |
+| **AT5** | ⬇️ | `JoystickDeflected AND M1&M2 ≥ RaiseTargetM` → treuils **0** → **AX6** |
+| **AX6_CLOSE_BUCKET** (6) | 🟩 step — 🪣 benne seule | M1+M2 **explicitement 0** · `BucketCmd.ReqClose := CycleMotionPermit` |
+| **AT6** | ⬇️ *(C1e — sans temps mort)* | `JoystickDeflected AND Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)` → `ReqClose := FALSE` → **AX7** |
+| **AX7_CTRL_ASCENT** (7) | 🟩 step — 🐌 montée contrôle | M1+M2 `RunRequest := CycleMotionPermit`, `ReqAscent`, `StepTgt := CST_StepSlow` · surveillance écart vitesse M1/M2 (§3) |
+| **AT7** | ⬇️ | `JoystickDeflected AND M1&M2 ≥ TouchPositionM + CtrlAscentDistM AND ABS(M1−M2) ≤ CtrlAscentToleranceM` → **AX8** |
+| **AX8_ASCENT_LOADED** (8) | 🟩 step — ⬆️ montée en charge | M1+M2 `RunRequest := CycleMotionPermit`, `ReqAscent`, `StepTgt := CST_StepLoaded` |
+| **AT8** | ⬇️ | `JoystickDeflected AND M1_CablePosM ≥ CableLimitM1AscentM` → treuils **0** → **AX9** |
+| **AX9_DRAIN_PAUSE** (9) | 🟩 step — 💧 égouttage | treuils **0** · `WaitingForProcess` · tempo `DrainingTimer` (gate `State = AX9`, `PT := DrainTimeEff`) |
+| **AT9** | ⬇️ | `JoystickDeflected AND (DrainingTimer.Q OR SkipDrainEdge.Q)` → **AX10** |
+| **AX10_TRANSLATE_DUMP** (10) | 🟩 step — 🚚 translation trémie | `TranslationCmd.PositionTgt := 1` (Trémie) · `ReqStart := CycleMotionPermit` · `ExpectedDirection := -1` |
+| **AT10** | ⬇️ | `JoystickDeflected AND Translation_At_Tremie` → `ReqStart := FALSE` → **AX11A** |
+| **AX11A_DUMP_ARRIVE** (11) | 🟩 step — 🛑 treuils arrêtés | M1+M2 **0** · attente geste |
+| **AT11A** | ⬇️ | `JoystickDeflected` → **AX11B** |
+| **AX11B_DUMP_OPEN** (15) | 🟩 step — 🪣 benne seule, treuils 0 | M1+M2 **0** · `BucketCmd.ReqOpen := CycleMotionPermit` |
+| **AT11B-c** | ⬇️ *(option)* | `RepositionRequest` → **AX11C** |
+| **AT11B** | ⬇️ | `JoystickDeflected AND Benne_Done AND Benne_IsOpen` → `ReqOpen := FALSE` → **AX13** |
+| **AX11C_DUMP_REPOSITION** (16) | 🟩 step — 🔁 descente couplée option | M1+M2 `RunRequest := CycleMotionPermit`, `ReqDescend`, `StepTgt := CST_StepSlow` (symétrique) · `BucketCmd.ReqOpen := CycleMotionPermit AND NOT Benne_IsOpen` |
+| **AT11C** | ⬆️ | `NOT RepositionRequest` → treuils **0** → **AX11B** |
+| **AX13_DONE_SYNC** (13) | 🟩 step — ✅ fin | treuils / translation **0** · `Lifecycle.Done := TRUE`, `Busy := FALSE` · `SampleCount + 1` + `LastCycleDuration := CurrentCycleElapsed` (cadré `SampleCountDone`) |
+| **AT13** | ⬇️ | `StartEdge.Q` → `SampleCountDone := FALSE` → **AX0** *(rebouclage direct — Q4)* |
+| **AX_STAB** (14) *(ex-`STABILIZING`)* | 🟥 step — repli défaut | tout **0** · `BucketCmd.ReqKoboldMeasureEnable := FALSE` · msg « acquitter le defaut » |
 
-### ⬆️ Transverses (hors CASE, évaluées chaque scan)
+### ⬆️ Transverses (hors CASE, chaque scan)
 
 | Rep. | Déclencheur | Effet |
 |---|---|---|
-| **GT-safe** | `NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent` | neutralise toutes demandes ; si cycle en cours (`State ∉ {X0, X13, STABILIZING}`) → `PausedState := State`, `WaitingResume := TRUE` ; `RETURN` |
-| **GT-resume** | `WaitingResume` | `StartEdge.Q` → `State := PausedState` (reprise consciente) ; sinon *hold* + msg « Reprendre : StartCycle » |
-| **GT-fault** | `ErrorEdge.Q` (front `Fault.Error`) | `CycleStepAtError := State` → **STABILIZING** · `WaitingResume := FALSE` |
-| **GT-reset** | `ResetEdge.Q` | si `State = STABILIZING` → **X0** ; `SavedState := X0` |
-| **GT-abort** | `AbortEdge.Q` | → **X0** · `WaitingResume := FALSE` · `PausedState := X0` |
-| **GT-permit** | relâche manche **OU** homme-mort pendant `Lifecycle.Busy` | `CycleMotionPermit` retombe → toutes commandes coupées, **étape conservée** (pas de retour X0), **pas de défaut** |
+| **GT-safe** | `NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent` | neutralise tout ; si cycle en cours (`State ∉ {AX0, AX13, AX_STAB}`) → `PausedState := State`, `WaitingResume := TRUE` ; `RETURN` |
+| **GT-resume** | `WaitingResume` | `StartEdge.Q` → `State := PausedState` ; sinon *hold* + msg « Reprendre : StartCycle » |
+| **GT-fault** | `ErrorEdge.Q` | `CycleStepAtError := State` → **AX_STAB** · `WaitingResume := FALSE` |
+| **GT-reset** | `ResetEdge.Q` | si `State = AX_STAB` → **AX0** ; `SavedState := AX0` |
+| **GT-abort** | `AbortEdge.Q` | → **AX0** · `WaitingResume := FALSE` · `PausedState := AX0` |
+| **GT-permit** | relâche manche **OU** homme-mort pendant `Lifecycle.Busy` | commandes coupées, **étape conservée**, **pas de défaut** |
 
 ---
 
-## 2️⃣ Causes de défaut latchées (§1, → STABILIZING)
+## 3️⃣ Causes de défaut latchées (§1 FB, → AX_STAB)
 
 | # | Cause | Condition |
 |---|---|---|
-| 0 | `LimitLegalReached` | `X4` seul |
-| 1 | `WinchSyncError` | hors `X0` / `STABILIZING` |
-| 2 | `SpeedMismatchConfirmed` (écart vitesse M1/M2, 500 ms) | `X7` |
-| 3 | `NOT HeartbeatIhmOk` | hors `X0` / `STABILIZING` |
-| 4 | `StepMaxTimer.Q` (backstop durée d'étape, réarmé à chaque changement d'étape) | hors `STABILIZING` |
-| 5 | stabilisation / tolérance écart codeurs | `X7` |
-| 6 | anti-télescopage `ABS(M1_CablePosM − M2_CablePosM) > CST_CoupledPosBacklashM` | `X4 / X5 / X8 / X11C` (phases couplées) |
+| 0 | `LimitLegalReached` | `AX4` seul |
+| 1 | `WinchSyncError` | hors `AX0` / `AX_STAB` |
+| 2 | `SpeedMismatchConfirmed` (écart vitesse M1/M2, 500 ms) | `AX7` |
+| 3 | `NOT HeartbeatIhmOk` | hors `AX0` / `AX_STAB` |
+| 4 | `StepMaxTimer.Q` (backstop durée d'étape, réarmé au changement d'étape) | hors `AX_STAB` |
+| 5 | stabilisation / tolérance écart codeurs | `AX7` |
+| 6 | anti-télescopage `ABS(M1_CablePosM − M2_CablePosM) > CST_CoupledPosBacklashM` | `AX4 / AX5 / AX8 / AX11C` |
 
 ---
 
-## 3️⃣ Contraintes non négociables reprises baseline
+## 4️⃣ ❓ Questions ouvertes
 
-- **C1** continuité joystick · **C1e** X6→X7 sans temps mort · **C3/C3.1** translation P1 · homed-only.
-- Split X11a/b/c + **gap à 12** conservés · anti-télescopage · `SampleCount` + durée cycle.
-
----
-
-## 4️⃣ ❓ Questions ouvertes (🟡 → 🟢)
-
-| Q | Sujet | Options |
+| Q | Statut | Décision |
 |---|---|---|
-| **Q1** | `CX_INIT` | nom + valeur enum (17 ? 99 ? négatif ?) · réceptivité `CT_INIT` (`Enable` ? front entrée mode ?) · renumérotation vs valeur hors-plage |
-| **Q2** | **X1_HOMING** utilité | SEMI_AUTO est homed-only (gate FB_Modes) → `HomedM1/M2` est toujours vrai en X1 → X1 est franchie sans effet. **Garder X1** comme garde de position redondante, ou **fusionner X0→X2** ? |
-| **Q3** | `X0` housekeeping vs `CX_INIT` | quelles affectations restent en `X0` (préparation active) une fois `CX_INIT` pure ajoutée ? `SampleCountDone := FALSE` reste en X0 ? |
-| **Q4** | `X13 → X0` sur `StartEdge` | rebouclage direct, ou passer par `CX_INIT` ? |
-| **Q5** | Renommage `E_CycleStep` ? | l'enum garde son nom (`E_CycleStep`) ou devient `E_CycleSemiAutoStep` (cohérence `FB_CycleSemiAuto`) ? ripple XML/registry. |
-| **Q6** | ✅ tranché | `X2` = **pas de sélection**, comme en maintenance. `SelectedWorkTarget` = champ mort → **à retirer** de l'interface (`ST_SequencePublicState` / `ST_ChainCycleSemiAuto`). Renommage step `X2_WORK_POS_SELECT` → `X2_TRANSLATE_P1`. |
-| **Q7** | Plage d'acceptation posture départ (XT0) | `CfgStartTopWindowM` : valeur (ex. ±0,10 m sous le capteur haut) ? config persistante ou constante ? Message exact « position haute » à figer. |
+| **Q1** | ✅ | `AX_REPOS := 99` initiale pure · `AT_INIT` : `Enable (= Mode SEMI_AUTO)` → AX0 |
+| **Q2** | 🟡 défaut | `AX1_HOMING` **gardé** (garde de position redondante, ripple minimal). Fusion AX0→AX2 = plus tard si besoin. |
+| **Q3** | 🟡 défaut | `AX0` garde tout son housekeeping actuel (dont `SampleCountDone := FALSE`). `AX_REPOS` n'écrit rien. |
+| **Q4** | 🟡 défaut | `AX13 → AX0` **direct** (rebouclage). `AX_REPOS` seulement au boot / première entrée SEMI_AUTO. |
+| **Q5** | ✅ | `E_CycleStep` → **`E_AutoCycleStep`** ; toutes valeurs `X*` → `AX*`. |
+| **Q6** | ✅ | `AX2` = pas de sélection. `SelectedWorkTarget` **supprimé** de l'interface. |
+| **Q7** | 🟡 | `CfgStartTopWindowM` : proposé **0,10 m** sous le capteur haut, **constante** (`CST_StartTopWindowM`) pour commencer, à ajuster banc. Message figé : « Amener les treuils en position haute (capteur haut) en maintenance avant de lancer le cycle ». |
 
 ---
 
-_Brouillon 2026-09-03. Ne pas coder tant que §4 n'est pas résolu et le doc validé._
+_Brouillon 2026-09-03. Signale les erreurs, je corrige._
