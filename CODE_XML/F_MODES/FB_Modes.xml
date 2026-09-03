@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T03:57:50.779905" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T03:57:50.779905">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:49:27.661805" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:49:27.661805">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -888,7 +888,17 @@ Auth.M2SpeedLow           := ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps;
 // le mode est un état de sélection, le mouvement est coupé en aval (FB_Cycle, FB_Safety_Winch,
 // FB_Winch) par PowerContactorEngaged et les interlocks. Seule la bascule N1/N2/SEMI_AUTO
 // reste soumise à l'arrêt mécanique confirmé des treuils (ModeChangeAllowed).
-IF (SelMode &lt;&gt; PrevArbitratedMode)
+// 3.2bis (AF-05 §4bis - referencement benne guide) : SEMI_AUTO est un mode "homed-only".
+// Une selection SEMI_AUTO sans datum machine valide (MachineHomed) est REFUSEE et le mode
+// est force vers MAINT_N1 (expulsion). Vaut aussi si MachineHomed retombe alors qu'on EST
+// en SEMI_AUTO (perte de datum -&gt; bascule MAINT_N1). Le SafeStop des treuils sur perte de
+// datum en mouvement est assure en aval (PRG_04 via MachineHoming.HomingLoss). L'expulsion
+// n'est jamais bloquee par l'arret mecanique (comme la sortie DISABLE, contrat D2).
+IF (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed THEN
+    Auth.Mode := E_Mode.MAINT_N1;
+    Auth.ModeChangePendingBlocked := TRUE;
+    Auth.ModeChangeBlockReason := 'SEMI_AUTO refuse : machine non referencee';
+ELSIF (SelMode &lt;&gt; PrevArbitratedMode)
       AND (SelMode &lt;&gt; E_Mode.DISABLE) AND (PrevArbitratedMode &lt;&gt; E_Mode.DISABLE)
       AND NOT ModeChangeAllowed THEN
     // Bascule N1/N2/SEMI_AUTO refusée : le mode courant est MAINTENU.
