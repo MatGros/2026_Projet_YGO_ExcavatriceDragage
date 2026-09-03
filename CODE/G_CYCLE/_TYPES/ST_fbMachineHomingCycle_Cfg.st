@@ -1,17 +1,22 @@
 (* =======================================================================
    ⚙️ ST_fbMachineHomingCycle_Cfg — Réglages de FB_MachineHomingCycle
    ───────────────────────────────────────────────────────────────────────
-   🎯 Rôle : Regrouper les réglages géométriques du référencement machine
-             (cible haute M1 + écarts benne ouverte/fermée).
-   🔒 Ownership : produit par le call-site PRG_02_Acquisition depuis
-             _WinchM1CfgPersist et _BucketCfgPersist (GVL_PERSISTENT).
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   🎯 Rôle : Réglages géométriques du référencement machine (cible haute
+             commune M1/M2 + écarts benne) + temporisations de garde du
+             GRAFCET de homing (montée, homing axes).
+   🔒 Ownership : produit par PRG_02_Acquisition depuis _WinchM1CfgPersist
+             et _BucketCfgPersist (GVL_PERSISTENT). Initialized : drapeau
+             de restauration boot (pont persistant).
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
    ======================================================================= *)
 
 TYPE ST_fbMachineHomingCycle_Cfg :
 STRUCT
-    CfgTopHomingTarget_M : REAL;   // Cible haute configurée M1 (m)
-    CfgOffsetOpen_M      : REAL;   // Ecart géométrique benne ouverte (m)
-    CfgOffsetClose_M     : REAL;   // Ecart géométrique benne fermée (m)
+    CfgTopHomingTarget_M : REAL;           // Cible haute au capteur haut, commune M1 et M2 (m)
+    CfgOffsetOpen_M      : REAL;           // Ecart géométrique benne ouverte (m)
+    CfgOffsetClose_M     : REAL;           // Ecart géométrique benne fermée (m)
+    CfgTimeoutClimb      : TIME := T#120s; // Garde HX2 : montée au capteur haut (0 = pas de garde)
+    CfgTimeoutHomeAxes   : TIME := T#60s;  // Garde HX3 : descente jusqu'au front descendant capteur (0 = pas de garde)
+    Initialized          : BOOL := FALSE;  // Drapeau de restauration config au boot (pont persistant)
 END_STRUCT
 END_TYPE
