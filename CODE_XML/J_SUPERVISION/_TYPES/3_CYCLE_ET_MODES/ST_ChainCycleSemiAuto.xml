@@ -291,7 +291,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
           <enum>
             <values>
               <value name="AX0_REPOS" value="0" />
-              <value name="AX1_HOMING" value="1" />
+              <value name="AX1_INIT" value="1" />
               <value name="AX2_TRANSLATE_P1" value="2" />
               <value name="AX3_OPEN_BUCKET" value="3" />
               <value name="AX4_DESCEND_OPEN" value="4" />
@@ -319,7 +319,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX1_HOMING</Name>
+                <Name>AX1_INIT</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Verif reference machine (HomedM1/M2) - aucun mouvement</xhtml>
                 </Documentation>

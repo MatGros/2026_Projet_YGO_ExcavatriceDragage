@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "file": "test_fb_cyclesemiauto.st",
+  "results": [
+    {
+      "name": "TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-001 : Relachement manche (JoystickDeflected=FALSE) stoppe les commandes sans perdre l etape",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-002 : Le cycle produit des demandes et passe a AX1_INIT sur Start",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-003 : Defaut de synchronisation treuils bascule le cycle en AX_STAB et fige l etape",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-004 : Reprise apres AX_STAB necessite Cause disparue + Reset + StartCycle",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur AX13_DONE_SYNC",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-013 : Bascule Semi-Auto vers Maintenance preserve l etape et neutralise les demandes sans redemarrage auto",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutralisees, etape maintenue, PAS de redemarrage auto (T169-A S3)",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX_STAB, pas de redemarrage auto (T169-A S4)",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 60 s) sans AX_STAB",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-026 : backstop anti-telescopage - ecart position M1/M2 > 0,5 m en phase couplee X4 -> AX_STAB",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pas de redemarrage) (T192-A S1)",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et compteur",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 13,
+    "passed": 13,
+    "failed": 0
+  }
+}

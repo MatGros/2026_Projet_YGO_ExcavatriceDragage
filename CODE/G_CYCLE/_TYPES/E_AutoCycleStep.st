@@ -10,7 +10,7 @@
 TYPE E_AutoCycleStep :
 (
   AX0_REPOS            := 0,   (* Repos / park : toutes commandes 0, etat neutre *)
-  AX1_HOMING           := 1,   (* Verif reference machine (HomedM1/M2) - aucun mouvement *)
+  AX1_INIT           := 1,   (* Verif reference machine (HomedM1/M2) - aucun mouvement *)
   AX2_TRANSLATE_P1     := 2,   (* Translation vers P1 au joystick (pas de selection, comme maintenance) *)
   AX3_OPEN_BUCKET      := 3,   (* Ouverture benne (si deja ouverte -> passe vite) *)
   AX4_DESCEND_OPEN     := 4,   (* Plongee benne ouverte, M1+M2 synchro, Kobold mesure ON *)
