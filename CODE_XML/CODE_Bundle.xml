@@ -1964,6 +1964,14 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Plafond palier du jog benne M2</xhtml>
               </documentation>
             </variable>
+            <variable name="ManualBucketLimitsActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Butees relatives benne actives en jog unitaire M2 (TglManualBucketLimits ET WinchSel=2)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Ready">
               <type>
                 <BOOL />
@@ -18397,6 +18405,21 @@ ELSE
         END_IF;
     END_IF;
 END_IF;
+
+// --- Distance restante publiee en PERMANENCE (auto ET jog manuel M2) -----------------
+// Hors sequence commandee (Lifecycle.Busy, qui calcule deja RemainingTravelM au plus
+// juste), on publie la distance geometrique vers la cible OPPOSEE a l'etat courant :
+// benne fermee -&gt; reste a parcourir pour ouvrir ; benne ouverte -&gt; reste pour fermer.
+// Permet l'affichage IHM du "reste a faire" meme en pilotage unitaire M2 (WinchSel=2).
+IF NOT Lifecycle.Busy AND NOT SevereError THEN
+    IF BucketState.IsClosed AND NOT BucketState.IsOpen THEN
+        RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
+    ELSIF BucketState.IsOpen AND NOT BucketState.IsClosed THEN
+        RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
+    ELSE
+        RemainingTravelM := 0.0;
+    END_IF;
+END_IF;
 {endregion}
 
 {region "§5 Offset actif et validite"}
@@ -20694,9 +20717,13 @@ CASE SeqStep OF
         // HT0 : lancement explicite (commande IHM / motif 3 appuis) OU perte de datum OU
         // auto (machine non referencee en maintenance N1/N2). Vers HX1 = annonce + choix,
         // AUCUN mouvement. CommitPublished N'est PAS efface ici (fait a HT1b, cf. glitch).
-        IF (StartEdge.Q OR ExplicitValidationPulse
-            OR (MachineWasHomed AND NOT MachineHomedRaw)
-            OR AutoArmTimer.Q)
+        // Garde MES : seul le bouton IHM dedie (StartEdge) peut RE-referencer une machine
+        // deja homed. Les gestes indirects (3 appuis BP joystick, auto-armement) sont
+        // ignores si M1 ET M2 sont deja references -&gt; evite le passage en homing pendant
+        // un travail benne en MAINT (appuis repetes du BP homme-mort).
+        IF (StartEdge.Q
+            OR ((ExplicitValidationPulse OR AutoArmTimer.Q) AND NOT BothAxesHomed)
+            OR (MachineWasHomed AND NOT MachineHomedRaw))
            AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
             HomeReqDone := FALSE;
             SeqStep     := E_MachineHomingTxState.HX1_CHOICE;
@@ -20858,6 +20885,12 @@ ELSIF MachineHomingFailed OR (SeqStep = E_MachineHomingTxState.HXF_FAILED) THEN
 ELSIF MachineHomingLossSafeStop THEN
     MachineHomingStep := E_MachineHomingStep.LOSS_SAFESTOP;
     MachineHomingInstruction := 'Reference perdue - Arret controle';
+ELSIF MachineHomed AND NOT CycleRunning THEN
+    // Machine referencee et cycle homing a l'arret : AUCUN message homing a l'IHM.
+    // (les branches HXn ci-dessous ne s'appliquent qu'a un cycle en cours ou une
+    //  reference absente / incomplete). Un defaut latche reste prioritaire (ci-dessus).
+    MachineHomingStep := E_MachineHomingStep.VALID;
+    MachineHomingInstruction := '';
 ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
     MachineHomingInstruction := 'HX2 - RefHoming Tirer JOY palier 1 vers FDC haut';
@@ -49912,6 +49945,7 @@ BucketState.M2RunRequest := instBucket.M2_RunRequest;
 BucketState.M2ReqAscent := instBucket.M2_ReqAscent;
 BucketState.M2ReqDescend := instBucket.M2_ReqDescend;
 BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
+BucketState.ManualBucketLimitsActive := ManualBucketLimitsActive;
 BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;

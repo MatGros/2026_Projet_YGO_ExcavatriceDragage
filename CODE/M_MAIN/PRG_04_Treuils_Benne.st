@@ -1376,6 +1376,7 @@ BucketState.M2RunRequest := instBucket.M2_RunRequest;
 BucketState.M2ReqAscent := instBucket.M2_ReqAscent;
 BucketState.M2ReqDescend := instBucket.M2_ReqDescend;
 BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
+BucketState.ManualBucketLimitsActive := ManualBucketLimitsActive;
 BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;

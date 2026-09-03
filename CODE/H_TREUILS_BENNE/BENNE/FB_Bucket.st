@@ -392,6 +392,21 @@ ELSE
         END_IF;
     END_IF;
 END_IF;
+
+// --- Distance restante publiee en PERMANENCE (auto ET jog manuel M2) -----------------
+// Hors sequence commandee (Lifecycle.Busy, qui calcule deja RemainingTravelM au plus
+// juste), on publie la distance geometrique vers la cible OPPOSEE a l'etat courant :
+// benne fermee -> reste a parcourir pour ouvrir ; benne ouverte -> reste pour fermer.
+// Permet l'affichage IHM du "reste a faire" meme en pilotage unitaire M2 (WinchSel=2).
+IF NOT Lifecycle.Busy AND NOT SevereError THEN
+    IF BucketState.IsClosed AND NOT BucketState.IsOpen THEN
+        RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
+    ELSIF BucketState.IsOpen AND NOT BucketState.IsClosed THEN
+        RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
+    ELSE
+        RemainingTravelM := 0.0;
+    END_IF;
+END_IF;
 {endregion}
 
 {region "§5 Offset actif et validite"}

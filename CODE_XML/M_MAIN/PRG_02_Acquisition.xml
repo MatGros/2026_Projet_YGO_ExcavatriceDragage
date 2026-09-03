@@ -4696,9 +4696,13 @@ CASE SeqStep OF
         // HT0 : lancement explicite (commande IHM / motif 3 appuis) OU perte de datum OU
         // auto (machine non referencee en maintenance N1/N2). Vers HX1 = annonce + choix,
         // AUCUN mouvement. CommitPublished N'est PAS efface ici (fait a HT1b, cf. glitch).
-        IF (StartEdge.Q OR ExplicitValidationPulse
-            OR (MachineWasHomed AND NOT MachineHomedRaw)
-            OR AutoArmTimer.Q)
+        // Garde MES : seul le bouton IHM dedie (StartEdge) peut RE-referencer une machine
+        // deja homed. Les gestes indirects (3 appuis BP joystick, auto-armement) sont
+        // ignores si M1 ET M2 sont deja references -&gt; evite le passage en homing pendant
+        // un travail benne en MAINT (appuis repetes du BP homme-mort).
+        IF (StartEdge.Q
+            OR ((ExplicitValidationPulse OR AutoArmTimer.Q) AND NOT BothAxesHomed)
+            OR (MachineWasHomed AND NOT MachineHomedRaw))
            AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
             HomeReqDone := FALSE;
             SeqStep     := E_MachineHomingTxState.HX1_CHOICE;
@@ -4860,6 +4864,12 @@ ELSIF MachineHomingFailed OR (SeqStep = E_MachineHomingTxState.HXF_FAILED) THEN
 ELSIF MachineHomingLossSafeStop THEN
     MachineHomingStep := E_MachineHomingStep.LOSS_SAFESTOP;
     MachineHomingInstruction := 'Reference perdue - Arret controle';
+ELSIF MachineHomed AND NOT CycleRunning THEN
+    // Machine referencee et cycle homing a l'arret : AUCUN message homing a l'IHM.
+    // (les branches HXn ci-dessous ne s'appliquent qu'a un cycle en cours ou une
+    //  reference absente / incomplete). Un defaut latche reste prioritaire (ci-dessus).
+    MachineHomingStep := E_MachineHomingStep.VALID;
+    MachineHomingInstruction := '';
 ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
     MachineHomingInstruction := 'HX2 - RefHoming Tirer JOY palier 1 vers FDC haut';

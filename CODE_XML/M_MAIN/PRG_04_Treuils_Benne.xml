@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:18:06.051756" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:18:06.051756">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T16:10:56.929019" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T16:10:56.929019">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -173,6 +173,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🐢 Plafond palier du jog benne M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ManualBucketLimitsActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Butees relatives benne actives en jog unitaire M2 (TglManualBucketLimits ET WinchSel=2)</xhtml>
               </documentation>
             </variable>
             <variable name="Ready">
@@ -6959,6 +6967,7 @@ BucketState.M2RunRequest := instBucket.M2_RunRequest;
 BucketState.M2ReqAscent := instBucket.M2_ReqAscent;
 BucketState.M2ReqDescend := instBucket.M2_ReqDescend;
 BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
+BucketState.ManualBucketLimitsActive := ManualBucketLimitsActive;
 BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;
@@ -8000,6 +8009,21 @@ ELSE
         IF NOT MotionRequestActive THEN
             Lifecycle.Done := FALSE;
         END_IF;
+    END_IF;
+END_IF;
+
+// --- Distance restante publiee en PERMANENCE (auto ET jog manuel M2) -----------------
+// Hors sequence commandee (Lifecycle.Busy, qui calcule deja RemainingTravelM au plus
+// juste), on publie la distance geometrique vers la cible OPPOSEE a l'etat courant :
+// benne fermee -&gt; reste a parcourir pour ouvrir ; benne ouverte -&gt; reste pour fermer.
+// Permet l'affichage IHM du "reste a faire" meme en pilotage unitaire M2 (WinchSel=2).
+IF NOT Lifecycle.Busy AND NOT SevereError THEN
+    IF BucketState.IsClosed AND NOT BucketState.IsOpen THEN
+        RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
+    ELSIF BucketState.IsOpen AND NOT BucketState.IsClosed THEN
+        RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
+    ELSE
+        RemainingTravelM := 0.0;
     END_IF;
 END_IF;
 {endregion}
