@@ -162,6 +162,18 @@ TEST 'TC-P05-004bis SEMI_AUTO homed-only : sans reference machine -> expulsion M
     ASSERT_TRUE(FB.Fault.Error, 'Reference incomplete -> diagnostic live visible');
 END_TEST
 
+TEST 'TC-P05-004ter Perte de datum EN SEMI_AUTO -> expulsion MAINT_N1, motif distinct, sans coupure (T226 AC2)'
+    (* Scan 1 : on est en SEMI_AUTO, machine referencee -> mode = SEMI_AUTO. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE);
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.SEMI_AUTO, 'SEMI_AUTO etabli');
+    (* Scan 2 : MachineHomed retombe (perte de datum) -> bascule MAINT_N1, motif "datum perdu". *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.SEMI_AUTO,
+       EncoderFaultPresent := FALSE, MachineHomed := FALSE);
+    ASSERT_EQ(FB.Auth.Mode, E_Mode.MAINT_N1, 'Perte datum -> expulsion MAINT_N1');
+    ASSERT_TRUE(FB.Auth.ModeChangeBlockReason = 'Datum machine perdu : arret controle', 'Motif distinct de la simple selection refusee');
+END_TEST
+
 TEST 'TC-P05-005 Limite legale = blocage exploitation, pas safety (aucune sortie PowerCutOff)'
     (* FB_Modes ne produit aucune sortie de coupure puissance : le bus Auth ne porte ni
        PowerCutOff ni SafeStop (structural). En SEMI_AUTO nominal, Ready=TRUE sans blocage safety. *)
