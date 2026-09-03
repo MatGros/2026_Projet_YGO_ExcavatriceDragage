@@ -27213,7 +27213,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
         E_AutoCycleStep.AX1_INIT:
             OperatorActionCandidate := '[IHM] Vérifier conditions initiales (référencement, treuils FDC haut)';
         E_AutoCycleStep.AX2_TRANSLATE_P1:
-            OperatorActionCandidate := '[JOYSTICK] Pousser vers la droite : translation jusqu''à P1';
+            OperatorActionCandidate := '[JOYSTICK] Pousser vers la droite : translation vers P1';
         E_AutoCycleStep.AX3_OPEN_BUCKET:
             OperatorActionCandidate := '[IHM] Ouverture benne en cours';
         E_AutoCycleStep.AX4_DESCEND_OPEN:
