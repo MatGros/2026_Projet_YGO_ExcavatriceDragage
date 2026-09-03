@@ -2,7 +2,7 @@
    🧱 FB_TestHarness_PRG_03 : Banc d'essai unitaire pour PRG_03_Modes_Cycle
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Isole PRG_03, injecte les sélections de modes et commandes cycle,
-             exécute FB_Modes et FB_Cycle, et expose le bus ST_fbModes_Autorisations.
+             exécute FB_Modes et FB_CycleSemiAuto, et expose le bus ST_fbModes_Autorisations.
    ======================================================================= *)
 
 FUNCTION_BLOCK PUBLIC FB_TestHarness_PRG_03
@@ -47,7 +47,7 @@ VAR_OUTPUT
     Auth                    : ST_Modes_Autorisations;
     
     // === 🔄 Séquenceur de Cycle Semi-Auto ===
-    CycleStep               : E_CycleStep;
+    CycleStep               : E_AutoCycleStep;
     CycleBusy               : BOOL;
     CycleDone               : BOOL;
     CycleError              : BOOL;
@@ -56,7 +56,7 @@ END_VAR
 
 VAR
     instModes               : FB_Modes;
-    instCycleSemiAuto       : FB_Cycle;
+    instCycleSemiAuto       : FB_CycleSemiAuto;
     countMem                : INT := 0;
 END_VAR
 

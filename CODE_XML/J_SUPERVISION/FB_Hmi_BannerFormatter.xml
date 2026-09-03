@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:09:58.297714" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:09:58.297714">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:37:36.918080" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:37:36.918080">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1523,7 +1523,7 @@
                 <derived name="E_DiveSearchState" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] État plongée</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] RESERVE : etat plongee FB_DiveSearch. Plus consomme depuis GRAFCET SEMI_AUTO 20 steps (diving = AX4..AX8). Conserve pour l'assistant hors SEMI_AUTO.</xhtml>
               </documentation>
             </variable>
             <variable name="ExtractionState">

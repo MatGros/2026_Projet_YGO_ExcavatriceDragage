@@ -88,7 +88,7 @@ TEST 'PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape init
     );
     ASSERT_EQ(harness.Auth.Mode, E_Mode.SEMI_AUTO, 'Auth.Mode SEMI_AUTO arbitre');
     // Sequenceur de cycle prete (etape initiale de preparation)
-    ASSERT_EQ(harness.CycleStep, E_CycleStep.X0_PREPARATION, 'Sequenceur a l etape X0_PREPARATION');
+    ASSERT_EQ(harness.CycleStep, E_AutoCycleStep.AX0_REPOS, 'Sequenceur a l etape X0_PREPARATION');
     ASSERT_FALSE(harness.CycleBusy, 'Sequenceur non Busy initialement');
     ASSERT_FALSE(harness.CycleError, 'Sequenceur sans erreur');
 END_TEST

@@ -148,7 +148,8 @@ VAR
     KoboldFallEdge          : F_TRIG;       // . [LOC] Front DI Kobold 1->0 (fond, AX7)
     KoboldInitTimer         : TON;          // . [LOC] Fenetre de verif retour contacteur Kobold en AX5
     RetryJoyReleaseTimer    : TON;          // . [LOC] Anti-rebond relache joystick pendant diving (>= 200 ms avant reprise)
-    DivingRetryTrig         : BOOL;         // . [LOC] Synthese GT-dive-retry (erreur Kobold / joystick relache / palier <> 4 en AX5..AX7)
+    PalierNot4Timer         : TON;          // . [LOC] Confirmation palier bloque < 4 en plongee (tolere la rampe 1->4)
+    DivingRetryTrig         : BOOL;         // . [LOC] Synthese GT-dive-retry (erreur Kobold / joystick relache / palier < 4 confirme en AX5..AX7)
     CtrlAscentMaxStepEff    : INT;          // . [LOC] CfgCtrlAscentMaxStep borne [1..2]
     RaiseOffBottomEff       : REAL;         // . [LOC] CfgRaiseOffBottomM borne (>0, defaut 0,5 m)
     DiveStartMinEff         : REAL;         // . [LOC] DiveStartMinM borne (defaut interne si <= 0)
@@ -200,8 +201,15 @@ KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 JoyDeflectedEdge(CLK := JoystickDeflected);
 
-// Config diving/extraction bornee (repli defaut interne si non reglee cote IHM).
-DiveStartMinEff := SEL(DiveStartMinM > 0.0, 4.0, DiveStartMinM);
+// Config diving/extraction bornee (repli defaut interne si non reglee / valeur implausible).
+// DiveStartMinM = altimetrie de lancement Kobold dans le referentiel M1_CablePosM
+// (positif, ~7,5 m au FDC haut, decroissant a la descente). Plage plausible 0,5..8,0 m ;
+// hors plage -> repli 4,0 m.
+IF (DiveStartMinM >= 0.5) AND (DiveStartMinM <= 8.0) THEN
+    DiveStartMinEff := DiveStartMinM;
+ELSE
+    DiveStartMinEff := 4.0;
+END_IF;
 RaiseOffBottomEff := SEL(CfgRaiseOffBottomM > 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 
@@ -257,13 +265,22 @@ RetryJoyReleaseTimer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                              OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                             AND NOT JoystickDeflected,
                      PT := T#200ms);
+// Palier bloque SOUS 4 pendant la plongee : on TOLERE la rampe 1->4 (tempo contacteurs,
+// GEL AX4) ; seul un blocage confirme > 4 s en AX5..AX7 declenche la reprise. Palier 5
+// (> 4) est traite instantanement par la cause de defaut 8 (latche), pas ici.
+PalierNot4Timer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
+                        OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+                        OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
+                       AND JoystickDeflected
+                       AND ( ((M1_SpeedStepApplied > 0) AND (M1_SpeedStepApplied < CST_StepDive))
+                          OR ((M2_SpeedStepApplied > 0) AND (M2_SpeedStepApplied < CST_StepDive)) ),
+                PT := T#5s);
 DivingRetryTrig := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                      OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
                      OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                    AND ( (KoboldInitTimer.Q AND NOT KoboldContactorFeedback)
                          OR RetryJoyReleaseTimer.Q
-                         OR ((M1_SpeedStepApplied > 0) AND (M1_SpeedStepApplied <> CST_StepDive))
-                         OR ((M2_SpeedStepApplied > 0) AND (M2_SpeedStepApplied <> CST_StepDive)) );
+                         OR PalierNot4Timer.Q );
 
 // Table des causes de défaut
 instCauses[0].Active   := LimitLegalReached

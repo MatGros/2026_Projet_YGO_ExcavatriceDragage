@@ -273,10 +273,10 @@ instCycleSemiAuto(
     RepositionRequest       := GVL_IHM.Cycle.Cmd.BtnReposition,
     // Config diving / extraction (GEL 2026-09-03)
     DiveStartMinM           := GVL_IHM.CycleDiveSearch.Cfg.DiveStartMin_M, // altimetrie lancement Kobold (AT4)
-    CfgRaiseOffBottomM      := 0.0,   // TODO IHM : champ dedie ; 0 -> defaut interne FB 0,5 m
-    CfgCtrlAscentMaxStep    := 1,     // TODO IHM : champ dedie ; palier max montee controle AX11 [1..2]
-    M1_SpeedStepApplied     := 0,     // TODO : publier instWinchM1.StepNumber (PRG_04) ; 0 -> garde palier<>4 dormante
-    M2_SpeedStepApplied     := 0,     // TODO : publier instWinchM2.StepNumber (PRG_04)
+    CfgRaiseOffBottomM      := GVL_IHM.Cycle.Cfg.RaiseOffBottom_M,   // GEL Q16 : decollement du fond AX8 (reglable IHM)
+    CfgCtrlAscentMaxStep    := GVL_IHM.Cycle.Cfg.CtrlAscentMaxStep,  // GEL Q16 : palier max montee controle AX11 [1..2]
+    M1_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber, // palier applique (0..5) : garde palier<>4 en plongee (GT-dive-retry) + cause 8 (palier 5)
+    M2_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
     SampleCount            := _CycleSampleCount
 );
 
