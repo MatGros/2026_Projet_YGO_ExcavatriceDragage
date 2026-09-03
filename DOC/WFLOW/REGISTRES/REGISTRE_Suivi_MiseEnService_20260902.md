@@ -503,6 +503,58 @@
 
 ---
 
+### 🎯 Objectif de séance — 2026-09-03 — Mise en service homing machine + refonte GRAFCET SEMI_AUTO
+
+---
+
+### MES-039 — 🟢 Homing machine : échec au moment de quitter le capteur TOP (M2 réf. à ~23 m au lieu de 8,5)
+- 📅 **Date** : 2026-09-03 | 📍 **Lieu** : Terrain/Banc | 🏷️ **Version** : `backup/mes-septembre-20260902` (commit `0350e3d1`)
+- 🎯 **Périmètre** : `FB_MachineHomingCycle` §7, HX3 (réf. axes au vol), `FB_WinchSync`
+- 🚦 **Statut** : 🟢 **Corrigé** (à retester au banc)
+- 🔍 **Constat / Essai** :
+  - Séquence homing OK jusqu'à la sortie du capteur TOP pour le référencement au vol.
+  - À cet instant : `Fault.Latched` → message « Erreur ou Echec homing - Acquitter (Reset) ».
+  - Snapshot `Snapshot_Troubleshooting_20260903_161518.csv` : `Idx306_WinchSyncError = TRUE`, `Idx302_SyncFaultActive = TRUE`, `MachineHomingFailed = TRUE`. M1 bien référencé à 8,5 m (config). **M2 référencé à ~23 m** (benne fermée).
+- 🛠️ **Solution / Décision** : §7 forçait `M2Demand.UseDynamicTarget := TRUE` en HX3 avec `DynamicTarget_M = CfgTopHomingTarget_M + CfgOffsetClose_M` (~8,5 + 15 ≈ 23). Au préset « au vol » M2 sautait à ~23 m pendant que M1 se référençait à 8,5 → écart apparent ~15 m → `FB_WinchSync` SafeStop → défaut latché. **Fix** : HX3 = référencement des AXES uniquement (GEL homing) → `M2Demand.UseDynamicTarget := FALSE`, M2 se référence à la même cible nominale que M1. L'offset benne fermée reste appliqué par le commit benne HX5 (`BucketCommit.CommitClose` → `FB_Bucket`).
+- 📌 **Action différée** : retest banc séquence homing complète HX0→HX6 après download.
+
+---
+
+### MES-040 — 🟡 Position capteur haut M1/M2 : paramètre commun (fin du 8,5 figé M2)
+- 📅 **Date** : 2026-09-03 | 📍 **Lieu** : Banc | 🏷️ **Version** : commit `5fe1266f`
+- 🎯 **Périmètre** : `CfgTopSensorPos_M` M1/M2, `PRG_07_Supervision`, `PRG_02`
+- 🚦 **Statut** : 🟡 **À surveiller** (réglage IHM à confirmer)
+- 🔍 **Constat / Essai** : `BtnHome` M2 référençait toujours à 8,5 m quelle que soit la config ; `BtnHome` M1 fonctionnait (champ IHM câblé). Cause : `_WinchM2CfgPersist.CfgTopSensorPos_M` figé en NVRAM, sans widget IHM effectif.
+- 🛠️ **Solution / Décision** : M1 et M2 montent liés au même capteur → **M1 = maître**. `PRG_07` recopie en continu `GVL_IHM.M1TreuilRetenue.Cfg.CfgTopSensorPos_M` → `GVL_IHM.M2TreuilBenne.Cfg` **et** `_WinchM2CfgPersist`. Homing M2 (qui lit `_WinchM2CfgPersist`) prend la valeur M1. Tentatives antérieures (`_CommunCfgPersist` neuf, garde `SafeTopSensorPos`, relaxation permis) **revertées** (risque champ persistant neuf + régression M1).
+- 📌 **Action différée** : régler `CfgTopSensorPos_M` côté M1 sur l'IHM et vérifier que M1 **et** M2 réfèrent à cette valeur.
+
+---
+
+### MES-041 — 🟠 Refonte GRAFCET SEMI_AUTO en 20 steps (T237) — DIVING décomposé, EXTRACTION/DÉCHARGE
+- 📅 **Date** : 2026-09-03 | 📍 **Lieu** : Développement | 🏷️ **Version** : commits `2dff056f` → `f73c714b`
+- 🎯 **Périmètre** : `FB_CycleSemiAuto`, `E_AutoCycleStep`, `PRG_03`, banner, troubleshooting
+- 🚦 **Statut** : 🟠 **Non testé banc** — 13/13 tests CI, G200 PASS, revue agent expert
+- 🔍 **Constat / Essai** : GEL `GEL_GRAFCET_SEMIAUTO_20260903.md` figé (commit `537e1419`, Q1–Q16). DIVING décomposé en `AX4_DESCEND_DIVING` / `AX5_KOBOLD_INIT` / `AX6_SEARCH_IMMERSION` / `AX7_SEARCH_BOTTOM` / `AX8_BOTTOM_CONFIRMED` + `AX_DIVING_RETRY` (transverse GT-dive-retry : erreur Kobold / joystick relâché / palier ≠ 4). EXTRACTION `AX9..AX12` (retente câbles palier 1, palier max AX11 réglable [1..2], palier 4/1 selon benne en AX12). DÉCHARGE `AX13..AX18`, rebouclage `AX18 → AX2` (pas retour AX0). `CST_StepDive` 3→4.
+- 🛠️ **Solution / Décision** : revue agent — fixes M4 (AT18 sur front joystick, pas maintien), M5 (C1e AX10→AX11 sans temps mort), m6 (`BottomTouched` latché), m7 (anti-rebond 200 ms retry). Feedback palier câblé sur `PRG_04.Data.WinchM1/M2State.StepNumber`.
+- 📌 **Action différée** : **banc** — câbler retour contacteur Kobold réel (`KoboldContactorFeedback` = TRUE en dur), confirmer polarité DI Kobold + valeur `DiveStartMin_M` (3–5 m, persist à 1.0). **IHM** : table libellés step à régénérer (renumérotation). Rename `FB_MachineHomingCycle` → `FB_CycleMachineHoming` (`T237`/suite). Retrait sous-système assistants DiveSearch/ExtractionAssist/DumpAtTremie (`T238`).
+
+---
+
+### MES-042 — 🟢 Mise en service homing : IHM `CycleMachineHoming` + forçage de step encadré + textes `HXn -`
+- 📅 **Date** : 2026-09-03 | 📍 **Lieu** : Développement | 🏷️ **Version** : commits `d97d88b2`, `9d7a1c64`, `f624f353`, `bdd18d16`
+- 🎯 **Périmètre** : `GVL_IHM.CycleMachineHoming` (`ST_CycleMachineHomingHMI` Cmd/State/Cfg), `FB_MachineHomingCycle` §4bis
+- 🚦 **Statut** : 🟢 **Compile OK** — FB_MachineHomingCycle 8/8, PRG_07 3/3 (à tester banc)
+- 🔍 **Constat / Essai** : besoin mise en service — bouton validation IHM (en plus du BP joystick), forçage d'un step du GRAFCET homing, consignes opérateur ambiguës.
+- 🛠️ **Solution / Décision** :
+  - `GVL_IHM.CycleMachineHoming` homogène avec `Cycle` / `CycleDiveSearch` — commandes homing sorties de `ST_ModesCmd`.
+  - `Cmd.BtnValidate` (front) = équivaut à 1 appui du motif 3 appuis (mise en service sans joystick).
+  - Forçage step (`§4bis`) : **encadré** — `Cfg.TglCommissioning` (case) **ET** `MAINT_N2` **ET** `NOT Fault.Latched` **ET** front `BtnForceStepApply` ; impulsion (pas un force continu), purge latches, le GRAFCET reprend au scan suivant. Pont persistant `_CycleMachineHomingCfgPersist`.
+  - `MachineHomingInstruction` : préfixe `HXn - RefHoming …` (action-first, mention « 3 appuis JOY »), « Erreur ou Echec » au lieu de « Defaut ».
+  - Motif 3 appuis : durée mini d'appui **300 ms → 150 ms** (`CST_ValidationPressHold`).
+- 📌 **Action différée** : ajouter les widgets IHM (bouton validate, sélecteur step, case mise en service). Tester le forçage au banc.
+
+---
+
 ## 3. 📄 Modèle à Dupliquer
 
 ```md

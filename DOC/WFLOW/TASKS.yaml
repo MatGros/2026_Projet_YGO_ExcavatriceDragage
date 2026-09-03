@@ -5278,3 +5278,68 @@ tasks:
   - Bundle regenere, G200 PASS, gates palier C au niveau baseline
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T237_FB_CYCLESEMIAUTO_GEL_RENOMMAGE.yaml
   bloque_par: []
+- id: T238
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: SEQUENCEUR SEMI_AUTO / ASSISTANTS
+  agent: ''
+  date: '2026-09-03T17:00:00+02:00'
+  titre: Retrait du sous-systeme assistants DiveSearch / ExtractionAssist / DumpAtTremie
+  contexte: >
+    Demande utilisateur (2026-09-03). Depuis T237, le diving (AX4..AX8 +
+    AX_DIVING_RETRY) et l'extraction (AX9..AX12) sont des steps de plein droit du
+    GRAFCET SEMI_AUTO (FB_CycleSemiAuto). Les FB assistants FB_DiveSearch /
+    FB_ExtractionAssist et le vidage tremie legacy (dump-at-tremie) deviennent
+    obsoletes. L'operateur retire les 3 slots cote IHM/SCADA ; cette tache retire
+    le sous-systeme cote PLC. Perimetre estime : ~175 references / 22 fichiers.
+  description: >
+    Auditer d'abord les consommateurs residuels (MAINT_N1/N2 : le dragage assiste
+    hors SEMI_AUTO utilise-t-il encore ces FB ?). Si confirme obsolete :
+    retirer les instances instDiveSearch / instExtractionAssist (PRG_03) et le
+    vidage tremie (PRG_04), les 3 ponts (FB_CfgPersistBridge_CycleDiveSearchCfg /
+    _CycleExtractionCfg / _CycleDumpAtTremieCfg), les 3 blocs persist
+    (_CycleDiveSearchCfgPersist / _CycleExtractionCfgPersist /
+    _CycleDumpAtTremieCfgPersist), les types 5_ASSISTANCE_DRAGAGE (12 fichiers
+    ST_CycleDiveSearch* / ST_CycleExtraction* / ST_CycleDumpAtTremie*), les slots
+    GVL_IHM.CycleDiveSearch / CycleExtraction / CycleDumpAtTremie, le cablage
+    FB_TroubleshootingView (M_AssistanceDragage), l'input DiveState de
+    FB_Hmi_BannerFormatter. Conserver E_DiveSearchState si reutilise comme brique
+    de detection immersion/fond appelee dans AX6/AX7 (a trancher).
+    Attention : DiveStartMin_M (_CycleDiveSearchCfgPersist) est partage avec
+    l'altimetrie de lancement Kobold du GRAFCET (AT4) - a migrer, pas a supprimer.
+  objectifs:
+  - Audit consommateurs residuels des FB assistants (MAINT hors SEMI_AUTO)
+  - Retrait FB + instances + 3 ponts + 3 blocs persist + 12 types + slots GVL_IHM
+  - Migration de DiveStartMin_M (altimetrie lancement Kobold) hors _CycleDiveSearchCfgPersist
+  - Nettoyage troubleshooting (M_AssistanceDragage) + banner (DiveState)
+  - Bundle regenere, G200 PASS, gates palier C au niveau baseline, tests CI verts
+  contrat: ''
+  bloque_par:
+  - T237
+- id: T239
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: HOMING MACHINE / NOMMAGE
+  agent: ''
+  date: '2026-09-03T17:00:00+02:00'
+  titre: Renommage FB_MachineHomingCycle -> FB_CycleMachineHoming (homogeneite Cycle*)
+  contexte: >
+    Demande utilisateur (2026-09-03). GVL_IHM.CycleMachineHoming a ete pose
+    (commit bdd18d16) pour l'homogeneite avec Cycle / CycleDiveSearch /
+    CycleExtraction. Le FB lui-meme reste FB_MachineHomingCycle -> a renommer pour
+    coherence complete.
+  description: >
+    git mv CODE/G_CYCLE/FB_MachineHomingCycle.st -> FB_CycleMachineHoming.st,
+    renommer le POU, l'instance instMachineHomingCycle (PRG_02), les references
+    (PRG_05, FB_Hmi_BannerFormatter, GEL_GRAFCET_HOMING_CYCLE), le registry CI,
+    test_fb_machinehomingcycle.st, le bundle XML. Types satellites
+    ST_fbMachineHomingCycle_* : renommer ou laisser (a trancher). Verifier
+    G310/G315 (nom fichier = nom POU).
+  objectifs:
+  - Renommage FB_MachineHomingCycle -> FB_CycleMachineHoming complet et coherent
+  - Instance + references + registry + test + bundle a jour
+  - Bundle regenere, G200 PASS, FB_CycleMachineHoming tests verts
+  contrat: ''
+  bloque_par: []
