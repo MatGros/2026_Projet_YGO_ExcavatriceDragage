@@ -1,0 +1,10 @@
+Error compiling source files:
+
+FB_TestHarness_PRG_07.st:52:30: error: Undeclared variable 'E_CYCLESTEP'
+  52 |     CycleStep             := E_CycleStep.X0_PREPARATION,
+     |                              ^
+
+FB_TestHarness_PRG_07.st:55:30: error: Undeclared variable 'E_CYCLESTEP'
+  55 |     CycleStepAtError      := E_CycleStep.X0_PREPARATION,
+     |                              ^
+

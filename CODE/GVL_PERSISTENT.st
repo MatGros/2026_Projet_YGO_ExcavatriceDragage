@@ -114,6 +114,9 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 🔄 CYCLE (dragage semi-automatique)
     _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5, RaiseOffBottom_M := 0.5, CtrlAscentMaxStep := 1); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
 
+    // 🎯 CYCLE REFERENCEMENT MACHINE (homing) — reglage mise en service
+    _MachineHomingCfgPersist : ST_MachineHomingCfg := (ForceStepTarget := 0); // 🌉 Pont FB_CfgPersistBridge_MachineHomingCfg
+
     // 🤿 CYCLE PLONGÉE (DiveSearch)
     _CycleDiveSearchCfgPersist : ST_CycleDiveSearchCfg := (
         DiveStartMin_M := 1.0,   // Partage : assistant FB_DiveSearch ET altimetrie lancement Kobold GRAFCET (AT4). GEL attend 3-5 m -> a regler sur l'IHM (borne plausible FB : 0,5..8,0 m)

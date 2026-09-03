@@ -41,6 +41,11 @@ VAR_INPUT
     BtnValidation               : BOOL;                                      // --> [CMD] BP joystick (homme-mort) — motif 3 appuis successifs (V_EXPLICITE)
     StartRequest                : BOOL;                                      // --> [CMD] Lancer le cycle (front) — commande IHM dediee, alternative au motif joystick
 
+    // === MISE EN SERVICE : forcage de step (encadre) ===
+    CfgCommissioningEnable      : BOOL;                                      // --> [CFG] Case IHM mise en service homing : deverrouille le forcage de step
+    CfgForceStepTarget          : INT;                                       // --> [CFG] Step cible du forcage (0=HX0 .. 9=HXF), borne dans le FB
+    CfgForceStepApply           : BOOL;                                      // --> [CMD] Applique le forcage (front) — impulsion, le GRAFCET reprend ensuite
+
     // === REGLAGES & CONFIGURATION ===
     Cfg                         : ST_fbMachineHomingCycle_Cfg;              // --> [CFG] Reglages geometriques + temporisations de garde
 END_VAR
@@ -108,6 +113,8 @@ VAR
     ValidationBtnEdgeR          : R_TRIG;                                   // . [LOC] Front montant BtnValidation
     ValidationBtnEdgeF          : F_TRIG;                                   // . [LOC] Front descendant BtnValidation
     StartEdge                   : R_TRIG;                                   // . [LOC] Front montant StartRequest (commande IHM lancer cycle)
+    ForceStepApplyEdge          : R_TRIG;                                   // . [LOC] Front montant CfgForceStepApply (forcage step mise en service)
+    ForceStepClamped            : INT;                                      // . [LOC] CfgForceStepTarget borne [0..9] (selecteur CASE)
     ValidationHoldTimer         : TON;                                     // . [LOC] Maintien >= 150 ms d'un appui
     ValidationGapTimer          : TON;                                     // . [LOC] Fenetre <= 2 s entre appuis
     ValidationPressCount        : INT;                                     // . [LOC] Compteur d'appuis valides (0..3)
@@ -296,6 +303,38 @@ IF ResetEdge.Q THEN
     MachineWasHomed     := FALSE;
     HomingLossLatched   := FALSE;
     ReHomingAckRequired := FALSE;
+END_IF;
+{endregion}
+
+{region "§4bis MISE EN SERVICE : forcage de step (encadre, impulsion sur front)"}
+// === §4bis FORCAGE DE STEP (aide mise en service) ====================
+// Deverrouille UNIQUEMENT si : case IHM mise en service ET MAINT_N2 ET pas de defaut
+// latche. Impulsion sur front (pas un force continu qui se battrait avec le CASE) :
+// on pose SeqStep + on purge les latches incoherents, le GRAFCET reprend au scan suivant.
+ForceStepApplyEdge(CLK := CfgForceStepApply);
+IF ForceStepApplyEdge.Q
+   AND CfgCommissioningEnable
+   AND (Mode = E_Mode.MAINT_N2)
+   AND NOT Fault.Latched THEN
+    ForceStepClamped := LIMIT(0, CfgForceStepTarget, 9);
+    CASE ForceStepClamped OF
+        0: SeqStep := E_MachineHomingTxState.HX0_REPOS;
+        1: SeqStep := E_MachineHomingTxState.HX1_CHOICE;
+        2: SeqStep := E_MachineHomingTxState.HX2_CLIMB;
+        3: SeqStep := E_MachineHomingTxState.HX2N_NEUTRAL;
+        4: SeqStep := E_MachineHomingTxState.HX3_HOME_AXES;
+        5: SeqStep := E_MachineHomingTxState.HX3N_PAUSE;
+        6: SeqStep := E_MachineHomingTxState.HX4_BUCKET_ADJUST;
+        7: SeqStep := E_MachineHomingTxState.HX5_BUCKET_COMMIT;
+        8: SeqStep := E_MachineHomingTxState.HX6_HOMED;
+        9: SeqStep := E_MachineHomingTxState.HXF_FAILED;
+    END_CASE;
+    HomeReqDone  := FALSE;
+    SeenNeutral  := FALSE;
+    CommitDone   := FALSE;
+    PendingClose := FALSE;
+    ValidationPressCount := 0;
+    ValidationHeldOk     := FALSE;
 END_IF;
 {endregion}
 
