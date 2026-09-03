@@ -369,7 +369,7 @@ FB_Translation:
   - CODE/I_TRANSLATION/FB_Translation.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
   report_group: I_TRANSLATION
-FB_MachineHomingCycle:
+FB_CycleMachineHoming:
   domain: G_CYCLE
   sources:
   - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
@@ -384,8 +384,8 @@ FB_MachineHomingCycle:
   - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_BucketCommit.st
   - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_Cfg.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st
-  - CODE/G_CYCLE/FB_MachineHomingCycle.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_machinehomingcycle.st
+  - CODE/G_CYCLE/FB_CycleMachineHoming.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclemachinehoming.st
 FB_SimBench:
   domain: L_SIMULATION
   sources:

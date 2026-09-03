@@ -1,5 +1,5 @@
 (* =======================================================================
-   🎯 FB_MachineHomingCycle — Cycle de referencement machine M1/M2/benne
+   🎯 FB_CycleMachineHoming — Cycle de referencement machine M1/M2/benne
    ───────────────────────────────────────────────────────────────
    Role : GRAFCET sequentiel (HX0..HX6 + HXF) qui coordonne le homing
              machine : montee au capteur haut, homing des axes M1/M2 au
@@ -11,7 +11,7 @@
              aval. Aucun mouvement sans permis operateur maintenu.
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
    ======================================================================= *)
-FUNCTION_BLOCK PUBLIC FB_MachineHomingCycle
+FUNCTION_BLOCK PUBLIC FB_CycleMachineHoming
 VAR_INPUT
     // === CONTRAT STANDARD (Enable + Reset) ===
     Enable                      : BOOL;                                      // --> [CMD] Autorisation generale (FALSE => sorties sures, retour HX0)

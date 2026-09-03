@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:15:59.843654" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:15:59.843654">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:56:11.188712" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:56:11.188712">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -70,7 +70,7 @@
    🔌 ST_fbMachineHomingCycle_AxisHomingStatus — Statut homing d'un axe treuil
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Regroupe l'etat de homing d'un axe (M1 ou M2) consomme par
-             FB_MachineHomingCycle pour piloter le guide et la transaction.
+             FB_CycleMachineHoming pour piloter le guide et la transaction.
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
    =======================================================================</xhtml>
         </documentation>

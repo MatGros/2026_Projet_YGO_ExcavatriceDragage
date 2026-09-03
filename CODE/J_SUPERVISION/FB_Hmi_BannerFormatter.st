@@ -24,7 +24,7 @@ VAR_INPUT
     DiveState            : E_DiveSearchState;   // --> [HW] RESERVE : etat plongee FB_DiveSearch. Plus consomme depuis GRAFCET SEMI_AUTO 20 steps (diving = AX4..AX8). Conserve pour l'assistant hors SEMI_AUTO.
     ExtractionState      : E_ExtractionAssistState;   // --> [HW] État extraction
     MachineHomingStep        : INT;   // --> [HW] Étape guide homing machine (E_MachineHomingStep : 0..70, 60 = valide)
-    MachineHomingInstruction : STRING(120);   // --> [HW] Consigne opérateur en clair produite par FB_MachineHomingCycle
+    MachineHomingInstruction : STRING(120);   // --> [HW] Consigne opérateur en clair produite par FB_CycleMachineHoming
 
     // 🛡️ Dérogations & particularités
     BypassGlobalActive   : BOOL;   // --> [TST] Bypass global
@@ -237,7 +237,7 @@ Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 // 2. PROGRESSION — le numéro et l'étape restent exclusivement ici
 // Format (AF-07 §5.1) : Macro: <Cycle> > Sous-cycle: <Étape>
 // ═══════════════════════════════════════════════════════════════
-// Guide homing machine : source unique = FB_MachineHomingCycle (1 texte par étape).
+// Guide homing machine : source unique = FB_CycleMachineHoming (1 texte par étape).
 // Prioritaire tant que non valide (SEMI_AUTO est de toute façon interdit sans MachineHomed).
 IF (MachineHomingStep > 0) AND (MachineHomingStep <> 60) THEN
     Banner.SequenceProgressText := CONCAT('Homing: ', MachineHomingInstruction);

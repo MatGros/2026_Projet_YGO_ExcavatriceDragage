@@ -291,7 +291,7 @@ instSafetyTranslationM3(
 // SafeStop réellement appliqué au mouvement = agrégat InputModuleFault OR safety M3
 // (8 mécanismes) — aucune des deux causes ne doit être perdue.
 // + Verrou translation pendant le cycle de homing machine (HX2..HX6) : le chariot M3
-//   ne doit pas bouger tant que M1/M2 se référencent (produit par FB_MachineHomingCycle,
+//   ne doit pas bouger tant que M1/M2 se référencent (produit par FB_CycleMachineHoming,
 //   publié PRG_02.Data.MachineHoming.M3Locked). Pas de bypass : conscient = quitter le cycle.
 M3_SafeStop_Aggregate := M3_SafeStop_Active
                          OR instSafetyTranslationM3.SafeStop

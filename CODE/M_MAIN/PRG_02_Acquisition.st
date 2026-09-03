@@ -32,7 +32,7 @@ VAR
     instDiagEthercat         : FB_Diag_Ethercat;              // * [INST] Diagnostic reseau EtherCAT (codeurs/variateur) — rang 02
     instEncoderM1            : FB_Encoder;                    // * [INST] Facade codeur complet M1 (Abs+Homing+Scale+Safety+Rel+Speed)
     instEncoderM2            : FB_Encoder;                    // * [INST] Facade codeur complet M2
-    instMachineHomingCycle       : FB_MachineHomingCycle;             // * [INST] Guide reference machine et homing conjoint benne
+    instCycleMachineHoming       : FB_CycleMachineHoming;             // * [INST] Guide reference machine et homing conjoint benne
 
     // === 🎛️ VARIABLES LOCALES & DÉTECTEURS ===
     HwInM1                   : ST_fbEncoder_HwIn; // . [LOC] Entrees hardware codeur M1
@@ -441,14 +441,14 @@ ELSIF BucketReferenceCloseEdge.Q THEN
 END_IF;
 
 // Cible haute du homing machine = position capteur de M2 (benne) : seule la cible
-// DYNAMIQUE M2 du cycle (FB_MachineHomingCycle §7) consomme ce champ ; M1 y home sur
+// DYNAMIQUE M2 du cycle (FB_CycleMachineHoming §7) consomme ce champ ; M1 y home sur
 // sa propre config (ligne CfgTopSensorPosM M1 ci-dessous). Geometrie de mouflage
 // benne differente -> jamais la position M1.
 MachineHomingCfg.CfgTopHomingTarget_M := _WinchM2CfgPersist.CfgTopSensorPos_M;
 MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
 MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
-instMachineHomingCycle(
+instCycleMachineHoming(
     Enable                     := TRUE,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM OR GVL_IHM.CycleMachineHoming.Cmd.BtnAbort,
     Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
@@ -472,20 +472,20 @@ instMachineHomingCycle(
     CfgForceStepApply          := GVL_IHM.CycleMachineHoming.Cmd.BtnForceStepApply,
     Cfg                        := MachineHomingCfg
 );
-Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
-Data.MachineHoming.SetPosBucketOpen := instMachineHomingCycle.BucketCommit.CommitOpen;
-Data.MachineHoming.SetPosBucketClose := instMachineHomingCycle.BucketCommit.CommitClose;
-Data.MachineHoming.Active           := instMachineHomingCycle.MachineHomingActive;
-Data.MachineHoming.HomingLoss       := instMachineHomingCycle.MachineHomingLossSafeStop;
-Data.MachineHoming.Step             := TO_INT(instMachineHomingCycle.MachineHomingStep);
-Data.MachineHoming.Instruction      := instMachineHomingCycle.MachineHomingInstruction;
-Data.MachineHoming.Failed           := instMachineHomingCycle.MachineHomingFailed;
-Data.MachineHoming.SeqStep          := TO_INT(instMachineHomingCycle.MachineHomingSeqStep);
-Data.MachineHoming.M3Locked         := instMachineHomingCycle.M3Locked;
-Data.MachineHoming.CmdWinchM1       := instMachineHomingCycle.CmdWinchM1;
-Data.MachineHoming.CmdWinchM2       := instMachineHomingCycle.CmdWinchM2;
-Data.MachineHoming.CmdBucketOpen    := instMachineHomingCycle.CmdBucketOpen;
-Data.MachineHoming.CmdBucketClose   := instMachineHomingCycle.CmdBucketClose;
+Data.MachineHoming.Homed            := instCycleMachineHoming.MachineHomed;
+Data.MachineHoming.SetPosBucketOpen := instCycleMachineHoming.BucketCommit.CommitOpen;
+Data.MachineHoming.SetPosBucketClose := instCycleMachineHoming.BucketCommit.CommitClose;
+Data.MachineHoming.Active           := instCycleMachineHoming.MachineHomingActive;
+Data.MachineHoming.HomingLoss       := instCycleMachineHoming.MachineHomingLossSafeStop;
+Data.MachineHoming.Step             := TO_INT(instCycleMachineHoming.MachineHomingStep);
+Data.MachineHoming.Instruction      := instCycleMachineHoming.MachineHomingInstruction;
+Data.MachineHoming.Failed           := instCycleMachineHoming.MachineHomingFailed;
+Data.MachineHoming.SeqStep          := TO_INT(instCycleMachineHoming.MachineHomingSeqStep);
+Data.MachineHoming.M3Locked         := instCycleMachineHoming.M3Locked;
+Data.MachineHoming.CmdWinchM1       := instCycleMachineHoming.CmdWinchM1;
+Data.MachineHoming.CmdWinchM2       := instCycleMachineHoming.CmdWinchM2;
+Data.MachineHoming.CmdBucketOpen    := instCycleMachineHoming.CmdBucketOpen;
+Data.MachineHoming.CmdBucketClose   := instCycleMachineHoming.CmdBucketClose;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
@@ -498,10 +498,10 @@ instEncoderM1(
                                AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 2)
                                AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
                                                                        AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
-                              OR instMachineHomingCycle.M1Demand.HomeReq),
+                              OR instCycleMachineHoming.M1Demand.HomeReq),
     HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome
                              OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
-                             OR instMachineHomingCycle.M1Demand.HomeReq,
+                             OR instCycleMachineHoming.M1Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
     CfgHomingTargetM      := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
@@ -548,19 +548,19 @@ instEncoderM2(
                                AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 1)
                                AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
                                                                        AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
-                              OR instMachineHomingCycle.M2Demand.HomeReq),
+                              OR instCycleMachineHoming.M2Demand.HomeReq),
     HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome
                              OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
                              OR BucketReferenceRequested
-                             OR instMachineHomingCycle.M2Demand.HomeReq,
+                             OR instCycleMachineHoming.M2Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
     CfgHomingTargetM      := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
                                  _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
     CfgTopSensorPosM      := _WinchM2CfgPersist.CfgTopSensorPos_M,
-    UseDynamicTarget      := BucketReferenceRequested OR instMachineHomingCycle.M2Demand.UseDynamicTarget,
+    UseDynamicTarget      := BucketReferenceRequested OR instCycleMachineHoming.M2Demand.UseDynamicTarget,
     DynamicHomingTargetM  := SEL(BucketReferenceRequested,
-                                 instMachineHomingCycle.M2Demand.DynamicTarget_M, BucketReferenceTargetM),
+                                 instCycleMachineHoming.M2Demand.DynamicTarget_M, BucketReferenceTargetM),
     TopPositionSensor     := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     HwIn                  := HwInM2,
     PointsPerRev          := ENCODER_POINTS_PER_REV,
