@@ -1,86 +1,86 @@
 Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:105:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:105:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   105 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:160:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:160:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   160 |         s.FB.MOTIONDIRECTION = -1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:208:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:208:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   208 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:223:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:223:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   223 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:270:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:270:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   270 |         s.FB.MOTIONDIRECTION = -1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:285:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:285:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   285 |         s.FB.MOTIONDIRECTION = -1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:339:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:339:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   339 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:394:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:394:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   394 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:449:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:449:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   449 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:466:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:466:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   466 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:521:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:521:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   521 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:537:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:537:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   537 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:581:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:581:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   581 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:596:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:596:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   596 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:675:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:675:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   675 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:691:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:691:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   691 |         s.FB.MOTIONDIRECTION = -1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:744:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:744:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   744 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:760:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:760:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   760 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:775:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:775:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   775 |         s.FB.MOTIONDIRECTION = -1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:792:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:792:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   792 |         s.FB.MOTIONDIRECTION = -1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:808:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:808:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
   808 |         s.FB.MOTIONDIRECTION = -1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:1170:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp: In lambda function:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:1170:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
  1170 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:1187:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:1187:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
  1187 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_4g8pkrvr\strucpp-test-ebd6Kp\test_main.cpp:1203:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Bucket_9kq_gvdg\strucpp-test-Avta4Y\test_main.cpp:1203:14: error: 'class strucpp::FB_BUCKET' has no member named 'MOTIONDIRECTION'
  1203 |         s.FB.MOTIONDIRECTION = 1;
       |              ^~~~~~~~~~~~~~~
 

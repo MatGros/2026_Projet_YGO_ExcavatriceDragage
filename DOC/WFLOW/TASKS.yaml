@@ -5389,29 +5389,98 @@ tasks:
   domaine: HOMING MACHINE / GRAFCET
   agent: ''
   date: '2026-09-03T18:45:00+02:00'
-  titre: HX1_CHOICE - demander la fermeture visuelle de la benne avant la montee
+  updated_at: '2026-09-03T19:45:00+02:00'
+  titre: Homing machine possible benne OUVERTE ou FERMEE (capteur top partage M1/M2)
   contexte: >
-    Demande utilisateur (2026-09-03, mise en service). A HX1_CHOICE le homing
-    part vers HX2_CLIMB (montee couplee M1+M2) sans verifier l'etat de la benne.
-    Si on monte benne pas fermee, les cables ne s'enroulent pas correctement sur
-    les tambours. La fermeture + commit est bien redemandee a HX4, mais c'est
-    trop tard : la montee HX2/HX3 a deja eu lieu.
+    Mise en service 2026-09-03. Constat banc (MES-045) : M1 et M2 partagent UN
+    SEUL capteur top (HwIn.Winch.M1M2_TopPositionFree_DI ; PRG_02
+    instEncoderM2.TopPositionSensor := NOT M1M2_TopPositionFree_DI). Le fix
+    0350e3d1 (HX3 : M2Demand.UseDynamicTarget := FALSE) preset M2 a
+    CfgTopSensorPos_M (8.5) quel que soit l'etat benne. Consequence si homing
+    lance BENNE FERMEE : M2 physiquement ~15 m sous M1, preset a 8.5 -> 15 m
+    d'incoherence injectee -> DriftGuard M2 (MecaA) + WinchSync (MecaE) ->
+    M2Status.HomedAndReliable=FALSE -> HX3 n'aboutit pas -> HXF_FAILED, et le
+    datum M2 reste corrompu de ~15 m (bordel en cascade : bucket ERROR
+    OffsetMax, FB_WinchSync desactive a la main, mesures faussees).
+    Demande utilisateur : le referencement doit marcher benne ouverte OU fermee,
+    puisque HX4 redemande justement de fermer la benne + valider sa position.
+    NOTE : remplace l'ancienne demande "fermer la benne a HX1" - incompatible,
+    la benne doit rester ouverte pendant HX2/HX3 SAUF si on rend le preset M2
+    offset-aware.
   description: >
-    Ajouter au step HX1_CHOICE une invite (et/ou un garde de transition) pour
-    fermer la benne visuellement AVANT de lancer la montee. Options a trancher :
-    A) prompt seul - texte MachineHomingInstruction HX1 "Fermer la benne (visuel)
-       avant de lancer", aucun garde, responsabilite operateur (1 ligne, 0 risque).
-    B) garde HX1 -> HX2/HX2N : +VAR_INPUT BucketIsClosed (cable de
-       _BucketState.IsClosed via PRG_02), transition bloquee tant que benne pas
-       fermee, texte "Fermer la benne puis valider". Fermeture faite en manuel
-       avant, ou abandon (Reset) pour fermer puis relancer. +input + cablage +
-       test.
-    B+) comme B mais autoriser la fermeture benne directement a HX1 (meme
-       sous-action que HX4 : JoystickPull -> CmdBucketClose). Plus de travail.
-    Recommandation : B (empeche reellement la montee benne ouverte).
+    Spec GRAFCET homing (contrat obligatoire C2). Design propose :
+    1. HX1 : demander l'etat benne reel (ouverte / fermee) -> OffsetExpected
+       (0 ou OffsetCloseM).
+    2. HX3 : M2Demand.UseDynamicTarget := (OffsetExpected > 0) ;
+       M2Demand.DynamicTarget_M := M2.CfgTopSensorPos_M + OffsetExpected ->
+       M2 preseté a 8.5 (ouvert) ou ~23.5 (ferme).
+    3. Propager OffsetExpected vers instBucket.ActiveOffsetM pendant HX3 pour que
+       WinchSync / DriftGuard soient offset-aware (sinon SafeStop comme le
+       2026-09-02, cf. 0350e3d1).
+    4. RefWindowActive (FB_Safety_Winch) doit couvrir tout HX3 + reconvergence
+       M1/M2 : verifier que la fenetre M2 (InReferencingMode / PosStepDetected /
+       TonRefSettle 2 s) tient assez longtemps pour un preset de +15 m.
+    5. HX4/HX5 inchange : re-confirme + commit l'offset ferme.
+    Alternative minimale si trop risque : forcer benne ouverte pour HX2/HX3
+    (garde BucketIsOpen sur transition HX1->HX2) + prompt clair.
   objectifs:
-  - HX1 informe/oblige l'operateur a fermer la benne avant HX2_CLIMB
-  - Pas de montee couplee M1+M2 avec benne ouverte (si option B/B+)
+  - Homing machine aboutit benne ouverte ET benne fermee, sans datum M2 corrompu
+  - Pas de MecaA / MecaE parasite pendant le preset M2 (RefWindow couvre HX3)
+  - HX1 capte l'etat benne attendu ; HX3 preset M2 a la bonne cible
   - FB_CycleMachineHoming tests verts, bundle regenere, G200 PASS
+  contrat: ''
+  bloque_par: []
+
+- id: T241
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: TREUILS BENNE / MESURE ET OFFSET
+  agent: ''
+  date: '2026-09-03T19:40:00+02:00'
+  titre: Fiabiliser etat benne + calcul ActiveOffsetM + defauts benne (mesure physique)
+  contexte: >
+    Mise en service 2026-09-03 (MES-045). Serie de defauts en cascade en
+    pilotage benne : etat memorise (IsOpen/IsClosed) fixe UNIQUEMENT par les
+    boutons ConfirmOpen/ClosePos (MAINT_N2) ou le succes d'un cycle -> quand
+    l'etat diverge de la realite mecanique, ActiveOffsetM (0 ou OffsetCloseM)
+    est applique a l'envers -> M2PositionCorrected faux de ~15 m -> FB_WinchSync
+    voit un ecart fantome -> MecaE -> synchro desactivee a la main. Plus :
+    OffsetMaxFault latche a 13 cm de M2 sous M1 (borne basse = CablePosM1 sec,
+    sans tolerance). L'ancienne version (CODE_BACKUP 20260822) avait un
+    classifieur d'etat continu sur la mesure, retire lors d'un refactor.
+    Tentative R3 (detection sur position en jog M2, commit 0defd32e) a introduit
+    un fly-through -> etat faux -> MecaE ; retiree (commit 8bd0b65f).
+  description: >
+    Implemente (NON COMMITE au 2026-09-03 19:40, en test banc) :
+    - FB_Bucket §4a : CLASSIFICATION CONTINUE de l'etat sur la mesure physique.
+      IsClosed si |Delta - OffsetCloseM| <= CoherenceLimitM pendant 1 s (TON),
+      IsOpen si |Delta - OffsetOpenM| <= CoherenceLimitM pendant 1 s ;
+      gate machine TOTALEMENT arretee + referencee + hors sequence
+      (NOT M1_Busy AND NOT M2_Busy AND NOT Lifecycle.Busy AND NOT SevereError)
+      -> aucun transitoire d'ecart, self-heal des que la machine est parkee,
+      dans tous les modes. Zone intermediaire -> dernier etat franc conserve.
+    - FB_Bucket §5 : ActiveOffsetM pilote par cet etat fiable (un seul offset,
+      pas de split display/sync : sync est OFF en WinchSel=2 ou le pas d'offset
+      se produit).
+    - FB_Bucket §5a : OffsetStateMismatchWarn (VAR_OUTPUT, publie IHM
+      ST_BucketHMIState) - warn non bloquant si |Delta - ActiveOffsetM| >
+      CoherenceLimitM pendant 2 s -> "reconfirmer position benne".
+    - FB_Bucket §1 : OffsetMaxFault borne basse = OffsetOpenM - CoherenceLimitM
+      (au lieu de CablePosM1 sec) + latch seulement si hors plage > 500 ms
+      (TON anti-pic). CfgFault : tolere OffsetOpenM legerement negatif (>= -2 m)
+      pour recalibration.
+    - PRG_04 : publication OffsetStateMismatchWarn.
+  reste_a_faire:
+  - Test banc du classifieur continu (recalage auto etat a l'arret)
+  - Recalibration OffsetOpenM (~ -0.13) / OffsetCloseM (~ 13.95) aux vrais FDC
+  - Reparer le test unitaire FB_Bucket (harness reference MotionDirection,
+    input supprime a un refactor anterieur) - ROUGE pre-existant
+  - Widget IHM warn OffsetStateMismatchWarn
+  objectifs:
+  - Etat benne reflete la realite mecanique sans intervention MAINT_N2
+  - ActiveOffsetM correct -> M2PositionCorrected ~ M1 par construction
+  - Fin des OffsetMaxFault parasites (bruit codeur / sur-jog cm)
+  - Alarme non bloquante en cas d'incoherence offset/mesure persistante
   contrat: ''
   bloque_par: []
