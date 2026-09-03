@@ -6071,6 +6071,148 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_CycleMachineHomingCfg">
+        <baseType>
+          <struct>
+            <variable name="ForceStepTarget">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=HX0 .. 9=HXF), borné côté FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>892dec72-1fe2-5fad-a62f-d1ead6f61579</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_CycleMachineHomingCfg — Réglages IHM du cycle de référencement machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Mise en service. Les réglages géométriques (positions capteur, offsets benne)
+      restent portés par GVL_PERSISTENT (_WinchM1CfgPersist / _BucketCfgPersist).
+   💾 Ponté vers persist (_CycleMachineHomingCfgPersist) via FB_CfgPersistBridge_CycleMachineHomingCfg.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleMachineHomingCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnStart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">▶️ Lancer le cycle de homing machine (MAINT_N2, front) — alternative au motif 3 appuis joystick</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnValidate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Validation depuis IHM (front) — équivaut à 1 appui du motif 3 appuis joystick</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnAbort">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏹️ Quitter / abandonner le cycle homing (front) — retour HX0 sans mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglCommissioning">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Case mise en service : déverrouille le forçage de step (MAINT_N2). NON persisté (reset au reboot = sûr).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnForceStepApply">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Applique le forçage de step (front) — impulsion ; cible = ST_CycleMachineHomingCfg.ForceStepTarget</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>9a7a4500-30c5-5bb1-9b3d-3215396cab97</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_CycleMachineHomingCmd — Commandes IHM du cycle de référencement machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Cycle homing machine (FB_MachineHomingCycle) — orchestré en MAINT_N2.
+      Séparé de ST_CycleCmd (cycle SEMI_AUTO) et de ST_ModesCmd (modes de marche).
+      Boutons momentanés uniquement ; réglages -&gt; ST_CycleMachineHomingCfg.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_CycleMachineHomingHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_CycleMachineHomingCmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_MachineHoming" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image publiée du FB_MachineHomingCycle (SeqStep, Step, Instruction, Failed, ordres, …)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_CycleMachineHomingCfg" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>42bd473a-7e78-5433-b67f-4e45c4b7c366</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎯 ST_CycleMachineHomingHMI — Données d'échange IHM du cycle de référencement machine
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration Cmd / State / Cfg , homogène avec ST_CycleHMI /
+      ST_CycleDiveSearchHMI / ST_CycleExtractionHMI.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_CycleState">
         <baseType>
           <struct>
@@ -8450,148 +8592,6 @@ Valeur brute axe X (0..10000)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
-      <dataType name="ST_MachineHomingCfg">
-        <baseType>
-          <struct>
-            <variable name="ForceStepTarget">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="0" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=HX0 .. 9=HXF), borné côté FB</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>f880fd6c-2d2e-5164-a545-6de3d9045768</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_MachineHomingCfg — Réglages IHM du cycle de référencement machine
-   ───────────────────────────────────────────────────────────────
-   🎯 Mise en service. Les réglages géométriques (positions capteur, offsets benne)
-      restent portés par GVL_PERSISTENT (_WinchM1CfgPersist / _BucketCfgPersist).
-   💾 Ponté vers persist (_MachineHomingCfgPersist) via FB_CfgPersistBridge_MachineHomingCfg.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_MachineHomingCmd">
-        <baseType>
-          <struct>
-            <variable name="BtnStart">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">▶️ Lancer le cycle de homing machine (MAINT_N2, front) — alternative au motif 3 appuis joystick</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnValidate">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Validation depuis IHM (front) — équivaut à 1 appui du motif 3 appuis joystick</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnAbort">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏹️ Quitter / abandonner le cycle homing (front) — retour HX0 sans mouvement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglCommissioning">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Case mise en service : déverrouille le forçage de step (MAINT_N2). NON persisté (reset au reboot = sûr).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnForceStepApply">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Applique le forçage de step (front) — impulsion ; cible = ST_MachineHomingCfg.ForceStepTarget</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>866e29f3-d271-58a8-a751-8cc142d17dc5</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎮 ST_MachineHomingCmd — Commandes IHM du cycle de référencement machine
-   ───────────────────────────────────────────────────────────────
-   🎯 Cycle homing machine (FB_MachineHomingCycle) — orchestré en MAINT_N2.
-      Séparé de ST_CycleCmd (cycle SEMI_AUTO) et de ST_ModesCmd (modes de marche).
-      Boutons momentanés uniquement ; réglages -&gt; ST_MachineHomingCfg.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_MachineHomingHMI">
-        <baseType>
-          <struct>
-            <variable name="Cmd">
-              <type>
-                <derived name="ST_MachineHomingCmd" />
-              </type>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="ST_MachineHoming" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image publiée du FB_MachineHomingCycle (SeqStep, Step, Instruction, Failed, ordres, …)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Cfg">
-              <type>
-                <derived name="ST_MachineHomingCfg" />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>68db3803-6283-560e-b893-1aedfb393c4d</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎯 ST_MachineHomingHMI — Données d'échange IHM du cycle de référencement machine
-   ───────────────────────────────────────────────────────────────
-   📄 Structuration Cmd / State / Cfg , homogène avec ST_CycleHMI /
-      ST_CycleDiveSearchHMI / ST_CycleExtractionHMI.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_ModesCmd">
         <baseType>
           <struct>
@@ -8630,7 +8630,7 @@ Valeur brute axe X (0..10000)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle de référencement machine -&gt; GVL_IHM.MachineHomingCycle (ST_MachineHomingHMI), plus dans Modes.
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle de référencement machine -&gt; GVL_IHM.CycleMachineHoming (ST_CycleMachineHomingHMI), plus dans Modes.
 Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement</xhtml>
               </documentation>
@@ -19041,7 +19041,7 @@ END_IF;
           </data>
         </addData>
       </pou>
-      <pou name="FB_CfgPersistBridge_MachineHomingCfg" pouType="functionBlock">
+      <pou name="FB_CfgPersistBridge_CycleMachineHomingCfg" pouType="functionBlock">
         <interface>
           <inputVars />
           <outputVars>
@@ -19058,7 +19058,7 @@ END_IF;
           <inOutVars>
             <variable name="Hmi">
               <type>
-                <derived name="ST_MachineHomingCfg" />
+                <derived name="ST_CycleMachineHomingCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
@@ -19067,7 +19067,7 @@ END_IF;
             </variable>
             <variable name="Persist">
               <type>
-                <derived name="ST_MachineHomingCfg" />
+                <derived name="ST_CycleMachineHomingCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
@@ -19076,7 +19076,7 @@ END_IF;
           </inOutVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_MachineHomingCfg — Pont persistance pour ST_MachineHomingCfg
+   💾 FB_CfgPersistBridge_CycleMachineHomingCfg — Pont persistance pour ST_CycleMachineHomingCfg
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
    💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
@@ -19101,7 +19101,7 @@ END_IF;
         </body>
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a8062bc0-7fdb-5e62-a5e0-81e52d7b2b7e</ObjectId>
+            <ObjectId>c53fccdf-77fc-5d34-9ea6-2dba0c058397</ObjectId>
           </data>
         </addData>
       </pou>
@@ -46880,7 +46880,7 @@ MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
 instMachineHomingCycle(
     Enable                     := TRUE,
-    Reset                      := PRG_07_Supervision.FaultMachineReset_IHM OR GVL_IHM.MachineHomingCycle.Cmd.BtnAbort,
+    Reset                      := PRG_07_Supervision.FaultMachineReset_IHM OR GVL_IHM.CycleMachineHoming.Cmd.BtnAbort,
     Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
     TopPositionSensor          := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     WinchesMechanicallyStopped  := MachineHomingMechanicalStopOk,
@@ -46895,11 +46895,11 @@ instMachineHomingCycle(
     JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
     // Lancer / valider le cycle : BP joystick (= bouton homme-mort) pour le motif 3 appuis,
     // OU commande IHM dediee (front) pour le lancement direct.
-    BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.MachineHomingCycle.Cmd.BtnValidate,
-    StartRequest               := GVL_IHM.MachineHomingCycle.Cmd.BtnStart,
-    CfgCommissioningEnable     := GVL_IHM.MachineHomingCycle.Cmd.TglCommissioning,
-    CfgForceStepTarget         := GVL_IHM.MachineHomingCycle.Cfg.ForceStepTarget,
-    CfgForceStepApply          := GVL_IHM.MachineHomingCycle.Cmd.BtnForceStepApply,
+    BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.CycleMachineHoming.Cmd.BtnValidate,
+    StartRequest               := GVL_IHM.CycleMachineHoming.Cmd.BtnStart,
+    CfgCommissioningEnable     := GVL_IHM.CycleMachineHoming.Cmd.TglCommissioning,
+    CfgForceStepTarget         := GVL_IHM.CycleMachineHoming.Cfg.ForceStepTarget,
+    CfgForceStepApply          := GVL_IHM.CycleMachineHoming.Cmd.BtnForceStepApply,
     Cfg                        := MachineHomingCfg
 );
 Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
@@ -51884,9 +51884,9 @@ PowerCutOffActive := PowerCutOffReq;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle</xhtml>
               </documentation>
             </variable>
-            <variable name="instCfgPersistBridgeMachineHoming">
+            <variable name="instCfgPersistBridgeCycleMachineHoming">
               <type>
-                <derived name="FB_CfgPersistBridge_MachineHomingCfg" />
+                <derived name="FB_CfgPersistBridge_CycleMachineHomingCfg" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle homing machine</xhtml>
@@ -52426,8 +52426,8 @@ IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-instCfgPersistBridgeMachineHoming(Hmi := GVL_IHM.MachineHomingCycle.Cfg, Persist := _MachineHomingCfgPersist);
-IF instCfgPersistBridgeMachineHoming.JustRestored THEN
+instCfgPersistBridgeCycleMachineHoming(Hmi := GVL_IHM.CycleMachineHoming.Cfg, Persist := _CycleMachineHomingCfgPersist);
+IF instCfgPersistBridgeCycleMachineHoming.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
@@ -52764,7 +52764,7 @@ GVL_IHM.Modes.State.M2SpeedLow := PRG_03_Modes_Cycle.Data.Auth.M2SpeedLow;
 GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;
 GVL_IHM.Modes.State.HomingRequiredM2 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM2;
 // Etat publie du cycle de referencement machine (visu IHM) - recopie whole-struct.
-GVL_IHM.MachineHomingCycle.State := PRG_02_Acquisition.Data.MachineHoming;
+GVL_IHM.CycleMachineHoming.State := PRG_02_Acquisition.Data.MachineHoming;
 
 // ---------- §3f. État joystick &amp; réseau (diagnostic bus) ----------
 GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;
@@ -53346,9 +53346,9 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Commandes, états et diagnostic cycle semi-automatique</xhtml>
           </documentation>
         </variable>
-        <variable name="MachineHomingCycle">
+        <variable name="CycleMachineHoming">
           <type>
-            <derived name="ST_MachineHomingHMI" />
+            <derived name="ST_CycleMachineHomingHMI" />
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Cycle de référencement machine (FB_MachineHomingCycle) — MAINT_N2</xhtml>
@@ -54189,10 +54189,10 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
               <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
               <Object Name="ST_CycleCmd" ObjectId="dac4a7a5-fa3d-5326-bf1a-3202f2fbdc28" />
               <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
+              <Object Name="ST_CycleMachineHomingCfg" ObjectId="892dec72-1fe2-5fad-a62f-d1ead6f61579" />
+              <Object Name="ST_CycleMachineHomingCmd" ObjectId="9a7a4500-30c5-5bb1-9b3d-3215396cab97" />
+              <Object Name="ST_CycleMachineHomingHMI" ObjectId="42bd473a-7e78-5433-b67f-4e45c4b7c366" />
               <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
-              <Object Name="ST_MachineHomingCfg" ObjectId="f880fd6c-2d2e-5164-a545-6de3d9045768" />
-              <Object Name="ST_MachineHomingCmd" ObjectId="866e29f3-d271-58a8-a751-8cc142d17dc5" />
-              <Object Name="ST_MachineHomingHMI" ObjectId="68db3803-6283-560e-b893-1aedfb393c4d" />
               <Object Name="ST_ModesCmd" ObjectId="edbd07e7-72fc-5cee-a795-a49979bf9667" />
               <Object Name="ST_ModesCycleInterPrg" ObjectId="c66e2ea9-61f6-5705-86e7-b9f19e28d4f1" />
               <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
@@ -54313,7 +54313,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <Object Name="FB_CfgPersistBridge_CycleDiveSearchCfg" ObjectId="a92cb09a-e287-5430-8474-ac8533ffbe1a" />
             <Object Name="FB_CfgPersistBridge_CycleDumpAtTremieCfg" ObjectId="958f5330-cfab-5326-8351-b214608cfa61" />
             <Object Name="FB_CfgPersistBridge_CycleExtractionCfg" ObjectId="99243b20-8012-5d76-ac19-bd7ef00af05b" />
-            <Object Name="FB_CfgPersistBridge_MachineHomingCfg" ObjectId="a8062bc0-7fdb-5e62-a5e0-81e52d7b2b7e" />
+            <Object Name="FB_CfgPersistBridge_CycleMachineHomingCfg" ObjectId="c53fccdf-77fc-5d34-9ea6-2dba0c058397" />
             <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
             <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
             <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />

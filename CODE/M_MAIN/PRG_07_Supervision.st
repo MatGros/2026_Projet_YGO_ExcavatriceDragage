@@ -24,7 +24,7 @@ VAR
     instAckConfigRestored   : R_TRIG;                         // * [INST] Front acquittement config restauree
     instCfgPersistBridgeSync           : FB_CfgPersistBridge_SyncCfg;            // * [INST] Pont persistance config synchro
     instCfgPersistBridgeCycle          : FB_CfgPersistBridge_CycleCfg;            // * [INST] Pont persistance config cycle
-    instCfgPersistBridgeMachineHoming  : FB_CfgPersistBridge_MachineHomingCfg;    // * [INST] Pont persistance config cycle homing machine
+    instCfgPersistBridgeCycleMachineHoming  : FB_CfgPersistBridge_CycleMachineHomingCfg;    // * [INST] Pont persistance config cycle homing machine
     instCfgPersistBridgeCycleDiveSearchCfg   : FB_CfgPersistBridge_CycleDiveSearchCfg;   // * [INST] Pont persistance config cycle plongée
     instCfgPersistBridgeCycleExtractionCfg   : FB_CfgPersistBridge_CycleExtractionCfg;   // * [INST] Pont persistance config cycle extraction
     instCfgPersistBridgeCycleDumpAtTremieCfg : FB_CfgPersistBridge_CycleDumpAtTremieCfg; // * [INST] Pont persistance config cycle vidage trémie
@@ -192,8 +192,8 @@ IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-instCfgPersistBridgeMachineHoming(Hmi := GVL_IHM.MachineHomingCycle.Cfg, Persist := _MachineHomingCfgPersist);
-IF instCfgPersistBridgeMachineHoming.JustRestored THEN
+instCfgPersistBridgeCycleMachineHoming(Hmi := GVL_IHM.CycleMachineHoming.Cfg, Persist := _CycleMachineHomingCfgPersist);
+IF instCfgPersistBridgeCycleMachineHoming.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
@@ -530,7 +530,7 @@ GVL_IHM.Modes.State.M2SpeedLow := PRG_03_Modes_Cycle.Data.Auth.M2SpeedLow;
 GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;
 GVL_IHM.Modes.State.HomingRequiredM2 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM2;
 // Etat publie du cycle de referencement machine (visu IHM) - recopie whole-struct.
-GVL_IHM.MachineHomingCycle.State := PRG_02_Acquisition.Data.MachineHoming;
+GVL_IHM.CycleMachineHoming.State := PRG_02_Acquisition.Data.MachineHoming;
 
 // ---------- §3f. État joystick & réseau (diagnostic bus) ----------
 GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;
