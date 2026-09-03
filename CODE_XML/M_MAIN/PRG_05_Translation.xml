@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:36:51.423736" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:36:51.423736">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:27:15.637367" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:27:15.637367">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2434,7 +2434,12 @@ instSafetyTranslationM3(
 
 // SafeStop réellement appliqué au mouvement = agrégat InputModuleFault OR safety M3
 // (8 mécanismes) — aucune des deux causes ne doit être perdue.
-M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
+// + Verrou translation pendant le cycle de homing machine (HX2..HX6) : le chariot M3
+//   ne doit pas bouger tant que M1/M2 se référencent (produit par FB_MachineHomingCycle,
+//   publié PRG_02.Data.MachineHoming.M3Locked). Pas de bypass : conscient = quitter le cycle.
+M3_SafeStop_Aggregate := M3_SafeStop_Active
+                         OR instSafetyTranslationM3.SafeStop
+                         OR PRG_02_Acquisition.Data.MachineHoming.M3Locked;
 
 {endregion}
 

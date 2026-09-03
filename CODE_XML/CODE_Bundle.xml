@@ -29107,8 +29107,12 @@ DescendPermit       := DeadmanArmed AND JoystickPush;
 BucketPermit        := DeadmanArmed AND JoystickDeflected;
 
 // Fenetre de grace deceleration : armee des qu'on entre un step d'arret depuis une phase mouvement.
+// Fenetre de grace deceleration : armee sur tous les steps a l'arret (HX2N/HX3N +
+// HX4/HX5 ou les treuils doivent rester immobiles).
 SettleGraceTimer(IN := (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL)
-                       OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE), PT := CST_SettleGrace);
+                       OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE)
+                       OR (SeqStep = E_MachineHomingTxState.HX4_BUCKET_ADJUST)
+                       OR (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT), PT := CST_SettleGrace);
 
 // Conditions d'abandon fail-safe, chacune &lt;= 3 termes (std 2quater).
 AxisHomingError  := M1Status.HomingError OR M2Status.HomingError;
@@ -29367,7 +29371,8 @@ CASE SeqStep OF
         ELSIF BucketPermit AND JoystickPush THEN
             CmdBucketOpen := TRUE;
         END_IF;
-        IF AxisHomingError THEN
+        // Fail-safe : erreur codeur OU treuil qui flue hors phase mouvement (grace ecoulee).
+        IF AxisHomingError OR MotionOutOfPhase THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
         ELSIF ExplicitValidationPulse AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
@@ -29378,7 +29383,7 @@ CASE SeqStep OF
 
     E_MachineHomingTxState.HX5_BUCKET_COMMIT:
         // Commit atomique de l'etat benne : impulsion 1 scan garantie via CommitDone.
-        IF AxisHomingError OR NOT BothAxesHomed THEN
+        IF AxisHomingError OR NOT BothAxesHomed OR MotionOutOfPhase THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
         ELSIF NOT CommitDone THEN
@@ -29406,7 +29411,10 @@ END_CASE;
 CycleRunning := (SeqStep &lt;&gt; E_MachineHomingTxState.HX0_REPOS)
              AND (SeqStep &lt;&gt; E_MachineHomingTxState.HX1_CHOICE);
 // Verrou translation : interdite des qu'on quitte l'etape initiale (calcul post-CASE : sans retard).
-M3Locked             := (SeqStep &lt;&gt; E_MachineHomingTxState.HX0_REPOS);
+// Verrou translation : actif uniquement quand le cycle est reellement engage
+// (HX2..HX6), pas en HX1 (annonce + choix, aucun mouvement) qui peut s'armer seul
+// apres une perte de datum. Consomme par PRG_05 (M3_SafeStop_Aggregate).
+M3Locked             := CycleRunning;
 MachineHomingActive  := CycleRunning;
 Lifecycle.Busy       := CycleRunning;
 Lifecycle.Done       := CommitPublished AND (SeqStep = E_MachineHomingTxState.HX0_REPOS);
@@ -46617,7 +46625,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // M1+M2 palier 1 (HX2 montee / HX3 descente). Le FB gate deja sur permis operateur
     // maintenu (homme-mort + joystick) et ne commande qu'en HX2/HX3 ; PRG_04 conserve
     // ses interlocks maintenance. Copie struct entiere (ST_ProgramWinchRequest).
-    IF instModes.Auth.Mode = E_Mode.MAINT_N2 THEN
+    IF instModes.Auth.Mode = E_Mode.MAINT_N2
+       AND PRG_02_Acquisition.Data.MachineHoming.SeqStep &lt;&gt; 0 THEN
         Data.ReqProgram.ReqWinchM1 := PRG_02_Acquisition.Data.MachineHoming.CmdWinchM1;
         Data.ReqProgram.ReqWinchM2 := PRG_02_Acquisition.Data.MachineHoming.CmdWinchM2;
     END_IF;
@@ -46647,12 +46656,13 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.Outputs.MinStepDown;
 
     // Cycle de homing machine (MAINT_N2) : ordres benne palier 1 sans FDC soft (HX4).
-    // Mutuellement exclusifs cote FB ; s'ajoutent aux demandes assistants (non actifs pendant HX4).
-    IF instModes.Auth.Mode = E_Mode.MAINT_N2 THEN
-        Data.ReqProgram.ReqBucket.ReqOpen  := Data.ReqProgram.ReqBucket.ReqOpen
-                                              OR PRG_02_Acquisition.Data.MachineHoming.CmdBucketOpen;
-        Data.ReqProgram.ReqBucket.ReqClose := Data.ReqProgram.ReqBucket.ReqClose
-                                              OR PRG_02_Acquisition.Data.MachineHoming.CmdBucketClose;
+    // Mutuellement exclusifs cote FB. Route OVERRIDE (pas un OR) quand le cycle homing est
+    // engage : evite le cumul ReqOpen+ReqClose si un assistant (DumpAtTremie / Extraction)
+    // etait actif au meme instant. Hors cycle homing : demandes assistants inchangees.
+    IF instModes.Auth.Mode = E_Mode.MAINT_N2
+       AND PRG_02_Acquisition.Data.MachineHoming.SeqStep &lt;&gt; 0 THEN
+        Data.ReqProgram.ReqBucket.ReqOpen  := PRG_02_Acquisition.Data.MachineHoming.CmdBucketOpen;
+        Data.ReqProgram.ReqBucket.ReqClose := PRG_02_Acquisition.Data.MachineHoming.CmdBucketClose;
     END_IF;
 
     // États de séquence
@@ -49675,7 +49685,12 @@ instSafetyTranslationM3(
 
 // SafeStop réellement appliqué au mouvement = agrégat InputModuleFault OR safety M3
 // (8 mécanismes) — aucune des deux causes ne doit être perdue.
-M3_SafeStop_Aggregate := M3_SafeStop_Active OR instSafetyTranslationM3.SafeStop;
+// + Verrou translation pendant le cycle de homing machine (HX2..HX6) : le chariot M3
+//   ne doit pas bouger tant que M1/M2 se référencent (produit par FB_MachineHomingCycle,
+//   publié PRG_02.Data.MachineHoming.M3Locked). Pas de bypass : conscient = quitter le cycle.
+M3_SafeStop_Aggregate := M3_SafeStop_Active
+                         OR instSafetyTranslationM3.SafeStop
+                         OR PRG_02_Acquisition.Data.MachineHoming.M3Locked;
 
 {endregion}
 

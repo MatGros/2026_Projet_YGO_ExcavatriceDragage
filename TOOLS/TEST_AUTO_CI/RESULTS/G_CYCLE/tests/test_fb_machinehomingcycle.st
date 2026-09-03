@@ -70,7 +70,7 @@ TEST 'TC-P09-H010 : HT0 franchi apres 3 appuis valides, en MAINT_N2'
     Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
        DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_CHOICE, 'HT0 franchi -> HX1');
-    ASSERT_TRUE(Fb.M3Locked, 'AC11 : M3 verrouillee des HX1');
+    ASSERT_FALSE(Fb.M3Locked, 'AC11 : HX1 (choix, aucun mvt) -> M3 pas encore verrouillee');
 END_TEST
 
 TEST 'TC-P09-H011 : HT0 refuse hors MAINT_N2 (meme motif)'
@@ -189,6 +189,7 @@ TEST 'TC-P09-H090 : guide hors cycle = BOTH_NOT_HOMED, et FAILED sur Fault.Latch
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
        DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX2_CLIMB, 'HT1b -> HX2');
+    ASSERT_TRUE(Fb.M3Locked, 'AC11 : M3 verrouillee des HX2 (cycle engage)');
     // AC4 : montee sous permis
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionSensor := FALSE,
        WinchesMechanicallyStopped := FALSE, DeadmanArmed := TRUE, JoystickPull := TRUE,
