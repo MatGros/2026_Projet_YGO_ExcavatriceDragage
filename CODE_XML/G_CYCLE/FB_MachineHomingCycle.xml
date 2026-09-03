@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T08:48:04.627031" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T08:48:04.627031">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:27:01.637346" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:27:01.637346">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -572,7 +572,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible haute au capteur haut, commune M1 et M2 (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position capteur haut M2/benne (m) — sert UNIQUEMENT a la cible dynamique M2 du cycle (HX3)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgOffsetOpen_M">
@@ -636,11 +636,11 @@
    ⚙️ ST_fbMachineHomingCycle_Cfg — Réglages de FB_MachineHomingCycle
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : Réglages géométriques du référencement machine (cible haute
-             commune M1/M2 + écarts benne) + temporisations de garde du
-             GRAFCET de homing (montée, homing axes).
-   🔒 Ownership : produit par PRG_02_Acquisition depuis _WinchM1CfgPersist
-             et _BucketCfgPersist (GVL_PERSISTENT). Initialized : drapeau
-             de restauration boot (pont persistant).
+             M2/benne + écarts benne) + temporisations de garde du GRAFCET
+             de homing (montée, homing axes).
+   🔒 Ownership : produit par PRG_02_Acquisition depuis _WinchM2CfgPersist
+             (cible haute) et _BucketCfgPersist (écarts, GVL_PERSISTENT).
+             Initialized : drapeau de restauration boot (pont persistant).
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
    =======================================================================</xhtml>
         </documentation>
@@ -1481,8 +1481,12 @@ DescendPermit       := DeadmanArmed AND JoystickPush;
 BucketPermit        := DeadmanArmed AND JoystickDeflected;
 
 // Fenetre de grace deceleration : armee des qu'on entre un step d'arret depuis une phase mouvement.
+// Fenetre de grace deceleration : armee sur tous les steps a l'arret (HX2N/HX3N +
+// HX4/HX5 ou les treuils doivent rester immobiles).
 SettleGraceTimer(IN := (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL)
-                       OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE), PT := CST_SettleGrace);
+                       OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE)
+                       OR (SeqStep = E_MachineHomingTxState.HX4_BUCKET_ADJUST)
+                       OR (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT), PT := CST_SettleGrace);
 
 // Conditions d'abandon fail-safe, chacune &lt;= 3 termes (std 2quater).
 AxisHomingError  := M1Status.HomingError OR M2Status.HomingError;
@@ -1741,7 +1745,8 @@ CASE SeqStep OF
         ELSIF BucketPermit AND JoystickPush THEN
             CmdBucketOpen := TRUE;
         END_IF;
-        IF AxisHomingError THEN
+        // Fail-safe : erreur codeur OU treuil qui flue hors phase mouvement (grace ecoulee).
+        IF AxisHomingError OR MotionOutOfPhase THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
         ELSIF ExplicitValidationPulse AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
@@ -1752,7 +1757,7 @@ CASE SeqStep OF
 
     E_MachineHomingTxState.HX5_BUCKET_COMMIT:
         // Commit atomique de l'etat benne : impulsion 1 scan garantie via CommitDone.
-        IF AxisHomingError OR NOT BothAxesHomed THEN
+        IF AxisHomingError OR NOT BothAxesHomed OR MotionOutOfPhase THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
         ELSIF NOT CommitDone THEN
@@ -1780,7 +1785,10 @@ END_CASE;
 CycleRunning := (SeqStep &lt;&gt; E_MachineHomingTxState.HX0_REPOS)
              AND (SeqStep &lt;&gt; E_MachineHomingTxState.HX1_CHOICE);
 // Verrou translation : interdite des qu'on quitte l'etape initiale (calcul post-CASE : sans retard).
-M3Locked             := (SeqStep &lt;&gt; E_MachineHomingTxState.HX0_REPOS);
+// Verrou translation : actif uniquement quand le cycle est reellement engage
+// (HX2..HX6), pas en HX1 (annonce + choix, aucun mouvement) qui peut s'armer seul
+// apres une perte de datum. Consomme par PRG_05 (M3_SafeStop_Aggregate).
+M3Locked             := CycleRunning;
 MachineHomingActive  := CycleRunning;
 Lifecycle.Busy       := CycleRunning;
 Lifecycle.Done       := CommitPublished AND (SeqStep = E_MachineHomingTxState.HX0_REPOS);

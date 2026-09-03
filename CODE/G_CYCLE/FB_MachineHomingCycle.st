@@ -184,8 +184,12 @@ DescendPermit       := DeadmanArmed AND JoystickPush;
 BucketPermit        := DeadmanArmed AND JoystickDeflected;
 
 // Fenetre de grace deceleration : armee des qu'on entre un step d'arret depuis une phase mouvement.
+// Fenetre de grace deceleration : armee sur tous les steps a l'arret (HX2N/HX3N +
+// HX4/HX5 ou les treuils doivent rester immobiles).
 SettleGraceTimer(IN := (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL)
-                       OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE), PT := CST_SettleGrace);
+                       OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE)
+                       OR (SeqStep = E_MachineHomingTxState.HX4_BUCKET_ADJUST)
+                       OR (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT), PT := CST_SettleGrace);
 
 // Conditions d'abandon fail-safe, chacune <= 3 termes (std 2quater).
 AxisHomingError  := M1Status.HomingError OR M2Status.HomingError;
@@ -444,7 +448,8 @@ CASE SeqStep OF
         ELSIF BucketPermit AND JoystickPush THEN
             CmdBucketOpen := TRUE;
         END_IF;
-        IF AxisHomingError THEN
+        // Fail-safe : erreur codeur OU treuil qui flue hors phase mouvement (grace ecoulee).
+        IF AxisHomingError OR MotionOutOfPhase THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
         ELSIF ExplicitValidationPulse AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
@@ -455,7 +460,7 @@ CASE SeqStep OF
 
     E_MachineHomingTxState.HX5_BUCKET_COMMIT:
         // Commit atomique de l'etat benne : impulsion 1 scan garantie via CommitDone.
-        IF AxisHomingError OR NOT BothAxesHomed THEN
+        IF AxisHomingError OR NOT BothAxesHomed OR MotionOutOfPhase THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
         ELSIF NOT CommitDone THEN
@@ -483,7 +488,10 @@ END_CASE;
 CycleRunning := (SeqStep <> E_MachineHomingTxState.HX0_REPOS)
              AND (SeqStep <> E_MachineHomingTxState.HX1_CHOICE);
 // Verrou translation : interdite des qu'on quitte l'etape initiale (calcul post-CASE : sans retard).
-M3Locked             := (SeqStep <> E_MachineHomingTxState.HX0_REPOS);
+// Verrou translation : actif uniquement quand le cycle est reellement engage
+// (HX2..HX6), pas en HX1 (annonce + choix, aucun mouvement) qui peut s'armer seul
+// apres une perte de datum. Consomme par PRG_05 (M3_SafeStop_Aggregate).
+M3Locked             := CycleRunning;
 MachineHomingActive  := CycleRunning;
 Lifecycle.Busy       := CycleRunning;
 Lifecycle.Done       := CommitPublished AND (SeqStep = E_MachineHomingTxState.HX0_REPOS);
