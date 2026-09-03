@@ -24,7 +24,7 @@ VAR_INPUT
     AbortCycle              : BOOL;         // --> [CMD] Demande abandon (IHM)
 
     // === CIBLES ET CONFIGURATION ===
-    SelTarget               : INT;          // --> [CFG] Cible selectionnee (1=Tremie, 2=P2, 3=P1, 4=Maintenance)
+    SelTarget               : INT;          // --> [CFG] RESERVE (C3.1 : le cycle part toujours de P1, plus de selection de cible). Cable, non consomme.
     SetDepthM               : REAL;         // --> [CFG] Profondeur de consigne (negative)
     SetOffsetM              : REAL;         // --> [CFG] Ecart de fermeture benne cible
 
@@ -125,7 +125,7 @@ VAR
     // === MEMORISATIONS & REGISTRES INTERNES ===
     TouchPositionM          : REAL;         // . [LOC] Position M1 memorisee lors du contact fond
     RaiseTargetM            : REAL;         // . [LOC] Profondeur de remontee memorisee
-    SelectedWorkTarget      : INT;          // . [LOC] Cible de travail memorisee
+    SelectedWorkTarget      : INT;          // . [LOC] Cible de travail (fige a 3=P1 depuis C3.1) - conserve pour diag/futur
     StepMaxPrevState        : E_CycleStep;  // . [LOC] Etape du scan precedent (rearmement StepMaxTimer au changement d'etape)
 
     // === TEMPORISATEURS INTERNES ===
@@ -430,6 +430,7 @@ CASE State OF
 
     E_CycleStep.X2_WORK_POS_SELECT:
         CycleStep := E_CycleStep.X2_WORK_POS_SELECT;
+        CycleStateStr := 'X2 - Mise en position P1 (translation)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
@@ -456,7 +457,7 @@ CASE State OF
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0402;
-            OperatorAction := 'Chariot cote maintenance : sortir du semi-auto, revenir a P1, relancer.';
+            OperatorAction := 'Chariot cote maintenance : Abandon cycle, revenir a P1 en maintenance, relancer.';
             TranslationCmd.ReqStart := FALSE;
         ELSE
             // Entre tremie et P1 : consigne "joystick vers P1", maintien requis.
