@@ -1,5 +1,5 @@
 (* =======================================================================
-   ⚙️ ST_fbMachineHomingCycle_Cfg — Réglages de FB_MachineHomingCycle
+   ⚙️ ST_fbMachineHomingCycle_Cfg — Réglages de FB_CycleMachineHoming
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : Réglages géométriques du référencement machine (cible haute
              M2/benne + écarts benne) + temporisations de garde du GRAFCET

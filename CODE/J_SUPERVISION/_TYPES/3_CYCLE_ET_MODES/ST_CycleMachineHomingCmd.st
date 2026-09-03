@@ -1,7 +1,7 @@
 (* ═══════════════════════════════════════════════════════════════
    🎮 ST_CycleMachineHomingCmd — Commandes IHM du cycle de référencement machine
    ───────────────────────────────────────────────────────────────
-   🎯 Cycle homing machine (FB_MachineHomingCycle) — orchestré en MAINT_N2.
+   🎯 Cycle homing machine (FB_CycleMachineHoming) — orchestré en MAINT_N2.
       Séparé de ST_CycleCmd (cycle SEMI_AUTO) et de ST_ModesCmd (modes de marche).
       Boutons momentanés uniquement ; réglages -> ST_CycleMachineHomingCfg.
    ═══════════════════════════════════════════════════════════════ *)

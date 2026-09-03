@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:32:20.821024" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:32:20.821024">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:56:11.107232" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:56:11.107232">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2012,7 +2012,7 @@ CASE State OF
 
         // AX1_INIT : verification des CONDITIONS INITIALES du cycle. AUCUN ordre de
         // mouvement, aucun referencement (datum M1/M2/benne = responsabilite exclusive
-        // FB_MachineHomingCycle). Conditions : codeurs M1/M2 references, aucun defaut
+        // FB_CycleMachineHoming). Conditions : codeurs M1/M2 references, aucun defaut
         // latche, treuils au FDC logiciel haut (TopPositionSensor), et posture de depart
         // OK (InitPositionOk : chariot M3 PAS a droite de P1 + treuils dans la plage
         // +/- 0,4 m autour du FDC haut, calcul PRG_03 ; positionnement fin P1 = AX2).

@@ -39,14 +39,14 @@
 
 ---
 
-## 1️⃣ GRAFCET Homing machine — `FB_MachineHomingCycle` (cible)
+## 1️⃣ GRAFCET Homing machine — `FB_CycleMachineHoming` (cible)
 
 > Aujourd'hui : pas de GRAFCET (échelle de priorité §6 + transaction 3 états §4 déclenchée
 > par le front de confirmation benne). Cible : vrai séquentiel `X0 → X4`.
 
 ### Séquence
 
-> Variables = noms réels `FB_MachineHomingCycle`. Avancement = `StepValidate` (front) / `StepValidateJoy` (§0.6), pas de bit dédié.
+> Variables = noms réels `FB_CycleMachineHoming`. Avancement = `StepValidate` (front) / `StepValidateJoy` (§0.6), pas de bit dédié.
 > 🟦🟨🟩🟥 = **STEP** · ⬇️ transition · ⬆️ retour · 🚪 sortie.
 
 #### 🌳 Tronc commun — jusqu'au CHOIX

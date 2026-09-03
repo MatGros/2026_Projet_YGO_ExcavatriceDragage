@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:15:59.877994" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:15:59.877994">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:56:11.306741" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:56:11.306741">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -61,7 +61,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    🔌 ST_fbMachineHomingCycle_HomingDemand — Demande de homing conjoint vers un axe
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Ordre de prise d'origine emis par FB_MachineHomingCycle vers
+   🎯 Rôle : Ordre de prise d'origine emis par FB_CycleMachineHoming vers
              une facade FB_Encoder. M1 : cible configuree. M2 : cible
              geometrique dynamique (top M1 configure +/- offset benne),
              jamais une position M1 live.

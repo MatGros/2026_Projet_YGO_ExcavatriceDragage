@@ -10455,7 +10455,7 @@ END_IF;
                 <string length="120" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Consigne opérateur en clair produite par FB_MachineHomingCycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Consigne opérateur en clair produite par FB_CycleMachineHoming</xhtml>
               </documentation>
             </variable>
             <variable name="BypassGlobalActive">
@@ -11412,7 +11412,7 @@ Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 // 2. PROGRESSION — le numéro et l'étape restent exclusivement ici
 // Format (AF-07 §5.1) : Macro: &lt;Cycle&gt; &gt; Sous-cycle: &lt;Étape&gt;
 // ═══════════════════════════════════════════════════════════════
-// Guide homing machine : source unique = FB_MachineHomingCycle (1 texte par étape).
+// Guide homing machine : source unique = FB_CycleMachineHoming (1 texte par étape).
 // Prioritaire tant que non valide (SEMI_AUTO est de toute façon interdit sans MachineHomed).
 IF (MachineHomingStep &gt; 0) AND (MachineHomingStep &lt;&gt; 60) THEN
     Banner.SequenceProgressText := CONCAT('Homing: ', MachineHomingInstruction);

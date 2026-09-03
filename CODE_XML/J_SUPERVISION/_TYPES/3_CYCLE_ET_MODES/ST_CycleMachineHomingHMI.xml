@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:46:03.766994" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:46:03.766994">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:56:11.464836" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:56:11.464836">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -36,7 +36,7 @@
                 <derived name="ST_MachineHoming" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image publiée du FB_MachineHomingCycle (SeqStep, Step, Instruction, Failed, ordres, …)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image publiée du FB_CycleMachineHoming (SeqStep, Step, Instruction, Failed, ordres, …)</xhtml>
               </documentation>
             </variable>
             <variable name="Cfg">
@@ -159,7 +159,7 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎮 ST_CycleMachineHomingCmd — Commandes IHM du cycle de référencement machine
    ───────────────────────────────────────────────────────────────
-   🎯 Cycle homing machine (FB_MachineHomingCycle) — orchestré en MAINT_N2.
+   🎯 Cycle homing machine (FB_CycleMachineHoming) — orchestré en MAINT_N2.
       Séparé de ST_CycleCmd (cycle SEMI_AUTO) et de ST_ModesCmd (modes de marche).
       Boutons momentanés uniquement ; réglages -&gt; ST_CycleMachineHomingCfg.
    ═══════════════════════════════════════════════════════════════</xhtml>

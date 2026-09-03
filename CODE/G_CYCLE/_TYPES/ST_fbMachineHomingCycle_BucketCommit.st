@@ -1,7 +1,7 @@
 (* =======================================================================
    🔌 ST_fbMachineHomingCycle_BucketCommit — Commit atomique de l'etat benne
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Impulsion 1 scan emise par FB_MachineHomingCycle vers FB_Bucket
+   🎯 Rôle : Impulsion 1 scan emise par FB_CycleMachineHoming vers FB_Bucket
              apres succes des DEUX homings. FB_Bucket reste seul proprietaire
              de IsOpen / IsClosed.
    🔒 Sécurité : CommitOpen et CommitClose mutuellement exclusifs (garanti

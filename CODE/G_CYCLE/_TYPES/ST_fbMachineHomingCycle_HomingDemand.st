@@ -1,7 +1,7 @@
 (* =======================================================================
    🔌 ST_fbMachineHomingCycle_HomingDemand — Demande de homing conjoint vers un axe
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Ordre de prise d'origine emis par FB_MachineHomingCycle vers
+   🎯 Rôle : Ordre de prise d'origine emis par FB_CycleMachineHoming vers
              une facade FB_Encoder. M1 : cible configuree. M2 : cible
              geometrique dynamique (top M1 configure +/- offset benne),
              jamais une position M1 live.

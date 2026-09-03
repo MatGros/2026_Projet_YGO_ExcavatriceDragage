@@ -3888,7 +3888,7 @@ CASE State OF
 
         // AX1_INIT : verification des CONDITIONS INITIALES du cycle. AUCUN ordre de
         // mouvement, aucun referencement (datum M1/M2/benne = responsabilite exclusive
-        // FB_MachineHomingCycle). Conditions : codeurs M1/M2 references, aucun defaut
+        // FB_CycleMachineHoming). Conditions : codeurs M1/M2 references, aucun defaut
         // latche, treuils au FDC logiciel haut (TopPositionSensor), et posture de depart
         // OK (InitPositionOk : chariot M3 PAS a droite de P1 + treuils dans la plage
         // +/- 0,4 m autour du FDC haut, calcul PRG_03 ; positionnement fin P1 = AX2).

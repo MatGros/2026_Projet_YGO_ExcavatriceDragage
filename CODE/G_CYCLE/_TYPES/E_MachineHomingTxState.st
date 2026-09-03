@@ -2,7 +2,7 @@
    ⚙️ E_MachineHomingTxState — Steps du GRAFCET de referencement machine
    ───────────────────────────────────────────────────────────────
    🎯 Role : Machine a etats sequentielle (GRAFCET) du cycle de homing
-             machine M1/M2/benne pilote par FB_MachineHomingCycle (§4).
+             machine M1/M2/benne pilote par FB_CycleMachineHoming (§4).
              Distincte de E_MachineHomingStep (echelle de priorite du
              guide operateur, libelles de diagnostic - §6).
    📄 Doc : DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md

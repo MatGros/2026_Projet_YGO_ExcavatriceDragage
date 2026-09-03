@@ -1,5 +1,5 @@
 (* =======================================================================
-   FB_MachineHomingCycle -- GRAFCET de homing machine (HX0..HX6 + HXF)
+   FB_CycleMachineHoming -- GRAFCET de homing machine (HX0..HX6 + HXF)
    Spec : DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md (partie 1)
    Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T233_IMPL_GRAFCET_HOMING_MACHINE.yaml
    Couverture : AC1, AC2, AC4, AC6, AC10, AC11, AC12 (AC13 = linkage/gates).
@@ -9,7 +9,7 @@
 
 SETUP
 VAR
-    Fb      : FB_MachineHomingCycle;
+    Fb      : FB_CycleMachineHoming;
     Cfg     : ST_fbMachineHomingCycle_Cfg;
     StNone  : ST_fbMachineHomingCycle_AxisHomingStatus;
     StHomed : ST_fbMachineHomingCycle_AxisHomingStatus;

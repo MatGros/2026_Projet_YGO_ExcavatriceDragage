@@ -7,7 +7,7 @@
 TYPE ST_CycleMachineHomingHMI :
 STRUCT
     Cmd   : ST_CycleMachineHomingCmd;
-    State : ST_MachineHoming;      (* Image publiée du FB_MachineHomingCycle (SeqStep, Step, Instruction, Failed, ordres, …) *)
+    State : ST_MachineHoming;      (* Image publiée du FB_CycleMachineHoming (SeqStep, Step, Instruction, Failed, ordres, …) *)
     Cfg   : ST_CycleMachineHomingCfg;
 END_STRUCT
 END_TYPE
