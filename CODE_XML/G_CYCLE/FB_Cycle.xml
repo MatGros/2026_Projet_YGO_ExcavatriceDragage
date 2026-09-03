@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:15:05.366874" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:15:05.366874">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:21:46.430112" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:21:46.430112">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1402,6 +1402,20 @@ Palier lent : referencement X1, remontee X5, controle X7, vidage X11</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier montee en charge X8 (bridage strict &lt;= 4, jamais palier 5)</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_CoupledPosBacklashM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Backstop anti-telescopage : ecart de position M1/M2 max tolere pendant les phases
+reellement couplees hors X7 (qui a deja son propre controle a 0,25 m). Aligne sur
+CfgSyncCriticalToleranceM = 0,50 m (AF-04 §5). FB_SyncDeviation (PRG_04) reste la
+surveillance primaire ; ceci est un garde-fou local au sequenceur.</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -1492,6 +1506,18 @@ instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(M1_CablePosM - M2_CableP
                           AND (State = E_CycleStep.X7_CTRL_ASCENT);
 instCauses[5].Latching := TRUE;
 instCauses[5].Texte    := 'Defaut de stabilisation / tolerance ecart codeurs en remontee controle';
+
+// Backstop anti-telescopage : ecart de position M1/M2 excessif pendant une phase
+// reellement couplee (X4 plongee, X5 remontee, X8 montee en charge). X7 a deja son
+// propre controle (instCauses[5]). Seuil grossier (0,50 m) : filet local si
+// FB_SyncDeviation (PRG_04) ne coupe pas.
+instCauses[6].Active   := (ABS(M1_CablePosM - M2_CablePosM) &gt; CST_CoupledPosBacklashM)
+                          AND JoystickDeflected
+                          AND ((State = E_CycleStep.X4_DESCEND_OPEN)
+                            OR (State = E_CycleStep.X5_BOTTOM_CONFIRMED)
+                            OR (State = E_CycleStep.X8_ASCENT_LOADED));
+instCauses[6].Latching := TRUE;
+instCauses[6].Texte    := 'Ecart de position M1/M2 excessif en phase couplee (anti-telescopage)';
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
