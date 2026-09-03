@@ -358,15 +358,17 @@ IF NOT Enable THEN
 END_IF;
 {endregion}
 
-{region "§7 Cible dynamique M2 & temporisations de garde"}
-// === §7 CIBLE DYNAMIQUE M2 + GARDES ==================================
+{region "§7 Cible M2 & temporisations de garde"}
+// === §7 CIBLE HOMING M2 + GARDES ====================================
+// HX3 = referencement des AXES M1/M2 au vol, PAS la benne (GEL homing) : M1 et M2
+// montent lies au meme capteur haut -> M2 se reference a la MEME position que M1
+// (cible nominale = CfgTopHomingTarget_M). L'offset geometrique benne fermee
+// (CfgOffsetClose_M) est applique par le COMMIT benne (HX5 -> FB_Bucket), pas au
+// datum de l'axe. Cible dynamique (top + offset ~23 m) supprimee ici : elle creait
+// un ecart apparent M1/M2 de ~15 m au preset -> FB_WinchSync SafeStop -> Fault.Latched.
 M1Demand.UseDynamicTarget := FALSE;
-IF (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) THEN
-    M2Demand.UseDynamicTarget := TRUE;
-    M2Demand.DynamicTarget_M  := Cfg.CfgTopHomingTarget_M + Cfg.CfgOffsetClose_M;
-ELSE
-    M2Demand.UseDynamicTarget := FALSE;
-END_IF;
+M2Demand.UseDynamicTarget := FALSE;
+M2Demand.DynamicTarget_M  := 0.0;
 
 ClimbTimer(IN := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) AND (Cfg.CfgTimeoutClimb > T#0s),
            PT := Cfg.CfgTimeoutClimb);
