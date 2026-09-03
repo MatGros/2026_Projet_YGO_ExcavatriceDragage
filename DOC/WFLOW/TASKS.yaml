@@ -2627,27 +2627,6 @@ tasks:
   - Interlock de sécurité inchangé (Cause brute seule arbitre)
   bloque_par:
   - T173-A
-- id: T173-C
-  parent_id: T173
-  statut: ⬜
-  criticite: C2
-  domaine: TEST_AUTO_CI
-  agent: ORCHESTRATEUR
-  date: '2026-08-28T23:30:00+02:00'
-  titre: Tests & non-régression réarmement AU (snapshot + CI)
-  contexte: 'Après T173-B, valider les 4 scénarios d''armement (nominal, échec contacteur timeout, coupure volontaire, 1er
-    boot) en simulation : chaque échec doit produire le message attendu, le nominal reste sans message. Non-régression CI
-    (gates) et snapshots GVL_Troubleshooting. 🔁 **2026-08-31 : ABSORBÉ par le refactor emergency en cours** — la validation
-    des 4 scénarios se fait sur la structure refactorée (FB_Safety_EmergencyManagement + IHM OperatorMessage).'
-  description: 'Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-C_TESTS.yaml. Suite de validation par snapshots en simulation
-    + tests unitaires de la table de vérité des sorties de séquence, gates palier C.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-C_TESTS.yaml
-  objectifs:
-  - Les 4 scénarios validés en simulation (messages conformes)
-  - Aucune sortie silencieuse résiduelle prouvée par la table de vérité
-  - run_all_gates palier C PASS
-  bloque_par:
-  - T173-B
 - id: T174
   statut: ✅
   criticite: C3
