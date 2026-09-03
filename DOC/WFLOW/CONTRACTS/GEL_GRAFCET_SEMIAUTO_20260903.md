@@ -61,7 +61,7 @@
 | **AX3_OPEN_BUCKET** (3) | 🟩 step — 🪣 benne seule | treuils **0** · msg « **joystick poussé** : ouverture benne » · `BucketCmd.ReqOpen := CycleMotionPermit` — ouverture jusqu'au **FDC logiciel « benne ouverte »** (seuil) |
 | **AT3** | ⬇️ *(fluide — sans temps mort)* | `JoystickDeflected AND Benne_Done AND Benne_IsOpen` → `ReqOpen := FALSE` → **AX4** *(enchaînement direct si joystick maintenu poussé + armé)* |
 | **AX4_DESCEND_OPEN** (4) | 🟩 step — 🌊 plongée couplée + **recherche de couche** | M1+M2 `RunRequest := CycleMotionPermit`, `ReqDescend`, `BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit`, `ExpectedDirection := -1`. **Cycle diving intégré** : `StepTgt` **borné palier 4 mini ET 4 maxi** (`CST_StepDive := 4`). **Palier 5 interdit** en AX4 → **sortie cycle sur défaut latché**. La **tempo de séquencement des contacteurs de vitesse est conservée** (montée progressive 1→4, pas de saut direct au palier 4). |
-| **AT4** | ⬇️ | `JoystickDeflected AND KoboldContactFond` → treuils **0** · `TouchPositionM := M1_CablePosM` · `RaiseTargetM := TouchPositionM + 0,5` (borné legal) → **AX5** |
+| **AT4** | ⬇️ | fin sous-séquence diving (D3, fond touché) → treuils **0** · `TouchPositionM := M1_CablePosM` · `RaiseTargetM := TouchPositionM + 0,5` (borné legal) → **AX5** |
 | **AX5_BOTTOM_CONFIRMED** (5) | 🟩 step — ⬆️ montée lente | M1+M2 `RunRequest := CycleMotionPermit`, `ReqAscent`, `StepTgt := CST_StepSlow` · `ExpectedDirection := 1` *(inversion de sens)* |
 | **AT5** | ⬇️ | `JoystickDeflected AND M1&M2 ≥ RaiseTargetM` → treuils **0** → **AX6** |
 | **AX6_CLOSE_BUCKET** (6) | 🟩 step — 🪣 benne seule | M1+M2 **explicitement 0** · `BucketCmd.ReqClose := CycleMotionPermit` |
@@ -84,6 +84,20 @@
 | **AX13_DONE_SYNC** (13) | 🟩 step — ✅ fin | treuils / translation **0** · `Lifecycle.Done := TRUE`, `Busy := FALSE` · `SampleCount + 1` + `LastCycleDuration := CurrentCycleElapsed` (cadré `SampleCountDone`) |
 | **AT13** | ⬇️ | `StartEdge.Q` → `SampleCountDone := FALSE` → **AX0** *(rebouclage direct — Q4)* |
 | **AX_STAB** (14) *(ex-`STABILIZING`)* | 🟥 step — repli défaut | tout **0** · `BucketCmd.ReqKoboldMeasureEnable := FALSE` · msg « acquitter le defaut » |
+
+### 🌊 Sous-séquence diving dans AX4 (réutilise `FB_DiveSearch` / `E_DiveSearchState`)
+
+> ⚠️ **Non figé — à implémenter dans une passe dédiée** (réutilisation `FB_DiveSearch`).
+> **Joystick palier 4 maintenu poussé + armé pendant TOUTE la partie diving, y compris sous l'eau** :
+> si l'opérateur relâche, la détection du fond est impossible → **proposer une nouvelle tentative** (retour D0 via remontée position haute).
+
+| Phase | Entrée | Action | Sortie |
+|---|---|---|---|
+| **D0 — descente palier 4** | entrée AX4, joystick poussé + armé | M1+M2 `ReqDescend`, `StepTgt = 4` (mini **et** maxi). Tempo contacteurs conservée (1→4 progressif). Palier 5 → **défaut latché** (cause 8). | altimétrie `DiveStartMin_M` atteinte → D1 |
+| **D1 — init Kobold** | altimétrie de lancement atteinte | **enclencher le contacteur Kobold** (`ReqKoboldMeasureEnable`). Vérifier **retour contacteur** ET **état DI Kobold** cohérents. | retours OK → D2 · retours KO → **D_ERR** |
+| **D_ERR — séquence Kobold init KO** | retour contacteur / DI incohérent, **ou** joystick relâché pendant le diving | msg « **Problème séquence Kobold init — reprise ?** » (ou « Joystick relâché — reprise ? »). Treuils **0**, contacteur Kobold coupé. Sur acquittement : **remontée position haute** (FDC haut) puis **nouvelle tentative** → D0. | reprise acquittée → D0 · abandon → `GT-abort` |
+| **D2 — recherche fond (sous l'eau)** | init Kobold OK, **joystick toujours maintenu** | descente assistée maintenue, surveillance immersion / fond (`FB_DiveSearch`). Joystick relâché → **D_ERR** (fond non détectable). | perte Kobold (front tombant `KoboldImmersed`) → D3 |
+| **D3 — fond touché** | perte Kobold | **coupure instantanée** de toutes les commandes treuils (même scan). Positionne la variable d'info existante « fond touché » (`KoboldContactFond` / `Outputs.BottomConfirmed`). | → **AT4** → **AX5** |
 
 ### ⬆️ Transverses (hors CASE, chaque scan)
 
@@ -128,6 +142,7 @@
 | **Q8** | 🟡 | « benne référencée » en AX1_INIT : quelle entrée ? (`FB_CycleSemiAuto` n'a pas de flag benne-datum ; proxy = `MachineHomed` via gate FB_Modes, ou ajouter un input dédié). |
 | **Q9** | ✅ | **Cycle diving intégré dans AX4** : `StepTgt` borné **palier 4 mini ET maxi** — `CST_StepDive` passe de 3 à **4** (`CST_StepDive := 4`). Palier 5 en AX4 → défaut latché (cause 8). Tempo de séquencement des contacteurs de vitesse **conservée** (montée progressive, pas de saut direct). |
 | **Q10** | ✅ | **AX2 sans commande M3** : le cycle ne pilote pas la translation (opérateur + `PRG_05`). Surveillance treuils au FDC haut → sortie défaut (cause 7). Contrôle « chariot pas à droite de P1 » = **AX1_INIT** uniquement (l'ancien `AT2b` msg maintenance est supprimé). |
+| **Q11** | 🟡 à implémenter | **Sous-séquence diving dans AX4** (D0→D3, réutilise `FB_DiveSearch`) : init Kobold à l'altimétrie de lancement avec vérif retour contacteur + DI ; échec → « Problème séquence Kobold init » + reprise (remontée position haute, nouvelle tentative). **Joystick palier 4 maintenu poussé+armé sur tout le diving, sous l'eau compris** ; relâché → reprise (fond non détectable). Perte Kobold → coupure instantanée + variable d'info « fond touché ». Non figé : passe de code dédiée. |
 
 ---
 
