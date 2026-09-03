@@ -500,10 +500,12 @@ HwInM1.PresetStatusBit    := FALSE;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
+    // Homing manuel autorise en maintenance des que M1 est a l'arret (garde reelle :
+    // pas de preset codeur pendant que ca tourne). Plus d'exigence frein ferme /
+    // sur-capteur -> l'operateur peut re-homer sans condition apres changement de config.
     HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
                                AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 2)
-                               AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
-                                                                       AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
+                               AND (ABS(Data.EncoderM1.Measurement.Speed_Mps) < 0.05))
                               OR instMachineHomingCycle.M1Demand.HomeReq),
     HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome
                              OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
@@ -552,10 +554,12 @@ HwInM2.PresetStatusBit    := FALSE;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
+    // Homing manuel autorise en maintenance des que M2 est a l'arret (garde reelle :
+    // pas de preset codeur pendant que ca tourne). Plus d'exigence frein ferme /
+    // sur-capteur -> l'operateur peut re-homer sans condition apres changement de config.
     HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
                                AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 1)
-                               AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
-                                                                       AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
+                               AND (ABS(Data.EncoderM2.Measurement.Speed_Mps) < 0.05))
                               OR instMachineHomingCycle.M2Demand.HomeReq),
     HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome
                              OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
