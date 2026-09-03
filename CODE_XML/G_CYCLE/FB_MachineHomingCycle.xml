@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:58:20.189392" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:58:20.189392">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:09:08.289884" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:09:08.289884">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1882,59 +1882,59 @@ MachineHomed := BothAxesHomed AND CommitOrOffsetValid
 // est le GRAFCET (§8, CASE SeqStep). Precedent : FB_Modes.st (echelle IF/ELSIF).
 IF Fault.Latched THEN
     MachineHomingStep := E_MachineHomingStep.FAILED;
-    MachineHomingInstruction := 'Defaut homing : acquitter (Reset)';
+    MachineHomingInstruction := 'Erreur ou Echec homing - Acquitter (Reset)';
 ELSIF MachineHomingFailed OR (SeqStep = E_MachineHomingTxState.HXF_FAILED) THEN
     MachineHomingStep := E_MachineHomingStep.FAILED;
-    MachineHomingInstruction := 'HXF - Homing incomplet : recommencer en N2';
+    MachineHomingInstruction := 'HXF - Homing incomplet - Recommencer en N2';
 ELSIF MachineHomingLossSafeStop THEN
     MachineHomingStep := E_MachineHomingStep.LOSS_SAFESTOP;
-    MachineHomingInstruction := 'Reference perdue : arret controle';
+    MachineHomingInstruction := 'Reference perdue - Arret controle';
 ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
-    MachineHomingInstruction := 'HX2 - Non ref : monter palier 1 au capteur';
+    MachineHomingInstruction := 'HX2 - RefHoming Tirer JOY palier 1 vers FDC haut';
 ELSIF (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'HX2N - Non ref : neutre puis pousser (descente)';
+    MachineHomingInstruction := 'HX2N - RefHoming JOY au neutre puis pousser (descente)';
 ELSIF (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) THEN
     MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
-    MachineHomingInstruction := 'HX3 - Non ref : descente P1, homing M1 M2 au vol';
+    MachineHomingInstruction := 'HX3 - RefHoming Pousser JOY palier 1, homing M1/M2 au vol';
 ELSIF (SeqStep = E_MachineHomingTxState.HX3N_PAUSE) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'HX3N - Joystick au neutre (non ref, palier 1)';
+    MachineHomingInstruction := 'HX3N - RefHoming JOY au neutre (arret avant benne)';
 ELSIF (SeqStep = E_MachineHomingTxState.HX4_BUCKET_ADJUST) THEN
     MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-    MachineHomingInstruction := 'HX4 - Fermer benne puis valider (3 appuis joystick)';
+    MachineHomingInstruction := 'HX4 - RefHoming Fermer benne puis valider (3 appuis JOY)';
 ELSIF (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT)
       OR (SeqStep = E_MachineHomingTxState.HX6_HOMED) THEN
     MachineHomingStep := E_MachineHomingStep.VALID;
-    MachineHomingInstruction := 'HX5 - Etat benne enregistre : fin homing';
+    MachineHomingInstruction := 'HX5 - RefHoming Etat benne enregistre - fin homing';
 ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) THEN
     IF Mode &lt;&gt; E_Mode.MAINT_N2 THEN
         MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
-        MachineHomingInstruction := 'HX1 - Non ref : passer en MAINT_N2 pour referencer';
+        MachineHomingInstruction := 'HX1 - RefHoming Passer en MAINT_N2 pour referencer';
     ELSIF NOT TopPositionSensor THEN
         MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
-        MachineHomingInstruction := 'HX1 - Non ref : valider (3 appuis) pour lancer le homing';
+        MachineHomingInstruction := 'HX1 - RefHoming Valider (3 appuis JOY) pour lancer';
     ELSE
         MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-        MachineHomingInstruction := 'HX1 - Non ref capteur haut : valider homing (3 appuis)';
+        MachineHomingInstruction := 'HX1 - RefHoming Sur FDC haut - valider (3 appuis JOY)';
     END_IF;
 ELSIF NOT M1Status.HomedAndReliable AND NOT M2Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;
-    MachineHomingInstruction := 'HX0 - M1 M2 non ref : lancer homing N2 (3 appuis ou IHM)';
+    MachineHomingInstruction := 'HX0 - RefHoming M1+M2 non ref - lancer (3 appuis JOY ou IHM)';
 ELSIF NOT M1Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.M1_NOT_HOMED;
-    MachineHomingInstruction := 'HX0 - M1 non ref : relancer le homing machine';
+    MachineHomingInstruction := 'HX0 - RefHoming M1 non ref - relancer le homing';
 ELSIF NOT M2Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.M2_NOT_HOMED;
-    MachineHomingInstruction := 'HX0 - M2 non ref : relancer le homing machine';
+    MachineHomingInstruction := 'HX0 - RefHoming M2 non ref - relancer le homing';
 ELSIF NOT (CommitPublished OR BucketOffsetValid) THEN
     IF Mode &lt;&gt; E_Mode.MAINT_N2 THEN
         MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
-        MachineHomingInstruction := 'HX0 - Offset benne inconnu : passer en N2';
+        MachineHomingInstruction := 'HX0 - RefHoming Offset benne inconnu - passer en N2';
     ELSE
         MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-        MachineHomingInstruction := 'HX0 - Lancer le homing (etat benne)';
+        MachineHomingInstruction := 'HX0 - RefHoming Lancer le homing (etat benne)';
     END_IF;
 ELSE
     MachineHomingStep := E_MachineHomingStep.VALID;
