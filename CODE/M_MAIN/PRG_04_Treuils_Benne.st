@@ -350,7 +350,6 @@ instBucket(
     BucketState        := _BucketState,
     InhibitM1           := PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     InhibitM2           := PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
-    ManualJogM2Active   := ManualBucketJogActive,
     // Bypass benne (n°25 de la matrice) — effectif tous modes si armé (dérogation MES 2026, AF-05 §4bis)
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );

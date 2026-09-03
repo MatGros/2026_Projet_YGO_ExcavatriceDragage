@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T16:35:11.327081" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T16:35:11.327081">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T17:10:20.032505" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T17:10:20.032505">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -5973,7 +5973,6 @@ instBucket(
     BucketState        := _BucketState,
     InhibitM1           := PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     InhibitM2           := PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
-    ManualJogM2Active   := ManualBucketJogActive,
     // Bypass benne (n°25 de la matrice) — effectif tous modes si armé (dérogation MES 2026, AF-05 §4bis)
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );
@@ -7433,14 +7432,6 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Treuil M2 inhibe</xhtml>
               </documentation>
             </variable>
-            <variable name="ManualJogM2Active">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Pilotage unitaire benne M2 (WinchSel=2, MAINT) : detection passive d'etat sur position</xhtml>
-              </documentation>
-            </variable>
             <variable name="Config">
               <type>
                 <derived name="ST_fbBucket_Config" />
@@ -8114,23 +8105,11 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
     END_IF;
 END_IF;
 
-// --- Detection passive d'etat benne sur position (jog unitaire M2, hors sequence auto) --
-// En pilotage unitaire benne (WinchSel=2), FB_Bucket ne pilote pas l'ouverture/fermeture
-// mais l'etat memorise doit suivre la position : on accepte "ouvert" / "ferme" au meme
-// seuil que l'arret jog (Offset +/- Anticipation, tous deux reglables IHM). Le point
-// d'arret du jog = l'etat accepte. Zone intermediaire : etat inchange (memorise).
-// Uniquement M1 ET M2 references : sinon CablePosM1/M2 (donc le delta) sont sans valeur.
-IF ManualJogM2Active AND HomedM1 AND HomedM2 AND NOT Lifecycle.Busy AND NOT SevereError THEN
-    IF CablePosM2 &lt;= (CablePosM1 + Config.OffsetOpenM + Config.OpenAnticipationM) THEN
-        BucketState.IsOpen        := TRUE;
-        BucketState.IsClosed      := FALSE;
-        BucketState.StateIncoherent := FALSE;
-    ELSIF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
-        BucketState.IsClosed      := TRUE;
-        BucketState.IsOpen        := FALSE;
-        BucketState.StateIncoherent := FALSE;
-    END_IF;
-END_IF;
+// Note : la detection passive d'etat benne sur position en jog unitaire M2 a ete
+// retiree (elle basculait IsOpen/IsClosed au simple passage dans une bande -&gt;
+// ActiveOffsetM faux -&gt; ecart synchro fantome / MecaE au retour en couple).
+// L'etat benne reste fixe UNIQUEMENT par les confirmations explicites
+// (ConfirmOpenPosition / ConfirmClosePosition) et les commits homing. Deterministe.
 {endregion}
 
 {region "§5 Offset actif et validite"}
