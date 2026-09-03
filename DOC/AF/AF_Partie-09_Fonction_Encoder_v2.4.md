@@ -426,8 +426,13 @@ PendingHomingRefRaw := CentrePts − TargetPoints                   // référen
 - Un homing à 0 m ⇒ `TargetPoints = 0` ⇒ le compteur est centré et la référence vaut le centre :
   la position physique du moment **lit 0.0 m**. Un homing à 8.5 m ⇒ `TargetPoints = 34 816 pts`
   ⇒ `HomingRefRaw = Centre − 34 816`.
-- **Cible dynamique benne M2** : la cible (`CablePosM1` ± offset) n'est acceptée que si M1 est
-  `HomedAndReliable` — sinon la cible est bâtie sur une mesure non fiable, homing refusé
+- **Cible dynamique benne M2 (homing machine)** : la cible haute de M2 est sourcée **depuis la
+  config du capteur haut de M2** (`_WinchM2CfgPersist.CfgTopSensorPos_M`), **pas** depuis la
+  config M1 ni une position M1 live — la géométrie de mouflage de la benne (M2) diffère de celle
+  de la retenue (M1), les deux hauteurs hautes ne coïncident pas. ⚠️ **Fix 2026-09-03**
+  (`PRG_02_Acquisition.st:443`) : la cible était à tort bâtie sur la config M1.
+  Un usage « cible = `CablePosM1` ± offset » (suivi live de M1) n'est acceptable que si M1 est
+  `HomedAndReliable` — sinon la cible repose sur une mesure non fiable, homing refusé
   (`ErrorId` dédié).
 - **Fenêtre de saut** : entre l'ordre preset et sa prise en compte par le codeur, `RawPos` passe
   de la position physique au centre (~saut de compteur) ; pendant cette fenêtre les consommateurs
@@ -451,7 +456,15 @@ centre-plage, `LastKnownRawPos` vit près du centre : un wrap ne peut plus produ
 `BtnHome`. **`BtnHomingAtZero`** : force homing au centre exact (0.0m), usage mise en service —
 le compteur est centré à l'identique de tout autre mode.
 
-**Référence conjointe benne (T185, absorbe T132)** : `PRG_02_Acquisition` appelle `FB_MachineHomingCycle` avant les deux façades `FB_Encoder`. Le parcours IHM propose « benne fermée » par défaut, sans forcer l'état ; l'opérateur peut confirmer « ouverte » s'il le constate. Après confirmation visuelle en N2, capteur haut commun actif et arrêt mécanique confirmé, le cycle émet les deux demandes dans le même scan. M1 reçoit la cible haut configurée ; M2 reçoit exclusivement la cible haute configurée M1 + `OffsetOpenM|OffsetCloseM`, jamais une position M1 live. Les consommateurs de position restent gelés pendant `HomingLifecycle.Busy`. Le résultat des deux homings est ensuite committé atomiquement par `FB_Bucket`.
+**Référence conjointe benne (T185, absorbe T132)** : `PRG_02_Acquisition` appelle `FB_MachineHomingCycle` avant les deux façades `FB_Encoder`. Le parcours IHM propose « benne fermée » par défaut, sans forcer l'état ; l'opérateur peut confirmer « ouverte » s'il le constate. Après confirmation visuelle en N2, capteur haut commun actif et arrêt mécanique confirmé, le cycle émet les deux demandes dans le même scan. M1 reçoit sa cible haute configurée (`_WinchM1CfgPersist.CfgTopSensorPos_M`) ; **M2 reçoit sa PROPRE cible haute configurée** (`_WinchM2CfgPersist.CfgTopSensorPos_M`) `± OffsetClose_M`, **jamais la config M1 ni une position M1 live** (mouflage benne distinct — cf. §5, fix 2026-09-03). Les consommateurs de position restent gelés pendant `HomingLifecycle.Busy`. Le résultat des deux homings est ensuite committé atomiquement par `FB_Bucket`.
+
+> ❓ **QUESTION OUVERTE RES-004 — offset benne au homing machine** : le cycle de homing machine
+> (`FB_MachineHomingCycle`, refonte GRAFCET HX0..HX6 du 2026-09-03) référence **toujours** l'état
+> **« benne fermée »** (offset `Close`). Une variante **« benne ouverte »** (offset `Open`)
+> existait dans une version antérieure (cf. `OffsetOpenM` cité plus haut) et **n'est plus
+> implémentée**. À trancher : **existe-t-il un besoin métier de référencer benne ouverte**
+> (ex. benne non fermable — bloc rocheux, obstruction, cf. AF-10 §7.5) ? Si oui, restaurer le
+> choix d'offset dans le parcours IHM du cycle. **Non tranché — ne pas décider ici.**
 
 ---
 
@@ -555,6 +568,12 @@ dédiée (AF14) — pointeur, pas de duplication ici.
 
 ## 10 · 📜 Suivi historique
 
+- **v2.4 (fix) — 2026-09-03** : §5 — cible dynamique du homing machine M2 (benne) clarifiée :
+  sourcée depuis `_WinchM2CfgPersist.CfgTopSensorPos_M` (config capteur haut de M2), **pas** M1
+  (fix `PRG_02_Acquisition.st:443` ; mouflage benne distinct). Paragraphe T185 corrigé en
+  conséquence. Question ouverte **RES-004** consignée (§5 + §11) : le homing machine référence
+  toujours « benne fermée » (offset `Close`) ; variante « benne ouverte » retirée — besoin
+  métier à trancher. Lié à la refonte GRAFCET `FB_MachineHomingCycle` HX0..HX6 (2026-09-03).
 - **v2.3 → v2.4 (2026-08-30)** : **Exigence preset centre-plage (F09.08, TC-P09-070)** — à la
   suite du diagnostic `TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md` : le design
   d'origine (commit `26217dd9`, 2026-08-21) référençait le codeur au centre de plage
@@ -604,6 +623,10 @@ dédiée (AF14) — pointeur, pas de duplication ici.
 - **Simulation wrap** : `FB_Sim_Encoder` (AF13) clampe le compteur à 0 en descente au lieu
   d'enrouler — le wrap est intestable sur le banc actuel ; à corriger pour le garde-fou
   TC-P09-070 (règle `fix:`+`guard:`).
+- **RES-004 — offset benne au homing machine** : le cycle homing machine référence toujours
+  « benne fermée » (offset `Close`) ; la variante « benne ouverte » (offset `Open`) n'est plus
+  implémentée. Besoin métier de référencer benne ouverte (benne non fermable) ? À trancher —
+  voir §5 (question ouverte).
 - **Forçage état benne sans gate codeur** (`FB_Bucket` ConfirmOpen/ConfirmClose, AF10) : aucun
   contrôle `HomedAndReliable` — usage « sans codeur » documenté en mise en service
   (`ST_HomingChecklist`) mais risqué près d'une borne ; à cadrer côté AF10.

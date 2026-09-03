@@ -4,6 +4,13 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `GRAFCET_HOMING_HX0-HX6_T146` — 2026-09-03 — refonte séquentielle homing machine + fix cible M2 + plafond palier hors homing
+- **Branche** : `backup/mes-septembre-20260902` (application CODESYS manuelle par l'humain).
+- **`FB_MachineHomingCycle`** réécrit en **GRAFCET séquentiel `HX0..HX6` + `HXF`** (spec : `DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md`).
+- **Fix cible dynamique homing M2 (benne)** : sourcée depuis la config capteur haut de M2 (`_WinchM2CfgPersist.CfgTopSensorPos_M`) au lieu de M1 (`PRG_02_Acquisition.st:443`) — mouflage benne distinct.
+- **Fix sécurité C4 ISO 13849 (interim)** : `PRG_04_Treuils_Benne.st` §5ter — codeurs M1 ET/OU M2 non `HomedAndReliable` ⇒ plafond palier de vitesse = 1 (montée ET descente, les 2 treuils). Posture « bridage hors homing » fail-safe. Décision de posture **à contresigner** : `DOC/WFLOW/AUDITS/DESIGN/DECISIONS_T146_ARBITRAGE_ISO13849.md`.
+- **DOC alignée** : AF-09 v2.4 (fix §5 + RES-004), AF-10 v2.1 (fix §7.7). Reste ouvert T146 : visa ISO 13849, règle débridage capteur haut, volets TremieFull / SpeedGuardEnable.
+
 ### `AF01_v1.4_EMERGENCY_MANAGEMENT_T173C` — 2026-09-02 — alignement physique, 3 bypass MES & validation CI
 - **Spec AF01 v1.3→v1.4 (`FB_Safety_EmergencyManagement_v1.4.md`)** :
   - **3 Bypass MES orthogonaux** : `BypassArmingPreconditions`, `BypassRedundancyTest`, `BypassPowerCutOff` (décomposition `CutOffActive`).
