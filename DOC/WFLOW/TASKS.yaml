@@ -5280,7 +5280,7 @@ tasks:
   bloque_par: []
 - id: T238
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: SEQUENCEUR SEMI_AUTO / ASSISTANTS
   agent: ''
@@ -5319,16 +5319,42 @@ tasks:
     -> Le retrait est une DECISION FONCTIONNELLE (abandon de l'assistance mode
     manuel ?), pas un nettoyage mecanique. BLOQUE tant que l'humain ne confirme
     pas l'abandon de l'assistance dragage manuelle.
+  decision_2026_09_03: >
+    DECISION HUMAINE (2026-09-03) : abandon confirme de l'assistance dragage en
+    mode manuel. Plus de sous-cycle en MAINT_N1/N2 : il reste homing machine,
+    SEMI_AUTO, et le pilotage manuel N1/N2 SANS assistant. -> retrait / archivage
+    de FB_DiveSearch, FB_ExtractionAssist, et du vidage tremie legacy.
+  plan_phases: >
+    P1 - GVL_IHM : retrait des 3 slots CycleDiveSearch / CycleExtraction /
+      CycleDumpAtTremie (+ ST_CycleAssistToggles si plus reference).
+    P2 - PRG_03 : retrait instDiveSearch / instExtractionAssist + bus
+      DiveSearchInputs / ExtractionAssistInputs + toute la branche ELSE
+      (non-SEMI_AUTO) de §4 ; SequenceState en mode assist -> valeurs neutres.
+      Retrait DumpAtTremie* / BypassKobold* / BottomPositionConfirmed.
+    P3 - PRG_04 : neutraliser les permis issus des assistants -
+      DescendPermitDiveBucketOpen -> TRUE (descente libre MAINT manuel) ;
+      ExtractionAssistActive -> FALSE (montee libre) ; MinStepDown -> 0.
+      ATTENTION surveillance Kobold "descente normale" (PRG_04:596-631) : ce
+      n'est PAS l'assistant, c'est un arret-auto Kobold hors FB - a CONSERVER,
+      migrer ses reglages ImmersionUpper_M/Lower_M hors _CycleDiveSearchCfgPersist.
+    P4 - PRG_07 : retrait des 3 ponts instCfgPersistBridgeCycleDiveSearch/
+      Extraction/DumpAtTremie + GVL_PERSISTENT (_Cycle*CfgPersist).
+    P5 - migration DiveStartMin_M (altimetrie lancement Kobold GRAFCET AT4) +
+      ImmersionUpper/Lower_M -> ST_CycleCfg ou ST_CommunCfg (a trancher).
+    P6 - FB_TroubleshootingView : retrait section M_AssistanceDragage.
+      FB_Hmi_BannerFormatter : retrait input DiveState + branche diving vestigiale.
+      ST_SequencePublicState : retrait champs Dive* / Extraction*.
+    P7 - archivage ARCHIVES/ des FB + 12 types + 3 ponts. Registry CI + tests.
+    Commit + gates + review entre chaque phase (P1..P7).
   objectifs:
-  - '[FAIT] Audit consommateurs : assistants actifs en MAINT manuel, PAS remplaces par T237'
-  - '[BLOQUE] Decision humaine : abandonne-t-on l assistance dragage en mode manuel ?'
-  - 'Si OUI : retrait FB + instances + 3 ponts + 3 blocs persist + 12 types + slots GVL_IHM'
-  - 'Migration DiveStartMin_M (altimetrie lancement Kobold) hors _CycleDiveSearchCfgPersist'
-  - 'Nettoyage troubleshooting (M_AssistanceDragage) + banner (DiveState)'
-  - Bundle regenere, G200 PASS, gates palier C au niveau baseline, tests CI verts
+  - '[FAIT] Audit : assistants = MAINT manuel, non remplaces par T237'
+  - '[FAIT] Decision humaine : abandon assistance manuelle confirme'
+  - 'P1..P7 (voir plan_phases) - refactor C3, commit + gates entre phases'
+  - 'CONSERVER : arret-auto Kobold descente normale (PRG_04:596-631, hors FB)'
+  - 'Migrer DiveStartMin_M + ImmersionUpper/Lower_M hors _CycleDiveSearchCfgPersist'
+  - Bundle regenere, G200 PASS, gates palier C baseline, tests CI verts, NON TESTE BANC
   contrat: ''
-  bloque_par:
-  - HUMAIN (decision abandon assistance manuelle)
+  bloque_par: []
 - id: T239
   parent_id: ''
   statut: ✅
