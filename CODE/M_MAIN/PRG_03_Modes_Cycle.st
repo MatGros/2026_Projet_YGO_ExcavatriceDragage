@@ -348,6 +348,15 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqWinchM2.ReqDescend := FALSE;
     Data.ReqProgram.ReqWinchM2.StepTgt  := 0;
 
+    // Cycle de homing machine (MAINT_N2 uniquement) : route ses ordres treuil couple
+    // M1+M2 palier 1 (HX2 montee / HX3 descente). Le FB gate deja sur permis operateur
+    // maintenu (homme-mort + joystick) et ne commande qu'en HX2/HX3 ; PRG_04 conserve
+    // ses interlocks maintenance. Copie struct entiere (ST_ProgramWinchRequest).
+    IF instModes.Auth.Mode = E_Mode.MAINT_N2 THEN
+        Data.ReqProgram.ReqWinchM1 := PRG_02_Acquisition.Data.MachineHoming.CmdWinchM1;
+        Data.ReqProgram.ReqWinchM2 := PRG_02_Acquisition.Data.MachineHoming.CmdWinchM2;
+    END_IF;
+
     Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;
 
@@ -371,6 +380,15 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqBucket.AscentPermit                := instExtractionAssist.AscentPermit;
     // Plancher de plongee : produit par FB_DiveSearch, consomme par PRG_04 §5ter.
     Data.ReqProgram.ReqBucket.MinStepDown                 := instDiveSearch.Outputs.MinStepDown;
+
+    // Cycle de homing machine (MAINT_N2) : ordres benne palier 1 sans FDC soft (HX4).
+    // Mutuellement exclusifs cote FB ; s'ajoutent aux demandes assistants (non actifs pendant HX4).
+    IF instModes.Auth.Mode = E_Mode.MAINT_N2 THEN
+        Data.ReqProgram.ReqBucket.ReqOpen  := Data.ReqProgram.ReqBucket.ReqOpen
+                                              OR PRG_02_Acquisition.Data.MachineHoming.CmdBucketOpen;
+        Data.ReqProgram.ReqBucket.ReqClose := Data.ReqProgram.ReqBucket.ReqClose
+                                              OR PRG_02_Acquisition.Data.MachineHoming.CmdBucketClose;
+    END_IF;
 
     // États de séquence
     IF instDiveSearch.Lifecycle.Busy THEN
