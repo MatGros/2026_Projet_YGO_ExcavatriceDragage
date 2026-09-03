@@ -357,6 +357,22 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> ST
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Etabli en X4_DESCEND_OPEN');
 
+    (* Call 5bis : 1 scan de stabilisation en X4 -> StepMaxTimer armee (StepMaxPrevState = X4)
+       apres le rearmement au changement d'etape. Sans ce scan, la tempo est encore a 0 et
+       l'ADVANCE_TIME qui suit ne serait pas compte (IN passe FALSE->TRUE au scan d'avance). *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, HomingRequest := FALSE,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
+       Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+
     (* Call 6 : fond toujours pas atteint -> avance de 61 s (> StepMaxTimeout 60 s) -> timeout etape *)
     ADVANCE_TIME(61000000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -414,6 +430,104 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> ST
                 'Acquittement Reset -> retour preparation');
     ASSERT_FALSE(FB.Fault.Latched, 'Reset efface le latch (T186)');
     ASSERT_FALSE(FB.BucketCmd.ReqKoboldMeasureEnable, 'Reset efface Kobold contacteur (T186)');
+END_TEST
+
+TEST 'TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 60 s) sans STABILIZING'
+    SampleCount := 0;
+    // Progression jusqu'a X4 (deja home).
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := TRUE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Etabli en X4');
+    // 40 s en X4 (< 60 s) -> pas de timeout.
+    ADVANCE_TIME(40000000000);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_FALSE(FB.Fault.Error, 'X4 40 s : pas de timeout (< 60 s)');
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Toujours X4');
+    // Contact fond -> X5. Nouvelle etape -> StepMaxTimer REARMEE (pas de cumul des 40 s de X4).
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := TRUE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    // 1 scan de stabilisation en X5 pour armer StepMaxTimer sur la nouvelle etape.
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X5_BOTTOM_CONFIRMED, 'Etabli en X5');
+    // 40 s en X5 (< 60 s) -> total cycle 80 s mais aucune etape > 60 s -> PAS de STABILIZING.
+    ADVANCE_TIME(40000000000);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_FALSE(FB.Fault.Error, 'X5 40 s : pas de timeout - StepMaxTimer non cumulatif sur le cycle');
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X5_BOTTOM_CONFIRMED, 'Toujours X5, pas de STABILIZING');
 END_TEST
 
 TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pas de redemarrage) (T192-A S1)'

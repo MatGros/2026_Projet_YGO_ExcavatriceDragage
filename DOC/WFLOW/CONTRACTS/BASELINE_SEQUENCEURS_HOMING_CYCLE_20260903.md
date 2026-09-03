@@ -115,6 +115,23 @@
 | D | ✂️ split X11 → `X11A_DUMP_ARRIVE` (15) + `X11B_DUMP_OPEN` (16), `X11C` (17) réservé | X11 |
 | E | 🛡️ garde-fou `ABS(M1_CablePosM − M2_CablePosM)` dans `FB_Cycle` + gate CI statique sur la table | transverse |
 
+## Zone B2 — bugs latents `FB_Cycle` (fait, committé)
+- **B2.1** `StepMaxTimer` réarmé à chaque changement d'étape → tempo 60 s **par étape**, plus
+  cumulative sur le cycle. ⚠️ **Effet à acter** : il n'existe désormais **plus aucun plafond de
+  durée totale de cycle** (R5 = « backstop durée d'**état** » → conforme, mais si un garde-fou
+  global est voulu, le spécifier séparément dans AF-04). Pas de réarmement quand la reprise
+  `WaitingResume` restaure la même valeur d'étape (côté sûr, pré-existant).
+- **B2.2** `DrainingTimer` gaté `IN := (State = X9)` (déplacé en §1). Corrige un **bug latent réel**
+  (challenge confirmé) : sortie anormale de X9 (`ErrorEdge` → STABILIZING avant le `CASE`) ne
+  passait pas le `DrainingTimer(IN:=FALSE)` → ET figé ≥ PT → au **2ᵉ passage en X9**, `Q`
+  immédiatement TRUE → **égouttage sauté (0 s)**. Réserves 🟩 : (a) la tempo s'écoule pendant une
+  pause `WaitingResume`/coupure en X9 — à valider métier (égouttage « virtuel » pendant arrêt) ;
+  (b) **test dédié à compléter** : « sortie X9 → STABILIZING → 2ᵉ cycle → 5 s d'égouttage pleins ».
+- **B2.3** X6 neutralise explicitement les 4 champs des 2 treuils (plus de résidu directionnel de
+  X5, supprime l'activation parasite de `BucketNotClosedAscentCapStep1` en PRG_04 — inerte car
+  `RunRequest` déjà FALSE). Durcissement pur. 🟩 style : le repli §4 et les autres étapes
+  benne-seule ne neutralisent que `RunRequest` — harmoniser un jour.
+
 ## T226 — `FB_MachineHomingCycle` + `FB_Cycle` (Zone F, à cadrer)
 - **`FB_Cycle.X1_HOMING` gutté** : SEMI_AUTO n'est entré que si `MachineHomed` (AC1) → le cycle
   ne contient **plus aucun référencement**. Supprimer : l'entrée `HomingRequest`, la branche
