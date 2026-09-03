@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T11:08:43.688811" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T11:08:43.688811">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T12:25:45.078694" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T12:25:45.078694">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2729,7 +2729,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
         E_AutoCycleStep.AX1_INIT:
             OperatorActionCandidate := '[IHM] Vérifier conditions initiales (référencement, treuils FDC haut)';
         E_AutoCycleStep.AX2_TRANSLATE_P1:
-            OperatorActionCandidate := '[JOYSTICK] Pousser vers la droite : translation jusqu''à P1';
+            OperatorActionCandidate := '[JOYSTICK] Pousser vers la droite : translation vers P1';
         E_AutoCycleStep.AX3_OPEN_BUCKET:
             OperatorActionCandidate := '[IHM] Ouverture benne en cours';
         E_AutoCycleStep.AX4_DESCEND_OPEN:
