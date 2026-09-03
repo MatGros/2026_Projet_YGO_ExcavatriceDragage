@@ -77,6 +77,19 @@ Généraliser le principe à tout le cycle : **aucune étape ne commande M1/M2 a
 
 ---
 
+## 5bis. État d'implémentation (2026-09-03)
+
+| Item | État |
+|---|---|
+| Split `X11_OPEN_DUMP` | ✅ FAIT — `X11A_DUMP_ARRIVE` (11, treuils arrêtés) → `X11B_DUMP_OPEN` (15, ouverture benne, **les 2 treuils arrêtés** : plus de descente couplée simultanée à l'ouverture → plus d'écart M1/M2 ni de faux SafeStop concordance). `X11C_DUMP_REPOSITION` (16) **réservée, non implémentée** (repositionnement couplé optionnel = feature séparée). |
+| Config treuil explicite par étape | ✅ Partiel — étapes benne-seule (X3, X6, X11A, X11B) et X2 neutralisent **explicitement** les 2 treuils (4 champs). Pas de DUT `ST_CycleStepWinchProfile` ni de gate statique : discipline par inspection + revue. |
+| C3.1 translation | ✅ FAIT — X2 : plus de `SelTarget` (départ **toujours P1**), `TranslationCmd.PositionTgt := 3` figé, `ReqStart` gaté homme-mort ; ralenti PV + arrêt FDC P1 = `PRG_05/FB_Translation` (inchangé). Au-delà de P1 côté maintenance → message « sortir du semi-auto, revenir à P1 ». X10 idem vers trémie. |
+| Réserve `FB_SyncDeviation` coupé pendant X11 | ✅ Résolue par construction : X11B ne fait plus de descente couplée (les 2 treuils arrêtés). |
+| Backstop anti-télescopage | ✅ FAIT (Zone E) — `instCauses[6]` : `ABS(M1-M2) > 0,5 m` en X4/X5/X8 → STABILIZING. |
+| Bouton IHM repositionnement (Q1) | ⬜ non fait (X11C réservée). |
+
+⚠️ **Hors scope traité malgré tout** (enum rename oblige) : `FB_Hmi_BannerFormatter.st` (3 arms `X11_OPEN_DUMP` → `X11A_DUMP_ARRIVE`/`X11B_DUMP_OPEN`). `PRG_05` **non touché** (le M3 en SEMI_AUTO reste piloté par `TranslationCmd` du cycle ; un vrai jog joystick M3 en SEMI_AUTO = tâche dédiée touchant `FB_TranslationCmdArbitrationM3`).
+
 ## 6. À compléter
 
 - Détail des transitions de sous-étapes (conditions, timeouts)

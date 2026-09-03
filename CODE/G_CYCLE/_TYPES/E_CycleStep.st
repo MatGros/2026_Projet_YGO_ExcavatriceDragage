@@ -16,10 +16,12 @@ TYPE E_CycleStep :
   X6_CLOSE_BUCKET     := 6,   (* Fermeture benne — tolérance « à peu près fermé » *)
   X7_CTRL_ASCENT      := 7,   (* Remontée palier 1 de contrôle *)
   X8_ASCENT_LOADED    := 8,   (* Remontée nominale jusqu'à limite haute *)
-  X9_DRAIN_PAUSE      := 9,   (* Égouttage temporisé — temps affiché IHM *)
-  X10_TRANSLATE_DUMP  := 10,  (* Translation vers trémie + avertissements IHM *)
-  X11_OPEN_DUMP       := 11,  (* Ouverture benne = vidage ; montée possible, descente ouvre *)
-  X13_DONE_SYNC       := 13,  (* Fin de cycle, synchronisation finale (R4) + compteur *)
-  STABILIZING         := 14   (* État d'attente/stabilisation — pas une erreur *)
+  X9_DRAIN_PAUSE      := 9,   (* Égouttage temporisé — durée configurable / passable IHM *)
+  X10_TRANSLATE_DUMP  := 10,  (* Translation vers trémie (départ P1) + avertissements IHM *)
+  X11A_DUMP_ARRIVE    := 11,  (* Arrivée trémie : treuils à l'arrêt, attente geste opérateur (ex-X11) *)
+  X13_DONE_SYNC       := 13,  (* Fin de cycle, synchronisation finale (R4) + compteur + durée cycle *)
+  STABILIZING         := 14,  (* État d'attente/stabilisation — pas une erreur *)
+  X11B_DUMP_OPEN      := 15,  (* Vidage : M2 piloté seul (M1 tenu), ouverture benne ; sync contacteurs OFF via Bucket.Busy *)
+  X11C_DUMP_REPOSITION := 16  (* RÉSERVÉ (non implémenté) : repositionnement couplé M1+M2 optionnel avant reprise du vidage *)
 );
 END_TYPE

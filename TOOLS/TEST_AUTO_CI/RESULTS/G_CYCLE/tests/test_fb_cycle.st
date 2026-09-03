@@ -1007,7 +1007,7 @@ TEST 'TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et 
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
        SampleCount := FB.SampleCount);
 
-    (* 👀 Call 21 : X11 observé, ouverture vidange *)
+    (* 👀 Call 20b : X11a observé (arrivée trémie, treuils arrêtés) -> X11b sur geste joystick *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
@@ -1020,8 +1020,27 @@ TEST 'TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et 
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
        SampleCount := FB.SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X11_OPEN_DUMP, 'X11 observe : ouverture vidange');
-    ASSERT_TRUE(FB.BucketCmd.ReqOpen, 'X11 : ouverture benne commandee');
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X11A_DUMP_ARRIVE, 'X11a observe : arrivee tremie treuils arretes');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest, 'X11a : M1 arrete');
+    ASSERT_FALSE(FB.WinchM2Cmd.RunRequest, 'X11a : M2 arrete');
+
+    (* 👀 Call 21 : X11b observé, ouverture vidange *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, HomingRequest := FALSE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_At_Maintenance := FALSE,
+       Translation_Busy := FALSE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X11B_DUMP_OPEN, 'X11b observe : ouverture vidange');
+    ASSERT_TRUE(FB.BucketCmd.ReqOpen, 'X11b : ouverture benne commandee');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest, 'X11b : M1 arrete (pas de descente couplee)');
+    ASSERT_FALSE(FB.WinchM2Cmd.RunRequest, 'X11b : M2 arrete (pas de descente couplee)');
 
     (* ✅ Call 22 : benne ouverte → X13 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,

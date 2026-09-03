@@ -267,7 +267,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_CycleStep.X8_ASCENT_LOADED: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
             E_CycleStep.X9_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
             E_CycleStep.X10_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
-            E_CycleStep.X11_OPEN_DUMP: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+            E_CycleStep.X11A_DUMP_ARRIVE, E_CycleStep.X11B_DUMP_OPEN: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
             E_CycleStep.X13_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ';
             E_CycleStep.STABILIZING: Banner.SequenceProgressText := 'Cycle: STABILISATION';
         ELSE
@@ -518,7 +518,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             OperatorActionCandidate := '[IHM] Attendre égouttage';
         E_CycleStep.X10_TRANSLATE_DUMP:
             OperatorActionCandidate := '[JOYSTICK] Déplacer vers trémie';
-        E_CycleStep.X11_OPEN_DUMP:
+        E_CycleStep.X11A_DUMP_ARRIVE, E_CycleStep.X11B_DUMP_OPEN:
             OperatorActionCandidate := '[IHM] Vidage benne';
         E_CycleStep.X13_DONE_SYNC:
             OperatorActionCandidate := '[IHM] Cycle terminé';
@@ -536,7 +536,8 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_CycleStep.X8_ASCENT_LOADED: StepAtErrorStr := 'X8 (remontée chargée)';
                 E_CycleStep.X9_DRAIN_PAUSE: StepAtErrorStr := 'X9 (égouttage)';
                 E_CycleStep.X10_TRANSLATE_DUMP: StepAtErrorStr := 'X10 (translation trémie)';
-                E_CycleStep.X11_OPEN_DUMP: StepAtErrorStr := 'X11 (vidage benne)';
+                E_CycleStep.X11A_DUMP_ARRIVE: StepAtErrorStr := 'X11a (arrivee tremie)';
+                E_CycleStep.X11B_DUMP_OPEN: StepAtErrorStr := 'X11b (vidage benne)';
                 E_CycleStep.X13_DONE_SYNC: StepAtErrorStr := 'X13 (cycle terminé)';
                 E_CycleStep.STABILIZING: StepAtErrorStr := 'X14 (stabilisation)';
                 ELSE
