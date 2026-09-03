@@ -1,0 +1,102 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T232 : Mise a jour documentaire de la refonte du cycle SEMI_AUTO
+# ═══════════════════════════════════════════════════════════════════════════
+# Regroupe la MAJ des AF / catalogues TC / migration IHM suite aux lots T229 (+ B1/B2/E)
+# et T226-AC1/AC2 codes pendant la MES de septembre 2026.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T232_MAJ_DOC_REFONTE_CYCLE
+  criticality: C3
+  strategy: patch
+
+  objective: >
+    Aligner l'analyse fonctionnelle et les catalogues de tests sur le code du sequenceur
+    SEMI_AUTO tel que refondu pendant la MES : X1 sans referencement, split X11
+    (X11a/X11b/X11c), translation en cycle sans selection de cible (depart toujours P1),
+    garde-fous et diagnostics ajoutes, egouttage X9 configurable/passable IHM, duree de
+    cycle, et durcissement SEMI_AUTO homed-only cote FB_Modes. Aucune modification de code
+    metier : documentation, catalogues et fichier de migration IHM uniquement.
+
+  acceptance:
+    - id: AC1
+      statement: "AF_Partie-04 (sequenceur SEMI_AUTO) decrit : X1_HOMING sans aucun referencement ni bouton HomingRequest (homed presuppose) ; X11 decoupe en X11A_DUMP_ARRIVE (11, treuils arretes) / X11B_DUMP_OPEN (15, ouverture benne, 2 treuils arretes) / X11C_DUMP_REPOSITION (16, repositionnement couple M1+M2 sur option IHM maintenue) ; translation X2/X10 sans selection de cible, depart toujours P1, ralenti PV + arret FDC assures par PRG_05."
+      verified_by: "Relecture AF_Partie-04 : chaque etape a une description conforme au corps de FB_Cycle.st (commit HEAD), la table des etapes liste les valeurs d'enum reelles (11/13/14/15/16, trou a 12)."
+    - id: AC2
+      statement: "AF_Partie-04 documente les garde-fous et diagnostics ajoutes : StepMaxTimer non cumulatif (rearme a chaque changement d'etape, plus de plafond de duree totale de cycle), DrainingTimer gate sur X9, backstop anti-telescopage (ecart position M1/M2 > 0,5 m en phases couplees X4/X5/X8/X11C -> STABILIZING), et le permis de mouvement unique CycleMotionPermit (ex 8 permis)."
+      verified_by: "Relecture AF_Partie-04 §5 et §6 : les mecanismes cites correspondent aux instCauses[4..6] et au calcul CycleMotionPermit de FB_Cycle.st."
+    - id: AC3
+      statement: "AF_Partie-04 decrit l'egouttage X9 : duree configurable IHM (GVL_IHM.Cycle.Cfg.DrainTime, defaut 5 s), bouton 'passer l'egouttage' (GVL_IHM.Cycle.Cmd.BtnSkipDrain), et la mesure de duree de cycle (CurrentCycleElapsed / LastCycleDuration, figee a X13, exposee GVL_IHM.Cycle.State)."
+      verified_by: "Relecture AF_Partie-04 : les 4 variables et leur flux (FB_Cycle -> PRG_03 -> PRG_07 -> GVL_IHM) sont documentes."
+    - id: AC4
+      statement: "AF_Partie-05 (modes) documente SEMI_AUTO homed-only : une selection SEMI_AUTO sans MachineHomed est refusee et le mode est force vers MAINT_N1 ; perte de datum en cours de SEMI_AUTO -> expulsion MAINT_N1 avec motif IHM distinct ('Datum machine perdu : arret controle') ; la relaxation anterieure (SEMI_AUTO selectionnable sans reference) est retiree pour ce cas mais conservee pour defaut codeur et AU."
+      verified_by: "Relecture AF_Partie-05 §2/§7 et table TC-P05 : TC-P05-004 (defaut codeur non bloquant) et le nouveau comportement datum sont coherents avec FB_Modes.st §3.2bis."
+    - id: AC5
+      statement: "Le catalogue de tests de AF_Partie-04 reference les nouveaux TC implementes (parcours nominal via X11a/X11b, StepMaxTimer non cumulatif, backstop anti-telescopage, skip egouttage, repositionnement X11c) et AF_Partie-05 reference le TC 'perte de datum en SEMI_AUTO'."
+      verified_by: "Les IDs de TC presents dans test_fb_cycle.st / test_fb_modes.st et absents du catalogue AF sont ajoutes (plus d'avertissement 'teste mais absent du catalogue AF' pour ces IDs)."
+    - id: AC6
+      statement: "DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md liste toutes les nouvelles variables IHM du lot cycle (BtnSkipDrain, DrainTime, CurrentCycleElapsed, LastCycleDuration, BtnReposition) et le changement d'enumeration E_CycleStep (11 renomme, 15/16 nouvelles)."
+      verified_by: "Le fichier contient une entree 'Lot T229' complete + BtnReposition ; les chemins IHM et l'ownership (producteur -> PRG_03 -> PRG_07) sont donnes."
+    - id: AC7
+      statement: "DOC/VERSION_HISTORY.md porte un jalon pour la refonte du cycle SEMI_AUTO (branche backup/mes-septembre-20260902, commits de T229 / T226-AC1-AC2)."
+      verified_by: "Une ligne datee referencant la branche et les changements majeurs (split X11, homed-only, garde-fous) est presente."
+
+  scope:
+    allowed:
+      - DOC/AF/
+      - DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md
+      - DOC/VERSION_HISTORY.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T232_MAJ_DOC_REFONTE_CYCLE.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml
+      - DOC/WFLOW/CONTRACTS/T229_DESIGN_FB_CYCLE_STEPS.md
+      - DOC/WFLOW/CONTRACTS/BASELINE_SEQUENCEURS_HOMING_CYCLE_20260903.md
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/
+      - PRJ_CODESYS/
+      - ARCHIVES/
+
+  conservation:
+    must_survive:
+      - "Aucune modification de code metier ou de test ST dans le cadre de cette tache (documentation et catalogues seulement)."
+      - "Les etats V-I / NV des lignes AF non concernees restent inchanges."
+      - "Le placement AF-04 des sequences pilotees par PRG_03 (jamais relocalise) est conserve."
+    dropped_on_purpose:
+      - "Les descriptions AF-04/AF-05 decrivant l'ancien X11 monolithe, l'ancien X1 avec referencement, et la relaxation 'SEMI_AUTO selectionnable sans reference' (pour le cas datum)."
+
+  evidence_required:
+    - run_all_gates
+
+  open_questions:
+    - id: Q1
+      q: "AF_Partie-04 est en cours de refonte par l'equipe (nouveau decoupage AF_Partie-04_.../*_v1.0.md ?). Travailler sur la version en place (v2.3 racine) ou attendre la nouvelle structure ?"
+    - id: Q2
+      q: "T229 sous-tache T227 (AF + tests CI) : T232 la remplace-t-elle ou s'ajoute-t-elle (T227 couvrait aussi les tests CI, deja faits ici) ?"
+    - id: Q3
+      q: "X11C_DUMP_REPOSITION est implementee (option repositionnement couple) : confirmer qu'elle doit etre documentee comme fonctionnalite active et non comme reserve."
+
+  alert_duty: >
+    STOP si la MAJ documentaire impose de toucher du code ou un test ST (hors scope),
+    si une ligne AF a l'etat V-I concernee ne correspond plus au code (signaler l'ecart,
+    ne pas corriger le code), ou si une reponse d'open_question reste indeterminee.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Regroupe la dette documentaire des lots cycle codes pendant la MES 2026-09.
+    A lancer une fois T226 (AC3+) stabilise pour ne pas re-documenter deux fois.

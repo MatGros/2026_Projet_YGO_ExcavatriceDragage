@@ -5121,3 +5121,40 @@ tasks:
   - Maintenir 100% de conformité de index.html et des rapports CI
   contrat: ''
   bloque_par: []
+
+- id: T232
+  parent_id: ''
+  statut: ⏳
+  criticite: C1
+  domaine: TESTS & SPECIFICATIONS (TRANSLATION & SIMULATION)
+  agent: AGY-01
+  date: '2026-09-03T08:00:00+02:00'
+  titre: Granularisation des tests unitaires et fiches AF pour Translation et Simulation (I_TRANSLATION & L_SIMULATION)
+  contexte: >
+    Actuellement, I_TRANSLATION et L_SIMULATION ne disposent que d'un test monolithique
+    (FB_Translation et FB_SimBench), masquant la visibilité unitaire des sous-briques.
+    L'objectif est d'aligner ces deux domaines sur le modèle granulaire de H_TREUILS_BENNE
+    en créant les fiches AF manquantes et les tests unitaires ciblés (2-3 TC clés par FB)
+    sans modifier une seule ligne du code de production CODE/.
+  description: >
+    1. Créer la fiche AF manquante DOC/AF/AF_Partie-11_Fonction_Translation/FB_Translation_PositionEstimator_v1.0.md.
+    2. Créer les tests unitaires ST dans RESULTS/I_TRANSLATION/tests/ :
+       - test_fb_safety_translation.st (TC-P11-SAF-001..003 : Enable, défauts Meca A/rotation/survitesse)
+       - test_fb_translation_positiondecoder.st (TC-P11-DEC-001..003 : décodage mots cames, cohérence)
+       - test_fb_translationoutputinterlock.st (TC-P11-INT-001..003 : permis directionnels, interlock sens)
+       - test_fb_translation_positionestimator.st (TC-P11-EST-001..003 : recalage et interpolation)
+    3. Créer les tests unitaires ST dans RESULTS/L_SIMULATION/tests/ :
+       - test_fb_sim_encoder.st (TC-P13-ENC-001..002 : dynamique vitesse et position simulée)
+       - test_fb_sim_joystick.st (TC-P13-JOY-001..002 : consigne simulée et filtrage)
+       - test_fb_sim_safety.st (TC-P13-SAF-001..002 : boucle AU et retours contacteurs)
+       - test_fb_sim_translation.st (TC-P13-TR-001..002 : modèle chariot M3)
+    4. Déclarer ces 8 nouveaux blocs dans TOOLS/TEST_AUTO_CI/registry.yaml.
+    5. Exécuter la suite complète pour intégration dans index.html.
+  objectifs:
+  - Rédaction des fiches AF manquantes
+  - Écriture des 8 harnais de test unitaire STruCpp dédiés (2 à 3 TC ciblés par bloc)
+  - Intégration dans registry.yaml sous I_TRANSLATION et L_SIMULATION
+  - 100% de non-régression et visibilité granulaire dans index.html
+  - Zéro modification de CODE/
+  contrat: ''
+  bloque_par: []
