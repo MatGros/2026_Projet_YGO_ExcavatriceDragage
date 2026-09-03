@@ -275,18 +275,32 @@ END_IF;
 SevereError := Fault.Error;
 
 // --- §4a Classification continue de l'etat benne sur la MESURE physique -----------------
-// L'etat memorise (IsOpen/IsClosed) doit refleter la realite mecanique, sinon ActiveOffsetM
-// (0 ou OffsetCloseM) est applique a l'envers -> M2 corrige faux + ecart synchro fantome.
+// L'etat memorise doit refleter la realite mecanique, sinon ActiveOffsetM (0 ou
+// OffsetCloseM) est applique a l'envers -> M2 corrige faux + ecart synchro fantome.
 // Ne s'execute QUE machine totalement a l'arret et referencee (mesure fiable, aucun
-// transitoire d'ecart) ; debounce 1 s ; les commandes/sequences gardent la priorite via
-// NOT Lifecycle.Busy. Bande = OffsetX +/- CoherenceLimitM. Zone intermediaire : etat
-// inchange (le dernier etat franc est conserve, coherent avec le HOLD de l'offset en §5).
+// transitoire d'ecart). Deux niveaux :
+//   * IsOpen/IsClosed = LATCH avec debounce 1 s (etat logique stable, ActiveOffsetValid) ;
+//   * NearClosed/NearOpen/IsIntermediate/TooOpen/TooClosed = classification INSTANTANEE
+//     sur la bande mesuree (OffsetX +/- CoherenceLimitM) -> ActiveOffsetM se recale
+//     immediatement en §5 (M2 corrige ~ M1 des l'arret, sans attendre le debounce).
+// Zone intermediaire : IsOpen/IsClosed inchanges (dernier etat franc), IsIntermediate=TRUE.
 DeltaPosition_M := CablePosM2 - CablePosM1;
 ClassCanRun := HomedM1 AND HomedM2
                AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy
                AND NOT SevereError;
 NearClosed := ClassCanRun AND (ABS(DeltaPosition_M - Config.OffsetCloseM) <= Config.CoherenceLimitM);
 NearOpen   := ClassCanRun AND (ABS(DeltaPosition_M - Config.OffsetOpenM)  <= Config.CoherenceLimitM);
+
+// Classification instantanee (publiee, consommee par Benne_IsRoughlyClosed en PRG_04).
+IF ClassCanRun THEN
+    BucketState.IsIntermediate := NOT NearClosed AND NOT NearOpen
+                                  AND (DeltaPosition_M >= (Config.OffsetOpenM - Config.CoherenceLimitM))
+                                  AND (DeltaPosition_M <= (Config.OffsetCloseM + Config.CoherenceLimitM));
+    BucketState.TooOpen        := DeltaPosition_M <  (Config.OffsetOpenM  - Config.CoherenceLimitM);
+    BucketState.TooClosed      := DeltaPosition_M >  (Config.OffsetCloseM + Config.CoherenceLimitM);
+END_IF;
+
+// Latch d'etat franc, avec debounce anti-transitoire.
 TonClassClosed(IN := NearClosed, PT := T#1s);
 TonClassOpen(IN := NearOpen, PT := T#1s);
 IF TonClassClosed.Q AND NOT BucketState.IsClosed THEN
@@ -461,8 +475,17 @@ END_IF;
 {region "§5 Offset actif et validite"}
 // DeltaPosition_M deja calcule en §4a (classification etat).
 
+// Priorite : (1) manoeuvre en cours = ecart reel live ; (2) SNAP INSTANTANE sur la bande
+// mesuree des que la machine est a l'arret et referencee (M2 corrige ~ M1 sans attendre
+// le debounce d'etat) ; (3) sinon etat memorise / demande ; (4) sinon dernier connu.
 IF Lifecycle.Busy THEN
     ActiveOffsetM := CablePosM2 - CablePosM1;
+    HoldOffsetM := ActiveOffsetM;
+ELSIF NearClosed THEN
+    ActiveOffsetM := Config.OffsetCloseM;
+    HoldOffsetM := ActiveOffsetM;
+ELSIF NearOpen THEN
+    ActiveOffsetM := Config.OffsetOpenM;
     HoldOffsetM := ActiveOffsetM;
 ELSIF CloseReq OR BucketState.IsClosed THEN
     ActiveOffsetM := Config.OffsetCloseM;
