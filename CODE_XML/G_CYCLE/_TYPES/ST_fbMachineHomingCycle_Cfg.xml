@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:15:43.153533" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:15:43.153533">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T12:21:41.594060" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T12:21:41.594060">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -31,7 +31,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position capteur haut M2/benne (m) — sert UNIQUEMENT a la cible dynamique M2 du cycle (HX3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position capteur haut commune M1/M2 (m) — base cible dynamique M2 du cycle (HX3), + CfgOffsetClose_M</xhtml>
               </documentation>
             </variable>
             <variable name="CfgOffsetOpen_M">
@@ -95,10 +95,10 @@
    ⚙️ ST_fbMachineHomingCycle_Cfg — Réglages de FB_MachineHomingCycle
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : Réglages géométriques du référencement machine (cible haute
-             M2/benne + écarts benne) + temporisations de garde du GRAFCET
-             de homing (montée, homing axes).
-   🔒 Ownership : produit par PRG_02_Acquisition depuis _WinchM2CfgPersist
-             (cible haute) et _BucketCfgPersist (écarts, GVL_PERSISTENT).
+             commune M1/M2 + écarts benne) + temporisations de garde du
+             GRAFCET de homing (montée, homing axes).
+   🔒 Ownership : produit par PRG_02_Acquisition depuis _WinchM1CfgPersist
+             (cible haute commune) et _BucketCfgPersist (écarts, GVL_PERSISTENT).
              Initialized : drapeau de restauration boot (pont persistant).
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
    =======================================================================</xhtml>

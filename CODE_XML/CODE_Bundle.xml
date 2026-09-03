@@ -4945,6 +4945,17 @@ pas une vitesse continue.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgTopSensorPos_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="8.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Position inscrite au homing sur capteur haut (m). M1 ET M2 montent liES au meme capteur -&gt; parametre COMMUN unique</xhtml>
+              </documentation>
+            </variable>
             <variable name="TglEnableKoboldAutoStopDescent">
               <type>
                 <BOOL />
@@ -15089,7 +15100,7 @@ fournie par la configuration persistante de l'appelant.
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position capteur haut M2/benne (m) — sert UNIQUEMENT a la cible dynamique M2 du cycle (HX3)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position capteur haut commune M1/M2 (m) — base cible dynamique M2 du cycle (HX3), + CfgOffsetClose_M</xhtml>
               </documentation>
             </variable>
             <variable name="CfgOffsetOpen_M">
@@ -15153,10 +15164,10 @@ fournie par la configuration persistante de l'appelant.
    ⚙️ ST_fbMachineHomingCycle_Cfg — Réglages de FB_MachineHomingCycle
    ───────────────────────────────────────────────────────────────────────
    🎯 Rôle : Réglages géométriques du référencement machine (cible haute
-             M2/benne + écarts benne) + temporisations de garde du GRAFCET
-             de homing (montée, homing axes).
-   🔒 Ownership : produit par PRG_02_Acquisition depuis _WinchM2CfgPersist
-             (cible haute) et _BucketCfgPersist (écarts, GVL_PERSISTENT).
+             commune M1/M2 + écarts benne) + temporisations de garde du
+             GRAFCET de homing (montée, homing axes).
+   🔒 Ownership : produit par PRG_02_Acquisition depuis _WinchM1CfgPersist
+             (cible haute commune) et _BucketCfgPersist (écarts, GVL_PERSISTENT).
              Initialized : drapeau de restauration boot (pont persistant).
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
    =======================================================================</xhtml>
@@ -45565,7 +45576,7 @@ PreviousQualified := Qualified;
                 <derived name="ST_fbMachineHomingCycle_Cfg" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Reglages geometriques referencement (cible haute M2/benne + ecarts + gardes)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Reglages geometriques referencement (cible haute commune M1/M2 + ecarts benne + gardes)</xhtml>
               </documentation>
             </variable>
             <variable name="BucketReferenceOpenEdge">
@@ -46129,11 +46140,11 @@ ELSIF BucketReferenceCloseEdge.Q THEN
     BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
 
-// Cible haute du homing machine = position capteur de M2 (benne) : seule la cible
-// DYNAMIQUE M2 du cycle (FB_MachineHomingCycle §7) consomme ce champ ; M1 y home sur
-// sa propre config (ligne CfgTopSensorPosM M1 ci-dessous). Geometrie de mouflage
-// benne differente -&gt; jamais la position M1.
-MachineHomingCfg.CfgTopHomingTarget_M := _WinchM2CfgPersist.CfgTopSensorPos_M;
+// Cible haute du homing machine = position capteur haut COMMUNE M1/M2 : les deux
+// treuils montent liES mecaniquement vers le meme capteur -&gt; parametre commun unique
+// (_CommunCfgPersist.CfgTopSensorPos_M). La cible DYNAMIQUE M2 du cycle
+// (FB_MachineHomingCycle §7) ajoute CfgOffsetClose_M pour la geometrie benne.
+MachineHomingCfg.CfgTopHomingTarget_M := _CommunCfgPersist.CfgTopSensorPos_M;
 MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
 MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
@@ -46190,9 +46201,11 @@ instEncoderM1(
                              OR instMachineHomingCycle.M1Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
+    // Cible capteur haut = parametre COMMUN M1/M2 (_CommunCfgPersist) : les deux
+    // treuils montent lies au meme capteur -&gt; un seul reglage de mise en service.
     CfgHomingTargetM      := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
-                                 _WinchM1CfgPersist.CfgTopSensorPos_M, 0.0),
-    CfgTopSensorPosM      := _WinchM1CfgPersist.CfgTopSensorPos_M,
+                                 _CommunCfgPersist.CfgTopSensorPos_M, 0.0),
+    CfgTopSensorPosM      := _CommunCfgPersist.CfgTopSensorPos_M,
     UseDynamicTarget      := FALSE,
     DynamicHomingTargetM  := 0.0,
     TopPositionSensor     := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
@@ -46241,9 +46254,12 @@ instEncoderM2(
                              OR instMachineHomingCycle.M2Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
+    // Cible capteur haut M2 = parametre COMMUN M1/M2 (_CommunCfgPersist.CfgTopSensorPos_M).
+    // M1 et M2 montent lies mecaniquement au meme capteur -&gt; un seul reglage.
+    // _WinchM2CfgPersist.CfgTopSensorPos_M n'est plus consomme ici (restait fige a 8.5 NVRAM).
     CfgHomingTargetM      := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
-                                 _WinchM2CfgPersist.CfgTopSensorPos_M, 0.0),
-    CfgTopSensorPosM      := _WinchM2CfgPersist.CfgTopSensorPos_M,
+                                 _CommunCfgPersist.CfgTopSensorPos_M, 0.0),
+    CfgTopSensorPosM      := _CommunCfgPersist.CfgTopSensorPos_M,
     UseDynamicTarget      := BucketReferenceRequested OR instMachineHomingCycle.M2Demand.UseDynamicTarget,
     DynamicHomingTargetM  := SEL(BucketReferenceRequested,
                                  instMachineHomingCycle.M2Demand.DynamicTarget_M, BucketReferenceTargetM),
