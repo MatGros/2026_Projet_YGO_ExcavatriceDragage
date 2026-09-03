@@ -45,7 +45,6 @@ VAR
     BucketReferenceCloseEdge : R_TRIG; // . [LOC] Front confirmation benne fermee
     BucketReferenceRequested : BOOL;   // . [LOC] Homing materiel M2 requis par confirmation benne
     BucketReferenceTargetM   : REAL;   // . [LOC] Cible M2 calculee depuis la position M1
-    SafeTopSensorPosM        : REAL;   // . [LOC] Cible capteur haut commune M1/M2 bornee [5..10] m (garde champ persistant non initialise)
     JoystickCfgEffective     : ST_fbJoystick_Cfg; // . [LOC] Reglages joystick avec table de paliers centrale
 
     WinchInputSourceSimulated         : BOOL; // . [LOC] Source Winch simulee active
@@ -445,15 +444,7 @@ END_IF;
 // treuils montent liES mecaniquement vers le meme capteur -> parametre commun unique
 // (_CommunCfgPersist.CfgTopSensorPos_M). La cible DYNAMIQUE M2 du cycle
 // (FB_MachineHomingCycle §7) ajoute CfgOffsetClose_M pour la geometrie benne.
-// GARDE : champ neuf dans une struct PERSISTENT ; sans reinit origine il peut valoir
-// 0.0 -> homing a 0 m. Hors [5,0 ; 10,0] m -> repli 8,5 m (capteur reel).
-IF (_CommunCfgPersist.CfgTopSensorPos_M >= 5.0) AND (_CommunCfgPersist.CfgTopSensorPos_M <= 10.0) THEN
-    SafeTopSensorPosM := _CommunCfgPersist.CfgTopSensorPos_M;
-ELSE
-    SafeTopSensorPosM := 8.5;
-END_IF;
-
-MachineHomingCfg.CfgTopHomingTarget_M := SafeTopSensorPosM;
+MachineHomingCfg.CfgTopHomingTarget_M := _CommunCfgPersist.CfgTopSensorPos_M;
 MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
 MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
@@ -510,11 +501,11 @@ instEncoderM1(
                              OR instMachineHomingCycle.M1Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
-    // Cible capteur haut = parametre COMMUN M1/M2 borne (SafeTopSensorPosM) : les deux
+    // Cible capteur haut = parametre COMMUN M1/M2 (_CommunCfgPersist) : les deux
     // treuils montent lies au meme capteur -> un seul reglage de mise en service.
     CfgHomingTargetM      := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
-                                 SafeTopSensorPosM, 0.0),
-    CfgTopSensorPosM      := SafeTopSensorPosM,
+                                 _CommunCfgPersist.CfgTopSensorPos_M, 0.0),
+    CfgTopSensorPosM      := _CommunCfgPersist.CfgTopSensorPos_M,
     UseDynamicTarget      := FALSE,
     DynamicHomingTargetM  := 0.0,
     TopPositionSensor     := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
@@ -563,12 +554,12 @@ instEncoderM2(
                              OR instMachineHomingCycle.M2Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
     ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
-    // Cible capteur haut M2 = MEME parametre commun borne que M1 (SafeTopSensorPosM).
+    // Cible capteur haut M2 = parametre COMMUN M1/M2 (_CommunCfgPersist.CfgTopSensorPos_M).
     // M1 et M2 montent lies mecaniquement au meme capteur -> un seul reglage.
     // _WinchM2CfgPersist.CfgTopSensorPos_M n'est plus consomme ici (restait fige a 8.5 NVRAM).
     CfgHomingTargetM      := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
-                                 SafeTopSensorPosM, 0.0),
-    CfgTopSensorPosM      := SafeTopSensorPosM,
+                                 _CommunCfgPersist.CfgTopSensorPos_M, 0.0),
+    CfgTopSensorPosM      := _CommunCfgPersist.CfgTopSensorPos_M,
     UseDynamicTarget      := BucketReferenceRequested OR instMachineHomingCycle.M2Demand.UseDynamicTarget,
     DynamicHomingTargetM  := SEL(BucketReferenceRequested,
                                  instMachineHomingCycle.M2Demand.DynamicTarget_M, BucketReferenceTargetM),
