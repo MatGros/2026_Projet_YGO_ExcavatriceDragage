@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T16:10:56.927507" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T16:10:56.927507">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T16:34:51.215082" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T16:34:51.215082">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -257,7 +257,7 @@
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m) -- reglable IHM</xhtml>
               </documentation>
             </variable>
             <variable name="OpenAnticipationM">
@@ -268,7 +268,18 @@
                 <simpleValue value="1.3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JogSlowdownZoneM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant le point d'arret anticipe ou le jog unitaire M2 est force au palier 1 (m) -- reglable IHM</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -575,6 +586,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Treuil M2 inhibe</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ManualJogM2Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Pilotage unitaire benne M2 (WinchSel=2, MAINT) : detection passive d'etat sur position</xhtml>
               </documentation>
             </variable>
             <variable name="Config">
@@ -1247,6 +1266,24 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
         RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
     ELSE
         RemainingTravelM := 0.0;
+    END_IF;
+END_IF;
+
+// --- Detection passive d'etat benne sur position (jog unitaire M2, hors sequence auto) --
+// En pilotage unitaire benne (WinchSel=2), FB_Bucket ne pilote pas l'ouverture/fermeture
+// mais l'etat memorise doit suivre la position : on accepte "ouvert" / "ferme" au meme
+// seuil que l'arret jog (Offset +/- Anticipation, tous deux reglables IHM). Le point
+// d'arret du jog = l'etat accepte. Zone intermediaire : etat inchange (memorise).
+// Uniquement M1 ET M2 references : sinon CablePosM1/M2 (donc le delta) sont sans valeur.
+IF ManualJogM2Active AND HomedM1 AND HomedM2 AND NOT Lifecycle.Busy AND NOT SevereError THEN
+    IF CablePosM2 &lt;= (CablePosM1 + Config.OffsetOpenM + Config.OpenAnticipationM) THEN
+        BucketState.IsOpen        := TRUE;
+        BucketState.IsClosed      := FALSE;
+        BucketState.StateIncoherent := FALSE;
+    ELSIF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
+        BucketState.IsClosed      := TRUE;
+        BucketState.IsOpen        := FALSE;
+        BucketState.StateIncoherent := FALSE;
     END_IF;
 END_IF;
 {endregion}
