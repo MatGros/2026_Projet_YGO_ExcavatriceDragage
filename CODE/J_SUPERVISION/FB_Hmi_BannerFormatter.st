@@ -248,8 +248,8 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     ELSE
         CASE CycleStep OF
             E_AutoCycleStep.AX0_REPOS: Banner.SequenceProgressText := 'Cycle: PRÉPARATION';
-            E_AutoCycleStep.AX1_HOMING: Banner.SequenceProgressText := 'Cycle: RÉFÉRENCEMENT';
-            E_AutoCycleStep.AX2_TRANSLATE_P1: Banner.SequenceProgressText := 'Cycle: POSITION TRAVAIL';
+            E_AutoCycleStep.AX1_INIT: Banner.SequenceProgressText := 'Cycle: CONDITIONS INITIALES';
+            E_AutoCycleStep.AX2_TRANSLATE_P1: Banner.SequenceProgressText := 'Cycle: TRANSLATION P1';
             E_AutoCycleStep.AX3_OPEN_BUCKET: Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
             E_AutoCycleStep.AX4_DESCEND_OPEN:
                 IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
@@ -498,10 +498,10 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     CASE CycleStep OF
         E_AutoCycleStep.AX0_REPOS:
             OperatorActionCandidate := '[IHM/JOYSTICK] Démarrer le cycle (bouton Start ou homme-mort)';
-        E_AutoCycleStep.AX1_HOMING:
-            OperatorActionCandidate := '[IHM] Attendre référencement codeurs';
+        E_AutoCycleStep.AX1_INIT:
+            OperatorActionCandidate := '[IHM] Vérifier conditions initiales (référencement, treuils FDC haut)';
         E_AutoCycleStep.AX2_TRANSLATE_P1:
-            OperatorActionCandidate := '[IHM] Sélectionner position travail';
+            OperatorActionCandidate := '[JOYSTICK] Pousser vers la droite : translation jusqu''à P1';
         E_AutoCycleStep.AX3_OPEN_BUCKET:
             OperatorActionCandidate := '[IHM] Ouverture benne en cours';
         E_AutoCycleStep.AX4_DESCEND_OPEN:
@@ -526,7 +526,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             // Libellé de l'étape d'origine du défaut (CycleStepAtError).
             CASE CycleStepAtError OF
                 E_AutoCycleStep.AX0_REPOS: StepAtErrorStr := 'X0 (préparation)';
-                E_AutoCycleStep.AX1_HOMING: StepAtErrorStr := 'X1 (référencement)';
+                E_AutoCycleStep.AX1_INIT: StepAtErrorStr := 'X1 (référencement)';
                 E_AutoCycleStep.AX2_TRANSLATE_P1: StepAtErrorStr := 'X2 (sélection position)';
                 E_AutoCycleStep.AX3_OPEN_BUCKET: StepAtErrorStr := 'X3 (ouverture benne)';
                 E_AutoCycleStep.AX4_DESCEND_OPEN: StepAtErrorStr := 'X4 (descente)';

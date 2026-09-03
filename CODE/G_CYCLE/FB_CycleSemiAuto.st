@@ -61,6 +61,8 @@ VAR_INPUT
     HomedM2                 : BOOL;         // --> [HW] Codeur M2 reference
     TopPositionSensor       : BOOL;         // --> [HW] Capteur position haute (referencement)
     HomingRequest           : BOOL;         // --> [CMD] Demande de referencement (front)
+    InitPositionOk          : BOOL;         // --> [HW] Posture de depart OK (treuils/M3 dans la plage, calcul PRG_03) - condition AX1_INIT
+    WinchesAtTopWindow      : BOOL;         // --> [HW] Treuils M1 ET M2 dans la fenetre FDC logiciel haut (calcul PRG_03) - surveille en AX2
 
     // === CONFIG & COMMANDES CYCLE (IHM) ===
     CfgDrainTime           : TIME;         // --> [CFG] Duree d'egouttage X9 configurable IHM (<= 0 -> defaut interne)
@@ -127,6 +129,7 @@ VAR
     TouchPositionM          : REAL;         // . [LOC] Position M1 memorisee lors du contact fond
     RaiseTargetM            : REAL;         // . [LOC] Profondeur de remontee memorisee
     SelectedWorkTarget      : INT;          // . [LOC] Cible de travail (fige a 3=P1 depuis C3.1) - conserve pour diag/futur
+    InitConditionsOk        : BOOL;         // . [LOC] AX1_INIT : toutes les conditions initiales sont remplies
     StepMaxPrevState        : E_AutoCycleStep;  // . [LOC] Etape du scan precedent (rearmement StepMaxTimer au changement d'etape)
 
     // === TEMPORISATEURS INTERNES ===
@@ -152,7 +155,7 @@ END_VAR
 VAR CONSTANT
     // Paliers de vitesse treuil par etape (StepTgt des demandes WinchMxCmd, 1..5 ; 0 = arret).
     CST_StepSlow   : INT := 1;   // Palier lent : referencement X1, remontee X5, controle X7, vidage X11
-    CST_StepDive   : INT := 3;   // Palier plongee Kobold X4 : debit mini requis pour la mesure de fond
+    CST_StepDive   : INT := 4;   // Palier plongee Kobold AX4 (cycle diving integre) : palier 4 MINI ET MAXI impose, palier 5 interdit (GEL Q9)
     CST_StepLoaded : INT := 4;   // Palier montee en charge X8 (bridage strict <= 4, jamais palier 5)
     // Backstop anti-telescopage : ecart de position M1/M2 max tolere pendant les phases
     // reellement couplees hors X7 (qui a deja son propre controle a 0,25 m). Aligne sur
@@ -248,6 +251,13 @@ instCauses[6].Active   := (ABS(M1_CablePosM - M2_CablePosM) > CST_CoupledPosBack
                             OR (State = E_AutoCycleStep.AX11C_DUMP_REPOSITION));
 instCauses[6].Latching := TRUE;
 instCauses[6].Texte    := 'Ecart de position M1/M2 excessif en phase couplee (anti-telescopage)';
+
+// AX2 : pendant la translation vers P1 les treuils M1/M2 doivent RESTER au FDC
+// logiciel haut (WinchesAtTopWindow, calcul PRG_03). S'ils quittent la fenetre
+// -> defaut latche, sortie cycle (GEL SEMI_AUTO cause 7 / Q10).
+instCauses[7].Active   := NOT WinchesAtTopWindow AND (State = E_AutoCycleStep.AX2_TRANSLATE_P1);
+instCauses[7].Latching := TRUE;
+instCauses[7].Texte    := 'Treuils M1/M2 hors FDC haut pendant la translation vers P1';
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -400,34 +410,45 @@ CASE State OF
         // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
         IF (StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Latched THEN
             WaitingResume := FALSE;
-            State := E_AutoCycleStep.AX1_HOMING;
+            State := E_AutoCycleStep.AX1_INIT;
         END_IF;
 
-    E_AutoCycleStep.AX1_HOMING:
-        CycleStep := E_AutoCycleStep.AX1_HOMING;
+    E_AutoCycleStep.AX1_INIT:
+        CycleStep := E_AutoCycleStep.AX1_INIT;
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedDirection := 0;
 
-        // 🎯 Le referencement machine (datum M1/M2 + etat benne) est la responsabilite
-        // EXCLUSIVE de FB_MachineHomingCycle. SEMI_AUTO n'est cense etre accessible que si
-        // MachineHomed (gate FB_Modes). X1 ne fait donc QUE verifier la condition : elle
-        // n'emet AUCUN ordre de mouvement et ne contient aucun referencement.
-        IF HomedM1 AND HomedM2 THEN
-            CycleStateStr := 'X1 - Codeurs references : position validee';
+        // AX1_INIT : verification des CONDITIONS INITIALES du cycle. AUCUN ordre de
+        // mouvement, aucun referencement (datum M1/M2/benne = responsabilite exclusive
+        // FB_MachineHomingCycle). Conditions : codeurs M1/M2 references, aucun defaut
+        // latche, treuils au FDC logiciel haut (TopPositionSensor), et posture de depart
+        // OK (InitPositionOk : chariot M3 PAS a droite de P1 + treuils dans la plage
+        // +/- 0,4 m autour du FDC haut, calcul PRG_03 ; positionnement fin P1 = AX2).
+        InitConditionsOk := HomedM1 AND HomedM2 AND NOT Fault.Latched
+                            AND TopPositionSensor AND InitPositionOk;
+        IF InitConditionsOk THEN
+            CycleStateStr := 'AX1 - Conditions initiales OK';
             ExpectedAxis := E_OperatorAxis.NONE;
             WaitingForOperator := FALSE;
             WaitingForProcess := TRUE;
             OperatorActionId := 0;
             OperatorAction := '';
             State := E_AutoCycleStep.AX2_TRANSLATE_P1;   // franchie sans mouvement
-        ELSE
-            CycleStateStr := 'X1 - Machine non referencee';
+        ELSIF NOT (HomedM1 AND HomedM2) THEN
+            CycleStateStr := 'AX1 - Machine non referencee';
             ExpectedAxis := E_OperatorAxis.BUTTON;
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
             OperatorAction := 'Machine non referencee : passer en maintenance pour le referencement.';
+        ELSE
+            CycleStateStr := 'AX1 - Conditions initiales non remplies';
+            ExpectedAxis := E_OperatorAxis.BUTTON;
+            WaitingForOperator := TRUE;
+            WaitingForProcess := FALSE;
+            OperatorActionId := 16#0401;
+            OperatorAction := 'Amener les treuils au FDC haut.';
         END_IF;
 
     E_AutoCycleStep.AX2_TRANSLATE_P1:
@@ -436,14 +457,15 @@ CASE State OF
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
-        // C3.1 : le cycle part TOUJOURS de P1 (plus de selection de cible). Le treuil est a
-        // l'arret ; l'operateur amene M3 a P1 au joystick (ralenti automatique au capteur PV
-        // et arret sur FDC P1 assures par PRG_05/FB_Translation, comme en maintenance).
-        // Le cycle ne fait que fournir la consigne cible (P1) + surveiller l'arrivee.
+        // GEL SEMI_AUTO Q10 : le cycle n'emet AUCUNE commande M3 automatique (pas de
+        // selection de cible). L'operateur pousse le joystick VERS LA DROITE et amene M3
+        // a P1 ; ralenti PV + arret sur FDC P1 assures par PRG_05/FB_Translation (comme en
+        // maintenance). Le cycle SURVEILLE en permanence que les treuils M1/M2 RESTENT au
+        // FDC logiciel haut (WinchesAtTopWindow) : sortie sur defaut latche (cause 7) sinon.
+        // Le controle "chariot pas a droite de P1" est fait en AX1_INIT, pas ici.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
-        SelectedWorkTarget := 3;                  // P1, fige
-        TranslationCmd.PositionTgt := 3;          // cible P1 (le sens/ralenti PV/arret FDC = PRG_05)
+        TranslationCmd.PositionTgt := 3;          // repere P1 pour PRG_05 (info ; pas de pilotage cycle)
 
         IF Translation_At_P1 THEN
             ExpectedDirection := 0;
@@ -453,21 +475,15 @@ CASE State OF
             OperatorAction := 'Position P1 atteinte.';
             TranslationCmd.ReqStart := FALSE;
             State := E_AutoCycleStep.AX3_OPEN_BUCKET;
-        ELSIF Translation_At_Maintenance THEN
-            // Au-dela de P1 cote maintenance : le cycle ne ramene pas M3 -> l'operateur sort.
-            ExpectedDirection := 0;
-            WaitingForOperator := TRUE;
-            WaitingForProcess := FALSE;
-            OperatorActionId := 16#0402;
-            OperatorAction := 'Chariot cote maintenance : Abandon cycle, revenir a P1 en maintenance, relancer.';
-            TranslationCmd.ReqStart := FALSE;
         ELSE
-            // Entre tremie et P1 : consigne "joystick vers P1", maintien requis.
-            ExpectedDirection := -1;
+            // Entre tremie et P1 : l'operateur pousse le joystick VERS LA DROITE (axe
+            // Tremie--P2--P1--Maintenance : P1 est a droite de la tremie). Maintien requis ;
+            // ralenti PV + arret FDC P1 assures par PRG_05. Transition sur P1 STABILISE.
+            ExpectedDirection := 1;
             WaitingForOperator := NOT JoystickDeflected;
             WaitingForProcess := JoystickDeflected;
             OperatorActionId := 16#0402;
-            OperatorAction := 'Maintenir le joystick vers P1 : arret automatique sur P1.';
+            OperatorAction := 'Pousser le joystick vers la droite : arret automatique sur P1.';
             TranslationCmd.ReqStart := CycleMotionPermit;
         END_IF;
 
@@ -481,7 +497,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0403;
-        OperatorAction := 'Maintenir le joystick : ouverture complete de la benne.';
+        OperatorAction := 'Joystick pousse : ouverture benne jusqu au FDC logiciel benne ouverte.';
 
         // X3 = etape benne seule : treuils explicitement neutralises (config treuil unique par etape).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -509,7 +525,10 @@ CASE State OF
         OperatorActionId := 16#0404;
         OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
 
-        // M1 et M2 descendent ensemble (synchro gérée en aval)
+        // Cycle diving integre (GEL Q9) : palier 4 MINI ET MAXI impose (CST_StepDive := 4),
+        // palier 5 interdit. La tempo de sequencement des contacteurs de vitesse est
+        // conservee en aval (PRG_04 : montee progressive 1->4, pas de saut direct au
+        // palier 4). M1 et M2 descendent ensemble (synchro geree en aval).
         WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
         WinchM1Cmd.StepTgt  := CST_StepDive;

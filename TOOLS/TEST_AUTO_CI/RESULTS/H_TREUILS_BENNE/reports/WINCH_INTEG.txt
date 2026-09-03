@@ -1,6 +1,22 @@
-Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_WINCH_INTEG_aind55ip\strucpp-test-shSDt0\test_main.cpp: In lambda function:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_WINCH_INTEG_aind55ip\strucpp-test-shSDt0\test_main.cpp:4315:20: error: 'struct strucpp::ST_PROGRAMWINCHREQUEST' has no member named 'REQSTARTSTOP'
- 4315 |         s.SEQREQM2.REQSTARTSTOP = false;
-      |                    ^~~~~~~~~~~~
+Error compiling source files:
+
+FB_TestHarness_PRG_03.st:50:31: error: Undefined type 'E_CYCLESTEP' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_03'
+  50 |     CycleStep               : E_CycleStep;
+     |                               ^
+
+FB_TestHarness_PRG_03.st:59:31: error: Undefined type 'FB_CYCLE' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_03'
+  59 |     instCycleSemiAuto       : FB_Cycle;
+     |                               ^
+
+FB_Main_EndToEnd.st:153:31: error: Undefined type 'E_CYCLESTEP' in FUNCTION_BLOCK 'FB_MAIN_ENDTOEND'
+ 153 |     CycleStep               : E_CycleStep;
+     |                               ^
+
+FB_TestHarness_PRG_07.st:52:30: error: Undeclared variable 'E_CYCLESTEP'
+  52 |     CycleStep             := E_CycleStep.X0_PREPARATION,
+     |                              ^
+
+FB_TestHarness_PRG_07.st:55:30: error: Undeclared variable 'E_CYCLESTEP'
+  55 |     CycleStepAtError      := E_CycleStep.X0_PREPARATION,
+     |                              ^
 

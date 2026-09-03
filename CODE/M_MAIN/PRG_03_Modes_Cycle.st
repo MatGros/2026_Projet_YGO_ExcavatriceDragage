@@ -41,6 +41,12 @@ VAR
     DumpAtTremieActive            : BOOL;   // . [LOC] Option vidage à la trémie activée IHM
     DumpAtTremieAssistActive      : BOOL;   // . [LOC] Assistance vidage trémie active
     DumpAtTremieBucketOpenArmed   : BOOL;   // . [LOC] Armement ouverture benne à la trémie
+    CycleInitPositionOk           : BOOL;   // . [LOC] Posture de départ cycle SEMI_AUTO : chariot P1 + treuils au capteur haut (± CST_CycleInitWindowM)
+    CycleWinchesAtTopOk           : BOOL;   // . [LOC] Treuils M1 ET M2 dans la fenêtre FDC logiciel haut (± CST_CycleInitWindowM) - surveillé en AX2
+END_VAR
+
+VAR CONSTANT
+    CST_CycleInitWindowM : REAL := 0.4;    // Plage d'acceptation posture de départ cycle (m)
 END_VAR
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE & INTENTION OPÉRATEUR ===
@@ -105,6 +111,17 @@ ELSE
     END_IF;
     WinchBothMotionActive := (WinchBothMotionDirection <> 0);
 END_IF;
+
+// Posture de départ du cycle SEMI_AUTO (condition AX1_INIT) : treuils M1/M2 dans la
+// plage de position haute (± CST_CycleInitWindowM autour de la limite haute configurée)
+// ET chariot M3 PAS à droite de P1 (côté maintenance interdit). Le positionnement fin
+// sur P1 est fait ensuite en AX2. Calculé ici — FB_CycleSemiAuto ne fait que consommer.
+CycleWinchesAtTopOk :=
+    (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - _CommunCfgPersist.CfgCableLimitAscent_M) <= CST_CycleInitWindowM)
+    AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - _CommunCfgPersist.CfgCableLimitAscent_M) <= CST_CycleInitWindowM);
+
+// Posture de départ complète (AX1_INIT) = treuils en haut ET chariot M3 PAS à droite de P1.
+CycleInitPositionOk := NOT PRG_05_Translation.Data.M3_AtMaintenanceStable AND CycleWinchesAtTopOk;
 
 {endregion}
 
@@ -245,7 +262,9 @@ instCycleSemiAuto(
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
     HomedM1                 := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomedM2                 := PRG_02_Acquisition.Data.EncoderM2.Homed,
-    TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
+    TopPositionSensor       := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
+    InitPositionOk          := CycleInitPositionOk,
+    WinchesAtTopWindow      := CycleWinchesAtTopOk,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
     CfgDrainTime            := GVL_IHM.Cycle.Cfg.DrainTime,
     SkipDrainRequest        := GVL_IHM.Cycle.Cmd.BtnSkipDrain,
