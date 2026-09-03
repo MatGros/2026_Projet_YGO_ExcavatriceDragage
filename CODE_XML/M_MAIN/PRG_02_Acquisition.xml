@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T08:33:49.450107" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T08:33:49.450107">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T08:40:25.420352" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T08:40:25.420352">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2341,6 +2341,38 @@ Défaut FB_Encoder_Homing (état du référencement)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation M3 interdite pendant le cycle de homing machine</xhtml>
               </documentation>
             </variable>
+            <variable name="CmdWinchM1">
+              <type>
+                <derived name="ST_ProgramWinchRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre treuil M1 couple palier 1 (HX2 montee / HX3 descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdWinchM2">
+              <type>
+                <derived name="ST_ProgramWinchRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre treuil M2 couple palier 1 (HX2 montee / HX3 descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdBucketOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre ouverture benne palier 1 sans FDC soft (HX4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdBucketClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre fermeture benne palier 1 sans FDC soft (HX4)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -3410,6 +3442,10 @@ Data.MachineHoming.Instruction      := instMachineHomingCycle.MachineHomingInstr
 Data.MachineHoming.Failed           := instMachineHomingCycle.MachineHomingFailed;
 Data.MachineHoming.SeqStep          := TO_INT(instMachineHomingCycle.MachineHomingSeqStep);
 Data.MachineHoming.M3Locked         := instMachineHomingCycle.M3Locked;
+Data.MachineHoming.CmdWinchM1       := instMachineHomingCycle.CmdWinchM1;
+Data.MachineHoming.CmdWinchM2       := instMachineHomingCycle.CmdWinchM2;
+Data.MachineHoming.CmdBucketOpen    := instMachineHomingCycle.CmdBucketOpen;
+Data.MachineHoming.CmdBucketClose   := instMachineHomingCycle.CmdBucketClose;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
