@@ -5308,15 +5308,27 @@ tasks:
     de detection immersion/fond appelee dans AX6/AX7 (a trancher).
     Attention : DiveStartMin_M (_CycleDiveSearchCfgPersist) est partage avec
     l'altimetrie de lancement Kobold du GRAFCET (AT4) - a migrer, pas a supprimer.
+  audit_2026_09_03: >
+    RESULTAT AUDIT (2026-09-03) : FB_DiveSearch et FB_ExtractionAssist sont
+    Enable UNIQUEMENT en MAINT_N1 / MAINT_N2 (PRG_03:178-192), gates par les
+    toggles IHM TglEnableDiveSearch / TglEnableExtractionSequence. Ils fournissent
+    l'ASSISTANCE DRAGAGE EN MODE MANUEL (arret auto Kobold sur fond, permis de
+    descente couplee, permis de remontee assistee, MinStepDown). Ils n'ont JAMAIS
+    fait partie de SEMI_AUTO -> T237 (GRAFCET 20 steps) ne les rend PAS obsoletes.
+    CycleDumpAtTremie = assist manuel ouverture benne a la tremie (legacy, MAINT).
+    -> Le retrait est une DECISION FONCTIONNELLE (abandon de l'assistance mode
+    manuel ?), pas un nettoyage mecanique. BLOQUE tant que l'humain ne confirme
+    pas l'abandon de l'assistance dragage manuelle.
   objectifs:
-  - Audit consommateurs residuels des FB assistants (MAINT hors SEMI_AUTO)
-  - Retrait FB + instances + 3 ponts + 3 blocs persist + 12 types + slots GVL_IHM
-  - Migration de DiveStartMin_M (altimetrie lancement Kobold) hors _CycleDiveSearchCfgPersist
-  - Nettoyage troubleshooting (M_AssistanceDragage) + banner (DiveState)
+  - '[FAIT] Audit consommateurs : assistants actifs en MAINT manuel, PAS remplaces par T237'
+  - '[BLOQUE] Decision humaine : abandonne-t-on l assistance dragage en mode manuel ?'
+  - 'Si OUI : retrait FB + instances + 3 ponts + 3 blocs persist + 12 types + slots GVL_IHM'
+  - 'Migration DiveStartMin_M (altimetrie lancement Kobold) hors _CycleDiveSearchCfgPersist'
+  - 'Nettoyage troubleshooting (M_AssistanceDragage) + banner (DiveState)'
   - Bundle regenere, G200 PASS, gates palier C au niveau baseline, tests CI verts
   contrat: ''
   bloque_par:
-  - T237
+  - HUMAIN (decision abandon assistance manuelle)
 - id: T239
   parent_id: ''
   statut: ✅
