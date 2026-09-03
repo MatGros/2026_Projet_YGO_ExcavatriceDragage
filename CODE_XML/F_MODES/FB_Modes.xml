@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:49:27.661805" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:49:27.661805">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T05:57:35.158084" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T05:57:35.158084">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -897,7 +897,14 @@ Auth.M2SpeedLow           := ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps;
 IF (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed THEN
     Auth.Mode := E_Mode.MAINT_N1;
     Auth.ModeChangePendingBlocked := TRUE;
-    Auth.ModeChangeBlockReason := 'SEMI_AUTO refuse : machine non referencee';
+    // Motif distinct : perte de datum EN cours de SEMI_AUTO (arret controle assure en
+    // aval par MachineHoming.HomingLoss si les treuils bougeaient) vs simple selection
+    // refusee. Aucune coupure de puissance, aucun redemarrage automatique.
+    IF PrevArbitratedMode = E_Mode.SEMI_AUTO THEN
+        Auth.ModeChangeBlockReason := 'Datum machine perdu : arret controle';
+    ELSE
+        Auth.ModeChangeBlockReason := 'SEMI_AUTO refuse : datum machine absent';
+    END_IF;
 ELSIF (SelMode &lt;&gt; PrevArbitratedMode)
       AND (SelMode &lt;&gt; E_Mode.DISABLE) AND (PrevArbitratedMode &lt;&gt; E_Mode.DISABLE)
       AND NOT ModeChangeAllowed THEN
