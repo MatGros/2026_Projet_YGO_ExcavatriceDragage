@@ -26,13 +26,18 @@ END_SETUP
 
 
 (* ================= AC1 : HX0 etape initiale pure ===================== *)
-TEST 'TC-P09-H001 : HX0 n emet aucune sortie quel que soit l etat des entrees'
-    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N2, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2,
+(* Auto-armement HX0->HX1 des qu'on est en maintenance (N1/N2) non-homed : pour
+   tester l'inertie de HX0 on reste hors maintenance (SEMI_AUTO). *)
+TEST 'TC-P09-H001 : HX0 n emet aucune sortie (hors maintenance, pas d auto-armement)'
+    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.SEMI_AUTO, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO,
        TopPositionSensor := TRUE, WinchesMechanicallyStopped := FALSE,
        DeadmanArmed := TRUE, JoystickPull := TRUE, JoystickDeflected := TRUE,
        M1Status := StHomed, M2Status := StHomed, BucketOffsetValid := FALSE, Cfg := Cfg);
-    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'reste en HX0');
+    ADVANCE_TIME(500000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO,
+       M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'reste en HX0 hors maintenance');
     ASSERT_FALSE(Fb.CmdWinchM1.RunRequest, 'HX0 : aucun ordre treuil M1');
     ASSERT_FALSE(Fb.CmdWinchM2.RunRequest, 'HX0 : aucun ordre treuil M2');
     ASSERT_FALSE(Fb.CmdBucketOpen, 'HX0 : aucun ordre benne ouverture');
@@ -42,79 +47,84 @@ TEST 'TC-P09-H001 : HX0 n emet aucune sortie quel que soit l etat des entrees'
 END_TEST
 
 
-(* ================= AC2 : HT0 par motif 3 appuis en N2 =============== *)
-TEST 'TC-P09-H010 : HT0 franchi apres 3 appuis valides, en MAINT_N2'
-    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N2, Cfg := Cfg);
-    // appui 1
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ADVANCE_TIME(350000000);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    // appui 2
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ADVANCE_TIME(350000000);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    // appui 3
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ADVANCE_TIME(350000000);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_CHOICE, 'HT0 franchi -> HX1');
-    ASSERT_FALSE(Fb.M3Locked, 'AC11 : HX1 (choix, aucun mvt) -> M3 pas encore verrouillee');
+(* ================= AC2 : auto-armement + entree cycle ============== *)
+TEST 'TC-P09-H002 : auto-armement HX0 -> HX1 en maintenance (N1) non-homed'
+    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.SEMI_AUTO, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO,
+       M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'SEMI_AUTO : reste HX0');
+    // passage en MAINT_N1 non-homed : debounce puis auto-armement
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1,
+       M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ADVANCE_TIME(400000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1,
+       M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_CHOICE, 'MAINT_N1 non-homed : auto -> HX1');
+    ASSERT_FALSE(Fb.M3Locked, 'HX1 : M3 pas encore verrouillee (aucun mvt)');
+    ASSERT_FALSE(Fb.MachineHomingActive, 'HX1 : cycle pas encore actif');
+    ASSERT_EQ(Fb.MachineHomingStep, E_MachineHomingStep.OFFSET_UNKNOWN, 'HX1 en N1 : consigne passer N2');
 END_TEST
 
-TEST 'TC-P09-H012 : HT0 franchi sur front commande IHM StartRequest, en MAINT_N2'
-    Fb(Enable := TRUE, Reset := TRUE,  Mode := E_Mode.MAINT_N2, Cfg := Cfg);
+TEST 'TC-P09-H010 : validation 3 appuis HX1 -> HX2 en MAINT_N2 (pas sur capteur)'
+    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N2, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ADVANCE_TIME(400000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_CHOICE, 'auto -> HX1');
+    // 3 appuis courts (joystick centre, treuils arretes)
+    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ADVANCE_TIME(350000000);
+    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ADVANCE_TIME(350000000);
+    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ADVANCE_TIME(350000000);
+    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX2_CLIMB, '3 appuis -> HX2');
+    ASSERT_TRUE(Fb.M3Locked, 'AC11 : M3 verrouillee des HX2 (cycle engage)');
+END_TEST
+
+TEST 'TC-P09-H012 : entree cycle sur front commande IHM StartRequest, en MAINT_N2'
+    Fb(Enable := TRUE, Reset := TRUE,  Mode := E_Mode.SEMI_AUTO, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO, WinchesMechanicallyStopped := TRUE,
+       StartRequest := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ADVANCE_TIME(400000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO, WinchesMechanicallyStopped := TRUE,
+       StartRequest := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'SEMI_AUTO : StartRequest ignore');
+    // front StartRequest en MAINT_N2
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
        StartRequest := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'repos HX0');
-    // front montant StartRequest
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
        StartRequest := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_CHOICE, 'front StartRequest -> HX1');
-    // refuse hors MAINT_N2
-    Fb(Enable := TRUE, Reset := TRUE,  Mode := E_Mode.MAINT_N1, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       StartRequest := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       StartRequest := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'StartRequest hors N2 : reste HX0');
 END_TEST
 
-TEST 'TC-P09-H011 : HT0 refuse hors MAINT_N2 (meme motif)'
-    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N1, Cfg := Cfg);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ADVANCE_TIME(350000000);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ADVANCE_TIME(350000000);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ADVANCE_TIME(350000000);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'hors N2 : reste en HX0');
+TEST 'TC-P09-H011 : hors maintenance, ni auto ni motif ni StartRequest n arment'
+    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.SEMI_AUTO, Cfg := Cfg);
+    Fb(Enable := TRUE, Mode := E_Mode.SEMI_AUTO, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := TRUE, StartRequest := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ADVANCE_TIME(500000000);
+    Fb(Enable := TRUE, Mode := E_Mode.SEMI_AUTO, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := FALSE, StartRequest := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    Fb(Enable := TRUE, Mode := E_Mode.SEMI_AUTO, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := TRUE, StartRequest := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'hors maintenance : reste HX0');
 END_TEST
 
 
@@ -155,58 +165,42 @@ END_TEST
 
 
 (* ================= AC12 : guide operateur ========================== *)
-TEST 'TC-P09-H090 : guide hors cycle = BOTH_NOT_HOMED, et FAILED sur Fault.Latched'
-    Fb(Enable := TRUE, Reset := TRUE,  Mode := E_Mode.MAINT_N2, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionSensor := FALSE,
+TEST 'TC-P09-H090 : guide BOTH_NOT_HOMED, entree cycle, AC4, HomingError -> FAILED'
+    // Hors maintenance : le guide reste sur l echelle de priorite.
+    Fb(Enable := TRUE, Reset := TRUE,  Mode := E_Mode.SEMI_AUTO, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO, TopPositionSensor := FALSE,
        WinchesMechanicallyStopped := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingStep, E_MachineHomingStep.BOTH_NOT_HOMED, 'BOTH_NOT_HOMED hors cycle');
-    // amener en cycle (motif 3 appuis) puis HomingError -> Fault.Latched
+    // MAINT_N2 non-homed : auto-armement HX1 (debounce)
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+       M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ADVANCE_TIME(400000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_CHOICE, 'auto -> HX1');
+    // 3 appuis courts (pas sur capteur) -> HX2
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     ADVANCE_TIME(350000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+       BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     ADVANCE_TIME(350000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+       BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     ADVANCE_TIME(350000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+       BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_CHOICE, 'en HX1');
-    // HT1b : pas sur capteur + 3 appuis -> HX2
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ADVANCE_TIME(350000000);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ADVANCE_TIME(350000000);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ADVANCE_TIME(350000000);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
-       DeadmanArmed := TRUE, BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
-    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX2_CLIMB, 'HT1b -> HX2');
+       BtnValidation := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX2_CLIMB, '3 appuis -> HX2');
     ASSERT_TRUE(Fb.M3Locked, 'AC11 : M3 verrouillee des HX2 (cycle engage)');
     // AC4 : montee sous permis
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, TopPositionSensor := FALSE,

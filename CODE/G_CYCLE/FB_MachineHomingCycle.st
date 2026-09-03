@@ -101,6 +101,8 @@ VAR
     ClimbTimer                  : TON;                                      // . [LOC] Garde HX2 (montee au capteur)
     HomeAxesTimer               : TON;                                      // . [LOC] Garde HX3 (descente jusqu'au front descendant)
     SettleGraceTimer            : TON;                                      // . [LOC] Fenetre de grace decelaration a l'entree d'un step d'arret
+    AutoArmTimer                : TON;                                      // . [LOC] Debounce de l'auto-armement HX0->HX1 (anti-flapping MachineHomed)
+    FirstScanDone               : BOOL;                                     // . [LOC] Garde 1er scan : statuts codeurs pas encore stables au boot
 
     // === MOTIF DE VALIDATION "3 APPUIS" (V_EXPLICITE) ===
     ValidationBtnEdgeR          : R_TRIG;                                   // . [LOC] Front montant BtnValidation
@@ -121,6 +123,8 @@ VAR
     IsInMovePhase               : BOOL;                                    // . [LOC] Step GRAFCET qui commande un mouvement treuil (HX2/HX3)
     AxisHomingError             : BOOL;                                    // . [LOC] Erreur de homing M1 ou M2
     MotionOutOfPhase            : BOOL;                                    // . [LOC] Treuil bouge hors phase mouvement, grace decel ecoulee
+    ModeLostDuringCycle         : BOOL;                                    // . [LOC] Sortie de MAINT_N2 alors que le cycle est engage (HX2..HX6)
+    AutoArmCandidate            : BOOL;                                    // . [LOC] Machine non referencee en maintenance : le cycle se propose
     ClimbTimedOut               : BOOL;                                    // . [LOC] Garde HX2 ecoulee
     HomeAxesTimedOut            : BOOL;                                    // . [LOC] Garde HX3 ecoulee sans axes homes
     TransactionAbort            : BOOL;                                    // . [LOC] Condition d'abandon fail-safe pendant une phase mouvement
@@ -199,8 +203,21 @@ MotionOutOfPhase := CycleRunning AND NOT IsInMovePhase
                     AND NOT WinchesMechanicallyStopped AND SettleGraceTimer.Q;
 ClimbTimedOut    := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) AND ClimbTimer.Q;
 HomeAxesTimedOut := (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) AND HomeAxesTimer.Q AND NOT BothAxesHomed;
+// Sortie de MAINT_N2 alors qu'un step mouvement/commit est engage : abandon fail-safe.
+ModeLostDuringCycle := CycleRunning AND (Mode <> E_Mode.MAINT_N2);
 TransactionAbort := CycleRunning
-                    AND (AxisHomingError OR MotionOutOfPhase OR ClimbTimedOut OR HomeAxesTimedOut);
+                    AND (AxisHomingError OR MotionOutOfPhase OR ClimbTimedOut
+                         OR HomeAxesTimedOut OR ModeLostDuringCycle);
+
+// Auto-armement HX0->HX1 : machine non referencee en maintenance (N1 ou N2), le cycle
+// se propose de lui-meme (HX1 = annonce + choix, AUCUN mouvement). Debounce anti-flapping
+// sur MachineHomed + garde 1er scan (statuts codeurs non stables au boot). Jamais apres
+// defaut non acquitte (regle C : Reset conscient).
+AutoArmCandidate := FirstScanDone
+                    AND NOT MachineHomed AND NOT MachineHomingFailed
+                    AND NOT ReHomingAckRequired AND NOT HomingLossLatched
+                    AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2));
+AutoArmTimer(IN := AutoArmCandidate, PT := CST_ValidationHold);
 
 // --- Motif "3 appuis successifs" -> ExplicitValidationPulse ---
 // Pre-conditions permanentes : joystick centre + aucun mouvement + homme-mort arme.
@@ -366,20 +383,27 @@ CASE SeqStep OF
 
     E_MachineHomingTxState.HX0_REPOS:
         // Etape initiale pure : aucune action de sortie ici.
-        // Entree cycle (HT0) : commande IHM dediee OU motif 3 appuis joystick OU perte de
-        // datum ; toujours en MAINT_N2. HX1 = annonce + choix, aucun mouvement.
-        IF (StartEdge.Q OR ExplicitValidationPulse OR (MachineWasHomed AND NOT MachineHomedRaw))
-           AND (Mode = E_Mode.MAINT_N2) THEN
-            CommitPublished     := FALSE;   // datum invalide tant qu'il est refait
-            CommitDone          := FALSE;
-            MachineHomingFailed := FALSE;
-            HomeReqDone         := FALSE;
-            SeqStep             := E_MachineHomingTxState.HX1_CHOICE;
+        // HT0 : lancement explicite (commande IHM / motif 3 appuis) OU perte de datum OU
+        // auto (machine non referencee en maintenance N1/N2). Vers HX1 = annonce + choix,
+        // AUCUN mouvement. CommitPublished N'est PAS efface ici (fait a HT1b, cf. glitch).
+        IF (StartEdge.Q OR ExplicitValidationPulse
+            OR (MachineWasHomed AND NOT MachineHomedRaw)
+            OR AutoArmTimer.Q)
+           AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
+            HomeReqDone := FALSE;
+            SeqStep     := E_MachineHomingTxState.HX1_CHOICE;
         END_IF;
 
     E_MachineHomingTxState.HX1_CHOICE:
-        // Aucun ordre mouvement (garanti par la RAZ de tete de scan).
-        IF ExplicitValidationPulse THEN
+        // Annonce + choix. Aucun ordre mouvement (garanti par la RAZ de tete de scan).
+        // Retour HX0 si le datum redevient valide (recuperation transitoire) ou si on
+        // quitte la maintenance. Le referencement (mouvement) exige MAINT_N2.
+        IF MachineHomed
+           OR ((Mode <> E_Mode.MAINT_N1) AND (Mode <> E_Mode.MAINT_N2)) THEN
+            SeqStep := E_MachineHomingTxState.HX0_REPOS;
+        ELSIF ExplicitValidationPulse AND (Mode = E_Mode.MAINT_N2) THEN
+            CommitPublished := FALSE;   // datum invalide tant qu'il est refait (HT1b, deplace de HX0)
+            CommitDone      := FALSE;
             IF NOT TopPositionSensor THEN
                 SeqStep := E_MachineHomingTxState.HX2_CLIMB;
             ELSE
@@ -456,8 +480,8 @@ CASE SeqStep OF
         ELSIF BucketPermit AND JoystickPush THEN
             CmdBucketOpen := TRUE;
         END_IF;
-        // Fail-safe : erreur codeur OU treuil qui flue hors phase mouvement (grace ecoulee).
-        IF AxisHomingError OR MotionOutOfPhase THEN
+        // Fail-safe : erreur codeur OU treuil qui flue hors phase OU sortie de MAINT_N2.
+        IF AxisHomingError OR MotionOutOfPhase OR ModeLostDuringCycle THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
         ELSIF ExplicitValidationPulse AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
@@ -468,7 +492,7 @@ CASE SeqStep OF
 
     E_MachineHomingTxState.HX5_BUCKET_COMMIT:
         // Commit atomique de l'etat benne : impulsion 1 scan garantie via CommitDone.
-        IF AxisHomingError OR NOT BothAxesHomed OR MotionOutOfPhase THEN
+        IF AxisHomingError OR NOT BothAxesHomed OR MotionOutOfPhase OR ModeLostDuringCycle THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
         ELSIF NOT CommitDone THEN
@@ -546,7 +570,10 @@ ELSIF (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT)
     MachineHomingStep := E_MachineHomingStep.VALID;
     MachineHomingInstruction := 'Etat benne enregistre : fin homing';
 ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) THEN
-    IF NOT TopPositionSensor THEN
+    IF Mode <> E_Mode.MAINT_N2 THEN
+        MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
+        MachineHomingInstruction := 'Non ref : passer en MAINT_N2 pour referencer';
+    ELSIF NOT TopPositionSensor THEN
         MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
         MachineHomingInstruction := 'Non ref : valider pour lancer le homing';
     ELSE
@@ -581,6 +608,9 @@ IF LatchedEdge.Q THEN
 END_IF;
 
 Ready := Enable AND NOT Fault.Latched;
+
+// Garde 1er scan : bloque l'auto-armement tant que les statuts codeurs ne sont pas stables.
+FirstScanDone := TRUE;
 {endregion}
 
 END_FUNCTION_BLOCK
