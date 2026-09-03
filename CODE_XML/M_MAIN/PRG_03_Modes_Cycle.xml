@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:27:51.552065" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:27:51.552065">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:49:25.286087" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:49:25.286087">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2215,7 +2215,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // maintenu (homme-mort + joystick) et ne commande qu'en HX2/HX3 ; PRG_04 conserve
     // ses interlocks maintenance. Copie struct entiere (ST_ProgramWinchRequest).
     IF instModes.Auth.Mode = E_Mode.MAINT_N2
-       AND PRG_02_Acquisition.Data.MachineHoming.SeqStep &lt;&gt; 0 THEN
+       AND PRG_02_Acquisition.Data.MachineHoming.Active THEN
         Data.ReqProgram.ReqWinchM1 := PRG_02_Acquisition.Data.MachineHoming.CmdWinchM1;
         Data.ReqProgram.ReqWinchM2 := PRG_02_Acquisition.Data.MachineHoming.CmdWinchM2;
     END_IF;
@@ -2249,7 +2249,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // engage : evite le cumul ReqOpen+ReqClose si un assistant (DumpAtTremie / Extraction)
     // etait actif au meme instant. Hors cycle homing : demandes assistants inchangees.
     IF instModes.Auth.Mode = E_Mode.MAINT_N2
-       AND PRG_02_Acquisition.Data.MachineHoming.SeqStep &lt;&gt; 0 THEN
+       AND PRG_02_Acquisition.Data.MachineHoming.Active THEN
         Data.ReqProgram.ReqBucket.ReqOpen  := PRG_02_Acquisition.Data.MachineHoming.CmdBucketOpen;
         Data.ReqProgram.ReqBucket.ReqClose := PRG_02_Acquisition.Data.MachineHoming.CmdBucketClose;
     END_IF;
