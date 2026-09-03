@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:47:54.748183" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:47:54.748183">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:52:49.981579" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:52:49.981579">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -804,7 +804,15 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VALIDATION OPERATEUR (mecanisme homogene machine) ===
---&gt; [CMD] BP joystick — motif 3 appuis successifs (V_EXPLICITE)</xhtml>
+--&gt; [CMD] BP joystick (homme-mort) — motif 3 appuis successifs (V_EXPLICITE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Lancer le cycle (front) — commande IHM dediee, alternative au motif joystick</xhtml>
               </documentation>
             </variable>
             <variable name="Cfg">
@@ -1135,6 +1143,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant BtnValidation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant StartRequest (commande IHM lancer cycle)</xhtml>
               </documentation>
             </variable>
             <variable name="ValidationHoldTimer">
@@ -1501,6 +1517,7 @@ TransactionAbort := CycleRunning
 // Pre-conditions permanentes : joystick centre + aucun mouvement + homme-mort arme.
 ValidationBtnEdgeR(CLK := BtnValidation);
 ValidationBtnEdgeF(CLK := BtnValidation);
+StartEdge(CLK := StartRequest);
 ValidationHoldTimer(IN := BtnValidation, PT := CST_ValidationHold);
 ValidationGapTimer(IN := (ValidationPressCount &gt; 0) AND NOT BtnValidation, PT := CST_ValidationGap);
 
@@ -1510,7 +1527,10 @@ IF BtnValidation AND ValidationHoldTimer.Q THEN
     ValidationHeldOk := TRUE;
 END_IF;
 
-IF JoystickDeflected OR NOT WinchesMechanicallyStopped OR NOT DeadmanArmed THEN
+// Motif = geste STANDALONE (3 appuis courts sur le BP joystick, joystick centre,
+// treuils arretes). Ne PAS exiger DeadmanArmed : le BP joystick EST le bouton
+// homme-mort ; on ne peut pas le maintenir arme ET faire des appuis courts.
+IF JoystickDeflected OR NOT WinchesMechanicallyStopped THEN
     ValidationPressCount := 0;
     ValidationHeldOk     := FALSE;
 ELSIF ValidationGapTimer.Q THEN
@@ -1657,7 +1677,9 @@ CASE SeqStep OF
 
     E_MachineHomingTxState.HX0_REPOS:
         // Etape initiale pure : aucune action de sortie ici.
-        IF (ExplicitValidationPulse OR (MachineWasHomed AND NOT MachineHomedRaw))
+        // Entree cycle (HT0) : commande IHM dediee OU motif 3 appuis joystick OU perte de
+        // datum ; toujours en MAINT_N2. HX1 = annonce + choix, aucun mouvement.
+        IF (StartEdge.Q OR ExplicitValidationPulse OR (MachineWasHomed AND NOT MachineHomedRaw))
            AND (Mode = E_Mode.MAINT_N2) THEN
             CommitPublished     := FALSE;   // datum invalide tant qu'il est refait
             CommitDone          := FALSE;

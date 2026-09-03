@@ -73,6 +73,24 @@ TEST 'TC-P09-H010 : HT0 franchi apres 3 appuis valides, en MAINT_N2'
     ASSERT_FALSE(Fb.M3Locked, 'AC11 : HX1 (choix, aucun mvt) -> M3 pas encore verrouillee');
 END_TEST
 
+TEST 'TC-P09-H012 : HT0 franchi sur front commande IHM StartRequest, en MAINT_N2'
+    Fb(Enable := TRUE, Reset := TRUE,  Mode := E_Mode.MAINT_N2, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       StartRequest := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'repos HX0');
+    // front montant StartRequest
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, WinchesMechanicallyStopped := TRUE,
+       StartRequest := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_CHOICE, 'front StartRequest -> HX1');
+    // refuse hors MAINT_N2
+    Fb(Enable := TRUE, Reset := TRUE,  Mode := E_Mode.MAINT_N1, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
+       StartRequest := FALSE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,
+       StartRequest := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'StartRequest hors N2 : reste HX0');
+END_TEST
+
 TEST 'TC-P09-H011 : HT0 refuse hors MAINT_N2 (meme motif)'
     Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N1, Cfg := Cfg);
     Fb(Enable := TRUE, Mode := E_Mode.MAINT_N1, WinchesMechanicallyStopped := TRUE,

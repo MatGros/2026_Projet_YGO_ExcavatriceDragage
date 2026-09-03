@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:15:25.517716" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:15:25.517716">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:53:07.816082" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:53:07.816082">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3431,9 +3431,10 @@ instMachineHomingCycle(
     JoystickDeflected          := NOT Data.Joystick.AtNeutralXY,
     JoystickPull               := Data.Joystick.AxisY.DirectionPositive,
     JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
-    // BP validation (motif 3 appuis) : source BP joystick a mapper en acquisition HW.
-    // En attente : forcable en Watch CODESYS pour la MES banc.
-    BtnValidation              := FALSE,
+    // Lancer / valider le cycle : BP joystick (= bouton homme-mort) pour le motif 3 appuis,
+    // OU commande IHM dediee (front) pour le lancement direct.
+    BtnValidation              := HwIn.Operator.JoyBtnRaw,
+    StartRequest               := GVL_IHM.Modes.Cmd.BtnMachineHomingStart,
     Cfg                        := MachineHomingCfg
 );
 Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
@@ -5537,7 +5538,15 @@ NeutralYAct := NeutralYMem;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VALIDATION OPERATEUR (mecanisme homogene machine) ===
---&gt; [CMD] BP joystick — motif 3 appuis successifs (V_EXPLICITE)</xhtml>
+--&gt; [CMD] BP joystick (homme-mort) — motif 3 appuis successifs (V_EXPLICITE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Lancer le cycle (front) — commande IHM dediee, alternative au motif joystick</xhtml>
               </documentation>
             </variable>
             <variable name="Cfg">
@@ -5868,6 +5877,14 @@ NeutralYAct := NeutralYMem;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant BtnValidation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant StartRequest (commande IHM lancer cycle)</xhtml>
               </documentation>
             </variable>
             <variable name="ValidationHoldTimer">
@@ -6214,8 +6231,12 @@ DescendPermit       := DeadmanArmed AND JoystickPush;
 BucketPermit        := DeadmanArmed AND JoystickDeflected;
 
 // Fenetre de grace deceleration : armee des qu'on entre un step d'arret depuis une phase mouvement.
+// Fenetre de grace deceleration : armee sur tous les steps a l'arret (HX2N/HX3N +
+// HX4/HX5 ou les treuils doivent rester immobiles).
 SettleGraceTimer(IN := (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL)
-                       OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE), PT := CST_SettleGrace);
+                       OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE)
+                       OR (SeqStep = E_MachineHomingTxState.HX4_BUCKET_ADJUST)
+                       OR (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT), PT := CST_SettleGrace);
 
 // Conditions d'abandon fail-safe, chacune &lt;= 3 termes (std 2quater).
 AxisHomingError  := M1Status.HomingError OR M2Status.HomingError;
@@ -6230,6 +6251,7 @@ TransactionAbort := CycleRunning
 // Pre-conditions permanentes : joystick centre + aucun mouvement + homme-mort arme.
 ValidationBtnEdgeR(CLK := BtnValidation);
 ValidationBtnEdgeF(CLK := BtnValidation);
+StartEdge(CLK := StartRequest);
 ValidationHoldTimer(IN := BtnValidation, PT := CST_ValidationHold);
 ValidationGapTimer(IN := (ValidationPressCount &gt; 0) AND NOT BtnValidation, PT := CST_ValidationGap);
 
@@ -6239,7 +6261,10 @@ IF BtnValidation AND ValidationHoldTimer.Q THEN
     ValidationHeldOk := TRUE;
 END_IF;
 
-IF JoystickDeflected OR NOT WinchesMechanicallyStopped OR NOT DeadmanArmed THEN
+// Motif = geste STANDALONE (3 appuis courts sur le BP joystick, joystick centre,
+// treuils arretes). Ne PAS exiger DeadmanArmed : le BP joystick EST le bouton
+// homme-mort ; on ne peut pas le maintenir arme ET faire des appuis courts.
+IF JoystickDeflected OR NOT WinchesMechanicallyStopped THEN
     ValidationPressCount := 0;
     ValidationHeldOk     := FALSE;
 ELSIF ValidationGapTimer.Q THEN
@@ -6385,10 +6410,12 @@ HomeAxesTimer(IN := (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) AND (Cfg.Cf
 CASE SeqStep OF
 
     E_MachineHomingTxState.HX0_REPOS:
-        // Etape initiale pure : aucune action ici.
-        IF (ExplicitValidationPulse OR (MachineWasHomed AND NOT MachineHomedRaw))
+        // Etape initiale pure : aucune action de sortie ici.
+        // Entree cycle (HT0) : commande IHM dediee OU motif 3 appuis joystick OU perte de
+        // datum ; toujours en MAINT_N2. HX1 = annonce + choix, aucun mouvement.
+        IF (StartEdge.Q OR ExplicitValidationPulse OR (MachineWasHomed AND NOT MachineHomedRaw))
            AND (Mode = E_Mode.MAINT_N2) THEN
-            CommitPublished     := FALSE;   // datum invalide tant qu'il est refait (FINDING-003)
+            CommitPublished     := FALSE;   // datum invalide tant qu'il est refait
             CommitDone          := FALSE;
             MachineHomingFailed := FALSE;
             HomeReqDone         := FALSE;
@@ -6474,7 +6501,8 @@ CASE SeqStep OF
         ELSIF BucketPermit AND JoystickPush THEN
             CmdBucketOpen := TRUE;
         END_IF;
-        IF AxisHomingError THEN
+        // Fail-safe : erreur codeur OU treuil qui flue hors phase mouvement (grace ecoulee).
+        IF AxisHomingError OR MotionOutOfPhase THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
         ELSIF ExplicitValidationPulse AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
@@ -6485,7 +6513,7 @@ CASE SeqStep OF
 
     E_MachineHomingTxState.HX5_BUCKET_COMMIT:
         // Commit atomique de l'etat benne : impulsion 1 scan garantie via CommitDone.
-        IF AxisHomingError OR NOT BothAxesHomed THEN
+        IF AxisHomingError OR NOT BothAxesHomed OR MotionOutOfPhase THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
         ELSIF NOT CommitDone THEN
@@ -6513,7 +6541,10 @@ END_CASE;
 CycleRunning := (SeqStep &lt;&gt; E_MachineHomingTxState.HX0_REPOS)
              AND (SeqStep &lt;&gt; E_MachineHomingTxState.HX1_CHOICE);
 // Verrou translation : interdite des qu'on quitte l'etape initiale (calcul post-CASE : sans retard).
-M3Locked             := (SeqStep &lt;&gt; E_MachineHomingTxState.HX0_REPOS);
+// Verrou translation : actif uniquement quand le cycle est reellement engage
+// (HX2..HX6), pas en HX1 (annonce + choix, aucun mouvement) qui peut s'armer seul
+// apres une perte de datum. Consomme par PRG_05 (M3_SafeStop_Aggregate).
+M3Locked             := CycleRunning;
 MachineHomingActive  := CycleRunning;
 Lifecycle.Busy       := CycleRunning;
 Lifecycle.Done       := CommitPublished AND (SeqStep = E_MachineHomingTxState.HX0_REPOS);
@@ -6542,40 +6573,40 @@ ELSIF MachineHomingLossSafeStop THEN
     MachineHomingInstruction := 'Reference perdue : arret controle';
 ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
-    MachineHomingInstruction := 'Tirer joystick : monter au capteur haut';
+    MachineHomingInstruction := 'Non ref : monter palier 1 au capteur';
 ELSIF (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'Joystick au neutre, puis pousser';
+    MachineHomingInstruction := 'Non ref : neutre puis pousser (descente)';
 ELSIF (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) THEN
     MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
-    MachineHomingInstruction := 'Descente P1 : homing M1 M2 en cours';
+    MachineHomingInstruction := 'Non ref : descente P1, homing M1 M2';
 ELSIF (SeqStep = E_MachineHomingTxState.HX3N_PAUSE) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_MECHANICAL_STOP;
-    MachineHomingInstruction := 'Joystick au neutre';
+    MachineHomingInstruction := 'Joystick au neutre (non ref, palier 1)';
 ELSIF (SeqStep = E_MachineHomingTxState.HX4_BUCKET_ADJUST) THEN
     MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-    MachineHomingInstruction := 'Fermer la benne (P1), valider 3 appuis';
+    MachineHomingInstruction := 'Fermer benne, valider 3 appuis (non ref)';
 ELSIF (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT)
       OR (SeqStep = E_MachineHomingTxState.HX6_HOMED) THEN
     MachineHomingStep := E_MachineHomingStep.VALID;
-    MachineHomingInstruction := 'Etat benne enregistre : validation';
+    MachineHomingInstruction := 'Etat benne enregistre : fin homing';
 ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) THEN
     IF NOT TopPositionSensor THEN
         MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
-        MachineHomingInstruction := 'Non reference : valider pour monter';
+        MachineHomingInstruction := 'Non ref : valider pour lancer le homing';
     ELSE
         MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-        MachineHomingInstruction := 'Sur capteur : valider ou quitter N2';
+        MachineHomingInstruction := 'Non ref capteur haut : valider homing';
     END_IF;
 ELSIF NOT M1Status.HomedAndReliable AND NOT M2Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;
-    MachineHomingInstruction := 'M1 et M2 non references : homing N2';
+    MachineHomingInstruction := 'M1 M2 non ref : lancer homing (N2)';
 ELSIF NOT M1Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.M1_NOT_HOMED;
-    MachineHomingInstruction := 'M1 non reference : lancer le homing';
+    MachineHomingInstruction := 'M1 non ref : relancer le homing machine';
 ELSIF NOT M2Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.M2_NOT_HOMED;
-    MachineHomingInstruction := 'M2 non reference : lancer le homing';
+    MachineHomingInstruction := 'M2 non ref : relancer le homing machine';
 ELSIF NOT (CommitPublished OR BucketOffsetValid) THEN
     IF Mode &lt;&gt; E_Mode.MAINT_N2 THEN
         MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;

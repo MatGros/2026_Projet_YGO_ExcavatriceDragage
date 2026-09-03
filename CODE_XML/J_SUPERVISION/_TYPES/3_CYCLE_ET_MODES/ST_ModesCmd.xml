@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T11:05:47.076807" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T11:05:47.076807">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:52:05.358473" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:52:05.358473">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -51,6 +51,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Acquittement défaut FB_Modes uniquement ()</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnMachineHomingStart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Lancer le cycle de homing machine (MAINT_N2, front) — alternative au motif 3 appuis joystick</xhtml>
               </documentation>
             </variable>
             <variable name="SelJoystickWinch">

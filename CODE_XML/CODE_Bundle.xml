@@ -8419,6 +8419,14 @@ Valeur brute axe X (0..10000)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Acquittement défaut FB_Modes uniquement ()</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnMachineHomingStart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Lancer le cycle de homing machine (MAINT_N2, front) — alternative au motif 3 appuis joystick</xhtml>
+              </documentation>
+            </variable>
             <variable name="SelJoystickWinch">
               <type>
                 <INT />
@@ -28430,7 +28438,15 @@ NeutralYAct := NeutralYMem;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VALIDATION OPERATEUR (mecanisme homogene machine) ===
---&gt; [CMD] BP joystick — motif 3 appuis successifs (V_EXPLICITE)</xhtml>
+--&gt; [CMD] BP joystick (homme-mort) — motif 3 appuis successifs (V_EXPLICITE)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Lancer le cycle (front) — commande IHM dediee, alternative au motif joystick</xhtml>
               </documentation>
             </variable>
             <variable name="Cfg">
@@ -28761,6 +28777,14 @@ NeutralYAct := NeutralYMem;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant BtnValidation</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StartEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant StartRequest (commande IHM lancer cycle)</xhtml>
               </documentation>
             </variable>
             <variable name="ValidationHoldTimer">
@@ -29127,6 +29151,7 @@ TransactionAbort := CycleRunning
 // Pre-conditions permanentes : joystick centre + aucun mouvement + homme-mort arme.
 ValidationBtnEdgeR(CLK := BtnValidation);
 ValidationBtnEdgeF(CLK := BtnValidation);
+StartEdge(CLK := StartRequest);
 ValidationHoldTimer(IN := BtnValidation, PT := CST_ValidationHold);
 ValidationGapTimer(IN := (ValidationPressCount &gt; 0) AND NOT BtnValidation, PT := CST_ValidationGap);
 
@@ -29136,7 +29161,10 @@ IF BtnValidation AND ValidationHoldTimer.Q THEN
     ValidationHeldOk := TRUE;
 END_IF;
 
-IF JoystickDeflected OR NOT WinchesMechanicallyStopped OR NOT DeadmanArmed THEN
+// Motif = geste STANDALONE (3 appuis courts sur le BP joystick, joystick centre,
+// treuils arretes). Ne PAS exiger DeadmanArmed : le BP joystick EST le bouton
+// homme-mort ; on ne peut pas le maintenir arme ET faire des appuis courts.
+IF JoystickDeflected OR NOT WinchesMechanicallyStopped THEN
     ValidationPressCount := 0;
     ValidationHeldOk     := FALSE;
 ELSIF ValidationGapTimer.Q THEN
@@ -29283,7 +29311,9 @@ CASE SeqStep OF
 
     E_MachineHomingTxState.HX0_REPOS:
         // Etape initiale pure : aucune action de sortie ici.
-        IF (ExplicitValidationPulse OR (MachineWasHomed AND NOT MachineHomedRaw))
+        // Entree cycle (HT0) : commande IHM dediee OU motif 3 appuis joystick OU perte de
+        // datum ; toujours en MAINT_N2. HX1 = annonce + choix, aucun mouvement.
+        IF (StartEdge.Q OR ExplicitValidationPulse OR (MachineWasHomed AND NOT MachineHomedRaw))
            AND (Mode = E_Mode.MAINT_N2) THEN
             CommitPublished     := FALSE;   // datum invalide tant qu'il est refait
             CommitDone          := FALSE;
@@ -46024,9 +46054,10 @@ instMachineHomingCycle(
     JoystickDeflected          := NOT Data.Joystick.AtNeutralXY,
     JoystickPull               := Data.Joystick.AxisY.DirectionPositive,
     JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
-    // BP validation (motif 3 appuis) : source BP joystick a mapper en acquisition HW.
-    // En attente : forcable en Watch CODESYS pour la MES banc.
-    BtnValidation              := FALSE,
+    // Lancer / valider le cycle : BP joystick (= bouton homme-mort) pour le motif 3 appuis,
+    // OU commande IHM dediee (front) pour le lancement direct.
+    BtnValidation              := HwIn.Operator.JoyBtnRaw,
+    StartRequest               := GVL_IHM.Modes.Cmd.BtnMachineHomingStart,
     Cfg                        := MachineHomingCfg
 );
 Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
