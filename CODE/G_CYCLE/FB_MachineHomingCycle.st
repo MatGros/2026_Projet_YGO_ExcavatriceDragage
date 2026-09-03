@@ -108,10 +108,10 @@ VAR
     ValidationBtnEdgeR          : R_TRIG;                                   // . [LOC] Front montant BtnValidation
     ValidationBtnEdgeF          : F_TRIG;                                   // . [LOC] Front descendant BtnValidation
     StartEdge                   : R_TRIG;                                   // . [LOC] Front montant StartRequest (commande IHM lancer cycle)
-    ValidationHoldTimer         : TON;                                     // . [LOC] Maintien >= 300 ms d'un appui
+    ValidationHoldTimer         : TON;                                     // . [LOC] Maintien >= 150 ms d'un appui
     ValidationGapTimer          : TON;                                     // . [LOC] Fenetre <= 2 s entre appuis
     ValidationPressCount        : INT;                                     // . [LOC] Compteur d'appuis valides (0..3)
-    ValidationHeldOk            : BOOL;                                     // . [LOC] Appui courant maintenu >= 300 ms (latch, lu au relachement)
+    ValidationHeldOk            : BOOL;                                     // . [LOC] Appui courant maintenu >= 150 ms (latch, lu au relachement)
     ExplicitValidationPulse     : BOOL;                                    // . [LOC] Validation explicite acquise ce scan (impulsion 1 scan)
 
     // === CONDITIONS INTERMEDIAIRES NOMMEES (std 2quater : <= 3 termes) ===
@@ -143,8 +143,9 @@ VAR CONSTANT
     CST_CauseHomeAxesTimeout    : INT := 5;                                // HX3 : front descendant capteur non obtenu dans la garde (Latching)
 
     // === MOTIF 3 APPUIS ===
-    CST_ValidationHold  : TIME := T#300ms;   // Duree minimale d'un appui pris en compte
-    CST_ValidationGap   : TIME := T#2s;      // Fenetre maximale entre deux appuis
+    CST_ValidationHold     : TIME := T#300ms;   // Debounce anti-flapping de l'auto-armement HX0->HX1
+    CST_ValidationPressHold : TIME := T#150ms;  // Duree minimale d'un appui du motif 3 appuis
+    CST_ValidationGap      : TIME := T#2s;       // Fenetre maximale entre deux appuis
     CST_ValidationCount : INT  := 3;         // Nombre d'appuis requis
 
     // === DIVERS ===
@@ -224,7 +225,7 @@ AutoArmTimer(IN := AutoArmCandidate, PT := CST_ValidationHold);
 ValidationBtnEdgeR(CLK := BtnValidation);
 ValidationBtnEdgeF(CLK := BtnValidation);
 StartEdge(CLK := StartRequest);
-ValidationHoldTimer(IN := BtnValidation, PT := CST_ValidationHold);
+ValidationHoldTimer(IN := BtnValidation, PT := CST_ValidationPressHold);
 ValidationGapTimer(IN := (ValidationPressCount > 0) AND NOT BtnValidation, PT := CST_ValidationGap);
 
 // Latch "appui maintenu assez longtemps" : lu au relachement (le TON retombe le meme
