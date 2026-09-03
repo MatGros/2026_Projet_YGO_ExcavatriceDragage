@@ -5484,3 +5484,128 @@ tasks:
   - Alarme non bloquante en cas d'incoherence offset/mesure persistante
   contrat: ''
   bloque_par: []
+
+- id: T242
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: TRANSLATION M3 / POSITION
+  agent: ''
+  date: '2026-09-04T08:00:00+02:00'
+  titre: M3 translation - bits at position (tremie / P1 / zone maintenance) ne s activent pas
+  contexte: >
+    Mise en service 2026-09-03/04 (objectif seance 3). A l arrivee sur la
+    position tremie ou P1, et sans doute en zone maintenance, les bits
+    at position M3 ne s activent pas / ne se calculent pas. Bloque
+    l enchainement (verrous descente treuils lies a M3 a P1 / maintenance).
+  description: >
+    Diagnostic banc puis correction. Pistes : a) fenetre de tolerance position
+    trop serree vs precision decodage capteurs M3
+    (FB_Translation_PositionDecoder / PositionEstimator) ; b) logique de
+    detection de zone (maintenance) incorrecte ; c) position M3 pas mise a jour
+    (reference M3 non faite / decodage HS) ; d) seuils _TranslationCfgPersist
+    mal calibres. Action : snapshot position M3 + seuils, comparer ; elargir la
+    fenetre OU corriger la logique. Voir
+    INVENTAIRE_Defauts_Bloquants_MES_20260903 ligne M3-1 + MES-018.
+  objectifs:
+  - Bits at position M3 s activent a l arrivee tremie / P1 / zone maintenance
+  - Verrous descente treuils lies a M3 leves correctement a P1 / maintenance
+  - Seuils / logique documentes dans l inventaire des defauts bloquants
+  contrat: ''
+  bloque_par: []
+
+- id: T243
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: SECURITE / DEFAUTS MISE EN SERVICE
+  agent: ''
+  date: '2026-09-04T08:00:00+02:00'
+  titre: Inventaire exhaustif des defauts bloquants MES - decisions seuil / faux positif / bypass granulaire
+  contexte: >
+    Seance 2026-09-03 : serie de defauts bloquants en cascade (MES-045) -
+    MecaA/MecaE parasites, OffsetMaxFault a 13 cm, bucket ERROR. Utilisateur a
+    du desactiver FB_WinchSync a la main. Objectif seance 2 (2026-09-04) :
+    inventaire EXHAUSTIF de chaque garde qui latche ou bloque le mouvement,
+    decision par cas : garder / elargir seuil / faux positif (controle au
+    mauvais moment -> re-fenetrer) / bypass granulaire le temps des essais avec
+    reactivation planifiee a moyen terme.
+  description: >
+    Piloter DOC/WFLOW/AUDITS/INVENTAIRE_Defauts_Bloquants_MES_20260903.md
+    (pre-rempli). Pour chaque ligne : symptome reel + snapshot, seuil/fenetre
+    actuels, verdict. Regles : JAMAIS de bypass code jetable -> bypass IHM
+    granulaires existants (matrice AF-05 section 4bis) ; tout bypass pose ->
+    ligne section 3 du doc avec date de reactivation ; re-fenetrage trivial et
+    sur -> patch direct + MES sinon sous-tache. Prioriser les defauts lies a la
+    mesure de position (dependent de T240/T241).
+  reste_a_faire:
+  - Passe banc sur chaque ligne SW / BK / HM / M3 / PM du doc
+  - Trancher chaque verdict + tracer bypass avec reactivation
+  - Sous-taches pour les re-fenetrages non triviaux
+  objectifs:
+  - Inventaire complet renseigne avec preuve (snapshot/trace) par defaut
+  - Chaque defaut bloquant : verdict tranche + suite (patch / bypass+date / OK)
+  - Zero bypass code jetable ; tout bypass essai a une date de reactivation
+  contrat: ''
+  bloque_par: []
+
+- id: T244
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: MISE EN SERVICE / PERSISTANCE ET BITS FORCES
+  agent: ''
+  date: '2026-09-04T08:00:00+02:00'
+  titre: Test hors tension + reboot - ref codeurs persistantes + bits forces provisoires (usage partiel)
+  contexte: >
+    Objectif seance 6 (2026-09-04). Verifier qu apres coupure d alimentation et
+    reboot automate, les references codeurs M1/M2/benne et les reglages
+    persistants (GVL_PERSISTENT RETAIN) sont conserves. Definir un jeu de bits
+    forces PROVISOIRES documentes pour une utilisation PARTIELLE de la machine
+    (non entierement referencee) le temps de la mise en service.
+  description: >
+    1. Procedure test : relever tous les persistants critiques (datum M1/M2,
+    _BucketState, _WinchM1/M2CfgPersist, _CycleCfgPersist, offsets benne,
+    _CommunCfgPersist), couper alimentation, reboot, relever, comparer. Piege
+    PERSISTENT : un changement d initialiseur ne met pas a jour la valeur
+    retenue ; un champ neuf peut lire 0 sans Reinit. origine.
+    2. Inventaire des bits forces provisoires necessaires (HomedM1/M2 forces
+    pour jog benne partiel, bypass IHM granulaires) - chacun documente (raison,
+    portee, risque, retrait) dans l inventaire T243.
+    3. Regle : bit force cote code uniquement si [PROVISOIRE] + tache de
+    retrait ; privilegier bypass IHM.
+  objectifs:
+  - References codeurs + reglages persistants survivent a un reboot hors tension
+  - Liste des bits forces provisoires pour usage partiel, chacun trace + risque
+  - Aucun bit force code non marque [PROVISOIRE] / sans tache de retrait
+  contrat: ''
+  bloque_par: []
+
+- id: T245
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: CYCLE SEMI_AUTO / GRAFCET
+  agent: ''
+  date: '2026-09-04T08:00:00+02:00'
+  titre: Debug + execution banc du GRAFCET cycle SEMI_AUTO (20 steps, T237)
+  contexte: >
+    T237 (MES-041) : GRAFCET SEMI_AUTO refondu en 20 steps, 13/13 tests CI,
+    G200 PASS, revue agent - mais JAMAIS execute au banc. Objectif seance 4
+    (2026-09-04) : premiere execution reelle, debug pas a pas.
+  description: >
+    Executer le cycle SEMI_AUTO au banc, step par step (AX0 vers AX18),
+    snapshots / traces a chaque transition. Verifier : continuite joystick
+    (zero a-coup entre steps), sous-sequence diving AX4..AX8 + AX_DIVING_RETRY,
+    EXTRACTION AX9..AX12, DECHARGE AX13..AX18, rebouclage AX18 vers AX2.
+    Preconditions : machine referencee (T240/T241), retour contacteur Kobold
+    cable ou KoboldContactorFeedback = TRUE en dur assume, DiveStartMin_M regle
+    3-5 m. Consigner chaque anomalie en MES + inventaire defauts (T243).
+  objectifs:
+  - Cycle SEMI_AUTO parcourt AX0 vers AX18 vers AX2 au banc sans blocage non explique
+  - Continuite joystick respectee (zero a-coup entre steps)
+  - Sous-sequence diving + retry executees ; anomalies tracees en MES
+  contrat: ''
+  bloque_par:
+  - T240
+  - T241
