@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:40:21.882206" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:40:21.882206">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:40:39.483747" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:40:39.483747">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -555,6 +555,48 @@ TRUE des qu'un referencement a reussi</xhtml>
    💾 Données : Références brutes, état homed et contrôle de cohérence redémarrage
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_MachineHomingCfg">
+        <baseType>
+          <struct>
+            <variable name="ForceStepTarget">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=HX0 .. 9=HXF), borné côté FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f880fd6c-2d2e-5164-a545-6de3d9045768</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_MachineHomingCfg — Réglages IHM du cycle de référencement machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Mise en service. Les réglages géométriques (positions capteur, offsets benne)
+      restent portés par GVL_PERSISTENT (_WinchM1CfgPersist / _BucketCfgPersist).
+   💾 Ponté vers persist (_MachineHomingCfgPersist) via FB_CfgPersistBridge_MachineHomingCfg.
+   ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_SpeedStepTable">
@@ -1736,6 +1778,7 @@ palier : 1..5</xhtml>
             </Folder>
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
+              <Object Name="ST_MachineHomingCfg" ObjectId="f880fd6c-2d2e-5164-a545-6de3d9045768" />
             </Folder>
             <Folder Name="2_TRANSLATION">
               <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />

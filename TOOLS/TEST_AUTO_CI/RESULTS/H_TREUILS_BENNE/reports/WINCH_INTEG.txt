@@ -1,10 +1,6 @@
 Error compiling source files:
 
-FB_Hmi_BannerFormatter.st:266:46: error: Expected `Assign`, found `,`.
- 266 |             E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN, E_AutoCycleStep.AX15C_DUMP_REPOSITION: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
-     |                                              ^
-
-FB_Hmi_BannerFormatter.st:527:42: error: Expected `Assign`, found `,`.
- 527 |         E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN, E_AutoCycleStep.AX15C_DUMP_REPOSITION:
-     |                                          ^
+FB_Main_EndToEnd.st:361:18: error: Cannot assign E_AUTOCYCLESTEP to E_CYCLESTEP
+ 361 | CycleStep     := prg03.CycleStep;
+     |                  ^
 

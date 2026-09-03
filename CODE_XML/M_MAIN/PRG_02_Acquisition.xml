@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:28:44.344467" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:28:44.344467">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:40:46.517444" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:40:46.517444">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3418,7 +3418,7 @@ MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
 instMachineHomingCycle(
     Enable                     := TRUE,
-    Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
+    Reset                      := PRG_07_Supervision.FaultMachineReset_IHM OR GVL_IHM.MachineHomingCycle.Cmd.BtnAbort,
     Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
     TopPositionSensor          := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     WinchesMechanicallyStopped  := MachineHomingMechanicalStopOk,
@@ -3433,8 +3433,11 @@ instMachineHomingCycle(
     JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
     // Lancer / valider le cycle : BP joystick (= bouton homme-mort) pour le motif 3 appuis,
     // OU commande IHM dediee (front) pour le lancement direct.
-    BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.Modes.Cmd.BtnMachineHomingValidate,
-    StartRequest               := GVL_IHM.Modes.Cmd.BtnMachineHomingStart,
+    BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.MachineHomingCycle.Cmd.BtnValidate,
+    StartRequest               := GVL_IHM.MachineHomingCycle.Cmd.BtnStart,
+    CfgCommissioningEnable     := GVL_IHM.MachineHomingCycle.Cmd.TglCommissioning,
+    CfgForceStepTarget         := GVL_IHM.MachineHomingCycle.Cfg.ForceStepTarget,
+    CfgForceStepApply          := GVL_IHM.MachineHomingCycle.Cmd.BtnForceStepApply,
     Cfg                        := MachineHomingCfg
 );
 Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
@@ -5549,6 +5552,31 @@ NeutralYAct := NeutralYMem;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Lancer le cycle (front) — commande IHM dediee, alternative au motif joystick</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgCommissioningEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MISE EN SERVICE : forcage de step (encadre) ===
+--&gt; [CFG] Case IHM mise en service homing : deverrouille le forcage de step</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgForceStepTarget">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Step cible du forcage (0=HX0 .. 9=HXF), borne dans le FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgForceStepApply">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Applique le forcage (front) — impulsion, le GRAFCET reprend ensuite</xhtml>
+              </documentation>
+            </variable>
             <variable name="Cfg">
               <type>
                 <derived name="ST_fbMachineHomingCycle_Cfg" />
@@ -5901,6 +5929,22 @@ NeutralYAct := NeutralYMem;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant StartRequest (commande IHM lancer cycle)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepApplyEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant CfgForceStepApply (forcage step mise en service)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepClamped">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CfgForceStepTarget borne [0..9] (selecteur CASE)</xhtml>
               </documentation>
             </variable>
             <variable name="ValidationHoldTimer">
@@ -6379,6 +6423,38 @@ IF ResetEdge.Q THEN
     MachineWasHomed     := FALSE;
     HomingLossLatched   := FALSE;
     ReHomingAckRequired := FALSE;
+END_IF;
+{endregion}
+
+{region "§4bis MISE EN SERVICE : forcage de step (encadre, impulsion sur front)"}
+// === §4bis FORCAGE DE STEP (aide mise en service) ====================
+// Deverrouille UNIQUEMENT si : case IHM mise en service ET MAINT_N2 ET pas de defaut
+// latche. Impulsion sur front (pas un force continu qui se battrait avec le CASE) :
+// on pose SeqStep + on purge les latches incoherents, le GRAFCET reprend au scan suivant.
+ForceStepApplyEdge(CLK := CfgForceStepApply);
+IF ForceStepApplyEdge.Q
+   AND CfgCommissioningEnable
+   AND (Mode = E_Mode.MAINT_N2)
+   AND NOT Fault.Latched THEN
+    ForceStepClamped := LIMIT(0, CfgForceStepTarget, 9);
+    CASE ForceStepClamped OF
+        0: SeqStep := E_MachineHomingTxState.HX0_REPOS;
+        1: SeqStep := E_MachineHomingTxState.HX1_CHOICE;
+        2: SeqStep := E_MachineHomingTxState.HX2_CLIMB;
+        3: SeqStep := E_MachineHomingTxState.HX2N_NEUTRAL;
+        4: SeqStep := E_MachineHomingTxState.HX3_HOME_AXES;
+        5: SeqStep := E_MachineHomingTxState.HX3N_PAUSE;
+        6: SeqStep := E_MachineHomingTxState.HX4_BUCKET_ADJUST;
+        7: SeqStep := E_MachineHomingTxState.HX5_BUCKET_COMMIT;
+        8: SeqStep := E_MachineHomingTxState.HX6_HOMED;
+        9: SeqStep := E_MachineHomingTxState.HXF_FAILED;
+    END_CASE;
+    HomeReqDone  := FALSE;
+    SeenNeutral  := FALSE;
+    CommitDone   := FALSE;
+    PendingClose := FALSE;
+    ValidationPressCount := 0;
+    ValidationHeldOk     := FALSE;
 END_IF;
 {endregion}
 

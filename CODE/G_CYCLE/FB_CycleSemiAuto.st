@@ -484,7 +484,7 @@ CASE State OF
 
     E_AutoCycleStep.AX0_REPOS:
         CycleStep := E_AutoCycleStep.AX0_REPOS;
-        CycleStateStr := 'X0 - Verification coherence systeme';
+        CycleStateStr := 'AX0 - Verification coherence systeme';
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
@@ -496,7 +496,7 @@ CASE State OF
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0400;
-        OperatorAction := 'Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
+        OperatorAction := 'AX0 - Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
         SampleCountDone := FALSE;   // F2: réarmement du front de comptage à chaque entrée en X0
         BottomTouched   := FALSE;   // info fond touche effacee au repos
 
@@ -535,19 +535,19 @@ CASE State OF
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'Machine non referencee : passer en maintenance pour le referencement.';
+            OperatorAction := 'AX1 - Machine non referencee : passer en maintenance pour le referencement.';
         ELSE
             CycleStateStr := 'AX1 - Conditions initiales non remplies';
             ExpectedAxis := E_OperatorAxis.BUTTON;
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'Amener les treuils au FDC haut.';
+            OperatorAction := 'AX1 - Amener les treuils au FDC haut.';
         END_IF;
 
     E_AutoCycleStep.AX2_TRANSLATE_P1:
         CycleStep := E_AutoCycleStep.AX2_TRANSLATE_P1;
-        CycleStateStr := 'X2 - Mise en position P1 (translation)';
+        CycleStateStr := 'AX2 - Mise en position P1 (translation)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
@@ -566,7 +566,7 @@ CASE State OF
             WaitingForOperator := FALSE;
             WaitingForProcess := TRUE;
             OperatorActionId := 16#0402;
-            OperatorAction := 'Position P1 atteinte.';
+            OperatorAction := 'AX2 - Position P1 atteinte.';
             TranslationCmd.ReqStart := FALSE;
             State := E_AutoCycleStep.AX3_OPEN_BUCKET;
         ELSE
@@ -577,13 +577,13 @@ CASE State OF
             WaitingForOperator := NOT JoystickDeflected;
             WaitingForProcess := JoystickDeflected;
             OperatorActionId := 16#0402;
-            OperatorAction := 'Pousser le joystick vers la droite : arret automatique sur P1.';
+            OperatorAction := 'AX2 - Pousser le joystick vers la droite : arret automatique sur P1.';
             TranslationCmd.ReqStart := CycleMotionPermit;
         END_IF;
 
     E_AutoCycleStep.AX3_OPEN_BUCKET:
         CycleStep := E_AutoCycleStep.AX3_OPEN_BUCKET;
-        CycleStateStr := 'X3 - Ouverture benne';
+        CycleStateStr := 'AX3 - Ouverture benne';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -591,7 +591,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0403;
-        OperatorAction := 'Joystick pousse : ouverture benne jusqu au FDC logiciel benne ouverte.';
+        OperatorAction := 'AX3 - Joystick pousse : ouverture benne jusqu au FDC logiciel benne ouverte.';
 
         // X3 = etape benne seule : treuils explicitement neutralises (config treuil unique par etape).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -619,7 +619,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0404;
-        OperatorAction := 'Maintenir la descente palier 4 (Kobold pas encore enclenche).';
+        OperatorAction := 'AX4 - Maintenir la descente palier 4 (Kobold pas encore enclenche).';
 
         // Palier 4 MINI ET MAXI (CST_StepDive), palier 5 interdit (cause 8). Tempo
         // sequencement contacteurs conservee en aval (PRG_04 : montee progressive 1->4).
@@ -648,7 +648,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0405;
-        OperatorAction := 'Maintenir la descente palier 4 : initialisation Kobold en cours.';
+        OperatorAction := 'AX5 - Maintenir la descente palier 4 : initialisation Kobold en cours.';
 
         // Descente palier 4 maintenue ; enclenche le contacteur Kobold et attend le retour.
         WinchM1Cmd.RunRequest := CycleMotionPermit;
@@ -675,7 +675,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0406;
-        OperatorAction := 'Maintenir la descente palier 4 : entree dans l eau attendue.';
+        OperatorAction := 'AX6 - Maintenir la descente palier 4 : entree dans l eau attendue.';
 
         WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
@@ -700,7 +700,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0407;
-        OperatorAction := 'Maintenir la descente palier 4 sous l eau : detection du fond.';
+        OperatorAction := 'AX7 - Maintenir la descente palier 4 sous l eau : detection du fond.';
 
         WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
@@ -725,7 +725,7 @@ CASE State OF
         WaitingForOperator := FALSE;
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0408;
-        OperatorAction := 'Fond touche.';
+        OperatorAction := 'AX8 - Fond touche.';
 
         // Coupure INSTANTANEE de toutes les commandes treuils (meme scan) + Kobold coupe.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -751,7 +751,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0481;
-        OperatorAction := 'Reprise plongee : monter jusqu au FDC haut, puis relancer.';
+        OperatorAction := 'AX_DIVING_RETRY - Reprise plongee : monter jusqu au FDC haut, puis relancer.';
 
         // Remontee assistee palier lent, Kobold coupe.
         WinchM1Cmd.RunRequest := CycleMotionPermit;
@@ -781,7 +781,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0409;
-        OperatorAction := 'Maintenir la montee palier 1 : retente des cables, decollement du fond.';
+        OperatorAction := 'AX9 - Maintenir la montee palier 1 : retente des cables, decollement du fond.';
 
         // Palier 1 (doux). Selecteur couplage BOTH/M1/M2 = garde cote PRG_04 (GEL Q15),
         // le sequenceur commande toujours les deux treuils symetriquement.
@@ -808,7 +808,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040A;
-        OperatorAction := 'Maintenir la commande : fermeture de la benne.';
+        OperatorAction := 'AX10 - Maintenir la commande : fermeture de la benne.';
 
         // Etape benne seule : les DEUX treuils explicitement neutralises.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -838,7 +838,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'Maintenir la montee de controle : palier et synchronisme.';
+        OperatorAction := 'AX11 - Maintenir la montee de controle : palier et synchronisme.';
 
         // Palier max reglable IHM, borne [1..2] (defaut 1 / P1 ; P2 possible au besoin).
         WinchM1Cmd.RunRequest := CycleMotionPermit;
@@ -865,7 +865,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040C;
-        OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
+        OperatorAction := 'AX12 - Maintenir la montee en charge jusqu a la limite haute.';
 
         // Benne bien fermee -> palier 4 ; benne mal fermee (a peu pres) -> palier 1.
         // Pas de ralentissement 1 m avant la position top (montee franche).
@@ -894,7 +894,7 @@ CASE State OF
         WaitingForOperator := FALSE;
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0409;
-        OperatorAction := 'Egouttage : attendre la tempo ou appuyer sur "passer egouttage".';
+        OperatorAction := 'AX13 - Egouttage : attendre la tempo ou appuyer sur "passer egouttage".';
         WinchM1Cmd.RunRequest := FALSE;
         WinchM2Cmd.RunRequest := FALSE;
 
@@ -914,7 +914,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040A;
-        OperatorAction := 'Maintenir la translation vers la tremie de dechargement.';
+        OperatorAction := 'AX14 - Maintenir la translation vers la tremie de dechargement.';
 
         TranslationCmd.PositionTgt := 1; // Trémie
         TranslationCmd.ReqStart := CycleMotionPermit;
@@ -934,7 +934,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'A la tremie : deflechir vers le bas pour ouvrir la benne et vider.';
+        OperatorAction := 'AX15a - A la tremie : deflechir vers le bas pour ouvrir la benne et vider.';
 
         // Config treuil UNIQUE : arret des deux treuils (aucune descente couplee ici).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -955,7 +955,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'Maintenir : ouverture complete de la benne, vidage a la tremie.';
+        OperatorAction := 'AX15b - Maintenir : ouverture complete de la benne, vidage a la tremie.';
 
         // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
         // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -> plus
@@ -985,7 +985,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040C;
-        OperatorAction := 'Descente couplee M1+M2 ; relacher l option pour reprendre le vidage.';
+        OperatorAction := 'AX15c - Descente couplee M1+M2 ; relacher l option pour reprendre le vidage.';
 
         // Descente couplee M1+M2, palier lent, sous homme-mort. Commandes SYMETRIQUES
         // (meme sens, meme palier) -> FB_SyncDeviation actif, pas d'ecart volontaire.
@@ -1019,7 +1019,7 @@ CASE State OF
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#040D;
-        OperatorAction := 'Cycle termine. Aller en P1 (joystick vers la droite) pour recommencer.';
+        OperatorAction := 'AX18 - Cycle termine. Aller en P1 (joystick vers la droite) pour recommencer.';
 
         // Compteur de prélèvements (RETAIN) + durée du cycle — F2: cadré par front (1 seul par cycle)
         IF NOT SampleCountDone THEN
@@ -1054,7 +1054,7 @@ CASE State OF
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0480;
-        OperatorAction := 'Cycle stabilise sur anomalie : acquitter le defaut pour reinitialiser.';
+        OperatorAction := 'AX_STAB - Cycle stabilise sur anomalie : acquitter le defaut pour reinitialiser.';
 
 END_CASE;
 END_IF;

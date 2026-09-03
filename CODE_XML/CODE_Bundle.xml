@@ -8450,6 +8450,148 @@ Valeur brute axe X (0..10000)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_MachineHomingCfg">
+        <baseType>
+          <struct>
+            <variable name="ForceStepTarget">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=HX0 .. 9=HXF), borné côté FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>f880fd6c-2d2e-5164-a545-6de3d9045768</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   ⚙️ ST_MachineHomingCfg — Réglages IHM du cycle de référencement machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Mise en service. Les réglages géométriques (positions capteur, offsets benne)
+      restent portés par GVL_PERSISTENT (_WinchM1CfgPersist / _BucketCfgPersist).
+   💾 Ponté vers persist (_MachineHomingCfgPersist) via FB_CfgPersistBridge_MachineHomingCfg.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_MachineHomingCmd">
+        <baseType>
+          <struct>
+            <variable name="BtnStart">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">▶️ Lancer le cycle de homing machine (MAINT_N2, front) — alternative au motif 3 appuis joystick</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnValidate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Validation depuis IHM (front) — équivaut à 1 appui du motif 3 appuis joystick</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnAbort">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏹️ Quitter / abandonner le cycle homing (front) — retour HX0 sans mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglCommissioning">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Case mise en service : déverrouille le forçage de step (MAINT_N2). NON persisté (reset au reboot = sûr).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnForceStepApply">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Applique le forçage de step (front) — impulsion ; cible = ST_MachineHomingCfg.ForceStepTarget</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>866e29f3-d271-58a8-a751-8cc142d17dc5</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎮 ST_MachineHomingCmd — Commandes IHM du cycle de référencement machine
+   ───────────────────────────────────────────────────────────────
+   🎯 Cycle homing machine (FB_MachineHomingCycle) — orchestré en MAINT_N2.
+      Séparé de ST_CycleCmd (cycle SEMI_AUTO) et de ST_ModesCmd (modes de marche).
+      Boutons momentanés uniquement ; réglages -&gt; ST_MachineHomingCfg.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_MachineHomingHMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_MachineHomingCmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_MachineHoming" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Image publiée du FB_MachineHomingCycle (SeqStep, Step, Instruction, Failed, ordres, …)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Cfg">
+              <type>
+                <derived name="ST_MachineHomingCfg" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>68db3803-6283-560e-b893-1aedfb393c4d</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🎯 ST_MachineHomingHMI — Données d'échange IHM du cycle de référencement machine
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration Cmd / State / Cfg , homogène avec ST_CycleHMI /
+      ST_CycleDiveSearchHMI / ST_CycleExtractionHMI.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_ModesCmd">
         <baseType>
           <struct>
@@ -8480,22 +8622,6 @@ Valeur brute axe X (0..10000)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Acquittement défaut FB_Modes uniquement ()</xhtml>
               </documentation>
             </variable>
-            <variable name="BtnMachineHomingStart">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Lancer le cycle de homing machine (MAINT_N2, front) — alternative au motif 3 appuis joystick</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BtnMachineHomingValidate">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Validation homing depuis IHM (front) — equivaut a 1 appui du motif ; alternative au BP joystick pour la mise en service</xhtml>
-              </documentation>
-            </variable>
             <variable name="SelJoystickWinch">
               <type>
                 <INT />
@@ -8504,7 +8630,8 @@ Valeur brute axe X (0..10000)</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle de référencement machine -&gt; GVL_IHM.MachineHomingCycle (ST_MachineHomingHMI), plus dans Modes.
+Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement</xhtml>
               </documentation>
             </variable>
@@ -18914,6 +19041,70 @@ END_IF;
           </data>
         </addData>
       </pou>
+      <pou name="FB_CfgPersistBridge_MachineHomingCfg" pouType="functionBlock">
+        <interface>
+          <inputVars />
+          <outputVars>
+            <variable name="JustRestored">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
+&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
+              </documentation>
+            </variable>
+          </outputVars>
+          <inOutVars>
+            <variable name="Hmi">
+              <type>
+                <derived name="ST_MachineHomingCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
+&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Persist">
+              <type>
+                <derived name="ST_MachineHomingCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
+              </documentation>
+            </variable>
+          </inOutVars>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   💾 FB_CfgPersistBridge_MachineHomingCfg — Pont persistance pour ST_MachineHomingCfg
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
+   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
+   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
+   =======================================================================</xhtml>
+          </documentation>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">
+
+JustRestored := FALSE;
+IF NOT Hmi.Initialized THEN
+    Hmi := Persist;
+    Hmi.Initialized := TRUE;
+    JustRestored := TRUE;
+ELSE
+    Persist := Hmi;
+END_IF;
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a8062bc0-7fdb-5e62-a5e0-81e52d7b2b7e</ObjectId>
+          </data>
+        </addData>
+      </pou>
       <pou name="FB_CfgPersistBridge_SyncCfg" pouType="functionBlock">
         <interface>
           <inputVars />
@@ -20755,7 +20946,7 @@ CASE State OF
 
     E_AutoCycleStep.AX0_REPOS:
         CycleStep := E_AutoCycleStep.AX0_REPOS;
-        CycleStateStr := 'X0 - Verification coherence systeme';
+        CycleStateStr := 'AX0 - Verification coherence systeme';
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
@@ -20767,7 +20958,7 @@ CASE State OF
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0400;
-        OperatorAction := 'Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
+        OperatorAction := 'AX0 - Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
         SampleCountDone := FALSE;   // F2: réarmement du front de comptage à chaque entrée en X0
         BottomTouched   := FALSE;   // info fond touche effacee au repos
 
@@ -20806,19 +20997,19 @@ CASE State OF
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'Machine non referencee : passer en maintenance pour le referencement.';
+            OperatorAction := 'AX1 - Machine non referencee : passer en maintenance pour le referencement.';
         ELSE
             CycleStateStr := 'AX1 - Conditions initiales non remplies';
             ExpectedAxis := E_OperatorAxis.BUTTON;
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'Amener les treuils au FDC haut.';
+            OperatorAction := 'AX1 - Amener les treuils au FDC haut.';
         END_IF;
 
     E_AutoCycleStep.AX2_TRANSLATE_P1:
         CycleStep := E_AutoCycleStep.AX2_TRANSLATE_P1;
-        CycleStateStr := 'X2 - Mise en position P1 (translation)';
+        CycleStateStr := 'AX2 - Mise en position P1 (translation)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
@@ -20837,7 +21028,7 @@ CASE State OF
             WaitingForOperator := FALSE;
             WaitingForProcess := TRUE;
             OperatorActionId := 16#0402;
-            OperatorAction := 'Position P1 atteinte.';
+            OperatorAction := 'AX2 - Position P1 atteinte.';
             TranslationCmd.ReqStart := FALSE;
             State := E_AutoCycleStep.AX3_OPEN_BUCKET;
         ELSE
@@ -20848,13 +21039,13 @@ CASE State OF
             WaitingForOperator := NOT JoystickDeflected;
             WaitingForProcess := JoystickDeflected;
             OperatorActionId := 16#0402;
-            OperatorAction := 'Pousser le joystick vers la droite : arret automatique sur P1.';
+            OperatorAction := 'AX2 - Pousser le joystick vers la droite : arret automatique sur P1.';
             TranslationCmd.ReqStart := CycleMotionPermit;
         END_IF;
 
     E_AutoCycleStep.AX3_OPEN_BUCKET:
         CycleStep := E_AutoCycleStep.AX3_OPEN_BUCKET;
-        CycleStateStr := 'X3 - Ouverture benne';
+        CycleStateStr := 'AX3 - Ouverture benne';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -20862,7 +21053,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0403;
-        OperatorAction := 'Joystick pousse : ouverture benne jusqu au FDC logiciel benne ouverte.';
+        OperatorAction := 'AX3 - Joystick pousse : ouverture benne jusqu au FDC logiciel benne ouverte.';
 
         // X3 = etape benne seule : treuils explicitement neutralises (config treuil unique par etape).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -20890,7 +21081,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0404;
-        OperatorAction := 'Maintenir la descente palier 4 (Kobold pas encore enclenche).';
+        OperatorAction := 'AX4 - Maintenir la descente palier 4 (Kobold pas encore enclenche).';
 
         // Palier 4 MINI ET MAXI (CST_StepDive), palier 5 interdit (cause 8). Tempo
         // sequencement contacteurs conservee en aval (PRG_04 : montee progressive 1-&gt;4).
@@ -20919,7 +21110,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0405;
-        OperatorAction := 'Maintenir la descente palier 4 : initialisation Kobold en cours.';
+        OperatorAction := 'AX5 - Maintenir la descente palier 4 : initialisation Kobold en cours.';
 
         // Descente palier 4 maintenue ; enclenche le contacteur Kobold et attend le retour.
         WinchM1Cmd.RunRequest := CycleMotionPermit;
@@ -20946,7 +21137,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0406;
-        OperatorAction := 'Maintenir la descente palier 4 : entree dans l eau attendue.';
+        OperatorAction := 'AX6 - Maintenir la descente palier 4 : entree dans l eau attendue.';
 
         WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
@@ -20971,7 +21162,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0407;
-        OperatorAction := 'Maintenir la descente palier 4 sous l eau : detection du fond.';
+        OperatorAction := 'AX7 - Maintenir la descente palier 4 sous l eau : detection du fond.';
 
         WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
@@ -20996,7 +21187,7 @@ CASE State OF
         WaitingForOperator := FALSE;
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0408;
-        OperatorAction := 'Fond touche.';
+        OperatorAction := 'AX8 - Fond touche.';
 
         // Coupure INSTANTANEE de toutes les commandes treuils (meme scan) + Kobold coupe.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -21022,7 +21213,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0481;
-        OperatorAction := 'Reprise plongee : monter jusqu au FDC haut, puis relancer.';
+        OperatorAction := 'AX_DIVING_RETRY - Reprise plongee : monter jusqu au FDC haut, puis relancer.';
 
         // Remontee assistee palier lent, Kobold coupe.
         WinchM1Cmd.RunRequest := CycleMotionPermit;
@@ -21052,7 +21243,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0409;
-        OperatorAction := 'Maintenir la montee palier 1 : retente des cables, decollement du fond.';
+        OperatorAction := 'AX9 - Maintenir la montee palier 1 : retente des cables, decollement du fond.';
 
         // Palier 1 (doux). Selecteur couplage BOTH/M1/M2 = garde cote PRG_04 (GEL Q15),
         // le sequenceur commande toujours les deux treuils symetriquement.
@@ -21079,7 +21270,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040A;
-        OperatorAction := 'Maintenir la commande : fermeture de la benne.';
+        OperatorAction := 'AX10 - Maintenir la commande : fermeture de la benne.';
 
         // Etape benne seule : les DEUX treuils explicitement neutralises.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -21109,7 +21300,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'Maintenir la montee de controle : palier et synchronisme.';
+        OperatorAction := 'AX11 - Maintenir la montee de controle : palier et synchronisme.';
 
         // Palier max reglable IHM, borne [1..2] (defaut 1 / P1 ; P2 possible au besoin).
         WinchM1Cmd.RunRequest := CycleMotionPermit;
@@ -21136,7 +21327,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040C;
-        OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
+        OperatorAction := 'AX12 - Maintenir la montee en charge jusqu a la limite haute.';
 
         // Benne bien fermee -&gt; palier 4 ; benne mal fermee (a peu pres) -&gt; palier 1.
         // Pas de ralentissement 1 m avant la position top (montee franche).
@@ -21165,7 +21356,7 @@ CASE State OF
         WaitingForOperator := FALSE;
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0409;
-        OperatorAction := 'Egouttage : attendre la tempo ou appuyer sur "passer egouttage".';
+        OperatorAction := 'AX13 - Egouttage : attendre la tempo ou appuyer sur "passer egouttage".';
         WinchM1Cmd.RunRequest := FALSE;
         WinchM2Cmd.RunRequest := FALSE;
 
@@ -21185,7 +21376,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040A;
-        OperatorAction := 'Maintenir la translation vers la tremie de dechargement.';
+        OperatorAction := 'AX14 - Maintenir la translation vers la tremie de dechargement.';
 
         TranslationCmd.PositionTgt := 1; // Trémie
         TranslationCmd.ReqStart := CycleMotionPermit;
@@ -21205,7 +21396,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'A la tremie : deflechir vers le bas pour ouvrir la benne et vider.';
+        OperatorAction := 'AX15a - A la tremie : deflechir vers le bas pour ouvrir la benne et vider.';
 
         // Config treuil UNIQUE : arret des deux treuils (aucune descente couplee ici).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -21226,7 +21417,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'Maintenir : ouverture complete de la benne, vidage a la tremie.';
+        OperatorAction := 'AX15b - Maintenir : ouverture complete de la benne, vidage a la tremie.';
 
         // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
         // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -&gt; plus
@@ -21256,7 +21447,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040C;
-        OperatorAction := 'Descente couplee M1+M2 ; relacher l option pour reprendre le vidage.';
+        OperatorAction := 'AX15c - Descente couplee M1+M2 ; relacher l option pour reprendre le vidage.';
 
         // Descente couplee M1+M2, palier lent, sous homme-mort. Commandes SYMETRIQUES
         // (meme sens, meme palier) -&gt; FB_SyncDeviation actif, pas d'ecart volontaire.
@@ -21290,7 +21481,7 @@ CASE State OF
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#040D;
-        OperatorAction := 'Cycle termine. Aller en P1 (joystick vers la droite) pour recommencer.';
+        OperatorAction := 'AX18 - Cycle termine. Aller en P1 (joystick vers la droite) pour recommencer.';
 
         // Compteur de prélèvements (RETAIN) + durée du cycle — F2: cadré par front (1 seul par cycle)
         IF NOT SampleCountDone THEN
@@ -21325,7 +21516,7 @@ CASE State OF
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0480;
-        OperatorAction := 'Cycle stabilise sur anomalie : acquitter le defaut pour reinitialiser.';
+        OperatorAction := 'AX_STAB - Cycle stabilise sur anomalie : acquitter le defaut pour reinitialiser.';
 
 END_CASE;
 END_IF;
@@ -28953,6 +29144,31 @@ NeutralYAct := NeutralYMem;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Lancer le cycle (front) — commande IHM dediee, alternative au motif joystick</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgCommissioningEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MISE EN SERVICE : forcage de step (encadre) ===
+--&gt; [CFG] Case IHM mise en service homing : deverrouille le forcage de step</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgForceStepTarget">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Step cible du forcage (0=HX0 .. 9=HXF), borne dans le FB</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgForceStepApply">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Applique le forcage (front) — impulsion, le GRAFCET reprend ensuite</xhtml>
+              </documentation>
+            </variable>
             <variable name="Cfg">
               <type>
                 <derived name="ST_fbMachineHomingCycle_Cfg" />
@@ -29305,6 +29521,22 @@ NeutralYAct := NeutralYMem;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant StartRequest (commande IHM lancer cycle)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepApplyEdge">
+              <type>
+                <derived name="R_TRIG" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant CfgForceStepApply (forcage step mise en service)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepClamped">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CfgForceStepTarget borne [0..9] (selecteur CASE)</xhtml>
               </documentation>
             </variable>
             <variable name="ValidationHoldTimer">
@@ -29783,6 +30015,38 @@ IF ResetEdge.Q THEN
     MachineWasHomed     := FALSE;
     HomingLossLatched   := FALSE;
     ReHomingAckRequired := FALSE;
+END_IF;
+{endregion}
+
+{region "§4bis MISE EN SERVICE : forcage de step (encadre, impulsion sur front)"}
+// === §4bis FORCAGE DE STEP (aide mise en service) ====================
+// Deverrouille UNIQUEMENT si : case IHM mise en service ET MAINT_N2 ET pas de defaut
+// latche. Impulsion sur front (pas un force continu qui se battrait avec le CASE) :
+// on pose SeqStep + on purge les latches incoherents, le GRAFCET reprend au scan suivant.
+ForceStepApplyEdge(CLK := CfgForceStepApply);
+IF ForceStepApplyEdge.Q
+   AND CfgCommissioningEnable
+   AND (Mode = E_Mode.MAINT_N2)
+   AND NOT Fault.Latched THEN
+    ForceStepClamped := LIMIT(0, CfgForceStepTarget, 9);
+    CASE ForceStepClamped OF
+        0: SeqStep := E_MachineHomingTxState.HX0_REPOS;
+        1: SeqStep := E_MachineHomingTxState.HX1_CHOICE;
+        2: SeqStep := E_MachineHomingTxState.HX2_CLIMB;
+        3: SeqStep := E_MachineHomingTxState.HX2N_NEUTRAL;
+        4: SeqStep := E_MachineHomingTxState.HX3_HOME_AXES;
+        5: SeqStep := E_MachineHomingTxState.HX3N_PAUSE;
+        6: SeqStep := E_MachineHomingTxState.HX4_BUCKET_ADJUST;
+        7: SeqStep := E_MachineHomingTxState.HX5_BUCKET_COMMIT;
+        8: SeqStep := E_MachineHomingTxState.HX6_HOMED;
+        9: SeqStep := E_MachineHomingTxState.HXF_FAILED;
+    END_CASE;
+    HomeReqDone  := FALSE;
+    SeenNeutral  := FALSE;
+    CommitDone   := FALSE;
+    PendingClose := FALSE;
+    ValidationPressCount := 0;
+    ValidationHeldOk     := FALSE;
 END_IF;
 {endregion}
 
@@ -46616,7 +46880,7 @@ MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
 instMachineHomingCycle(
     Enable                     := TRUE,
-    Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
+    Reset                      := PRG_07_Supervision.FaultMachineReset_IHM OR GVL_IHM.MachineHomingCycle.Cmd.BtnAbort,
     Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
     TopPositionSensor          := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     WinchesMechanicallyStopped  := MachineHomingMechanicalStopOk,
@@ -46631,8 +46895,11 @@ instMachineHomingCycle(
     JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
     // Lancer / valider le cycle : BP joystick (= bouton homme-mort) pour le motif 3 appuis,
     // OU commande IHM dediee (front) pour le lancement direct.
-    BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.Modes.Cmd.BtnMachineHomingValidate,
-    StartRequest               := GVL_IHM.Modes.Cmd.BtnMachineHomingStart,
+    BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.MachineHomingCycle.Cmd.BtnValidate,
+    StartRequest               := GVL_IHM.MachineHomingCycle.Cmd.BtnStart,
+    CfgCommissioningEnable     := GVL_IHM.MachineHomingCycle.Cmd.TglCommissioning,
+    CfgForceStepTarget         := GVL_IHM.MachineHomingCycle.Cfg.ForceStepTarget,
+    CfgForceStepApply          := GVL_IHM.MachineHomingCycle.Cmd.BtnForceStepApply,
     Cfg                        := MachineHomingCfg
 );
 Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
@@ -51617,6 +51884,14 @@ PowerCutOffActive := PowerCutOffReq;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle</xhtml>
               </documentation>
             </variable>
+            <variable name="instCfgPersistBridgeMachineHoming">
+              <type>
+                <derived name="FB_CfgPersistBridge_MachineHomingCfg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle homing machine</xhtml>
+              </documentation>
+            </variable>
             <variable name="instCfgPersistBridgeCycleDiveSearchCfg">
               <type>
                 <derived name="FB_CfgPersistBridge_CycleDiveSearchCfg" />
@@ -52151,6 +52426,11 @@ IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
+instCfgPersistBridgeMachineHoming(Hmi := GVL_IHM.MachineHomingCycle.Cfg, Persist := _MachineHomingCfgPersist);
+IF instCfgPersistBridgeMachineHoming.JustRestored THEN
+    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
+END_IF;
+
 // Ponts persistance configs cycle (DiveSearch / Extraction / DumpAtTremie)
 instCfgPersistBridgeCycleDiveSearchCfg(Hmi := GVL_IHM.CycleDiveSearch.Cfg, Persist := _CycleDiveSearchCfgPersist);
 IF instCfgPersistBridgeCycleDiveSearchCfg.JustRestored THEN
@@ -52483,6 +52763,8 @@ GVL_IHM.Modes.State.M2BrakeApplied := PRG_03_Modes_Cycle.Data.Auth.M2BrakeApplie
 GVL_IHM.Modes.State.M2SpeedLow := PRG_03_Modes_Cycle.Data.Auth.M2SpeedLow;
 GVL_IHM.Modes.State.HomingRequiredM1 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM1;
 GVL_IHM.Modes.State.HomingRequiredM2 := PRG_03_Modes_Cycle.Data.Auth.HomingRequiredM2;
+// Etat publie du cycle de referencement machine (visu IHM) - recopie whole-struct.
+GVL_IHM.MachineHomingCycle.State := PRG_02_Acquisition.Data.MachineHoming;
 
 // ---------- §3f. État joystick &amp; réseau (diagnostic bus) ----------
 GVL_IHM.JOY1Joystick.State.RawX := PRG_02_Acquisition.HwIn.Operator.JoyXRaw_ANA1;
@@ -53062,6 +53344,14 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Commandes, états et diagnostic cycle semi-automatique</xhtml>
+          </documentation>
+        </variable>
+        <variable name="MachineHomingCycle">
+          <type>
+            <derived name="ST_MachineHomingHMI" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Cycle de référencement machine (FB_MachineHomingCycle) — MAINT_N2</xhtml>
           </documentation>
         </variable>
         <variable name="CycleDiveSearch">
@@ -53900,6 +54190,9 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
               <Object Name="ST_CycleCmd" ObjectId="dac4a7a5-fa3d-5326-bf1a-3202f2fbdc28" />
               <Object Name="ST_CycleHMI" ObjectId="313e1a80-c1fe-5852-823a-20d942e4c852" />
               <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
+              <Object Name="ST_MachineHomingCfg" ObjectId="f880fd6c-2d2e-5164-a545-6de3d9045768" />
+              <Object Name="ST_MachineHomingCmd" ObjectId="866e29f3-d271-58a8-a751-8cc142d17dc5" />
+              <Object Name="ST_MachineHomingHMI" ObjectId="68db3803-6283-560e-b893-1aedfb393c4d" />
               <Object Name="ST_ModesCmd" ObjectId="edbd07e7-72fc-5cee-a795-a49979bf9667" />
               <Object Name="ST_ModesCycleInterPrg" ObjectId="c66e2ea9-61f6-5705-86e7-b9f19e28d4f1" />
               <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />
@@ -54020,6 +54313,7 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             <Object Name="FB_CfgPersistBridge_CycleDiveSearchCfg" ObjectId="a92cb09a-e287-5430-8474-ac8533ffbe1a" />
             <Object Name="FB_CfgPersistBridge_CycleDumpAtTremieCfg" ObjectId="958f5330-cfab-5326-8351-b214608cfa61" />
             <Object Name="FB_CfgPersistBridge_CycleExtractionCfg" ObjectId="99243b20-8012-5d76-ac19-bd7ef00af05b" />
+            <Object Name="FB_CfgPersistBridge_MachineHomingCfg" ObjectId="a8062bc0-7fdb-5e62-a5e0-81e52d7b2b7e" />
             <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
             <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
             <Object Name="FB_CfgPersistBridge_WinchCfg" ObjectId="45adcc1b-fe93-5f2e-8192-a109f147a5f3" />
