@@ -249,6 +249,7 @@ instCycleSemiAuto(
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
     CfgDrainTime            := GVL_IHM.Cycle.Cfg.DrainTime,
     SkipDrainRequest        := GVL_IHM.Cycle.Cmd.BtnSkipDrain,
+    RepositionRequest       := GVL_IHM.Cycle.Cmd.BtnReposition,
     SampleCount            := _CycleSampleCount
 );
 

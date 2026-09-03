@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:12:20.775562" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:12:20.775562">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:57:07.359765" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:57:07.359765">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -64,6 +64,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏭️ Passer l'étape d'égouttage X9 (front)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnReposition">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ Option maintenue : repositionnement couplé M1+M2 pendant le vidage trémie (X11b &lt;-&gt; X11c)</xhtml>
               </documentation>
             </variable>
           </struct>

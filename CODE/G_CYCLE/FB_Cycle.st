@@ -65,6 +65,7 @@ VAR_INPUT
     // === CONFIG & COMMANDES CYCLE (IHM) ===
     CfgDrainTime           : TIME;         // --> [CFG] Duree d'egouttage X9 configurable IHM (<= 0 -> defaut interne)
     SkipDrainRequest       : BOOL;         // --> [CMD] Bouton IHM : passer l'etape d'egouttage X9 (front)
+    RepositionRequest      : BOOL;         // --> [CMD] Option IHM (maintenue) : repositionnement couple M1+M2 pendant le vidage tremie (X11b <-> X11c)
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DEFECTUOSITES ===
@@ -243,7 +244,8 @@ instCauses[6].Active   := (ABS(M1_CablePosM - M2_CablePosM) > CST_CoupledPosBack
                           AND JoystickDeflected
                           AND ((State = E_CycleStep.X4_DESCEND_OPEN)
                             OR (State = E_CycleStep.X5_BOTTOM_CONFIRMED)
-                            OR (State = E_CycleStep.X8_ASCENT_LOADED));
+                            OR (State = E_CycleStep.X8_ASCENT_LOADED)
+                            OR (State = E_CycleStep.X11C_DUMP_REPOSITION));
 instCauses[6].Latching := TRUE;
 instCauses[6].Texte    := 'Ecart de position M1/M2 excessif en phase couplee (anti-telescopage)';
 
@@ -712,9 +714,45 @@ CASE State OF
 
         BucketCmd.ReqOpen := CycleMotionPermit;
 
-        IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
+        // Option operateur (bit IHM) : descendre la benne dans la gueule de tremie
+        // pour aider la vidange -> repositionnement couple M1+M2 (X11C). Prioritaire
+        // sur la fin de vidage.
+        IF RepositionRequest THEN
+            State := E_CycleStep.X11C_DUMP_REPOSITION;
+        ELSIF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
             State := E_CycleStep.X13_DONE_SYNC;
+        END_IF;
+
+    E_CycleStep.X11C_DUMP_REPOSITION:
+        CycleStep := E_CycleStep.X11C_DUMP_REPOSITION;
+        CycleStateStr := 'X11c - Repositionnement couple M1+M2 (aide vidange tremie)';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
+        OperatorActionId := 16#040C;
+        OperatorAction := 'Descente couplee M1+M2 ; relacher l option pour reprendre le vidage.';
+
+        // Descente couplee M1+M2, palier lent, sous homme-mort. Commandes SYMETRIQUES
+        // (meme sens, meme palier) -> FB_SyncDeviation actif, pas d'ecart volontaire.
+        WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.StepTgt := CST_StepSlow;
+        WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.StepTgt := CST_StepSlow;
+
+        // La benne reste ouverte pendant le repositionnement (on finit l'ouverture si besoin).
+        BucketCmd.ReqOpen := CycleMotionPermit AND NOT Benne_IsOpen;
+
+        // Retour a X11B des que l'operateur relache l'option de repositionnement.
+        IF NOT RepositionRequest THEN
+            WinchM1Cmd.RunRequest := FALSE;
+            WinchM2Cmd.RunRequest := FALSE;
+            State := E_CycleStep.X11B_DUMP_OPEN;
         END_IF;
 
     E_CycleStep.X13_DONE_SYNC:
