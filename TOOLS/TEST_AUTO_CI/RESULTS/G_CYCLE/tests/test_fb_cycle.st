@@ -530,6 +530,68 @@ TEST 'TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 6
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X5_BOTTOM_CONFIRMED, 'Toujours X5, pas de STABILIZING');
 END_TEST
 
+TEST 'TC-P04-026 : backstop anti-telescopage - ecart position M1/M2 > 0,5 m en phase couplee X4 -> STABILIZING'
+    SampleCount := 0;
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := TRUE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := FALSE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := SampleCount);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X4_DESCEND_OPEN, 'Etabli en X4');
+    // Ecart de position M1/M2 = 1,0 m > 0,5 m en phase couplee -> defaut anti-telescopage.
+    FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := -10.0, M2_CablePosM := -9.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
+       SampleCount := SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.STABILIZING, 'Ecart couple excessif -> STABILIZING');
+    ASSERT_TRUE(FB.Fault.Error, 'Defaut anti-telescopage leve');
+END_TEST
+
 TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pas de redemarrage) (T192-A S1)'
     SampleCount := 0;
     // Scan 1 : Demarrage (front StartCycle) -> X0 vers X1

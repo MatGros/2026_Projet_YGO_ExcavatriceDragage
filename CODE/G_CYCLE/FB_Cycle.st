@@ -153,6 +153,11 @@ VAR CONSTANT
     CST_StepSlow   : INT := 1;   // Palier lent : referencement X1, remontee X5, controle X7, vidage X11
     CST_StepDive   : INT := 3;   // Palier plongee Kobold X4 : debit mini requis pour la mesure de fond
     CST_StepLoaded : INT := 4;   // Palier montee en charge X8 (bridage strict <= 4, jamais palier 5)
+    // Backstop anti-telescopage : ecart de position M1/M2 max tolere pendant les phases
+    // reellement couplees hors X7 (qui a deja son propre controle a 0,25 m). Aligne sur
+    // CfgSyncCriticalToleranceM = 0,50 m (AF-04 §5). FB_SyncDeviation (PRG_04) reste la
+    // surveillance primaire ; ceci est un garde-fou local au sequenceur.
+    CST_CoupledPosBacklashM : REAL := 0.5;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -229,6 +234,18 @@ instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(M1_CablePosM - M2_CableP
                           AND (State = E_CycleStep.X7_CTRL_ASCENT);
 instCauses[5].Latching := TRUE;
 instCauses[5].Texte    := 'Defaut de stabilisation / tolerance ecart codeurs en remontee controle';
+
+// Backstop anti-telescopage : ecart de position M1/M2 excessif pendant une phase
+// reellement couplee (X4 plongee, X5 remontee, X8 montee en charge). X7 a deja son
+// propre controle (instCauses[5]). Seuil grossier (0,50 m) : filet local si
+// FB_SyncDeviation (PRG_04) ne coupe pas.
+instCauses[6].Active   := (ABS(M1_CablePosM - M2_CablePosM) > CST_CoupledPosBacklashM)
+                          AND JoystickDeflected
+                          AND ((State = E_CycleStep.X4_DESCEND_OPEN)
+                            OR (State = E_CycleStep.X5_BOTTOM_CONFIRMED)
+                            OR (State = E_CycleStep.X8_ASCENT_LOADED));
+instCauses[6].Latching := TRUE;
+instCauses[6].Texte    := 'Ecart de position M1/M2 excessif en phase couplee (anti-telescopage)';
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
