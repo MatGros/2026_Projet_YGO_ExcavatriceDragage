@@ -86,6 +86,7 @@ VAR_OUTPUT
     SpeedMismatchMps        : REAL;         // <-- [DIAG] Ecart absolu vitesse M1/M2 (m/s)
     SpeedMismatchActive     : BOOL;         // <-- [DIAG] Seuil vitesse depasse sur cycle courant
     SpeedMismatchConfirmed  : BOOL;         // <-- [DIAG] Ecart vitesse confirme pendant timeout
+    BottomTouched           : BOOL;         // <-- [STAT] Fond touche (latch AX8, efface a AX0 / AX_STAB / Reset) - variable d'info GEL AX8
 
     // === ORDRES ACTIONNEURS (COMMANDES STRUCTUREES) ===
     // Types de contrat inter-PRG uniques (ST_Program*Request) : FB_CycleSemiAuto produit
@@ -121,6 +122,7 @@ VAR
     DeadmanArmedEdge        : R_TRIG;       // . [LOC] Detecteur front montant DeadmanArmed (demarrage joystick)
     AbortEdge               : R_TRIG;       // . [LOC] Detecteur front montant AbortCycle
     ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
+    JoyDeflectedEdge        : R_TRIG;       // . [LOC] Front montant JoystickDeflected (relance AX18 sur geste franc, pas maintien)
 
     // === GATE CONTINU HOMME-MORT ===
     CycleMotionPermit       : BOOL; // . [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme) ; gate commun a toutes les commandes d'actionneur du sequenceur. Le sens du mouvement reste porte par ReqAscent/ReqDescend de chaque etape.
@@ -145,6 +147,7 @@ VAR
     KoboldRiseEdge          : R_TRIG;       // . [LOC] Front DI Kobold 0->1 (entree dans l'eau, AX6)
     KoboldFallEdge          : F_TRIG;       // . [LOC] Front DI Kobold 1->0 (fond, AX7)
     KoboldInitTimer         : TON;          // . [LOC] Fenetre de verif retour contacteur Kobold en AX5
+    RetryJoyReleaseTimer    : TON;          // . [LOC] Anti-rebond relache joystick pendant diving (>= 200 ms avant reprise)
     DivingRetryTrig         : BOOL;         // . [LOC] Synthese GT-dive-retry (erreur Kobold / joystick relache / palier <> 4 en AX5..AX7)
     CtrlAscentMaxStepEff    : INT;          // . [LOC] CfgCtrlAscentMaxStep borne [1..2]
     RaiseOffBottomEff       : REAL;         // . [LOC] CfgRaiseOffBottomM borne (>0, defaut 0,5 m)
@@ -195,6 +198,7 @@ AbortEdge(CLK := AbortCycle);
 SkipDrainEdge(CLK := SkipDrainRequest);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
+JoyDeflectedEdge(CLK := JoystickDeflected);
 
 // Config diving/extraction bornee (repli defaut interne si non reglee cote IHM).
 DiveStartMinEff := SEL(DiveStartMinM > 0.0, 4.0, DiveStartMinM);
@@ -245,13 +249,19 @@ StepMaxPrevState := State;
 DrainingTimer(IN := (State = E_AutoCycleStep.AX13_DRAIN_PAUSE), PT := DrainTimeEff);
 
 // GT-dive-retry (GEL Q11) : en AX5/AX6/AX7, erreur sequence Kobold (retour contacteur
-// absent apres CST_KoboldInitTimeout) OU joystick relache OU palier applique <> 4 sur
-// M1 ou M2 (feedback si cable) -> reprise AX_DIVING_RETRY (PAS un defaut latche).
+// absent apres CST_KoboldInitTimeout) OU joystick relache (>= 200 ms, anti-rebond) OU
+// palier applique <> 4 sur M1 ou M2 (feedback si cable) -> reprise AX_DIVING_RETRY
+// (PAS un defaut latche).
+RetryJoyReleaseTimer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
+                             OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+                             OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
+                            AND NOT JoystickDeflected,
+                     PT := T#200ms);
 DivingRetryTrig := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                      OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
                      OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                    AND ( (KoboldInitTimer.Q AND NOT KoboldContactorFeedback)
-                         OR NOT JoystickDeflected
+                         OR RetryJoyReleaseTimer.Q
                          OR ((M1_SpeedStepApplied > 0) AND (M1_SpeedStepApplied <> CST_StepDive))
                          OR ((M2_SpeedStepApplied > 0) AND (M2_SpeedStepApplied <> CST_StepDive)) );
 
@@ -427,6 +437,7 @@ END_IF;
 
 IF ResetEdge.Q THEN
     SavedState := E_AutoCycleStep.AX0_REPOS;
+    BottomTouched := FALSE;
     IF State = E_AutoCycleStep.AX_STAB THEN
         State := E_AutoCycleStep.AX0_REPOS;
     END_IF;
@@ -470,6 +481,7 @@ CASE State OF
         OperatorActionId := 16#0400;
         OperatorAction := 'Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
         SampleCountDone := FALSE;   // F2: réarmement du front de comptage à chaque entrée en X0
+        BottomTouched   := FALSE;   // info fond touche effacee au repos
 
         // Transition si système sain et réarmé (front reset ou démarrage).
         // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
@@ -704,6 +716,7 @@ CASE State OF
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
         TouchPositionM := M1_CablePosM;
+        BottomTouched  := TRUE;   // variable d'info latchee (GEL AX8) - effacee a AX0 / AX_STAB / Reset
         IF LimitLegalDepthM < -0.01 THEN
             RaiseTargetM := MAX(TouchPositionM + RaiseOffBottomEff, LimitLegalDepthM + RaiseOffBottomEff);
         ELSE
@@ -721,7 +734,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0481;
-        OperatorAction := 'Reprise plongee : maintenir la montee jusqu au FDC haut, puis nouvelle tentative.';
+        OperatorAction := 'Reprise plongee : monter jusqu au FDC haut, puis relancer.';
 
         // Remontee assistee palier lent, Kobold coupe.
         WinchM1Cmd.RunRequest := CycleMotionPermit;
@@ -787,6 +800,14 @@ CASE State OF
 
         IF JoystickDeflected AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.ReqClose := FALSE;
+            // C1e (GEL principe 4) : AX10 -> AX11 sans temps mort. M1+M2 lances le MEME
+            // scan que la sortie AX10_CLOSE_BUCKET (pas de creux RunRequest a la frontiere).
+            WinchM1Cmd.RunRequest := CycleMotionPermit;
+            WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
+            WinchM1Cmd.StepTgt  := CtrlAscentMaxStepEff;
+            WinchM2Cmd.RunRequest := CycleMotionPermit;
+            WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
+            WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
             State := E_AutoCycleStep.AX11_CTRL_ASCENT;
         END_IF;
 
@@ -827,7 +848,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040C;
-        OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute (pas de ralenti avant le top).';
+        OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
 
         // Benne bien fermee -> palier 4 ; benne mal fermee (a peu pres) -> palier 1.
         // Pas de ralentissement 1 m avant la position top (montee franche).
@@ -992,7 +1013,9 @@ CASE State OF
 
         // Rebouclage DIRECT sur AX2_TRANSLATE_P1 (GEL Q14) : la machine est deja
         // referencee, la passe suivante enchaine sur la translation P1 (pas de retour AX0).
-        IF StartEdge.Q OR JoystickDeflected THEN
+        // Relance sur StartCycle OU FRONT joystick (geste franc) - pas sur simple maintien,
+        // pour que AX18 (Lifecycle.Done + msg) soit reellement observable / tracable.
+        IF StartEdge.Q OR JoyDeflectedEdge.Q THEN
             SampleCountDone := FALSE;
             Lifecycle.Done := FALSE;
             State := E_AutoCycleStep.AX2_TRANSLATE_P1;
@@ -1000,7 +1023,7 @@ CASE State OF
 
     E_AutoCycleStep.AX_STAB:
         CycleStep := E_AutoCycleStep.AX_STAB;
-        CycleStateStr := 'X14 - Cycle en attente / stabilisation (STAB)';
+        CycleStateStr := 'AX_STAB - Cycle en attente / stabilisation sur anomalie';
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE;
         TranslationCmd.ReqStart := FALSE;
