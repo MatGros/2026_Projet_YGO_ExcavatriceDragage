@@ -7,6 +7,7 @@ STRUCT
     BtnFaultReset      : BOOL;   (* 🔔 Acquittement défauts/alarmes domaine sécurité/métier — jamais Modes/Cycle *)
     BtnModeReset       : BOOL;   (* 🔁 Acquittement défaut FB_Modes uniquement () *)
     BtnMachineHomingStart : BOOL; (* 🎯 Lancer le cycle de homing machine (MAINT_N2, front) — alternative au motif 3 appuis joystick *)
+    BtnMachineHomingValidate : BOOL; (* ✅ Validation homing depuis IHM (front) — equivaut a 1 appui du motif ; alternative au BP joystick pour la mise en service *)
 
     // Sélection treuil au joystick, arbitrée par FB_Modes (0=couplé nominal, 1/2 unitaires MAINT_N2 uniquement)
     SelJoystickWinch   : INT := 0; (* 🕹️ 0=M1+M2 couplés (nominal), 1=M1 seul, 2=M2 seul — unitaires MAINT_N2 uniquement *)
