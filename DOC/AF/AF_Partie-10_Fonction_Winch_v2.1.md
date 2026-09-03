@@ -151,6 +151,7 @@
    - [7.4 Mou de câble & récupération](#74-🪢-spécification-mécanique-mou-de-câble-slackcable-récupération)
    - [7.5 Benne partiellement fermée & remontée palier 1](#75-🪣-sécurité-benne-partiellement-fermée-obstruée-remontée-palier-1)
    - [7.6 Synchronisation M1/M2 étagée](#76-️-synchronisation-m1m2-étagée-fb_winchsync)
+   - [7.7 Plafond palier sur codeurs non référencés (fail-safe hors homing)](#77--plafond-palier-sur-codeurs-non-référencés-fail-safe-hors-homing)
 8. [📜 Suivi historique](#8-suivi-historique)
 9. [❓ TBD](#9-tbd)
 10. [📚 Documents liés](#10-documents-liés)
@@ -589,12 +590,37 @@ L'asservissement synchro est découpé en 3 zones d'action calibrées sur site :
 - **Zone 2 (Écart modéré $0.8\,\text{m} \dots 2.5\,\text{m}$)** : **Dégradation automatique au Palier 1 (vitesse lente)** sur les deux treuils sans couper le mouvement (`SyncDegradedStep1 := TRUE`). Alarme préventive IHM (`SyncWarn`).
 - **Zone 3 (Écart critique $\ge 2.5\,\text{m}$)** : Déclenchement du **`SafeStop` (rampe rapide)** avec alarme Méca E (`CriticalSyncToleranceM := 2.5`).
 
+### 7.7 🛡️ Plafond palier sur codeurs non référencés (fail-safe hors homing)
+
+> 📌 **Constat (T146, C4 ISO 13849)** : tant que M1 **et** M2 ne sont pas
+> `HomedAndReliable`, `CablePosM` est potentiellement faux et **toutes les protections
+> logicielles de position sont inertes** (FDC haut logiciel, limite câble, limite légale,
+> ralentissements bordure). Sans clause dédiée, le treuil pouvait monter **et** descendre
+> jusqu'au palier 5.
+
+**Règle** : codeurs M1 **et/ou** M2 non `HomedAndReliable` ⇒ **plafond de palier de
+vitesse = 1** sur **les deux treuils**, en **montée ET en descente**. Posture **fail-safe**
+(position non fiable → énergie et vitesse minimales, mouvement maîtrisable à vue).
+
+- **Débridage** : sur `HomedAndReliable` M1∧M2 le plafond retombe. Règle complémentaire
+  **capteur haut (TOP) actif ⇒ position connue ⇒ levée du plafond** : **à définir / valider**
+  (polarité TOP, sens autorisés, non-régression interlock hauteur M3 strict).
+- **Statut** : plafond hors homing **CODÉ en interim** (`PRG_04_Treuils_Benne` §5ter) ;
+  décision de posture ISO 13849 à contresigner — `DOC/WFLOW/AUDITS/DESIGN/DECISIONS_T146_ARBITRAGE_ISO13849.md`.
+- ⚠️ **Distinct** du non-bypass de `SyncDeviationWarn` de §5.2 (note T184) : cette clause-ci
+  clampe le **palier** faute de position fiable ; la note T184 interdit de **lever la
+  surveillance d'écart synchro** faute d'offset benne qualifié. Deux verrous indépendants.
+- 🔗 Ce bridage n'est **pas** fondé sur la vitesse *mesurée* : il ne dépend pas du garde-fou
+  vitesse (`SpeedGuardEnable`, encore `FALSE` — §7.1/§7.3). Tout bridage futur fondé sur la
+  vitesse mesurée reste conditionné à ce garde-fou.
+
 ---
 
 ## 📜 8 · Suivi historique
 
 | Version | Date | Changement |
 |---|---|---|
+| v2.1 (fix) | 2026-09-03 | §7.7 ajouté (T146, C4 ISO 13849) : plafond palier = 1 (M1+M2, montée+descente) tant que codeurs non `HomedAndReliable` — fail-safe hors homing, CODÉ en interim dans `PRG_04_Treuils_Benne` §5ter, décision de posture à contresigner (`DECISIONS_T146_ARBITRAGE_ISO13849.md`). Sommaire mis à jour. |
 | v2.1 (fix) | 2026-08-26 | Revue de cohérence croisée AF-01→14 (sous-agent) : §5.2 citait encore `instSpeedMonitorM1/M2` comme instance active — retiré (`FB_Encoder_SpeedMonitor` supprimé, TBD signalé par AF-09 §11 mais resté sans effet jusqu'ici) |
 | v2.1 | 2026-08-26 | Mise en conformite `GUIDE_EDITION_AF_v1.0` : Sommaire lié (incluant 2bis/2ter et 7.1-7.6), section `🎯 Rôle et périmètre` explicite, Table des fonctions `F10.01`-`F10.09` ajoutée (obligatoire, famille Fonctions métier), diagramme composition HTML/SVG → Mermaid `flowchart TD` stylisé, Suivi historique + TBD ajoutés, renumérotation complète (dont fusion 7.5→7.4/7.6→7.5/7.7→7.6 pour combler le trou 7.4 jamais rempli). **Correctifs de fond** (review sous-agent expert automatisme) : 4 des 9 liens vers les fiches FB (`FB_Winch`, `FB_Safety_Winch`, `FB_WinchOutputInterlock`, `FB_Bucket`) étaient morts — pointaient vers `AF_Partie-10_FB_*_v1.0.md` (racine `DOC/AF/`) alors que les 9 fiches vivent dans `AF_Partie-10_Fonction_Winch/` — corrigés dans la table Composition et le tableau Points de validation ; phrase tronquée en tête de §7 complétée ; §5.1 (organisation de l'exécution `PRG_04_Treuils_Benne`) entièrement fausse — décrivait des régions (`instBucket` en premier, arbitrage M1/M2 séparés, etc.) ne correspondant plus aux 8 régions réelles du code (`§1`-`§8` vérifiées une à une) — corrigée ; références à des tâches inexistantes (T87/T93/T94/T95/T96, jamais créées dans `TASKS.yaml`) retirées de §7.2/§7.3/§9/§10, la seule étude T91 réelle citée à tort ici concerne en fait `FB_Brake` (périmètre distinct depuis le découplage frein §2bis). Code repointé (`CODE/H_TREUILS_BENNE/*` et 3 audits) |
 | v2.0 | — | Version precedente (voir `ARCHIVES/Doc/`) |

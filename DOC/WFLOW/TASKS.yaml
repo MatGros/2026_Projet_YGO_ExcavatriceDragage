@@ -938,7 +938,12 @@ tasks:
     haut protège. Aucun débridage « capteur TOP haut », aucun interlock « grille levée / trémie pleine » (TremieFull_OR_GateRaised_DI
     déclaré non consommé). Décision métier ISO 13849 requise : bridage progressif vs repos capteur physique assumé. Formulation
     « Homed=TRUE strict » : correcte pour l''anti-collision hauteur M3 et la benne, à NE PAS généraliser — à coupler à un
-    bridage vitesse (Homed strict là où la position est critique, bridage sinon, levé si capteur TOP haut).'
+    bridage vitesse (Homed strict là où la position est critique, bridage sinon, levé si capteur TOP haut). **MAJ
+    2026-09-03 (branche backup/mes-septembre-20260902)** : le volet « plafond palier hors homing » est CODÉ en interim
+    (PRG_04_Treuils_Benne §5ter : codeurs M1 ET/OU M2 non HomedAndReliable => plafond palier = 1, montée + descente, les
+    2 treuils) ; refonte GRAFCET homing HX0..HX6 + fix cible dynamique M2 (config capteur haut M2, pas M1) livrés dans le
+    même lot. RESTE : décision ISO 13849 contresignée (DECISIONS_T146_ARBITRAGE_ISO13849.md, validated_by vide) + règle
+    débridage capteur haut à définir/implémenter + volets TremieFull / SpeedGuardEnable.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T146.yaml
   objectifs:
   - 'Clos : interlock hauteur M3 exige Homed=TRUE strict (HomedAndReliable M1∧M2) — déjà conforme (commit d66728f6).'
@@ -5209,3 +5214,34 @@ tasks:
   - Jalon VERSION_HISTORY.md
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T234_MAJ_DOC_REFONTE_CYCLE.yaml
   bloque_par: [T233]
+- id: T235
+  parent_id: ''
+  statut: ⬜
+  criticite: C4
+  domaine: CODEURS / HOMING
+  agent: ''
+  date: '2026-09-03T09:00:00+02:00'
+  titre: Refonte transaction de vérification preset homing (suppression latence 500 ms)
+  contexte: >
+    Demande utilisateur (2026-09-03) : retirer la temporisation de référencement
+    CST_PresetVerifyTime (500 ms) dans FB_Encoder_Homing.st. Analyse : ce n'est
+    PAS un simple retrait de constante — c'est la latence de sécurité
+    transactionnelle qui laisse le codeur appliquer physiquement le preset avant
+    la relecture de vérification (ReadbackOk). La retirer sans refonte risque de
+    valider Calib.Homed sur une position non encore appliquée (référence
+    erronée). Zone liée au bug homing M2 « benne fermée » (M2 reste à 8.5 m,
+    cf. T213).
+  description: >
+    Remplacer la latence fixe 500 ms (CST_PresetVerifyTime + TON PresetVerifyTimer)
+    par une logique de vérification déterministe (déclencheur événementiel :
+    retour PDO / état codeur), en conservant la garantie de non-validation d'un
+    preset non appliqué (ReadbackOk dans CST_HomingVerifyToleranceM avant
+    Calib.Homed := TRUE). Criticité C4 : fiabilité du référencement codeur.
+  objectifs:
+  - Supprimer CST_PresetVerifyTime et PresetVerifyTimer de FB_Encoder_Homing.st
+  - Déclencher la vérification preset par un événement déterministe, pas un timeout
+  - Garantir Calib.Homed non validé si position hors tolérance (0.010 m)
+  - Conserver les modes de confirmation (READBACK_ONLY / READBACK_AND_STATUSBIT / STATUSBIT_ONLY)
+  - Documenter la nouvelle logique dans AF_Partie-09 v2.4
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T235_REFONTE_TRANSACTION_PRESET.yaml
+  bloque_par: []
