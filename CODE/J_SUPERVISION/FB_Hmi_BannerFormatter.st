@@ -251,24 +251,20 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX1_INIT: Banner.SequenceProgressText := 'Cycle: CONDITIONS INITIALES';
             E_AutoCycleStep.AX2_TRANSLATE_P1: Banner.SequenceProgressText := 'Cycle: TRANSLATION P1';
             E_AutoCycleStep.AX3_OPEN_BUCKET: Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
-            E_AutoCycleStep.AX4_DESCEND_OPEN:
-                IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
-                    Banner.SequenceProgressText := 'Cycle: DESCENTE > IMMERSION';
-                ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
-                    Banner.SequenceProgressText := 'Cycle: DESCENTE > RECHERCHE FOND';
-                ELSIF DiveState = E_DiveSearchState.BOTTOM_CONFIRMED THEN
-                    Banner.SequenceProgressText := 'Cycle: DESCENTE > FOND CONFIRMÉ';
-                ELSE
-                    Banner.SequenceProgressText := 'Cycle: DESCENTE BENNE OUVERTE';
-                END_IF;
-            E_AutoCycleStep.AX5_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
-            E_AutoCycleStep.AX6_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
-            E_AutoCycleStep.AX7_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: ARRACHAGE / MONTÉE LENTE';
-            E_AutoCycleStep.AX8_ASCENT_LOADED: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
-            E_AutoCycleStep.AX9_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
-            E_AutoCycleStep.AX10_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
-            E_AutoCycleStep.AX11A_DUMP_ARRIVE, E_AutoCycleStep.AX11B_DUMP_OPEN: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
-            E_AutoCycleStep.AX13_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ';
+            E_AutoCycleStep.AX4_DESCEND_DIVING: Banner.SequenceProgressText := 'Cycle: PLONGÉE PALIER 4';
+            E_AutoCycleStep.AX5_KOBOLD_INIT: Banner.SequenceProgressText := 'Cycle: INIT KOBOLD';
+            E_AutoCycleStep.AX6_SEARCH_IMMERSION: Banner.SequenceProgressText := 'Cycle: RECHERCHE IMMERSION';
+            E_AutoCycleStep.AX7_SEARCH_BOTTOM: Banner.SequenceProgressText := 'Cycle: RECHERCHE FOND';
+            E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
+            E_AutoCycleStep.AX_DIVING_RETRY: Banner.SequenceProgressText := 'Cycle: REPRISE PLONGÉE';
+            E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: Banner.SequenceProgressText := 'Cycle: RETENTE CÂBLES';
+            E_AutoCycleStep.AX10_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
+            E_AutoCycleStep.AX11_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: MONTÉE CONTRÔLE';
+            E_AutoCycleStep.AX12_LOADED_ASCENT: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
+            E_AutoCycleStep.AX13_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
+            E_AutoCycleStep.AX14_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
+            E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN, E_AutoCycleStep.AX15C_DUMP_REPOSITION: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+            E_AutoCycleStep.AX18_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ - ALLER P1';
             E_AutoCycleStep.AX_STAB: Banner.SequenceProgressText := 'Cycle: STABILISATION';
         ELSE
             Banner.SequenceProgressText := 'Cycle: ÉTAPE EN COURS';
@@ -504,24 +500,34 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             OperatorActionCandidate := '[JOYSTICK] Pousser vers la droite : translation vers P1';
         E_AutoCycleStep.AX3_OPEN_BUCKET:
             OperatorActionCandidate := '[IHM] Ouverture benne en cours';
-        E_AutoCycleStep.AX4_DESCEND_OPEN:
-            OperatorActionCandidate := '[JOYSTICK] Descendre benne ouverte > Attendre contact fond';
-        E_AutoCycleStep.AX5_BOTTOM_CONFIRMED:
-            OperatorActionCandidate := '[IHM] Fond confirmé - remontée';
-        E_AutoCycleStep.AX6_CLOSE_BUCKET:
+        E_AutoCycleStep.AX4_DESCEND_DIVING:
+            OperatorActionCandidate := '[JOYSTICK] Descendre palier 4 jusqu a l altimetrie de lancement';
+        E_AutoCycleStep.AX5_KOBOLD_INIT:
+            OperatorActionCandidate := '[JOYSTICK] Maintenir descente : init Kobold en cours';
+        E_AutoCycleStep.AX6_SEARCH_IMMERSION:
+            OperatorActionCandidate := '[JOYSTICK] Maintenir descente : entree dans l eau attendue';
+        E_AutoCycleStep.AX7_SEARCH_BOTTOM:
+            OperatorActionCandidate := '[JOYSTICK] Maintenir descente : detection du fond';
+        E_AutoCycleStep.AX8_BOTTOM_CONFIRMED:
+            OperatorActionCandidate := '[IHM] Fond touche';
+        E_AutoCycleStep.AX_DIVING_RETRY:
+            OperatorActionCandidate := '[JOYSTICK] Reprise plongee : remonter au FDC haut';
+        E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM:
+            OperatorActionCandidate := '[JOYSTICK] Retente des cables (palier 1)';
+        E_AutoCycleStep.AX10_CLOSE_BUCKET:
             OperatorActionCandidate := '[IHM] Fermeture benne en cours';
-        E_AutoCycleStep.AX7_CTRL_ASCENT:
-            OperatorActionCandidate := '[JOYSTICK] Remontée lente de contrôle';
-        E_AutoCycleStep.AX8_ASCENT_LOADED:
-            OperatorActionCandidate := '[IHM] Remontée en charge';
-        E_AutoCycleStep.AX9_DRAIN_PAUSE:
-            OperatorActionCandidate := '[IHM] Attendre égouttage';
-        E_AutoCycleStep.AX10_TRANSLATE_DUMP:
-            OperatorActionCandidate := '[JOYSTICK] Déplacer vers trémie';
-        E_AutoCycleStep.AX11A_DUMP_ARRIVE, E_AutoCycleStep.AX11B_DUMP_OPEN:
+        E_AutoCycleStep.AX11_CTRL_ASCENT:
+            OperatorActionCandidate := '[JOYSTICK] Remontee de controle';
+        E_AutoCycleStep.AX12_LOADED_ASCENT:
+            OperatorActionCandidate := '[IHM] Remontee en charge';
+        E_AutoCycleStep.AX13_DRAIN_PAUSE:
+            OperatorActionCandidate := '[IHM] Attendre egouttage (ou bypass IHM)';
+        E_AutoCycleStep.AX14_TRANSLATE_DUMP:
+            OperatorActionCandidate := '[JOYSTICK] Deplacer vers tremie';
+        E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN, E_AutoCycleStep.AX15C_DUMP_REPOSITION:
             OperatorActionCandidate := '[IHM] Vidage benne';
-        E_AutoCycleStep.AX13_DONE_SYNC:
-            OperatorActionCandidate := '[IHM] Cycle terminé';
+        E_AutoCycleStep.AX18_DONE_SYNC:
+            OperatorActionCandidate := '[JOYSTICK] Cycle termine : aller en P1 pour recommencer';
         E_AutoCycleStep.AX_STAB:
             // Libellé de l'étape d'origine du défaut (CycleStepAtError).
             CASE CycleStepAtError OF
@@ -529,17 +535,23 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_AutoCycleStep.AX1_INIT: StepAtErrorStr := 'X1 (référencement)';
                 E_AutoCycleStep.AX2_TRANSLATE_P1: StepAtErrorStr := 'X2 (sélection position)';
                 E_AutoCycleStep.AX3_OPEN_BUCKET: StepAtErrorStr := 'X3 (ouverture benne)';
-                E_AutoCycleStep.AX4_DESCEND_OPEN: StepAtErrorStr := 'X4 (descente)';
-                E_AutoCycleStep.AX5_BOTTOM_CONFIRMED: StepAtErrorStr := 'X5 (fond confirmé)';
-                E_AutoCycleStep.AX6_CLOSE_BUCKET: StepAtErrorStr := 'X6 (fermeture benne)';
-                E_AutoCycleStep.AX7_CTRL_ASCENT: StepAtErrorStr := 'X7 (remontée contrôle)';
-                E_AutoCycleStep.AX8_ASCENT_LOADED: StepAtErrorStr := 'X8 (remontée chargée)';
-                E_AutoCycleStep.AX9_DRAIN_PAUSE: StepAtErrorStr := 'X9 (égouttage)';
-                E_AutoCycleStep.AX10_TRANSLATE_DUMP: StepAtErrorStr := 'X10 (translation trémie)';
-                E_AutoCycleStep.AX11A_DUMP_ARRIVE: StepAtErrorStr := 'X11a (arrivee tremie)';
-                E_AutoCycleStep.AX11B_DUMP_OPEN: StepAtErrorStr := 'X11b (vidage benne)';
-                E_AutoCycleStep.AX13_DONE_SYNC: StepAtErrorStr := 'X13 (cycle terminé)';
-                E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'X14 (stabilisation)';
+                E_AutoCycleStep.AX4_DESCEND_DIVING: StepAtErrorStr := 'AX4 (plongee palier 4)';
+                E_AutoCycleStep.AX5_KOBOLD_INIT: StepAtErrorStr := 'AX5 (init Kobold)';
+                E_AutoCycleStep.AX6_SEARCH_IMMERSION: StepAtErrorStr := 'AX6 (recherche immersion)';
+                E_AutoCycleStep.AX7_SEARCH_BOTTOM: StepAtErrorStr := 'AX7 (recherche fond)';
+                E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: StepAtErrorStr := 'AX8 (fond confirme)';
+                E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'AX_DIVING_RETRY (reprise plongee)';
+                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (retente cables)';
+                E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10 (fermeture benne)';
+                E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11 (remontee controle)';
+                E_AutoCycleStep.AX12_LOADED_ASCENT: StepAtErrorStr := 'AX12 (remontee chargee)';
+                E_AutoCycleStep.AX13_DRAIN_PAUSE: StepAtErrorStr := 'AX13 (egouttage)';
+                E_AutoCycleStep.AX14_TRANSLATE_DUMP: StepAtErrorStr := 'AX14 (translation tremie)';
+                E_AutoCycleStep.AX15A_DUMP_ARRIVE: StepAtErrorStr := 'AX15a (arrivee tremie)';
+                E_AutoCycleStep.AX15B_DUMP_OPEN: StepAtErrorStr := 'AX15b (vidage benne)';
+                E_AutoCycleStep.AX15C_DUMP_REPOSITION: StepAtErrorStr := 'AX15c (repositionnement)';
+                E_AutoCycleStep.AX18_DONE_SYNC: StepAtErrorStr := 'AX18 (cycle termine)';
+                E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'AX_STAB (stabilisation)';
                 ELSE
                     StepAtErrorStr := '?';
             END_CASE;

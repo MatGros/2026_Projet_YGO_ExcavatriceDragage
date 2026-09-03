@@ -29,7 +29,9 @@ VAR_INPUT
     SetOffsetM              : REAL;         // --> [CFG] Ecart de fermeture benne cible
 
     // === FEEDBACKS CAPTEURS & MATERIEL ===
-    KoboldContactFond       : BOOL;         // --> [HW] Retour dedie Kobold : TRUE = contact fond
+    KoboldContactFond       : BOOL;         // --> [HW] Retour dedie Kobold : TRUE = contact fond (front descendant DI)
+    KoboldImmersed          : BOOL;         // --> [HW] Etat brut DI Kobold : TRUE = sonde dans l'eau (fronts AX6/AX7)
+    KoboldContactorFeedback : BOOL;         // --> [HW] Retour contacteur Kobold enclenche (verif init AX5)
     LimitLegalReached       : BOOL;         // --> [SAFE] Limite legale atteinte (descente interdite)
     LimitLegalDepthM        : REAL;         // --> [CFG] Profondeur legale minimale autorisee
     WinchSyncError          : BOOL;         // --> [SAFE] Desynchronisme bloquant M1/M2
@@ -65,9 +67,16 @@ VAR_INPUT
     WinchesAtTopWindow      : BOOL;         // --> [HW] Treuils M1 ET M2 dans la fenetre FDC logiciel haut (calcul PRG_03) - surveille en AX2
 
     // === CONFIG & COMMANDES CYCLE (IHM) ===
-    CfgDrainTime           : TIME;         // --> [CFG] Duree d'egouttage X9 configurable IHM (<= 0 -> defaut interne)
-    SkipDrainRequest       : BOOL;         // --> [CMD] Bouton IHM : passer l'etape d'egouttage X9 (front)
-    RepositionRequest      : BOOL;         // --> [CMD] Option IHM (maintenue) : repositionnement couple M1+M2 pendant le vidage tremie (X11b <-> X11c)
+    CfgDrainTime           : TIME;         // --> [CFG] Duree d'egouttage AX13 configurable IHM (<= 0 -> defaut interne)
+    SkipDrainRequest       : BOOL;         // --> [CMD] Bouton IHM : passer l'etape d'egouttage AX13 (front)
+    RepositionRequest      : BOOL;         // --> [CMD] Option IHM (maintenue) : repositionnement couple M1+M2 pendant le vidage tremie (AX15B <-> AX15C)
+
+    // === CONFIG DIVING / EXTRACTION (GEL 2026-09-03) ===
+    DiveStartMinM          : REAL;         // --> [CFG] Altimetrie de lancement Kobold (AT4 : AX4 -> AX5), reglable IHM (~3..5 m ; <= 0 -> defaut interne)
+    CfgRaiseOffBottomM     : REAL;         // --> [CFG] Decollement du fond en AX8 : RaiseTargetM = TouchPositionM + ce champ (reglable IHM ; <= 0 -> 0,5 m)
+    CfgCtrlAscentMaxStep   : INT;          // --> [CFG] Palier max montee controle AX11, borne [1..2] (defaut 1)
+    M1_SpeedStepApplied    : INT;          // --> [HW] Palier vitesse effectivement applique M1 (0 = inconnu ; garde palier <> 4 en diving)
+    M2_SpeedStepApplied    : INT;          // --> [HW] Palier vitesse effectivement applique M2 (0 = inconnu)
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DEFECTUOSITES ===
@@ -132,6 +141,15 @@ VAR
     InitConditionsOk        : BOOL;         // . [LOC] AX1_INIT : toutes les conditions initiales sont remplies
     StepMaxPrevState        : E_AutoCycleStep;  // . [LOC] Etape du scan precedent (rearmement StepMaxTimer au changement d'etape)
 
+    // === FRONTS / TEMPO DIVING ===
+    KoboldRiseEdge          : R_TRIG;       // . [LOC] Front DI Kobold 0->1 (entree dans l'eau, AX6)
+    KoboldFallEdge          : F_TRIG;       // . [LOC] Front DI Kobold 1->0 (fond, AX7)
+    KoboldInitTimer         : TON;          // . [LOC] Fenetre de verif retour contacteur Kobold en AX5
+    DivingRetryTrig         : BOOL;         // . [LOC] Synthese GT-dive-retry (erreur Kobold / joystick relache / palier <> 4 en AX5..AX7)
+    CtrlAscentMaxStepEff    : INT;          // . [LOC] CfgCtrlAscentMaxStep borne [1..2]
+    RaiseOffBottomEff       : REAL;         // . [LOC] CfgRaiseOffBottomM borne (>0, defaut 0,5 m)
+    DiveStartMinEff         : REAL;         // . [LOC] DiveStartMinM borne (defaut interne si <= 0)
+
     // === TEMPORISATEURS INTERNES ===
     DrainingTimer           : TON;          // . [LOC] Temporisateur de vidage (egouttage), PT = DrainTimeEff
     CycleRunTimer           : TON;          // . [LOC] Chronometre du cycle en cours (IN = Lifecycle.Busy) ; .ET = duree
@@ -154,9 +172,11 @@ VAR
 END_VAR
 VAR CONSTANT
     // Paliers de vitesse treuil par etape (StepTgt des demandes WinchMxCmd, 1..5 ; 0 = arret).
-    CST_StepSlow   : INT := 1;   // Palier lent : referencement X1, remontee X5, controle X7, vidage X11
-    CST_StepDive   : INT := 4;   // Palier plongee Kobold AX4 (cycle diving integre) : palier 4 MINI ET MAXI impose, palier 5 interdit (GEL Q9)
-    CST_StepLoaded : INT := 4;   // Palier montee en charge X8 (bridage strict <= 4, jamais palier 5)
+    CST_StepSlow   : INT := 1;   // Palier lent : retente AX9, controle AX11, repositionnement AX15C
+    CST_StepDive   : INT := 4;   // Palier plongee Kobold AX4..AX7 : palier 4 MINI ET MAXI impose, palier 5 interdit (GEL Q9)
+    CST_StepLoaded : INT := 4;   // Palier montee en charge AX12 (bridage strict <= 4, jamais palier 5)
+    CST_KoboldInitTimeout : TIME := T#3s;   // Fenetre max de confirmation retour contacteur Kobold en AX5
+    CST_RaiseOffBottomDefaultM : REAL := 0.5;   // Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM <= 0
     // Backstop anti-telescopage : ecart de position M1/M2 max tolere pendant les phases
     // reellement couplees hors X7 (qui a deja son propre controle a 0,25 m). Aligne sur
     // CfgSyncCriticalToleranceM = 0,50 m (AF-04 §5). FB_SyncDeviation (PRG_04) reste la
@@ -173,6 +193,13 @@ StartEdge(CLK := StartCycle);
 DeadmanArmedEdge(CLK := DeadmanArmed);
 AbortEdge(CLK := AbortCycle);
 SkipDrainEdge(CLK := SkipDrainRequest);
+KoboldRiseEdge(CLK := KoboldImmersed);
+KoboldFallEdge(CLK := KoboldImmersed);
+
+// Config diving/extraction bornee (repli defaut interne si non reglee cote IHM).
+DiveStartMinEff := SEL(DiveStartMinM > 0.0, 4.0, DiveStartMinM);
+RaiseOffBottomEff := SEL(CfgRaiseOffBottomM > 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
+CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 
 // ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
 // .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration à l'achèvement (X13).
@@ -182,18 +209,21 @@ CurrentCycleElapsed := CycleRunTimer.ET;
 // Durée d'égouttage effective : config IHM si valide, sinon défaut interne.
 DrainTimeEff := SEL(CfgDrainTime <= T#0s, CfgDrainTime, DrainingTime);
 
-// ⏱️ Surveillance indépendante de la remontée lente
-// AX7_CTRL_ASCENT -> AX8_ASCENT_LOADED : TON de stabilisation palier 1.
-StabilizationTimer(IN := (State = E_AutoCycleStep.AX7_CTRL_ASCENT), PT := CtrlAscentTimeout);
+// ⏱️ Surveillance indépendante de la remontée lente de controle
+// AX11_CTRL_ASCENT -> AX12_LOADED_ASCENT : TON de stabilisation palier lent.
+StabilizationTimer(IN := (State = E_AutoCycleStep.AX11_CTRL_ASCENT), PT := CtrlAscentTimeout);
+
+// ⏱️ AX5_KOBOLD_INIT : fenetre de confirmation du retour contacteur Kobold.
+KoboldInitTimer(IN := (State = E_AutoCycleStep.AX5_KOBOLD_INIT), PT := CST_KoboldInitTimeout);
 
 // 📏 Comparaison vitesse réelle M1/M2
 SpeedMismatchMps := ABS(M1_MeasuredSpeedMps - M2_MeasuredSpeedMps);
-SpeedMismatchActive := (State = E_AutoCycleStep.AX7_CTRL_ASCENT)
+SpeedMismatchActive := (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
                        AND JoystickDeflected
                        AND (SpeedMismatchThresholdMps > 0.0)
                        AND (SpeedMismatchTimeout > T#0ms)
                        AND (SpeedMismatchMps > SpeedMismatchThresholdMps);
-// AX7_CTRL_ASCENT -> AX_STAB : TON confirmation écart vitesse.
+// AX11_CTRL_ASCENT -> AX_STAB : TON confirmation écart vitesse.
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
@@ -204,17 +234,33 @@ SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 StepMaxTimer(IN := (State = StepMaxPrevState)
                   AND JoystickDeflected
                   AND (State <> E_AutoCycleStep.AX0_REPOS)
-                  AND (State <> E_AutoCycleStep.AX13_DONE_SYNC)
-                  AND (State <> E_AutoCycleStep.AX_STAB),
+                  AND (State <> E_AutoCycleStep.AX18_DONE_SYNC)
+                  AND (State <> E_AutoCycleStep.AX_STAB)
+                  AND (State <> E_AutoCycleStep.AX_DIVING_RETRY),
              PT := StepMaxTimeout);
 StepMaxPrevState := State;
 
-// Egouttage X9 : TON gaté sur l'étape (remis à 0 hors X9). Remplace l'ancien IN:=TRUE câblé
-// qui pouvait laisser Q déjà vrai à l'entrée en X9 (temps d'égouttage non respecté).
-DrainingTimer(IN := (State = E_AutoCycleStep.AX9_DRAIN_PAUSE), PT := DrainTimeEff);
+// Egouttage AX13 : TON gaté sur l'étape (remis à 0 hors AX13). Remplace l'ancien IN:=TRUE câblé
+// qui pouvait laisser Q déjà vrai à l'entrée en AX13 (temps d'égouttage non respecté).
+DrainingTimer(IN := (State = E_AutoCycleStep.AX13_DRAIN_PAUSE), PT := DrainTimeEff);
+
+// GT-dive-retry (GEL Q11) : en AX5/AX6/AX7, erreur sequence Kobold (retour contacteur
+// absent apres CST_KoboldInitTimeout) OU joystick relache OU palier applique <> 4 sur
+// M1 ou M2 (feedback si cable) -> reprise AX_DIVING_RETRY (PAS un defaut latche).
+DivingRetryTrig := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
+                     OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+                     OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
+                   AND ( (KoboldInitTimer.Q AND NOT KoboldContactorFeedback)
+                         OR NOT JoystickDeflected
+                         OR ((M1_SpeedStepApplied > 0) AND (M1_SpeedStepApplied <> CST_StepDive))
+                         OR ((M2_SpeedStepApplied > 0) AND (M2_SpeedStepApplied <> CST_StepDive)) );
 
 // Table des causes de défaut
-instCauses[0].Active   := LimitLegalReached AND (State = E_AutoCycleStep.AX4_DESCEND_OPEN);
+instCauses[0].Active   := LimitLegalReached
+                          AND ((State = E_AutoCycleStep.AX4_DESCEND_DIVING)
+                            OR (State = E_AutoCycleStep.AX5_KOBOLD_INIT)
+                            OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+                            OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM));
 instCauses[0].Latching := TRUE;
 instCauses[0].Texte    := 'Limite legale de profondeur atteinte pendant descente';
 
@@ -235,20 +281,22 @@ instCauses[4].Latching := TRUE;
 instCauses[4].Texte    := 'Depassement tempo maximale d etape (blocage mouvement)';
 
 instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(M1_CablePosM - M2_CablePosM) > CtrlAscentToleranceM))
-                          AND (State = E_AutoCycleStep.AX7_CTRL_ASCENT);
+                          AND (State = E_AutoCycleStep.AX11_CTRL_ASCENT);
 instCauses[5].Latching := TRUE;
 instCauses[5].Texte    := 'Defaut de stabilisation / tolerance ecart codeurs en remontee controle';
 
 // Backstop anti-telescopage : ecart de position M1/M2 excessif pendant une phase
-// reellement couplee (X4 plongee, X5 remontee, X8 montee en charge). X7 a deja son
-// propre controle (instCauses[5]). Seuil grossier (0,50 m) : filet local si
-// FB_SyncDeviation (PRG_04) ne coupe pas.
+// reellement couplee. AX11 a deja son propre controle (instCauses[5]). Seuil grossier
+// (0,50 m) : filet local si FB_SyncDeviation (PRG_04) ne coupe pas.
 instCauses[6].Active   := (ABS(M1_CablePosM - M2_CablePosM) > CST_CoupledPosBacklashM)
                           AND JoystickDeflected
-                          AND ((State = E_AutoCycleStep.AX4_DESCEND_OPEN)
-                            OR (State = E_AutoCycleStep.AX5_BOTTOM_CONFIRMED)
-                            OR (State = E_AutoCycleStep.AX8_ASCENT_LOADED)
-                            OR (State = E_AutoCycleStep.AX11C_DUMP_REPOSITION));
+                          AND ((State = E_AutoCycleStep.AX4_DESCEND_DIVING)
+                            OR (State = E_AutoCycleStep.AX5_KOBOLD_INIT)
+                            OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+                            OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM)
+                            OR (State = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
+                            OR (State = E_AutoCycleStep.AX12_LOADED_ASCENT)
+                            OR (State = E_AutoCycleStep.AX15C_DUMP_REPOSITION));
 instCauses[6].Latching := TRUE;
 instCauses[6].Texte    := 'Ecart de position M1/M2 excessif en phase couplee (anti-telescopage)';
 
@@ -258,6 +306,17 @@ instCauses[6].Texte    := 'Ecart de position M1/M2 excessif en phase couplee (an
 instCauses[7].Active   := NOT WinchesAtTopWindow AND (State = E_AutoCycleStep.AX2_TRANSLATE_P1);
 instCauses[7].Latching := TRUE;
 instCauses[7].Texte    := 'Treuils M1/M2 hors FDC haut pendant la translation vers P1';
+
+// GEL cause 8 : palier vitesse > 4 (palier 5) applique pendant la plongee. Le FB commande
+// toujours CST_StepDive = 4 ; un palier 5 en retour feedback = anomalie aval -> defaut latche.
+// (Un palier < 4 en retour est traite en reprise par GT-dive-retry, pas ici.)
+instCauses[8].Active   := (((M1_SpeedStepApplied > CST_StepDive) OR (M2_SpeedStepApplied > CST_StepDive)))
+                          AND ((State = E_AutoCycleStep.AX4_DESCEND_DIVING)
+                            OR (State = E_AutoCycleStep.AX5_KOBOLD_INIT)
+                            OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+                            OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM));
+instCauses[8].Latching := TRUE;
+instCauses[8].Texte    := 'Palier vitesse > 4 (palier 5) pendant la plongee - interdit';
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -289,7 +348,7 @@ IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
     // Si on quitte le semi-auto alors qu'un cycle était en cours, on mémorise l'étape pour la pause
-    IF (State <> E_AutoCycleStep.AX0_REPOS) AND (State <> E_AutoCycleStep.AX13_DONE_SYNC) AND (State <> E_AutoCycleStep.AX_STAB) THEN
+    IF (State <> E_AutoCycleStep.AX0_REPOS) AND (State <> E_AutoCycleStep.AX18_DONE_SYNC) AND (State <> E_AutoCycleStep.AX_STAB) THEN
         PausedState := State;
         WaitingResume := TRUE;
     END_IF;
@@ -358,6 +417,12 @@ IF ErrorEdge.Q THEN
     CycleStepAtError := State;
     State := E_AutoCycleStep.AX_STAB;
     WaitingResume := FALSE;   // un défaut abroge la reprise consciente : repli AX_STAB
+END_IF;
+
+// GT-dive-retry (GEL Q11) : reprise de plongee (PAS un defaut latche). Prioritaire
+// apres le repli defaut : une vraie erreur (ErrorEdge) l'emporte.
+IF DivingRetryTrig AND (State <> E_AutoCycleStep.AX_STAB) THEN
+    State := E_AutoCycleStep.AX_DIVING_RETRY;
 END_IF;
 
 IF ResetEdge.Q THEN
@@ -504,18 +569,20 @@ CASE State OF
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
         IF Benne_IsOpen THEN
-            State := E_AutoCycleStep.AX4_DESCEND_OPEN;
+            State := E_AutoCycleStep.AX4_DESCEND_DIVING;
         ELSE
             BucketCmd.ReqOpen := CycleMotionPermit;
             IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
                 BucketCmd.ReqOpen := FALSE;
-                State := E_AutoCycleStep.AX4_DESCEND_OPEN;
+                State := E_AutoCycleStep.AX4_DESCEND_DIVING;
             END_IF;
         END_IF;
 
-    E_AutoCycleStep.AX4_DESCEND_OPEN:
-        CycleStep := E_AutoCycleStep.AX4_DESCEND_OPEN;
-        CycleStateStr := 'X4 - Plongee benne ouverte (synchro)';
+    (* ===================== DIVING (AX4..AX8 + AX_DIVING_RETRY) ===================== *)
+
+    E_AutoCycleStep.AX4_DESCEND_DIVING:
+        CycleStep := E_AutoCycleStep.AX4_DESCEND_DIVING;
+        CycleStateStr := 'AX4 - Plongee couplee palier 4 jusqu a l altimetrie de lancement';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -523,12 +590,38 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0404;
-        OperatorAction := 'Maintenir la descente : plongee synchro et detection fond Kobold.';
+        OperatorAction := 'Maintenir la descente palier 4 (Kobold pas encore enclenche).';
 
-        // Cycle diving integre (GEL Q9) : palier 4 MINI ET MAXI impose (CST_StepDive := 4),
-        // palier 5 interdit. La tempo de sequencement des contacteurs de vitesse est
-        // conservee en aval (PRG_04 : montee progressive 1->4, pas de saut direct au
-        // palier 4). M1 et M2 descendent ensemble (synchro geree en aval).
+        // Palier 4 MINI ET MAXI (CST_StepDive), palier 5 interdit (cause 8). Tempo
+        // sequencement contacteurs conservee en aval (PRG_04 : montee progressive 1->4).
+        // Contacteur Kobold PAS enclenche a cette etape.
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
+        WinchM1Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
+        WinchM2Cmd.StepTgt  := CST_StepDive;
+        BucketCmd.ReqKoboldMeasureEnable := FALSE;
+
+        // AT4 : altimetrie de lancement atteinte (M1 ET M2 <= DiveStartMinEff).
+        IF JoystickDeflected
+           AND (M1_CablePosM <= DiveStartMinEff) AND (M2_CablePosM <= DiveStartMinEff) THEN
+            State := E_AutoCycleStep.AX5_KOBOLD_INIT;
+        END_IF;
+
+    E_AutoCycleStep.AX5_KOBOLD_INIT:
+        CycleStep := E_AutoCycleStep.AX5_KOBOLD_INIT;
+        CycleStateStr := 'AX5 - Activation contacteur Kobold au vol';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
+        OperatorActionId := 16#0405;
+        OperatorAction := 'Maintenir la descente palier 4 : initialisation Kobold en cours.';
+
+        // Descente palier 4 maintenue ; enclenche le contacteur Kobold et attend le retour.
         WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
         WinchM1Cmd.StepTgt  := CST_StepDive;
@@ -537,32 +630,131 @@ CASE State OF
         WinchM2Cmd.StepTgt  := CST_StepDive;
         BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
 
-        // Transition uniquement sur le retour dédié Kobold.
-        IF JoystickDeflected AND KoboldContactFond THEN
-            WinchM1Cmd.RunRequest := FALSE;
-            WinchM2Cmd.RunRequest := FALSE;
-            BucketCmd.ReqKoboldMeasureEnable := FALSE;
-            TouchPositionM := M1_CablePosM;
-            IF LimitLegalDepthM < -0.01 THEN
-                RaiseTargetM := MAX(TouchPositionM + 0.5, LimitLegalDepthM + 0.5);
-            ELSE
-                RaiseTargetM := TouchPositionM + 0.5;
-            END_IF;
-            State := E_AutoCycleStep.AX5_BOTTOM_CONFIRMED;
+        // AT5 : retour contacteur Kobold coherent -> recherche immersion.
+        // (echec init / joystick relache / palier <> 4 -> AX_DIVING_RETRY via GT-dive-retry §1)
+        IF JoystickDeflected AND KoboldContactorFeedback THEN
+            State := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
         END_IF;
 
-    E_AutoCycleStep.AX5_BOTTOM_CONFIRMED:
-        CycleStep := E_AutoCycleStep.AX5_BOTTOM_CONFIRMED;
-        CycleStateStr := 'X5 - Fond confirme : remontee securisee';
+    E_AutoCycleStep.AX6_SEARCH_IMMERSION:
+        CycleStep := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
+        CycleStateStr := 'AX6 - Recherche entree dans l eau (front DI Kobold 0->1)';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
+        OperatorActionId := 16#0406;
+        OperatorAction := 'Maintenir la descente palier 4 : entree dans l eau attendue.';
+
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
+        WinchM1Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
+        WinchM2Cmd.StepTgt  := CST_StepDive;
+        BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
+
+        // AT6 : front montant DI Kobold (immersion confirmee) -> recherche du fond.
+        IF JoystickDeflected AND KoboldRiseEdge.Q THEN
+            State := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
+        END_IF;
+
+    E_AutoCycleStep.AX7_SEARCH_BOTTOM:
+        CycleStep := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
+        CycleStateStr := 'AX7 - Recherche du fond (front DI Kobold 1->0)';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
+        OperatorActionId := 16#0407;
+        OperatorAction := 'Maintenir la descente palier 4 sous l eau : detection du fond.';
+
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
+        WinchM1Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
+        WinchM2Cmd.StepTgt  := CST_StepDive;
+        BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
+
+        // AT7 : front descendant DI Kobold (ou retour dedie KoboldContactFond) = fond.
+        IF JoystickDeflected AND (KoboldFallEdge.Q OR KoboldContactFond) THEN
+            State := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
+        END_IF;
+
+    E_AutoCycleStep.AX8_BOTTOM_CONFIRMED:
+        CycleStep := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
+        CycleStateStr := 'AX8 - Fond confirme : coupure treuils, memorisation';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.NONE;
+        ExpectedDirection := 0;
+        WaitingForOperator := FALSE;
+        WaitingForProcess := TRUE;
+        OperatorActionId := 16#0408;
+        OperatorAction := 'Fond touche.';
+
+        // Coupure INSTANTANEE de toutes les commandes treuils (meme scan) + Kobold coupe.
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        BucketCmd.ReqKoboldMeasureEnable := FALSE;
+
+        TouchPositionM := M1_CablePosM;
+        IF LimitLegalDepthM < -0.01 THEN
+            RaiseTargetM := MAX(TouchPositionM + RaiseOffBottomEff, LimitLegalDepthM + RaiseOffBottomEff);
+        ELSE
+            RaiseTargetM := TouchPositionM + RaiseOffBottomEff;
+        END_IF;
+        State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
+
+    E_AutoCycleStep.AX_DIVING_RETRY:
+        CycleStep := E_AutoCycleStep.AX_DIVING_RETRY;
+        CycleStateStr := 'AX_DIVING_RETRY - Reprise plongee : remonter au FDC haut';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
-        OperatorActionId := 16#0405;
-        OperatorAction := 'Fond confirme : maintenir la montee jusqu a la hauteur de fermeture.';
+        OperatorActionId := 16#0481;
+        OperatorAction := 'Reprise plongee : maintenir la montee jusqu au FDC haut, puis nouvelle tentative.';
 
+        // Remontee assistee palier lent, Kobold coupe.
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
+        WinchM1Cmd.StepTgt  := CST_StepSlow;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
+        WinchM2Cmd.StepTgt  := CST_StepSlow;
+        BucketCmd.ReqKoboldMeasureEnable := FALSE;
+
+        // AT-retry : treuils revenus au FDC haut -> nouvelle tentative de plongee.
+        IF JoystickDeflected AND (WinchesAtTopWindow OR TopPositionSensor) THEN
+            WinchM1Cmd.RunRequest := FALSE;
+            WinchM2Cmd.RunRequest := FALSE;
+            State := E_AutoCycleStep.AX4_DESCEND_DIVING;
+        END_IF;
+
+    (* ===================== EXTRACTION (AX9..AX12) ===================== *)
+
+    E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM:
+        CycleStep := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
+        CycleStateStr := 'AX9 - Retente les cables (palier 1), decollement du fond';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := 1;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
+        OperatorActionId := 16#0409;
+        OperatorAction := 'Maintenir la montee palier 1 : retente des cables, decollement du fond.';
+
+        // Palier 1 (doux). Selecteur couplage BOTH/M1/M2 = garde cote PRG_04 (GEL Q15),
+        // le sequenceur commande toujours les deux treuils symetriquement.
         WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM1Cmd.StepTgt := CST_StepSlow;
@@ -573,88 +765,90 @@ CASE State OF
         IF JoystickDeflected AND (M1_CablePosM >= RaiseTargetM) AND (M2_CablePosM >= RaiseTargetM) THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
-            State := E_AutoCycleStep.AX6_CLOSE_BUCKET;
+            State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
         END_IF;
 
-    E_AutoCycleStep.AX6_CLOSE_BUCKET:
-        CycleStep := E_AutoCycleStep.AX6_CLOSE_BUCKET;
-        CycleStateStr := 'X6 - Fermeture benne (tolerance a peu pres ferme)';
+    E_AutoCycleStep.AX10_CLOSE_BUCKET:
+        CycleStep := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+        CycleStateStr := 'AX10 - Fermeture benne (tolerance a peu pres ferme)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
-        OperatorActionId := 16#0406;
+        OperatorActionId := 16#040A;
         OperatorAction := 'Maintenir la commande : fermeture de la benne.';
 
-        // X6 = étape benne seule : les DEUX treuils explicitement neutralisés
-        // (pas de résidu ReqAscent/StepTgt hérité de X5 — config treuil unique par étape).
+        // Etape benne seule : les DEUX treuils explicitement neutralises.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
-        // L'ordre benne reste soumis au même homme-mort que le cycle : aucune
-        // commande d'actionneur ne doit survivre à la perte du permis opérateur.
         BucketCmd.ReqClose := CycleMotionPermit;
 
         IF JoystickDeflected AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.ReqClose := FALSE;
-            State := E_AutoCycleStep.AX7_CTRL_ASCENT;
+            State := E_AutoCycleStep.AX11_CTRL_ASCENT;
         END_IF;
 
-    E_AutoCycleStep.AX7_CTRL_ASCENT:
-        CycleStep := E_AutoCycleStep.AX7_CTRL_ASCENT;
-        CycleStateStr := 'X7 - Remontee lente de controle';
+    E_AutoCycleStep.AX11_CTRL_ASCENT:
+        CycleStep := E_AutoCycleStep.AX11_CTRL_ASCENT;
+        CycleStateStr := 'AX11 - Remontee lente de controle';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
-        OperatorActionId := 16#0407;
-        OperatorAction := 'Maintenir la montee lente : palier de controle et synchronisme.';
+        OperatorActionId := 16#040B;
+        OperatorAction := 'Maintenir la montee de controle : palier et synchronisme.';
 
+        // Palier max reglable IHM, borne [1..2] (defaut 1 / P1 ; P2 possible au besoin).
         WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
-        WinchM1Cmd.StepTgt  := CST_StepSlow;
+        WinchM1Cmd.StepTgt  := CtrlAscentMaxStepEff;
         WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-        WinchM2Cmd.StepTgt  := CST_StepSlow;
+        WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
 
         IF JoystickDeflected
            AND (M1_CablePosM >= (TouchPositionM + CtrlAscentDistM))
            AND (M2_CablePosM >= (TouchPositionM + CtrlAscentDistM))
            AND (ABS(M1_CablePosM - M2_CablePosM) <= CtrlAscentToleranceM) THEN
-            State := E_AutoCycleStep.AX8_ASCENT_LOADED;
+            State := E_AutoCycleStep.AX12_LOADED_ASCENT;
         END_IF;
 
-    E_AutoCycleStep.AX8_ASCENT_LOADED:
-        CycleStep := E_AutoCycleStep.AX8_ASCENT_LOADED;
-        CycleStateStr := 'X8 - Remontee en charge';
+    E_AutoCycleStep.AX12_LOADED_ASCENT:
+        CycleStep := E_AutoCycleStep.AX12_LOADED_ASCENT;
+        CycleStateStr := 'AX12 - Remontee en charge';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := 1;
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
-        OperatorActionId := 16#0408;
-        OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute.';
+        OperatorActionId := 16#040C;
+        OperatorAction := 'Maintenir la montee en charge jusqu a la limite haute (pas de ralenti avant le top).';
 
+        // Benne bien fermee -> palier 4 ; benne mal fermee (a peu pres) -> palier 1.
+        // Pas de ralentissement 1 m avant la position top (montee franche).
         WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
-        WinchM1Cmd.StepTgt  := CST_StepLoaded;
+        WinchM1Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
         WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-        WinchM2Cmd.StepTgt  := CST_StepLoaded;
+        WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
         IF JoystickDeflected AND M1_CablePosM >= CableLimitM1AscentM THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
-            State := E_AutoCycleStep.AX9_DRAIN_PAUSE;
+            State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
         END_IF;
 
-    E_AutoCycleStep.AX9_DRAIN_PAUSE:
-        CycleStep := E_AutoCycleStep.AX9_DRAIN_PAUSE;
-        CycleStateStr := 'X9 - Egouttage du godet en cours';
+    (* ===================== DECHARGE (AX13..AX18) ===================== *)
+
+    E_AutoCycleStep.AX13_DRAIN_PAUSE:
+        CycleStep := E_AutoCycleStep.AX13_DRAIN_PAUSE;
+        CycleStateStr := 'AX13 - Egouttage du godet en cours';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.NONE;
@@ -666,15 +860,15 @@ CASE State OF
         WinchM1Cmd.RunRequest := FALSE;
         WinchM2Cmd.RunRequest := FALSE;
 
-        // Tempo d'egouttage armee/remise a zero en §1 (gate sur State = X9, PT = DrainTimeEff).
-        // Passage a X10 : fin de tempo OU appui operateur "passer l'egouttage" (SkipDrainEdge).
+        // Tempo d'egouttage armee/remise a zero en §1 (gate sur State = AX13, PT = DrainTimeEff).
+        // Duree reglable IHM (CfgDrainTime) + bypass immediat (SkipDrainEdge).
         IF JoystickDeflected AND (DrainingTimer.Q OR SkipDrainEdge.Q) THEN
-            State := E_AutoCycleStep.AX10_TRANSLATE_DUMP;
+            State := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
         END_IF;
 
-    E_AutoCycleStep.AX10_TRANSLATE_DUMP:
-        CycleStep := E_AutoCycleStep.AX10_TRANSLATE_DUMP;
-        CycleStateStr := 'X10 - Deplacement vers tremie (grille/crible libres)';
+    E_AutoCycleStep.AX14_TRANSLATE_DUMP:
+        CycleStep := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
+        CycleStateStr := 'AX14 - Deplacement vers tremie (grille/crible libres)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
@@ -689,12 +883,12 @@ CASE State OF
 
         IF JoystickDeflected AND Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
-            State := E_AutoCycleStep.AX11A_DUMP_ARRIVE;
+            State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
         END_IF;
 
-    E_AutoCycleStep.AX11A_DUMP_ARRIVE:
-        CycleStep := E_AutoCycleStep.AX11A_DUMP_ARRIVE;
-        CycleStateStr := 'X11a - Arrivee tremie : treuils arretes, attente ouverture';
+    E_AutoCycleStep.AX15A_DUMP_ARRIVE:
+        CycleStep := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
+        CycleStateStr := 'AX15a - Arrivee tremie : treuils arretes, attente ouverture';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -710,12 +904,12 @@ CASE State OF
 
         // Geste operateur (manche defleci) -> phase d'ouverture benne.
         IF JoystickDeflected THEN
-            State := E_AutoCycleStep.AX11B_DUMP_OPEN;
+            State := E_AutoCycleStep.AX15B_DUMP_OPEN;
         END_IF;
 
-    E_AutoCycleStep.AX11B_DUMP_OPEN:
-        CycleStep := E_AutoCycleStep.AX11B_DUMP_OPEN;
-        CycleStateStr := 'X11b - Vidage : ouverture benne, treuils arretes';
+    E_AutoCycleStep.AX15B_DUMP_OPEN:
+        CycleStep := E_AutoCycleStep.AX15B_DUMP_OPEN;
+        CycleStateStr := 'AX15b - Vidage : ouverture benne pour vider le contenu, treuils arretes';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -734,18 +928,18 @@ CASE State OF
         BucketCmd.ReqOpen := CycleMotionPermit;
 
         // Option operateur (bit IHM) : descendre la benne dans la gueule de tremie
-        // pour aider la vidange -> repositionnement couple M1+M2 (X11C). Prioritaire
+        // pour aider la vidange -> repositionnement couple M1+M2 (AX15C). Prioritaire
         // sur la fin de vidage.
         IF RepositionRequest THEN
-            State := E_AutoCycleStep.AX11C_DUMP_REPOSITION;
+            State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
         ELSIF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
-            State := E_AutoCycleStep.AX13_DONE_SYNC;
+            State := E_AutoCycleStep.AX18_DONE_SYNC;
         END_IF;
 
-    E_AutoCycleStep.AX11C_DUMP_REPOSITION:
-        CycleStep := E_AutoCycleStep.AX11C_DUMP_REPOSITION;
-        CycleStateStr := 'X11c - Repositionnement couple M1+M2 (aide vidange tremie)';
+    E_AutoCycleStep.AX15C_DUMP_REPOSITION:
+        CycleStep := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
+        CycleStateStr := 'AX15c - Repositionnement couple M1+M2 (aide vidange tremie)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -767,27 +961,27 @@ CASE State OF
         // La benne reste ouverte pendant le repositionnement (on finit l'ouverture si besoin).
         BucketCmd.ReqOpen := CycleMotionPermit AND NOT Benne_IsOpen;
 
-        // Retour a X11B des que l'operateur relache l'option de repositionnement.
+        // Retour a AX15B des que l'operateur relache l'option de repositionnement.
         IF NOT RepositionRequest THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
-            State := E_AutoCycleStep.AX11B_DUMP_OPEN;
+            State := E_AutoCycleStep.AX15B_DUMP_OPEN;
         END_IF;
 
-    E_AutoCycleStep.AX13_DONE_SYNC:
-        CycleStep := E_AutoCycleStep.AX13_DONE_SYNC;
-        CycleStateStr := 'X13 - Cycle automatique complete - pret';
+    E_AutoCycleStep.AX18_DONE_SYNC:
+        CycleStep := E_AutoCycleStep.AX18_DONE_SYNC;
+        CycleStateStr := 'AX18 - Passe terminee : aller en P1 pour recommencer';
         WinchM1Cmd.RunRequest := FALSE;
         WinchM2Cmd.RunRequest := FALSE;
         TranslationCmd.ReqStart := FALSE;
         Lifecycle.Done := TRUE;
         Lifecycle.Busy := FALSE;
-        ExpectedAxis := E_OperatorAxis.BUTTON;
-        ExpectedDirection := 0;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
+        ExpectedDirection := 1;
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#040D;
-        OperatorAction := 'Cycle termine avec succes. Relancer un nouveau cycle.';
+        OperatorAction := 'Cycle termine. Aller en P1 (joystick vers la droite) pour recommencer.';
 
         // Compteur de prélèvements (RETAIN) + durée du cycle — F2: cadré par front (1 seul par cycle)
         IF NOT SampleCountDone THEN
@@ -796,10 +990,12 @@ CASE State OF
             SampleCountDone := TRUE;
         END_IF;
 
-        IF StartEdge.Q THEN
+        // Rebouclage DIRECT sur AX2_TRANSLATE_P1 (GEL Q14) : la machine est deja
+        // referencee, la passe suivante enchaine sur la translation P1 (pas de retour AX0).
+        IF StartEdge.Q OR JoystickDeflected THEN
             SampleCountDone := FALSE;
             Lifecycle.Done := FALSE;
-            State := E_AutoCycleStep.AX0_REPOS;
+            State := E_AutoCycleStep.AX2_TRANSLATE_P1;
         END_IF;
 
     E_AutoCycleStep.AX_STAB:
