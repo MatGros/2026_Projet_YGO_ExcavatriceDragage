@@ -120,6 +120,7 @@ VAR
     TouchPositionM          : REAL;         // . [LOC] Position M1 memorisee lors du contact fond
     RaiseTargetM            : REAL;         // . [LOC] Profondeur de remontee memorisee
     SelectedWorkTarget      : INT;          // . [LOC] Cible de travail memorisee
+    StepMaxPrevState        : E_CycleStep;  // . [LOC] Etape du scan precedent (rearmement StepMaxTimer au changement d'etape)
 
     // === TEMPORISATEURS INTERNES ===
     DrainingTimer           : TON;          // . [LOC] Temporisateur de vidage (egouttage)
@@ -169,12 +170,21 @@ SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
-// Tempo max d'étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
-// Xi -> STABILIZING : TON backstop durée d'état pour tous les états de mouvement.
-StepMaxTimer(IN := JoystickDeflected AND (State <> E_CycleStep.X0_PREPARATION)
+// Tempo max d'étape (R5) — backstop durée d'état, lancé SEULEMENT si pilotage joystick actif.
+// Xi -> STABILIZING sur dépassement. Réarmé à CHAQUE changement d'étape (IN=FALSE 1 scan) :
+// chaque étape dispose de sa propre fenêtre StepMaxTimeout, la tempo n'est PAS cumulative
+// sur l'ensemble du cycle (un cycle réel long ne tombe plus en STABILIZING intempestif).
+StepMaxTimer(IN := (State = StepMaxPrevState)
+                  AND JoystickDeflected
+                  AND (State <> E_CycleStep.X0_PREPARATION)
                   AND (State <> E_CycleStep.X13_DONE_SYNC)
                   AND (State <> E_CycleStep.STABILIZING),
              PT := StepMaxTimeout);
+StepMaxPrevState := State;
+
+// Egouttage X9 : TON gaté sur l'étape (remis à 0 hors X9). Remplace l'ancien IN:=TRUE câblé
+// qui pouvait laisser Q déjà vrai à l'entrée en X9 (temps d'égouttage non respecté).
+DrainingTimer(IN := (State = E_CycleStep.X9_DRAIN_PAUSE), PT := DrainingTime);
 
 // Table des causes de défaut
 instCauses[0].Active   := LimitLegalReached AND (State = E_CycleStep.X4_DESCEND_OPEN);
@@ -503,7 +513,10 @@ CASE State OF
         OperatorActionId := 16#0406;
         OperatorAction := 'Maintenir la commande : fermeture de la benne.';
 
-        WinchM1Cmd.RunRequest := FALSE;
+        // X6 = étape benne seule : les DEUX treuils explicitement neutralisés
+        // (pas de résidu ReqAscent/StepTgt hérité de X5 — config treuil unique par étape).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         // L'ordre benne reste soumis au même homme-mort que le cycle : aucune
         // commande d'actionneur ne doit survivre à la perte du permis opérateur.
         BucketCmd.ReqClose := CycleMotionPermit;
@@ -578,9 +591,8 @@ CASE State OF
         WinchM1Cmd.RunRequest := FALSE;
         WinchM2Cmd.RunRequest := FALSE;
 
-        DrainingTimer(IN := TRUE, PT := DrainingTime);
+        // Tempo d'egouttage armee/remise a zero en §1 (gate sur State = X9).
         IF JoystickDeflected AND DrainingTimer.Q THEN
-            DrainingTimer(IN := FALSE);
             State := E_CycleStep.X10_TRANSLATE_DUMP;
         END_IF;
 
