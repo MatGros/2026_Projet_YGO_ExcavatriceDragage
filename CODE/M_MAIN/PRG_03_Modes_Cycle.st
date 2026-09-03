@@ -6,7 +6,7 @@
             DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
    🎯 Rôle unique : Instancier FB_Modes, distribuer le bus ST_Modes_Autorisations,
       et instancier les 2 séquenceurs de cycle (maintenance + semi-auto).
-   ⚠️ Retard d'un scan : FB_Cycle (rang 03) lit les feedbacks de PRG_04/05
+   ⚠️ Retard d'un scan : FB_CycleSemiAuto (rang 03) lit les feedbacks de PRG_04/05
       (rangs 04/05) du scan PRÉCÉDENT — documenté, cohérent avec la pratique
       existante (PRG_04 « lag 1 scan »). Les demandes produites sont consommées
       par PRG_04/05 dans le MÊME scan (producteur avant consommateur).
@@ -26,7 +26,7 @@ END_VAR
 VAR
     // === 🧩 SOUS-INSTANCES FB INTERNES ===
     instModes              : FB_Modes;              // * [INST] Arbitrage des modes machine et calcul autorisations
-    instCycleSemiAuto      : FB_Cycle;              // * [INST] Séquenceur de cycle semi-automatique (privé)
+    instCycleSemiAuto      : FB_CycleSemiAuto;              // * [INST] Séquenceur de cycle semi-automatique (privé)
     instDiveSearch         : FB_DiveSearch;         // * [INST] Assistance plongée et recherche fond Kobold
     instExtractionAssist : FB_ExtractionAssist; // * [INST] Séquence d'extraction et remontée assistée
 
@@ -272,7 +272,7 @@ Data.WinchBothIntent.ReqDescend := WinchBothMotionDirection < 0;
 
 // 2. Demandes programme et état public de séquence
 IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
-    // Demandes treuils M1 / M2 — copie struct entière : FB_Cycle produit directement
+    // Demandes treuils M1 / M2 — copie struct entière : FB_CycleSemiAuto produit directement
     // le type de contrat inter-PRG (ST_Program*Request). Plus de re-mapping
     // champ-à-champ ni de DUT ST_fbCycle_*CmdDemand redondants (NC-090).
     Data.ReqProgram.ReqWinchM1 := instCycleSemiAuto.WinchM1Cmd;
@@ -281,7 +281,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Demande translation M3
     Data.ReqProgram.ReqTranslation := instCycleSemiAuto.TranslationCmd;
 
-    // Demande benne — FB_Cycle fournit aussi les champs assistants neutres
+    // Demande benne — FB_CycleSemiAuto fournit aussi les champs assistants neutres
     // (DescendPermitDiveBucketOpen=TRUE, ExtractionControlActive=FALSE, AscentPermit=FALSE, MinStepDown=0).
     Data.ReqProgram.ReqBucket := instCycleSemiAuto.BucketCmd;
 
@@ -421,9 +421,9 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
         Data.SequenceState.Fault.ErrorId      := 0;
         Data.SequenceState.Fault.Latched      := FALSE;
     END_IF;
-    Data.SequenceState.Step                   := E_CycleStep.X0_PREPARATION;
+    Data.SequenceState.Step                   := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.StepStr                := 'ASSIST_MODE';
-    Data.SequenceState.StepAtFault            := E_CycleStep.X0_PREPARATION;
+    Data.SequenceState.StepAtFault            := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.ExpectedAxis           := E_OperatorAxis.JOYSTICK_Y;
     Data.SequenceState.ExpectedDirection      := WinchBothMotionDirection;
     Data.SequenceState.WaitingForOperator     := FALSE;
@@ -488,9 +488,9 @@ ELSE
     Data.SequenceState.Fault.Error             := FALSE;
     Data.SequenceState.Fault.ErrorId           := 0;
     Data.SequenceState.Fault.Latched           := FALSE;
-    Data.SequenceState.Step                    := E_CycleStep.X0_PREPARATION;
-    Data.SequenceState.StepStr                 := 'X0_PREPARATION';
-    Data.SequenceState.StepAtFault             := E_CycleStep.X0_PREPARATION;
+    Data.SequenceState.Step                    := E_AutoCycleStep.AX0_REPOS;
+    Data.SequenceState.StepStr                 := 'AX0_REPOS';
+    Data.SequenceState.StepAtFault             := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.OperatorActionId        := 0;
     Data.SequenceState.OperatorAction          := '';
     Data.SequenceState.ExpectedAxis            := E_OperatorAxis.NONE;

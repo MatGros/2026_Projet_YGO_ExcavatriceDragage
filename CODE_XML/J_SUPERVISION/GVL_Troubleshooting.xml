@@ -572,10 +572,10 @@
             </variable>
             <variable name="Idx206_Step">
               <type>
-                <derived name="E_CycleStep" />
+                <derived name="E_AutoCycleStep" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape courante (X0 à X13 + STABILIZING)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape courante (X0 à X13 + AX_STAB)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx207_StepStr">
@@ -588,7 +588,7 @@
             </variable>
             <variable name="Idx208_StepAtError">
               <type>
-                <derived name="E_CycleStep" />
+                <derived name="E_AutoCycleStep" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape mémorisée lors du dernier défaut</xhtml>
@@ -652,7 +652,7 @@
             </variable>
             <variable name="Idx216_PausedState">
               <type>
-                <derived name="E_CycleStep" />
+                <derived name="E_AutoCycleStep" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Étape mémorisée prête pour reprise</xhtml>
@@ -2510,26 +2510,26 @@ Cause de blocage prioritaire</xhtml>
           </data>
         </addData>
       </dataType>
-      <dataType name="E_CycleStep">
+      <dataType name="E_AutoCycleStep">
         <baseType>
           <enum>
             <values>
-              <value name="X0_PREPARATION" value="0" />
-              <value name="X1_HOMING" value="1" />
-              <value name="X2_WORK_POS_SELECT" value="2" />
-              <value name="X3_OPEN_BUCKET" value="3" />
-              <value name="X4_DESCEND_OPEN" value="4" />
-              <value name="X5_BOTTOM_CONFIRMED" value="5" />
-              <value name="X6_CLOSE_BUCKET" value="6" />
-              <value name="X7_CTRL_ASCENT" value="7" />
-              <value name="X8_ASCENT_LOADED" value="8" />
-              <value name="X9_DRAIN_PAUSE" value="9" />
-              <value name="X10_TRANSLATE_DUMP" value="10" />
-              <value name="X11A_DUMP_ARRIVE" value="11" />
-              <value name="X13_DONE_SYNC" value="13" />
-              <value name="STABILIZING" value="14" />
-              <value name="X11B_DUMP_OPEN" value="15" />
-              <value name="X11C_DUMP_REPOSITION" value="16" />
+              <value name="AX0_REPOS" value="0" />
+              <value name="AX1_HOMING" value="1" />
+              <value name="AX2_TRANSLATE_P1" value="2" />
+              <value name="AX3_OPEN_BUCKET" value="3" />
+              <value name="AX4_DESCEND_OPEN" value="4" />
+              <value name="AX5_BOTTOM_CONFIRMED" value="5" />
+              <value name="AX6_CLOSE_BUCKET" value="6" />
+              <value name="AX7_CTRL_ASCENT" value="7" />
+              <value name="AX8_ASCENT_LOADED" value="8" />
+              <value name="AX9_DRAIN_PAUSE" value="9" />
+              <value name="AX10_TRANSLATE_DUMP" value="10" />
+              <value name="AX11A_DUMP_ARRIVE" value="11" />
+              <value name="AX13_DONE_SYNC" value="13" />
+              <value name="AX_STAB" value="14" />
+              <value name="AX11B_DUMP_OPEN" value="15" />
+              <value name="AX11C_DUMP_REPOSITION" value="16" />
             </values>
           </enum>
         </baseType>
@@ -2537,99 +2537,99 @@ Cause de blocage prioritaire</xhtml>
           <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
             <EnumValueDocumentation>
               <EnumValue>
-                <Name>X0_PREPARATION</Name>
+                <Name>AX0_REPOS</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Début de graphe : à la TRÉMIE, treuils en position HAUTE</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repos / park : toutes commandes 0, etat neutre</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X1_HOMING</Name>
+                <Name>AX1_HOMING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesses lentes pour chercher capteur top + référencement</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Verif reference machine (HomedM1/M2) - aucun mouvement</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X2_WORK_POS_SELECT</Name>
+                <Name>AX2_TRANSLATE_P1</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Sélection cible Trémie/P1/Maintenance + translation validée</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers P1 au joystick (pas de selection, comme maintenance)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X3_OPEN_BUCKET</Name>
+                <Name>AX3_OPEN_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si déjà ouverte -&gt; passe vite)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si deja ouverte -&gt; passe vite)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X4_DESCEND_OPEN</Name>
+                <Name>AX4_DESCEND_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongée benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongee benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X5_BOTTOM_CONFIRMED</Name>
+                <Name>AX5_BOTTOM_CONFIRMED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé (FB_DiveSearch) ; arrêt descente</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirme (Kobold) ; montee lente securisee</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X6_CLOSE_BUCKET</Name>
+                <Name>AX6_CLOSE_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne — tolérance « à peu près fermé »</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne - tolerance a peu pres ferme</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X7_CTRL_ASCENT</Name>
+                <Name>AX7_CTRL_ASCENT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 de contrôle</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontee palier 1 de controle + surveillance ecart M1/M2</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X8_ASCENT_LOADED</Name>
+                <Name>AX8_ASCENT_LOADED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée nominale jusqu'à limite haute</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontee en charge jusqu'a limite haute</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X9_DRAIN_PAUSE</Name>
+                <Name>AX9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — durée configurable / passable IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Egouttage temporise - duree configurable / passable IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X10_TRANSLATE_DUMP</Name>
+                <Name>AX10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie (départ P1) + avertissements IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers tremie (depart P1) + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X11A_DUMP_ARRIVE</Name>
+                <Name>AX11A_DUMP_ARRIVE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrivée trémie : treuils à l'arrêt, attente geste opérateur (ex-X11)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrivee tremie : treuils a l'arret, attente geste operateur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X13_DONE_SYNC</Name>
+                <Name>AX13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur + durée cycle</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle : compteur vidages + duree cycle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>STABILIZING</Name>
+                <Name>AX_STAB</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repli defaut / stabilisation - pas une erreur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X11B_DUMP_OPEN</Name>
+                <Name>AX11B_DUMP_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage à la trémie : ouverture benne, LES DEUX treuils à l'arrêt (aucune descente couplée)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage tremie : ouverture benne, LES DEUX treuils a l'arret</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X11C_DUMP_REPOSITION</Name>
+                <Name>AX11C_DUMP_REPOSITION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repositionnement couplé M1+M2 (option IHM maintenue) : descente lente pour dégager la vidange, retour X11b au relâchement</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repositionnement couple M1+M2 (option IHM maintenue), retour AX11B au relachement</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -2641,7 +2641,7 @@ Cause de blocage prioritaire</xhtml>
             </Attributes>
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>6cb965ad-bf44-5119-9acc-50ecd5c9f87b</ObjectId>
+            <ObjectId>6e89b113-d6f1-5719-b130-7af999a1c7fd</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -4791,7 +4791,7 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
         </Folder>
         <Folder Name="G_CYCLE">
           <Folder Name="_TYPES">
-            <Object Name="E_CycleStep" ObjectId="6cb965ad-bf44-5119-9acc-50ecd5c9f87b" />
+            <Object Name="E_AutoCycleStep" ObjectId="6e89b113-d6f1-5719-b130-7af999a1c7fd" />
             <Object Name="E_OperatorAxis" ObjectId="07a48a82-b7c8-54f5-9041-14c13244835f" />
             <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
             <Object Name="E_ExtractionAssistState" ObjectId="52924d25-cfcc-5dc2-a673-d7581dfb2d37" />

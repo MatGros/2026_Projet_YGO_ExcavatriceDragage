@@ -583,7 +583,7 @@ GVL_IHM.Cycle.State.M1Position_M           := SEL(M1PosDisplayFrozen, PRG_02_Acq
 GVL_IHM.Cycle.State.M2Position_M           := SEL(M2PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM, M2PosHmiHeld_M);
 GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
 // 🕹️ JoystickDeflected = déflexion joystick seule (SANS homme-mort) — même signal que
-// JoystickDeflected (FB_Cycle, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
+// JoystickDeflected (FB_CycleSemiAuto, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
 // « joystick défléchi » est projeté à l'IHM.
 GVL_IHM.Cycle.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 

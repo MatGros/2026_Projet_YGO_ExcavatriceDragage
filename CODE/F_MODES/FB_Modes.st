@@ -5,7 +5,7 @@
     🔒 Sécurité : La sélection de mode est découplée de l'autorisation de mouvement :
                   le mode suit la sélection IHM même sous AU, arrêt d'urgence ou défaut ; le
                   mouvement est coupé en aval par la chaîne AU physique (PowerContactorEngaged)
-                  et les interlocks (FB_Cycle, FB_Safety_Winch, FB_Winch). Bascule N1/N2/SEMI_AUTO
+                  et les interlocks (FB_CycleSemiAuto, FB_Safety_Winch, FB_Winch). Bascule N1/N2/SEMI_AUTO
                   soumise à l'arrêt mécanique confirmé des treuils ; re-homing obligatoire après
                   usage effectif d'un override/bypass de position (AF-05 §4bis) — publié à l'IHM,
                   ne bloque pas la sélection mais le cycle.
@@ -128,7 +128,7 @@ END_IF;
 
 // Diagnostic « cycle non prêt » — le mode SEMI_AUTO reste sélectionnable mais le
 // cycle ne tournera pas tant que ces conditions ne sont pas saines. Info NON-bloquante :
-// la sélection n'est pas refusée, le mouvement est coupé en aval (FB_Cycle/FB_Safety_Winch).
+// la sélection n'est pas refusée, le mouvement est coupé en aval (FB_CycleSemiAuto/FB_Safety_Winch).
 // Une cause = un fait (AF03 §4) : défaut codeur, re-homing et référencement sont distincts.
 SemiAutoCycleNotReadyFault         := (SelMode = E_Mode.SEMI_AUTO) AND EncoderFaultPresent;
 SemiAutoCycleNotReadyHoming        := (SelMode = E_Mode.SEMI_AUTO) AND (MaintHomingRequiredM1 OR MaintHomingRequiredM2);
@@ -210,7 +210,7 @@ Auth.M2SpeedLow           := ABS(M2SpeedAbsMps) < MovementSpeedThresholdMps;
 
 // 3.2 ARBITRAGE — le mode suit la sélection IHM (découplé de l'AU/défaut)
 // La sélection de mode n'est JAMAIS bloquée par l'AU, l'arrêt d'urgence ou un défaut :
-// le mode est un état de sélection, le mouvement est coupé en aval (FB_Cycle, FB_Safety_Winch,
+// le mode est un état de sélection, le mouvement est coupé en aval (FB_CycleSemiAuto, FB_Safety_Winch,
 // FB_Winch) par PowerContactorEngaged et les interlocks. Seule la bascule N1/N2/SEMI_AUTO
 // reste soumise à l'arrêt mécanique confirmé des treuils (ModeChangeAllowed).
 // 3.2bis (AF-05 §4bis - referencement benne guide) : SEMI_AUTO est un mode "homed-only".

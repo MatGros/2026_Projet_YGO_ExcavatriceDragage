@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T10:40:44.751380" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T10:40:44.751380">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="E_AutoCycleStep">
+        <baseType>
+          <enum>
+            <values>
+              <value name="AX0_REPOS" value="0" />
+              <value name="AX1_HOMING" value="1" />
+              <value name="AX2_TRANSLATE_P1" value="2" />
+              <value name="AX3_OPEN_BUCKET" value="3" />
+              <value name="AX4_DESCEND_OPEN" value="4" />
+              <value name="AX5_BOTTOM_CONFIRMED" value="5" />
+              <value name="AX6_CLOSE_BUCKET" value="6" />
+              <value name="AX7_CTRL_ASCENT" value="7" />
+              <value name="AX8_ASCENT_LOADED" value="8" />
+              <value name="AX9_DRAIN_PAUSE" value="9" />
+              <value name="AX10_TRANSLATE_DUMP" value="10" />
+              <value name="AX11A_DUMP_ARRIVE" value="11" />
+              <value name="AX13_DONE_SYNC" value="13" />
+              <value name="AX_STAB" value="14" />
+              <value name="AX11B_DUMP_OPEN" value="15" />
+              <value name="AX11C_DUMP_REPOSITION" value="16" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>AX0_REPOS</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repos / park : toutes commandes 0, etat neutre</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX1_HOMING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Verif reference machine (HomedM1/M2) - aucun mouvement</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX2_TRANSLATE_P1</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers P1 au joystick (pas de selection, comme maintenance)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX3_OPEN_BUCKET</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si deja ouverte -&gt; passe vite)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX4_DESCEND_OPEN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongee benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX5_BOTTOM_CONFIRMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirme (Kobold) ; montee lente securisee</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX6_CLOSE_BUCKET</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne - tolerance a peu pres ferme</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX7_CTRL_ASCENT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontee palier 1 de controle + surveillance ecart M1/M2</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX8_ASCENT_LOADED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontee en charge jusqu'a limite haute</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX9_DRAIN_PAUSE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Egouttage temporise - duree configurable / passable IHM</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX10_TRANSLATE_DUMP</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers tremie (depart P1) + avertissements IHM</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX11A_DUMP_ARRIVE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrivee tremie : treuils a l'arret, attente geste operateur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX13_DONE_SYNC</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle : compteur vidages + duree cycle</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX_STAB</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repli defaut / stabilisation - pas une erreur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX11B_DUMP_OPEN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage tremie : ouverture benne, LES DEUX treuils a l'arret</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX11C_DUMP_REPOSITION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repositionnement couple M1+M2 (option IHM maintenue), retour AX11B au relachement</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6e89b113-d6f1-5719-b130-7af999a1c7fd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="G_CYCLE">
+          <Folder Name="_TYPES">
+            <Object Name="E_AutoCycleStep" ObjectId="6e89b113-d6f1-5719-b130-7af999a1c7fd" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
