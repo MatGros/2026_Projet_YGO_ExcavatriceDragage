@@ -213,7 +213,17 @@ Auth.M2SpeedLow           := ABS(M2SpeedAbsMps) < MovementSpeedThresholdMps;
 // le mode est un état de sélection, le mouvement est coupé en aval (FB_Cycle, FB_Safety_Winch,
 // FB_Winch) par PowerContactorEngaged et les interlocks. Seule la bascule N1/N2/SEMI_AUTO
 // reste soumise à l'arrêt mécanique confirmé des treuils (ModeChangeAllowed).
-IF (SelMode <> PrevArbitratedMode)
+// 3.2bis (AF-05 §4bis - referencement benne guide) : SEMI_AUTO est un mode "homed-only".
+// Une selection SEMI_AUTO sans datum machine valide (MachineHomed) est REFUSEE et le mode
+// est force vers MAINT_N1 (expulsion). Vaut aussi si MachineHomed retombe alors qu'on EST
+// en SEMI_AUTO (perte de datum -> bascule MAINT_N1). Le SafeStop des treuils sur perte de
+// datum en mouvement est assure en aval (PRG_04 via MachineHoming.HomingLoss). L'expulsion
+// n'est jamais bloquee par l'arret mecanique (comme la sortie DISABLE, contrat D2).
+IF (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed THEN
+    Auth.Mode := E_Mode.MAINT_N1;
+    Auth.ModeChangePendingBlocked := TRUE;
+    Auth.ModeChangeBlockReason := 'SEMI_AUTO refuse : machine non referencee';
+ELSIF (SelMode <> PrevArbitratedMode)
       AND (SelMode <> E_Mode.DISABLE) AND (PrevArbitratedMode <> E_Mode.DISABLE)
       AND NOT ModeChangeAllowed THEN
     // Bascule N1/N2/SEMI_AUTO refusée : le mode courant est MAINTENU.
