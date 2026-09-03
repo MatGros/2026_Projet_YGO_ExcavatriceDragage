@@ -5761,7 +5761,14 @@ Auth.M2SpeedLow           := ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps;
 IF (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed THEN
     Auth.Mode := E_Mode.MAINT_N1;
     Auth.ModeChangePendingBlocked := TRUE;
-    Auth.ModeChangeBlockReason := 'SEMI_AUTO refuse : machine non referencee';
+    // Motif distinct : perte de datum EN cours de SEMI_AUTO (arret controle assure en
+    // aval par MachineHoming.HomingLoss si les treuils bougeaient) vs simple selection
+    // refusee. Aucune coupure de puissance, aucun redemarrage automatique.
+    IF PrevArbitratedMode = E_Mode.SEMI_AUTO THEN
+        Auth.ModeChangeBlockReason := 'Datum machine perdu : arret controle';
+    ELSE
+        Auth.ModeChangeBlockReason := 'SEMI_AUTO refuse : datum machine absent';
+    END_IF;
 ELSIF (SelMode &lt;&gt; PrevArbitratedMode)
       AND (SelMode &lt;&gt; E_Mode.DISABLE) AND (PrevArbitratedMode &lt;&gt; E_Mode.DISABLE)
       AND NOT ModeChangeAllowed THEN

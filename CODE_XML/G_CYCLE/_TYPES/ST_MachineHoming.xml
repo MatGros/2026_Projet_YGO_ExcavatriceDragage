@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:40:22.362771" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:40:22.362771">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T08:33:25.626950" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T08:33:25.626950">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -71,7 +71,7 @@
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee reference</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee reference (echelle de priorite E_MachineHomingStep)</xhtml>
               </documentation>
             </variable>
             <variable name="Instruction">
@@ -88,6 +88,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction reference abandonnee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SeqStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Step GRAFCET courant (E_MachineHomingTxState HX0..HXF)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3Locked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation M3 interdite pendant le cycle de homing machine</xhtml>
               </documentation>
             </variable>
           </struct>

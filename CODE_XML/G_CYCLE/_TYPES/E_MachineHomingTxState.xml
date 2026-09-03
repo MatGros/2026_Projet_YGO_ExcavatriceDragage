@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T23:30:07.486320" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T23:30:07.486320">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T08:15:16.004567" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T08:15:16.004567">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -27,9 +27,16 @@
         <baseType>
           <enum>
             <values>
-              <value name="IDLE" value="0" />
-              <value name="ARMED" value="1" />
-              <value name="BUSY_OBSERVED" value="2" />
+              <value name="HX0_REPOS" value="0" />
+              <value name="HX1_CHOICE" value="1" />
+              <value name="HX2_CLIMB" value="2" />
+              <value name="HX2N_NEUTRAL" value="3" />
+              <value name="HX3_HOME_AXES" value="4" />
+              <value name="HX3N_PAUSE" value="5" />
+              <value name="HX4_BUCKET_ADJUST" value="6" />
+              <value name="HX5_BUCKET_COMMIT" value="7" />
+              <value name="HX6_HOMED" value="8" />
+              <value name="HXF_FAILED" value="9" />
             </values>
           </enum>
         </baseType>
@@ -37,21 +44,63 @@
           <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
             <EnumValueDocumentation>
               <EnumValue>
-                <Name>IDLE</Name>
+                <Name>HX0_REPOS</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Aucune transaction : attente d'un front de confirmation dans la fenetre sure</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape initiale pure : aucune action, aucune affectation</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>ARMED</Name>
+                <Name>HX1_CHOICE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande homing conjoint emise (HomeReq M1+M2) ; attente qu'un axe passe Busy</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Annonce + choix operateur : aucun mouvement</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>BUSY_OBSERVED</Name>
+                <Name>HX2_CLIMB</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Au moins un axe a ete vu Busy ; attente des 2 succes -&gt; commit atomique</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Chemin A : montee couplee M1+M2 palier 1 jusqu au capteur haut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HX2N_NEUTRAL</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret + inversion de sens (tire -&gt; pousse) : mouvement nul obligatoire</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HX3_HOME_AXES</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing axes M1+M2 au vol sur front descendant capteur, puis descente couplee</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HX3N_PAUSE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret avant benne : mouvement nul, retour joystick au neutre</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HX4_BUCKET_ADJUST</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ajustement benne palier 1 sans FDC soft, 2 sens autorises</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HX5_BUCKET_COMMIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Commit atomique etat benne fermee (CommitClose)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HX6_HOMED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Machine referencee : MachineHomed := TRUE (fugace)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>HXF_FAILED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Referencement incomplet : rester en N2 et recommencer</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

@@ -136,13 +136,13 @@
               <EnumValue>
                 <Name>X11B_DUMP_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage : M2 piloté seul (M1 tenu), ouverture benne ; sync contacteurs OFF via Bucket.Busy</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage à la trémie : ouverture benne, LES DEUX treuils à l'arrêt (aucune descente couplée)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X11C_DUMP_REPOSITION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">RÉSERVÉ (non implémenté) : repositionnement couplé M1+M2 optionnel avant reprise du vidage</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repositionnement couplé M1+M2 (option IHM maintenue) : descente lente pour dégager la vidange, retour X11b au relâchement</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

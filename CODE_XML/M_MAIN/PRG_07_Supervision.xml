@@ -846,9 +846,11 @@ fournie par la configuration persistante de l'appelant.
               <value name="X8_ASCENT_LOADED" value="8" />
               <value name="X9_DRAIN_PAUSE" value="9" />
               <value name="X10_TRANSLATE_DUMP" value="10" />
-              <value name="X11_OPEN_DUMP" value="11" />
+              <value name="X11A_DUMP_ARRIVE" value="11" />
               <value name="X13_DONE_SYNC" value="13" />
               <value name="STABILIZING" value="14" />
+              <value name="X11B_DUMP_OPEN" value="15" />
+              <value name="X11C_DUMP_REPOSITION" value="16" />
             </values>
           </enum>
         </baseType>
@@ -912,31 +914,43 @@ fournie par la configuration persistante de l'appelant.
               <EnumValue>
                 <Name>X9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — temps affiché IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — durée configurable / passable IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie + avertissements IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie (départ P1) + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X11_OPEN_DUMP</Name>
+                <Name>X11A_DUMP_ARRIVE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrivée trémie : treuils à l'arrêt, attente geste opérateur (ex-X11)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur + durée cycle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>STABILIZING</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X11B_DUMP_OPEN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage à la trémie : ouverture benne, LES DEUX treuils à l'arrêt (aucune descente couplée)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X11C_DUMP_REPOSITION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repositionnement couplé M1+M2 (option IHM maintenue) : descente lente pour dégager la vidange, retour X11b au relâchement</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -11239,7 +11253,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_CycleStep.X8_ASCENT_LOADED: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
             E_CycleStep.X9_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
             E_CycleStep.X10_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
-            E_CycleStep.X11_OPEN_DUMP: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+            E_CycleStep.X11A_DUMP_ARRIVE, E_CycleStep.X11B_DUMP_OPEN: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
             E_CycleStep.X13_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ';
             E_CycleStep.STABILIZING: Banner.SequenceProgressText := 'Cycle: STABILISATION';
         ELSE
@@ -11490,7 +11504,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             OperatorActionCandidate := '[IHM] Attendre égouttage';
         E_CycleStep.X10_TRANSLATE_DUMP:
             OperatorActionCandidate := '[JOYSTICK] Déplacer vers trémie';
-        E_CycleStep.X11_OPEN_DUMP:
+        E_CycleStep.X11A_DUMP_ARRIVE, E_CycleStep.X11B_DUMP_OPEN:
             OperatorActionCandidate := '[IHM] Vidage benne';
         E_CycleStep.X13_DONE_SYNC:
             OperatorActionCandidate := '[IHM] Cycle terminé';
@@ -11508,7 +11522,8 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_CycleStep.X8_ASCENT_LOADED: StepAtErrorStr := 'X8 (remontée chargée)';
                 E_CycleStep.X9_DRAIN_PAUSE: StepAtErrorStr := 'X9 (égouttage)';
                 E_CycleStep.X10_TRANSLATE_DUMP: StepAtErrorStr := 'X10 (translation trémie)';
-                E_CycleStep.X11_OPEN_DUMP: StepAtErrorStr := 'X11 (vidage benne)';
+                E_CycleStep.X11A_DUMP_ARRIVE: StepAtErrorStr := 'X11a (arrivee tremie)';
+                E_CycleStep.X11B_DUMP_OPEN: StepAtErrorStr := 'X11b (vidage benne)';
                 E_CycleStep.X13_DONE_SYNC: StepAtErrorStr := 'X13 (cycle terminé)';
                 E_CycleStep.STABILIZING: StepAtErrorStr := 'X14 (stabilisation)';
                 ELSE
