@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:36:14.997924" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:36:14.997924">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T09:18:06.051756" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T09:18:06.051756">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6585,6 +6585,19 @@ Data.ArmingAvailability.AnyAxisAvail       := ArmAnyAxisAvail;
 // --- Sources communes (M1 = M2) ---
 CommonMaxStepAscent   := EffectiveMaxStepAscent;
 CommonMaxStepDescent := EffectiveMaxStepDescent;
+
+// SECURITE ISO 13849 - posture fail-safe : bridage vitesse hors homing.
+// Codeurs non references =&gt; position non fiable =&gt; plafond palier 1 sur M1 ET M2,
+// montee ET descente. Symetrique (aucun vecteur contacteur M1&lt;&gt;M2). Sans ce garde-fou,
+// palier 5 accessible non reference : les caps de position (SlowdownMaxStep,
+// SyncDeviationWarn) sont eux-memes inactifs sans reference fiable. Debridage assume
+// plus tard sur capteur haut actif (position redevenue connue).
+IF NOT (PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
+        AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable) THEN
+    CommonMaxStepAscent  := 1;
+    CommonMaxStepDescent := 1;
+END_IF;
+
 IF instWinchSync.SyncDeviationWarn THEN
     CommonMaxStepAscent   := 1;
     CommonMaxStepDescent := 1;

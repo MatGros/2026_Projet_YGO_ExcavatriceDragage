@@ -1002,6 +1002,19 @@ Data.ArmingAvailability.AnyAxisAvail       := ArmAnyAxisAvail;
 // --- Sources communes (M1 = M2) ---
 CommonMaxStepAscent   := EffectiveMaxStepAscent;
 CommonMaxStepDescent := EffectiveMaxStepDescent;
+
+// SECURITE ISO 13849 - posture fail-safe : bridage vitesse hors homing.
+// Codeurs non references => position non fiable => plafond palier 1 sur M1 ET M2,
+// montee ET descente. Symetrique (aucun vecteur contacteur M1<>M2). Sans ce garde-fou,
+// palier 5 accessible non reference : les caps de position (SlowdownMaxStep,
+// SyncDeviationWarn) sont eux-memes inactifs sans reference fiable. Debridage assume
+// plus tard sur capteur haut actif (position redevenue connue).
+IF NOT (PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
+        AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable) THEN
+    CommonMaxStepAscent  := 1;
+    CommonMaxStepDescent := 1;
+END_IF;
+
 IF instWinchSync.SyncDeviationWarn THEN
     CommonMaxStepAscent   := 1;
     CommonMaxStepDescent := 1;
