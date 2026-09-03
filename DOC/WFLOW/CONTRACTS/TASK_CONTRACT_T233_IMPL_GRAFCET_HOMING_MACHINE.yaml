@@ -1,0 +1,132 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T233 : Implementation du GRAFCET de homing machine
+# ═══════════════════════════════════════════════════════════════════════════
+# Realise la spec figee DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md
+# (partie 1 : FB_MachineHomingCycle). Concretise T226 D5/AC5/AC8/AC9.
+# Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <fichier>
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T233_IMPL_GRAFCET_HOMING_MACHINE
+  criticality: C3
+  strategy: rebuild
+
+  objective: >
+    Transformer FB_MachineHomingCycle d'un guide passif (echelle de priorite +
+    transaction 3 etats declenchee par un front de confirmation benne) en un
+    veritable cycle de homing machine sequentiel (GRAFCET HX0..HX6 + HXF) qui
+    coordonne la montee au capteur haut, la reference des axes M1/M2 au vol sur
+    le front descendant du capteur, la mise en position fermee de la benne et le
+    commit atomique de l'etat benne, jusqu'a MachineHomed. Les ordres de
+    mouvement treuil sont emis par le FB (WinchM1Cmd/WinchM2Cmd) et consommes
+    par PRG_03 -> PRG_04. Aucun mouvement sans permis operateur maintenu.
+
+  acceptance:
+    - id: AC1
+      statement: "HX0 est une etape initiale pure : le corps de l'etat n'ecrit AUCUNE affectation ni sortie ; toutes les sorties impulsionnelles/mouvement sont remises a FALSE en tete de scan, jamais dans HX0. Etre en HX0 pendant que le cycle SEMI_AUTO tourne n'a aucun effet de bord."
+      verified_by: "test_fb_machinehomingcycle : TC verifiant qu'en HX0, WinchM1Cmd/WinchM2Cmd/M1Demand/M2Demand/BucketCommit/BucketOpenCmd/BucketCloseCmd sont tous FALSE/0 quel que soit l'etat des entrees hors HT0."
+    - id: AC2
+      statement: "HT0 (HX0->HX1) se franchit sur V_EXPLICITE (motif 3 appuis BtnValidation + homme-mort arme) OU sur perte de MachineHomed, ET seulement si TxState=HX0_REPOS ET Mode=MAINT_N2. Hors N2, aucune entree en cycle."
+      verified_by: "test_fb_machinehomingcycle : TC franchissement HT0 par motif 3 appuis en N2 ; TC non-franchissement hors N2 ; TC entree auto sur front descendant de MachineHomed."
+    - id: AC3
+      statement: "Depuis HX1, trois issues exclusives : HT1a (front Reset / BP annulation) -> abandon, retour HX0, aucune sortie ; HT1b (NOT TopPositionActive ET V_EXPLICITE) -> HX2 ; HT1c (TopPositionActive ET V_EXPLICITE) -> HX2N. HT1b et HT1c ne different que par la polarite de TopPositionActive. HX1 n'emet aucun ordre treuil / benne / translation."
+      verified_by: "test_fb_machinehomingcycle : 3 TC (une par transition) + TC verifiant sorties nulles en HX1."
+    - id: AC4
+      statement: "HX2 (Chemin A) commande la montee couplee M1+M2 au palier 1 (WinchM1Cmd/WinchM2Cmd : RunRequest, ReqAscent, StepTgt=1) uniquement tant que le permis operateur est maintenu (joystick tire dans le sens montee ET DeadmanArmed) ; permis relache -> RunRequest FALSE immediat, etape conservee. HT2 (->HX2N) se franchit sur TopPositionActive."
+      verified_by: "test_fb_machinehomingcycle : TC montee active sous permis ; TC coupure sur relachement permis ; TC franchissement HT2 sur TopPositionActive."
+    - id: AC5
+      statement: "HX2N impose un mouvement nul (WinchM1Cmd/WinchM2Cmd = 0) et latche SeenNeutral des que le joystick repasse au neutre (satisfait d'emblee si on y arrive centre). HT2N (->HX3) exige WinchesMechanicallyStopped ET SeenNeutral ET joystick pousse (sens descente impose par HX3) ET DeadmanArmed. Pas de bascule tire->pousse sans passage par le neutre."
+      verified_by: "test_fb_machinehomingcycle : TC blocage HT2N tant que SeenNeutral faux ; TC franchissement apres retour neutre + poussee ; TC Chemin B (arrive centre) SeenNeutral vrai d'emblee."
+    - id: AC6
+      statement: "HX3 commande la descente couplee M1+M2 palier 1 sous permis maintenu et emet M1Demand.HomeReq + M2Demand.HomeReq (impulsion 1 scan) UNIQUEMENT sur F_TRIG(TopPositionActive) (front descendant = sortie capteur). Reference des AXES seulement (pas d'etat benne). Echec (M1Status.HomingError OR M2Status.HomingError, ou axes non HomedAndReliable apres le front + timeout Cfg.CfgTimeoutRefAxes) -> HXF."
+      verified_by: "test_fb_machinehomingcycle : TC HomeReq emis exactement au front descendant (pas avant, pas apres, 1 scan) ; TC echec HomingError -> HXF ; TC timeout -> HXF."
+    - id: AC7
+      statement: "HT3 (HX3->HX3N) se franchit sur NOT TopPositionActive ET M1Status.HomedAndReliable ET M2Status.HomedAndReliable. HX3N impose mouvement nul (treuils + benne a 0) et latche SeenNeutral ; HT3N (->HX4) exige WinchesMechanicallyStopped ET SeenNeutral. Empeche que le joystick reste pousse (descente HX3) ne commande la benne des l'entree HX4."
+      verified_by: "test_fb_machinehomingcycle : TC franchissement HT3 ; TC HX3N sorties nulles ; TC blocage HT3N tant que joystick pas revenu au neutre."
+    - id: AC8
+      statement: "HX4 commande la benne au palier 1 SANS FDC logiciel benne, dans les 2 sens (BucketOpenCmd / BucketCloseCmd selon le joystick), treuils a 0. HT4 (->HX5) se franchit sur V_EXPLICITE (motif 3 appuis, joystick centre + WinchesMechanicallyStopped) et pose PendingClose := TRUE."
+      verified_by: "test_fb_machinehomingcycle : TC pilotage benne 2 sens en HX4 ; TC franchissement HT4 par motif 3 appuis + PendingClose."
+    - id: AC9
+      statement: "HX5 emet le commit atomique BucketCommit.CommitClose := PendingClose (impulsion 1 scan), sans re-homing d'axe. HT5 (->HX6) sur CommitPublished ET M1Status.HomedAndReliable ET M2Status.HomedAndReliable. HX6 pose MachineHomed selon la formule inchangee (AxisHomed AND CommitOrOffsetValid AND NOT MachineHomingFailed AND NOT ReHomingAckRequired AND NOT Fault.Latched) puis retour HX0 (1 scan)."
+      verified_by: "test_fb_machinehomingcycle : TC commit CommitClose 1 scan ; TC MachineHomed TRUE en HX6 ; TC retour HX0."
+    - id: AC10
+      statement: "Fail-safe et transverses conserves : HTF (NOT TopPositionActive hors phase descente volontaire OU NOT WinchesMechanicallyStopped hors phase mouvement OU HomingError M1/M2 OU timeout) -> HXF (MachineHomingFailed:=TRUE) ; sortie HXF sur front Reset conscient uniquement ; NOT Enable -> sorties sures + MachineHomed:=FALSE + retour HX0 ; perte de datum en mouvement -> MachineHomingLossSafeStop latche jusqu'a arret meca + Reset. Aucun redemarrage automatique."
+      verified_by: "test_fb_machinehomingcycle : TC HTF sur chaque cause ; TC sortie HXF Reset-only ; TC NOT Enable ; TC perte datum en mouvement -> SafeStop latche."
+    - id: AC11
+      statement: "M3 translation interdite tout le cycle (HX1->HX6) : le FB expose M3Locked := (TxState <> HX0_REPOS) pour verrou aval. DIRECTION (sens impose par le step) et VALIDATION (V_CONTINU joystick maintenu / V_EXPLICITE motif 3 appuis partage) sont des mecanismes distincts, le motif 3 appuis defini une seule fois."
+      verified_by: "test_fb_machinehomingcycle : TC M3Locked vrai hors HX0, faux en HX0 ; revue de code : une seule implementation du compteur 3 appuis."
+    - id: AC12
+      statement: "Le guide operateur (E_MachineHomingStep, echelle de priorite §6, IF/ELSIF) reste present et coherent : il produit MachineHomingInstruction en clair (ASCII, <=120, <=80 par litteral) pour le step GRAFCET courant, et couvre le cas Fault.Latched (angle mort baseline comble)."
+      verified_by: "test_fb_machinehomingcycle : TC instruction non vide et coherente pour HX1/HX2/HX3/HX4/HXF ; TC branche Fault.Latched. Gates G405/G406 PASS."
+    - id: AC13
+      statement: "Cablage inter-POU structurellement complet : PRG_02_Acquisition alimente Cfg (dont les nouveaux timeouts) et Enable de instMachineHomingCycle ; PRG_03_Modes_Cycle relaie WinchM1Cmd/WinchM2Cmd vers la chaine PRG_04 et le verrou M3Locked ; pour chaque POU touche le nom de fichier reste identique au nom de POU et le suffixe reste identique au langage genere dans le bundle ; bundle PLCopenXML regenere, zero instance orpheline."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report : 0 erreur sur MachineHoming / WinchM1Cmd / WinchM2Cmd / M3Locked ; generate_codesys_bundle.py OK ; run_all_gates.py --palier C."
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_MachineHomingCycle.st
+      - CODE/G_CYCLE/_TYPES/E_MachineHomingTxState.st
+      - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_Cfg.st
+      - CODE/G_CYCLE/_TYPES/ST_fbMachineHomingCycle_HomingDemand.st
+      - CODE/G_CYCLE/_TYPES/E_MachineHomingStep.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES
+      - CODE_XML
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_machinehomingcycle.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T233_IMPL_GRAFCET_HOMING_MACHINE.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - DOC/STDS/CODE_QUALITY_STANDARDS.md
+      - CODE/G_CYCLE/FB_Cycle.st
+      - CODE/H_TREUILS_BENNE
+
+  conservation:
+    must_survive:
+      - "MachineHomed = seul gate SEMI_AUTO ; formule de qualification inchangee (AxisHomed AND CommitOrOffsetValid AND NOT MachineHomingFailed AND NOT ReHomingAckRequired AND NOT Fault.Latched)."
+      - "Producteur UNIQUE de la qualification machine ; ne relit jamais un ActiveOffsetValid aval."
+      - "Reference conjointe M1+M2 uniquement (jamais un axe seul) ; aucun datum partiel."
+      - "Aucun redemarrage automatique apres defaut : sortie HXF sur front Reset conscient."
+      - "Perte de datum EN MOUVEMENT -> MachineHomingLossSafeStop latche jusqu'a arret meca + Reset (C-1)."
+      - "BucketCommit CommitOpen/CommitClose mutuellement exclusifs ; FB_Bucket reste seul proprietaire de IsOpen/IsClosed."
+      - "Contrat standard Enable/Reset/Ready/Fault/Lifecycle ; Reset jamais conditionne ; NOT Enable -> sorties sures + RETURN."
+      - "STRING ASCII, MachineHomingInstruction <= 120, litteraux <= 80 (G405/G406)."
+    dropped_on_purpose:
+      - "Le declenchement de la transaction par un front ConfirmOpenPosition/ConfirmClosePosition XOR (remplace par le GRAFCET + V_EXPLICITE)."
+      - "L'echelle §6 comme unique moteur : elle devient le producteur de message du step GRAFCET courant, pas l'etat ou l'on dispatche."
+      - "Le suivi de test T185 (TC-T185-xxx) base sur l'ancien modele de declenchement : remplace par des TC GRAFCET."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    STOP et remonter a l'orchestrateur : si la spec GEL_GRAFCET est ambigue sur
+    un point d'implementation, si un DUT aval (ST_ProgramWinchRequest cote
+    benne, interface PRG_04) ne permet pas le comportement demande sans creux de
+    commande, ou si un fichier non prevu / une suppression apparait dans le diff.
+
+status: PENDING
+
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Spec figee et validee pour implementation le 2026-09-03
+    (GEL_GRAFCET_HOMING_CYCLE_20260903.md partie 1). Concretise T226 D5/AC5/AC8/AC9.

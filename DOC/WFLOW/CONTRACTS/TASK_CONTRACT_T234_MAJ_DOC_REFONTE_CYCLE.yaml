@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# CONTRAT DE TACHE — T232 : Mise a jour documentaire de la refonte du cycle SEMI_AUTO
+# CONTRAT DE TACHE — T234 : Mise a jour documentaire de la refonte du cycle SEMI_AUTO
 # ═══════════════════════════════════════════════════════════════════════════
 # Regroupe la MAJ des AF / catalogues TC / migration IHM suite aux lots T229 (+ B1/B2/E)
 # et T226-AC1/AC2 codes pendant la MES de septembre 2026.
@@ -7,7 +7,7 @@
 # ═══════════════════════════════════════════════════════════════════════════
 
 contract:
-  task_id: T232_MAJ_DOC_REFONTE_CYCLE
+  task_id: T234_MAJ_DOC_REFONTE_CYCLE
   criticality: C3
   strategy: patch
 
@@ -48,7 +48,7 @@ contract:
       - DOC/WFLOW/AUDITS/IHM_VARIABLES_MIGRATION.md
       - DOC/VERSION_HISTORY.md
       - DOC/WFLOW/TASKS.yaml
-      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T232_MAJ_DOC_REFONTE_CYCLE.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T234_MAJ_DOC_REFONTE_CYCLE.yaml
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T229_FB_CYCLE_STEP_CONFIG_TREUIL_UNIQUE.yaml
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml
       - DOC/WFLOW/CONTRACTS/T229_DESIGN_FB_CYCLE_STEPS.md
@@ -75,7 +75,7 @@ contract:
     - id: Q1
       q: "AF_Partie-04 est en cours de refonte par l'equipe (nouveau decoupage AF_Partie-04_.../*_v1.0.md ?). Travailler sur la version en place (v2.3 racine) ou attendre la nouvelle structure ?"
     - id: Q2
-      q: "T229 sous-tache T227 (AF + tests CI) : T232 la remplace-t-elle ou s'ajoute-t-elle (T227 couvrait aussi les tests CI, deja faits ici) ?"
+      q: "T229 sous-tache T227 (AF + tests CI) : T232 la remplace-t-elle ou s'ajoute-t-elle (T227 - via T234 - couvrait aussi les tests CI, deja faits ici) ?"
     - id: Q3
       q: "X11C_DUMP_REPOSITION est implementee (option repositionnement couple) : confirmer qu'elle doit etre documentee comme fonctionnalite active et non comme reserve."
 
