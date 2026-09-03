@@ -222,7 +222,7 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -230,7 +230,7 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
        SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'Etabli en AX4_DESCEND_DIVING');
     ASSERT_TRUE(FB.WinchM1Cmd.RunRequest, 'Descente M1 commandee avant relache');
-    ASSERT_TRUE(FB.BucketCmd.ReqKoboldMeasureEnable, 'Kobold contacteur arme en X4 pendant plongee (T186)');
+    ASSERT_FALSE(FB.BucketCmd.ReqKoboldMeasureEnable, 'Kobold PAS enclenche en AX4 - enclenche seulement des AX5');
     ASSERT_TRUE(FB.RequestActive, 'RequestActive=TRUE en X4 (plongee active, T186)');
 
     (* Call 6 : relache homme-mort / manche au centre pendant la plongee -> neutralisation, etape maintenue *)
@@ -240,7 +240,7 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -260,7 +260,7 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -277,7 +277,7 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -294,7 +294,7 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := TRUE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
        M1_CablePosM := 7.0, M2_CablePosM := 7.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
@@ -307,7 +307,7 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
        M1_CablePosM := 7.0, M2_CablePosM := 7.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
@@ -320,7 +320,7 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
        M1_CablePosM := 7.0, M2_CablePosM := 7.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
@@ -333,10 +333,10 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -346,10 +346,10 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -363,10 +363,10 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -378,10 +378,10 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -399,10 +399,10 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -417,10 +417,10 @@ TEST 'TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX
     FB(Enable := TRUE, Reset := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -437,7 +437,7 @@ TEST 'TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 6
     // Progression jusqu'a X4 (deja home).
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := TRUE,
-       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
        M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
@@ -446,7 +446,7 @@ TEST 'TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 6
        SampleCount := SampleCount);
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
-       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
        M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
@@ -455,7 +455,7 @@ TEST 'TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 6
        SampleCount := SampleCount);
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
-       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
        M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
@@ -464,19 +464,19 @@ TEST 'TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 6
        SampleCount := SampleCount);
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
-       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, KoboldContactFond := FALSE,
        Translation_At_P1 := TRUE, Translation_Done := TRUE,
        Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
-       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, KoboldContactFond := FALSE,
        Translation_At_P1 := TRUE, Translation_Done := TRUE,
        Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
@@ -485,10 +485,10 @@ TEST 'TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 6
     ADVANCE_TIME(40000000000);
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
-       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, KoboldContactFond := FALSE,
        Translation_At_P1 := TRUE, Translation_Done := TRUE,
        Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
@@ -497,37 +497,37 @@ TEST 'TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 6
     // Contact fond -> X5. Nouvelle etape -> StepMaxTimer REARMEE (pas de cumul des 40 s de X4).
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
-       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := TRUE,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, KoboldContactFond := TRUE,
        Translation_At_P1 := TRUE, Translation_Done := TRUE,
        Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     // 1 scan de stabilisation en X5 pour armer StepMaxTimer sur la nouvelle etape.
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
-       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, KoboldContactFond := FALSE,
        Translation_At_P1 := TRUE, Translation_Done := TRUE,
        Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM, 'Etabli en X5');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'Etabli en AX4 (plongee)');
     // 40 s en X5 (< 60 s) -> total cycle 80 s mais aucune etape > 60 s -> PAS de AX_STAB.
     ADVANCE_TIME(40000000000);
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
-       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, KoboldContactFond := FALSE,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, KoboldContactFond := FALSE,
        Translation_At_P1 := TRUE, Translation_Done := TRUE,
        Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     ASSERT_FALSE(FB.Fault.Error, 'X5 40 s : pas de timeout - StepMaxTimer non cumulatif sur le cycle');
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM, 'Toujours X5, pas de AX_STAB');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'Toujours AX4, pas de AX_STAB (StepMaxTimer non cumulatif)');
 END_TEST
 
 TEST 'TC-P04-026 : backstop anti-telescopage - ecart position M1/M2 > 0,5 m en phase couplee X4 -> AX_STAB'
@@ -599,7 +599,7 @@ TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pa
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := TRUE, AbortCycle := FALSE, WinchSyncError := FALSE, Reset := FALSE,
        HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
-       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
@@ -611,7 +611,7 @@ TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pa
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, AbortCycle := FALSE, WinchSyncError := FALSE, Reset := FALSE,
        HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
-       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
@@ -624,7 +624,7 @@ TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pa
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, AbortCycle := FALSE, WinchSyncError := TRUE, Reset := FALSE,
        HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
-       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
@@ -638,7 +638,7 @@ TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pa
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, AbortCycle := FALSE, WinchSyncError := FALSE, Reset := FALSE,
        HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
-       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
@@ -651,7 +651,7 @@ TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pa
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, AbortCycle := TRUE, WinchSyncError := FALSE, Reset := FALSE,
        HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
-       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
@@ -664,7 +664,7 @@ TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pa
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := TRUE, AbortCycle := FALSE, WinchSyncError := FALSE, Reset := FALSE,
        HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
-       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
@@ -677,7 +677,7 @@ TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pa
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, AbortCycle := FALSE, WinchSyncError := FALSE, Reset := FALSE,
        HomedM1 := FALSE, HomedM2 := FALSE, TopPositionSensor := FALSE, HomingRequest := FALSE,
-       M1_CablePosM := 0.0, M2_CablePosM := 0.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        KoboldContactFond := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := FALSE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
@@ -790,54 +790,52 @@ TEST 'TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et 
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := FB.SampleCount);
 
-    (* 👀 Call 7 : X4 observé, plongée *)
+    (* 👀 Call 7 : AX4 observe, plongee palier 4 (au-dessus de l'altimetrie de lancement) *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
-       KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       DiveStartMinM := 4.0, KoboldContactFond := FALSE, KoboldImmersed := FALSE, KoboldContactorFeedback := FALSE,
+       WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := FB.SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'X4 observe : plongee benne ouverte');
-    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest, 'X4 : descente M1 commandee');
-    ASSERT_TRUE(FB.WinchM2Cmd.RunRequest, 'X4 : descente M2 commandee');
-    ASSERT_TRUE(FB.BucketCmd.ReqKoboldMeasureEnable, 'X4 : contacteur Kobold arme');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'AX4 observe : plongee palier 4');
+    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest, 'AX4 : descente M1+M2 commandee');
+    ASSERT_TRUE(FB.WinchM1Cmd.StepTgt = 4, 'AX4 : palier 4');
+    ASSERT_FALSE(FB.BucketCmd.ReqKoboldMeasureEnable, 'AX4 : Kobold PAS enclenche');
 
-    (* 🎯 Call 8 : contact fond → X5 *)
-    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
-       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
-       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
-       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
-       KoboldContactFond := TRUE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
-       Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
-       Translation_Busy := FALSE, Translation_Done := TRUE,
-       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
-       SampleCount := FB.SampleCount);
+    (* 🎯 Call 8 : altimetrie de lancement atteinte -> AX5 *)
+    FB(M1_CablePosM := -10.0, M2_CablePosM := -10.0, DiveStartMinM := 4.0, SampleCount := FB.SampleCount);
+    (* 👀 Call 9 : AX5 observe, retour contacteur Kobold OK -> AX6 *)
+    FB(M1_CablePosM := -10.0, M2_CablePosM := -10.0, DiveStartMinM := 4.0, KoboldContactorFeedback := TRUE, SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX5_KOBOLD_INIT, 'AX5 observe : init Kobold');
+    ASSERT_TRUE(FB.BucketCmd.ReqKoboldMeasureEnable, 'AX5 : contacteur Kobold enclenche');
+    ASSERT_TRUE(FB.WinchM1Cmd.StepTgt = 4, 'AX5 : palier 4 maintenu');
 
-    (* 👀 Call 9 : X5 observé, remontée *)
-    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
-       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
-       LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
-       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
-       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
-       KoboldContactFond := FALSE, WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
-       Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
-       Translation_Busy := FALSE, Translation_Done := TRUE,
-       Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
-       SampleCount := FB.SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM, 'X5 observe : fond confirme');
-    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest, 'X5 : remontee M1 commandee');
-    ASSERT_TRUE(FB.WinchM2Cmd.RunRequest, 'X5 : remontee M2 commandee');
+    (* 🌊 Call 10 : AX6 observe, front montant DI Kobold -> AX7 *)
+    FB(M1_CablePosM := -10.0, M2_CablePosM := -10.0, DiveStartMinM := 4.0, KoboldContactorFeedback := TRUE, KoboldImmersed := FALSE, SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX6_SEARCH_IMMERSION, 'AX6 observe : recherche immersion');
+    FB(M1_CablePosM := -10.0, M2_CablePosM := -10.0, DiveStartMinM := 4.0, KoboldContactorFeedback := TRUE, KoboldImmersed := TRUE, SampleCount := FB.SampleCount);
+
+    (* 🕳️ Call 11 : AX7 observe, front descendant DI Kobold -> AX8 *)
+    FB(M1_CablePosM := -10.0, M2_CablePosM := -10.0, DiveStartMinM := 4.0, KoboldContactorFeedback := TRUE, KoboldImmersed := TRUE, SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX7_SEARCH_BOTTOM, 'AX7 observe : recherche fond');
+    FB(M1_CablePosM := -10.0, M2_CablePosM := -10.0, DiveStartMinM := 4.0, KoboldContactorFeedback := TRUE, KoboldImmersed := FALSE, SampleCount := FB.SampleCount);
+
+    (* 🛑 Call 12 : AX8 observe -> coupure instantanee + memo -> AX9 *)
+    FB(M1_CablePosM := -10.0, M2_CablePosM := -10.0, DiveStartMinM := 4.0, KoboldImmersed := FALSE, SampleCount := FB.SampleCount);
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest OR FB.WinchM2Cmd.RunRequest, 'AX8 : treuils coupes');
+
+    (* 👀 Call 13 : AX9 observe, retente cables palier 1 *)
+    FB(M1_CablePosM := -10.0, M2_CablePosM := -10.0, DiveStartMinM := 4.0, KoboldContactFond := FALSE, KoboldImmersed := FALSE, SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM, 'AX9 observe : retente cables');
+    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest, 'AX9 : remontee M1+M2 commandee');
+    ASSERT_TRUE(FB.WinchM1Cmd.StepTgt = 1, 'AX9 : palier 1');
 
     (* ⬆️ Call 10 : hauteur fermeture → X6 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -1151,7 +1149,7 @@ TEST 'TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et 
        SampleCount := FB.SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX18_DONE_SYNC, 'X13 observe : rebouclage pose (front StartCycle)');
 
-    (* 🔄 Call 26 : X0 observé, rebouclage effectif *)
+    (* 🔄 Call 26 : rebouclage effectif -> AX2_TRANSLATE_P1 (GEL Q14 : pas de retour AX0) *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
@@ -1164,7 +1162,7 @@ TEST 'TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et 
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := FB.SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX0_REPOS, 'X0 observe : rebouclage effectif');
-    ASSERT_FALSE(FB.Lifecycle.Done, 'X0 : Lifecycle.Done retombe');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX2_TRANSLATE_P1, 'Rebouclage effectif : retour direct AX2 (pas AX0)');
+    ASSERT_FALSE(FB.Lifecycle.Done, 'Lifecycle.Done retombe apres rebouclage');
 END_TEST
 

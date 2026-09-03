@@ -1,22 +1,10 @@
 Error compiling source files:
 
-FB_TestHarness_PRG_03.st:50:31: error: Undefined type 'E_CYCLESTEP' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_03'
-  50 |     CycleStep               : E_CycleStep;
-     |                               ^
+FB_Hmi_BannerFormatter.st:266:46: error: Expected `Assign`, found `,`.
+ 266 |             E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN, E_AutoCycleStep.AX15C_DUMP_REPOSITION: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+     |                                              ^
 
-FB_TestHarness_PRG_03.st:59:31: error: Undefined type 'FB_CYCLE' in FUNCTION_BLOCK 'FB_TESTHARNESS_PRG_03'
-  59 |     instCycleSemiAuto       : FB_Cycle;
-     |                               ^
-
-FB_Main_EndToEnd.st:153:31: error: Undefined type 'E_CYCLESTEP' in FUNCTION_BLOCK 'FB_MAIN_ENDTOEND'
- 153 |     CycleStep               : E_CycleStep;
-     |                               ^
-
-FB_TestHarness_PRG_07.st:52:30: error: Undeclared variable 'E_CYCLESTEP'
-  52 |     CycleStep             := E_CycleStep.X0_PREPARATION,
-     |                              ^
-
-FB_TestHarness_PRG_07.st:55:30: error: Undeclared variable 'E_CYCLESTEP'
-  55 |     CycleStepAtError      := E_CycleStep.X0_PREPARATION,
-     |                              ^
+FB_Hmi_BannerFormatter.st:527:42: error: Expected `Assign`, found `,`.
+ 527 |         E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN, E_AutoCycleStep.AX15C_DUMP_REPOSITION:
+     |                                          ^
 
