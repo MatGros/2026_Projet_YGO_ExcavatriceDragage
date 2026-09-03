@@ -5381,3 +5381,37 @@ tasks:
   - Bundle regenere, G200 PASS, FB_CycleMachineHoming tests verts
   contrat: ''
   bloque_par: []
+
+- id: T240
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: HOMING MACHINE / GRAFCET
+  agent: ''
+  date: '2026-09-03T18:45:00+02:00'
+  titre: HX1_CHOICE - demander la fermeture visuelle de la benne avant la montee
+  contexte: >
+    Demande utilisateur (2026-09-03, mise en service). A HX1_CHOICE le homing
+    part vers HX2_CLIMB (montee couplee M1+M2) sans verifier l'etat de la benne.
+    Si on monte benne pas fermee, les cables ne s'enroulent pas correctement sur
+    les tambours. La fermeture + commit est bien redemandee a HX4, mais c'est
+    trop tard : la montee HX2/HX3 a deja eu lieu.
+  description: >
+    Ajouter au step HX1_CHOICE une invite (et/ou un garde de transition) pour
+    fermer la benne visuellement AVANT de lancer la montee. Options a trancher :
+    A) prompt seul - texte MachineHomingInstruction HX1 "Fermer la benne (visuel)
+       avant de lancer", aucun garde, responsabilite operateur (1 ligne, 0 risque).
+    B) garde HX1 -> HX2/HX2N : +VAR_INPUT BucketIsClosed (cable de
+       _BucketState.IsClosed via PRG_02), transition bloquee tant que benne pas
+       fermee, texte "Fermer la benne puis valider". Fermeture faite en manuel
+       avant, ou abandon (Reset) pour fermer puis relancer. +input + cablage +
+       test.
+    B+) comme B mais autoriser la fermeture benne directement a HX1 (meme
+       sous-action que HX4 : JoystickPull -> CmdBucketClose). Plus de travail.
+    Recommandation : B (empeche reellement la montee benne ouverte).
+  objectifs:
+  - HX1 informe/oblige l'operateur a fermer la benne avant HX2_CLIMB
+  - Pas de montee couplee M1+M2 avec benne ouverte (si option B/B+)
+  - FB_CycleMachineHoming tests verts, bundle regenere, G200 PASS
+  contrat: ''
+  bloque_par: []
