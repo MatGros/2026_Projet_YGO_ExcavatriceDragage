@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T16:10:56.927507" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T16:10:56.927507">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T17:53:29.319147" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T17:53:29.319147">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -88,6 +88,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Butees relatives benne actives en jog unitaire M2 (TglManualBucketLimits ET WinchSel=2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OffsetStateMismatchWarn">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Ecart mesure M2-M1 incoherent avec l'offset de l'etat memorise (non bloquant) - reconfirmer position benne</xhtml>
               </documentation>
             </variable>
             <variable name="Ready">

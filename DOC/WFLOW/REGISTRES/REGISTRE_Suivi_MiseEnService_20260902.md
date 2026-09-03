@@ -555,6 +555,50 @@
 
 ---
 
+### MES-043 — 🟢 Homing : garde re-homing si déjà référencé + silence message homed + forçage step sur défaut latché
+- 📅 **Date** : 2026-09-03 | 📍 **Lieu** : Développement + Banc | 🏷️ **Version** : commits `9a2518d2`, `eec7014d`
+- 🎯 **Périmètre** : `FB_CycleMachineHoming` §4bis / §8 (HX0) / §10
+- 🚦 **Statut** : 🟢 **Compile OK, FB 8/8, G200 PASS** (à confirmer banc)
+- 🔍 **Constat / Essai** : (1) « quand je vais homing M2 ça prend toujours 8.5 » résolu avant, mais en travail benne MAINT des appuis répétés du BP joystick (homme-mort) faisaient repartir le cycle homing alors que la machine était déjà référencée. (2) Message homing affiché en permanence même machine homed. (3) Forçage de step inopérant quand un défaut est latché — or c'est exactement le cas où on en a besoin.
+- 🛠️ **Solution / Décision** :
+  - §8 HX0 : gestes indirects (`ExplicitValidationPulse` 3 appuis, `AutoArmTimer`) ignorés si `BothAxesHomed`. Seul le bouton IHM `StartEdge` re-référence une machine homed. Perte de datum réelle (`MachineWasHomed AND NOT MachineHomedRaw`) toujours prise.
+  - §10 : `MachineHomed AND NOT CycleRunning` → `MachineHomingInstruction := ''` (aucun texte homing IHM), `Fault.Latched` reste prioritaire.
+  - §4bis : suppression du gate `NOT Fault.Latched` (le forçage EST l'action de récupération) + `MachineHomingFailed := FALSE` dans la purge.
+- 📌 **Action différée** : test banc du forçage sur défaut latché.
+
+---
+
+### MES-044 — 🟠 Jog benne unitaire M2 (WinchSel=2) : ouverture permise hors Dive + ralentissement zone anticipation + RemainingTravel permanent
+- 📅 **Date** : 2026-09-03 | 📍 **Lieu** : Banc | 🏷️ **Version** : commits `eec7014d`, `0defd32e`, `8bd0b65f`
+- 🎯 **Périmètre** : `PRG_04` (`ProcessPermitM2_Descend`, §5ter), `FB_Bucket` §4, `ST_fbBucket_Config`, `GVL_PERSISTENT`, `ST_BucketHMIState`
+- 🚦 **Statut** : 🟠 **En service partiel** — ouverture/fermeture sur FDC OK en MAINT_N1, mais série de bugs état/offset découverts (→ MES-045)
+- 🔍 **Constat / Essai** : régression vs ancien programme — en mode benne WinchSel=2 on ne pouvait plus **ouvrir** la benne (M2 descente). Cause : `ProcessPermitM2_Descend` gaté par `DescendPermitDiveBucketOpen` (TRUE seulement en mode Dive). De plus le jog était bridé palier 1 sur toute la course.
+- 🛠️ **Solution / Décision** :
+  - **R1** : `ProcessPermitM2_Descend` += `ManualBucketJogActive` (`WinchSel=2 AND MAINT`) → ouverture permise hors Dive. Gardes conservés (Kobold latch, clamp anticipation, `SafetyPermitM2_Descend`).
+  - **R4** : jog M2 palier **libre** en course, palier 1 seulement dans la **zone d'approche** (`JogSlowdownZoneM` avant le point d'arrêt anticipé `Offset ± Anticipation`) ; repli palier 1 si M1/M2 non référencés. `BucketNotClosedAscentCapStep1` (fermeture benne ouverte → P1) reste prioritaire.
+  - **Config** : `ST_fbBucket_Config` +`JogSlowdownZoneM := 1.0` ; `GVL_PERSISTENT` inits explicites `OpenAnticipationM := 1.3` / `CloseAnticipationM := 1.0` / `JogSlowdownZoneM` — **réglables IHM** via pont existant.
+  - `RemainingTravel_M` calculé en permanence (hors `Lifecycle.Busy`) pour l'affichage jog manuel. `ManualBucketLimitsActive` publié IHM.
+  - **R3** (détection passive d'état sur position en jog M2) : ajoutée (`0defd32e`) puis **retirée** (`8bd0b65f`) — basculait `IsOpen/IsClosed` au simple passage dans une bande → `ActiveOffsetM` faux → MecaE synchro fantôme au retour en couple.
+- 📌 **Action différée** : `JogMaxStep` (plafond ouverture benne réglable IHM, demandé ≈ P4) non implémenté. **PERSISTENT** : nouveaux champs config → « Réinit. origine » ou réglage IHM une fois après download (sinon lus à 0). `GVL_IHM.CycleSemiAuto` = slot mort (PLC lit `Cycle`). Voir MES-045 pour la suite.
+
+---
+
+### MES-045 — 🔴 Bug benne mise en service : datum M2 corrompu (~15 m), cascade MecaA/MecaE/OffsetMax → chantier fiabilisation état/offset (T241)
+- 📅 **Date** : 2026-09-03 | 📍 **Lieu** : Banc | 🏷️ **Version** : commit `8bd0b65f` + travaux **NON COMMITÉS** (classifieur continu §4a)
+- 🎯 **Périmètre** : `FB_CycleMachineHoming` HX3, `FB_Bucket` (état / `ActiveOffsetM` / `OffsetMaxFault`), `FB_Safety_Winch` (MecaA/MecaE), `PRG_02`
+- 🚦 **Statut** : 🔴 **Bloquant mise en service homing** — contourné (homing benne ouverte), chantier T241 en cours
+- 🔍 **Constat / Essai** (traces `Suivi_DéfautSortieSEnsorTopREf_20260902_18`, `Suivi_BugBenne_20260902_19` ; snapshots `..._192533` → `..._195046`) :
+  - Homing lancé **benne fermée** → `1/2 [M2] ErrorID:08 MecaA` « déplacement sans commande » à la sortie du capteur top. M1 = 3.23 m référencé OK, **M2 = 17.76 m NON référencé**, `MachineHomingStep = 70` (FAILED).
+  - **Cause racine** : M1 et M2 partagent **UN capteur top** (`M1M2_TopPositionFree_DI` ; `PRG_02` `instEncoderM2.TopPositionSensor := NOT M1M2_TopPositionFree_DI`). Le fix `0350e3d1` preset M2 à `CfgTopSensorPos_M` (8.5). Benne fermée → M2 physiquement ~15 m sous M1 → preset à 8.5 → 15 m d'incohérence → `DriftGuardA` M2 (MecaA) avant que `RefWindowActive` couvre → `HomedAndReliable` FALSE → HXF_FAILED. **Le datum M2 reste faux de ~15 m.**
+  - Cascade : `FB_Bucket` `OffsetMaxFault` (ErrorID:02) latché → `FBState = ERROR` → `SevereError` → `RemainingTravel_M` figé, FDC « disparus » ; `M2PositionCorrected = M2 − ActiveOffsetM` faux de 15 m (état benne ≠ réalité) ; `FB_WinchSync` MecaE fantôme → **synchro désactivée à la main**. `OffsetMaxFault` re-latche à **13 cm** de M2 sous M1 (borne basse = `CablePosM1` sec).
+- 🛠️ **Solution / Décision** :
+  - **Récupération banc** : `FaultMachineReset` → sortie ERROR ; ré-référencer M2 physiquement (homing **benne ouverte** au capteur partagé, ou `BtnHomingAtZero` pour casser l'erreur puis re-homing) ; `BtnConfirmOpen/ClosePos` en **MAINT_N2** pour recaler état + offset. Résidu ~1 m constaté → `OffsetCloseM` réel ≈ 13.95 (pas 15).
+  - **T240 révisée** : homing doit accepter benne ouverte **OU** fermée → HX3 preset M2 offset-aware (`CfgTopSensorPos_M + OffsetExpected`), propager l'offset vers `ActiveOffsetM` pendant HX3, `RefWindowActive` doit couvrir le saut. (Ancienne demande « fermer benne à HX1 » abandonnée — incompatible avec capteur partagé.)
+  - **T241 (fiabilisation, code NON COMMITÉ, en test banc)** : `FB_Bucket` §4a **classification continue de l'état sur la mesure** (`|Δ − Offset| ≤ CoherenceLimitM` pendant 1 s, machine totalement à l'arrêt + référencée) → self-heal dans tous les modes ; §5 `ActiveOffsetM` piloté par cet état fiable ; §5a warn `OffsetStateMismatchWarn` (non bloquant, publié IHM) si `|Δ − ActiveOffsetM|` incohérent > 2 s ; §1 `OffsetMaxFault` borne basse `OffsetOpenM − CoherenceLimitM` + latch persistant > 500 ms ; `CfgFault` tolère `OffsetOpenM` légèrement négatif.
+- 📌 **Action différée** : voir **T240** (homing benne ouverte/fermée, contrat C2) et **T241** (`reste_a_faire` : test banc classifieur, recalibration `OffsetOpenM/CloseM`, réparer test unitaire `FB_Bucket` périmé, widget IHM warn).
+
+---
+
 ## 3. 📄 Modèle à Dupliquer
 
 ```md

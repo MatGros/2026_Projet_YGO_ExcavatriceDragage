@@ -11,6 +11,7 @@ STRUCT
     M2ReqDescend        : BOOL;             (* 🛗 Commande descente forcée vers M2 *)
     M2BucketJogLimit    : BOOL;             (* 🐢 Plafond palier du jog benne M2 *)
     ManualBucketLimitsActive : BOOL;        (* 🚧 Butees relatives benne actives en jog unitaire M2 (TglManualBucketLimits ET WinchSel=2) *)
+    OffsetStateMismatchWarn : BOOL;         (* ⚠️ Ecart mesure M2-M1 incoherent avec l'offset de l'etat memorise (non bloquant) - reconfirmer position benne *)
     Ready               : BOOL;             (* 🟢 Bloc opérationnel *)
     Busy                : BOOL;             (* ⚙️ Mouvement d'ouverture/fermeture en cours *)
     Done                : BOOL;             (* ✅ Mouvement terminé avec succès *)

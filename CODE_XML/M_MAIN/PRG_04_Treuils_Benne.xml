@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T17:10:20.032505" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T17:10:20.032505">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T17:53:35.210761" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T17:53:35.210761">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -181,6 +181,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚧 Butees relatives benne actives en jog unitaire M2 (TglManualBucketLimits ET WinchSel=2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OffsetStateMismatchWarn">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Ecart mesure M2-M1 incoherent avec l'offset de l'etat memorise (non bloquant) - reconfirmer position benne</xhtml>
               </documentation>
             </variable>
             <variable name="Ready">
@@ -7046,6 +7054,7 @@ BucketState.M2ReqAscent := instBucket.M2_ReqAscent;
 BucketState.M2ReqDescend := instBucket.M2_ReqDescend;
 BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
 BucketState.ManualBucketLimitsActive := ManualBucketLimitsActive;
+BucketState.OffsetStateMismatchWarn := instBucket.OffsetStateMismatchWarn;
 BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.ActiveOffsetM;
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;
@@ -7589,6 +7598,14 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Distance restante avant cible (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="OffsetStateMismatchWarn">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Avertissement : ecart mesure M2-M1 incoherent avec l'offset de l'etat memorise (non bloquant)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <inOutVars>
             <variable name="BucketState">
@@ -7643,6 +7660,70 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisateur timeout de mouvement</xhtml>
               </documentation>
             </variable>
+            <variable name="TonClassClosed">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce classification "benne fermee" sur mesure</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonClassOpen">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce classification "benne ouverte" sur mesure</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonOffsetMismatch">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Persistance avant avertissement incoherence offset/mesure</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonOffsetMaxViol">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Persistance avant latch OffsetMax (anti-pic bruit codeur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ClassCanRun">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Conditions reunies pour classer l'etat sur la mesure (tout arrete + reference)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NearClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mesure dans la bande "fermee"</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NearOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mesure dans la bande "ouverte"</xhtml>
+              </documentation>
+            </variable>
+            <variable name="OffsetMaxViolNow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart M2-M1 hors plage plausible ce scan</xhtml>
+              </documentation>
+            </variable>
             <variable name="FirstCycle">
               <type>
                 <BOOL />
@@ -7668,7 +7749,15 @@ Data.BothBlockReason              := BothBlockReason;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Offset max calcule dynamiquement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Borne haute plausible M2-M1 (offset ferme + marge)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MinAllowedOffset">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Borne basse plausible M2-M1 (offset ouvert - tolerance coherence)</xhtml>
               </documentation>
             </variable>
             <variable name="M1RefPosM">
@@ -7816,18 +7905,28 @@ IF ResetEdge.Q OR BypassGlobal THEN
 END_IF;
 
 IF NOT BypassGlobal THEN
-    // Cause 0 : Configuration géométrie benne
+    // Cause 0 : Configuration géométrie benne.
+    // Ordre ouvert &lt; ferme obligatoire. Offset ouvert legerement negatif tolere
+    // (M2 un cheveu sous M1 a l'ouverture pleine, recalibration MES) -&gt; seuil -2 m.
     IF (Config.OffsetOpenM &gt;= Config.OffsetCloseM)
-       OR (Config.OffsetOpenM &lt; 0.0) THEN
+       OR (Config.OffsetOpenM &lt; -2.0) THEN
         CfgFaultLatched := TRUE;
     END_IF;
     instCauses[0].Active   := CfgFaultLatched;
     instCauses[0].Latching := TRUE;
     instCauses[0].Texte    := 'Configuration geometrie benne invalide';
 
-    // Cause 1 : Dépassement écart max
+    // Cause 1 : Depassement ecart max (plage physique plausible M2 - M1).
+    // Borne haute : offset ferme + 2 m de marge inertie. Borne basse : offset ouvert
+    // MOINS la tolerance de coherence (bruit codeur / leger sur-jog a l'ouverture) -&gt;
+    // ne latche plus un defaut pour quelques cm de M2 sous M1.
     MaxAllowedOffset := Config.OffsetCloseM + 2.0;
-    IF (CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset)) OR (CablePosM2 &lt; CablePosM1) THEN
+    MinAllowedOffset := Config.OffsetOpenM - Config.CoherenceLimitM;
+    OffsetMaxViolNow := (CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset))
+                     OR (CablePosM2 &lt; (CablePosM1 + MinAllowedOffset));
+    // Anti-pic : ne latche que si l'ecart reste hors plage &gt; 500 ms (bruit codeur / glitch).
+    TonOffsetMaxViol(IN := OffsetMaxViolNow, PT := T#500ms);
+    IF TonOffsetMaxViol.Q THEN
         OffsetMaxFaultLatched := TRUE;
     END_IF;
     instCauses[1].Active   := OffsetMaxFaultLatched;
@@ -7950,6 +8049,34 @@ END_IF;
 
 {region "§4 Séquencement mouvement benne"}
 SevereError := Fault.Error;
+
+// --- §4a Classification continue de l'etat benne sur la MESURE physique -----------------
+// L'etat memorise (IsOpen/IsClosed) doit refleter la realite mecanique, sinon ActiveOffsetM
+// (0 ou OffsetCloseM) est applique a l'envers -&gt; M2 corrige faux + ecart synchro fantome.
+// Ne s'execute QUE machine totalement a l'arret et referencee (mesure fiable, aucun
+// transitoire d'ecart) ; debounce 1 s ; les commandes/sequences gardent la priorite via
+// NOT Lifecycle.Busy. Bande = OffsetX +/- CoherenceLimitM. Zone intermediaire : etat
+// inchange (le dernier etat franc est conserve, coherent avec le HOLD de l'offset en §5).
+DeltaPosition_M := CablePosM2 - CablePosM1;
+ClassCanRun := HomedM1 AND HomedM2
+               AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy
+               AND NOT SevereError;
+NearClosed := ClassCanRun AND (ABS(DeltaPosition_M - Config.OffsetCloseM) &lt;= Config.CoherenceLimitM);
+NearOpen   := ClassCanRun AND (ABS(DeltaPosition_M - Config.OffsetOpenM)  &lt;= Config.CoherenceLimitM);
+TonClassClosed(IN := NearClosed, PT := T#1s);
+TonClassOpen(IN := NearOpen, PT := T#1s);
+IF TonClassClosed.Q AND NOT BucketState.IsClosed THEN
+    BucketState.IsClosed        := TRUE;
+    BucketState.IsOpen          := FALSE;
+    BucketState.LastPosM2Close  := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
+ELSIF TonClassOpen.Q AND NOT BucketState.IsOpen THEN
+    BucketState.IsOpen          := TRUE;
+    BucketState.IsClosed        := FALSE;
+    BucketState.LastPosM2Open   := CablePosM2;
+    BucketState.StateIncoherent := FALSE;
+END_IF;
+
 MotionRequestConflict := ReqAscent AND ReqDescend;
 MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
 
@@ -8105,15 +8232,10 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
     END_IF;
 END_IF;
 
-// Note : la detection passive d'etat benne sur position en jog unitaire M2 a ete
-// retiree (elle basculait IsOpen/IsClosed au simple passage dans une bande -&gt;
-// ActiveOffsetM faux -&gt; ecart synchro fantome / MecaE au retour en couple).
-// L'etat benne reste fixe UNIQUEMENT par les confirmations explicites
-// (ConfirmOpenPosition / ConfirmClosePosition) et les commits homing. Deterministe.
 {endregion}
 
 {region "§5 Offset actif et validite"}
-DeltaPosition_M := CablePosM2 - CablePosM1;
+// DeltaPosition_M deja calcule en §4a (classification etat).
 
 IF Lifecycle.Busy THEN
     ActiveOffsetM := CablePosM2 - CablePosM1;
@@ -8134,6 +8256,17 @@ ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND (MachineHomed OR (BucketState.IsOpen XOR BucketState.IsClosed))
                      AND NOT MachineHomingActive;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
+
+// --- §5a Filet : avertissement incoherence offset applique / mesure reelle --------------
+// Non bloquant. Si l'ecart mesure M2-M1 s'ecarte durablement de l'offset issu de l'etat
+// memorise (etat faux, datum M2 derive, offset mal calibre) -&gt; alarme "reconfirmer".
+// Ne se declenche qu'a l'arret, reference, hors sequence.
+TonOffsetMismatch(
+    IN := ClassCanRun
+          AND (BucketState.IsOpen XOR BucketState.IsClosed)
+          AND (ABS(DeltaPosition_M - ActiveOffsetM) &gt; Config.CoherenceLimitM),
+    PT := T#2s);
+OffsetStateMismatchWarn := TonOffsetMismatch.Q;
 {endregion}
 </xhtml>
           </ST>
