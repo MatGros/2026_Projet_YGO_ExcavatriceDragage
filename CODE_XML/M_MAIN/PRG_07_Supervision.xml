@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:14:26.720081" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:14:26.720081">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:13:59.696182" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:13:59.696182">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -304,6 +304,17 @@ gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/Extraction
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décalage cible de fermeture de la benne (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DrainTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#5s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en X9 (configurable IHM)</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -8646,6 +8657,8 @@ GVL_IHM.Cycle.State.CycleStep              := PRG_03_Modes_Cycle.Data.SequenceSt
 GVL_IHM.Cycle.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.SequenceState.StepStr;
 GVL_IHM.Cycle.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
 GVL_IHM.Cycle.State.SampleCount            := _CycleSampleCount;
+GVL_IHM.Cycle.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
+GVL_IHM.Cycle.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
 GVL_IHM.Cycle.State.SelTarget              := GVL_IHM.TranslationM3.Cmd.SelTarget;
 GVL_IHM.Cycle.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;
 GVL_IHM.Cycle.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;

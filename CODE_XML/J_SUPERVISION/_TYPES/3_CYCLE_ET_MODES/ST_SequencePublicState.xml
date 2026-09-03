@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T23:08:54.033197" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T23:08:54.033197">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:12:36.730980" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:12:36.730980">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -160,6 +160,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart vitesse confirmé pendant timeout</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CurrentCycleElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée écoulée du cycle SEMI_AUTO en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée du dernier cycle SEMI_AUTO achevé (figée à X13)</xhtml>
               </documentation>
             </variable>
             <variable name="DiveReady">

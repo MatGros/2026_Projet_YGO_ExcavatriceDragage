@@ -26,5 +26,7 @@ STRUCT
     JoystickDeflected      : BOOL;        (* 🕹️ Joystick défléchi (non centré) — même signal que JoystickDeflected (FB_Cycle) ; SANS homme-mort *)
     CycleStepAtError       : E_CycleStep; (* 🧊 Étape spécifique au moment du défaut  *)
     SampleCount            : INT;         (* Compteur de prélèvements (RETAIN, Q3bis) *)
+    CurrentCycleElapsed    : TIME;        (* ⏱️ Durée écoulée du cycle en cours *)
+    LastCycleDuration      : TIME;        (* ⏱️ Durée du dernier cycle achevé (figée à X13) *)
 END_STRUCT
 END_TYPE

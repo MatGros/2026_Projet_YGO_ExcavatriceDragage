@@ -132,6 +132,17 @@
   `RunRequest` déjà FALSE). Durcissement pur. 🟩 style : le repli §4 et les autres étapes
   benne-seule ne neutralisent que `RunRequest` — harmoniser un jour.
 
+### Zone B2+ — retours utilisateur (fait, committé)
+- **Durée de cycle** : `FB_Cycle` expose `CurrentCycleElapsed` (chrono sur `Lifecycle.Busy`) +
+  `LastCycleDuration` (figée à X13, comme `SampleCount` compte les vidages). Publié
+  `PRG_03.Data.SequenceState.*` → `PRG_07` → `GVL_IHM.Cycle.State.*`.
+- **Égouttage X9 configurable + passable IHM** : `CfgDrainTime` (VAR_INPUT ← `GVL_IHM.Cycle.Cfg.DrainTime`,
+  défaut interne 5 s si ≤ 0) ; bouton `SkipDrainRequest` (← `GVL_IHM.Cycle.Cmd.BtnSkipDrain`, front)
+  → sortie X9 sur fin de tempo **OU** appui « passer égouttage ».
+- **Tests à compléter (assumés)** : (a) `TC-P04-024` skip-drain end-to-end (progression X0→X9 lourde) ;
+  (b) B2.2 « sortie X9 → STABILIZING → 2ᵉ cycle → 5 s pleins ». `TC-P04-023` (non-cumul StepMax)
+  + assert `LastCycleDuration > 0` dans SCEN-NOM en place.
+
 ## T226 — `FB_MachineHomingCycle` + `FB_Cycle` (Zone F, à cadrer)
 - **`FB_Cycle.X1_HOMING` gutté** : SEMI_AUTO n'est entré que si `MachineHomed` (AC1) → le cycle
   ne contient **plus aucun référencement**. Supprimer : l'entrée `HomingRequest`, la branche

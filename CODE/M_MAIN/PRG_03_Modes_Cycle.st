@@ -247,6 +247,8 @@ instCycleSemiAuto(
     HomedM2                 := PRG_02_Acquisition.Data.EncoderM2.Homed,
     TopPositionSensor       := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
+    CfgDrainTime            := GVL_IHM.Cycle.Cfg.DrainTime,
+    SkipDrainRequest        := GVL_IHM.Cycle.Cmd.BtnSkipDrain,
     SampleCount            := _CycleSampleCount
 );
 
@@ -305,6 +307,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.SpeedMismatchMps       := instCycleSemiAuto.SpeedMismatchMps;
     Data.SequenceState.SpeedMismatchActive    := instCycleSemiAuto.SpeedMismatchActive;
     Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
+    Data.SequenceState.CurrentCycleElapsed    := instCycleSemiAuto.CurrentCycleElapsed;
+    Data.SequenceState.LastCycleDuration      := instCycleSemiAuto.LastCycleDuration;
     Data.SequenceState.DiveState              := E_DiveSearchState.WAIT_PRECONDITIONS;
     Data.SequenceState.DiveStepAtFault        := E_DiveSearchState.WAIT_PRECONDITIONS;
     Data.SequenceState.BottomTouchConfirmed   := FALSE;
@@ -407,6 +411,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchMps       := 0.0;
     Data.SequenceState.SpeedMismatchActive    := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
+    Data.SequenceState.CurrentCycleElapsed    := T#0s;
+    Data.SequenceState.LastCycleDuration      := T#0s;
     Data.SequenceState.DiveReady                  := instDiveSearch.Ready;
     Data.SequenceState.DiveBusy                   := instDiveSearch.Lifecycle.Busy;
     Data.SequenceState.DiveDone                   := instDiveSearch.Lifecycle.Done;
@@ -474,6 +480,8 @@ ELSE
     Data.SequenceState.SpeedMismatchMps        := 0.0;
     Data.SequenceState.SpeedMismatchActive     := FALSE;
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
+    Data.SequenceState.CurrentCycleElapsed     := T#0s;
+    Data.SequenceState.LastCycleDuration       := T#0s;
     Data.SequenceState.DiveReady                  := FALSE;
     Data.SequenceState.DiveBusy                   := FALSE;
     Data.SequenceState.DiveDone                   := FALSE;

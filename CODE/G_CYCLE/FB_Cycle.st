@@ -61,6 +61,10 @@ VAR_INPUT
     HomedM2                 : BOOL;         // --> [HW] Codeur M2 reference
     TopPositionSensor       : BOOL;         // --> [HW] Capteur position haute (referencement)
     HomingRequest           : BOOL;         // --> [CMD] Demande de referencement (front)
+
+    // === CONFIG & COMMANDES CYCLE (IHM) ===
+    CfgDrainTime           : TIME;         // --> [CFG] Duree d'egouttage X9 configurable IHM (<= 0 -> defaut interne)
+    SkipDrainRequest       : BOOL;         // --> [CMD] Bouton IHM : passer l'etape d'egouttage X9 (front)
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DEFECTUOSITES ===
@@ -91,6 +95,8 @@ VAR_OUTPUT
     WaitingForOperator      : BOOL;                 // <-- [STAT] En attente d'une action operateur
     WaitingForProcess       : BOOL;                 // <-- [STAT] En attente d'une condition procede
     RequestActive           : BOOL;                 // <-- [STAT] Demande de mouvement active
+    CurrentCycleElapsed     : TIME;                 // <-- [DIAG] Duree ecoulee du cycle en cours (chronometre sur Lifecycle.Busy)
+    LastCycleDuration       : TIME;                 // <-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)
 END_VAR
 VAR_IN_OUT
     // === STRUCTURES PARTAGEES & COMPTEURS ===
@@ -123,7 +129,10 @@ VAR
     StepMaxPrevState        : E_CycleStep;  // . [LOC] Etape du scan precedent (rearmement StepMaxTimer au changement d'etape)
 
     // === TEMPORISATEURS INTERNES ===
-    DrainingTimer           : TON;          // . [LOC] Temporisateur de vidage (egouttage)
+    DrainingTimer           : TON;          // . [LOC] Temporisateur de vidage (egouttage), PT = DrainTimeEff
+    CycleRunTimer           : TON;          // . [LOC] Chronometre du cycle en cours (IN = Lifecycle.Busy) ; .ET = duree
+    SkipDrainEdge           : R_TRIG;       // . [LOC] Front bouton IHM "passer egouttage"
+    DrainTimeEff            : TIME;         // . [LOC] Duree d'egouttage effective (CfgDrainTime bornee au defaut interne)
     StabilizationTimer      : TON;          // . [LOC] Temporisation maximale de remontee lente
     SpeedMismatchTimer      : TON;          // . [LOC] Confirmation temporelle ecart de vitesse
     StepMaxTimer            : TON;          // . [LOC] Tempo max d'etape
@@ -154,6 +163,15 @@ ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
 DeadmanArmedEdge(CLK := DeadmanArmed);
 AbortEdge(CLK := AbortCycle);
+SkipDrainEdge(CLK := SkipDrainRequest);
+
+// ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
+// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration à l'achèvement (X13).
+CycleRunTimer(IN := Lifecycle.Busy, PT := T#12h);
+CurrentCycleElapsed := CycleRunTimer.ET;
+
+// Durée d'égouttage effective : config IHM si valide, sinon défaut interne.
+DrainTimeEff := SEL(CfgDrainTime <= T#0s, CfgDrainTime, DrainingTime);
 
 // ⏱️ Surveillance indépendante de la remontée lente
 // X7_CTRL_ASCENT -> X8_ASCENT_LOADED : TON de stabilisation palier 1.
@@ -184,7 +202,7 @@ StepMaxPrevState := State;
 
 // Egouttage X9 : TON gaté sur l'étape (remis à 0 hors X9). Remplace l'ancien IN:=TRUE câblé
 // qui pouvait laisser Q déjà vrai à l'entrée en X9 (temps d'égouttage non respecté).
-DrainingTimer(IN := (State = E_CycleStep.X9_DRAIN_PAUSE), PT := DrainingTime);
+DrainingTimer(IN := (State = E_CycleStep.X9_DRAIN_PAUSE), PT := DrainTimeEff);
 
 // Table des causes de défaut
 instCauses[0].Active   := LimitLegalReached AND (State = E_CycleStep.X4_DESCEND_OPEN);
@@ -587,12 +605,13 @@ CASE State OF
         WaitingForOperator := FALSE;
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0409;
-        OperatorAction := 'Egouttage du godet en cours (temporisation).';
+        OperatorAction := 'Egouttage : attendre la tempo ou appuyer sur "passer egouttage".';
         WinchM1Cmd.RunRequest := FALSE;
         WinchM2Cmd.RunRequest := FALSE;
 
-        // Tempo d'egouttage armee/remise a zero en §1 (gate sur State = X9).
-        IF JoystickDeflected AND DrainingTimer.Q THEN
+        // Tempo d'egouttage armee/remise a zero en §1 (gate sur State = X9, PT = DrainTimeEff).
+        // Passage a X10 : fin de tempo OU appui operateur "passer l'egouttage" (SkipDrainEdge).
+        IF JoystickDeflected AND (DrainingTimer.Q OR SkipDrainEdge.Q) THEN
             State := E_CycleStep.X10_TRANSLATE_DUMP;
         END_IF;
 
@@ -660,9 +679,10 @@ CASE State OF
         OperatorActionId := 16#040D;
         OperatorAction := 'Cycle termine avec succes. Relancer un nouveau cycle.';
 
-        // Compteur de prélèvements (RETAIN) — F2: incrément cadré par front (1 seul par cycle)
+        // Compteur de prélèvements (RETAIN) + durée du cycle — F2: cadré par front (1 seul par cycle)
         IF NOT SampleCountDone THEN
             SampleCount := SampleCount + 1;
+            LastCycleDuration := CurrentCycleElapsed;   // fige la durée du cycle qui vient de s'achever
             SampleCountDone := TRUE;
         END_IF;
 
