@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:56:11.055115" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:56:11.055115">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T15:27:37.002568" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T15:27:37.002568">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1691,14 +1691,14 @@ END_IF;
 
 {region "§4bis MISE EN SERVICE : forcage de step (encadre, impulsion sur front)"}
 // === §4bis FORCAGE DE STEP (aide mise en service) ====================
-// Deverrouille UNIQUEMENT si : case IHM mise en service ET MAINT_N2 ET pas de defaut
-// latche. Impulsion sur front (pas un force continu qui se battrait avec le CASE) :
-// on pose SeqStep + on purge les latches incoherents, le GRAFCET reprend au scan suivant.
+// Deverrouille UNIQUEMENT si : case IHM mise en service ET MAINT_N2. Autorise MEME
+// sur defaut latche (le forcage est justement l'action de recuperation : on sort du
+// step bloque puis on acquitte). Impulsion sur front (pas un force continu) : on pose
+// SeqStep + on purge les latches incoherents, le GRAFCET reprend au scan suivant.
 ForceStepApplyEdge(CLK := CfgForceStepApply);
 IF ForceStepApplyEdge.Q
    AND CfgCommissioningEnable
-   AND (Mode = E_Mode.MAINT_N2)
-   AND NOT Fault.Latched THEN
+   AND (Mode = E_Mode.MAINT_N2) THEN
     ForceStepClamped := LIMIT(0, CfgForceStepTarget, 9);
     CASE ForceStepClamped OF
         0: SeqStep := E_MachineHomingTxState.HX0_REPOS;
@@ -1718,6 +1718,7 @@ IF ForceStepApplyEdge.Q
     PendingClose := FALSE;
     ValidationPressCount := 0;
     ValidationHeldOk     := FALSE;
+    MachineHomingFailed  := FALSE;   // le forcage annule l'etat "sequence abandonnee"
 END_IF;
 {endregion}
 

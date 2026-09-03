@@ -20573,14 +20573,14 @@ END_IF;
 
 {region "§4bis MISE EN SERVICE : forcage de step (encadre, impulsion sur front)"}
 // === §4bis FORCAGE DE STEP (aide mise en service) ====================
-// Deverrouille UNIQUEMENT si : case IHM mise en service ET MAINT_N2 ET pas de defaut
-// latche. Impulsion sur front (pas un force continu qui se battrait avec le CASE) :
-// on pose SeqStep + on purge les latches incoherents, le GRAFCET reprend au scan suivant.
+// Deverrouille UNIQUEMENT si : case IHM mise en service ET MAINT_N2. Autorise MEME
+// sur defaut latche (le forcage est justement l'action de recuperation : on sort du
+// step bloque puis on acquitte). Impulsion sur front (pas un force continu) : on pose
+// SeqStep + on purge les latches incoherents, le GRAFCET reprend au scan suivant.
 ForceStepApplyEdge(CLK := CfgForceStepApply);
 IF ForceStepApplyEdge.Q
    AND CfgCommissioningEnable
-   AND (Mode = E_Mode.MAINT_N2)
-   AND NOT Fault.Latched THEN
+   AND (Mode = E_Mode.MAINT_N2) THEN
     ForceStepClamped := LIMIT(0, CfgForceStepTarget, 9);
     CASE ForceStepClamped OF
         0: SeqStep := E_MachineHomingTxState.HX0_REPOS;
@@ -20600,6 +20600,7 @@ IF ForceStepApplyEdge.Q
     PendingClose := FALSE;
     ValidationPressCount := 0;
     ValidationHeldOk     := FALSE;
+    MachineHomingFailed  := FALSE;   // le forcage annule l'etat "sequence abandonnee"
 END_IF;
 {endregion}
 
@@ -53338,12 +53339,20 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">↔️ Variables d'échange IHM Translation M3</xhtml>
           </documentation>
         </variable>
-        <variable name="CycleSemiAuto">
+        <variable name="Cycle">
           <type>
             <derived name="ST_CycleHMI" />
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Commandes, états et diagnostic cycle semi-automatique</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CycleSemiAuto">
+          <type>
+            <derived name="ST_CycleHMI" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔄 Alias compatibilité</xhtml>
           </documentation>
         </variable>
         <variable name="CycleMachineHoming">
@@ -53352,6 +53361,30 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Cycle de référencement machine (FB_CycleMachineHoming) — MAINT_N2</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CycleDiveSearch">
+          <type>
+            <derived name="ST_CycleDiveSearchHMI" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🤿 Assistance plongée (DiveSearch) MAINT_N1/N2</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CycleExtraction">
+          <type>
+            <derived name="ST_CycleExtractionHMI" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">⛏️ Assistance extraction MAINT_N1/N2</xhtml>
+          </documentation>
+        </variable>
+        <variable name="CycleDumpAtTremie">
+          <type>
+            <derived name="ST_CycleDumpAtTremieHMI" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🚚 Vidage à la trémie (legacy)</xhtml>
           </documentation>
         </variable>
         <variable name="Banner">
