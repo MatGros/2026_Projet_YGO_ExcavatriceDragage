@@ -465,7 +465,7 @@ instMachineHomingCycle(
     JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
     // Lancer / valider le cycle : BP joystick (= bouton homme-mort) pour le motif 3 appuis,
     // OU commande IHM dediee (front) pour le lancement direct.
-    BtnValidation              := HwIn.Operator.JoyBtnRaw,
+    BtnValidation              := HwIn.Operator.JoyBtnRaw OR GVL_IHM.Modes.Cmd.BtnMachineHomingValidate,
     StartRequest               := GVL_IHM.Modes.Cmd.BtnMachineHomingStart,
     Cfg                        := MachineHomingCfg
 );

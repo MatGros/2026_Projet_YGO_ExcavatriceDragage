@@ -90,6 +90,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Lancer le cycle de homing machine (MAINT_N2, front) — alternative au motif 3 appuis joystick</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnMachineHomingValidate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Validation homing depuis IHM (front) — equivaut a 1 appui du motif ; alternative au BP joystick pour la mise en service</xhtml>
+              </documentation>
+            </variable>
             <variable name="SelJoystickWinch">
               <type>
                 <INT />
