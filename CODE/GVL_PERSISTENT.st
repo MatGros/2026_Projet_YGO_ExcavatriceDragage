@@ -146,8 +146,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         WinchSlowdownDistanceTop_M := 0.0,
         WinchSlowdownDistanceBottom_M := 1.0,
         WinchSlowdownMaxStep := 1,
-        CfgCableLimitAscent_M := 7.5,
-        CfgTopSensorPos_M := 8.5 // Capteur haut physique commun M1/M2 (8.0-8.5 m selon site)
+        CfgCableLimitAscent_M := 7.5
     ); // 🌉 Pont FB_CfgPersistBridge_CommunCfg
 
     // 🚦 SYSTÈME / IHM

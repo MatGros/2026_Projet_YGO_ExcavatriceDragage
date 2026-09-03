@@ -19,7 +19,6 @@ STRUCT
     // pas une vitesse continue.
     WinchSlowdownMaxStep        : INT := 1;     (* : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2 *)
     CfgCableLimitAscent_M       : REAL := 7.5;  (* 📐 Limite haute d'exploitation NORMALE (m), commun M1/M2 *)
-    CfgTopSensorPos_M           : REAL := 8.5;  (* 📐 Position inscrite au homing sur capteur haut (m). M1 ET M2 montent liES au meme capteur -> parametre COMMUN unique *)
     TglEnableKoboldAutoStopDescent : BOOL := FALSE; (* : Arrêt auto descente sur détection fond Kobold (pilotage normal) *)
     // Coupe-circuit d'urgence pour le séquencement auto benne.
     // Défaut FALSE = mouvement M1/M2 synchro jamais
