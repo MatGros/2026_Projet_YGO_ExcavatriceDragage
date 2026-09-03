@@ -24,9 +24,9 @@ STRUCT
     Idx203_Done                      : BOOL; // 1 = Cycle terminé avec succès
     Idx204_Error                     : BOOL; // 1 = Défaut ou anomalie bloquante sur le cycle
     Idx205_ErrorId                   : WORD; // Code d'erreur interne FB_Cycle
-    Idx206_Step                      : E_CycleStep; // Étape courante (X0 à X13 + STABILIZING)
+    Idx206_Step                      : E_AutoCycleStep; // Étape courante (X0 à X13 + AX_STAB)
     Idx207_StepStr                   : STRING(80);  // Libellé explicite de l'étape
-    Idx208_StepAtError               : E_CycleStep; // Étape mémorisée lors du dernier défaut
+    Idx208_StepAtError               : E_AutoCycleStep; // Étape mémorisée lors du dernier défaut
     Idx209_WaitingForOperator        : BOOL;        // 1 = En attente d'une action humaine
     Idx210_WaitingForProcess         : BOOL;        // 1 = En attente d'une condition physique/procédé
     Idx211_OperatorActionId          : WORD;        // Identifiant numérique de l'action attendue
@@ -34,7 +34,7 @@ STRUCT
     Idx213_ExpectedAxis              : E_OperatorAxis; // Organe attendu (NONE, JOYSTICK_X, JOYSTICK_Y, BUTTON)
     Idx214_ExpectedDirection         : INT;         // Sens attendu (-1, 0, +1)
     Idx215_WaitingResume             : BOOL;        // 1 = En pause suite à bascule de mode (attente StartCycle)
-    Idx216_PausedState               : E_CycleStep; // Étape mémorisée prête pour reprise
+    Idx216_PausedState               : E_AutoCycleStep; // Étape mémorisée prête pour reprise
 
     // 🎯 3. Consignes & Feedbacks Opérationnels
     Idx301_TargetPosition            : INT;  // Cible translation sélectionnée (1=Trémie, 3=P1)

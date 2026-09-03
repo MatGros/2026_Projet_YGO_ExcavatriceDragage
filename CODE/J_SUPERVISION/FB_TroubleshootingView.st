@@ -78,9 +78,9 @@ VAR_INPUT
     CycleDone                : BOOL;   (* --> [STAT] Séquenceur terminé *)
     CycleError               : BOOL;   (* --> [STAT] Séquenceur en erreur *)
     CycleErrorId             : WORD;   (* --> [DIAG] Code erreur séquenceur *)
-    CycleStep                : E_CycleStep; (* --> [STAT] Étape courante *)
+    CycleStep                : E_AutoCycleStep; (* --> [STAT] Étape courante *)
     CycleStepStr             : STRING(80);  (* --> [STAT] Libellé étape *)
-    CycleStepAtError         : E_CycleStep; (* --> [DIAG] Étape au défaut *)
+    CycleStepAtError         : E_AutoCycleStep; (* --> [DIAG] Étape au défaut *)
     CycleWaitingForOperator  : BOOL;        (* --> [STAT] Attente action humaine *)
     CycleWaitingForProcess   : BOOL;        (* --> [STAT] Attente condition procédé *)
     CycleOperatorActionId    : WORD;        (* --> [DIAG] ID action attendue *)
@@ -706,7 +706,7 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx211_OperatorActionId          := CycleOpe
 GVL_Troubleshooting.G_CycleSemiAuto.Idx212_OperatorAction            := CycleOperatorAction;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx213_ExpectedAxis              := CycleExpectedAxis;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx214_ExpectedDirection         := CycleExpectedDirection;
-GVL_Troubleshooting.G_CycleSemiAuto.Idx215_WaitingResume             := (Auth.Mode <> E_Mode.SEMI_AUTO) AND (CycleStep <> E_CycleStep.X0_PREPARATION) AND (CycleStep <> E_CycleStep.X13_DONE_SYNC) AND (CycleStep <> E_CycleStep.STABILIZING);
+GVL_Troubleshooting.G_CycleSemiAuto.Idx215_WaitingResume             := (Auth.Mode <> E_Mode.SEMI_AUTO) AND (CycleStep <> E_AutoCycleStep.AX0_REPOS) AND (CycleStep <> E_AutoCycleStep.AX13_DONE_SYNC) AND (CycleStep <> E_AutoCycleStep.AX_STAB);
 GVL_Troubleshooting.G_CycleSemiAuto.Idx216_PausedState               := CycleStep;
 
 GVL_Troubleshooting.G_CycleSemiAuto.Idx301_TargetPosition            := CycleTargetPosition;

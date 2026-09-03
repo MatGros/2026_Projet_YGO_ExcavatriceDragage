@@ -153,7 +153,7 @@ FB_Modes:
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
   - CODE/F_MODES/FB_Modes.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/F_MODES/tests/test_fb_modes.st
-FB_Cycle:
+FB_CycleSemiAuto:
   domain: G_CYCLE
   af_doc: DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
   sources:
@@ -163,14 +163,14 @@ FB_Cycle:
   - CODE/A_COMMUN/_TYPES/ST_Lifecycle.st
   - CODE/A_COMMUN/FB_FaultCore.st
   - CODE/F_MODES/E_Mode.st
-  - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+  - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
   - CODE/G_CYCLE/_TYPES/E_OperatorAxis.st
   - CODE/G_CYCLE/_TYPES/E_ProgramSequence.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st
-  - CODE/G_CYCLE/FB_Cycle.st
-  test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cycle.st
+  - CODE/G_CYCLE/FB_CycleSemiAuto.st
+  test: TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
 FB_DiveSearch:
   domain: G_CYCLE
   sources:
@@ -410,7 +410,7 @@ FB_SimBench:
   - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
   - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
   - CODE/F_MODES/E_Mode.st
-  - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+  - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
   - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Config.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st
@@ -574,7 +574,7 @@ FB_Hmi_BannerFormatter:
   - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
   - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
   - CODE/F_MODES/E_Mode.st
-  - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+  - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
   - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Config.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st
@@ -725,7 +725,7 @@ FB_TroubleshootingView:
   - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
   - CODE/E_CODEURS/_TYPES/ST_EncoderMeasurements.st
   - CODE/F_MODES/E_Mode.st
-  - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+  - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
   - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Config.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st
@@ -977,7 +977,7 @@ PRG_03_Modes_Cycle:
   - CODE/A_COMMUN/FB_Filter.st
   - CODE/F_MODES/E_Mode.st
   - CODE/F_MODES/FB_Modes.st
-  - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+  - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
   - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Config.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st
@@ -986,7 +986,7 @@ PRG_03_Modes_Cycle:
   - CODE/G_CYCLE/FB_DiveSearch.st
   - CODE/G_CYCLE/FB_ExtractionAssist.st
   - CODE/G_CYCLE/_TYPES/E_OperatorAxis.st
-  - CODE/G_CYCLE/FB_Cycle.st
+  - CODE/G_CYCLE/FB_CycleSemiAuto.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_ProgramSequence.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramWinchRequest.st
@@ -1003,7 +1003,7 @@ PRG_04_Treuils_Benne:
   domain: M_MAIN
   sources:
   - TOOLS/TEST_AUTO_CI/MOCKS/DEVICE_STATE.st
-  - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+  - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
   - CODE/G_CYCLE/_TYPES/E_OperatorAxis.st
   - CODE/G_CYCLE/_TYPES/E_ProgramSequence.st
   - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramTranslationRequest.st
@@ -1261,7 +1261,7 @@ PRG_07_Supervision:
   - CODE/A_COMMUN/_TYPES/ST_ContactorCheck.st
   - CODE/A_COMMUN/FB_FaultCore.st
   - CODE/F_MODES/E_Mode.st
-  - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+  - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
   - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Config.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st
@@ -1363,7 +1363,7 @@ MAIN_GLOBAL:
   - CODE/E_CODEURS/FB_Encoder.st
   - CODE/F_MODES/E_Mode.st
   - CODE/F_MODES/FB_Modes.st
-  - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+  - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
   - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Config.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st
@@ -1376,7 +1376,7 @@ MAIN_GLOBAL:
   - CODE/G_CYCLE/FB_DiveSearch.st
   - CODE/G_CYCLE/FB_ExtractionAssist.st
   - CODE/G_CYCLE/_TYPES/E_OperatorAxis.st
-  - CODE/G_CYCLE/FB_Cycle.st
+  - CODE/G_CYCLE/FB_CycleSemiAuto.st
   - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st
   - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
   - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st
@@ -1512,7 +1512,7 @@ WINCH_INTEG:
   - CODE/E_CODEURS/FB_Encoder.st
   - CODE/F_MODES/E_Mode.st
   - CODE/F_MODES/FB_Modes.st
-  - CODE/G_CYCLE/_TYPES/E_CycleStep.st
+  - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
   - CODE/G_CYCLE/_TYPES/E_DiveSearchState.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Config.st
   - CODE/G_CYCLE/_TYPES/ST_fbDiveSearch_Inputs.st
@@ -1525,7 +1525,7 @@ WINCH_INTEG:
   - CODE/G_CYCLE/FB_DiveSearch.st
   - CODE/G_CYCLE/FB_ExtractionAssist.st
   - CODE/G_CYCLE/_TYPES/E_OperatorAxis.st
-  - CODE/G_CYCLE/FB_Cycle.st
+  - CODE/G_CYCLE/FB_CycleSemiAuto.st
   - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st
   - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
   - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockState.st

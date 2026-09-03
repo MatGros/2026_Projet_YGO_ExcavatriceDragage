@@ -17,10 +17,10 @@ VAR_INPUT
     WinchSelected        : INT; // --> [CMD] 1 = M1, 2 = M2
 
     // 🔄 Cycle & sous-cycles
-    CycleStep            : E_CycleStep;   // --> [HW] Étape cycle
-    CycleStateStr        : STRING(80);   // --> [HW] Libellé détaillé de l'étape cycle (FB_Cycle.CycleStateStr)
-    CycleErrorId         : WORD;   // --> [DIAG] Code défaut cycle (FB_Cycle.ErrorId) — notifié à STABILIZING
-    CycleStepAtError     : E_CycleStep;   // --> [DIAG] Dernière étape avant le défaut (FB_Cycle.CycleStepAtError)
+    CycleStep            : E_AutoCycleStep;   // --> [HW] Étape cycle
+    CycleStateStr        : STRING(80);   // --> [HW] Libellé détaillé de l'étape cycle (FB_CycleSemiAuto.CycleStateStr)
+    CycleErrorId         : WORD;   // --> [DIAG] Code défaut cycle (FB_CycleSemiAuto.ErrorId) — notifié à AX_STAB
+    CycleStepAtError     : E_AutoCycleStep;   // --> [DIAG] Dernière étape avant le défaut (FB_CycleSemiAuto.CycleStepAtError)
     DiveState            : E_DiveSearchState;   // --> [HW] État plongée
     ExtractionState      : E_ExtractionAssistState;   // --> [HW] État extraction
     MachineHomingStep        : INT;   // --> [HW] Étape guide homing machine (E_MachineHomingStep : 0..70, 60 = valide)
@@ -242,16 +242,16 @@ Banner.GlobalContextText := CONCAT(CONCAT(PrefixContext, ModeStr), CouplingStr);
 IF (MachineHomingStep > 0) AND (MachineHomingStep <> 60) THEN
     Banner.SequenceProgressText := CONCAT('Homing: ', MachineHomingInstruction);
 ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
-    // Détail de l'étape (FB_Cycle.CycleStateStr) prioritaire ; label court en fallback.
+    // Détail de l'étape (FB_CycleSemiAuto.CycleStateStr) prioritaire ; label court en fallback.
     IF CycleStateStr <> '' THEN
         Banner.SequenceProgressText := CONCAT('Cycle: ', CycleStateStr);
     ELSE
         CASE CycleStep OF
-            E_CycleStep.X0_PREPARATION: Banner.SequenceProgressText := 'Cycle: PRÉPARATION';
-            E_CycleStep.X1_HOMING: Banner.SequenceProgressText := 'Cycle: RÉFÉRENCEMENT';
-            E_CycleStep.X2_WORK_POS_SELECT: Banner.SequenceProgressText := 'Cycle: POSITION TRAVAIL';
-            E_CycleStep.X3_OPEN_BUCKET: Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
-            E_CycleStep.X4_DESCEND_OPEN:
+            E_AutoCycleStep.AX0_REPOS: Banner.SequenceProgressText := 'Cycle: PRÉPARATION';
+            E_AutoCycleStep.AX1_HOMING: Banner.SequenceProgressText := 'Cycle: RÉFÉRENCEMENT';
+            E_AutoCycleStep.AX2_TRANSLATE_P1: Banner.SequenceProgressText := 'Cycle: POSITION TRAVAIL';
+            E_AutoCycleStep.AX3_OPEN_BUCKET: Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
+            E_AutoCycleStep.AX4_DESCEND_OPEN:
                 IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
                     Banner.SequenceProgressText := 'Cycle: DESCENTE > IMMERSION';
                 ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
@@ -261,15 +261,15 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 ELSE
                     Banner.SequenceProgressText := 'Cycle: DESCENTE BENNE OUVERTE';
                 END_IF;
-            E_CycleStep.X5_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
-            E_CycleStep.X6_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
-            E_CycleStep.X7_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: ARRACHAGE / MONTÉE LENTE';
-            E_CycleStep.X8_ASCENT_LOADED: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
-            E_CycleStep.X9_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
-            E_CycleStep.X10_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
-            E_CycleStep.X11A_DUMP_ARRIVE, E_CycleStep.X11B_DUMP_OPEN: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
-            E_CycleStep.X13_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ';
-            E_CycleStep.STABILIZING: Banner.SequenceProgressText := 'Cycle: STABILISATION';
+            E_AutoCycleStep.AX5_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
+            E_AutoCycleStep.AX6_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
+            E_AutoCycleStep.AX7_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: ARRACHAGE / MONTÉE LENTE';
+            E_AutoCycleStep.AX8_ASCENT_LOADED: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
+            E_AutoCycleStep.AX9_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
+            E_AutoCycleStep.AX10_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
+            E_AutoCycleStep.AX11A_DUMP_ARRIVE, E_AutoCycleStep.AX11B_DUMP_OPEN: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+            E_AutoCycleStep.AX13_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ';
+            E_AutoCycleStep.AX_STAB: Banner.SequenceProgressText := 'Cycle: STABILISATION';
         ELSE
             Banner.SequenceProgressText := 'Cycle: ÉTAPE EN COURS';
         END_CASE;
@@ -496,50 +496,50 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // Guidance par étape du cycle (AF-07 §5.1) — ne masque jamais un défaut
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
     CASE CycleStep OF
-        E_CycleStep.X0_PREPARATION:
+        E_AutoCycleStep.AX0_REPOS:
             OperatorActionCandidate := '[IHM/JOYSTICK] Démarrer le cycle (bouton Start ou homme-mort)';
-        E_CycleStep.X1_HOMING:
+        E_AutoCycleStep.AX1_HOMING:
             OperatorActionCandidate := '[IHM] Attendre référencement codeurs';
-        E_CycleStep.X2_WORK_POS_SELECT:
+        E_AutoCycleStep.AX2_TRANSLATE_P1:
             OperatorActionCandidate := '[IHM] Sélectionner position travail';
-        E_CycleStep.X3_OPEN_BUCKET:
+        E_AutoCycleStep.AX3_OPEN_BUCKET:
             OperatorActionCandidate := '[IHM] Ouverture benne en cours';
-        E_CycleStep.X4_DESCEND_OPEN:
+        E_AutoCycleStep.AX4_DESCEND_OPEN:
             OperatorActionCandidate := '[JOYSTICK] Descendre benne ouverte > Attendre contact fond';
-        E_CycleStep.X5_BOTTOM_CONFIRMED:
+        E_AutoCycleStep.AX5_BOTTOM_CONFIRMED:
             OperatorActionCandidate := '[IHM] Fond confirmé - remontée';
-        E_CycleStep.X6_CLOSE_BUCKET:
+        E_AutoCycleStep.AX6_CLOSE_BUCKET:
             OperatorActionCandidate := '[IHM] Fermeture benne en cours';
-        E_CycleStep.X7_CTRL_ASCENT:
+        E_AutoCycleStep.AX7_CTRL_ASCENT:
             OperatorActionCandidate := '[JOYSTICK] Remontée lente de contrôle';
-        E_CycleStep.X8_ASCENT_LOADED:
+        E_AutoCycleStep.AX8_ASCENT_LOADED:
             OperatorActionCandidate := '[IHM] Remontée en charge';
-        E_CycleStep.X9_DRAIN_PAUSE:
+        E_AutoCycleStep.AX9_DRAIN_PAUSE:
             OperatorActionCandidate := '[IHM] Attendre égouttage';
-        E_CycleStep.X10_TRANSLATE_DUMP:
+        E_AutoCycleStep.AX10_TRANSLATE_DUMP:
             OperatorActionCandidate := '[JOYSTICK] Déplacer vers trémie';
-        E_CycleStep.X11A_DUMP_ARRIVE, E_CycleStep.X11B_DUMP_OPEN:
+        E_AutoCycleStep.AX11A_DUMP_ARRIVE, E_AutoCycleStep.AX11B_DUMP_OPEN:
             OperatorActionCandidate := '[IHM] Vidage benne';
-        E_CycleStep.X13_DONE_SYNC:
+        E_AutoCycleStep.AX13_DONE_SYNC:
             OperatorActionCandidate := '[IHM] Cycle terminé';
-        E_CycleStep.STABILIZING:
+        E_AutoCycleStep.AX_STAB:
             // Libellé de l'étape d'origine du défaut (CycleStepAtError).
             CASE CycleStepAtError OF
-                E_CycleStep.X0_PREPARATION: StepAtErrorStr := 'X0 (préparation)';
-                E_CycleStep.X1_HOMING: StepAtErrorStr := 'X1 (référencement)';
-                E_CycleStep.X2_WORK_POS_SELECT: StepAtErrorStr := 'X2 (sélection position)';
-                E_CycleStep.X3_OPEN_BUCKET: StepAtErrorStr := 'X3 (ouverture benne)';
-                E_CycleStep.X4_DESCEND_OPEN: StepAtErrorStr := 'X4 (descente)';
-                E_CycleStep.X5_BOTTOM_CONFIRMED: StepAtErrorStr := 'X5 (fond confirmé)';
-                E_CycleStep.X6_CLOSE_BUCKET: StepAtErrorStr := 'X6 (fermeture benne)';
-                E_CycleStep.X7_CTRL_ASCENT: StepAtErrorStr := 'X7 (remontée contrôle)';
-                E_CycleStep.X8_ASCENT_LOADED: StepAtErrorStr := 'X8 (remontée chargée)';
-                E_CycleStep.X9_DRAIN_PAUSE: StepAtErrorStr := 'X9 (égouttage)';
-                E_CycleStep.X10_TRANSLATE_DUMP: StepAtErrorStr := 'X10 (translation trémie)';
-                E_CycleStep.X11A_DUMP_ARRIVE: StepAtErrorStr := 'X11a (arrivee tremie)';
-                E_CycleStep.X11B_DUMP_OPEN: StepAtErrorStr := 'X11b (vidage benne)';
-                E_CycleStep.X13_DONE_SYNC: StepAtErrorStr := 'X13 (cycle terminé)';
-                E_CycleStep.STABILIZING: StepAtErrorStr := 'X14 (stabilisation)';
+                E_AutoCycleStep.AX0_REPOS: StepAtErrorStr := 'X0 (préparation)';
+                E_AutoCycleStep.AX1_HOMING: StepAtErrorStr := 'X1 (référencement)';
+                E_AutoCycleStep.AX2_TRANSLATE_P1: StepAtErrorStr := 'X2 (sélection position)';
+                E_AutoCycleStep.AX3_OPEN_BUCKET: StepAtErrorStr := 'X3 (ouverture benne)';
+                E_AutoCycleStep.AX4_DESCEND_OPEN: StepAtErrorStr := 'X4 (descente)';
+                E_AutoCycleStep.AX5_BOTTOM_CONFIRMED: StepAtErrorStr := 'X5 (fond confirmé)';
+                E_AutoCycleStep.AX6_CLOSE_BUCKET: StepAtErrorStr := 'X6 (fermeture benne)';
+                E_AutoCycleStep.AX7_CTRL_ASCENT: StepAtErrorStr := 'X7 (remontée contrôle)';
+                E_AutoCycleStep.AX8_ASCENT_LOADED: StepAtErrorStr := 'X8 (remontée chargée)';
+                E_AutoCycleStep.AX9_DRAIN_PAUSE: StepAtErrorStr := 'X9 (égouttage)';
+                E_AutoCycleStep.AX10_TRANSLATE_DUMP: StepAtErrorStr := 'X10 (translation trémie)';
+                E_AutoCycleStep.AX11A_DUMP_ARRIVE: StepAtErrorStr := 'X11a (arrivee tremie)';
+                E_AutoCycleStep.AX11B_DUMP_OPEN: StepAtErrorStr := 'X11b (vidage benne)';
+                E_AutoCycleStep.AX13_DONE_SYNC: StepAtErrorStr := 'X13 (cycle terminé)';
+                E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'X14 (stabilisation)';
                 ELSE
                     StepAtErrorStr := '?';
             END_CASE;
@@ -805,7 +805,7 @@ IF ((EmergencyErrorId AND 16#0008) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarme
     AlarmArray[AlarmCount] := '[AU] ErrorID:04 - echec autotest demarrage'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5h. Collecte — cycle semi-auto (FB_Cycle.ErrorId)
+// 5h. Collecte — cycle semi-auto (FB_CycleSemiAuto.ErrorId)
 IF ((CycleErrorId AND 16#0001) <> 16#0000) AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:01 - limite legale atteinte'; AlarmCount := AlarmCount + 1;
 END_IF;

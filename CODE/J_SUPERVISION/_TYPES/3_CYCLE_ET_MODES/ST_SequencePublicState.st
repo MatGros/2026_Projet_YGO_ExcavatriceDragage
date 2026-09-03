@@ -10,8 +10,8 @@ STRUCT
     Lifecycle           : ST_Lifecycle;     // Cycle de vie IEC 61131-3 (Busy, Done)
     Fault               : ST_Fault;         // Défaut transverse (Error, ErrorId)
     SequenceId          : E_ProgramSequence;// Identifiant séquence active
-    Step                : E_CycleStep;      // Étape active du Grafcet
-    StepAtFault         : E_CycleStep;      // Étape mémorisée au défaut
+    Step                : E_AutoCycleStep;      // Étape active du Grafcet
+    StepAtFault         : E_AutoCycleStep;      // Étape mémorisée au défaut
     OperatorActionId    : WORD;             // Identifiant action opérateur requise
     OperatorAction      : STRING(120);      // Message explicatif pour l'IHM
     ExpectedAxis        : E_OperatorAxis;   // Organe joystick/bouton attendu

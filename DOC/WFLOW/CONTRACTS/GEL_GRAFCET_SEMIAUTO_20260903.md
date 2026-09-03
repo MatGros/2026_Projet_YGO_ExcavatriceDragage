@@ -48,11 +48,8 @@
 
 | Rep. | 🎬 | Contenu (variables réelles) |
 |---|---|---|
-| **AX_REPOS** (99) | 🟦 step initiale pure | *rien* — aucune action, aucune affectation |
-| **AT_INIT** | ⬇️ | `Enable (= Mode SEMI_AUTO)` → **AX0** *(Q1)* |
-| **AX0_PREPARATION** (0) | 🟩 step — housekeeping + vérif posture départ | treuils / translation / benne **0** · `Lifecycle.Busy/Done := FALSE` · `WaitingForOperator` · `SampleCountDone := FALSE` · vérifie **posture de départ** : treuils M1/M2 au **capteur haut** (plage `CfgStartTopWindowM`, Q7) |
-| **AT0-ok** | ⬇️ | `(StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Latched` **ET** treuils M1/M2 au capteur haut (plage) → **AX1** |
-| **AT0-nok** | *(hold)* | treuils PAS en haut → msg « Amener les treuils en position haute (capteur haut) en maintenance avant de lancer » — reste AX0 |
+| **AX0_REPOS** (0) *(ex-`X0_PREPARATION`)* | 🟦 step repos / park | toutes commandes **0** · `Lifecycle.Busy/Done := FALSE` · `WaitingForOperator` · `SampleCountDone := FALSE` (état neutre, aucun ordre) |
+| **AT0** | ⬇️ *(démarrer le GRAFCET)* | `Enable (= Mode SEMI_AUTO)` **ET** `(StartEdge.Q OR DeadmanArmedEdge.Q)` **ET** `NOT Fault.Latched` → **AX1** |
 | **AX1_HOMING** (1) | 🟩 step — 🚫 mvt, vérif référence | `Lifecycle.Busy := TRUE` · **aucun ordre mouvement, aucun référencement** |
 | **AT1a** | ⬇️ | `HomedM1 AND HomedM2` → **AX2** *(toujours vrai car homed-only — Q2 : garde redondante)* |
 | **AT1b** | *(hold)* | sinon : msg « Machine non referencee : passer en maintenance » |
@@ -118,13 +115,13 @@
 
 | Q | Statut | Décision |
 |---|---|---|
-| **Q1** | ✅ | `AX_REPOS := 99` initiale pure · `AT_INIT` : `Enable (= Mode SEMI_AUTO)` → AX0 |
+| **Q1** | ✅ | Pas de step ajoute ni de renumerotation. `X0_PREPARATION` (valeur 0) devient **`AX0_REPOS`** (repos / park, aucun ordre). `AT0` = `Enable (SEMI_AUTO) AND (StartEdge OR DeadmanArmedEdge) AND NOT Fault.Latched` → AX1. |
 | **Q2** | 🟡 défaut | `AX1_HOMING` **gardé** (garde de position redondante, ripple minimal). Fusion AX0→AX2 = plus tard si besoin. |
-| **Q3** | 🟡 défaut | `AX0` garde tout son housekeeping actuel (dont `SampleCountDone := FALSE`). `AX_REPOS` n'écrit rien. |
-| **Q4** | 🟡 défaut | `AX13 → AX0` **direct** (rebouclage). `AX_REPOS` seulement au boot / première entrée SEMI_AUTO. |
-| **Q5** | ✅ | `E_CycleStep` → **`E_AutoCycleStep`** ; toutes valeurs `X*` → `AX*`. |
-| **Q6** | ✅ | `AX2` = pas de sélection. `SelectedWorkTarget` **supprimé** de l'interface. |
-| **Q7** | 🟡 | `CfgStartTopWindowM` : proposé **0,10 m** sous le capteur haut, **constante** (`CST_StartTopWindowM`) pour commencer, à ajuster banc. Message figé : « Amener les treuils en position haute (capteur haut) en maintenance avant de lancer le cycle ». |
+| **Q3** | ✅ | `AX0_REPOS` garde son contenu de park (mise a 0 des ordres + Lifecycle idle + `SampleCountDone := FALSE`). |
+| **Q4** | 🟡 défaut | `AX13 → AX0` **direct** (rebouclage) sur `StartEdge`. |
+| **Q5** | ✅ | `E_CycleStep` → **`E_AutoCycleStep`** ; toutes valeurs `X*` → `AX*` (valeurs numeriques inchangees). |
+| **Q6** | ✅ | `AX2` = pas de selection. `SelectedWorkTarget` **supprime** de l'interface. |
+| **Q7** | ❌ retire | pas de posture-check treuils sur AT0 (la mise en position M3/P1 est deja geree par AX2). |
 
 ---
 

@@ -306,7 +306,7 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active
 // donnée AVANT l'ordre. Il reflète que l'axe est PRÊT À FONCTIONNER (pas de défaut,
 // puissance, thermique) ET que la direction est physiquement possible (fins de course,
 // autorisation cible). Il ne reflète PAS la commande (homme-mort) : l'homme-mort est une
-// condition de COMMANDE (arbitrage FB_TranslationCmdArbitrationM3 / FB_Cycle), pas de
+// condition de COMMANDE (arbitrage FB_TranslationCmdArbitrationM3 / FB_CycleSemiAuto), pas de
 // possibilité — il n'entre donc PAS dans le permit exposé.
 // Pour M3, le Safety (FB_Safety_Translation) fournit les faits de sécurité :
 //   - TremieLimitClear = NOT LimitSwitchTremie (direction possible vers Trémie)
