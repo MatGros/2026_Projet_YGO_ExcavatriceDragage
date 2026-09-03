@@ -143,6 +143,20 @@
   (b) B2.2 « sortie X9 → STABILIZING → 2ᵉ cycle → 5 s pleins ». `TC-P04-023` (non-cumul StepMax)
   + assert `LastCycleDuration > 0` dans SCEN-NOM en place.
 
+## Zones C + D + G — split X11 + translation P1 + doc (fait, committé)
+- **D — split X11** : `X11_OPEN_DUMP` (11) → `X11A_DUMP_ARRIVE` (11, treuils arrêtés) +
+  `X11B_DUMP_OPEN` (15, ouverture benne, **2 treuils arrêtés**) ; `X11C_DUMP_REPOSITION` (16)
+  réservée non implémentée. Plus de descente couplée M1+M2 simultanée à l'ouverture benne →
+  la réserve « `FB_SyncDeviation` coupé pendant X11 » est résolue par construction.
+- **C — config treuil / translation** : X2/X10 → `PositionTgt` figé (P1 / trémie), plus de
+  `SelTarget` (**départ toujours P1** — C3.1). Au-delà de P1 côté maintenance : message
+  « sortir du semi-auto, revenir à P1 ». Étapes benne-seule (X3, X6, X11A, X11B) + X2
+  neutralisent explicitement les 2 treuils. Pas de DUT `ST_CycleStepWinchProfile` (discipline
+  par inspection). `PRG_05` non touché.
+- **G — doc** : `IHM_VARIABLES_MIGRATION.md` (lot T229 : `Cycle.Cmd.BtnSkipDrain`,
+  `Cycle.Cfg.DrainTime`, `Cycle.State.CurrentCycleElapsed/LastCycleDuration`, enum 15/16).
+  `FB_Hmi_BannerFormatter.st` : 3 arms `X11_OPEN_DUMP` → `X11A`/`X11B` (forcé par le rename).
+
 ## T226 — `FB_MachineHomingCycle` + `FB_Cycle` (Zone F, à cadrer)
 - **`FB_Cycle.X1_HOMING` gutté** : SEMI_AUTO n'est entré que si `MachineHomed` (AC1) → le cycle
   ne contient **plus aucun référencement**. Supprimer : l'entrée `HomingRequest`, la branche

@@ -322,3 +322,28 @@ Découplage strict entre les champs synoptiques IHM / Diagnostic de séquence et
 | `GVL_IHM.DredgingAssist.State.ExtractionStepAtFault` | Mémorisation de l'étape active lors de l'apparition d'un défaut d'extraction (`E_ExtractionSequenceState`) | Produit par `FB_ExtractionSequence.StepAtFault` $\to$ exposé par `PRG_03.Data.SequenceState.ExtractionStepAtFault` $\to$ projeté exclusivement dans `PRG_07_Supervision`. |
 
 
+
+---
+
+## 🆕 Lot T229 — Refonte séquenceur cycle (durée cycle, égouttage IHM, split X11)
+
+### Nouvelles variables IHM
+
+| Chemin | Type | Rôle | Ownership / flux |
+|---|---|---|---|
+| `GVL_IHM.Cycle.Cmd.BtnSkipDrain` | `BOOL` | Bouton IHM « passer l'égouttage » (front) : sortie X9 avant fin de tempo | IHM → `PRG_03` → `FB_Cycle.SkipDrainRequest` |
+| `GVL_IHM.Cycle.Cfg.DrainTime` | `TIME := T#5s` | Durée d'égouttage X9 configurable (≤ 0 → défaut interne 5 s) | IHM (persist) → `PRG_03` → `FB_Cycle.CfgDrainTime` |
+| `GVL_IHM.Cycle.State.CurrentCycleElapsed` | `TIME` | Durée écoulée du cycle SEMI_AUTO en cours (chrono sur `Lifecycle.Busy`) | `FB_Cycle` → `PRG_03.Data.SequenceState` → `PRG_07` → IHM |
+| `GVL_IHM.Cycle.State.LastCycleDuration` | `TIME` | Durée du dernier cycle achevé (figée à X13, persiste au cycle suivant) | idem |
+
+### Changement d'énumération `E_CycleStep` (⚠️ valeurs)
+
+| Avant | Après | Valeur |
+|---|---|---|
+| `X11_OPEN_DUMP` | `X11A_DUMP_ARRIVE` | **11 (inchangée)** — sémantique : arrivée trémie, treuils arrêtés |
+| — | `X11B_DUMP_OPEN` | **15 (nouvelle)** — ouverture benne, treuils arrêtés |
+| — | `X11C_DUMP_REPOSITION` | **16 (nouvelle, RÉSERVÉE non implémentée)** |
+
+Un IHM/SCADA qui indexe un libellé par ordinal doit ajouter les entrées 15 et 16.
+La valeur 11 reste valide (ne pas la retirer des mappings) mais son libellé passe de
+« vidage benne » à « arrivée trémie ». `STABILIZING` reste **14**, `X13_DONE_SYNC` reste **13**.

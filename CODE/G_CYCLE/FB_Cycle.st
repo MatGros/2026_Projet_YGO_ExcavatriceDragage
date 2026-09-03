@@ -430,28 +430,42 @@ CASE State OF
 
     E_CycleStep.X2_WORK_POS_SELECT:
         CycleStep := E_CycleStep.X2_WORK_POS_SELECT;
-        CycleStateStr := 'X2 - Selection position travail';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
-        ExpectedDirection := 0;
-        WaitingForOperator := (SelTarget = 0) OR NOT JoystickDeflected;
-        WaitingForProcess := (SelTarget <> 0) AND JoystickDeflected;
-        OperatorActionId := 16#0402;
-        OperatorAction := 'Selectionner la cible et maintenir la translation vers la position de travail.';
+        // C3.1 : le cycle part TOUJOURS de P1 (plus de selection de cible). Le treuil est a
+        // l'arret ; l'operateur amene M3 a P1 au joystick (ralenti automatique au capteur PV
+        // et arret sur FDC P1 assures par PRG_05/FB_Translation, comme en maintenance).
+        // Le cycle ne fait que fournir la consigne cible (P1) + surveiller l'arrivee.
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        SelectedWorkTarget := 3;                  // P1, fige
+        TranslationCmd.PositionTgt := 3;          // cible P1 (le sens/ralenti PV/arret FDC = PRG_05)
 
-        IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
-            SelectedWorkTarget := SelTarget;
-            TranslationCmd.PositionTgt := SelTarget;
+        IF Translation_At_P1 THEN
+            ExpectedDirection := 0;
+            WaitingForOperator := FALSE;
+            WaitingForProcess := TRUE;
+            OperatorActionId := 16#0402;
+            OperatorAction := 'Position P1 atteinte.';
+            TranslationCmd.ReqStart := FALSE;
+            State := E_CycleStep.X3_OPEN_BUCKET;
+        ELSIF Translation_At_Maintenance THEN
+            // Au-dela de P1 cote maintenance : le cycle ne ramene pas M3 -> l'operateur sort.
+            ExpectedDirection := 0;
+            WaitingForOperator := TRUE;
+            WaitingForProcess := FALSE;
+            OperatorActionId := 16#0402;
+            OperatorAction := 'Chariot cote maintenance : sortir du semi-auto, revenir a P1, relancer.';
+            TranslationCmd.ReqStart := FALSE;
+        ELSE
+            // Entre tremie et P1 : consigne "joystick vers P1", maintien requis.
+            ExpectedDirection := -1;
+            WaitingForOperator := NOT JoystickDeflected;
+            WaitingForProcess := JoystickDeflected;
+            OperatorActionId := 16#0402;
+            OperatorAction := 'Maintenir le joystick vers P1 : arret automatique sur P1.';
             TranslationCmd.ReqStart := CycleMotionPermit;
-            // Arrivée à la cible (Trémie/P1/Maintenance)
-            IF JoystickDeflected AND (
-                (SelTarget = 1 AND Translation_At_Tremie) OR
-                (SelTarget = 3 AND Translation_At_P1) OR
-                (SelTarget = 4 AND Translation_At_Maintenance)) THEN
-                TranslationCmd.ReqStart := FALSE;
-                State := E_CycleStep.X3_OPEN_BUCKET;
-            END_IF;
         END_IF;
 
     E_CycleStep.X3_OPEN_BUCKET:
@@ -465,6 +479,10 @@ CASE State OF
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0403;
         OperatorAction := 'Maintenir le joystick : ouverture complete de la benne.';
+
+        // X3 = etape benne seule : treuils explicitement neutralises (config treuil unique par etape).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
         IF Benne_IsOpen THEN
             State := E_CycleStep.X4_DESCEND_OPEN;
@@ -649,12 +667,12 @@ CASE State OF
 
         IF JoystickDeflected AND Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
-            State := E_CycleStep.X11_OPEN_DUMP;
+            State := E_CycleStep.X11A_DUMP_ARRIVE;
         END_IF;
 
-    E_CycleStep.X11_OPEN_DUMP:
-        CycleStep := E_CycleStep.X11_OPEN_DUMP;
-        CycleStateStr := 'X11 - Vidange / ouverture du godet (montee possible, descente ouvre)';
+    E_CycleStep.X11A_DUMP_ARRIVE:
+        CycleStep := E_CycleStep.X11A_DUMP_ARRIVE;
+        CycleStateStr := 'X11a - Arrivee tremie : treuils arretes, attente ouverture';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -662,19 +680,36 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'Deflechir vers le bas pour ouvrir la benne et vider la charge.';
+        OperatorAction := 'A la tremie : deflechir vers le bas pour ouvrir la benne et vider.';
 
-        // X11 est une ouverture par déflexion vers le bas : la direction doit
-        // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
-        // précédent). Les deux treuils restent synchrones et sous homme-mort.
-        WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
-        WinchM1Cmd.StepTgt  := CST_StepSlow;
-        WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
-        WinchM2Cmd.StepTgt  := CST_StepSlow;
+        // Config treuil UNIQUE : arret des deux treuils (aucune descente couplee ici).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
-        BucketCmd.ReqOpen := CycleMotionPermit AND WinchM1Cmd.ReqDescend;
+        // Geste operateur (manche defleci) -> phase d'ouverture benne.
+        IF JoystickDeflected THEN
+            State := E_CycleStep.X11B_DUMP_OPEN;
+        END_IF;
+
+    E_CycleStep.X11B_DUMP_OPEN:
+        CycleStep := E_CycleStep.X11B_DUMP_OPEN;
+        CycleStateStr := 'X11b - Vidage : ouverture benne, treuils arretes';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
+        OperatorActionId := 16#040B;
+        OperatorAction := 'Maintenir : ouverture complete de la benne, vidage a la tremie.';
+
+        // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
+        // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -> plus
+        // d'ecart M1/M2 volontaire ni de faux SafeStop concordance contacteurs).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+
+        BucketCmd.ReqOpen := CycleMotionPermit;
 
         IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
