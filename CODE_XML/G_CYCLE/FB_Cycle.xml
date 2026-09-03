@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:38:53.934355" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:38:53.934355">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:47:30.515692" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:47:30.515692">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -136,7 +136,7 @@
               <EnumValue>
                 <Name>X11B_DUMP_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage : M2 piloté seul (M1 tenu), ouverture benne ; sync contacteurs OFF via Bucket.Busy</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage à la trémie : ouverture benne, LES DEUX treuils à l'arrêt (aucune descente couplée)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -662,7 +662,7 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CIBLES ET CONFIGURATION ===
---&gt; [CFG] Cible selectionnee (1=Tremie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
+--&gt; [CFG] RESERVE (C3.1 : le cycle part toujours de P1, plus de selection de cible). Cable, non consomme.</xhtml>
               </documentation>
             </variable>
             <variable name="SetDepthM">
@@ -1236,7 +1236,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible de travail memorisee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible de travail (fige a 3=P1 depuis C3.1) - conserve pour diag/futur</xhtml>
               </documentation>
             </variable>
             <variable name="StepMaxPrevState">
@@ -1716,6 +1716,7 @@ CASE State OF
 
     E_CycleStep.X2_WORK_POS_SELECT:
         CycleStep := E_CycleStep.X2_WORK_POS_SELECT;
+        CycleStateStr := 'X2 - Mise en position P1 (translation)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
@@ -1742,7 +1743,7 @@ CASE State OF
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0402;
-            OperatorAction := 'Chariot cote maintenance : sortir du semi-auto, revenir a P1, relancer.';
+            OperatorAction := 'Chariot cote maintenance : Abandon cycle, revenir a P1 en maintenance, relancer.';
             TranslationCmd.ReqStart := FALSE;
         ELSE
             // Entre tremie et P1 : consigne "joystick vers P1", maintien requis.

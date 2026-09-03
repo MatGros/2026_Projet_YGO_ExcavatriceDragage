@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:38:53.935401" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:38:53.935401">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:46:59.846766" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:46:59.846766">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -136,7 +136,7 @@
               <EnumValue>
                 <Name>X11B_DUMP_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage : M2 piloté seul (M1 tenu), ouverture benne ; sync contacteurs OFF via Bucket.Busy</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage à la trémie : ouverture benne, LES DEUX treuils à l'arrêt (aucune descente couplée)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
