@@ -1042,6 +1042,53 @@ TEST 'TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et 
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest, 'X11b : M1 arrete (pas de descente couplee)');
     ASSERT_FALSE(FB.WinchM2Cmd.RunRequest, 'X11b : M2 arrete (pas de descente couplee)');
 
+    (* ⬇️ Call 21b : option repositionnement (BtnReposition) -> X11c *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       RepositionRequest := TRUE, SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := FB.SampleCount);
+    (* 👀 Call 21c : X11c observe -> descente couplee M1+M2 symetrique palier lent *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       RepositionRequest := TRUE, SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X11C_DUMP_REPOSITION, 'X11c observe : repositionnement couple');
+    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest, 'X11c : M1 ET M2 commandes');
+    ASSERT_TRUE(FB.WinchM1Cmd.ReqDescend AND FB.WinchM2Cmd.ReqDescend, 'X11c : descente couplee symetrique');
+    ASSERT_EQ(FB.WinchM1Cmd.StepTgt, FB.WinchM2Cmd.StepTgt, 'X11c : meme palier M1/M2');
+    (* 🔼 Call 21d : relache l'option -> retour X11b *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       RepositionRequest := FALSE, SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := FB.SampleCount);
+    (* 👀 Call 21e : X11b observe de nouveau *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
+       RepositionRequest := FALSE, SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
+       SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
+       HomedM1 := TRUE, HomedM2 := TRUE, TopPositionSensor := TRUE,
+       M1_CablePosM := 7.0, M2_CablePosM := 7.0, KoboldContactFond := FALSE,
+       Translation_At_P1 := FALSE, Translation_At_Tremie := TRUE, Translation_Done := TRUE,
+       Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
+       SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.CycleStep = E_CycleStep.X11B_DUMP_OPEN, 'X11c -> X11b au relachement de l option');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest, 'Retour X11b : M1 de nouveau arrete');
+
     (* ✅ Call 22 : benne ouverte → X13 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, HeartbeatIhmOk := TRUE,

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:46:59.846766" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:46:59.846766">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:58:03.489479" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:58:03.489479">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -142,7 +142,7 @@
               <EnumValue>
                 <Name>X11C_DUMP_REPOSITION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">RÉSERVÉ (non implémenté) : repositionnement couplé M1+M2 optionnel avant reprise du vidage</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repositionnement couplé M1+M2 (option IHM maintenue) : descente lente pour dégager la vidange, retour X11b au relâchement</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

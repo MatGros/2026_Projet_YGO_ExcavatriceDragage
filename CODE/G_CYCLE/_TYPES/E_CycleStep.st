@@ -22,6 +22,6 @@ TYPE E_CycleStep :
   X13_DONE_SYNC       := 13,  (* Fin de cycle, synchronisation finale (R4) + compteur + durée cycle *)
   STABILIZING         := 14,  (* État d'attente/stabilisation — pas une erreur *)
   X11B_DUMP_OPEN      := 15,  (* Vidage à la trémie : ouverture benne, LES DEUX treuils à l'arrêt (aucune descente couplée) *)
-  X11C_DUMP_REPOSITION := 16  (* RÉSERVÉ (non implémenté) : repositionnement couplé M1+M2 optionnel avant reprise du vidage *)
+  X11C_DUMP_REPOSITION := 16  (* Repositionnement couplé M1+M2 (option IHM maintenue) : descente lente pour dégager la vidange, retour X11b au relâchement *)
 );
 END_TYPE

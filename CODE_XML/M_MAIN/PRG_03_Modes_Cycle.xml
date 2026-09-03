@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:13:42.256636" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:13:42.256636">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:57:52.165707" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:57:52.165707">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -275,9 +275,11 @@ Position minimale avant descente (m)</xhtml>
               <value name="X8_ASCENT_LOADED" value="8" />
               <value name="X9_DRAIN_PAUSE" value="9" />
               <value name="X10_TRANSLATE_DUMP" value="10" />
-              <value name="X11_OPEN_DUMP" value="11" />
+              <value name="X11A_DUMP_ARRIVE" value="11" />
               <value name="X13_DONE_SYNC" value="13" />
               <value name="STABILIZING" value="14" />
+              <value name="X11B_DUMP_OPEN" value="15" />
+              <value name="X11C_DUMP_REPOSITION" value="16" />
             </values>
           </enum>
         </baseType>
@@ -341,31 +343,43 @@ Position minimale avant descente (m)</xhtml>
               <EnumValue>
                 <Name>X9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — temps affiché IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — durée configurable / passable IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie + avertissements IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie (départ P1) + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X11_OPEN_DUMP</Name>
+                <Name>X11A_DUMP_ARRIVE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrivée trémie : treuils à l'arrêt, attente geste opérateur (ex-X11)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur + durée cycle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>STABILIZING</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X11B_DUMP_OPEN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage à la trémie : ouverture benne, LES DEUX treuils à l'arrêt (aucune descente couplée)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X11C_DUMP_REPOSITION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repositionnement couplé M1+M2 (option IHM maintenue) : descente lente pour dégager la vidange, retour X11b au relâchement</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -2097,6 +2111,7 @@ instCycleSemiAuto(
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
     CfgDrainTime            := GVL_IHM.Cycle.Cfg.DrainTime,
     SkipDrainRequest        := GVL_IHM.Cycle.Cmd.BtnSkipDrain,
+    RepositionRequest       := GVL_IHM.Cycle.Cmd.BtnReposition,
     SampleCount            := _CycleSampleCount
 );
 
@@ -2455,7 +2470,7 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CIBLES ET CONFIGURATION ===
---&gt; [CFG] Cible selectionnee (1=Tremie, 2=P2, 3=P1, 4=Maintenance)</xhtml>
+--&gt; [CFG] RESERVE (C3.1 : le cycle part toujours de P1, plus de selection de cible). Cable, non consomme.</xhtml>
               </documentation>
             </variable>
             <variable name="SetDepthM">
@@ -2701,6 +2716,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Bouton IHM : passer l'etape d'egouttage X9 (front)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RepositionRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Option IHM (maintenue) : repositionnement couple M1+M2 pendant le vidage tremie (X11b &lt;-&gt; X11c)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -3029,7 +3052,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible de travail memorisee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible de travail (fige a 3=P1 depuis C3.1) - conserve pour diag/futur</xhtml>
               </documentation>
             </variable>
             <variable name="StepMaxPrevState">
@@ -3209,6 +3232,20 @@ Palier lent : referencement X1, remontee X5, controle X7, vidage X11</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier montee en charge X8 (bridage strict &lt;= 4, jamais palier 5)</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_CoupledPosBacklashM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Backstop anti-telescopage : ecart de position M1/M2 max tolere pendant les phases
+reellement couplees hors X7 (qui a deja son propre controle a 0,25 m). Aligne sur
+CfgSyncCriticalToleranceM = 0,50 m (AF-04 §5). FB_SyncDeviation (PRG_04) reste la
+surveillance primaire ; ceci est un garde-fou local au sequenceur.</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -3299,6 +3336,19 @@ instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(M1_CablePosM - M2_CableP
                           AND (State = E_CycleStep.X7_CTRL_ASCENT);
 instCauses[5].Latching := TRUE;
 instCauses[5].Texte    := 'Defaut de stabilisation / tolerance ecart codeurs en remontee controle';
+
+// Backstop anti-telescopage : ecart de position M1/M2 excessif pendant une phase
+// reellement couplee (X4 plongee, X5 remontee, X8 montee en charge). X7 a deja son
+// propre controle (instCauses[5]). Seuil grossier (0,50 m) : filet local si
+// FB_SyncDeviation (PRG_04) ne coupe pas.
+instCauses[6].Active   := (ABS(M1_CablePosM - M2_CablePosM) &gt; CST_CoupledPosBacklashM)
+                          AND JoystickDeflected
+                          AND ((State = E_CycleStep.X4_DESCEND_OPEN)
+                            OR (State = E_CycleStep.X5_BOTTOM_CONFIRMED)
+                            OR (State = E_CycleStep.X8_ASCENT_LOADED)
+                            OR (State = E_CycleStep.X11C_DUMP_REPOSITION));
+instCauses[6].Latching := TRUE;
+instCauses[6].Texte    := 'Ecart de position M1/M2 excessif en phase couplee (anti-telescopage)';
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -3483,28 +3533,43 @@ CASE State OF
 
     E_CycleStep.X2_WORK_POS_SELECT:
         CycleStep := E_CycleStep.X2_WORK_POS_SELECT;
-        CycleStateStr := 'X2 - Selection position travail';
+        CycleStateStr := 'X2 - Mise en position P1 (translation)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
-        ExpectedDirection := 0;
-        WaitingForOperator := (SelTarget = 0) OR NOT JoystickDeflected;
-        WaitingForProcess := (SelTarget &lt;&gt; 0) AND JoystickDeflected;
-        OperatorActionId := 16#0402;
-        OperatorAction := 'Selectionner la cible et maintenir la translation vers la position de travail.';
+        // C3.1 : le cycle part TOUJOURS de P1 (plus de selection de cible). Le treuil est a
+        // l'arret ; l'operateur amene M3 a P1 au joystick (ralenti automatique au capteur PV
+        // et arret sur FDC P1 assures par PRG_05/FB_Translation, comme en maintenance).
+        // Le cycle ne fait que fournir la consigne cible (P1) + surveiller l'arrivee.
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        SelectedWorkTarget := 3;                  // P1, fige
+        TranslationCmd.PositionTgt := 3;          // cible P1 (le sens/ralenti PV/arret FDC = PRG_05)
 
-        IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
-            SelectedWorkTarget := SelTarget;
-            TranslationCmd.PositionTgt := SelTarget;
+        IF Translation_At_P1 THEN
+            ExpectedDirection := 0;
+            WaitingForOperator := FALSE;
+            WaitingForProcess := TRUE;
+            OperatorActionId := 16#0402;
+            OperatorAction := 'Position P1 atteinte.';
+            TranslationCmd.ReqStart := FALSE;
+            State := E_CycleStep.X3_OPEN_BUCKET;
+        ELSIF Translation_At_Maintenance THEN
+            // Au-dela de P1 cote maintenance : le cycle ne ramene pas M3 -&gt; l'operateur sort.
+            ExpectedDirection := 0;
+            WaitingForOperator := TRUE;
+            WaitingForProcess := FALSE;
+            OperatorActionId := 16#0402;
+            OperatorAction := 'Chariot cote maintenance : Abandon cycle, revenir a P1 en maintenance, relancer.';
+            TranslationCmd.ReqStart := FALSE;
+        ELSE
+            // Entre tremie et P1 : consigne "joystick vers P1", maintien requis.
+            ExpectedDirection := -1;
+            WaitingForOperator := NOT JoystickDeflected;
+            WaitingForProcess := JoystickDeflected;
+            OperatorActionId := 16#0402;
+            OperatorAction := 'Maintenir le joystick vers P1 : arret automatique sur P1.';
             TranslationCmd.ReqStart := CycleMotionPermit;
-            // Arrivée à la cible (Trémie/P1/Maintenance)
-            IF JoystickDeflected AND (
-                (SelTarget = 1 AND Translation_At_Tremie) OR
-                (SelTarget = 3 AND Translation_At_P1) OR
-                (SelTarget = 4 AND Translation_At_Maintenance)) THEN
-                TranslationCmd.ReqStart := FALSE;
-                State := E_CycleStep.X3_OPEN_BUCKET;
-            END_IF;
         END_IF;
 
     E_CycleStep.X3_OPEN_BUCKET:
@@ -3518,6 +3583,10 @@ CASE State OF
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0403;
         OperatorAction := 'Maintenir le joystick : ouverture complete de la benne.';
+
+        // X3 = etape benne seule : treuils explicitement neutralises (config treuil unique par etape).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
         IF Benne_IsOpen THEN
             State := E_CycleStep.X4_DESCEND_OPEN;
@@ -3702,12 +3771,12 @@ CASE State OF
 
         IF JoystickDeflected AND Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
-            State := E_CycleStep.X11_OPEN_DUMP;
+            State := E_CycleStep.X11A_DUMP_ARRIVE;
         END_IF;
 
-    E_CycleStep.X11_OPEN_DUMP:
-        CycleStep := E_CycleStep.X11_OPEN_DUMP;
-        CycleStateStr := 'X11 - Vidange / ouverture du godet (montee possible, descente ouvre)';
+    E_CycleStep.X11A_DUMP_ARRIVE:
+        CycleStep := E_CycleStep.X11A_DUMP_ARRIVE;
+        CycleStateStr := 'X11a - Arrivee tremie : treuils arretes, attente ouverture';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -3715,23 +3784,76 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'Deflechir vers le bas pour ouvrir la benne et vider la charge.';
+        OperatorAction := 'A la tremie : deflechir vers le bas pour ouvrir la benne et vider.';
 
-        // X11 est une ouverture par déflexion vers le bas : la direction doit
-        // être écrite avant d'être évaluée (ne jamais tester la valeur du scan
-        // précédent). Les deux treuils restent synchrones et sous homme-mort.
-        WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
-        WinchM1Cmd.StepTgt  := CST_StepSlow;
-        WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
-        WinchM2Cmd.StepTgt  := CST_StepSlow;
+        // Config treuil UNIQUE : arret des deux treuils (aucune descente couplee ici).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
-        BucketCmd.ReqOpen := CycleMotionPermit AND WinchM1Cmd.ReqDescend;
+        // Geste operateur (manche defleci) -&gt; phase d'ouverture benne.
+        IF JoystickDeflected THEN
+            State := E_CycleStep.X11B_DUMP_OPEN;
+        END_IF;
 
-        IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
+    E_CycleStep.X11B_DUMP_OPEN:
+        CycleStep := E_CycleStep.X11B_DUMP_OPEN;
+        CycleStateStr := 'X11b - Vidage : ouverture benne, treuils arretes';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
+        OperatorActionId := 16#040B;
+        OperatorAction := 'Maintenir : ouverture complete de la benne, vidage a la tremie.';
+
+        // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
+        // (plus de descente couplee M1+M2 simultanee a l'ouverture benne -&gt; plus
+        // d'ecart M1/M2 volontaire ni de faux SafeStop concordance contacteurs).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+
+        BucketCmd.ReqOpen := CycleMotionPermit;
+
+        // Option operateur (bit IHM) : descendre la benne dans la gueule de tremie
+        // pour aider la vidange -&gt; repositionnement couple M1+M2 (X11C). Prioritaire
+        // sur la fin de vidage.
+        IF RepositionRequest THEN
+            State := E_CycleStep.X11C_DUMP_REPOSITION;
+        ELSIF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
             State := E_CycleStep.X13_DONE_SYNC;
+        END_IF;
+
+    E_CycleStep.X11C_DUMP_REPOSITION:
+        CycleStep := E_CycleStep.X11C_DUMP_REPOSITION;
+        CycleStateStr := 'X11c - Repositionnement couple M1+M2 (aide vidange tremie)';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
+        OperatorActionId := 16#040C;
+        OperatorAction := 'Descente couplee M1+M2 ; relacher l option pour reprendre le vidage.';
+
+        // Descente couplee M1+M2, palier lent, sous homme-mort. Commandes SYMETRIQUES
+        // (meme sens, meme palier) -&gt; FB_SyncDeviation actif, pas d'ecart volontaire.
+        WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.StepTgt := CST_StepSlow;
+        WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.StepTgt := CST_StepSlow;
+
+        // La benne reste ouverte pendant le repositionnement (on finit l'ouverture si besoin).
+        BucketCmd.ReqOpen := CycleMotionPermit AND NOT Benne_IsOpen;
+
+        // Retour a X11B des que l'operateur relache l'option de repositionnement.
+        IF NOT RepositionRequest THEN
+            WinchM1Cmd.RunRequest := FALSE;
+            WinchM2Cmd.RunRequest := FALSE;
+            State := E_CycleStep.X11B_DUMP_OPEN;
         END_IF;
 
     E_CycleStep.X13_DONE_SYNC:
@@ -5630,7 +5752,17 @@ Auth.M2SpeedLow           := ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps;
 // le mode est un état de sélection, le mouvement est coupé en aval (FB_Cycle, FB_Safety_Winch,
 // FB_Winch) par PowerContactorEngaged et les interlocks. Seule la bascule N1/N2/SEMI_AUTO
 // reste soumise à l'arrêt mécanique confirmé des treuils (ModeChangeAllowed).
-IF (SelMode &lt;&gt; PrevArbitratedMode)
+// 3.2bis (AF-05 §4bis - referencement benne guide) : SEMI_AUTO est un mode "homed-only".
+// Une selection SEMI_AUTO sans datum machine valide (MachineHomed) est REFUSEE et le mode
+// est force vers MAINT_N1 (expulsion). Vaut aussi si MachineHomed retombe alors qu'on EST
+// en SEMI_AUTO (perte de datum -&gt; bascule MAINT_N1). Le SafeStop des treuils sur perte de
+// datum en mouvement est assure en aval (PRG_04 via MachineHoming.HomingLoss). L'expulsion
+// n'est jamais bloquee par l'arret mecanique (comme la sortie DISABLE, contrat D2).
+IF (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed THEN
+    Auth.Mode := E_Mode.MAINT_N1;
+    Auth.ModeChangePendingBlocked := TRUE;
+    Auth.ModeChangeBlockReason := 'SEMI_AUTO refuse : machine non referencee';
+ELSIF (SelMode &lt;&gt; PrevArbitratedMode)
       AND (SelMode &lt;&gt; E_Mode.DISABLE) AND (PrevArbitratedMode &lt;&gt; E_Mode.DISABLE)
       AND NOT ModeChangeAllowed THEN
     // Bascule N1/N2/SEMI_AUTO refusée : le mode courant est MAINTENU.
