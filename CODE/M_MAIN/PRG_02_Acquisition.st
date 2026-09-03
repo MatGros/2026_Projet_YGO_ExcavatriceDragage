@@ -40,7 +40,7 @@ VAR
     MachineHomingM1Status    : ST_fbMachineHomingCycle_AxisHomingStatus; // . [LOC] Statut homing M1
     MachineHomingM2Status    : ST_fbMachineHomingCycle_AxisHomingStatus; // . [LOC] Statut homing M2
     MachineHomingMechanicalStopOk : BOOL; // . [LOC] Arret mecanique conjoint M1/M2 confirme
-    MachineHomingCfg          : ST_fbMachineHomingCycle_Cfg; // . [LOC] Reglages geometriques referencement (cible M1 + ecarts benne)
+    MachineHomingCfg          : ST_fbMachineHomingCycle_Cfg; // . [LOC] Reglages geometriques referencement (cible haute M2/benne + ecarts + gardes)
     BucketReferenceOpenEdge  : R_TRIG; // . [LOC] Front confirmation benne ouverte
     BucketReferenceCloseEdge : R_TRIG; // . [LOC] Front confirmation benne fermee
     BucketReferenceRequested : BOOL;   // . [LOC] Homing materiel M2 requis par confirmation benne
@@ -440,7 +440,11 @@ ELSIF BucketReferenceCloseEdge.Q THEN
     BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
 
-MachineHomingCfg.CfgTopHomingTarget_M := _WinchM1CfgPersist.CfgTopSensorPos_M;
+// Cible haute du homing machine = position capteur de M2 (benne) : seule la cible
+// DYNAMIQUE M2 du cycle (FB_MachineHomingCycle §7) consomme ce champ ; M1 y home sur
+// sa propre config (ligne CfgTopSensorPosM M1 ci-dessous). Geometrie de mouflage
+// benne differente -> jamais la position M1.
+MachineHomingCfg.CfgTopHomingTarget_M := _WinchM2CfgPersist.CfgTopSensorPos_M;
 MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
 MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
 MachineHomingCfg.Initialized          := TRUE;
