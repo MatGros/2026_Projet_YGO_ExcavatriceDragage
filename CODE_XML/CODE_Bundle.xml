@@ -29301,7 +29301,7 @@ NeutralYAct := NeutralYMem;
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien &gt;= 300 ms d'un appui</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien &gt;= 150 ms d'un appui</xhtml>
               </documentation>
             </variable>
             <variable name="ValidationGapTimer">
@@ -29325,7 +29325,7 @@ NeutralYAct := NeutralYMem;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Appui courant maintenu &gt;= 300 ms (latch, lu au relachement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Appui courant maintenu &gt;= 150 ms (latch, lu au relachement)</xhtml>
               </documentation>
             </variable>
             <variable name="ExplicitValidationPulse">
@@ -29549,7 +29549,18 @@ Perte d'un datum valide pendant un mouvement (Latching)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MOTIF 3 APPUIS ===
-Duree minimale d'un appui pris en compte</xhtml>
+Debounce anti-flapping de l'auto-armement HX0-&gt;HX1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_ValidationPressHold">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#150ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Duree minimale d'un appui du motif 3 appuis</xhtml>
               </documentation>
             </variable>
             <variable name="CST_ValidationGap">
@@ -29690,7 +29701,7 @@ AutoArmTimer(IN := AutoArmCandidate, PT := CST_ValidationHold);
 ValidationBtnEdgeR(CLK := BtnValidation);
 ValidationBtnEdgeF(CLK := BtnValidation);
 StartEdge(CLK := StartRequest);
-ValidationHoldTimer(IN := BtnValidation, PT := CST_ValidationHold);
+ValidationHoldTimer(IN := BtnValidation, PT := CST_ValidationPressHold);
 ValidationGapTimer(IN := (ValidationPressCount &gt; 0) AND NOT BtnValidation, PT := CST_ValidationGap);
 
 // Latch "appui maintenu assez longtemps" : lu au relachement (le TON retombe le meme
