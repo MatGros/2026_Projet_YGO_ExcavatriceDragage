@@ -7,5 +7,6 @@ STRUCT
     BtnPause : BOOL; (* ⏸️ Pause cycle automatique *)
     BtnAbort : BOOL; (* ⏹️ Abandon / arrêt cycle automatique *)
     BtnReset : BOOL; (* 🔁 Reset dédié FB_Cycle, jamais mélangé au reset défauts général () *)
+    BtnSkipDrain : BOOL; (* ⏭️ Passer l'étape d'égouttage X9 (front) *)
 END_STRUCT
 END_TYPE

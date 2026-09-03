@@ -991,6 +991,7 @@ TEST 'TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et 
     ASSERT_TRUE(FB.CycleStep = E_CycleStep.X13_DONE_SYNC, 'X13 observe : cycle termine');
     ASSERT_TRUE(FB.Lifecycle.Done, 'X13 : Lifecycle.Done=TRUE');
     ASSERT_EQ(FB.SampleCount, 1, 'X13 : SampleCount incremente UNE fois (1er cycle)');
+    ASSERT_TRUE(FB.LastCycleDuration > T#0s, 'X13 : duree du cycle figee (> 0) - chronometre');
 
     (* 🔒 Call 24 : X13 2e scan, garde anti-double *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,

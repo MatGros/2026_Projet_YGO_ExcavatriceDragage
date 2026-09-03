@@ -23,6 +23,8 @@ STRUCT
     SpeedMismatchMps    : REAL;             // Écart absolu vitesse M1/M2 (m/s)
     SpeedMismatchActive : BOOL;             // Seuil vitesse dépassé
     SpeedMismatchConfirmed : BOOL;          // Écart vitesse confirmé pendant timeout
+    CurrentCycleElapsed : TIME;             // Durée écoulée du cycle SEMI_AUTO en cours
+    LastCycleDuration   : TIME;             // Durée du dernier cycle SEMI_AUTO achevé (figée à X13)
 
     // === 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
     DiveReady                   : BOOL;                    // Assistance plongée prête
