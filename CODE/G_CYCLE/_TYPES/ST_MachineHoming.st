@@ -14,8 +14,10 @@ STRUCT
     SetPosBucketClose: BOOL;          (* Valider position actuelle = reference benne fermee *)
     Active           : BOOL;          (* Homing conjoint en cours *)
     HomingLoss       : BOOL;          (* Perte reference en mouvement : arret controle SafeStop *)
-    Step             : INT;           (* Etape guidee reference *)
+    Step             : INT;           (* Etape guidee reference (echelle de priorite E_MachineHomingStep) *)
     Instruction      : STRING(120);   (* Consigne IHM reference *)
     Failed           : BOOL;          (* Transaction reference abandonnee *)
+    SeqStep          : INT;           (* Step GRAFCET courant (E_MachineHomingTxState HX0..HXF) *)
+    M3Locked         : BOOL;          (* Translation M3 interdite pendant le cycle de homing machine *)
 END_STRUCT
 END_TYPE

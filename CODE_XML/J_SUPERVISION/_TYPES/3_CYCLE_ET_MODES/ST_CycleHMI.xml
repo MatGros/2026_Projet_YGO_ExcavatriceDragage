@@ -82,6 +82,17 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décalage cible de fermeture de la benne (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="DrainTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#5s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en X9 (configurable IHM)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -140,6 +151,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔁 Reset dédié FB_Cycle, jamais mélangé au reset défauts général ()</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnSkipDrain">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏭️ Passer l'étape d'égouttage X9 (front)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnReposition">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ Option maintenue : repositionnement couplé M1+M2 pendant le vidage trémie (X11b &lt;-&gt; X11c)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -342,6 +369,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur de prélèvements (RETAIN, Q3bis)</xhtml>
               </documentation>
             </variable>
+            <variable name="CurrentCycleElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée écoulée du cycle en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="LastCycleDuration">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée du dernier cycle achevé (figée à X13)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -370,9 +413,11 @@
               <value name="X8_ASCENT_LOADED" value="8" />
               <value name="X9_DRAIN_PAUSE" value="9" />
               <value name="X10_TRANSLATE_DUMP" value="10" />
-              <value name="X11_OPEN_DUMP" value="11" />
+              <value name="X11A_DUMP_ARRIVE" value="11" />
               <value name="X13_DONE_SYNC" value="13" />
               <value name="STABILIZING" value="14" />
+              <value name="X11B_DUMP_OPEN" value="15" />
+              <value name="X11C_DUMP_REPOSITION" value="16" />
             </values>
           </enum>
         </baseType>
@@ -436,31 +481,43 @@
               <EnumValue>
                 <Name>X9_DRAIN_PAUSE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — temps affiché IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Égouttage temporisé — durée configurable / passable IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X10_TRANSLATE_DUMP</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie + avertissements IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers trémie (départ P1) + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>X11_OPEN_DUMP</Name>
+                <Name>X11A_DUMP_ARRIVE</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne = vidage ; montée possible, descente ouvre</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrivée trémie : treuils à l'arrêt, attente geste opérateur (ex-X11)</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>X13_DONE_SYNC</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle, synchronisation finale (R4) + compteur + durée cycle</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>STABILIZING</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">État d'attente/stabilisation — pas une erreur</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X11B_DUMP_OPEN</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage à la trémie : ouverture benne, LES DEUX treuils à l'arrêt (aucune descente couplée)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>X11C_DUMP_REPOSITION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repositionnement couplé M1+M2 (option IHM maintenue) : descente lente pour dégager la vidange, retour X11b au relâchement</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

@@ -443,19 +443,25 @@ END_IF;
 MachineHomingCfg.CfgTopHomingTarget_M := _WinchM1CfgPersist.CfgTopSensorPos_M;
 MachineHomingCfg.CfgOffsetOpen_M      := _BucketCfgPersist.Config.OffsetOpenM;
 MachineHomingCfg.CfgOffsetClose_M     := _BucketCfgPersist.Config.OffsetCloseM;
+MachineHomingCfg.Initialized          := TRUE;
 instMachineHomingCycle(
     Enable                     := TRUE,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
-    TopPositionActive          := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
+    TopPositionSensor          := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     WinchesMechanicallyStopped  := MachineHomingMechanicalStopOk,
     M1Status                   := MachineHomingM1Status,
     M2Status                   := MachineHomingM2Status,
     BucketOffsetValid          := PRG_04_Treuils_Benne.Data.BucketState.MechState.ActiveOffsetValid,
-    // Les fronts IHM benne sont consommes par la route materielle M2 ci-dessus.
-    // Le cycle reste producteur du guide/qualification, sans les rediriger vers M1.
-    ConfirmOpenPosition        := FALSE,
-    ConfirmClosePosition       := FALSE,
+    // Permis operateur maintenu (meme source que l'arbitrage joystick) : sens montee = manche
+    // tire (Y+), sens descente = manche pousse (Y-) ; ref. baseline continuite C1.
+    DeadmanArmed               := Data.Joystick.DeadmanArmed,
+    JoystickDeflected          := NOT Data.Joystick.AtNeutralXY,
+    JoystickPull               := Data.Joystick.AxisY.DirectionPositive,
+    JoystickPush               := Data.Joystick.AxisY.DirectionNegative,
+    // BP validation (motif 3 appuis) : source BP joystick a mapper en acquisition HW.
+    // En attente : forcable en Watch CODESYS pour la MES banc.
+    BtnValidation              := FALSE,
     Cfg                        := MachineHomingCfg
 );
 Data.MachineHoming.Homed            := instMachineHomingCycle.MachineHomed;
@@ -466,6 +472,8 @@ Data.MachineHoming.HomingLoss       := instMachineHomingCycle.MachineHomingLossS
 Data.MachineHoming.Step             := TO_INT(instMachineHomingCycle.MachineHomingStep);
 Data.MachineHoming.Instruction      := instMachineHomingCycle.MachineHomingInstruction;
 Data.MachineHoming.Failed           := instMachineHomingCycle.MachineHomingFailed;
+Data.MachineHoming.SeqStep          := TO_INT(instMachineHomingCycle.MachineHomingSeqStep);
+Data.MachineHoming.M3Locked         := instMachineHomingCycle.M3Locked;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;

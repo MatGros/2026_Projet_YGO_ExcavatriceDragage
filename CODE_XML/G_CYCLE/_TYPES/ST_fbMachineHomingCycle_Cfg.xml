@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T07:43:40.973960" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T07:43:40.973960">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T08:15:28.027110" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T08:15:28.027110">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -31,7 +31,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible haute configurée M1 (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible haute au capteur haut, commune M1 et M2 (m)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgOffsetOpen_M">
@@ -50,6 +50,39 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart géométrique benne fermée (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgTimeoutClimb">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#120s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde HX2 : montée au capteur haut (0 = pas de garde)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTimeoutHomeAxes">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#60s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde HX3 : descente jusqu'au front descendant capteur (0 = pas de garde)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Initialized">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Drapeau de restauration config au boot (pont persistant)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -61,11 +94,13 @@
           <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚙️ ST_fbMachineHomingCycle_Cfg — Réglages de FB_MachineHomingCycle
    ───────────────────────────────────────────────────────────────────────
-   🎯 Rôle : Regrouper les réglages géométriques du référencement machine
-             (cible haute M1 + écarts benne ouverte/fermée).
-   🔒 Ownership : produit par le call-site PRG_02_Acquisition depuis
-             _WinchM1CfgPersist et _BucketCfgPersist (GVL_PERSISTENT).
-   📄 Doc : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   🎯 Rôle : Réglages géométriques du référencement machine (cible haute
+             commune M1/M2 + écarts benne) + temporisations de garde du
+             GRAFCET de homing (montée, homing axes).
+   🔒 Ownership : produit par PRG_02_Acquisition depuis _WinchM1CfgPersist
+             et _BucketCfgPersist (GVL_PERSISTENT). Initialized : drapeau
+             de restauration boot (pont persistant).
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
    =======================================================================</xhtml>
         </documentation>
       </dataType>
