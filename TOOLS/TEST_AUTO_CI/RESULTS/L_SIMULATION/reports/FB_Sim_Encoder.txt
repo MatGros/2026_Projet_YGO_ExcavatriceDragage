@@ -1,0 +1,25 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Encoder_44j_0iqi\strucpp-test-88g5ki\test_main.cpp: In function 'bool test_1(strucpp::TestContext&)':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Encoder_44j_0iqi\strucpp-test-88g5ki\test_main.cpp:11:8: error: 'class strucpp::FB_SIM_ENCODER' has no member named 'SPEEDSTEP'
+   11 |     FB.SPEEDSTEP = 3;
+      |        ^~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Encoder_44j_0iqi\strucpp-test-88g5ki\test_main.cpp:14:27: error: 'class strucpp::FB_SIM_ENCODER' has no member named 'RAWCOUNT'
+   14 |     if (!ctx.assert_eq(FB.RAWCOUNT, 0, "FB.RAWCOUNT", "0", 11, "Enable FALSE -> RawCount 0")) return false;
+      |                           ^~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Encoder_44j_0iqi\strucpp-test-88g5ki\test_main.cpp:15:27: error: 'class strucpp::FB_SIM_ENCODER' has no member named 'LINEARPOSITIONM'
+   15 |     if (!ctx.assert_eq(FB.LINEARPOSITIONM, 0.0, "FB.LINEARPOSITIONM", "0.0", 12, "Enable FALSE -> Position 0.0")) return false;
+      |                           ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Encoder_44j_0iqi\strucpp-test-88g5ki\test_main.cpp: In function 'bool test_2(strucpp::TestContext&)':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Encoder_44j_0iqi\strucpp-test-88g5ki\test_main.cpp:23:8: error: 'class strucpp::FB_SIM_ENCODER' has no member named 'LINEARVELOCITYMPERS'
+   23 |     FB.LINEARVELOCITYMPERS = 1.0;
+      |        ^~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Encoder_44j_0iqi\strucpp-test-88g5ki\test_main.cpp:24:8: error: 'class strucpp::FB_SIM_ENCODER' has no member named 'SIMULATEASCENT'
+   24 |     FB.SIMULATEASCENT = true;
+      |        ^~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Encoder_44j_0iqi\strucpp-test-88g5ki\test_main.cpp:25:8: error: 'class strucpp::FB_SIM_ENCODER' has no member named 'SIMULATEDESCENT'
+   25 |     FB.SIMULATEDESCENT = false;
+      |        ^~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Encoder_44j_0iqi\strucpp-test-88g5ki\test_main.cpp:30:47: error: 'class strucpp::FB_SIM_ENCODER' has no member named 'RAWCOUNT'
+   30 |     if (!ctx.assert_true(static_cast<bool>(FB.RAWCOUNT > 0), "FB.RAWCOUNT > 0", 25, "Montee -> RawCount incremente")) return false;
+      |                                               ^~~~~~~~
+

@@ -1,0 +1,757 @@
+{
+  "FB_Encoder": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\E_CODEURS\\reports\\FB_Encoder.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "E_CODEURS"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:19"
+  },
+  "FB_Joystick": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\D_JOYSTICK\\reports\\FB_Joystick.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "D_JOYSTICK"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:23"
+  },
+  "FB_CycleTime": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\A_COMMUN\\reports\\A_COMMUN.html",
+    "report_group": "A_COMMUN",
+    "section_kwargs": {
+      "domain": "A_COMMUN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:23"
+  },
+  "FB_FaultCore": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\A_COMMUN\\reports\\A_COMMUN.html",
+    "report_group": "A_COMMUN",
+    "section_kwargs": {
+      "domain": "A_COMMUN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:23"
+  },
+  "FB_Ramp": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\A_COMMUN\\reports\\A_COMMUN.html",
+    "report_group": "A_COMMUN",
+    "section_kwargs": {
+      "domain": "A_COMMUN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:23"
+  },
+  "FB_Acquisition_Preflight": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\A_COMMUN\\reports\\A_COMMUN.html",
+    "report_group": "A_COMMUN",
+    "section_kwargs": {
+      "domain": "A_COMMUN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:23"
+  },
+  "FB_Filter": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\A_COMMUN\\reports\\A_COMMUN.html",
+    "report_group": "A_COMMUN",
+    "section_kwargs": {
+      "domain": "A_COMMUN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:23"
+  },
+  "FB_Brake": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\A_COMMUN\\reports\\A_COMMUN.html",
+    "report_group": "A_COMMUN",
+    "section_kwargs": {
+      "domain": "A_COMMUN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:23"
+  },
+  "FB_Safety_EmergencyManagement": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\B_AU_SECURITE\\reports\\FB_Safety_EmergencyManagement.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "B_AU_SECURITE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:15"
+  },
+  "FB_Diag_CanOpen": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\C_DIAG_RESEAUX\\reports\\FB_Diag_CanOpen.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "C_DIAG_RESEAUX"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:13"
+  },
+  "FB_Diag_Ethercat": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\C_DIAG_RESEAUX\\reports\\FB_Diag_Ethercat.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "C_DIAG_RESEAUX"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:13"
+  },
+  "FB_Diag_IhmHeartbeat": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\C_DIAG_RESEAUX\\reports\\FB_Diag_IhmHeartbeat.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "C_DIAG_RESEAUX"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:49:13"
+  },
+  "FB_Modes": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\F_MODES\\reports\\FB_Modes.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "F_MODES"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:57:50"
+  },
+  "FB_Cycle": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\G_CYCLE\\reports\\FB_Cycle.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "G_CYCLE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:58:19"
+  },
+  "FB_DiveSearch": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\G_CYCLE\\reports\\FB_DiveSearch.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "G_CYCLE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:52:05"
+  },
+  "FB_ExtractionAssist": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\G_CYCLE\\reports\\FB_ExtractionAssist.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "G_CYCLE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:52:05"
+  },
+  "FB_WinchLoadEstimator": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_Winch_Symmetry": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_WinchStepShaper": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_WinchDirectionInterlock": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_DriftGuard": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_SpeedStep": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_WinchSpeedLearning": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_Winch": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_Bucket": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_Safety_Winch": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_WinchOutputInterlock": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_WinchSync": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_SyncContactor": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_Translation": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\I_TRANSLATION\\reports\\I_TRANSLATION.html",
+    "report_group": "I_TRANSLATION",
+    "section_kwargs": {
+      "domain": "I_TRANSLATION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:12:53"
+  },
+  "FB_MachineHomingCycle": {
+    "ok": false,
+    "report": null,
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "G_CYCLE"
+    },
+    "tests": [],
+    "updated_at": null
+  },
+  "FB_SimBench": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\L_SIMULATION\\reports\\FB_SimBench.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "L_SIMULATION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 08:05:40"
+  },
+  "FB_Hmi_BannerFormatter": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\J_SUPERVISION\\reports\\FB_Hmi_BannerFormatter.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "J_SUPERVISION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 01:16:53"
+  },
+  "FB_TroubleshootingView": {
+    "ok": false,
+    "report": null,
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "J_SUPERVISION"
+    },
+    "tests": [],
+    "updated_at": null
+  },
+  "PRG_02_Acquisition": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\M_MAIN\\reports\\PRG_02_Acquisition.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "M_MAIN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:53:42"
+  },
+  "PRG_02_Acquisition_Archi": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\M_MAIN\\reports\\PRG_02_Acquisition_Archi.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "M_MAIN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:53:46"
+  },
+  "PRG_03_Modes_Cycle": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\M_MAIN\\reports\\PRG_03_Modes_Cycle.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "M_MAIN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:53:44"
+  },
+  "PRG_04_Treuils_Benne": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\M_MAIN\\reports\\PRG_04_Treuils_Benne.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "M_MAIN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:53:43"
+  },
+  "PRG_05_Translation": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\M_MAIN\\reports\\PRG_05_Translation.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "M_MAIN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:53:41"
+  },
+  "PRG_06_Outputs": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\M_MAIN\\reports\\PRG_06_Outputs.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "M_MAIN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:53:41"
+  },
+  "PRG_07_Supervision": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\M_MAIN\\reports\\PRG_07_Supervision.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "M_MAIN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:53:44"
+  },
+  "MAIN_GLOBAL": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\M_MAIN\\reports\\MAIN_GLOBAL.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "M_MAIN"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 07:53:46"
+  },
+  "WINCH_INTEG": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",
+    "report_group": "H_TREUILS_BENNE",
+    "section_kwargs": {
+      "domain": "H_TREUILS_BENNE"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:09:22"
+  },
+  "FB_Safety_Translation": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\I_TRANSLATION\\reports\\I_TRANSLATION.html",
+    "report_group": "I_TRANSLATION",
+    "section_kwargs": {
+      "domain": "I_TRANSLATION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:12:53"
+  },
+  "FB_TranslationOutputInterlock": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\I_TRANSLATION\\reports\\I_TRANSLATION.html",
+    "report_group": "I_TRANSLATION",
+    "section_kwargs": {
+      "domain": "I_TRANSLATION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:12:53"
+  },
+  "FB_Translation_PositionDecoder": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\I_TRANSLATION\\reports\\I_TRANSLATION.html",
+    "report_group": "I_TRANSLATION",
+    "section_kwargs": {
+      "domain": "I_TRANSLATION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:12:53"
+  },
+  "FB_Translation_PositionEstimator": {
+    "ok": false,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\I_TRANSLATION\\reports\\I_TRANSLATION.html",
+    "report_group": "I_TRANSLATION",
+    "section_kwargs": {
+      "domain": "I_TRANSLATION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": false
+      }
+    ],
+    "updated_at": "2026-09-03 08:12:53"
+  },
+  "FB_Sim_Encoder": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\L_SIMULATION\\reports\\FB_Sim_Encoder.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "L_SIMULATION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 08:05:40"
+  },
+  "FB_Sim_Joystick": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\L_SIMULATION\\reports\\FB_Sim_Joystick.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "L_SIMULATION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 08:05:40"
+  },
+  "FB_Sim_Safety": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\L_SIMULATION\\reports\\FB_Sim_Safety.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "L_SIMULATION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 08:05:40"
+  },
+  "FB_Sim_Translation": {
+    "ok": true,
+    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\L_SIMULATION\\reports\\FB_Sim_Translation.html",
+    "report_group": null,
+    "section_kwargs": {
+      "domain": "L_SIMULATION"
+    },
+    "tests": [
+      {
+        "name": "Statut sauvegarde",
+        "passed": true
+      }
+    ],
+    "updated_at": "2026-09-03 08:05:47"
+  }
+}

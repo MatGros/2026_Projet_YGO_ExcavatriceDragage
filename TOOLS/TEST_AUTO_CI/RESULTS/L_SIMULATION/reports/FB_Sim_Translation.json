@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_translation.st",
+  "results": [
+    {
+      "name": "TC-P13-TR-001 Enable FALSE -> capteurs tous a zero",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-TR-002 Position initiale a Tremie (mot 11111)",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0
+  }
+}

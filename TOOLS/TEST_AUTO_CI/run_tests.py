@@ -419,7 +419,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--fb", help="Nom du FB a tester (cle du registry.yaml)")
-    group.add_argument("--domain", help="Tester tous les FB d'un domaine (ex: AU_SECURITE, JOYSTICK)")
+    group.add_argument("--domain", nargs="+", help="Tester tous les FB d'un ou plusieurs domaines (ex: A_COMMUN B_AU_SECURITE)")
     group.add_argument("--all", action="store_true", help="Tester tous les FB du registre (defaut si aucune option)")
     parser.add_argument("-j", "--jobs", type=int, default=default_workers,
                         help=f"Nombre d'instances de test en parallele (defaut calibre : {default_workers} threads)")
@@ -446,10 +446,11 @@ def main() -> int:
     start_time = _time.perf_counter()
 
     if args.domain:
-        targets = {name: e for name, e in registry.items() if e["domain"] == args.domain}
+        req_domains = set(args.domain)
+        targets = {name: e for name, e in registry.items() if e["domain"] in req_domains}
         if not targets:
             domains = sorted({e["domain"] for e in registry.values()})
-            print(f"[ERREUR] Aucun FB dans le domaine '{args.domain}' -- domaines disponibles : {', '.join(domains)}")
+            print(f"[ERREUR] Aucun FB dans les domaines '{args.domain}' -- domaines disponibles : {', '.join(domains)}")
             return 1
     elif args.fb:
         if args.fb not in registry:
@@ -563,10 +564,56 @@ def main() -> int:
             uri = str(path)
         print(f"Rapport groupe {group_name} : {uri}")
 
-    # Génération du dashboard index.html à la racine de TEST_AUTO_CI
-    if generate_reports and (len(results) > 1 or args.all or args.domain):
+    # Génération du dashboard index.html à la racine de TEST_AUTO_CI (Maintien de l'intégralité des briques)
+    if generate_reports:
         from html_report import render_index_dashboard
-        index_html = render_index_dashboard(results, group_report_paths)
+        index_state_file = TEST_AUTO_CI / "RESULTS" / ".index_state.json"
+        saved_state = {}
+        if index_state_file.exists():
+            try:
+                import json
+                saved_state = json.loads(index_state_file.read_text(encoding="utf-8"))
+            except Exception:
+                saved_state = {}
+        
+        # Pour chaque FB de tout le registre, s'il n'a pas encore de state, l'initialiser
+        for reg_name, reg_entry in registry.items():
+            if reg_name not in saved_state:
+                r_dom = reg_entry.get("domain", "AUTRES")
+                r_rg = reg_entry.get("report_group")
+                if r_rg:
+                    r_rep = TEST_AUTO_CI / "RESULTS" / r_dom / "reports" / f"{r_rg}.html"
+                else:
+                    r_rep = TEST_AUTO_CI / "RESULTS" / r_dom / "reports" / f"{reg_name}.html"
+                r_exists = r_rep.exists()
+                saved_state[reg_name] = {
+                    "ok": False,
+                    "report": str(r_rep) if r_exists else None,
+                    "report_group": r_rg,
+                    "section_kwargs": {"domain": r_dom},
+                    "tests": []
+                }
+
+        # Mettre à jour avec les résultats fraîchement exécutés
+        now_str = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for name, res in results.items():
+            saved_state[name] = {
+                "ok": res.get("ok", False),
+                "report": str(res["report"]) if res.get("report") else None,
+                "report_group": res.get("report_group"),
+                "section_kwargs": res.get("section_kwargs", {}),
+                "tests": res.get("tests", []),
+                "updated_at": now_str
+            }
+
+        try:
+            import json
+            index_state_file.parent.mkdir(parents=True, exist_ok=True)
+            index_state_file.write_text(json.dumps(saved_state, indent=2), encoding="utf-8")
+        except Exception:
+            pass
+
+        index_html = render_index_dashboard(saved_state, group_report_paths)
         index_path = TEST_AUTO_CI / "index.html"
         index_path.write_text(index_html, encoding="utf-8")
         try:

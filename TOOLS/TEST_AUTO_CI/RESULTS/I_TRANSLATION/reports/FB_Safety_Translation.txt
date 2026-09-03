@@ -1,0 +1,10 @@
+Error in test file 'test_fb_safety_translation.st':
+
+test_fb_safety_translation.st:25:5: error: Undeclared variable 'I'
+  25 |     FOR i := 1 TO 350 DO
+     |     ^
+
+test_fb_safety_translation.st:47:5: error: Undeclared variable 'I'
+  47 |     FOR i := 1 TO 350 DO
+     |     ^
+

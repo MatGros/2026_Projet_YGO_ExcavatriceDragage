@@ -3,85 +3,41 @@
   "file": "test_fb_machinehomingcycle.st",
   "results": [
     {
-      "name": "TC-T185-001 : machine non qualifiee avec 2 codeurs seuls (offset benne absent)",
+      "name": "TC-P09-H001 : HX0 n emet aucune sortie (hors maintenance, pas d auto-armement)",
       "passed": true
     },
     {
-      "name": "TC-T185-010 : M1 non reference => M1_NOT_HOMED",
+      "name": "TC-P09-H002 : auto-armement HX0 -> HX1 en maintenance (N1) non-homed",
       "passed": true
     },
     {
-      "name": "TC-T185-011 : M2 non reference => M2_NOT_HOMED",
+      "name": "TC-P09-H010 : validation 3 appuis HX1 -> HX2 en MAINT_N2 (pas sur capteur)",
       "passed": true
     },
     {
-      "name": "TC-T185-012 : les deux non references => BOTH_NOT_HOMED",
+      "name": "TC-P09-H012 : entree cycle sur front commande IHM StartRequest, en MAINT_N2",
       "passed": true
     },
     {
-      "name": "TC-T185-020 : codeurs OK, offset absent, N2 sans capteur haut => NEED_TOP_POSITION",
+      "name": "TC-P09-H011 : hors maintenance, ni auto ni motif ni StartRequest n arment",
       "passed": true
     },
     {
-      "name": "TC-T185-021 : capteur haut atteint mais treuils non arretes => NEED_MECHANICAL_STOP",
+      "name": "TC-P09-H080 : NOT Enable -> sorties sures + MachineHomed FALSE + HX0",
       "passed": true
     },
     {
-      "name": "TC-T185-022 : fenetre sure => AWAIT_BUCKET_CONFIRM",
+      "name": "TC-P09-H082 : perte de datum EN MOUVEMENT -> SafeStop latche jusqu a arret + Reset",
       "passed": true
     },
     {
-      "name": "TC-T185-030 : confirmation refusee hors MAINT_N2",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-031 : confirmation fermee admissible => homing M1+M2, cible M2 = top + offset ferme, commit atomique",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-040 : abandon si capteur haut perdu pendant la transaction",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-041 : abandon si erreur homing M1 pendant la transaction",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-043 : HomingError present au scan exact du front de confirmation => abandon LE MEME SCAN, MachineHomed jamais TRUE",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-042 : abandon si mouvement pendant la transaction",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-050 : Confirm ouverte ET fermee au meme scan => aucune transaction + cause latchee",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-060 : confirmation ignoree si un homing d axe est deja Busy",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-070 : perte reference en mouvement => SafeStop, puis pas de requalification auto",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-080 : Enable FALSE en pleine transaction => retour IDLE, sorties sures",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-090 : aucune confirmation explicite => aucun commit benne",
-      "passed": true
-    },
-    {
-      "name": "TC-T185-091 : confirmation ouverte explicite => chemin ouvert exclusif",
+      "name": "TC-P09-H090 : guide BOTH_NOT_HOMED, entree cycle, AC4, HomingError -> FAILED",
       "passed": true
     }
   ],
   "summary": {
-    "total": 19,
-    "passed": 19,
+    "total": 8,
+    "passed": 8,
     "failed": 0
   }
 }

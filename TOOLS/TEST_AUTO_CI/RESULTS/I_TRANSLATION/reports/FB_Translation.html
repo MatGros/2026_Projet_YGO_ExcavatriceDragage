@@ -152,6 +152,53 @@
         display: block;
         text-align: center;
     }
+    /* Pastilles de provenance & typage des variables */
+    .var-prov-badge {
+        display: inline-block;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        margin-top: 3px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .badge-var-in { background: rgba(2, 132, 199, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .badge-var-out { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); }
+    .badge-var-inout { background: rgba(139, 92, 246, 0.18); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .badge-var-loc { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .badge-var-cst { background: rgba(217, 119, 6, 0.18); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+    .badge-var-hw { background: rgba(20, 184, 166, 0.18); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.35); }
+    .badge-var-gvl { background: rgba(14, 165, 233, 0.18); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.35); }
+    .badge-var-prg { background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.35); }
+    .badge-var-diag { background: rgba(217, 70, 239, 0.18); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.35); }
+    .badge-var-ext { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.35); }
+
+    [data-theme="light"] .badge-var-in { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-out { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .badge-var-inout { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+    [data-theme="light"] .badge-var-loc { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    [data-theme="light"] .badge-var-cst { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    [data-theme="light"] .badge-var-hw { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+    [data-theme="light"] .badge-var-gvl { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-prg { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .badge-var-diag { background: #fdf4ff; color: #a21caf; border-color: #fbcfe8; }
+    [data-theme="light"] .badge-var-ext { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+
+    .chrono-table th .th-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        pointer-events: auto;
+    }
+    .chrono-table th .var-name-lbl {
+        font-family: monospace;
+        font-weight: 700;
+        font-size: 11px;
+    }
     /* Mode Titres Verticaux (Compact) */
     .chrono-table.headers-vertical {
         width: max-content !important;
@@ -162,7 +209,7 @@
         width: 280px !important;
     }
     .chrono-table.headers-vertical th.var-th {
-        height: 155px;
+        height: 165px;
         vertical-align: bottom;
         padding-bottom: 10px;
         padding-top: 10px;
@@ -173,26 +220,36 @@
     .chrono-table.headers-vertical th.var-th .th-content {
         writing-mode: vertical-rl;
         transform: rotate(180deg);
-        display: inline-block;
+        display: inline-flex;
+        flex-direction: row-reverse;
+        align-items: center;
         white-space: nowrap;
         text-align: left;
-        max-height: 135px;
+        max-height: 145px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .chrono-table th .th-content {
-        display: inline-block;
-        pointer-events: auto;
+    .chrono-table.headers-vertical th.var-th .var-prov-badge {
+        margin-top: 0;
+        margin-left: 4px;
     }
     .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
     .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
     [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
     [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
-    .chrono-note-cell { text-align: left !important; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
-    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 310px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-cell { text-align: left !important; max-width: 360px; font-size: 11px; }
+    .chrono-note-container { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
     .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    .chrono-chk-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; padding: 2px 8px; font-weight: 600; font-size: 10.5px; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
+    .chrono-chk-pass { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .chrono-chk-fail { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .chrono-chk-chip .chk-icon { font-weight: 800; font-size: 11.5px; }
     [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
     [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    [data-theme="light"] .chrono-chk-pass { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .chrono-chk-fail { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .wf-check-marker { font-size: 12px; fill: #10b981; font-weight: 800; text-anchor: middle; font-family: monospace; cursor: help; }
     .v-true { color: #34d399; font-weight: 700; }
     .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
@@ -229,6 +286,7 @@
     .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
     [data-theme="light"] .wf-tt-head { color: #0284c7; }
     .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-meta { font-size: 10.5px; margin-bottom: 4px; }
     .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
     .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
     .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
@@ -315,7 +373,7 @@
             <span class="badge badge-fail">FAIL</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-03 01:16:48</div>
+    <div class="exec-time">2026-09-03 12:21:24</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (37 tests)</summary>
@@ -785,9 +843,10 @@
         <div style="margin-top: 12px;">
             
         <article id="test-fb-translation-0" class="test-card test-card-pass test-card-collapsed test-card-contract">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <h3 style="flex: 1; user-select: text;">TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure <span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:4px;">🧬 CONTRAT & INTERFACE</span></h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P03-001 Dynamique Enable : neutralisation initiale, transition Ready au repos, puis coupure')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -813,9 +872,10 @@
         <div style="margin-top: 12px;">
             
         <article id="test-fb-translation-1" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-001 Safety_Translation : Enable=FALSE neutralise les autorisations')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -830,9 +890,10 @@
             </div>
         </article>
         <article id="test-fb-translation-2" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-010 Translation : commande variateur nominale </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-010 Translation : commande variateur nominale </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-010 Translation : commande variateur nominale')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -851,9 +912,10 @@
             </div>
         </article>
         <article id="test-fb-translation-3" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-001 PositionDecoder : 6 mots valides acceptes, autre -&gt; Incoherent')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -872,9 +934,10 @@
             </div>
         </article>
         <article id="test-fb-translation-4" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-002 Safety : mot capteurs incoherent -&gt; bit7 -&gt; SafeStop+PowerCutOff')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -893,9 +956,10 @@
             </div>
         </article>
         <article id="test-fb-translation-5" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-003 Translation Enable=FALSE coupe tout independamment de SafeStop/StartStop')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -914,9 +978,10 @@
             </div>
         </article>
         <article id="test-fb-translation-6" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-004 Translation ralentissement PV (Direction=1 + SlowdownSensorTremie)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -935,9 +1000,10 @@
             </div>
         </article>
         <article id="test-fb-translation-7" class="test-card test-card-fail">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-fail">FAIL</span>
-                <h3 style="flex: 1;">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-005 Translation interlock sens : inversion Fwd-&gt;Rev differee (pas immediate)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -956,9 +1022,10 @@
             </div>
         </article>
         <article id="test-fb-translation-8" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-013 Boutons IHM MAINT exigent DeadmanArmed (essai manuel — stub)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -979,9 +1046,10 @@
             </div>
         </article>
         <article id="test-fb-translation-9" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-006 Watchdog frein 500ms : frontiere 499/500 </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-006 Watchdog frein 500ms : frontiere 499/500 </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-006 Watchdog frein 500ms : frontiere 499/500')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1000,9 +1068,10 @@
             </div>
         </article>
         <article id="test-fb-translation-10" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-007 Apres timeout frein : RestartInhibit, acquittement Reset + reautorisation')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1021,9 +1090,10 @@
             </div>
         </article>
         <article id="test-fb-translation-11" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-008 Gate final : mot/freq nuls sans confirmation frein simultanee')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1042,9 +1112,10 @@
             </div>
         </article>
         <article id="test-fb-translation-12" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-009 Mot 7 (reset AC600) autorise pendant RestartInhibit')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1063,9 +1134,10 @@
             </div>
         </article>
         <article id="test-fb-translation-13" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-011 Meca B : incohérence arret &gt;3s -&gt; SafeStop+PowerCutOff')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1084,9 +1156,10 @@
             </div>
         </article>
         <article id="test-fb-translation-14" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-011.1 Meca B variante perte IHM : condition elargie </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-011.1 Meca B variante perte IHM : condition elargie </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-011.1 Meca B variante perte IHM : condition elargie')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1105,9 +1178,10 @@
             </div>
         </article>
         <article id="test-fb-translation-15" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-014 BypassGlobal : aucune surveillance active, pas de nouveau defaut')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1126,9 +1200,10 @@
             </div>
         </article>
         <article id="test-fb-translation-16" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-015 Anti-telescopage hauteur M1/M2 (essai manuel — stub)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1151,9 +1226,10 @@
             </div>
         </article>
         <article id="test-fb-translation-17" class="test-card test-card-fail">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-fail">FAIL</span>
-                <h3 style="flex: 1;">TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-016 Translation vers Trémie : cycle complet réaliste (rampe, frein, mot FWD, fréquence)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1172,9 +1248,10 @@
             </div>
         </article>
         <article id="test-fb-translation-18" class="test-card test-card-fail">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-fail">FAIL</span>
-                <h3 style="flex: 1;">TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-017 Translation vers Maintenance : mot REV (2) + fréquence pleine')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1193,9 +1270,10 @@
             </div>
         </article>
         <article id="test-fb-translation-19" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-018 Translation : arrivée sur capteur cible (debounce 100ms) + arrêt exact + frein collé')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1214,9 +1292,10 @@
             </div>
         </article>
         <article id="test-fb-translation-20" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-019 Translation : interlock sens complet Fwd-&gt;Rev (délai 200ms à vitesse nulle)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1235,9 +1314,10 @@
             </div>
         </article>
         <article id="test-fb-translation-21" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-020 Translation : SafeStop -&gt; rampe rapide (décélération rapide)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1256,9 +1336,10 @@
             </div>
         </article>
         <article id="test-fb-translation-22" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-021 Translation : StartStop=FALSE -&gt; rampe normale (décélération normale)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1277,9 +1358,10 @@
             </div>
         </article>
         <article id="test-fb-translation-23" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-022 Safety : perte comm EtherCAT drive (bit1) -&gt; SafeStop seul, pas de PowerCutOff')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1298,9 +1380,10 @@
             </div>
         </article>
         <article id="test-fb-translation-24" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-023 Safety : perte comm opérateur (bit0) -&gt; SafeStop seul, pas de PowerCutOff')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1319,9 +1402,10 @@
             </div>
         </article>
         <article id="test-fb-translation-25" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-024 Safety : défaut rotation de phases (bit2) -&gt; SafeStop seul, pas de PowerCutOff')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1336,9 +1420,10 @@
             </div>
         </article>
         <article id="test-fb-translation-26" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-025 Safety : surchauffe thermique frein (bit3) -&gt; SafeStop + PowerCutOff')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1353,9 +1438,10 @@
             </div>
         </article>
         <article id="test-fb-translation-27" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-026 Safety : mouvement non commandé (Meca A, bit5) -&gt; SafeStop + PowerCutOff')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1374,9 +1460,10 @@
             </div>
         </article>
         <article id="test-fb-translation-28" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-027 Safety : escalade fin de course (bit6) -&gt; SafeStop + PowerCutOff')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1395,9 +1482,10 @@
             </div>
         </article>
         <article id="test-fb-translation-29" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-028 Safety : permits directionnels TremiePermit/MaintenancePermit (fail-safe)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1416,9 +1504,10 @@
             </div>
         </article>
         <article id="test-fb-translation-30" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-029 Safety : PowerContactorEngaged=FALSE (chaîne AU non réarmée) -&gt; SafeStop')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1433,9 +1522,10 @@
             </div>
         </article>
         <article id="test-fb-translation-31" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-030 Safety : acquittement Reset après défaut laté (BrakeThermal)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1454,9 +1544,10 @@
             </div>
         </article>
         <article id="test-fb-translation-32" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-031 Translation : fin de course extrême coupe le mouvement (bit6)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1475,9 +1566,10 @@
             </div>
         </article>
         <article id="test-fb-translation-33" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -&gt; rampe bloquee (mot 0, freq 0)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1496,9 +1588,10 @@
             </div>
         </article>
         <article id="test-fb-translation-34" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe) </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-033 Gate de sens : Direction=-1 sans MaintenancePermit -&gt; rampe bloquee (fail-safe)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1513,9 +1606,10 @@
             </div>
         </article>
         <article id="test-fb-translation-35" class="test-card test-card-fail">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-fail">FAIL</span>
-                <h3 style="flex: 1;">TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-034 Gate de sens : Direction=1 avec TremiePermit -&gt; mouvement autorise')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1534,9 +1628,10 @@
             </div>
         </article>
         <article id="test-fb-translation-36" class="test-card test-card-fail">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-fail">FAIL</span>
-                <h3 style="flex: 1;">TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise </h3>
+                <h3 style="flex: 1; user-select: text;">TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'TC-P11-035 Gate de sens : Direction=-1 avec MaintenancePermit -&gt; mouvement autorise')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -3053,6 +3148,24 @@ test_fb_translation.st
     </details>
 </div>
 <script>
+function copyTextToClipboard(btn, text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    var orig = btn.innerHTML;
+    btn.innerHTML = "✓ Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
 function copyPinExpr(el) {
     var text = el.getAttribute('title') || el.textContent;
     var ta = document.createElement('textarea');
@@ -3323,9 +3436,14 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier (sauf si sélection de texte en cours)
         var testHeader = e.target.closest('.test-card-header');
         if (testHeader) {
+            // Si l'utilisateur est en train de surligner / sélectionner du texte, ne pas replier
+            var selection = window.getSelection ? window.getSelection().toString() : '';
+            if (selection && selection.length > 0) {
+                return;
+            }
             var card = testHeader.closest('.test-card');
             if (card) {
                 card.classList.toggle('test-card-collapsed');
@@ -3364,6 +3482,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
         var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+        var metaData = JSON.parse(svg.getAttribute('data-meta') || '{}');
 
         var colIdx = Math.floor((svgX - left) / colw);
         var rowIdx = Math.floor((svgY - top) / laneh);
@@ -3393,12 +3512,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 cursorLine.style.display = '';
             }
 
+            var fMeta = metaData[f] || {};
+            var badgeCls = fMeta.cls || 'badge-var-loc';
+            var metaBadge = fMeta.badge ? '<span class="var-prov-badge ' + badgeCls + '" style="font-size:9.5px;padding:1px 5px;margin-right:4px;">[' + fMeta.badge + ']</span>' : '';
+            var typeStr = fMeta.type ? '<span style="color:var(--muted);font-size:11px;font-family:monospace;">' + fMeta.type + '</span>' : '';
+            var metaLineHtml = (metaBadge || typeStr) ? '<div class="wf-tt-meta">' + metaBadge + typeStr + '</div>' : '';
+
             var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+            var assertsHtml = '';
+            if (s.asserts && s.asserts.length > 0) {
+                var chkItems = s.asserts.map(function(c) {
+                    return '<div style="color:#34d399;font-size:10.5px;margin-top:2px;font-family:monospace;">✓ ' + c + '</div>';
+                }).join('');
+                assertsHtml = '<div style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px;"><strong style="color:var(--accent);font-size:10.5px;">Assertions vérifiées :</strong>' + chkItems + '</div>';
+            }
 
             tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
                            '<div class="wf-tt-var">' + f + '</div>' +
+                           metaLineHtml +
                            '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
-                           noteHtml;
+                           noteHtml +
+                           assertsHtml;
 
             tt.style.display = 'block';
             var ttX = e.clientX + 16;

@@ -152,6 +152,53 @@
         display: block;
         text-align: center;
     }
+    /* Pastilles de provenance & typage des variables */
+    .var-prov-badge {
+        display: inline-block;
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        margin-top: 3px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .badge-var-in { background: rgba(2, 132, 199, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+    .badge-var-out { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); }
+    .badge-var-inout { background: rgba(139, 92, 246, 0.18); color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.35); }
+    .badge-var-loc { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .badge-var-cst { background: rgba(217, 119, 6, 0.18); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+    .badge-var-hw { background: rgba(20, 184, 166, 0.18); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.35); }
+    .badge-var-gvl { background: rgba(14, 165, 233, 0.18); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.35); }
+    .badge-var-prg { background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.35); }
+    .badge-var-diag { background: rgba(217, 70, 239, 0.18); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.35); }
+    .badge-var-ext { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.35); }
+
+    [data-theme="light"] .badge-var-in { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-out { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .badge-var-inout { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+    [data-theme="light"] .badge-var-loc { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    [data-theme="light"] .badge-var-cst { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    [data-theme="light"] .badge-var-hw { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+    [data-theme="light"] .badge-var-gvl { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    [data-theme="light"] .badge-var-prg { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    [data-theme="light"] .badge-var-diag { background: #fdf4ff; color: #a21caf; border-color: #fbcfe8; }
+    [data-theme="light"] .badge-var-ext { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+
+    .chrono-table th .th-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        pointer-events: auto;
+    }
+    .chrono-table th .var-name-lbl {
+        font-family: monospace;
+        font-weight: 700;
+        font-size: 11px;
+    }
     /* Mode Titres Verticaux (Compact) */
     .chrono-table.headers-vertical {
         width: max-content !important;
@@ -162,7 +209,7 @@
         width: 280px !important;
     }
     .chrono-table.headers-vertical th.var-th {
-        height: 155px;
+        height: 165px;
         vertical-align: bottom;
         padding-bottom: 10px;
         padding-top: 10px;
@@ -173,26 +220,36 @@
     .chrono-table.headers-vertical th.var-th .th-content {
         writing-mode: vertical-rl;
         transform: rotate(180deg);
-        display: inline-block;
+        display: inline-flex;
+        flex-direction: row-reverse;
+        align-items: center;
         white-space: nowrap;
         text-align: left;
-        max-height: 135px;
+        max-height: 145px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .chrono-table th .th-content {
-        display: inline-block;
-        pointer-events: auto;
+    .chrono-table.headers-vertical th.var-th .var-prov-badge {
+        margin-top: 0;
+        margin-left: 4px;
     }
     .chrono-table .scan-idx { color: var(--accent); font-weight: 700; font-family: monospace; }
     .chrono-table td.changed { background: rgba(56, 189, 248, 0.16); color: #38bdf8; font-weight: 700; border-color: rgba(56, 189, 248, 0.3); }
     [data-theme="light"] .chrono-table th { background: #f1f5f9; color: #475569; }
     [data-theme="light"] .chrono-table td.changed { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
-    .chrono-note-cell { text-align: left !important; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
-    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 310px; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-note-cell { text-align: left !important; max-width: 360px; font-size: 11px; }
+    .chrono-note-container { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .chrono-note-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(129, 140, 248, 0.12); color: #a5b4fc; border: 1px solid rgba(129, 140, 248, 0.25); border-radius: 4px; padding: 2px 8px; font-weight: 600; cursor: help; transition: all 0.2s ease; max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
     .chrono-note-chip:hover { background: rgba(129, 140, 248, 0.25); color: #ffffff; border-color: #818cf8; }
+    .chrono-chk-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; padding: 2px 8px; font-weight: 600; font-size: 10.5px; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
+    .chrono-chk-pass { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .chrono-chk-fail { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .chrono-chk-chip .chk-icon { font-weight: 800; font-size: 11.5px; }
     [data-theme="light"] .chrono-note-chip { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
     [data-theme="light"] .chrono-note-chip:hover { background: #e0e7ff; color: #312e81; }
+    [data-theme="light"] .chrono-chk-pass { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    [data-theme="light"] .chrono-chk-fail { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .wf-check-marker { font-size: 12px; fill: #10b981; font-weight: 800; text-anchor: middle; font-family: monospace; cursor: help; }
     .v-true { color: #34d399; font-weight: 700; }
     .v-false { color: #64748b; }
     .wf-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border);
@@ -229,6 +286,7 @@
     .wf-tt-head { font-weight: 700; color: #38bdf8; font-family: monospace; margin-bottom: 3px; font-size: 11px; }
     [data-theme="light"] .wf-tt-head { color: #0284c7; }
     .wf-tt-var { font-weight: 700; font-family: monospace; font-size: 12px; margin-bottom: 3px; }
+    .wf-tt-meta { font-size: 10.5px; margin-bottom: 4px; }
     .wf-tt-val { margin-bottom: 3px; font-size: 12px; }
     .wf-tt-val strong { font-family: monospace; color: #34d399; font-size: 12.5px; }
     .wf-tt-note { font-size: 11px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 4px; margin-top: 4px; }
@@ -315,7 +373,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-03 01:17:01</div>
+    <div class="exec-time">2026-09-03 12:21:49</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (5 tests)</summary>
@@ -606,7 +664,7 @@
     
     
     <details class="pin-diagram-details" open>
-        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_03_Modes_Cycle</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 41 flux entrants · 73 flux sortants)</span></summary>
+        <summary>📦 Représentation Bloc & Boîte Noire I/O — <b>PRG_03_Modes_Cycle</b> <span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.6px;background:rgba(99,102,241,0.2);color:#c7d2fe;border:1px solid #818cf8;margin-left:8px;font-family:monospace;">POU PRINCIPAL</span> <span style="font-size:13px;color:var(--muted);font-weight:600;margin-left:8px;">(📊 45 flux entrants · 75 flux sortants)</span></summary>
         <div style="margin:10px 0 6px 0;font-size:13px;color:var(--muted);">
             <b>Sous-instances actives intégrées :</b><br>
             <div style="margin-top:4px;"><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instModes <span style="color:var(--muted);font-weight:500;">(FB_Modes)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instCycleSemiAuto <span style="color:var(--muted);font-weight:500;">(FB_Cycle)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instDiveSearch <span style="color:var(--muted);font-weight:500;">(FB_DiveSearch)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ instExtractionAssist <span style="color:var(--muted);font-weight:500;">(FB_ExtractionAssist)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ DiveSearchInputs <span style="color:var(--muted);font-weight:500;">(ST_fbDiveSearch_Inputs)</span></span><span style="background:var(--card-sub);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace;">⚙️ BypassKoboldFallEdge <span style="color:var(--muted);font-weight:500;">(F_TRIG)</span></span></div>
@@ -682,7 +740,7 @@
         <details style="margin:4px 0;">
             <summary style="list-style:none;cursor:pointer;">
                 <div class="pin-row pin-row-unwired" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_02_Acquisition</span> <span style="font-size:11px;color:#818cf8;">(9 retours ▾)</span></div>
+                    <div class="pin-expr"><span style="color:#c7d2fe;font-weight:700;font-size:12px;">🔗 PRG_02_Acquisition</span> <span style="font-size:11px;color:#818cf8;">(13 retours ▾)</span></div>
                     <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.25);color:#c7d2fe;">Inter-PRG</span></div>
                 </div>
             </summary>
@@ -709,6 +767,22 @@
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
                 <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.Joystick.DeadmanArmed</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.MachineHoming.CmdBucketClose</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.MachineHoming.CmdBucketOpen</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.MachineHoming.CmdWinchM1</code></div>
+                <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
+            </div>
+            <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
+                <div class="pin-expr"><code style="color:#818cf8;background:rgba(99,102,241,0.15);font-size:11px;">PRG_02_Acquisition.Data.MachineHoming.CmdWinchM2</code></div>
                 <div class="pin-name"><span class="pin-tag" style="background:rgba(99,102,241,0.2);color:#c7d2fe;font-size:10px;">🔗 PRG In</span></div>
             </div>
             <div class="pin-row pin-row-unwired" style="padding-left:16px;background:var(--card-sub);border-left:3px solid #6366f1;margin-top:2px;">
@@ -832,12 +906,12 @@
                     <div>• Entrées Formelles : <b style="color:#ffffff;">0</b></div>
                     <div>• Entrées Physiques : <b style="color:#ffffff;">0</b></div>
                     <div>• Lectures GVL : <b style="color:#ffffff;">14</b></div>
-                    <div>• Retours PRG : <b style="color:#ffffff;">14</b></div>
+                    <div>• Retours PRG : <b style="color:#ffffff;">18</b></div>
                     <div>• Calibrations RETAIN : <b style="color:#ffffff;">0</b></div>
                     <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:2px;">• Structures Out : <b style="color:#ffffff;">1</b></div>
-                    <div>• Champs Out : <b style="color:#ffffff;">70</b></div>
+                    <div>• Champs Out : <b style="color:#ffffff;">72</b></div>
                     <div>• Écritures GVL : <b style="color:#ffffff;">3</b></div>
-                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">41 IN</b> / <b style="color:#ffffff;">73 OUT</b></div>
+                    <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:4px;font-weight:800;color:#38bdf8;font-size:12px;">Total : <b style="color:#ffffff;">45 IN</b> / <b style="color:#ffffff;">75 OUT</b></div>
                 </div>
                 
     <div style="margin-top:8px;padding:8px 10px;background:var(--card-sub);border:1px solid var(--border);border-radius:6px;font-size:11px;text-align:left;color:#f1f5f9;font-weight:normal;">
@@ -852,7 +926,7 @@
             <details style="margin:4px 0;">
                 <summary style="list-style:none;cursor:pointer;">
                     <div class="pin-row pin-row-wired pin-row-out" style="background:rgba(99,102,241,0.15);border:1px solid #6366f1;cursor:pointer;">
-                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Data</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_ModesCycleInterPrg</span> <span style="font-size:11px;color:#a5b4fc;">(70 champs ▾)</span></div>
+                        <div class="pin-name" style="color:#c7d2fe;font-size:12.5px;">📦 <b>Data</b> : <span class="pin-type" style="color:#818cf8;font-weight:700;">ST_ModesCycleInterPrg</span> <span style="font-size:11px;color:#a5b4fc;">(72 champs ▾)</span></div>
                         <div class="pin-expr"><span style="color:#34d399;font-weight:700;font-size:10.5px;font-family:monospace;">[VAR_OUTPUT STRUCTURE]</span></div>
                     </div>
                 </summary>
@@ -962,6 +1036,10 @@
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.CurrentCycleElapsed</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.DiveBusy</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
                 </div>
@@ -1059,6 +1137,10 @@
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
                     <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.Fault.Latched</div>
+                    <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
+                </div>
+                <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
+                    <div class="pin-name" style="font-size:12px;color:#f8fafc;">↳ <b>Data</b>.SequenceState.LastCycleDuration</div>
                     <div class="pin-expr"><span style="font-size:10.5px;color:var(--muted);">champ de ST_ModesCycleInterPrg</span></div>
                 </div>
                 <div class="pin-row pin-row-wired pin-row-out" style="padding-left:18px;background:var(--card-sub);border-left:3px solid #818cf8;margin-top:2px;">
@@ -1296,9 +1378,9 @@
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
                 <td><code>FB_Cycle</code></td>
-                <td>39</td><td>20</td>
-                <td>1</td><td>28</td>
-                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (28 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
+                <td>42</td><td>22</td>
+                <td>1</td><td>33</td>
+                <td><div style='font-size:12px;'><span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Pas d'écriture externe (33 VAR locales protégées)</span> · <span style='color:#cbd5e1;'><b style='color:#34d399;'>✓</b> Zéro dépendance GVL masquée (Interface IEC pure)</span></div></td>
             </tr>
             <tr class="encaps-row-pass">
                 <td><span class="badge badge-pass">PASS</span></td>
@@ -1322,9 +1404,10 @@
         <div style="margin-top: 12px;">
             
         <article id="test-prg-03-modes-cycle-0" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires) </h3>
+                <h3 style="flex: 1; user-select: text;">PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'PRG_03_Modes_Cycle : Mode Manuel MAINT_N1 (arbitrage + autorisations unitaires)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1341,15 +1424,16 @@
         <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
         <details class="chronogram-static">
             <summary>🔒 Valeurs du scan unique (47)</summary>
-            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>1</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEHOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>1</td></tr><tr><td><code>AUTH.SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>1</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODECHANGEPENDINGBLOCKED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M1SPEEDLOW</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M2BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2SPEEDLOW</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>1</td></tr><tr><td><code>BTNMODERESET</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEHOMED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>1</td></tr><tr><td><code>AUTH.SYNCENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>1</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODECHANGEPENDINGBLOCKED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1CONTACTORSRELEASED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1BRAKEAPPLIED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M1SPEEDLOW</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2CONTACTORSRELEASED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M2BRAKEAPPLIED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2SPEEDLOW</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr></tbody></table>
         </details>
     </div>
             </div>
         </article>
         <article id="test-prg-03-modes-cycle-1" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance) </h3>
+                <h3 style="flex: 1; user-select: text;">PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'PRG_03_Modes_Cycle : Mode MAINT_N2 (inhibitions exclusives + homing + maintenance)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1366,15 +1450,16 @@
         <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
         <details class="chronogram-static">
             <summary>🔒 Valeurs du scan unique (47)</summary>
-            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>2</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>2</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEHOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>2</td></tr><tr><td><code>AUTH.SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>2</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODECHANGEPENDINGBLOCKED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M1SPEEDLOW</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M2BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2SPEEDLOW</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>2</td></tr><tr><td><code>BTNMODERESET</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>2</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEHOMED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>2</td></tr><tr><td><code>AUTH.SYNCENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>2</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODECHANGEPENDINGBLOCKED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1CONTACTORSRELEASED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1BRAKEAPPLIED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M1SPEEDLOW</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2CONTACTORSRELEASED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M2BRAKEAPPLIED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2SPEEDLOW</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr></tbody></table>
         </details>
     </div>
             </div>
         </article>
         <article id="test-prg-03-modes-cycle-2" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives) </h3>
+                <h3 style="flex: 1; user-select: text;">PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'PRG_03_Modes_Cycle : Exclusion mutuelle inhibition M1/M2 (jamais les deux actives)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1391,15 +1476,16 @@
         <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
         <details class="chronogram-static">
             <summary>🔒 Valeurs du scan unique (47)</summary>
-            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>2</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEHOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>2</td></tr><tr><td><code>AUTH.SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>1</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MODECHANGEPENDINGBLOCKED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M1SPEEDLOW</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M2BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2SPEEDLOW</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>2</td></tr><tr><td><code>BTNMODERESET</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEHOMED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>2</td></tr><tr><td><code>AUTH.SYNCENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>1</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MODECHANGEPENDINGBLOCKED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1CONTACTORSRELEASED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1BRAKEAPPLIED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M1SPEEDLOW</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2CONTACTORSRELEASED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M2BRAKEAPPLIED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2SPEEDLOW</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr></tbody></table>
         </details>
     </div>
             </div>
         </article>
         <article id="test-prg-03-modes-cycle-3" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_03_Modes_Cycle : Defaut codeur - SEMI_AUTO selectionne mais cycle non autorise (T207) </h3>
+                <h3 style="flex: 1; user-select: text;">PRG_03_Modes_Cycle : Defaut codeur - SEMI_AUTO selectionne mais cycle non autorise (T207) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'PRG_03_Modes_Cycle : Defaut codeur - SEMI_AUTO selectionne mais cycle non autorise (T207)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1416,15 +1502,16 @@
         <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
         <details class="chronogram-static">
             <summary>🔒 Valeurs du scan unique (47)</summary>
-            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>3</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MACHINEHOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>3</td></tr><tr><td><code>AUTH.SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>0</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MODECHANGEPENDINGBLOCKED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M1SPEEDLOW</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M2BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2SPEEDLOW</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>3</td></tr><tr><td><code>BTNMODERESET</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>MACHINEHOMED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>3</td></tr><tr><td><code>AUTH.SYNCENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MODECHANGEPENDINGBLOCKED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1CONTACTORSRELEASED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1BRAKEAPPLIED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M1SPEEDLOW</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2CONTACTORSRELEASED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M2BRAKEAPPLIED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2SPEEDLOW</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr></tbody></table>
         </details>
     </div>
             </div>
         </article>
         <article id="test-prg-03-modes-cycle-4" class="test-card test-card-pass test-card-collapsed">
-            <header class="test-card-header" style="cursor: pointer; user-select: none;" title="Cliquer pour replier / déplier le test">
+            <header class="test-card-header" style="cursor: pointer; user-select: text;" title="Cliquer pour replier / déplier le test">
                 <span class="badge badge-pass">PASS</span>
-                <h3 style="flex: 1;">PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale) </h3>
+                <h3 style="flex: 1; user-select: text;">PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale) </h3>
+                <button type="button" class="btn-export" onclick="event.stopPropagation(); copyTextToClipboard(this, 'PRG_03_Modes_Cycle : Mode Semi-Auto nominal (sequenceur active, etape initiale)')" title="Copier le nom complet du test" style="padding: 2px 7px; font-size: 11px; margin-left: 6px;">📋 Copier</button>
                 <span class="test-card-toggle" style="font-size: 13px; color: var(--muted); margin-left: 8px;">▾</span>
             </header>
             <div class="test-card-body">
@@ -1441,7 +1528,7 @@
         <p class="chrono-single-scan-note">ℹ️ Test à scan unique (état figé) — rien à observer dans le temps.</p>
         <details class="chronogram-static">
             <summary>🔒 Valeurs du scan unique (47)</summary>
-            <table class="static-table"><tbody><tr><td><code>SELMODE</code></td><td>3</td></tr><tr><td><code>BTNMODERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEHOMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code></td><td>3</td></tr><tr><td><code>AUTH.SYNCENABLE</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code></td><td>0</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MODECHANGEPENDINGBLOCKED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M1SPEEDLOW</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2CONTACTORSRELEASED</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M2BRAKEAPPLIED</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2SPEEDLOW</code></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM1</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM2</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code></td><td>0</td></tr></tbody></table>
+            <table class="static-table"><tbody><tr><td><code>SELMODE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>3</td></tr><tr><td><code>BTNMODERESET</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELSYNCENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>INHIBITM1REQUEST</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>INHIBITM2REQUEST</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELHOMINGAPPROACHENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>SELJOYSTICKWINCH</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>1</td></tr><tr><td><code>TGLMAINTENANCEZONEACCESS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>POWERCONTACTORENGAGED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>ENCODERFAULTPRESENT</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>MACHINEHOMED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BTNSTARTCYCLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNABORTCYCLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BTNCYCLERESET</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>DEADMANARMED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>JOYSTICKDEFLECTED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HEARTBEATIHMOK</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>M1_CABLEPOSM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>5</td></tr><tr><td><code>M2_CABLEPOSM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>5</td></tr><tr><td><code>M1_SPEEDMPS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>M2_SPEEDMPS</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>BENNE_ISCLOSED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>BENNE_ISOPEN</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>BENNE_ISROUGHLYCLOSED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>HOMEDM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.MODE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>3</td></tr><tr><td><code>AUTH.SYNCENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.INHIBITM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.INHIBITM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.JOYSTICKWINCHSELECTARBITRATED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>AUTH.HOMINGAPPROACHENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MAINTENANCEM3TARGETENABLE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.MODECHANGEPENDINGBLOCKED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1CONTACTORSRELEASED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M1BRAKEAPPLIED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M1SPEEDLOW</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2CONTACTORSRELEASED</code> <span class='var-prov-badge badge-var-in' style='font-size:10px;padding:1px 5px;'>[VAR_INPUT]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Entrée/Consigne)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.M2BRAKEAPPLIED</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.M2SPEEDLOW</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-true">TRUE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM1</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>AUTH.HOMINGREQUIREDM2</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLESTEP</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr><tr><td><code>CYCLEBUSY</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEDONE</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>CYCLEERROR</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td><span class="v-false">FALSE</span></td></tr><tr><td><code>COUNTMEM</code> <span class='var-prov-badge badge-var-loc' style='font-size:10px;padding:1px 5px;'>[VAR]</span> <span style='font-size:10.5px;color:var(--muted);font-family:monospace;'>(Interne/Calculée)</span></td><td>0</td></tr></tbody></table>
         </details>
     </div>
             </div>
@@ -2182,7 +2269,24 @@ Auth.M2SpeedLow           := ABS(M2SpeedAbsMps) &lt; MovementSpeedThresholdMps;
 // le mode est un état de sélection, le mouvement est coupé en aval (FB_Cycle, FB_Safety_Winch,
 // FB_Winch) par PowerContactorEngaged et les interlocks. Seule la bascule N1/N2/SEMI_AUTO
 // reste soumise à l&#x27;arrêt mécanique confirmé des treuils (ModeChangeAllowed).
-IF (SelMode &lt;&gt; PrevArbitratedMode)
+// 3.2bis (AF-05 §4bis - referencement benne guide) : SEMI_AUTO est un mode &quot;homed-only&quot;.
+// Une selection SEMI_AUTO sans datum machine valide (MachineHomed) est REFUSEE et le mode
+// est force vers MAINT_N1 (expulsion). Vaut aussi si MachineHomed retombe alors qu&#x27;on EST
+// en SEMI_AUTO (perte de datum -&gt; bascule MAINT_N1). Le SafeStop des treuils sur perte de
+// datum en mouvement est assure en aval (PRG_04 via MachineHoming.HomingLoss). L&#x27;expulsion
+// n&#x27;est jamais bloquee par l&#x27;arret mecanique (comme la sortie DISABLE, contrat D2).
+IF (SelMode = E_Mode.SEMI_AUTO) AND NOT MachineHomed THEN
+    Auth.Mode := E_Mode.MAINT_N1;
+    Auth.ModeChangePendingBlocked := TRUE;
+    // Motif distinct : perte de datum EN cours de SEMI_AUTO (arret controle assure en
+    // aval par MachineHoming.HomingLoss si les treuils bougeaient) vs simple selection
+    // refusee. Aucune coupure de puissance, aucun redemarrage automatique.
+    IF PrevArbitratedMode = E_Mode.SEMI_AUTO THEN
+        Auth.ModeChangeBlockReason := &#x27;Datum machine perdu : arret controle&#x27;;
+    ELSE
+        Auth.ModeChangeBlockReason := &#x27;SEMI_AUTO refuse : datum machine absent&#x27;;
+    END_IF;
+ELSIF (SelMode &lt;&gt; PrevArbitratedMode)
       AND (SelMode &lt;&gt; E_Mode.DISABLE) AND (PrevArbitratedMode &lt;&gt; E_Mode.DISABLE)
       AND NOT ModeChangeAllowed THEN
     // Bascule N1/N2/SEMI_AUTO refusée : le mode courant est MAINTENU.
@@ -2309,11 +2413,13 @@ TYPE E_CycleStep :
   X6_CLOSE_BUCKET     := 6,   (* Fermeture benne — tolérance « à peu près fermé » *)
   X7_CTRL_ASCENT      := 7,   (* Remontée palier 1 de contrôle *)
   X8_ASCENT_LOADED    := 8,   (* Remontée nominale jusqu&#x27;à limite haute *)
-  X9_DRAIN_PAUSE      := 9,   (* Égouttage temporisé — temps affiché IHM *)
-  X10_TRANSLATE_DUMP  := 10,  (* Translation vers trémie + avertissements IHM *)
-  X11_OPEN_DUMP       := 11,  (* Ouverture benne = vidage ; montée possible, descente ouvre *)
-  X13_DONE_SYNC       := 13,  (* Fin de cycle, synchronisation finale (R4) + compteur *)
-  STABILIZING         := 14   (* État d&#x27;attente/stabilisation — pas une erreur *)
+  X9_DRAIN_PAUSE      := 9,   (* Égouttage temporisé — durée configurable / passable IHM *)
+  X10_TRANSLATE_DUMP  := 10,  (* Translation vers trémie (départ P1) + avertissements IHM *)
+  X11A_DUMP_ARRIVE    := 11,  (* Arrivée trémie : treuils à l&#x27;arrêt, attente geste opérateur (ex-X11) *)
+  X13_DONE_SYNC       := 13,  (* Fin de cycle, synchronisation finale (R4) + compteur + durée cycle *)
+  STABILIZING         := 14,  (* État d&#x27;attente/stabilisation — pas une erreur *)
+  X11B_DUMP_OPEN      := 15,  (* Vidage à la trémie : ouverture benne, LES DEUX treuils à l&#x27;arrêt (aucune descente couplée) *)
+  X11C_DUMP_REPOSITION := 16  (* Repositionnement couplé M1+M2 (option IHM maintenue) : descente lente pour dégager la vidange, retour X11b au relâchement *)
 );
 END_TYPE
 </pre>
@@ -3091,7 +3197,7 @@ VAR_INPUT
     AbortCycle              : BOOL;         // --&gt; [CMD] Demande abandon (IHM)
 
     // === CIBLES ET CONFIGURATION ===
-    SelTarget               : INT;          // --&gt; [CFG] Cible selectionnee (1=Tremie, 2=P2, 3=P1, 4=Maintenance)
+    SelTarget               : INT;          // --&gt; [CFG] RESERVE (C3.1 : le cycle part toujours de P1, plus de selection de cible). Cable, non consomme.
     SetDepthM               : REAL;         // --&gt; [CFG] Profondeur de consigne (negative)
     SetOffsetM              : REAL;         // --&gt; [CFG] Ecart de fermeture benne cible
 
@@ -3128,6 +3234,11 @@ VAR_INPUT
     HomedM2                 : BOOL;         // --&gt; [HW] Codeur M2 reference
     TopPositionSensor       : BOOL;         // --&gt; [HW] Capteur position haute (referencement)
     HomingRequest           : BOOL;         // --&gt; [CMD] Demande de referencement (front)
+
+    // === CONFIG &amp; COMMANDES CYCLE (IHM) ===
+    CfgDrainTime           : TIME;         // --&gt; [CFG] Duree d&#x27;egouttage X9 configurable IHM (&lt;= 0 -&gt; defaut interne)
+    SkipDrainRequest       : BOOL;         // --&gt; [CMD] Bouton IHM : passer l&#x27;etape d&#x27;egouttage X9 (front)
+    RepositionRequest      : BOOL;         // --&gt; [CMD] Option IHM (maintenue) : repositionnement couple M1+M2 pendant le vidage tremie (X11b &lt;-&gt; X11c)
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC &amp; DEFECTUOSITES ===
@@ -3158,6 +3269,8 @@ VAR_OUTPUT
     WaitingForOperator      : BOOL;                 // &lt;-- [STAT] En attente d&#x27;une action operateur
     WaitingForProcess       : BOOL;                 // &lt;-- [STAT] En attente d&#x27;une condition procede
     RequestActive           : BOOL;                 // &lt;-- [STAT] Demande de mouvement active
+    CurrentCycleElapsed     : TIME;                 // &lt;-- [DIAG] Duree ecoulee du cycle en cours (chronometre sur Lifecycle.Busy)
+    LastCycleDuration       : TIME;                 // &lt;-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)
 END_VAR
 VAR_IN_OUT
     // === STRUCTURES PARTAGEES &amp; COMPTEURS ===
@@ -3186,10 +3299,14 @@ VAR
     // === MEMORISATIONS &amp; REGISTRES INTERNES ===
     TouchPositionM          : REAL;         // . [LOC] Position M1 memorisee lors du contact fond
     RaiseTargetM            : REAL;         // . [LOC] Profondeur de remontee memorisee
-    SelectedWorkTarget      : INT;          // . [LOC] Cible de travail memorisee
+    SelectedWorkTarget      : INT;          // . [LOC] Cible de travail (fige a 3=P1 depuis C3.1) - conserve pour diag/futur
+    StepMaxPrevState        : E_CycleStep;  // . [LOC] Etape du scan precedent (rearmement StepMaxTimer au changement d&#x27;etape)
 
     // === TEMPORISATEURS INTERNES ===
-    DrainingTimer           : TON;          // . [LOC] Temporisateur de vidage (egouttage)
+    DrainingTimer           : TON;          // . [LOC] Temporisateur de vidage (egouttage), PT = DrainTimeEff
+    CycleRunTimer           : TON;          // . [LOC] Chronometre du cycle en cours (IN = Lifecycle.Busy) ; .ET = duree
+    SkipDrainEdge           : R_TRIG;       // . [LOC] Front bouton IHM &quot;passer egouttage&quot;
+    DrainTimeEff            : TIME;         // . [LOC] Duree d&#x27;egouttage effective (CfgDrainTime bornee au defaut interne)
     StabilizationTimer      : TON;          // . [LOC] Temporisation maximale de remontee lente
     SpeedMismatchTimer      : TON;          // . [LOC] Confirmation temporelle ecart de vitesse
     StepMaxTimer            : TON;          // . [LOC] Tempo max d&#x27;etape
@@ -3210,6 +3327,11 @@ VAR CONSTANT
     CST_StepSlow   : INT := 1;   // Palier lent : referencement X1, remontee X5, controle X7, vidage X11
     CST_StepDive   : INT := 3;   // Palier plongee Kobold X4 : debit mini requis pour la mesure de fond
     CST_StepLoaded : INT := 4;   // Palier montee en charge X8 (bridage strict &lt;= 4, jamais palier 5)
+    // Backstop anti-telescopage : ecart de position M1/M2 max tolere pendant les phases
+    // reellement couplees hors X7 (qui a deja son propre controle a 0,25 m). Aligne sur
+    // CfgSyncCriticalToleranceM = 0,50 m (AF-04 §5). FB_SyncDeviation (PRG_04) reste la
+    // surveillance primaire ; ceci est un garde-fou local au sequenceur.
+    CST_CoupledPosBacklashM : REAL := 0.5;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -3220,6 +3342,15 @@ ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
 DeadmanArmedEdge(CLK := DeadmanArmed);
 AbortEdge(CLK := AbortCycle);
+SkipDrainEdge(CLK := SkipDrainRequest);
+
+// ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
+// .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration à l&#x27;achèvement (X13).
+CycleRunTimer(IN := Lifecycle.Busy, PT := T#12h);
+CurrentCycleElapsed := CycleRunTimer.ET;
+
+// Durée d&#x27;égouttage effective : config IHM si valide, sinon défaut interne.
+DrainTimeEff := SEL(CfgDrainTime &lt;= T#0s, CfgDrainTime, DrainingTime);
 
 // ⏱️ Surveillance indépendante de la remontée lente
 // X7_CTRL_ASCENT -&gt; X8_ASCENT_LOADED : TON de stabilisation palier 1.
@@ -3236,12 +3367,21 @@ SpeedMismatchActive := (State = E_CycleStep.X7_CTRL_ASCENT)
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
-// Tempo max d&#x27;étape (R5) — lancée SEULEMENT si pilotage joystick actif (pas de défaut au repos)
-// Xi -&gt; STABILIZING : TON backstop durée d&#x27;état pour tous les états de mouvement.
-StepMaxTimer(IN := JoystickDeflected AND (State &lt;&gt; E_CycleStep.X0_PREPARATION)
+// Tempo max d&#x27;étape (R5) — backstop durée d&#x27;état, lancé SEULEMENT si pilotage joystick actif.
+// Xi -&gt; STABILIZING sur dépassement. Réarmé à CHAQUE changement d&#x27;étape (IN=FALSE 1 scan) :
+// chaque étape dispose de sa propre fenêtre StepMaxTimeout, la tempo n&#x27;est PAS cumulative
+// sur l&#x27;ensemble du cycle (un cycle réel long ne tombe plus en STABILIZING intempestif).
+StepMaxTimer(IN := (State = StepMaxPrevState)
+                  AND JoystickDeflected
+                  AND (State &lt;&gt; E_CycleStep.X0_PREPARATION)
                   AND (State &lt;&gt; E_CycleStep.X13_DONE_SYNC)
                   AND (State &lt;&gt; E_CycleStep.STABILIZING),
              PT := StepMaxTimeout);
+StepMaxPrevState := State;
+
+// Egouttage X9 : TON gaté sur l&#x27;étape (remis à 0 hors X9). Remplace l&#x27;ancien IN:=TRUE câblé
+// qui pouvait laisser Q déjà vrai à l&#x27;entrée en X9 (temps d&#x27;égouttage non respecté).
+DrainingTimer(IN := (State = E_CycleStep.X9_DRAIN_PAUSE), PT := DrainTimeEff);
 
 // Table des causes de défaut
 instCauses[0].Active   := LimitLegalReached AND (State = E_CycleStep.X4_DESCEND_OPEN);
@@ -3268,6 +3408,19 @@ instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(M1_CablePosM - M2_CableP
                           AND (State = E_CycleStep.X7_CTRL_ASCENT);
 instCauses[5].Latching := TRUE;
 instCauses[5].Texte    := &#x27;Defaut de stabilisation / tolerance ecart codeurs en remontee controle&#x27;;
+
+// Backstop anti-telescopage : ecart de position M1/M2 excessif pendant une phase
+// reellement couplee (X4 plongee, X5 remontee, X8 montee en charge). X7 a deja son
+// propre controle (instCauses[5]). Seuil grossier (0,50 m) : filet local si
+// FB_SyncDeviation (PRG_04) ne coupe pas.
+instCauses[6].Active   := (ABS(M1_CablePosM - M2_CablePosM) &gt; CST_CoupledPosBacklashM)
+                          AND JoystickDeflected
+                          AND ((State = E_CycleStep.X4_DESCEND_OPEN)
+                            OR (State = E_CycleStep.X5_BOTTOM_CONFIRMED)
+                            OR (State = E_CycleStep.X8_ASCENT_LOADED)
+                            OR (State = E_CycleStep.X11C_DUMP_REPOSITION));
+instCauses[6].Latching := TRUE;
+instCauses[6].Texte    := &#x27;Ecart de position M1/M2 excessif en phase couplee (anti-telescopage)&#x27;;
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -3447,33 +3600,48 @@ CASE State OF
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := &#x27;Machine non referencee : passer en maintenance et lancer le cycle de referencement.&#x27;;
+            OperatorAction := &#x27;Machine non referencee : passer en maintenance pour le referencement.&#x27;;
         END_IF;
 
     E_CycleStep.X2_WORK_POS_SELECT:
         CycleStep := E_CycleStep.X2_WORK_POS_SELECT;
-        CycleStateStr := &#x27;X2 - Selection position travail&#x27;;
+        CycleStateStr := &#x27;X2 - Mise en position P1 (translation)&#x27;;
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
-        ExpectedDirection := 0;
-        WaitingForOperator := (SelTarget = 0) OR NOT JoystickDeflected;
-        WaitingForProcess := (SelTarget &lt;&gt; 0) AND JoystickDeflected;
-        OperatorActionId := 16#0402;
-        OperatorAction := &#x27;Selectionner la cible et maintenir la translation vers la position de travail.&#x27;;
+        // C3.1 : le cycle part TOUJOURS de P1 (plus de selection de cible). Le treuil est a
+        // l&#x27;arret ; l&#x27;operateur amene M3 a P1 au joystick (ralenti automatique au capteur PV
+        // et arret sur FDC P1 assures par PRG_05/FB_Translation, comme en maintenance).
+        // Le cycle ne fait que fournir la consigne cible (P1) + surveiller l&#x27;arrivee.
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        SelectedWorkTarget := 3;                  // P1, fige
+        TranslationCmd.PositionTgt := 3;          // cible P1 (le sens/ralenti PV/arret FDC = PRG_05)
 
-        IF (SelTarget = 1) OR (SelTarget = 3) OR (SelTarget = 4) THEN
-            SelectedWorkTarget := SelTarget;
-            TranslationCmd.PositionTgt := SelTarget;
+        IF Translation_At_P1 THEN
+            ExpectedDirection := 0;
+            WaitingForOperator := FALSE;
+            WaitingForProcess := TRUE;
+            OperatorActionId := 16#0402;
+            OperatorAction := &#x27;Position P1 atteinte.&#x27;;
+            TranslationCmd.ReqStart := FALSE;
+            State := E_CycleStep.X3_OPEN_BUCKET;
+        ELSIF Translation_At_Maintenance THEN
+            // Au-dela de P1 cote maintenance : le cycle ne ramene pas M3 -&gt; l&#x27;operateur sort.
+            ExpectedDirection := 0;
+            WaitingForOperator := TRUE;
+            WaitingForProcess := FALSE;
+            OperatorActionId := 16#0402;
+            OperatorAction := &#x27;Chariot cote maintenance : Abandon cycle, revenir a P1 en maintenance, relancer.&#x27;;
+            TranslationCmd.ReqStart := FALSE;
+        ELSE
+            // Entre tremie et P1 : consigne &quot;joystick vers P1&quot;, maintien requis.
+            ExpectedDirection := -1;
+            WaitingForOperator := NOT JoystickDeflected;
+            WaitingForProcess := JoystickDeflected;
+            OperatorActionId := 16#0402;
+            OperatorAction := &#x27;Maintenir le joystick vers P1 : arret automatique sur P1.&#x27;;
             TranslationCmd.ReqStart := CycleMotionPermit;
-            // Arrivée à la cible (Trémie/P1/Maintenance)
-            IF JoystickDeflected AND (
-                (SelTarget = 1 AND Translation_At_Tremie) OR
-                (SelTarget = 3 AND Translation_At_P1) OR
-                (SelTarget = 4 AND Translation_At_Maintenance)) THEN
-                TranslationCmd.ReqStart := FALSE;
-                State := E_CycleStep.X3_OPEN_BUCKET;
-            END_IF;
         END_IF;
 
     E_CycleStep.X3_OPEN_BUCKET:
@@ -3487,6 +3655,10 @@ CASE State OF
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0403;
         OperatorAction := &#x27;Maintenir le joystick : ouverture complete de la benne.&#x27;;
+
+        // X3 = etape benne seule : treuils explicitement neutralises (config treuil unique par etape).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
         IF Benne_IsOpen THEN
             State := E_CycleStep.X4_DESCEND_OPEN;
@@ -3570,7 +3742,10 @@ CASE State OF
         OperatorActionId := 16#0406;
         OperatorAction := &#x27;Maintenir la commande : fermeture de la benne.&#x27;;
 
-        WinchM1Cmd.RunRequest := FALSE;
+        // X6 = étape benne seule : les DEUX treuils explicitement neutralisés
+        // (pas de résidu ReqAscent/StepTgt hérité de X5 — config treuil unique par étape).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         // L&#x27;ordre benne reste soumis au même homme-mort que le cycle : aucune
         // commande d&#x27;actionneur ne doit survivre à la perte du permis opérateur.
         BucketCmd.ReqClose := CycleMotionPermit;
@@ -3641,13 +3816,13 @@ CASE State OF
         WaitingForOperator := FALSE;
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0409;
-        OperatorAction := &#x27;Egouttage du godet en cours (temporisation).&#x27;;
+        OperatorAction := &#x27;Egouttage : attendre la tempo ou appuyer sur &quot;passer egouttage&quot;.&#x27;;
         WinchM1Cmd.RunRequest := FALSE;
         WinchM2Cmd.RunRequest := FALSE;
 
-        DrainingTimer(IN := TRUE, PT := DrainingTime);
-        IF JoystickDeflected AND DrainingTimer.Q THEN
-            DrainingTimer(IN := FALSE);
+        // Tempo d&#x27;egouttage armee/remise a zero en §1 (gate sur State = X9, PT = DrainTimeEff).
+        // Passage a X10 : fin de tempo OU appui operateur &quot;passer l&#x27;egouttage&quot; (SkipDrainEdge).
+        IF JoystickDeflected AND (DrainingTimer.Q OR SkipDrainEdge.Q) THEN
             State := E_CycleStep.X10_TRANSLATE_DUMP;
         END_IF;
 
@@ -3668,12 +3843,12 @@ CASE State OF
 
         IF JoystickDeflected AND Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
-            State := E_CycleStep.X11_OPEN_DUMP;
+            State := E_CycleStep.X11A_DUMP_ARRIVE;
         END_IF;
 
-    E_CycleStep.X11_OPEN_DUMP:
-        CycleStep := E_CycleStep.X11_OPEN_DUMP;
-        CycleStateStr := &#x27;X11 - Vidange / ouverture du godet (montee possible, descente ouvre)&#x27;;
+    E_CycleStep.X11A_DUMP_ARRIVE:
+        CycleStep := E_CycleStep.X11A_DUMP_ARRIVE;
+        CycleStateStr := &#x27;X11a - Arrivee tremie : treuils arretes, attente ouverture&#x27;;
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -3681,23 +3856,76 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := &#x27;Deflechir vers le bas pour ouvrir la benne et vider la charge.&#x27;;
+        OperatorAction := &#x27;A la tremie : deflechir vers le bas pour ouvrir la benne et vider.&#x27;;
 
-        // X11 est une ouverture par déflexion vers le bas : la direction doit
-        // être écrite avant d&#x27;être évaluée (ne jamais tester la valeur du scan
-        // précédent). Les deux treuils restent synchrones et sous homme-mort.
-        WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
-        WinchM1Cmd.StepTgt  := CST_StepSlow;
-        WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
-        WinchM2Cmd.StepTgt  := CST_StepSlow;
+        // Config treuil UNIQUE : arret des deux treuils (aucune descente couplee ici).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
-        BucketCmd.ReqOpen := CycleMotionPermit AND WinchM1Cmd.ReqDescend;
+        // Geste operateur (manche defleci) -&gt; phase d&#x27;ouverture benne.
+        IF JoystickDeflected THEN
+            State := E_CycleStep.X11B_DUMP_OPEN;
+        END_IF;
 
-        IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
+    E_CycleStep.X11B_DUMP_OPEN:
+        CycleStep := E_CycleStep.X11B_DUMP_OPEN;
+        CycleStateStr := &#x27;X11b - Vidage : ouverture benne, treuils arretes&#x27;;
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
+        OperatorActionId := 16#040B;
+        OperatorAction := &#x27;Maintenir : ouverture complete de la benne, vidage a la tremie.&#x27;;
+
+        // Config treuil UNIQUE : etape benne seule, les deux treuils neutralises
+        // (plus de descente couplee M1+M2 simultanee a l&#x27;ouverture benne -&gt; plus
+        // d&#x27;ecart M1/M2 volontaire ni de faux SafeStop concordance contacteurs).
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+
+        BucketCmd.ReqOpen := CycleMotionPermit;
+
+        // Option operateur (bit IHM) : descendre la benne dans la gueule de tremie
+        // pour aider la vidange -&gt; repositionnement couple M1+M2 (X11C). Prioritaire
+        // sur la fin de vidage.
+        IF RepositionRequest THEN
+            State := E_CycleStep.X11C_DUMP_REPOSITION;
+        ELSIF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
             State := E_CycleStep.X13_DONE_SYNC;
+        END_IF;
+
+    E_CycleStep.X11C_DUMP_REPOSITION:
+        CycleStep := E_CycleStep.X11C_DUMP_REPOSITION;
+        CycleStateStr := &#x27;X11c - Repositionnement couple M1+M2 (aide vidange tremie)&#x27;;
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT JoystickDeflected;
+        WaitingForProcess := JoystickDeflected;
+        OperatorActionId := 16#040C;
+        OperatorAction := &#x27;Descente couplee M1+M2 ; relacher l option pour reprendre le vidage.&#x27;;
+
+        // Descente couplee M1+M2, palier lent, sous homme-mort. Commandes SYMETRIQUES
+        // (meme sens, meme palier) -&gt; FB_SyncDeviation actif, pas d&#x27;ecart volontaire.
+        WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
+        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.StepTgt := CST_StepSlow;
+        WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
+        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.StepTgt := CST_StepSlow;
+
+        // La benne reste ouverte pendant le repositionnement (on finit l&#x27;ouverture si besoin).
+        BucketCmd.ReqOpen := CycleMotionPermit AND NOT Benne_IsOpen;
+
+        // Retour a X11B des que l&#x27;operateur relache l&#x27;option de repositionnement.
+        IF NOT RepositionRequest THEN
+            WinchM1Cmd.RunRequest := FALSE;
+            WinchM2Cmd.RunRequest := FALSE;
+            State := E_CycleStep.X11B_DUMP_OPEN;
         END_IF;
 
     E_CycleStep.X13_DONE_SYNC:
@@ -3715,9 +3943,10 @@ CASE State OF
         OperatorActionId := 16#040D;
         OperatorAction := &#x27;Cycle termine avec succes. Relancer un nouveau cycle.&#x27;;
 
-        // Compteur de prélèvements (RETAIN) — F2: incrément cadré par front (1 seul par cycle)
+        // Compteur de prélèvements (RETAIN) + durée du cycle — F2: cadré par front (1 seul par cycle)
         IF NOT SampleCountDone THEN
             SampleCount := SampleCount + 1;
+            LastCycleDuration := CurrentCycleElapsed;   // fige la durée du cycle qui vient de s&#x27;achever
             SampleCountDone := TRUE;
         END_IF;
 
@@ -3951,6 +4180,8 @@ STRUCT
     SpeedMismatchMps    : REAL;             // Écart absolu vitesse M1/M2 (m/s)
     SpeedMismatchActive : BOOL;             // Seuil vitesse dépassé
     SpeedMismatchConfirmed : BOOL;          // Écart vitesse confirmé pendant timeout
+    CurrentCycleElapsed : TIME;             // Durée écoulée du cycle SEMI_AUTO en cours
+    LastCycleDuration   : TIME;             // Durée du dernier cycle SEMI_AUTO achevé (figée à X13)
 
     // === 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
     DiveReady                   : BOOL;                    // Assistance plongée prête
@@ -4160,6 +4391,24 @@ test_prg_03_modes_cycle.st
     </details>
 </div>
 <script>
+function copyTextToClipboard(btn, text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    var orig = btn.innerHTML;
+    btn.innerHTML = "✓ Copié !";
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copied');
+    }, 1200);
+}
+
 function copyPinExpr(el) {
     var text = el.getAttribute('title') || el.textContent;
     var ta = document.createElement('textarea');
@@ -4430,9 +4679,14 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Clic sur l'en-tête d'une carte de test pour la replier / déplier
+        // Clic sur l'en-tête d'une carte de test pour la replier / déplier (sauf si sélection de texte en cours)
         var testHeader = e.target.closest('.test-card-header');
         if (testHeader) {
+            // Si l'utilisateur est en train de surligner / sélectionner du texte, ne pas replier
+            var selection = window.getSelection ? window.getSelection().toString() : '';
+            if (selection && selection.length > 0) {
+                return;
+            }
             var card = testHeader.closest('.test-card');
             if (card) {
                 card.classList.toggle('test-card-collapsed');
@@ -4471,6 +4725,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var scansData = JSON.parse(svg.getAttribute('data-scans') || '[]');
         var fieldsData = JSON.parse(svg.getAttribute('data-fields') || '[]');
+        var metaData = JSON.parse(svg.getAttribute('data-meta') || '{}');
 
         var colIdx = Math.floor((svgX - left) / colw);
         var rowIdx = Math.floor((svgY - top) / laneh);
@@ -4500,12 +4755,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 cursorLine.style.display = '';
             }
 
+            var fMeta = metaData[f] || {};
+            var badgeCls = fMeta.cls || 'badge-var-loc';
+            var metaBadge = fMeta.badge ? '<span class="var-prov-badge ' + badgeCls + '" style="font-size:9.5px;padding:1px 5px;margin-right:4px;">[' + fMeta.badge + ']</span>' : '';
+            var typeStr = fMeta.type ? '<span style="color:var(--muted);font-size:11px;font-family:monospace;">' + fMeta.type + '</span>' : '';
+            var metaLineHtml = (metaBadge || typeStr) ? '<div class="wf-tt-meta">' + metaBadge + typeStr + '</div>' : '';
+
             var noteHtml = s.note ? '<div class="wf-tt-note">' + s.note + '</div>' : '';
+            var assertsHtml = '';
+            if (s.asserts && s.asserts.length > 0) {
+                var chkItems = s.asserts.map(function(c) {
+                    return '<div style="color:#34d399;font-size:10.5px;margin-top:2px;font-family:monospace;">✓ ' + c + '</div>';
+                }).join('');
+                assertsHtml = '<div style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.1);padding-top:4px;"><strong style="color:var(--accent);font-size:10.5px;">Assertions vérifiées :</strong>' + chkItems + '</div>';
+            }
 
             tt.innerHTML = '<div class="wf-tt-head">Scan #' + s.scan + ' (' + s.t_ms + ' ms)</div>' +
                            '<div class="wf-tt-var">' + f + '</div>' +
+                           metaLineHtml +
                            '<div class="wf-tt-val">Valeur : <strong>' + displayVal + '</strong></div>' +
-                           noteHtml;
+                           noteHtml +
+                           assertsHtml;
 
             tt.style.display = 'block';
             var ttX = e.clientX + 16;

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "file": "test_fb_sim_encoder.st",
+  "results": [
+    {
+      "name": "TC-P13-ENC-001 Enable FALSE conserve la valeur passee par VAR_IN_OUT",
+      "passed": true
+    },
+    {
+      "name": "TC-P13-ENC-002 Simulation incrementation comptage en montee",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0
+  }
+}

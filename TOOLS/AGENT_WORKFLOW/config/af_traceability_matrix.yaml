@@ -2129,6 +2129,36 @@ domains:
         type: 💻 AUTO
         ref: §3
         etat: NV-I
+      TC-P11-EST-01:
+        intention: "\U0001F4A4 Étape 1 (Initialisation à froid) : Démarrage sous Enable=TRUE\
+          \ avec PersistedPositionM=12.5 et PersistedInitialized=TRUE. \n        \U0001F3AF\
+          \ Étape 2 (Restauration immédiate) : PositionEstimatedM prend immédiatement\
+          \ la valeur 12.5m dès le 1er cycle. \n        \U0001F512 Étape 3 (Verrouillage\
+          \ état) : Initialized=TRUE, aucun saut parasite de recalage émis (Recalibrated=FALSE,\
+          \ RecalibratedSensorId=-1)."
+        type: ⚡ AUTO
+        ref: §4.1
+        etat: V-I
+      TC-P11-EST-02:
+        intention: "\U0001F697 Étape 1 (Mouvement avec dérive) : Position estimée\
+          \ courante à 19.2m. \n        \U0001F4CD Étape 2 (Franchissement physique\
+          \ P1) : Front montant SensorP1: FALSE ➔ TRUE (cote calibrée PosP1M=20.0m).\
+          \ \n        \U0001F3AF Étape 3 (Recalage instantané) : PositionEstimatedM\
+          \ saute instantanément à 20.0m, pulse Recalibrated=TRUE pendant 1 cycle\
+          \ avec RecalibratedSensorId=1 (P1)."
+        type: ⚡ AUTO
+        ref: §4.2
+        etat: V-I
+      TC-P11-EST-03:
+        intention: "⚡ Étape 1 (Commande Maintenance) : ReqMaintenance=TRUE sous DriveActualFreqHz=50.0\
+          \ Hz (vitesse $0.416\\text{ m/s}$). \n        ⏱️ Étape 2 (Progression temporelle)\
+          \ : Exécution continue pendant $1.0\\text{ s}$ $\\rightarrow$ la position\
+          \ progresse de manière monotone de $+0.416\\text{ m}$. \n        \U0001F6D1\
+          \ Étape 3 (Neutralisation) : Enable=FALSE $\\rightarrow$ arrêt strict de\
+          \ l'intégration, maintien de la dernière valeur estimée."
+        type: 💻 AUTO
+        ref: §4.3
+        etat: V-I
       TC-P11-003:
         intention: "\U0001F4A4 Étape 0 : Enable=FALSE \n        \U0001F680 Étape 1\
           \ : Toute commande entrante (SafeStop/StartStop quelconques) \n        ⚡\

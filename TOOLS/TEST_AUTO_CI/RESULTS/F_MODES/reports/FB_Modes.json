@@ -35,7 +35,11 @@
       "passed": true
     },
     {
-      "name": "TC-P05-004bis SEMI_AUTO selectionnable sans reference machine (cycle non pret)",
+      "name": "TC-P05-004bis SEMI_AUTO homed-only : sans reference machine -> expulsion MAINT_N1 (T226 D1, AF-05 \u00a74bis)",
+      "passed": true
+    },
+    {
+      "name": "TC-P05-004ter Perte de datum EN SEMI_AUTO -> expulsion MAINT_N1, motif distinct, sans coupure (T226 AC2)",
       "passed": true
     },
     {
@@ -56,8 +60,8 @@
     }
   ],
   "summary": {
-    "total": 13,
-    "passed": 13,
+    "total": 14,
+    "passed": 14,
     "failed": 0
   }
 }

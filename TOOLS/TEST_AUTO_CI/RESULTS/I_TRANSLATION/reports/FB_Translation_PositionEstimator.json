@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "file": "test_fb_translation_positionestimator.st",
+  "results": [
+    {
+      "name": "TC-P11-EST-001 Reprise sur ColdStart avec position persistee",
+      "passed": true
+    },
+    {
+      "name": "TC-P11-EST-002 Recalage absolu instantane sur front montant capteur P1 (20.0m)",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0
+  }
+}

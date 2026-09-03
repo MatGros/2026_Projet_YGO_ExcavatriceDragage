@@ -1,0 +1,22 @@
+Error: C++ compilation failed:
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Safety_6o_huzqb\strucpp-test-oHyj3T\test_main.cpp: In function 'bool test_1(strucpp::TestContext&)':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Safety_6o_huzqb\strucpp-test-oHyj3T\test_main.cpp:13:48: error: 'class strucpp::FB_SIM_SAFETY' has no member named 'EMERGENCYCHAINCLOSED'
+   13 |     if (!ctx.assert_false(static_cast<bool>(FB.EMERGENCYCHAINCLOSED), "FB.EMERGENCYCHAINCLOSED", 10, "Enable FALSE -> Boucle AU ouverte")) return false;
+      |                                                ^~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Safety_6o_huzqb\strucpp-test-oHyj3T\test_main.cpp:14:48: error: 'class strucpp::FB_SIM_SAFETY' has no member named 'POWERCONTACTORFEEDBACK'
+   14 |     if (!ctx.assert_false(static_cast<bool>(FB.POWERCONTACTORFEEDBACK), "FB.POWERCONTACTORFEEDBACK", 11, "Enable FALSE -> Contacteur puissance ouvert")) return false;
+      |                                                ^~~~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Safety_6o_huzqb\strucpp-test-oHyj3T\test_main.cpp: In function 'bool test_2(strucpp::TestContext&)':
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Safety_6o_huzqb\strucpp-test-oHyj3T\test_main.cpp:22:8: error: 'class strucpp::FB_SIM_SAFETY' has no member named 'EMERGENCYCHAINHEALTHY'
+   22 |     FB.EMERGENCYCHAINHEALTHY = true;
+      |        ^~~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Safety_6o_huzqb\strucpp-test-oHyj3T\test_main.cpp:23:8: error: 'class strucpp::FB_SIM_SAFETY' has no member named 'POWERCONTACTORCMD'
+   23 |     FB.POWERCONTACTORCMD = true;
+      |        ^~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Safety_6o_huzqb\strucpp-test-oHyj3T\test_main.cpp:26:47: error: 'class strucpp::FB_SIM_SAFETY' has no member named 'EMERGENCYCHAINCLOSED'
+   26 |     if (!ctx.assert_true(static_cast<bool>(FB.EMERGENCYCHAINCLOSED), "FB.EMERGENCYCHAINCLOSED", 22, "AU Sain -> EmergencyChainClosed TRUE")) return false;
+      |                                               ^~~~~~~~~~~~~~~~~~~~
+C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Safety_6o_huzqb\strucpp-test-oHyj3T\test_main.cpp:27:47: error: 'class strucpp::FB_SIM_SAFETY' has no member named 'POWERCONTACTORFEEDBACK'
+   27 |     if (!ctx.assert_true(static_cast<bool>(FB.POWERCONTACTORFEEDBACK), "FB.POWERCONTACTORFEEDBACK", 23, "PowerCmd TRUE -> Feedback TRUE")) return false;
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~
+
