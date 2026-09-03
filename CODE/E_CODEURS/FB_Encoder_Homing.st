@@ -107,7 +107,7 @@ END_VAR
 VAR CONSTANT
     // === TOLERANCE & TEMPORISATION TRANSACTION ===
     CST_HomingVerifyToleranceM : REAL := 0.010; // Tolerance mesure cible (m)
-    CST_PresetVerifyTime        : TIME := T#500MS; // Latence historique avant relecture
+    CST_PresetVerifyTime        : TIME := T#50MS; // Latence historique avant relecture
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Encoder_Homing) ===

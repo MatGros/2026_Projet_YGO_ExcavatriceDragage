@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:43:50.960000" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:43:50.960000">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:11:32.182586" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:11:32.182586">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -841,7 +841,7 @@ Tolerance mesure cible (m)</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#500MS" />
+                <simpleValue value="TIME#50MS" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Latence historique avant relecture</xhtml>

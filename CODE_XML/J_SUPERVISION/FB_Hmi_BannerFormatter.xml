@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T12:25:45.078694" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T12:25:45.078694">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:09:58.297714" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:09:58.297714">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -31,18 +31,23 @@
               <value name="AX1_INIT" value="1" />
               <value name="AX2_TRANSLATE_P1" value="2" />
               <value name="AX3_OPEN_BUCKET" value="3" />
-              <value name="AX4_DESCEND_OPEN" value="4" />
-              <value name="AX5_BOTTOM_CONFIRMED" value="5" />
-              <value name="AX6_CLOSE_BUCKET" value="6" />
-              <value name="AX7_CTRL_ASCENT" value="7" />
-              <value name="AX8_ASCENT_LOADED" value="8" />
-              <value name="AX9_DRAIN_PAUSE" value="9" />
-              <value name="AX10_TRANSLATE_DUMP" value="10" />
-              <value name="AX11A_DUMP_ARRIVE" value="11" />
-              <value name="AX13_DONE_SYNC" value="13" />
-              <value name="AX_STAB" value="14" />
-              <value name="AX11B_DUMP_OPEN" value="15" />
-              <value name="AX11C_DUMP_REPOSITION" value="16" />
+              <value name="AX4_DESCEND_DIVING" value="4" />
+              <value name="AX5_KOBOLD_INIT" value="5" />
+              <value name="AX6_SEARCH_IMMERSION" value="6" />
+              <value name="AX7_SEARCH_BOTTOM" value="7" />
+              <value name="AX8_BOTTOM_CONFIRMED" value="8" />
+              <value name="AX9_RAISE_OFF_BOTTOM" value="9" />
+              <value name="AX10_CLOSE_BUCKET" value="10" />
+              <value name="AX11_CTRL_ASCENT" value="11" />
+              <value name="AX12_LOADED_ASCENT" value="12" />
+              <value name="AX13_DRAIN_PAUSE" value="13" />
+              <value name="AX14_TRANSLATE_DUMP" value="14" />
+              <value name="AX15A_DUMP_ARRIVE" value="15" />
+              <value name="AX15B_DUMP_OPEN" value="16" />
+              <value name="AX15C_DUMP_REPOSITION" value="17" />
+              <value name="AX18_DONE_SYNC" value="18" />
+              <value name="AX_STAB" value="19" />
+              <value name="AX_DIVING_RETRY" value="20" />
             </values>
           </enum>
         </baseType>
@@ -52,79 +57,119 @@
               <EnumValue>
                 <Name>AX0_REPOS</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repos / park : toutes commandes 0, etat neutre</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repos / park : toutes commandes 0, etat neutre - etape initiale pure</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>AX1_INIT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Verif reference machine (HomedM1/M2) - aucun mouvement</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Verif CONDITIONS INITIALES (Homed M1/M2, treuils FDC haut, M3 pas a droite de P1) - aucun mouvement, aucun referencement</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>AX2_TRANSLATE_P1</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers P1 au joystick (pas de selection, comme maintenance)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers P1 : joystick vers la droite, le cycle n'emet aucune commande M3 ; surveillance treuils au FDC haut</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
                 <Name>AX3_OPEN_BUCKET</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne (si deja ouverte -&gt; passe vite)</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ouverture benne jusqu'au FDC logiciel benne ouverte
+--- DIVING (5 steps + retry) ---</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX4_DESCEND_OPEN</Name>
+                <Name>AX4_DESCEND_DIVING</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongee benne ouverte, M1+M2 synchro, Kobold mesure ON</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Plongee couplee benne ouverte palier 4 jusqu'a l'altimetrie de lancement (DiveStartMin_M) - Kobold PAS enclenche</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX5_BOTTOM_CONFIRMED</Name>
+                <Name>AX5_KOBOLD_INIT</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirme (Kobold) ; montee lente securisee</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Activation contacteur Kobold &lt;&lt; au vol &gt;&gt;, verif retour contacteur, descente palier 4 maintenue</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX6_CLOSE_BUCKET</Name>
+                <Name>AX6_SEARCH_IMMERSION</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne - tolerance a peu pres ferme</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Recherche entree dans l'eau : attente front DI Kobold 0-&gt;1, descente palier 4 maintenue</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX7_CTRL_ASCENT</Name>
+                <Name>AX7_SEARCH_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontee palier 1 de controle + surveillance ecart M1/M2</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Recherche du fond : attente front DI Kobold 1-&gt;0, descente palier 4 maintenue</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX8_ASCENT_LOADED</Name>
+                <Name>AX8_BOTTOM_CONFIRMED</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontee en charge jusqu'a limite haute</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirme : coupure instantanee treuils, set bit fond, TouchPositionM / RaiseTargetM
+--- EXTRACTION (4 steps) ---</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX9_DRAIN_PAUSE</Name>
+                <Name>AX9_RAISE_OFF_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Egouttage temporise - duree configurable / passable IHM</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Retente les cables (palier 1), decollement du fond ; selecteur couplage BOTH/M1/M2 accessible</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX10_TRANSLATE_DUMP</Name>
+                <Name>AX10_CLOSE_BUCKET</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fermeture benne, treuils explicitement 0</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX11_CTRL_ASCENT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee controle palier max reglable [1..2] + surveillance ecart vitesse M1/M2 ; benne mal fermee autorisee</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX12_LOADED_ASCENT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee en charge : palier 4 si benne fermee, palier 1 si mal fermee ; pas de ralenti 1 m avant top
+--- DECHARGE (6 steps) ---</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX13_DRAIN_PAUSE</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Egouttage temporise - duree reglable IHM + bypass immediat</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX14_TRANSLATE_DUMP</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation vers tremie (depart P1) + avertissements IHM</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX11A_DUMP_ARRIVE</Name>
+                <Name>AX15A_DUMP_ARRIVE</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Arrivee tremie : treuils a l'arret, attente geste operateur</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX13_DONE_SYNC</Name>
+                <Name>AX15B_DUMP_OPEN</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de cycle : compteur vidages + duree cycle</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage : ouverture benne au-dessus de la tremie, LES DEUX treuils a l'arret</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX15C_DUMP_REPOSITION</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repositionnement couple M1+M2 (option IHM maintenue), retour AX15B au relachement</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX18_DONE_SYNC</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fin de passe : compteur vidages + duree cycle ; msg &lt;&lt; aller en P1 &gt;&gt; ; rebouclage direct sur AX2
+--- STEPS SPECIAUX ---</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -134,15 +179,9 @@
                 </Documentation>
               </EnumValue>
               <EnumValue>
-                <Name>AX11B_DUMP_OPEN</Name>
+                <Name>AX_DIVING_RETRY</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Vidage tremie : ouverture benne, LES DEUX treuils a l'arret</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>AX11C_DUMP_REPOSITION</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Repositionnement couple M1+M2 (option IHM maintenue), retour AX11B au relachement</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Reprise diving : remontee assistee palier lent jusqu'au FDC haut puis retour AX4 ; sur erreur Kobold / joystick relache / palier &lt;&gt; 4 en AX5..AX7</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -2479,24 +2518,20 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX1_INIT: Banner.SequenceProgressText := 'Cycle: CONDITIONS INITIALES';
             E_AutoCycleStep.AX2_TRANSLATE_P1: Banner.SequenceProgressText := 'Cycle: TRANSLATION P1';
             E_AutoCycleStep.AX3_OPEN_BUCKET: Banner.SequenceProgressText := 'Cycle: OUVERTURE BENNE';
-            E_AutoCycleStep.AX4_DESCEND_OPEN:
-                IF DiveState = E_DiveSearchState.SEARCHING_IMMERSION THEN
-                    Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; IMMERSION';
-                ELSIF DiveState = E_DiveSearchState.SEARCHING_BOTTOM THEN
-                    Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; RECHERCHE FOND';
-                ELSIF DiveState = E_DiveSearchState.BOTTOM_CONFIRMED THEN
-                    Banner.SequenceProgressText := 'Cycle: DESCENTE &gt; FOND CONFIRMÉ';
-                ELSE
-                    Banner.SequenceProgressText := 'Cycle: DESCENTE BENNE OUVERTE';
-                END_IF;
-            E_AutoCycleStep.AX5_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
-            E_AutoCycleStep.AX6_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
-            E_AutoCycleStep.AX7_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: ARRACHAGE / MONTÉE LENTE';
-            E_AutoCycleStep.AX8_ASCENT_LOADED: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
-            E_AutoCycleStep.AX9_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
-            E_AutoCycleStep.AX10_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
-            E_AutoCycleStep.AX11A_DUMP_ARRIVE, E_AutoCycleStep.AX11B_DUMP_OPEN: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
-            E_AutoCycleStep.AX13_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ';
+            E_AutoCycleStep.AX4_DESCEND_DIVING: Banner.SequenceProgressText := 'Cycle: PLONGÉE PALIER 4';
+            E_AutoCycleStep.AX5_KOBOLD_INIT: Banner.SequenceProgressText := 'Cycle: INIT KOBOLD';
+            E_AutoCycleStep.AX6_SEARCH_IMMERSION: Banner.SequenceProgressText := 'Cycle: RECHERCHE IMMERSION';
+            E_AutoCycleStep.AX7_SEARCH_BOTTOM: Banner.SequenceProgressText := 'Cycle: RECHERCHE FOND';
+            E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
+            E_AutoCycleStep.AX_DIVING_RETRY: Banner.SequenceProgressText := 'Cycle: REPRISE PLONGÉE';
+            E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: Banner.SequenceProgressText := 'Cycle: RETENTE CÂBLES';
+            E_AutoCycleStep.AX10_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
+            E_AutoCycleStep.AX11_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: MONTÉE CONTRÔLE';
+            E_AutoCycleStep.AX12_LOADED_ASCENT: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
+            E_AutoCycleStep.AX13_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
+            E_AutoCycleStep.AX14_TRANSLATE_DUMP: Banner.SequenceProgressText := 'Cycle: TRANSLATION TRÉMIE';
+            E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN, E_AutoCycleStep.AX15C_DUMP_REPOSITION: Banner.SequenceProgressText := 'Cycle: VIDAGE BENNE';
+            E_AutoCycleStep.AX18_DONE_SYNC: Banner.SequenceProgressText := 'Cycle: TERMINÉ - ALLER P1';
             E_AutoCycleStep.AX_STAB: Banner.SequenceProgressText := 'Cycle: STABILISATION';
         ELSE
             Banner.SequenceProgressText := 'Cycle: ÉTAPE EN COURS';
@@ -2732,24 +2767,34 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             OperatorActionCandidate := '[JOYSTICK] Pousser vers la droite : translation vers P1';
         E_AutoCycleStep.AX3_OPEN_BUCKET:
             OperatorActionCandidate := '[IHM] Ouverture benne en cours';
-        E_AutoCycleStep.AX4_DESCEND_OPEN:
-            OperatorActionCandidate := '[JOYSTICK] Descendre benne ouverte &gt; Attendre contact fond';
-        E_AutoCycleStep.AX5_BOTTOM_CONFIRMED:
-            OperatorActionCandidate := '[IHM] Fond confirmé - remontée';
-        E_AutoCycleStep.AX6_CLOSE_BUCKET:
+        E_AutoCycleStep.AX4_DESCEND_DIVING:
+            OperatorActionCandidate := '[JOYSTICK] Descendre palier 4 jusqu a l altimetrie de lancement';
+        E_AutoCycleStep.AX5_KOBOLD_INIT:
+            OperatorActionCandidate := '[JOYSTICK] Maintenir descente : init Kobold en cours';
+        E_AutoCycleStep.AX6_SEARCH_IMMERSION:
+            OperatorActionCandidate := '[JOYSTICK] Maintenir descente : entree dans l eau attendue';
+        E_AutoCycleStep.AX7_SEARCH_BOTTOM:
+            OperatorActionCandidate := '[JOYSTICK] Maintenir descente : detection du fond';
+        E_AutoCycleStep.AX8_BOTTOM_CONFIRMED:
+            OperatorActionCandidate := '[IHM] Fond touche';
+        E_AutoCycleStep.AX_DIVING_RETRY:
+            OperatorActionCandidate := '[JOYSTICK] Reprise plongee : remonter au FDC haut';
+        E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM:
+            OperatorActionCandidate := '[JOYSTICK] Retente des cables (palier 1)';
+        E_AutoCycleStep.AX10_CLOSE_BUCKET:
             OperatorActionCandidate := '[IHM] Fermeture benne en cours';
-        E_AutoCycleStep.AX7_CTRL_ASCENT:
-            OperatorActionCandidate := '[JOYSTICK] Remontée lente de contrôle';
-        E_AutoCycleStep.AX8_ASCENT_LOADED:
-            OperatorActionCandidate := '[IHM] Remontée en charge';
-        E_AutoCycleStep.AX9_DRAIN_PAUSE:
-            OperatorActionCandidate := '[IHM] Attendre égouttage';
-        E_AutoCycleStep.AX10_TRANSLATE_DUMP:
-            OperatorActionCandidate := '[JOYSTICK] Déplacer vers trémie';
-        E_AutoCycleStep.AX11A_DUMP_ARRIVE, E_AutoCycleStep.AX11B_DUMP_OPEN:
+        E_AutoCycleStep.AX11_CTRL_ASCENT:
+            OperatorActionCandidate := '[JOYSTICK] Remontee de controle';
+        E_AutoCycleStep.AX12_LOADED_ASCENT:
+            OperatorActionCandidate := '[IHM] Remontee en charge';
+        E_AutoCycleStep.AX13_DRAIN_PAUSE:
+            OperatorActionCandidate := '[IHM] Attendre egouttage (ou bypass IHM)';
+        E_AutoCycleStep.AX14_TRANSLATE_DUMP:
+            OperatorActionCandidate := '[JOYSTICK] Deplacer vers tremie';
+        E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN, E_AutoCycleStep.AX15C_DUMP_REPOSITION:
             OperatorActionCandidate := '[IHM] Vidage benne';
-        E_AutoCycleStep.AX13_DONE_SYNC:
-            OperatorActionCandidate := '[IHM] Cycle terminé';
+        E_AutoCycleStep.AX18_DONE_SYNC:
+            OperatorActionCandidate := '[JOYSTICK] Cycle termine : aller en P1 pour recommencer';
         E_AutoCycleStep.AX_STAB:
             // Libellé de l'étape d'origine du défaut (CycleStepAtError).
             CASE CycleStepAtError OF
@@ -2757,17 +2802,23 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_AutoCycleStep.AX1_INIT: StepAtErrorStr := 'X1 (référencement)';
                 E_AutoCycleStep.AX2_TRANSLATE_P1: StepAtErrorStr := 'X2 (sélection position)';
                 E_AutoCycleStep.AX3_OPEN_BUCKET: StepAtErrorStr := 'X3 (ouverture benne)';
-                E_AutoCycleStep.AX4_DESCEND_OPEN: StepAtErrorStr := 'X4 (descente)';
-                E_AutoCycleStep.AX5_BOTTOM_CONFIRMED: StepAtErrorStr := 'X5 (fond confirmé)';
-                E_AutoCycleStep.AX6_CLOSE_BUCKET: StepAtErrorStr := 'X6 (fermeture benne)';
-                E_AutoCycleStep.AX7_CTRL_ASCENT: StepAtErrorStr := 'X7 (remontée contrôle)';
-                E_AutoCycleStep.AX8_ASCENT_LOADED: StepAtErrorStr := 'X8 (remontée chargée)';
-                E_AutoCycleStep.AX9_DRAIN_PAUSE: StepAtErrorStr := 'X9 (égouttage)';
-                E_AutoCycleStep.AX10_TRANSLATE_DUMP: StepAtErrorStr := 'X10 (translation trémie)';
-                E_AutoCycleStep.AX11A_DUMP_ARRIVE: StepAtErrorStr := 'X11a (arrivee tremie)';
-                E_AutoCycleStep.AX11B_DUMP_OPEN: StepAtErrorStr := 'X11b (vidage benne)';
-                E_AutoCycleStep.AX13_DONE_SYNC: StepAtErrorStr := 'X13 (cycle terminé)';
-                E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'X14 (stabilisation)';
+                E_AutoCycleStep.AX4_DESCEND_DIVING: StepAtErrorStr := 'AX4 (plongee palier 4)';
+                E_AutoCycleStep.AX5_KOBOLD_INIT: StepAtErrorStr := 'AX5 (init Kobold)';
+                E_AutoCycleStep.AX6_SEARCH_IMMERSION: StepAtErrorStr := 'AX6 (recherche immersion)';
+                E_AutoCycleStep.AX7_SEARCH_BOTTOM: StepAtErrorStr := 'AX7 (recherche fond)';
+                E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: StepAtErrorStr := 'AX8 (fond confirme)';
+                E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'AX_DIVING_RETRY (reprise plongee)';
+                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (retente cables)';
+                E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10 (fermeture benne)';
+                E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11 (remontee controle)';
+                E_AutoCycleStep.AX12_LOADED_ASCENT: StepAtErrorStr := 'AX12 (remontee chargee)';
+                E_AutoCycleStep.AX13_DRAIN_PAUSE: StepAtErrorStr := 'AX13 (egouttage)';
+                E_AutoCycleStep.AX14_TRANSLATE_DUMP: StepAtErrorStr := 'AX14 (translation tremie)';
+                E_AutoCycleStep.AX15A_DUMP_ARRIVE: StepAtErrorStr := 'AX15a (arrivee tremie)';
+                E_AutoCycleStep.AX15B_DUMP_OPEN: StepAtErrorStr := 'AX15b (vidage benne)';
+                E_AutoCycleStep.AX15C_DUMP_REPOSITION: StepAtErrorStr := 'AX15c (repositionnement)';
+                E_AutoCycleStep.AX18_DONE_SYNC: StepAtErrorStr := 'AX18 (cycle termine)';
+                E_AutoCycleStep.AX_STAB: StepAtErrorStr := 'AX_STAB (stabilisation)';
                 ELSE
                     StepAtErrorStr := '?';
             END_CASE;

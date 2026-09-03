@@ -239,6 +239,8 @@ instCycleSemiAuto(
     SetDepthM               := GVL_IHM.Cycle.Cfg.SetDepth_M,
     SetOffsetM              := GVL_IHM.Cycle.Cfg.SetOffset_M,
     KoboldContactFond       := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
+    KoboldImmersed          := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI, // DI brut Kobold (fronts AX6/AX7) - convention a confirmer au banc
+    KoboldContactorFeedback := TRUE, // TODO banc : cabler le retour contacteur Kobold reel ; TRUE = init reputee OK (verif AX5 dormante)
     LimitLegalReached       := GVL_IHM.Commun.LimitLegalReached,
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
     WinchSyncError          := PRG_04_Treuils_Benne.Data.WinchSyncError,
@@ -269,6 +271,12 @@ instCycleSemiAuto(
     CfgDrainTime            := GVL_IHM.Cycle.Cfg.DrainTime,
     SkipDrainRequest        := GVL_IHM.Cycle.Cmd.BtnSkipDrain,
     RepositionRequest       := GVL_IHM.Cycle.Cmd.BtnReposition,
+    // Config diving / extraction (GEL 2026-09-03)
+    DiveStartMinM           := GVL_IHM.CycleDiveSearch.Cfg.DiveStartMin_M, // altimetrie lancement Kobold (AT4)
+    CfgRaiseOffBottomM      := 0.0,   // TODO IHM : champ dedie ; 0 -> defaut interne FB 0,5 m
+    CfgCtrlAscentMaxStep    := 1,     // TODO IHM : champ dedie ; palier max montee controle AX11 [1..2]
+    M1_SpeedStepApplied     := 0,     // TODO : publier instWinchM1.StepNumber (PRG_04) ; 0 -> garde palier<>4 dormante
+    M2_SpeedStepApplied     := 0,     // TODO : publier instWinchM2.StepNumber (PRG_04)
     SampleCount            := _CycleSampleCount
 );
 

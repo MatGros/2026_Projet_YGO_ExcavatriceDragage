@@ -706,7 +706,7 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx211_OperatorActionId          := CycleOpe
 GVL_Troubleshooting.G_CycleSemiAuto.Idx212_OperatorAction            := CycleOperatorAction;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx213_ExpectedAxis              := CycleExpectedAxis;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx214_ExpectedDirection         := CycleExpectedDirection;
-GVL_Troubleshooting.G_CycleSemiAuto.Idx215_WaitingResume             := (Auth.Mode <> E_Mode.SEMI_AUTO) AND (CycleStep <> E_AutoCycleStep.AX0_REPOS) AND (CycleStep <> E_AutoCycleStep.AX13_DONE_SYNC) AND (CycleStep <> E_AutoCycleStep.AX_STAB);
+GVL_Troubleshooting.G_CycleSemiAuto.Idx215_WaitingResume             := (Auth.Mode <> E_Mode.SEMI_AUTO) AND (CycleStep <> E_AutoCycleStep.AX0_REPOS) AND (CycleStep <> E_AutoCycleStep.AX18_DONE_SYNC) AND (CycleStep <> E_AutoCycleStep.AX_STAB);
 GVL_Troubleshooting.G_CycleSemiAuto.Idx216_PausedState               := CycleStep;
 
 GVL_Troubleshooting.G_CycleSemiAuto.Idx301_TargetPosition            := CycleTargetPosition;
