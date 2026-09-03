@@ -36,6 +36,7 @@ VAR_INPUT
     M2_Busy                         : BOOL;                           // --> [HW] Treuil M2 en mouvement (Busy)
     InhibitM1                       : BOOL;                           // --> [HW] Treuil M1 inhibe
     InhibitM2                       : BOOL;                           // --> [HW] Treuil M2 inhibe
+    ManualJogM2Active               : BOOL;                           // --> [CMD] Pilotage unitaire benne M2 (WinchSel=2, MAINT) : detection passive d'etat sur position
 
     // === REGLAGES ET CONFIGURATION ===
     Config                          : ST_fbBucket_Config;                // --> [CFG] Configuration parametres benne
@@ -405,6 +406,24 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
         RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
     ELSE
         RemainingTravelM := 0.0;
+    END_IF;
+END_IF;
+
+// --- Detection passive d'etat benne sur position (jog unitaire M2, hors sequence auto) --
+// En pilotage unitaire benne (WinchSel=2), FB_Bucket ne pilote pas l'ouverture/fermeture
+// mais l'etat memorise doit suivre la position : on accepte "ouvert" / "ferme" au meme
+// seuil que l'arret jog (Offset +/- Anticipation, tous deux reglables IHM). Le point
+// d'arret du jog = l'etat accepte. Zone intermediaire : etat inchange (memorise).
+// Uniquement M1 ET M2 references : sinon CablePosM1/M2 (donc le delta) sont sans valeur.
+IF ManualJogM2Active AND HomedM1 AND HomedM2 AND NOT Lifecycle.Busy AND NOT SevereError THEN
+    IF CablePosM2 <= (CablePosM1 + Config.OffsetOpenM + Config.OpenAnticipationM) THEN
+        BucketState.IsOpen        := TRUE;
+        BucketState.IsClosed      := FALSE;
+        BucketState.StateIncoherent := FALSE;
+    ELSIF CablePosM2 >= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
+        BucketState.IsClosed      := TRUE;
+        BucketState.IsOpen        := FALSE;
+        BucketState.StateIncoherent := FALSE;
     END_IF;
 END_IF;
 {endregion}

@@ -9,7 +9,8 @@ STRUCT
     OffsetOpenM        : REAL;                                        // Ecart M1/M2 en metres benne ouvert (m)
     OffsetCloseM       : REAL;                                        // Ecart M1/M2 en metres benne ferme (m)
     CoherenceLimitM    : REAL;                                        // Seuil de detection d'incoherence au boot (m)
-    CloseAnticipationM : REAL := 1.0;                                 // Anticipation coupure commande fermeture (m)
-    OpenAnticipationM  : REAL := 1.3;                                 // Anticipation coupure commande ouverture (m)
+    CloseAnticipationM : REAL := 1.0;                                 // Anticipation coupure commande fermeture (m) -- reglable IHM
+    OpenAnticipationM  : REAL := 1.3;                                 // Anticipation coupure commande ouverture (m) -- reglable IHM
+    JogSlowdownZoneM   : REAL := 1.0;                                 // Distance avant le point d'arret anticipe ou le jog unitaire M2 est force au palier 1 (m) -- reglable IHM
 END_STRUCT
 END_TYPE

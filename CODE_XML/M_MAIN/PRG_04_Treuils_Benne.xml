@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T16:10:56.929019" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T16:10:56.929019">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T16:35:11.327081" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T16:35:11.327081">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2672,7 +2672,7 @@ TRUE = relais sens + C1..C4 tous retombés (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m) -- reglable IHM</xhtml>
               </documentation>
             </variable>
             <variable name="OpenAnticipationM">
@@ -2683,7 +2683,18 @@ TRUE = relais sens + C1..C4 tous retombés (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <simpleValue value="1.3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande ouverture (m) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JogSlowdownZoneM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant le point d'arret anticipe ou le jog unitaire M2 est force au palier 1 (m) -- reglable IHM</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5568,6 +5579,30 @@ treuil bloque alors l'autre : départ jamais isolé.</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">pilotage unitaire M2 "sécurisé" -- bornes ouvert/fermé + palier 1</xhtml>
               </documentation>
             </variable>
+            <variable name="ManualBucketJogActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">WinchSel=2 + MAINT : jog benne unitaire M2 (ouv/ferm), indépendant du toggle bornes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2JogApproachOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 dans la zone de ralentissement avant l'arrêt ouverture (palier 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2JogApproachClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M2 dans la zone de ralentissement avant l'arrêt fermeture (palier 1)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SlackCableAscentCapStep1">
               <type>
                 <BOOL />
@@ -5871,6 +5906,12 @@ MaintN1 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1);
 ExtractionAssistActive := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
                           AND GVL_IHM.CycleExtraction.Cmd.TglEnableExtractionSequence;
 
+// Jog benne unitaire M2 : joystick dédié M2 (WinchSel=2) en maintenance. Autorise
+// l'ouverture (descente M2) hors mode Dive + active la détection passive d'état benne
+// dans FB_Bucket. Indépendant du toggle bornes (TglManualBucketLimits).
+ManualBucketJogActive := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
+    AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
+
 // Règle absolue en pilotage both normal --
 // descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
 // Décision déléguée à FB_BucketCmdArbitration (POO §5) : flags armés + commandes
@@ -5932,6 +5973,7 @@ instBucket(
     BucketState        := _BucketState,
     InhibitM1           := PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     InhibitM2           := PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
+    ManualJogM2Active   := ManualBucketJogActive,
     // Bypass benne (n°25 de la matrice) — effectif tous modes si armé (dérogation MES 2026, AF-05 §4bis)
     BypassGlobal        := GVL_IHM.M2TreuilBenne.Bucket.Bypass.Global
 );
@@ -6231,10 +6273,13 @@ ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimi
     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2);
 
 ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
-// Ce chemin (pilotage
-// unitaire M2, hors instBucket) applique l'anticipation d'inertie OpenAnticipationM/CloseAnticipationM
-// (mêmes que FB_Bucket) pour couvrir aussi le jog unitaire.
-ProcessPermitM2_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen
+// Ce chemin (pilotage unitaire M2, hors instBucket) applique l'anticipation d'inertie
+// OpenAnticipationM/CloseAnticipationM (mêmes que FB_Bucket, réglables IHM) pour couvrir
+// aussi le jog unitaire. L'ouverture benne (descente M2) est permise soit par le mode Dive
+// (DescendPermitDiveBucketOpen), soit par le jog benne unitaire en maintenance
+// (ManualBucketJogActive) — sinon la benne ne pourrait plus s'ouvrir en WinchSel=2.
+ProcessPermitM2_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched)
+    AND (DescendPermitDiveBucketOpen OR ManualBucketJogActive)
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &lt;= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetOpenM + _BucketCfgPersist.Config.OpenAnticipationM)));
 
 // Permis process de montee : contrat extraction commun aux deux axes.
@@ -6245,6 +6290,22 @@ ProcessPermitM1_Ascent := NOT ExtractionAssistActive
 ProcessPermitM2_Ascent := (NOT ExtractionAssistActive
     OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.AscentPermit)
     AND NOT (ManualBucketLimitsActive AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &gt;= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM - _BucketCfgPersist.Config.CloseAnticipationM)));
+
+// Zone de ralentissement jog unitaire M2 : palier 1 forcé dans les JogSlowdownZoneM
+// derniers mètres AVANT le point d'arrêt anticipé (Offset ± Anticipation). Le "1 m d'avant"
+// est donc calculé sur la cible anticipée, pas sur l'offset brut, et suit tout réglage IHM.
+M2JogApproachOpen := ManualBucketJogActive
+    AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM
+         &lt;= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
+             + _BucketCfgPersist.Config.OffsetOpenM
+             + _BucketCfgPersist.Config.OpenAnticipationM
+             + _BucketCfgPersist.Config.JogSlowdownZoneM));
+M2JogApproachClose := ManualBucketJogActive
+    AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM
+         &gt;= (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
+             + _BucketCfgPersist.Config.OffsetCloseM
+             - _BucketCfgPersist.Config.CloseAnticipationM
+             - _BucketCfgPersist.Config.JogSlowdownZoneM));
 
 M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
                       0.0,
@@ -6634,9 +6695,27 @@ CommonMinStepDown := MAX(0, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStep
 // --- M2-propre (jamais vu par M1) ---
 M2MaxStepUp   := CommonMaxStepAscent;
 M2MaxStepDown := CommonMaxStepDescent;
-IF instBucket.M2_BucketJogLimit OR ManualBucketLimitsActive THEN
+// Auto-séquencement benne (FB_Bucket) : palier 1 sur toute la manœuvre.
+IF instBucket.M2_BucketJogLimit THEN
     M2MaxStepUp   := 1;
     M2MaxStepDown := 1;
+END_IF;
+// Jog unitaire M2 : palier libre en course, palier 1 uniquement dans la zone de
+// ralentissement (JogSlowdownZoneM avant le point d'arrêt anticipé — cf. §5). Montée M2
+// = fermeture, descente M2 = ouverture. Les zones sont calculées sur la position :
+// si M1/M2 ne sont pas référencés, la position n'a pas de sens → repli palier 1 partout.
+IF ManualBucketJogActive THEN
+    IF NOT (PRG_02_Acquisition.Data.EncoderM1.Homed AND PRG_02_Acquisition.Data.EncoderM2.Homed) THEN
+        M2MaxStepUp   := 1;
+        M2MaxStepDown := 1;
+    ELSE
+        IF M2JogApproachClose THEN
+            M2MaxStepUp := 1;
+        END_IF;
+        IF M2JogApproachOpen THEN
+            M2MaxStepDown := 1;
+        END_IF;
+    END_IF;
 END_IF;
 IF BucketNotClosedAscentCapStep1 OR SlackCableAscentCapStep1 THEN
     M2MaxStepUp := 1;
@@ -7354,6 +7433,14 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Treuil M2 inhibe</xhtml>
               </documentation>
             </variable>
+            <variable name="ManualJogM2Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Pilotage unitaire benne M2 (WinchSel=2, MAINT) : detection passive d'etat sur position</xhtml>
+              </documentation>
+            </variable>
             <variable name="Config">
               <type>
                 <derived name="ST_fbBucket_Config" />
@@ -8024,6 +8111,24 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
         RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
     ELSE
         RemainingTravelM := 0.0;
+    END_IF;
+END_IF;
+
+// --- Detection passive d'etat benne sur position (jog unitaire M2, hors sequence auto) --
+// En pilotage unitaire benne (WinchSel=2), FB_Bucket ne pilote pas l'ouverture/fermeture
+// mais l'etat memorise doit suivre la position : on accepte "ouvert" / "ferme" au meme
+// seuil que l'arret jog (Offset +/- Anticipation, tous deux reglables IHM). Le point
+// d'arret du jog = l'etat accepte. Zone intermediaire : etat inchange (memorise).
+// Uniquement M1 ET M2 references : sinon CablePosM1/M2 (donc le delta) sont sans valeur.
+IF ManualJogM2Active AND HomedM1 AND HomedM2 AND NOT Lifecycle.Busy AND NOT SevereError THEN
+    IF CablePosM2 &lt;= (CablePosM1 + Config.OffsetOpenM + Config.OpenAnticipationM) THEN
+        BucketState.IsOpen        := TRUE;
+        BucketState.IsClosed      := FALSE;
+        BucketState.StateIncoherent := FALSE;
+    ELSIF CablePosM2 &gt;= (CablePosM1 + Config.OffsetCloseM - Config.CloseAnticipationM) THEN
+        BucketState.IsClosed      := TRUE;
+        BucketState.IsOpen        := FALSE;
+        BucketState.StateIncoherent := FALSE;
     END_IF;
 END_IF;
 {endregion}

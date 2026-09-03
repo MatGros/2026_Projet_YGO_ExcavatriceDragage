@@ -375,7 +375,7 @@
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:16px;margin:24px 0;">
         <div class="card-neon-blue" style="background:var(--surface);border-radius:12px;padding:18px;text-align:center;">
-            <div style="font-size:30px;font-weight:900;color:var(--accent);font-family:monospace;">52</div>
+            <div style="font-size:30px;font-weight:900;color:var(--accent);font-family:monospace;">53</div>
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">POU & Composants</div>
         </div>
         <div class="card-neon-ok" style="background:var(--surface);border-radius:12px;padding:18px;text-align:center;">
@@ -383,11 +383,11 @@
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Succès (PASS)</div>
         </div>
         <div class="card-neon-fail" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
-            <div style="font-size:30px;font-weight:900;color:var(--red-text);font-family:monospace;">23</div>
+            <div style="font-size:30px;font-weight:900;color:var(--red-text);font-family:monospace;">24</div>
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Échecs (FAIL)</div>
         </div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;">
-            <div style="font-size:16px;font-weight:800;color:var(--text);margin-top:8px;font-family:monospace;">2026-09-03 16:34:16</div>
+            <div style="font-size:16px;font-weight:800;color:var(--text);margin-top:8px;font-family:monospace;">2026-09-03 18:32:12</div>
             <div style="font-size:12px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:0.6px;margin-top:2px;">Horodatage Exécution</div>
         </div>
     </div>
@@ -605,7 +605,7 @@
         <div class="card-neon-fail" style="background:var(--surface);border-radius:12px;padding:20px 24px;margin-bottom:22px;transition:all 0.2s ease;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;">
                 <h2 style="margin:0;font-size:19px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px;">📁 <span style="color:var(--accent);font-family:monospace;font-weight:800;">CODE/G_CYCLE</span></h2>
-                <div style="display:flex;align-items:center;gap:10px;"><span class="badge badge-fail">FAIL</span> <span style="font-size:14px;color:var(--muted);font-weight:700;">3/5 composant(s)</span></div>
+                <div style="display:flex;align-items:center;gap:10px;"><span class="badge badge-fail">FAIL</span> <span style="font-size:14px;color:var(--muted);font-weight:700;">3/6 composant(s)</span></div>
             </div>
             <table style="width:100%;border-collapse:collapse;font-size:14px;">
                 <tbody>
@@ -620,6 +620,18 @@
                     </div>
                 </td>
                 <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_Cycle.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
+                <td style="padding: 12px 14px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
+                        <a href="RESULTS/G_CYCLE/reports/FB_CycleMachineHoming.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_CycleMachineHoming</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/0 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;color:#f87171;background:rgba(239,68,68,0.15);padding:3px 8px;border-radius:6px;border:1px solid #dc2626;font-weight:700;">⚪ Non exécuté</span>
+                    </div>
+                </td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_CycleMachineHoming.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>
@@ -662,12 +674,12 @@
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.txt" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_MachineHomingCycle</a>
-                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/1 test(s) OK</span>
-                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 16:34:16</span>
+                        <a href="RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.html" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_MachineHomingCycle</a>
+                        <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/0 test(s) OK</span>
+                        <span style="font-size:12px;font-family:monospace;color:#f87171;background:rgba(239,68,68,0.15);padding:3px 8px;border-radius:6px;border:1px solid #dc2626;font-weight:700;">⚪ Non exécuté</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.txt" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/G_CYCLE/reports/FB_MachineHomingCycle.html" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr></tbody>
             </table>
         </div>
@@ -683,12 +695,12 @@
                 <td style="padding: 12px 14px;">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                         <span style="background:rgba(168,85,247,0.35);color:#ffffff;border:1.5px solid #c084fc;font-size:13.5px;padding:4px 10px;border-radius:6px;font-weight:900;letter-spacing:0.8px;font-family:monospace;box-shadow:0 0 10px rgba(168,85,247,0.4);">⚙️ FB</span>
-                        <a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_bucket" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Bucket</a>
+                        <a href="RESULTS/H_TREUILS_BENNE/reports/FB_Bucket.txt#fb-section-fb_bucket" style="font-family:monospace;font-size:16px;font-weight:800;color:#e2e8f0;text-decoration:none;letter-spacing:0.3px;">FB_Bucket</a>
                         <span style="font-size:13px;font-weight:700;color:var(--muted);background:var(--card-sub);padding:3px 10px;border-radius:6px;border:1px solid var(--border);">0/1 test(s) OK</span>
-                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 08:09:22</span>
+                        <span style="font-size:12px;font-family:monospace;padding:3px 9px;border-radius:6px;font-weight:700;letter-spacing:0.3px;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);" title="Rapport récent (< 24h)">🟢 2026-09-03 18:32:12</span>
                     </div>
                 </td>
-                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/H_TREUILS_BENNE.html#fb-section-fb_bucket" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
+                <td style="padding: 12px 14px;text-align:right;"><a href="RESULTS/H_TREUILS_BENNE/reports/FB_Bucket.txt#fb-section-fb_bucket" style="display:inline-block;padding:6px 14px;background:var(--btn-bg);border:1px solid var(--btn-border);border-radius:6px;font-size:12.5px;font-weight:700;color:var(--text);text-decoration:none;">Ouvrir Rapport ➔</a></td>
             </tr>
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 12px 14px; width:90px;"><span class="badge badge-fail">FAIL</span></td>

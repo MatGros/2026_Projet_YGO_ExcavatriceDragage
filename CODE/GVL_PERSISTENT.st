@@ -67,7 +67,14 @@ VAR_GLOBAL PERSISTENT RETAIN
             OffsetCloseM     := 15.0,
             // Avec l'anticipation inertie, un écart résiduel après arrêt est normal :
             // le seuil de cohérence tolère cet écart résiduel.
-            CoherenceLimitM  := 1.0
+            CoherenceLimitM  := 1.0,
+            // Anticipations d'inertie + zone de ralentissement jog — réglables IHM
+            // (méca dynamique évolutive). Le point d'arrêt jog unitaire M2 et
+            // l'acceptation d'état ouvert/fermé sont à Offset ± Anticipation ;
+            // palier 1 forcé dans les JogSlowdownZoneM derniers mètres.
+            CloseAnticipationM := 1.0,
+            OpenAnticipationM  := 1.3,
+            JogSlowdownZoneM   := 1.0
         ),
         CfgTimeoutDuration := T#60s
     ); // 🌉 Pont FB_CfgPersistBridge_BucketCfg
