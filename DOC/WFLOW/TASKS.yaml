@@ -5158,3 +5158,54 @@ tasks:
   - Zéro modification de CODE/
   contrat: ''
   bloque_par: []
+
+- id: T233
+  parent_id: T226
+  statut: ⏳
+  criticite: C3
+  domaine: CYCLE / HOMING MACHINE (G_CYCLE)
+  agent: CC-01
+  date: '2026-09-03T09:30:00+02:00'
+  titre: Implementation du GRAFCET de homing machine (FB_MachineHomingCycle HX0..HX6)
+  contexte: >
+    Realise la spec figee DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md
+    (partie 1). Transforme FB_MachineHomingCycle d'un guide passif en un cycle de
+    homing machine sequentiel qui coordonne montee capteur, reference axes M1/M2
+    au vol sur front descendant, mise en position benne fermee et commit atomique.
+    Concretise T226 D5/AC5/AC8/AC9.
+  description: >
+    P1 : types + interface FB (Cfg +timeouts, nouveaux VAR_INPUT/VAR_OUTPUT, squelette CASE).
+    P2 : corps GRAFCET complet (CASE HX0..HXF, sous-machine 3 appuis, SeenNeutral, guide S6) + rebuild tests StruCpp.
+    P3 : cablage PRG_02/PRG_03 (Cfg, WinchM1/M2Cmd -> PRG_04, M3Locked) + bundle + G200 + gates palier C + reviews.
+  objectifs:
+  - GRAFCET HX0 (initiale pure) .. HX6 + HXF conforme a la spec gelee
+  - Reference conjointe M1+M2 au vol sur F_TRIG(TopPositionActive)
+  - Separation DIRECTION / V_CONTINU / V_EXPLICITE (motif 3 appuis partage, defini une fois)
+  - M3 interdit tout le cycle (M3Locked)
+  - Fail-safe et transverses conserves ; aucun redemarrage auto
+  - Suite test_fb_machinehomingcycle reconstruite sur le modele GRAFCET
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T233_IMPL_GRAFCET_HOMING_MACHINE.yaml
+  bloque_par: []
+
+- id: T234
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: DOCUMENTATION (REFONTE CYCLE SEMI_AUTO)
+  agent: CC-01
+  date: '2026-09-03T08:10:00+02:00'
+  titre: Mise a jour documentaire de la refonte du cycle SEMI_AUTO (ex-T232, renumerote)
+  contexte: >
+    Regroupe la dette documentaire des lots cycle codes pendant la MES 2026-09
+    (T229 + B1/B2/E, T226-AC1/AC2). Renumerote de T232 vers T234 suite a une
+    collision d'ID avec la tache AGY-01.
+  description: >
+    Aligner AF_Partie-04 / AF_Partie-05, les catalogues de tests, IHM_VARIABLES_MIGRATION.md
+    et VERSION_HISTORY.md sur le code du sequenceur SEMI_AUTO refondu. Scope DOC uniquement.
+  objectifs:
+  - AF_Partie-04 decrit X1 sans referencement, split X11a/b/c, translation depart P1
+  - AF_Partie-05 documente SEMI_AUTO homed-only + perte de datum
+  - Catalogues TC et IHM_VARIABLES_MIGRATION.md a jour
+  - Jalon VERSION_HISTORY.md
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T234_MAJ_DOC_REFONTE_CYCLE.yaml
+  bloque_par: [T233]
