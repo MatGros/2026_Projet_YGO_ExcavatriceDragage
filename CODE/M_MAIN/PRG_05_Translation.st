@@ -90,6 +90,7 @@ VAR
     M3_StatusText        : STRING(80);
     M3_SensorsWordPrev   : BYTE;   // detection franchissement (RAZ jeton sans dependance frequence)
     M3_SensorsWordChanged : BOOL;
+    M3_AtWorkPositionStable : BOOL; // M3 arrete P1 ou Maintenance — lecture STATIQUE mot capteurs (vrai des le boot)
     TonTremieProcessBlock : TON;
 
     // 🕵️ Trace de blocage terrain (publiée via Data.TranslationTrace, consommée FB_TroubleshootingView)
@@ -213,6 +214,17 @@ ELSIF M3_SensorsWordChanged THEN
     // Le mot capteurs a change sans que ce soit une arrivee -> on a quitte le dernier point.
     M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
 END_IF;
+
+// --- M3 a une position de travail : STATIQUE (mot capteurs), pas un jeton de franchissement ---
+// Les jetons M3_AtXxxStable ne se posent que sur un FRONT capteur : au boot PLC, pont deja
+// pose a P1 ou Maintenance sans mouvement -> jetons FALSE -> le verrou descente treuil
+// (T249-A) resterait bloque jusqu'a devoir franchir un capteur. On complete donc par une
+// lecture STATIQUE du mot : 00011 = arret au P1 (capteur P1 fait, P2 depasse) ; 00000 =
+// extreme Maintenance. Tremie / PV / P2 / transit -> pas une position de travail.
+M3_AtWorkPositionStable := (NOT instPosDecoderM3.Incoherent)
+    AND ( M3_AtP1Stable OR M3_AtMaintenanceStable
+          OR (instPosDecoderM3.SensorsWord = 2#00011)
+          OR (instPosDecoderM3.SensorsWord = 2#00000) );
 
 {endregion}
 
@@ -662,6 +674,7 @@ Data.TranslationDone                  := instTranslationM3.TargetReached;
 Data.M3_AtTremieStable                := M3_AtTremieStable;
 Data.M3_AtP1Stable                    := M3_AtP1Stable;
 Data.M3_AtMaintenanceStable           := M3_AtMaintenanceStable;
+Data.M3_AtWorkPositionStable          := M3_AtWorkPositionStable;
 // 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView)
 Data.TranslationTrace                 := TranslationTrace;
 

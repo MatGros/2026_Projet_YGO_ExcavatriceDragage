@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T10:20:53.724010" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T10:20:53.724010">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T12:40:31.032835" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T12:40:31.032835">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -566,6 +566,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable en zone Maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtWorkPositionStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 arrete a une position de travail (P1 ou Maintenance) — STATIQUE (mot capteurs), vrai des le boot sans franchissement. Consomme par le verrou descente treuil T249-A.</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationTrace">
@@ -2260,6 +2268,14 @@ front capteur (M3_AtXxxStable) sinon zone entre 2 capteurs (SensorsWord).</xhtml
                 <BOOL />
               </type>
             </variable>
+            <variable name="M3_AtWorkPositionStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M3 arrete P1 ou Maintenance — lecture STATIQUE mot capteurs (vrai des le boot)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonTremieProcessBlock">
               <type>
                 <derived name="TON" />
@@ -2415,6 +2431,17 @@ ELSIF M3_SensorsWordChanged THEN
     // Le mot capteurs a change sans que ce soit une arrivee -&gt; on a quitte le dernier point.
     M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
 END_IF;
+
+// --- M3 a une position de travail : STATIQUE (mot capteurs), pas un jeton de franchissement ---
+// Les jetons M3_AtXxxStable ne se posent que sur un FRONT capteur : au boot PLC, pont deja
+// pose a P1 ou Maintenance sans mouvement -&gt; jetons FALSE -&gt; le verrou descente treuil
+// (T249-A) resterait bloque jusqu'a devoir franchir un capteur. On complete donc par une
+// lecture STATIQUE du mot : 00011 = arret au P1 (capteur P1 fait, P2 depasse) ; 00000 =
+// extreme Maintenance. Tremie / PV / P2 / transit -&gt; pas une position de travail.
+M3_AtWorkPositionStable := (NOT instPosDecoderM3.Incoherent)
+    AND ( M3_AtP1Stable OR M3_AtMaintenanceStable
+          OR (instPosDecoderM3.SensorsWord = 2#00011)
+          OR (instPosDecoderM3.SensorsWord = 2#00000) );
 
 {endregion}
 
@@ -2864,6 +2891,7 @@ Data.TranslationDone                  := instTranslationM3.TargetReached;
 Data.M3_AtTremieStable                := M3_AtTremieStable;
 Data.M3_AtP1Stable                    := M3_AtP1Stable;
 Data.M3_AtMaintenanceStable           := M3_AtMaintenanceStable;
+Data.M3_AtWorkPositionStable          := M3_AtWorkPositionStable;
 // 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView)
 Data.TranslationTrace                 := TranslationTrace;
 
