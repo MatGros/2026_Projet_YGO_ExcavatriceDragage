@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T12:40:31.032835" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T12:40:31.032835">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T12:55:03.117332" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T12:55:03.117332">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2436,12 +2436,18 @@ END_IF;
 // Les jetons M3_AtXxxStable ne se posent que sur un FRONT capteur : au boot PLC, pont deja
 // pose a P1 ou Maintenance sans mouvement -&gt; jetons FALSE -&gt; le verrou descente treuil
 // (T249-A) resterait bloque jusqu'a devoir franchir un capteur. On complete donc par une
-// lecture STATIQUE du mot : 00011 = arret au P1 (capteur P1 fait, P2 depasse) ; 00000 =
-// extreme Maintenance. Tremie / PV / P2 / transit -&gt; pas une position de travail.
+// lecture STATIQUE du mot : 00011 = zone P2-&gt;P1 (capteur P1 fait, P2 depasse) ; 00000 =
+// extreme Maintenance.
+// ATTENTION : 00011 couvre TOUTE la zone P2-&gt;P1 (15..20 m), pas le seul point P1. On
+// n'autorise donc la lecture statique QUE si le pont est A L'ARRET et sans cible en cours,
+// sinon la descente treuil serait permise pendant le transit P2-&gt;P1 (5 m). Le jeton
+// M3_AtP1Stable (front) reste la voie normale quand le pont vient d'arriver.
 M3_AtWorkPositionStable := (NOT instPosDecoderM3.Incoherent)
     AND ( M3_AtP1Stable OR M3_AtMaintenanceStable
-          OR (instPosDecoderM3.SensorsWord = 2#00011)
-          OR (instPosDecoderM3.SensorsWord = 2#00000) );
+          OR ( (instPosDecoderM3.SensorsWord = 2#00011 OR instPosDecoderM3.SensorsWord = 2#00000)
+               AND NOT M3_ConfirmedMoving
+               AND NOT M3_ReqTremie_Active
+               AND NOT M3_ReqMaintenance_Active ) );
 
 {endregion}
 
