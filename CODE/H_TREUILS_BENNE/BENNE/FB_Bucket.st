@@ -67,6 +67,7 @@ VAR_OUTPUT
     DeltaPosition_M                 : REAL;                           // <-- [DIAG] Ecart reel signe M2 - M1 (m)
     RemainingTravelM                : REAL;                           // <-- [DIAG] Distance restante avant cible (m)
     OffsetStateMismatchWarn         : BOOL;                           // <-- [DIAG] Avertissement : ecart mesure M2-M1 incoherent avec l'offset de l'etat memorise (non bloquant)
+    ActiveOffsetSettled             : BOOL;                           // <-- [STAT] ActiveOffsetM stabilise sur sa cible ET concordance etat/bande -> synchro autorisable (consomme par PRG_04)
 END_VAR
 VAR_IN_OUT
     // === STRUCTURES DE DONNÉES PARTAGÉES ===
@@ -81,11 +82,19 @@ VAR
     TonTimeout                      : TON;                            // . [LOC] Temporisateur timeout de mouvement
     TonClassClosed                  : TON;                            // . [LOC] Debounce classification "benne fermee" sur mesure
     TonClassOpen                    : TON;                            // . [LOC] Debounce classification "benne ouverte" sur mesure
+    TonBandClosed                   : TON;                            // . [LOC] Debounce court bande "fermee" -> cible offset (anti-chatter au bord de bande)
+    TonBandOpen                     : TON;                            // . [LOC] Debounce court bande "ouverte" -> cible offset
+    TonOffsetResettle               : TON;                            // . [LOC] Stabilisation apres recalage de ActiveOffsetM (synchro re-autorisee)
     TonOffsetMismatch               : TON;                            // . [LOC] Persistance avant avertissement incoherence offset/mesure
     TonOffsetMaxViol                : TON;                            // . [LOC] Persistance avant latch OffsetMax (anti-pic bruit codeur)
-    ClassCanRun                     : BOOL;                           // . [LOC] Conditions reunies pour classer l'etat sur la mesure (tout arrete + reference)
-    NearClosed                      : BOOL;                           // . [LOC] Mesure dans la bande "fermee"
-    NearOpen                        : BOOL;                           // . [LOC] Mesure dans la bande "ouverte"
+    ClassCanRun                     : BOOL;                           // . [LOC] Conditions reunies pour classer l'etat sur la mesure (tout arrete + reference + hors homing)
+    NearClosed                      : BOOL;                           // . [LOC] Mesure dans la bande "fermee" (instantane)
+    NearOpen                        : BOOL;                           // . [LOC] Mesure dans la bande "ouverte" (instantane)
+    NearClosedStable                : BOOL;                           // . [LOC] Bande "fermee" confirmee CST_BandStableTime (cible offset)
+    NearOpenStable                  : BOOL;                           // . [LOC] Bande "ouverte" confirmee CST_BandStableTime
+    BandLatchConcord                : BOOL;                           // . [LOC] Etat latche ET bande mesuree concordent -> offset benne fiable
+    OffsetTargetM                   : REAL;                           // . [LOC] Cible de ActiveOffsetM avant limitation de pente
+    StateOffsetM                    : REAL;                           // . [LOC] Offset issu de l'ETAT LATCHE seul (reference du filet §5a, independant du recalage)
     OffsetMaxViolNow                : BOOL;                           // . [LOC] Ecart M2-M1 hors plage plausible ce scan
 
     // === VARIABLES LOCALES CALCULÉES ===
@@ -112,6 +121,12 @@ VAR
     // Socle défaut
     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
     instCauses                      : ARRAY[0..15] OF ST_FaultCause;  // . [LOC] Table des causes nommées
+END_VAR
+VAR CONSTANT
+    CST_BandStableTime      : TIME := T#200ms;   // Confirmation de bande avant recalage de la cible offset (anti-chatter au bord)
+    CST_OffsetSlewMPerScan  : REAL := 0.08;      // Pente max de ActiveOffsetM (m/scan) : < seuil FB_Safety_Winch (0.5 m) -> pas de faux "saut de preset"
+    CST_OffsetStepThresholdM : REAL := 0.10;     // Ecart cible/valeur en-dessous duquel l'offset est considere "arrive"
+    CST_OffsetResettleTime  : TIME := T#1s;      // Attente supplementaire apres recalage avant de re-declarer l'offset fiable (synchro)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -205,7 +220,9 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     END_IF;
     Ready := FALSE;
     ActiveOffsetValid := FALSE;
+    ActiveOffsetSettled := FALSE;
     ActiveOffsetM := 0.0;
+    HoldOffsetM := 0.0;          // R8 : ne pas ressortir un HOLD d'avant la coupure a la reprise
     DeltaPosition_M := 0.0;
     RemainingTravelM := 0.0;
     Lifecycle.Busy := FALSE;
@@ -285,19 +302,28 @@ SevereError := Fault.Error;
 //     immediatement en §5 (M2 corrige ~ M1 des l'arret, sans attendre le debounce).
 // Zone intermediaire : IsOpen/IsClosed inchanges (dernier etat franc), IsIntermediate=TRUE.
 DeltaPosition_M := CablePosM2 - CablePosM1;
+// R5 : NOT MachineHomingActive -> le homing conjoint pilote lui-meme l'etat benne
+// (MachineHomingCommitOpen/Close, §3) ; la classification sur mesure ne doit pas entrer
+// en concurrence pendant les pas d'arret de HX3/HX5.
 ClassCanRun := HomedM1 AND HomedM2
                AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy
-               AND NOT SevereError;
+               AND NOT SevereError AND NOT MachineHomingActive;
 NearClosed := ClassCanRun AND (ABS(DeltaPosition_M - Config.OffsetCloseM) <= Config.CoherenceLimitM);
 NearOpen   := ClassCanRun AND (ABS(DeltaPosition_M - Config.OffsetOpenM)  <= Config.CoherenceLimitM);
 
 // Classification instantanee (publiee, consommee par Benne_IsRoughlyClosed en PRG_04).
+// R4 : remise a FALSE explicite hors ClassCanRun -> pas de bit gele stale pendant un
+// mouvement / un homing / un defaut (sinon Benne_IsRoughlyClosed devient faux en transitoire).
 IF ClassCanRun THEN
     BucketState.IsIntermediate := NOT NearClosed AND NOT NearOpen
                                   AND (DeltaPosition_M >= (Config.OffsetOpenM - Config.CoherenceLimitM))
                                   AND (DeltaPosition_M <= (Config.OffsetCloseM + Config.CoherenceLimitM));
     BucketState.TooOpen        := DeltaPosition_M <  (Config.OffsetOpenM  - Config.CoherenceLimitM);
     BucketState.TooClosed      := DeltaPosition_M >  (Config.OffsetCloseM + Config.CoherenceLimitM);
+ELSE
+    BucketState.IsIntermediate := FALSE;
+    BucketState.TooOpen        := FALSE;
+    BucketState.TooClosed      := FALSE;
 END_IF;
 
 // Latch d'etat franc, avec debounce anti-transitoire.
@@ -475,43 +501,81 @@ END_IF;
 {region "§5 Offset actif et validite"}
 // DeltaPosition_M deja calcule en §4a (classification etat).
 
-// Priorite : (1) manoeuvre en cours = ecart reel live ; (2) SNAP INSTANTANE sur la bande
-// mesuree des que la machine est a l'arret et referencee (M2 corrige ~ M1 sans attendre
-// le debounce d'etat) ; (3) sinon etat memorise / demande ; (4) sinon dernier connu.
+// --- Cible d'offset OffsetTargetM (avant limitation de pente) ---------------------------
+// Priorite : (1) manoeuvre en cours = ecart reel live ; (2) recalage sur la bande mesuree
+// CONFIRMEE CST_BandStableTime (anti-chatter au bord de bande, R3) ; (3) etat memorise /
+// demande ; (4) sinon dernier connu.
+TonBandClosed(IN := NearClosed, PT := CST_BandStableTime);
+TonBandOpen(IN := NearOpen,   PT := CST_BandStableTime);
+NearClosedStable := TonBandClosed.Q;
+NearOpenStable   := TonBandOpen.Q;
+
 IF Lifecycle.Busy THEN
-    ActiveOffsetM := CablePosM2 - CablePosM1;
-    HoldOffsetM := ActiveOffsetM;
-ELSIF NearClosed THEN
-    ActiveOffsetM := Config.OffsetCloseM;
-    HoldOffsetM := ActiveOffsetM;
-ELSIF NearOpen THEN
-    ActiveOffsetM := Config.OffsetOpenM;
-    HoldOffsetM := ActiveOffsetM;
+    OffsetTargetM := CablePosM2 - CablePosM1;
+ELSIF NearClosedStable THEN
+    OffsetTargetM := Config.OffsetCloseM;
+ELSIF NearOpenStable THEN
+    OffsetTargetM := Config.OffsetOpenM;
 ELSIF CloseReq OR BucketState.IsClosed THEN
-    ActiveOffsetM := Config.OffsetCloseM;
-    HoldOffsetM := ActiveOffsetM;
+    OffsetTargetM := Config.OffsetCloseM;
 ELSIF OpenReq OR BucketState.IsOpen THEN
-    ActiveOffsetM := Config.OffsetOpenM;
-    HoldOffsetM := ActiveOffsetM;
+    OffsetTargetM := Config.OffsetOpenM;
 ELSE
-    ActiveOffsetM := HoldOffsetM;
+    OffsetTargetM := HoldOffsetM;
 END_IF;
 
+// --- ActiveOffsetM : suivi de la cible A PENTE LIMITEE (R2/R3) --------------------------
+// Un pas brut de 0 <-> OffsetCloseM (~15 m) en un scan faisait : latcher SyncDeviationWarn
+// (FB_SyncDeviation, seuil 0.10 m, RAZ sur Reset seulement) et sauter PosStepDetected
+// (FB_Safety_Winch, 0.5 m) -> RAZ + inhibition MecaA/MecaE. On converge donc a pente
+// bornee ; pendant la convergence l'offset n'est pas "fiable" (voir ActiveOffsetSettled)
+// et la synchro est inhibee cote PRG_04.
+IF Lifecycle.Busy THEN
+    ActiveOffsetM := OffsetTargetM;                                   // suit l'ecart reel (deplacement lent du treuil, aucun pas)
+ELSE
+    ActiveOffsetM := ActiveOffsetM
+                     + LIMIT(-CST_OffsetSlewMPerScan,
+                              OffsetTargetM - ActiveOffsetM,
+                              CST_OffsetSlewMPerScan);
+END_IF;
+HoldOffsetM := ActiveOffsetM;
+
+// --- ActiveOffsetSettled : ActiveOffsetM n'est PAS en cours de recalage --------------
+// Vrai des que la valeur colle a sa cible depuis CST_OffsetResettleTime. Reste vrai en
+// mouvement couple nominal (cible == valeur, aucun pas). Retombe UNIQUEMENT quand un
+// nouveau recalage est engage (sortie de manoeuvre, re-latch d'etat apres correction).
+// -> c'est CE flag qui autorise la synchro (PRG_04) : elle n'est coupee que pendant le
+//    transitoire de recalage, pas en fonctionnement couple.
+TonOffsetResettle(IN := (ABS(OffsetTargetM - ActiveOffsetM) <= CST_OffsetStepThresholdM),
+                  PT := CST_OffsetResettleTime);
+ActiveOffsetSettled := TonOffsetResettle.Q;
+
+// --- ActiveOffsetValid : offset semantiquement fiable (consommateurs cycle/homing) -----
+// Plus strict qu'avant : en plus de l'etat latche present + offset stabilise, on invalide
+// si (machine a l'arret) l'etat latche CONTREDIT la bande mesuree -> latch stale / datum
+// derive. Non evaluable en mouvement (ClassCanRun=FALSE) : pas de fausse invalidation.
+BandLatchConcord := NOT ClassCanRun
+                    OR (BucketState.IsClosed AND NOT NearOpen)
+                    OR (BucketState.IsOpen   AND NOT NearClosed);
 ActiveOffsetValid := Enable AND PowerContactorEngaged
                      AND NOT BucketState.StateIncoherent
                      AND (Fault.ErrorId = 0)
-                     AND (MachineHomed OR (BucketState.IsOpen XOR BucketState.IsClosed))
-                     AND NOT MachineHomingActive;
+                     AND NOT MachineHomingActive
+                     AND ActiveOffsetSettled
+                     AND (Lifecycle.Busy OR (BucketState.IsOpen XOR BucketState.IsClosed))
+                     AND BandLatchConcord;
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
 
-// --- §5a Filet : avertissement incoherence offset applique / mesure reelle --------------
-// Non bloquant. Si l'ecart mesure M2-M1 s'ecarte durablement de l'offset issu de l'etat
-// memorise (etat faux, datum M2 derive, offset mal calibre) -> alarme "reconfirmer".
-// Ne se declenche qu'a l'arret, reference, hors sequence.
+// --- §5a Filet : avertissement incoherence offset / mesure reelle (R1) -----------------
+// Non bloquant. Compare l'ecart MESURE a l'offset issu du SEUL etat latche (pas de
+// ActiveOffsetM, qui colle a la mesure par construction et masquerait la derive).
+StateOffsetM := SEL(BucketState.IsClosed,
+                    SEL(BucketState.IsOpen, HoldOffsetM, Config.OffsetOpenM),
+                    Config.OffsetCloseM);
 TonOffsetMismatch(
     IN := ClassCanRun
           AND (BucketState.IsOpen XOR BucketState.IsClosed)
-          AND (ABS(DeltaPosition_M - ActiveOffsetM) > Config.CoherenceLimitM),
+          AND (ABS(DeltaPosition_M - StateOffsetM) > Config.CoherenceLimitM),
     PT := T#2s);
 OffsetStateMismatchWarn := TonOffsetMismatch.Q;
 {endregion}
