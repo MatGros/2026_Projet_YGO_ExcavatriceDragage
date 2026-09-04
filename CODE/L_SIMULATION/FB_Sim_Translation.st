@@ -5,13 +5,20 @@
       de Trémie vers Maintenance. Le modèle ne publie que les six mots valides
       de FB_Translation_PositionDecoder : 11111 → 01111 → 00111 → 00011 →
       00001 → 00000.
+(* ═══════════════════════════════════════════════════════════════
+   🧪 FB_Sim_Translation — Progression capteurs simulés M3
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Produit les cinq capteurs de position M3 par progression continue
+      de Trémie vers Maintenance. Le modèle ne publie que les six mots valides
+      de FB_Translation_PositionDecoder : 11111 → 01111 → 00111 → 00011 →
+      00001 → 00000.
    📏 Convention : PositionProgress en mètres, 0 m = Trémie … 30 m = Maintenance.
       Distances NON-linéaires : Trémie(0)→PV(5)=5 m, PV(5)→P2(15)=10 m,
       P2(15)→P1(20)=5 m, P1(20)→Maintenance(30)=10 m.
    🔒 Le modèle est une source d'entrée confinée derrière HwIn ; il ne pilote
       aucune sortie réelle. Un override manuel valide est appliqué par
       FB_SimBench, pas par ce FB.
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
              DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
    ═══════════════════════════════════════════════════════════════ *)
 
