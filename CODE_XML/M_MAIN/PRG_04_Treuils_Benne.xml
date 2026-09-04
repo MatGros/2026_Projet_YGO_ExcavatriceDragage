@@ -9300,10 +9300,10 @@ END_IF;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance derive position Meca A (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Tolerance derive position Meca A (m) - MES 2026-09-04 : 2.0 -&gt; 5.0 (confirme operateur)</xhtml>
               </documentation>
             </variable>
             <variable name="PostRampTimeout">

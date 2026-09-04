@@ -1214,10 +1214,10 @@ jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) �
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#500ms" />
+                <simpleValue value="TIME#2s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake - MES 2026-09-04 : monte 500ms -&gt; 2s (confirme operateur)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedbackTimeout">
@@ -1225,10 +1225,10 @@ jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) �
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#300ms" />
+                <simpleValue value="TIME#800ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Strictement sous watchdog final 500 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] MES 2026-09-04 : 300ms trop court pour un arret dur au FdC (coast reel ~600ms) -&gt; latch spurieux. Monte a 800ms (confirme operateur).</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -3606,6 +3606,9 @@ IF NOT BypassGlobal THEN
     instCauses[5].Texte    := 'Mouvement non commande translation (Meca A)';
 
     // Cause 6 : Limite extrême escalade (live)
+    // REVERT 2026-09-04 : le retrait de DriveStatusWord.0 n'a jamais ete confirme comme la
+    // cause reelle d'un defaut terrain (le defaut rapporte etait en realite bit0/MecaB,
+    // pas cette cause 6) -&gt; pas de modif safety sans confirmation terrain, retour a l'origine.
     IF NOT (BypassSafety OR BypassLimitSwitch) THEN
         OverrunCondition := (LimitSwitchTremie AND ReqTremie AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
                          OR (LimitSwitchMaintenance AND ReqMaintenance AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
@@ -4134,6 +4137,22 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] SafeStop effectif = SafeStop OR sens non permis (gate de sens)</xhtml>
               </documentation>
             </variable>
+            <variable name="OverrunLimitSwitch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Depassement reel FdC (mouvement soutenu), pas juste arrivee normale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonLimitSwitchOverrun">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Persistance avant fault Cause 6 (evite le faux defaut sur arrivee nominale)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DriveFaultLatching">
               <type>
                 <BOOL />
@@ -4209,11 +4228,20 @@ instCauses[3].Active   := DriveFaultLatching;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Defaut variateur translation AC600';
 
-IF NOT BypassLimitSwitch AND ((CommandedTremie AND LimitSwitchTremie) OR (CommandedMaintenance AND LimitSwitchMaintenance)) THEN
-    instCauses[6].Active := TRUE;
-ELSE
-    instCauses[6].Active := FALSE;
-END_IF;
+// REX MES 2026-09-04 (trace Suivi_TranslationM3bug_20260904_27) : ce test se declenchait
+// INSTANTANEMENT a chaque arrivee NOMINALE sur le FdC (CommandedTremie ET LimitSwitchTremie
+// sont vrais des le 1er scan d'une arrivee normale, avant meme que la decel soit terminee)
+// -&gt; Fault.Error pulse -&gt; §6 force BrakeReleaseRequest:=FALSE en ecrasant Brake.BrakeCmd
+// pendant que FB_Brake pense toujours commander l'ouverture (son propre MovementRequested
+// reste vrai le temps du coast ~600ms) -&gt; incoherence commande/retour frein -&gt; latch
+// definitif dans FB_Brake. On ne fault desormais que sur un DEPASSEMENT REEL : encore
+// commande vers le FdC, sur le FdC, ET reellement en train de tourner (pas juste en decel),
+// soutenu 1.5s (meme garde que FB_Safety_Translation Cause 6).
+OverrunLimitSwitch := NOT BypassLimitSwitch
+    AND ((CommandedTremie AND LimitSwitchTremie) OR (CommandedMaintenance AND LimitSwitchMaintenance))
+    AND (ABS(DriveActualFreqHz) &gt; 0.5);
+TonLimitSwitchOverrun(IN := OverrunLimitSwitch, PT := T#1S500MS);
+instCauses[6].Active := TonLimitSwitchOverrun.Q;
 instCauses[6].Latching := FALSE;
 instCauses[6].Texte    := 'Limite extreme translation atteinte';
 
