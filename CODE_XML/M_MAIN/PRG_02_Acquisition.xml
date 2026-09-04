@@ -7108,10 +7108,10 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="0.35" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) ; ~0.35 = finit dans la bande ouvert/ferme malgre l'anticipation d'arret</xhtml>
               </documentation>
             </variable>
             <variable name="SimTopPositionActive">
