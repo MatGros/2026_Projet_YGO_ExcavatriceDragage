@@ -966,13 +966,21 @@ SafetyPermitM2_Ascent  := instSafetyWinchM2.AscentPermit;
 ProcessAndSafetyPermitM1_Descend := ProcessPermitM1_Descend AND SafetyPermitM1_Descend;
 ProcessAndSafetyPermitM2_Descend := ProcessPermitM2_Descend AND SafetyPermitM2_Descend;
 
-// Mode "vidage à la trémie" : descente M1 ET M2 interdite tant
-// que M3 n'est pas à P1 (travail) ou en position Maintenance -- verrouille la séquence
-// descente-treuil / translation pour se rapprocher d'un enchaînement automatique sûr.
+// Mode "vidage à la trémie" : descente M1 interdite tant que M3 n'est pas à P1 (travail)
+// ou en position Maintenance -- verrouille la descente-treuil (payout cable reel) / la
+// translation, pour se rapprocher d'un enchaînement automatique sûr.
+// M2 EXEMPTE quand seule la benne bouge (jog unitaire WinchSel=2 ou programme benne) :
+// ouvrir/fermer la benne (M2 seul, M1 immobile) N'EST PAS une descente treuil verticale
+// -> ça doit rester possible a la Tremie (design d'origine : "a la Tremie, seul open/close
+// benne permis"). Sans cette exemption, EffectivePermitBucket_Open/Close (cable sur
+// EffectivePermitM2_Descend/Ascent, ligne ~1004) heritait du meme verrou par accident de
+// cablage -> ouverture benne bloquee a la Tremie (REX MES 2026-09-04).
 // Décision et calcul centralisés dans PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked
 IF PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked THEN
     ProcessAndSafetyPermitM1_Descend := FALSE;
-    ProcessAndSafetyPermitM2_Descend := FALSE;
+    IF NOT (ManualBucketJogActive OR ProgramBucketDriveActive) THEN
+        ProcessAndSafetyPermitM2_Descend := FALSE;
+    END_IF;
 END_IF;
 // Permis de montée assistée : consommé depuis FB_ExtractionAssist (via le contrat benne).
 // Hors extraction (NOT ExtractionAssistActive), la montée reste libre ; pendant l'extraction,
@@ -1528,7 +1536,9 @@ BucketState.M2ReqDescend := instBucket.M2_ReqDescend;
 BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
 BucketState.ManualBucketLimitsActive := ManualBucketLimitsActive;
 BucketState.OffsetStateMismatchWarn := instBucket.OffsetStateMismatchWarn;
-BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.ActiveOffsetM;
+// Affichage operateur : cible instantanee (OffsetTargetM), pas la pente de securite
+// (ActiveOffsetM). Rampe visuelle inutile ici, meme raison que DeltaPositionCorrected_M.
+BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.OffsetTargetM;
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;
 BucketState.Done := instBucket.Lifecycle.Done;
