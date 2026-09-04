@@ -34,7 +34,7 @@
       - L'ouverture « PLC coupe un canal » est représentée par TestCutActive (test redondance) et
         PowerCutOffRequest (coupure métier) — jamais par PowerCutOff_A/B seuls.
    ═══════════════════════════════════════════════════════════════
-   📄 Docs : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.4.md
+   📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
 *)
 FUNCTION_BLOCK FB_Sim_Safety
 VAR_INPUT

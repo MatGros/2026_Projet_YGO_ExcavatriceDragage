@@ -81,11 +81,8 @@ VAR
     ConfirmOpenEdge                 : R_TRIG;                         // . [LOC] Detecteur front confirmation ouverture IHM
     ConfirmCloseEdge                : R_TRIG;                         // . [LOC] Detecteur front confirmation fermeture IHM
     TonTimeout                      : TON;                            // . [LOC] Temporisateur timeout de mouvement
-    TonClassClosed                  : TON;                            // . [LOC] Debounce classification "benne fermee" sur mesure
-    TonClassOpen                    : TON;                            // . [LOC] Debounce classification "benne ouverte" sur mesure
     TonBandClosed                   : TON;                            // . [LOC] Debounce court bande "fermee" -> cible offset (anti-chatter au bord de bande)
     TonBandOpen                     : TON;                            // . [LOC] Debounce court bande "ouverte" -> cible offset
-    TonClassInter                   : TON;                            // . [LOC] Debounce intermediaire franc / depassement -> efface le latch d'etat stale
     TonOffsetResettle               : TON;                            // . [LOC] Stabilisation apres recalage de ActiveOffsetM (synchro re-autorisee)
     TonOffsetMismatch               : TON;                            // . [LOC] Persistance avant avertissement incoherence offset/mesure
     TonOffsetMaxViol                : TON;                            // . [LOC] Persistance avant latch OffsetMax (anti-pic bruit codeur)
@@ -244,12 +241,7 @@ Ready := Enable AND NOT Fault.Latched;
 {region "§3 Premier cycle & recalage boutons IHM"}
 IF FirstCycle THEN
     FirstCycle := FALSE;
-    // Une seule position doit être qualifiée au démarrage : ni l'une ni l'autre
-    // ou les deux simultanément signifient que la mémorisation n'est pas fiable.
-    IF (BucketState.IsOpen AND BucketState.IsClosed)
-       OR (NOT BucketState.IsOpen AND NOT BucketState.IsClosed) THEN
-        BucketState.StateIncoherent := TRUE;
-    END_IF;
+    BucketState.StateIncoherent := FALSE;
 END_IF;
 
 // Les confirmations IHM restent les commandes fonctionnelles de référence
@@ -294,70 +286,37 @@ END_IF;
 SevereError := Fault.Error;
 
 // --- §4a Classification continue de l'etat benne sur la MESURE physique -----------------
-// L'etat memorise doit refleter la realite mecanique, sinon ActiveOffsetM (0 ou
-// OffsetCloseM) est applique a l'envers -> M2 corrige faux + ecart synchro fantome.
-// Ne s'execute QUE machine totalement a l'arret et referencee (mesure fiable, aucun
-// transitoire d'ecart). Deux niveaux :
-//   * IsOpen/IsClosed = LATCH avec debounce 1 s (etat logique stable, ActiveOffsetValid) ;
-//   * NearClosed/NearOpen/IsIntermediate/TooOpen/TooClosed = classification INSTANTANEE
-//     sur la bande mesuree (OffsetX +/- CoherenceLimitM) -> ActiveOffsetM se recale
-//     immediatement en §5 (M2 corrige ~ M1 des l'arret, sans attendre le debounce).
-// Zone intermediaire : IsOpen/IsClosed inchanges (dernier etat franc), IsIntermediate=TRUE.
+// L'etat benne reflete directement la cinematique reelle Delta = M2 - M1.
+// Tant que M1 et M2 sont references, la position relative de la benne est connue en continu.
 DeltaPosition_M := CablePosM2 - CablePosM1;
-// R5 : NOT MachineHomingActive -> le homing conjoint pilote lui-meme l'etat benne
-// (MachineHomingCommitOpen/Close, §3) ; la classification sur mesure ne doit pas entrer
-// en concurrence pendant les pas d'arret de HX3/HX5.
+
 ClassCanRun := HomedM1 AND HomedM2
-               AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy
-               AND NOT SevereError AND NOT MachineHomingActive;
+               AND NOT SevereError;
+
 NearClosed := ClassCanRun AND (ABS(DeltaPosition_M - Config.OffsetCloseM) <= Config.CoherenceLimitM);
 NearOpen   := ClassCanRun AND (ABS(DeltaPosition_M - Config.OffsetOpenM)  <= Config.CoherenceLimitM);
 
-// Classification instantanee (publiee, consommee par Benne_IsRoughlyClosed en PRG_04).
-// R4 : remise a FALSE explicite hors ClassCanRun -> pas de bit gele stale pendant un
-// mouvement / un homing / un defaut (sinon Benne_IsRoughlyClosed devient faux en transitoire).
+// Classification continue instantanee (publiee en direct sur BucketState) :
 IF ClassCanRun THEN
+    BucketState.IsClosed       := NearClosed;
+    BucketState.IsOpen         := NearOpen;
     BucketState.IsIntermediate := NOT NearClosed AND NOT NearOpen
                                   AND (DeltaPosition_M >= (Config.OffsetOpenM - Config.CoherenceLimitM))
                                   AND (DeltaPosition_M <= (Config.OffsetCloseM + Config.CoherenceLimitM));
     BucketState.TooOpen        := DeltaPosition_M <  (Config.OffsetOpenM  - Config.CoherenceLimitM);
     BucketState.TooClosed      := DeltaPosition_M >  (Config.OffsetCloseM + Config.CoherenceLimitM);
+    BucketState.StateIncoherent := FALSE;
+    IF NearClosed THEN
+        BucketState.LastPosM2Close := CablePosM2;
+    ELSIF NearOpen THEN
+        BucketState.LastPosM2Open  := CablePosM2;
+    END_IF;
 ELSE
+    BucketState.IsClosed       := FALSE;
+    BucketState.IsOpen         := FALSE;
     BucketState.IsIntermediate := FALSE;
     BucketState.TooOpen        := FALSE;
     BucketState.TooClosed      := FALSE;
-END_IF;
-
-// Latch d'etat franc, avec debounce anti-transitoire.
-TonClassClosed(IN := NearClosed, PT := T#1s);
-TonClassOpen(IN := NearOpen, PT := T#1s);
-IF TonClassClosed.Q AND NOT BucketState.IsClosed THEN
-    BucketState.IsClosed        := TRUE;
-    BucketState.IsOpen          := FALSE;
-    BucketState.LastPosM2Close  := CablePosM2;
-    BucketState.StateIncoherent := FALSE;
-ELSIF TonClassOpen.Q AND NOT BucketState.IsOpen THEN
-    BucketState.IsOpen          := TRUE;
-    BucketState.IsClosed        := FALSE;
-    BucketState.LastPosM2Open   := CablePosM2;
-    BucketState.StateIncoherent := FALSE;
-END_IF;
-
-// A : intermediaire franc / depassement CONFIRME (debounce 1 s) -> l'etat latche ne peut
-// plus etre tenu pour vrai (benne reellement entre-deux). On efface IsClosed/IsOpen :
-// l'etat logique redevient le miroir de la cinematique (evite IsClosed + IsIntermediate
-// simultanes et le M2_LimitShift sur un latch stale). ActiveOffsetValid tombe (§5) ->
-// OffsetStateMismatchWarn / reconfirmer position.
-// LIMITE AUX MODES MAINT : en AUTO/SEMI_AUTO c'est la sequence (Lifecycle.Busy) qui gere
-// l'etat benne ; effacer le latch en plein cycle -> MachineHomedRaw FALSE -> SafeStop
-// "reference perdue" parasite (challenge 2026-09-04). En cycle, seul le WARN signale.
-TonClassInter(IN := ClassCanRun
-                    AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
-                    AND (BucketState.IsIntermediate OR BucketState.TooOpen OR BucketState.TooClosed),
-              PT := T#1s);
-IF TonClassInter.Q AND (BucketState.IsClosed OR BucketState.IsOpen) THEN
-    BucketState.IsClosed := FALSE;
-    BucketState.IsOpen   := FALSE;
 END_IF;
 
 MotionRequestConflict := ReqAscent AND ReqDescend;
@@ -588,31 +547,19 @@ TonOffsetResettle(IN := (ABS(OffsetTargetM - ActiveOffsetM) <= CST_OffsetStepThr
 ActiveOffsetSettled := TonOffsetResettle.Q;
 
 // --- ActiveOffsetValid : offset semantiquement fiable (consommateurs cycle/homing) -----
-// Plus strict qu'avant : en plus de l'etat latche present + offset stabilise, on invalide
-// si (machine a l'arret) l'etat latche CONTREDIT la bande mesuree -> latch stale / datum
-// derive. Non evaluable en mouvement (ClassCanRun=FALSE) : pas de fausse invalidation.
-BandLatchConcord := NOT ClassCanRun
-                    OR (BucketState.IsClosed AND NOT NearOpen)
-                    OR (BucketState.IsOpen   AND NOT NearClosed);
+// L'offset benne est valide des lors que le bloc est actif, les codeurs M1 et M2 references,
+// et qu'aucun defaut n'invalide la mesure physique. L'etat intermediaire n'invalide PAS la reference.
 ActiveOffsetValid := Enable AND PowerContactorEngaged
+                     AND HomedM1 AND HomedM2
                      AND NOT BucketState.StateIncoherent
-                     AND (Fault.ErrorId = 0)
-                     AND NOT MachineHomingActive
-                     AND ActiveOffsetSettled
-                     AND (Lifecycle.Busy OR (BucketState.IsOpen XOR BucketState.IsClosed))
-                     AND BandLatchConcord;
+                     AND (Fault.ErrorId = 0);
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
 
-// --- §5a Filet : avertissement incoherence offset / mesure reelle (R1) -----------------
-// Non bloquant. Compare l'ecart MESURE a l'offset issu du SEUL etat latche (pas de
-// ActiveOffsetM, qui colle a la mesure par construction et masquerait la derive).
-StateOffsetM := SEL(BucketState.IsClosed,
-                    SEL(BucketState.IsOpen, HoldOffsetM, Config.OffsetOpenM),
-                    Config.OffsetCloseM);
+// --- §5a Filet : avertissement incoherence geometrique benne (R1) -----------------
+// Avertit si l'ecart mesure depasse les bornes plausibles [OffsetOpen - Coherence .. OffsetClose + Coherence]
 TonOffsetMismatch(
     IN := ClassCanRun
-          AND (BucketState.IsOpen XOR BucketState.IsClosed)
-          AND (ABS(DeltaPosition_M - StateOffsetM) > Config.CoherenceLimitM),
+          AND (BucketState.TooOpen OR BucketState.TooClosed),
     PT := T#2s);
 OffsetStateMismatchWarn := TonOffsetMismatch.Q;
 {endregion}
