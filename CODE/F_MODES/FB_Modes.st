@@ -112,7 +112,7 @@ VAR CONSTANT
     // DirectionInterlockDelayAscent/Descent) + retombee/settle contacteurs, sinon
     // l'autre treuil (immobile depuis longtemps, dispo immediatement) part SEUL ->
     // decalage tambours (REX MES 2026-09-04 : M1 seul 63 cm, ecart final 50 cm).
-    CST_T248TransitionSettle  : TIME := T#2s;      // MES 2026-09-04 : 2 s pour valider, a REDUIRE apres essais banc
+    CST_T248TransitionSettle  : TIME := T#1s200ms; // MES 2026-09-04 : reduit de 2s (validation initiale) -> plancher = delai D18 montee (900ms) + marge ~300ms
 END_VAR
 
 // === IMPLEMENTATION ===
