@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T07:10:47.242457" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T07:10:47.242457">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T13:44:01.120036" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T13:44:01.120036">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3404,7 +3404,11 @@ BucketReferenceRequested := (BucketReferenceOpenEdge.Q XOR BucketReferenceCloseE
                           AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
                           AND MachineHomingMechanicalStopOk;
 IF BucketReferenceOpenEdge.Q THEN
-    BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM;
+    // Symetrique du CLOSE ci-dessous : Delta attendu benne ouverte = OffsetOpenM (butee
+    // physique reelle ~2.25 m), pas 0. L'ancien preset (M1 sans offset) forcait Delta=0
+    // -&gt; hors plage [OffsetOpenM-CoherenceLimitM .. OffsetCloseM+2] -&gt; FB_Bucket relatchait
+    // ErrorID:02 juste apres la confirmation (REX MES 2026-09-04, audit T250 finding M6).
+    BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetOpenM;
 ELSIF BucketReferenceCloseEdge.Q THEN
     BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
@@ -11355,21 +11359,23 @@ Distances NON-linéaires : 0→5 (PV), 5→15 (P2), 15→20 (P1), 20→30 (Maint
 
 {region "§1 Gate"}
 IF NOT Enable THEN
-    // Prochain démarrage déterministe sur la Trémie (0 m), pour un état de départ propre.
-    PositionProgress := CST_PositionAtTremie;
+    // Démarrage déterministe au P1 (20 m) = position de travail : mot capteurs 00011
+    // (P1 + Maintenance faits). Evite qu'un boot sim en 00000 (tout FALSE) fasse croire
+    // au decodeur "extreme Maintenance" et bloque le verrou descente treuil (T249-A).
+    PositionProgress := CST_PositionAtP1;
     Initialized := FALSE;
     PosTremie := FALSE;
     PosPV := FALSE;
     PosP2 := FALSE;
-    PosP1 := FALSE;
-    PosMaintenance := FALSE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
     RETURN;
 END_IF;
 {endregion}
 
 {region "§2 Initialisation"}
 IF NOT Initialized THEN
-    PositionProgress := CST_PositionAtTremie;
+    PositionProgress := CST_PositionAtP1;   // etat de depart = position de travail P1 (voir §1)
     Initialized := TRUE;
 END_IF;
 {endregion}
