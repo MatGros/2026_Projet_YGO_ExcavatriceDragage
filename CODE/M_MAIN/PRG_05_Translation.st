@@ -84,11 +84,24 @@ VAR
     // physique (M3_LimitSwitchTremieStable). PAS de latch sur recul (signal process :
     // dès qu'il retombe l'approche est re-permise). Débounce anti-parasite. Bypass N2.
     M3_TremieProcessBlock : BOOL;
+
+    // T249-B : "at position" par PLAGE autour de la position estimee recalee sur capteur
+    // (pas de dependance a la frequence variateur). M3_AtBandX = capteur ON ET estime a
+    // +/- CST_M3AtBandM du point -> "at position" ; sinon "en transit". Lecture seule IHM.
+    M3_AtBandTremie      : BOOL;
+    M3_AtBandPV          : BOOL;
+    M3_AtBandP2          : BOOL;
+    M3_AtBandP1          : BOOL;
+    M3_AtBandMaintenance : BOOL;
+    M3_StatusText        : STRING(80);
     TonTremieProcessBlock : TON;
 
     // 🕵️ Trace de blocage terrain (publiée via Data.TranslationTrace, consommée FB_TroubleshootingView)
     TranslationTrace           : ST_TraceTranslation;        // . [LOC] Trace blocage translation M3
     TraceTranslation_PrevReason : E_TranslationTraceBlockReason; // . [LOC] Cause précédente M3 (détection de changement)
+END_VAR
+VAR CONSTANT
+    CST_M3AtBandM : REAL := 0.5;   // T249-B : demi-largeur de la plage "at position" autour d'un capteur (m)
 END_VAR
 
 {region "§0 Decodage position M3"}
@@ -435,6 +448,50 @@ instPosEstimatorM3(
 GVL_PERSISTENT._TranslationPosEstimated_M := instPosEstimatorM3.PositionEstimatedM;
 GVL_PERSISTENT._TranslationPosEstimatedInitialized := instPosEstimatorM3.Initialized;
 
+// === T249-B : "AT POSITION" PAR PLAGE + TEXTE STATUT M3 (lecture seule IHM) ===========
+// "at position X" = capteur X ON (TranslationPosX = passthrough du DI, individuel ou
+// cumulatif) ET position estimee (recalee sur front capteur) a +/- CST_M3AtBandM du
+// point calibre. Des que le pont quitte le capteur -> DI OFF -> "en transit". La plage
+// ne sert que de garde anti-rebond DI. Aucune dependance a la frequence variateur.
+M3_AtBandTremie      := instPosDecoderM3.TranslationPosTremie
+    AND (ABS(instPosEstimatorM3.PositionEstimatedM - GVL_PERSISTENT._TranslationPosTremie_M)      <= CST_M3AtBandM);
+M3_AtBandPV          := instPosDecoderM3.TranslationPosPV
+    AND (ABS(instPosEstimatorM3.PositionEstimatedM - GVL_PERSISTENT._TranslationPosPV_M)          <= CST_M3AtBandM);
+M3_AtBandP2          := instPosDecoderM3.TranslationPosP2
+    AND (ABS(instPosEstimatorM3.PositionEstimatedM - GVL_PERSISTENT._TranslationPosP2_M)          <= CST_M3AtBandM);
+M3_AtBandP1          := instPosDecoderM3.TranslationPosP1
+    AND (ABS(instPosEstimatorM3.PositionEstimatedM - GVL_PERSISTENT._TranslationPosP1_M)          <= CST_M3AtBandM);
+M3_AtBandMaintenance := instPosDecoderM3.TranslationPosMaintenance
+    AND (ABS(instPosEstimatorM3.PositionEstimatedM - GVL_PERSISTENT._TranslationPosMaintenance_M) <= CST_M3AtBandM);
+
+// Texte : position si dans une plage, sinon zone de transit bornee par l'estime.
+IF M3_AtBandTremie THEN
+    M3_StatusText := 'M3 a la Tremie';
+ELSIF M3_AtBandPV THEN
+    M3_StatusText := 'M3 au capteur PV';
+ELSIF M3_AtBandP2 THEN
+    M3_StatusText := 'M3 au capteur P2';
+ELSIF M3_AtBandP1 THEN
+    M3_StatusText := 'M3 au capteur P1';
+ELSIF M3_AtBandMaintenance THEN
+    M3_StatusText := 'M3 a la Maintenance';
+ELSIF instPosDecoderM3.Incoherent THEN
+    M3_StatusText := 'M3 position INCOHERENTE (capteurs)';
+ELSIF instPosEstimatorM3.PositionEstimatedM < GVL_PERSISTENT._TranslationPosPV_M THEN
+    M3_StatusText := 'M3 entre Tremie et PV';
+ELSIF instPosEstimatorM3.PositionEstimatedM < GVL_PERSISTENT._TranslationPosP2_M THEN
+    M3_StatusText := 'M3 entre PV et P2';
+ELSIF instPosEstimatorM3.PositionEstimatedM < GVL_PERSISTENT._TranslationPosP1_M THEN
+    M3_StatusText := 'M3 entre P2 et P1';
+ELSE
+    M3_StatusText := 'M3 entre P1 et Maintenance';
+END_IF;
+// Suffixe sens de deplacement (commande active).
+IF M3_ReqTremie_Active THEN
+    M3_StatusText := CONCAT(M3_StatusText, ' -> Tremie');
+ELSIF M3_ReqMaintenance_Active THEN
+    M3_StatusText := CONCAT(M3_StatusText, ' -> Maintenance');
+END_IF;
 
 {endregion}
 
@@ -496,6 +553,14 @@ TranslationState.AtPV := M3_AtPVStable;
 TranslationState.AtP2 := M3_AtP2Stable;
 TranslationState.AtP1 := M3_AtP1Stable;
 TranslationState.AtMaintenance := M3_AtMaintenanceStable;
+// T249-B : "at position" par PLAGE (capteur ON + estime +/-0.5 m) — fiable sans
+// dependance frequence variateur, contrairement a AtXxx (front/frequence). + texte statut.
+TranslationState.AtBandTremie      := M3_AtBandTremie;
+TranslationState.AtBandPV          := M3_AtBandPV;
+TranslationState.AtBandP2          := M3_AtBandP2;
+TranslationState.AtBandP1          := M3_AtBandP1;
+TranslationState.AtBandMaintenance := M3_AtBandMaintenance;
+TranslationState.M3StatusText      := M3_StatusText;
 TranslationState.EstimatedPosM3_M := instPosEstimatorM3.PositionEstimatedM;
 TranslationState.SensorsWord := instPosDecoderM3.SensorsWord;
 TranslationState.SensorWordIncoherent := instPosDecoderM3.Incoherent;
