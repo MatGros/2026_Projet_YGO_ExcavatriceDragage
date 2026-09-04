@@ -768,6 +768,14 @@ instSafetyWinchM1(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
+    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : ACTIF seulement quand
+    // les treuils sont reellement solidaires (couple joystick OU boutons both) et HORS
+    // operation benne unitaire (jog M2 -> M2-M1 varie volontairement de ~15 m). N'affecte
+    // PAS le routage mou-de-cable (:508/:520) qui reste sur SyncEnable brut.
+    CrossCheckEnable       := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
+                              AND ((PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
+                                   OR WinchBothMotionActive)
+                              AND NOT ManualBucketJogActive,
     JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
@@ -830,6 +838,14 @@ instSafetyWinchM2(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
+    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : ACTIF seulement quand
+    // les treuils sont reellement solidaires (couple joystick OU boutons both) et HORS
+    // operation benne unitaire (jog M2 -> M2-M1 varie volontairement de ~15 m). N'affecte
+    // PAS le routage mou-de-cable (:508/:520) qui reste sur SyncEnable brut.
+    CrossCheckEnable       := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
+                              AND ((PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
+                                   OR WinchBothMotionActive)
+                              AND NOT ManualBucketJogActive,
     JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,

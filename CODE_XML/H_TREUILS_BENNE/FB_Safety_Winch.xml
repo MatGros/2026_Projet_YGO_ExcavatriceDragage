@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T17:02:16.674488" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T17:02:16.674488">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T03:59:03.420055" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T03:59:03.420055">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -219,7 +219,18 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation synchronisation treuils</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation synchronisation treuils (routage mou-de-cable :508/:520)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CrossCheckEnable">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorise le controle d'ecart critique croise M1/M2 (Meca E) : treuils reellement solidaires ET hors jog benne unitaire</xhtml>
               </documentation>
             </variable>
             <variable name="ReqAscent">
@@ -1454,8 +1465,12 @@ IF NOT BypassGlobal THEN
     instCauses[11].Latching := TRUE;
     instCauses[11].Texte    := 'Escalade fin de course haut (Meca D)';
 
-    // Cause 12 &amp; 13 : Méca E écart critique synchro &amp; escalade (latched)
-    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT RefWindowActive AND NOT OtherWinchInhibited
+    // Cause 12 &amp; 13 : Méca E écart critique synchro &amp; escalade (latched).
+    // CrossCheckEnable (et non SyncEnable) : le controle d'ecart croise M1/M2 n'a de sens
+    // que treuils solidaires ; en jog benne unitaire (M2-M1 varie de ~15 m volontairement)
+    // il est inhibe. TonMecaE (:362) ne s'escalade que si MecaEFaultLatched est pose ici,
+    // donc gater ce seul point suffit. Le mou-de-cable (:508/:520) reste sur SyncEnable.
+    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND CrossCheckEnable AND NOT RefWindowActive AND NOT OtherWinchInhibited
        AND (ABS(CablePosM - ExpectedOtherWinchPosM) &gt; CriticalSyncToleranceM) THEN
         MecaEFaultLatched := TRUE;
     END_IF;

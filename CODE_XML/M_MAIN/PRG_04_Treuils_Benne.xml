@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T21:54:16.505600" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T21:54:16.505600">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T03:57:10.272548" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T03:57:10.272548">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6399,6 +6399,14 @@ instSafetyWinchM1(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
+    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : ACTIF seulement quand
+    // les treuils sont reellement solidaires (couple joystick OU boutons both) et HORS
+    // operation benne unitaire (jog M2 -&gt; M2-M1 varie volontairement de ~15 m). N'affecte
+    // PAS le routage mou-de-cable (:508/:520) qui reste sur SyncEnable brut.
+    CrossCheckEnable       := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
+                              AND ((PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
+                                   OR WinchBothMotionActive)
+                              AND NOT ManualBucketJogActive,
     JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
@@ -6461,6 +6469,14 @@ instSafetyWinchM2(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
+    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : ACTIF seulement quand
+    // les treuils sont reellement solidaires (couple joystick OU boutons both) et HORS
+    // operation benne unitaire (jog M2 -&gt; M2-M1 varie volontairement de ~15 m). N'affecte
+    // PAS le routage mou-de-cable (:508/:520) qui reste sur SyncEnable brut.
+    CrossCheckEnable       := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
+                              AND ((PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
+                                   OR WinchBothMotionActive)
+                              AND NOT ManualBucketJogActive,
     JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
@@ -8664,7 +8680,18 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation synchronisation treuils</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Validation synchronisation treuils (routage mou-de-cable :508/:520)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CrossCheckEnable">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorise le controle d'ecart critique croise M1/M2 (Meca E) : treuils reellement solidaires ET hors jog benne unitaire</xhtml>
               </documentation>
             </variable>
             <variable name="ReqAscent">
@@ -9899,8 +9926,12 @@ IF NOT BypassGlobal THEN
     instCauses[11].Latching := TRUE;
     instCauses[11].Texte    := 'Escalade fin de course haut (Meca D)';
 
-    // Cause 12 &amp; 13 : Méca E écart critique synchro &amp; escalade (latched)
-    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT RefWindowActive AND NOT OtherWinchInhibited
+    // Cause 12 &amp; 13 : Méca E écart critique synchro &amp; escalade (latched).
+    // CrossCheckEnable (et non SyncEnable) : le controle d'ecart croise M1/M2 n'a de sens
+    // que treuils solidaires ; en jog benne unitaire (M2-M1 varie de ~15 m volontairement)
+    // il est inhibe. TonMecaE (:362) ne s'escalade que si MecaEFaultLatched est pose ici,
+    // donc gater ce seul point suffit. Le mou-de-cable (:508/:520) reste sur SyncEnable.
+    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND CrossCheckEnable AND NOT RefWindowActive AND NOT OtherWinchInhibited
        AND (ABS(CablePosM - ExpectedOtherWinchPosM) &gt; CriticalSyncToleranceM) THEN
         MecaEFaultLatched := TRUE;
     END_IF;

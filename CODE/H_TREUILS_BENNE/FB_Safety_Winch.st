@@ -12,7 +12,8 @@ VAR_INPUT
     Enable                          : BOOL;                           // --> [CMD] Active la surveillance globale FB
     Reset                           : BOOL;                           // --> [CMD] Front acquittement defauts
     Mode                            : E_Mode;                         // --> [CMD] Mode d'exploitation actif
-    SyncEnable                      : BOOL;                           // --> [CMD] Validation synchronisation treuils
+    SyncEnable                      : BOOL;                           // --> [CMD] Validation synchronisation treuils (routage mou-de-cable :508/:520)
+    CrossCheckEnable                : BOOL := TRUE;                    // --> [CMD] Autorise le controle d'ecart critique croise M1/M2 (Meca E) : treuils reellement solidaires ET hors jog benne unitaire
     ReqAscent                       : BOOL;                           // --> [CMD] Commande active montée
     ReqDescend                      : BOOL;                           // --> [CMD] Commande active descente
     MovementCommanded               : BOOL;                           // --> [CMD] Au moins un contacteur de sens commande
@@ -350,8 +351,12 @@ IF NOT BypassGlobal THEN
     instCauses[11].Latching := TRUE;
     instCauses[11].Texte    := 'Escalade fin de course haut (Meca D)';
 
-    // Cause 12 & 13 : Méca E écart critique synchro & escalade (latched)
-    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND SyncEnable AND NOT RefWindowActive AND NOT OtherWinchInhibited
+    // Cause 12 & 13 : Méca E écart critique synchro & escalade (latched).
+    // CrossCheckEnable (et non SyncEnable) : le controle d'ecart croise M1/M2 n'a de sens
+    // que treuils solidaires ; en jog benne unitaire (M2-M1 varie de ~15 m volontairement)
+    // il est inhibe. TonMecaE (:362) ne s'escalade que si MecaEFaultLatched est pose ici,
+    // donc gater ce seul point suffit. Le mou-de-cable (:508/:520) reste sur SyncEnable.
+    IF Enable AND NOT (BypassProcess OR BypassMecaE) AND CrossCheckEnable AND NOT RefWindowActive AND NOT OtherWinchInhibited
        AND (ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM) THEN
         MecaEFaultLatched := TRUE;
     END_IF;

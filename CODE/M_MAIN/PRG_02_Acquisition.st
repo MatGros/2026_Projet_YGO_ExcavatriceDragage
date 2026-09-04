@@ -494,8 +494,12 @@ HwInM1.PresetStatusBit    := FALSE;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
+    // Homing unitaire M1 : autorise en MAINT_N1/N2 quel que soit WinchSel (0/1/2).
+    // L'ancien verrou croise WinchSel<>2 est retire (demande MES) : le homing est un
+    // appui bouton delibere ET conditionne a une position de reference (butee meca OK,
+    // ou capteur haut atteint pour BtnHome) -> la garde position suffit. Le cycle homing
+    // machine reste inconditionnel via M1Demand.HomeReq.
     HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                               AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 2)
                                AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
                                                                        AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
                               OR instCycleMachineHoming.M1Demand.HomeReq),
@@ -544,8 +548,10 @@ HwInM2.PresetStatusBit    := FALSE;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
+    // Homing unitaire M2 (benne) : autorise en MAINT_N1/N2 quel que soit WinchSel (0/1/2).
+    // L'ancien verrou croise WinchSel<>1 est retire (demande MES) : meme raisonnement que
+    // M1 ci-dessus. Permet notamment le homing benne en mode benne WinchSel=2.
     HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                               AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated <> 1)
                                AND (MachineHomingMechanicalStopOk OR (NOT GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
                                                                        AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
                               OR instCycleMachineHoming.M2Demand.HomeReq),
