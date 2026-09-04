@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T10:35:45.317461" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T10:35:45.317461">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T11:40:35.582543" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T11:40:35.582543">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6036,6 +6036,7 @@ instBucket(
     HomingSuspectM1     := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     HomingSuspectM2     := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     WinchSelBucket      := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
+    BucketJogActive     := ManualBucketJogActive,
     ProgramBucketDriveActive := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
                                 OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose,
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
@@ -7614,6 +7615,17 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Treuil M2 en mouvement (Busy)</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketJogActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Jog benne unitaire M2 en cours (WinchSel=2) : l'offset actif doit SUIVRE l'ecart mesure comme en Lifecycle.Busy (pas de figeage -&gt; pas de rampe/a-coup a la fin du jog). Sur en WinchSel=2 : sync/MecaE deja OFF.</xhtml>
+              </documentation>
+            </variable>
             <variable name="InhibitM1">
               <type>
                 <BOOL />
@@ -8655,7 +8667,8 @@ TonBandOpen(IN := NearOpen,   PT := CST_BandStableTime);
 NearClosedStable := TonBandClosed.Q;
 NearOpenStable   := TonBandOpen.Q;
 
-IF Lifecycle.Busy THEN
+IF Lifecycle.Busy OR BucketJogActive THEN
+    // Sequence auto OU jog unitaire M2 : l'offset suit l'ecart reel au rythme du treuil.
     OffsetTargetM := CablePosM2 - CablePosM1;
 ELSIF NearClosedStable THEN
     OffsetTargetM := Config.OffsetCloseM;
@@ -8680,8 +8693,8 @@ END_IF;
 // (FB_Safety_Winch, 0.5 m) -&gt; RAZ + inhibition MecaA/MecaE. On converge donc a pente
 // bornee ; pendant la convergence l'offset n'est pas "fiable" (voir ActiveOffsetSettled)
 // et la synchro est inhibee cote PRG_04.
-IF Lifecycle.Busy THEN
-    ActiveOffsetM := OffsetTargetM;                                   // suit l'ecart reel (deplacement lent du treuil, aucun pas)
+IF Lifecycle.Busy OR BucketJogActive THEN
+    ActiveOffsetM := OffsetTargetM;                                   // suit l'ecart reel (deplacement lent du treuil, aucun pas) -- seq auto OU jog M2
 ELSE
     ActiveOffsetM := ActiveOffsetM
                      + LIMIT(-CST_OffsetSlewMPerScan,
