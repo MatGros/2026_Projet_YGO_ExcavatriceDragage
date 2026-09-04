@@ -5657,3 +5657,44 @@ tasks:
   - Message operateur clair ; recalage offset benne impose avant re-autorisation
   contrat: ''
   bloque_par: []
+
+- id: T249
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: TRANSLATION M3 / IHM / SECURITE
+  agent: ''
+  date: '2026-09-04T11:45:00+02:00'
+  titre: Remontee statut position M3 (bannier/messages) + verrou descente treuil general
+  contexte: >-
+    MES 2026-09-04. (1) Aucune info M3 dans la banniere : l'operateur ne sait pas
+    entre quels capteurs se trouve le pont ni s'il est arrete a une position.
+    (2) Le verrou "descente M1/M2 interdite si M3 pas a P1/Maintenance"
+    (DumpAtTremieDescentLocked) n'etait actif que pendant l'assist vidage-tremie.
+    Passe en GENERAL en MAINT au commit T249-a (a tester banc). Le nom du champ
+    DumpAtTremieDescentLocked est desormais trompeur (a renommer).
+  description: >-
+    Lot 2 volets, meme domaine M3 :
+    A) INTERLOCK (fait, a valider banc) : PRG_03 - DumpAtTremieDescentLocked :=
+       NOT (M3_AtP1Stable OR M3_AtMaintenanceStable) AND NOT Bypass.LimitSwitch
+       AND NOT Bypass.Global, en MAINT_N1/N2. Reste a faire : bit IHM
+       TglAllowWinchMoveAtTremie (autorise montee+descente treuil quand M3 arrete
+       stable a la Tremie) ; decider regle MONTEE (libre partout ? ou meme regle) ;
+       renommer DumpAtTremieDescentLocked -> WinchVerticalMoveLockedByM3 (type +
+       consommateurs PRG_04:968) ; verifier branche SEMI_AUTO.
+    B) MESSAGE STATUT M3 (lecture seule, zero impact conduite) : table SensorsWord
+       -> texte (11111 a la Tremie / 01111 entre Tremie et PV / 00111 entre PV et
+       P2 / 00011 entre P2 et P1 / 00001 entre P1 et Maintenance / 00000 a la
+       Maintenance) ; suffixe mouvement (-> Tremie / -> Maintenance / arrete)
+       selon signe vitesse ; publie TranslationState.StatusText : STRING(80),
+       niveau INFO. Priorite banniere : M3 en mouvement OU sel. hors treuils ->
+       message M3 ; treuil M1/M2 en mouvement -> message treuil ; sinon dernier
+       pertinent.
+  objectifs:
+  - Descente M1/M2 interdite hors M3 arrete stable P1/Maintenance (bypass MES possible)
+  - Bit IHM override Tremie fonctionnel ; regle montee tranchee et documentee
+  - Champ renomme, tous consommateurs alignes, branche SEMI_AUTO coherente
+  - StatusText M3 correct pour les 6 mots + transit, avec sens de deplacement
+  - Bascule banniere M3 <-> treuil selon contexte, niveau INFO (jamais alarme)
+  contrat: ''
+  bloque_par: []
