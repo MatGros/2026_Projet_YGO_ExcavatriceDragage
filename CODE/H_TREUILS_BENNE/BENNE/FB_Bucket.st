@@ -166,12 +166,18 @@ IF NOT BypassGlobal THEN
 
     // Cause 1 : Depassement ecart max (plage physique plausible M2 - M1).
     // Borne haute : offset ferme + 2 m de marge inertie. Borne basse : offset ouvert
-    // MOINS la tolerance de coherence (bruit codeur / leger sur-jog a l'ouverture) ->
-    // ne latche plus un defaut pour quelques cm de M2 sous M1.
+    // MOINS la tolerance de coherence, MAIS bornee a -0.5 m au minimum : la borne basse
+    // ne doit JAMAIS remonter au-dessus de M1. Avec OffsetOpenM > CoherenceLimitM (ex.
+    // 2.25 > 2.0) l'ancienne formule donnait une borne basse POSITIVE (+0.25) -> tout
+    // Delta ~ 0 latchait ErrorID:02, notamment le PRESET homing machine (M1 et M2
+    // references a la meme position -> Delta = 0 volontaire). On tolere donc toujours
+    // M2 un peu au-dessus de M1 (bruit codeur / sur-jog ouverture / preset), et on
+    // desarme completement la surveillance pendant le homing conjoint.
     MaxAllowedOffset := Config.OffsetCloseM + 2.0;
-    MinAllowedOffset := Config.OffsetOpenM - Config.CoherenceLimitM;
-    OffsetMaxViolNow := (CablePosM2 > (CablePosM1 + MaxAllowedOffset))
-                     OR (CablePosM2 < (CablePosM1 + MinAllowedOffset));
+    MinAllowedOffset := MIN(Config.OffsetOpenM - Config.CoherenceLimitM, -0.5);
+    OffsetMaxViolNow := ( (CablePosM2 > (CablePosM1 + MaxAllowedOffset))
+                          OR (CablePosM2 < (CablePosM1 + MinAllowedOffset)) )
+                        AND NOT MachineHomingActive;
     // Anti-pic : ne latche que si l'ecart reste hors plage > 500 ms (bruit codeur / glitch).
     TonOffsetMaxViol(IN := OffsetMaxViolNow, PT := T#500ms);
     IF TonOffsetMaxViol.Q THEN

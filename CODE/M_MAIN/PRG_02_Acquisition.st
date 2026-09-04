@@ -436,7 +436,11 @@ BucketReferenceRequested := (BucketReferenceOpenEdge.Q XOR BucketReferenceCloseE
                           AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
                           AND MachineHomingMechanicalStopOk;
 IF BucketReferenceOpenEdge.Q THEN
-    BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM;
+    // Symetrique du CLOSE ci-dessous : Delta attendu benne ouverte = OffsetOpenM (butee
+    // physique reelle ~2.25 m), pas 0. L'ancien preset (M1 sans offset) forcait Delta=0
+    // -> hors plage [OffsetOpenM-CoherenceLimitM .. OffsetCloseM+2] -> FB_Bucket relatchait
+    // ErrorID:02 juste apres la confirmation (REX MES 2026-09-04, audit T250 finding M6).
+    BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetOpenM;
 ELSIF BucketReferenceCloseEdge.Q THEN
     BucketReferenceTargetM := instEncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM;
 END_IF;
