@@ -18,9 +18,11 @@ STRUCT
     EncoderIncoherent : BOOL;         // TRUE = incoherence redemarrage ou hors bornes
 
     // === MESURES DE VITESSE CABLE ===
-    Speed_Mps         : REAL;         // Vitesse absolue sur fenetre glissante (m/s)
+    Speed_Mps         : REAL;         // Vitesse absolue sur fenetre glissante / filtree (m/s)
     SignedSpeed_Mps   : REAL;         // Vitesse signee (m/s, + montee, - descente)
-    SpeedValid        : BOOL;         // TRUE si 6 echantillons valides sur au moins 50 ms
+    RawSpeed_Mps      : REAL;         // Vitesse absolue brute instantanee (m/s)
+    RawSignedSpeed_Mps: REAL;         // Vitesse signee brute instantanee (m/s)
+    SpeedValid        : BOOL;         // TRUE si mesure valide et codeur operationnel
 
     // === STATUTS DES SOUS-FB & REFERENCE ===
     HomingFault       : ST_Fault;     // Défaut FB_Encoder_Homing (état du référencement)

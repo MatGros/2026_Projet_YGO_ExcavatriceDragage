@@ -1,8 +1,10 @@
 (* =======================================================================
    ⚙️ FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Calcul de la vitesse absolue et signée sur fenêtre glissante horodatée
-   🔒 Polarité : Valid=TRUE après 6 échantillons couvrant au moins 50ms
+   🎯 Rôle : Calcul de la vitesse câble double mesure (Brute instantanée + Filtrée)
+   ⚙️ Différenciation : ΔPosition / dt réel issu de FB_CycleTime
+   🌊 Lissage : Filtre PT1 (FB_Filter) pour la sortie standard lissée
+   🛡️ Sans bornage : zéro clamping artificiel
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
@@ -15,128 +17,75 @@ VAR_INPUT
     // === MESURE SURES EN ENTREE ===
     Position_M          : REAL;        // --> [HW]  Position cable sure en metres (FB_Encoder_Safety)
     PositionValid       : BOOL;        // --> [SAFE] Validite de la chaine codeur
+    FilterTimeConst     : TIME := T#100MS; // --> [CFG] Constante de temps du filtre PT1
 END_VAR
 VAR_OUTPUT
-    // === VITESSE CALCULÉE & VALIDITE ===
-    Speed_Mps           : REAL;        // <-- [DIAG] Vitesse absolue sur la fenetre glissante (m/s)
-    SignedSpeed_Mps     : REAL;        // <-- [DIAG] Vitesse signee (+ montee, - descente) (m/s)
-    Valid               : BOOL;        // <-- [STAT] Vitesse valide (6 ech. sur 50 ms)
+    // === VITESSE PRINCIPALE (FILTRÉE) ===
+    Speed_Mps           : REAL;        // <-- [DIAG] Vitesse absolue filtree PT1 (m/s)
+    SignedSpeed_Mps     : REAL;        // <-- [DIAG] Vitesse signee filtree PT1 (+ montee, - descente) (m/s)
+    Valid               : BOOL;        // <-- [STAT] Validite mesure (TRUE si codeur operationnel et premier cycle passe)
+
+    // === VITESSE BRUTE INSTANTANÉE (SCAN-PAR-SCAN, SANS FILTRE, NON BORNÉE) ===
+    RawSpeed_Mps        : REAL;        // <-- [DIAG] Vitesse absolue instantanee brute (m/s)
+    RawSignedSpeed_Mps  : REAL;        // <-- [DIAG] Vitesse signee instantanee brute (m/s)
 END_VAR
 VAR
-    // === HISTORIQUE & ECHANTILLONS ===
-    Positions_M         : ARRAY[0..5] OF REAL; // . [LOC] Tableau des 6 positions enregistrees
-    Timestamps          : ARRAY[0..5] OF TIME; // . [LOC] Horodatage associe aux 6 positions
+    // === SOUS-INSTANCES ===
+    instCycleTime       : FB_CycleTime; // * [INST] Mesure du dt reel par scan (tache 20ms)
+    instFilter          : FB_Filter;    // * [INST] Filtre PT1 pour la mesure lissée
 
-    // === HORODATAGE & TEMPORISATION ===
-    CurrentTimestamp    : TIME;        // . [LOC] Horodatage courant du cycle
-    LastTimestamp       : TIME;        // . [LOC] Horodatage de l'echantillon precedent
-    ElapsedSinceSample  : TIME;        // . [LOC] Temps ecoule depuis le dernier echantillon
-    WindowElapsed       : TIME;        // . [LOC] Temps total ecoule sur la fenetre de mesure
-
-    // === COMPTEURS & ETATS INTERNES ===
-    CollectedSamples    : INT;         // . [LOC] Nombre d'echantillons collectes dans la fenetre
-    Index               : INT;         // . [LOC] Index de boucle de decalage
-    TimestampInitialized: BOOL;        // . [LOC] Indicateur d'initialisation du premier horodatage
-END_VAR
-VAR CONSTANT
-    // === PARAMETRES DE LA FENETRE GLISSANTE ===
-    WindowTime          : TIME := T#50MS; // Fenetre glissante de mesure
-    SamplePeriod        : TIME := T#10MS; // Periode minimale entre deux echantillons
-    SampleCount         : INT := 6;       // Nombre total d'echantillons requis
+    // === MEMOIRES & DETECTEURS ===
+    PrevPosition_M      : REAL;         // . [LOC] Position du scan precedent
+    FirstScanDone       : BOOL;         // . [LOC] Drapeau d'initialisation premier cycle
+    ResetEdge           : R_TRIG;       // . [LOC] Detecteur front montant Reset
 END_VAR
 
-{region "§1 Horodatage et purge"}
-// ⏱️ Horodatage natif : le calcul utilise le temps réellement écoulé, jamais un cycle supposé.
-CurrentTimestamp := TIME();
+{region "§1 Gestion du temps & Gate de neutralisation"}
+ResetEdge(CLK := Reset);
+instCycleTime(DefaultValueS := 0.020); // Tache PRG_02_Acquisition = 20ms
 
-// Purge des six positions sur rupture de confiance : aucune source antérieure ne peut contaminer la mesure.
-IF NOT Enable OR Reset OR NOT PositionValid THEN
-    Speed_Mps := 0.0;
-    SignedSpeed_Mps := 0.0;
-    Valid := FALSE;
-    CollectedSamples := 0;
-    TimestampInitialized := FALSE;
+// Purge immediate sur perte de confiance ou Reset
+IF NOT Enable OR ResetEdge.Q OR NOT PositionValid THEN
+    Speed_Mps          := 0.0;
+    SignedSpeed_Mps    := 0.0;
+    RawSpeed_Mps       := 0.0;
+    RawSignedSpeed_Mps := 0.0;
+    Valid              := FALSE;
+    FirstScanDone      := FALSE;
+    PrevPosition_M     := Position_M;
     RETURN;
 END_IF;
 {endregion}
 
-{region "§2 Première position"}
-// 🕒 Première position de la nouvelle fenêtre.
-IF NOT TimestampInitialized THEN
-    Positions_M[0] := Position_M;
-    Timestamps[0] := CurrentTimestamp;
-    LastTimestamp := CurrentTimestamp;
-    CollectedSamples := 1;
-    TimestampInitialized := TRUE;
-    Speed_Mps := 0.0;
-    SignedSpeed_Mps := 0.0;
-    Valid := FALSE;
+{region "§2 Initialisation premier scan"}
+IF NOT FirstScanDone THEN
+    PrevPosition_M := Position_M;
+    FirstScanDone  := TRUE;
+    Valid          := FALSE;
+    Speed_Mps          := 0.0;
+    SignedSpeed_Mps    := 0.0;
+    RawSpeed_Mps       := 0.0;
+    RawSignedSpeed_Mps := 0.0;
     RETURN;
 END_IF;
 {endregion}
 
-{region "§3 Rebouclage TIME"}
-// 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant.
-IF CurrentTimestamp < LastTimestamp THEN
-    Positions_M[0] := Position_M;
-    Timestamps[0] := CurrentTimestamp;
-    LastTimestamp := CurrentTimestamp;
-    CollectedSamples := 1;
-    Speed_Mps := 0.0;
-    SignedSpeed_Mps := 0.0;
-    Valid := FALSE;
-    RETURN;
+{region "§3 Calcul vitesse brute instantanee"}
+IF instCycleTime.CycleTimeS > 0.0 THEN
+    RawSignedSpeed_Mps := (Position_M - PrevPosition_M) / instCycleTime.CycleTimeS;
+    RawSpeed_Mps       := ABS(RawSignedSpeed_Mps);
+    Valid              := TRUE;
 END_IF;
-
-ElapsedSinceSample := CurrentTimestamp - LastTimestamp;
-
-// 🛡️ Delta nul : aucune division et aucun doublon d'échantillon.
-IF ElapsedSinceSample <= T#0MS THEN
-    RETURN;
-END_IF;
+PrevPosition_M := Position_M;
 {endregion}
 
-{region "§4 Collecte échantillons"}
-// 📥 Six positions espacées d'au moins 10 ms donnent cinq intervalles sur la fenêtre interne de 50 ms.
-IF ElapsedSinceSample >= SamplePeriod THEN
-    LastTimestamp := CurrentTimestamp;
+{region "§4 Filtrage PT1 pour sortie lissée"}
+instFilter(
+    ValueIn    := RawSignedSpeed_Mps,
+    TimeConst  := FilterTimeConst,
+    CycleTimeS := instCycleTime.CycleTimeS
+);
 
-    IF CollectedSamples < SampleCount THEN
-        Positions_M[CollectedSamples] := Position_M;
-        Timestamps[CollectedSamples] := CurrentTimestamp;
-        CollectedSamples := CollectedSamples + 1;
-    ELSE
-        FOR Index := 0 TO 4 DO
-            Positions_M[Index] := Positions_M[Index + 1];
-            Timestamps[Index] := Timestamps[Index + 1];
-        END_FOR;
-        Positions_M[5] := Position_M;
-        Timestamps[5] := CurrentTimestamp;
-    END_IF;
-{endregion}
-
-{region "§5 Calcul vitesse"}
-    IF CollectedSamples = SampleCount THEN
-        // 🛡️ Ordre temporel et durée minimale contrôlés avant toute conversion/division.
-        IF Timestamps[5] >= Timestamps[0] THEN
-            WindowElapsed := Timestamps[5] - Timestamps[0];
-            IF WindowElapsed >= WindowTime THEN
-                SignedSpeed_Mps := (Positions_M[5] - Positions_M[0])
-                                   / (UDINT_TO_REAL(TIME_TO_UDINT(WindowElapsed)) / 1000.0);
-                Speed_Mps := ABS(SignedSpeed_Mps);
-                Valid := TRUE;
-            ELSE
-                Speed_Mps := 0.0;
-                SignedSpeed_Mps := 0.0;
-                Valid := FALSE;
-            END_IF;
-        ELSE
-            Speed_Mps := 0.0;
-            SignedSpeed_Mps := 0.0;
-            Valid := FALSE;
-            CollectedSamples := 0;
-            TimestampInitialized := FALSE;
-        END_IF;
-    END_IF;
-END_IF;
+SignedSpeed_Mps := instFilter.ValueOut;
+Speed_Mps       := ABS(SignedSpeed_Mps);
 {endregion}

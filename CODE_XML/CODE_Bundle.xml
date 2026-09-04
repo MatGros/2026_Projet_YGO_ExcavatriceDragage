@@ -15030,7 +15030,7 @@ Position cable (m, signee, + enroule)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE VITESSE CABLE ===
-Vitesse absolue sur fenetre glissante (m/s)</xhtml>
+Vitesse absolue sur fenetre glissante / filtree (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SignedSpeed_Mps">
@@ -15041,12 +15041,28 @@ Vitesse absolue sur fenetre glissante (m/s)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee (m/s, + montee, - descente)</xhtml>
               </documentation>
             </variable>
+            <variable name="RawSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse absolue brute instantanee (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawSignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee brute instantanee (m/s)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SpeedValid">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si 6 echantillons valides sur au moins 50 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si mesure valide et codeur operationnel</xhtml>
               </documentation>
             </variable>
             <variable name="HomingFault">
@@ -25691,6 +25707,8 @@ Measurement.CablePosMSafe     := instSafety.CablePosMSafe;
 Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;
+Measurement.RawSpeed_Mps      := instSpeed.RawSpeed_Mps;
+Measurement.RawSignedSpeed_Mps:= instSpeed.RawSignedSpeed_Mps;
 Measurement.SpeedValid        := instSpeed.Valid;
 Measurement.HomingFault        := instHoming.Fault;
 Measurement.HomingLifecycle    := instHoming.Lifecycle;
@@ -27281,6 +27299,17 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Validite de la chaine codeur</xhtml>
               </documentation>
             </variable>
+            <variable name="FilterTimeConst">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100MS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Constante de temps du filtre PT1</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Speed_Mps">
@@ -27288,8 +27317,8 @@ END_IF;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VITESSE CALCULÉE &amp; VALIDITE ===
-&lt;-- [DIAG] Vitesse absolue sur la fenetre glissante (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VITESSE PRINCIPALE (FILTRÉE) ===
+&lt;-- [DIAG] Vitesse absolue filtree PT1 (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SignedSpeed_Mps">
@@ -27297,7 +27326,7 @@ END_IF;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse signee (+ montee, - descente) (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse signee filtree PT1 (+ montee, - descente) (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="Valid">
@@ -27305,128 +27334,68 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Vitesse valide (6 ech. sur 50 ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Validite mesure (TRUE si codeur operationnel et premier cycle passe)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VITESSE BRUTE INSTANTANÉE (SCAN-PAR-SCAN, SANS FILTRE, NON BORNÉE) ===
+&lt;-- [DIAG] Vitesse absolue instantanee brute (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawSignedSpeed_Mps">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse signee instantanee brute (m/s)</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="Positions_M">
+            <variable name="instCycleTime">
               <type>
-                <array>
-                  <dimension lower="0" upper="5" />
-                  <baseType>
-                    <REAL />
-                  </baseType>
-                </array>
+                <derived name="FB_CycleTime" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HISTORIQUE &amp; ECHANTILLONS ===
-. [LOC] Tableau des 6 positions enregistrees</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES ===
+* [INST] Mesure du dt reel par scan (tache 20ms)</xhtml>
               </documentation>
             </variable>
-            <variable name="Timestamps">
+            <variable name="instFilter">
               <type>
-                <array>
-                  <dimension lower="0" upper="5" />
-                  <baseType>
-                    <TIME />
-                  </baseType>
-                </array>
+                <derived name="FB_Filter" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Horodatage associe aux 6 positions</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Filtre PT1 pour la mesure lissée</xhtml>
               </documentation>
             </variable>
-            <variable name="CurrentTimestamp">
+            <variable name="PrevPosition_M">
               <type>
-                <TIME />
+                <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== HORODATAGE &amp; TEMPORISATION ===
-. [LOC] Horodatage courant du cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MEMOIRES &amp; DETECTEURS ===
+. [LOC] Position du scan precedent</xhtml>
               </documentation>
             </variable>
-            <variable name="LastTimestamp">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Horodatage de l'echantillon precedent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ElapsedSinceSample">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps ecoule depuis le dernier echantillon</xhtml>
-              </documentation>
-            </variable>
-            <variable name="WindowElapsed">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps total ecoule sur la fenetre de mesure</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CollectedSamples">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== COMPTEURS &amp; ETATS INTERNES ===
-. [LOC] Nombre d'echantillons collectes dans la fenetre</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Index">
-              <type>
-                <INT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Index de boucle de decalage</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TimestampInitialized">
+            <variable name="FirstScanDone">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Indicateur d'initialisation du premier horodatage</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Drapeau d'initialisation premier cycle</xhtml>
               </documentation>
             </variable>
-            <variable name="WindowTime">
+            <variable name="ResetEdge">
               <type>
-                <TIME />
+                <derived name="R_TRIG" />
               </type>
-              <initialValue>
-                <simpleValue value="TIME#50MS" />
-              </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PARAMETRES DE LA FENETRE GLISSANTE ===
-Fenetre glissante de mesure</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SamplePeriod">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#10MS" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Periode minimale entre deux echantillons</xhtml>
-              </documentation>
-            </variable>
-            <variable name="SampleCount">
-              <type>
-                <INT />
-              </type>
-              <initialValue>
-                <simpleValue value="6" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre total d'echantillons requis</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Reset</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -27434,8 +27403,10 @@ Fenetre glissante de mesure</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
    ⚙️ FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Calcul de la vitesse absolue et signée sur fenêtre glissante horodatée
-   🔒 Polarité : Valid=TRUE après 6 échantillons couvrant au moins 50ms
+   🎯 Rôle : Calcul de la vitesse câble double mesure (Brute instantanée + Filtrée)
+   ⚙️ Différenciation : ΔPosition / dt réel issu de FB_CycleTime
+   🌊 Lissage : Filtre PT1 (FB_Filter) pour la sortie standard lissée
+   🛡️ Sans bornage : zéro clamping artificiel
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
           </documentation>
@@ -27444,100 +27415,54 @@ Fenetre glissante de mesure</xhtml>
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "§1 Horodatage et purge"}
-// ⏱️ Horodatage natif : le calcul utilise le temps réellement écoulé, jamais un cycle supposé.
-CurrentTimestamp := TIME();
+{region "§1 Gestion du temps &amp; Gate de neutralisation"}
+ResetEdge(CLK := Reset);
+instCycleTime(DefaultValueS := 0.020); // Tache PRG_02_Acquisition = 20ms
 
-// Purge des six positions sur rupture de confiance : aucune source antérieure ne peut contaminer la mesure.
-IF NOT Enable OR Reset OR NOT PositionValid THEN
-    Speed_Mps := 0.0;
-    SignedSpeed_Mps := 0.0;
-    Valid := FALSE;
-    CollectedSamples := 0;
-    TimestampInitialized := FALSE;
+// Purge immediate sur perte de confiance ou Reset
+IF NOT Enable OR ResetEdge.Q OR NOT PositionValid THEN
+    Speed_Mps          := 0.0;
+    SignedSpeed_Mps    := 0.0;
+    RawSpeed_Mps       := 0.0;
+    RawSignedSpeed_Mps := 0.0;
+    Valid              := FALSE;
+    FirstScanDone      := FALSE;
+    PrevPosition_M     := Position_M;
     RETURN;
 END_IF;
 {endregion}
 
-{region "§2 Première position"}
-// 🕒 Première position de la nouvelle fenêtre.
-IF NOT TimestampInitialized THEN
-    Positions_M[0] := Position_M;
-    Timestamps[0] := CurrentTimestamp;
-    LastTimestamp := CurrentTimestamp;
-    CollectedSamples := 1;
-    TimestampInitialized := TRUE;
-    Speed_Mps := 0.0;
-    SignedSpeed_Mps := 0.0;
-    Valid := FALSE;
+{region "§2 Initialisation premier scan"}
+IF NOT FirstScanDone THEN
+    PrevPosition_M := Position_M;
+    FirstScanDone  := TRUE;
+    Valid          := FALSE;
+    Speed_Mps          := 0.0;
+    SignedSpeed_Mps    := 0.0;
+    RawSpeed_Mps       := 0.0;
+    RawSignedSpeed_Mps := 0.0;
     RETURN;
 END_IF;
 {endregion}
 
-{region "§3 Rebouclage TIME"}
-// 🛡️ Rebouclage de TIME détecté localement : purge sans réutiliser le delta aberrant.
-IF CurrentTimestamp &lt; LastTimestamp THEN
-    Positions_M[0] := Position_M;
-    Timestamps[0] := CurrentTimestamp;
-    LastTimestamp := CurrentTimestamp;
-    CollectedSamples := 1;
-    Speed_Mps := 0.0;
-    SignedSpeed_Mps := 0.0;
-    Valid := FALSE;
-    RETURN;
+{region "§3 Calcul vitesse brute instantanee"}
+IF instCycleTime.CycleTimeS &gt; 0.0 THEN
+    RawSignedSpeed_Mps := (Position_M - PrevPosition_M) / instCycleTime.CycleTimeS;
+    RawSpeed_Mps       := ABS(RawSignedSpeed_Mps);
+    Valid              := TRUE;
 END_IF;
-
-ElapsedSinceSample := CurrentTimestamp - LastTimestamp;
-
-// 🛡️ Delta nul : aucune division et aucun doublon d'échantillon.
-IF ElapsedSinceSample &lt;= T#0MS THEN
-    RETURN;
-END_IF;
+PrevPosition_M := Position_M;
 {endregion}
 
-{region "§4 Collecte échantillons"}
-// 📥 Six positions espacées d'au moins 10 ms donnent cinq intervalles sur la fenêtre interne de 50 ms.
-IF ElapsedSinceSample &gt;= SamplePeriod THEN
-    LastTimestamp := CurrentTimestamp;
+{region "§4 Filtrage PT1 pour sortie lissée"}
+instFilter(
+    ValueIn    := RawSignedSpeed_Mps,
+    TimeConst  := FilterTimeConst,
+    CycleTimeS := instCycleTime.CycleTimeS
+);
 
-    IF CollectedSamples &lt; SampleCount THEN
-        Positions_M[CollectedSamples] := Position_M;
-        Timestamps[CollectedSamples] := CurrentTimestamp;
-        CollectedSamples := CollectedSamples + 1;
-    ELSE
-        FOR Index := 0 TO 4 DO
-            Positions_M[Index] := Positions_M[Index + 1];
-            Timestamps[Index] := Timestamps[Index + 1];
-        END_FOR;
-        Positions_M[5] := Position_M;
-        Timestamps[5] := CurrentTimestamp;
-    END_IF;
-{endregion}
-
-{region "§5 Calcul vitesse"}
-    IF CollectedSamples = SampleCount THEN
-        // 🛡️ Ordre temporel et durée minimale contrôlés avant toute conversion/division.
-        IF Timestamps[5] &gt;= Timestamps[0] THEN
-            WindowElapsed := Timestamps[5] - Timestamps[0];
-            IF WindowElapsed &gt;= WindowTime THEN
-                SignedSpeed_Mps := (Positions_M[5] - Positions_M[0])
-                                   / (UDINT_TO_REAL(TIME_TO_UDINT(WindowElapsed)) / 1000.0);
-                Speed_Mps := ABS(SignedSpeed_Mps);
-                Valid := TRUE;
-            ELSE
-                Speed_Mps := 0.0;
-                SignedSpeed_Mps := 0.0;
-                Valid := FALSE;
-            END_IF;
-        ELSE
-            Speed_Mps := 0.0;
-            SignedSpeed_Mps := 0.0;
-            Valid := FALSE;
-            CollectedSamples := 0;
-            TimestampInitialized := FALSE;
-        END_IF;
-    END_IF;
-END_IF;
+SignedSpeed_Mps := instFilter.ValueOut;
+Speed_Mps       := ABS(SignedSpeed_Mps);
 {endregion}
 </xhtml>
           </ST>
