@@ -55,7 +55,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M2)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
-    _SyncCfgPersist : ST_SyncCfg := (CfgSyncTolerance_M := 0.8); // 🌉 Pont FB_CfgPersistBridge_SyncCfg (Zone 2: dégradation Palier 1 dès 0.8m)
+    _SyncCfgPersist : ST_SyncCfg := (CfgSyncTolerance_M := 2.0, CfgSyncCriticalTolerance_M := 4.0); // 🌉 Pont FB_CfgPersistBridge_SyncCfg — MES 2026-09-04 : Warn 0.8->2.0m, Fault 2.0(defaut type)->4.0m (confirme operateur)
     _WinchCriticalSyncTolerance_M : REAL := 2.5; // Méca E : écart critique (Zone 3: SafeStop dès 2.5m)
     _SyncSoftStopEnable : BOOL := FALSE; // Rattrapage directionnel (Défaut: OFF)
 
