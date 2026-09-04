@@ -697,6 +697,22 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couples nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
               </documentation>
             </variable>
+            <variable name="CoupledBucketPhaseLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : phase mouvement couple VERROUILLEE pour ce maintien joystick -&gt; la perte de l'etat ouvert/ferme en mouvement ne relance PAS de correction benne, ni de blocage "descente/montee interdite". Efface au relachement joystick confirme.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSelTransitionHold">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : changement de selecteur en cours -&gt; requetes mouvement M1/M2 forcees a 0 jusqu'a l'arret confirme (pas de hand-off en mouvement)</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingApproachEnable">
               <type>
                 <BOOL />

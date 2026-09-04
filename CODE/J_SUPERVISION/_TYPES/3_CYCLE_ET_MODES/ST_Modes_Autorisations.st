@@ -19,6 +19,8 @@ STRUCT
     InhibitM1                   : BOOL;       // Inhibition M1 (MAINT_N2 only)
     InhibitM2                   : BOOL;       // Inhibition M2 (MAINT_N2 only)
     JoystickWinchSelectArbitrated : INT;      // 0=M1+M2 couples nominal, 1=M1, 2=M2 (unitaires MAINT_N2)
+    CoupledBucketPhaseLocked    : BOOL;       // T248 : phase mouvement couple VERROUILLEE pour ce maintien joystick -> la perte de l'etat ouvert/ferme en mouvement ne relance PAS de correction benne, ni de blocage "descente/montee interdite". Efface au relachement joystick confirme.
+    WinchSelTransitionHold      : BOOL;       // T248 : changement de selecteur en cours -> requetes mouvement M1/M2 forcees a 0 jusqu'a l'arret confirme (pas de hand-off en mouvement)
     HomingApproachEnable        : BOOL;       // Depassement butee haut (N2)
     MaintenanceM3TargetEnable   : BOOL;       // Cible Translation Maintenance (N2 only)
 

@@ -8941,6 +8941,22 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couples nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
               </documentation>
             </variable>
+            <variable name="CoupledBucketPhaseLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : phase mouvement couple VERROUILLEE pour ce maintien joystick -&gt; la perte de l'etat ouvert/ferme en mouvement ne relance PAS de correction benne, ni de blocage "descente/montee interdite". Efface au relachement joystick confirme.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSelTransitionHold">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : changement de selecteur en cours -&gt; requetes mouvement M1/M2 forcees a 0 jusqu'a l'arret confirme (pas de hand-off en mouvement)</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingApproachEnable">
               <type>
                 <BOOL />
@@ -14193,6 +14209,14 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne fermée (BucketState.IsClosed)</xhtml>
               </documentation>
             </variable>
+            <variable name="CoupledPhaseLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] T248 : phase couplée verrouillée (Auth.CoupledBucketPhaseLocked) -&gt; ne PAS (ré)armer dive-open/ascent-close : plus de correction benne ni de blocage sur l'état temps réel une fois le mouvement lancé</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -19055,12 +19079,18 @@ IF NOT Enable THEN
 ELSE
     // ── Règle absolue en pilotage both normal (bit-identique PRG_04 §1) ──
     // Descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
+    // T248 : une fois la phase couplée VERROUILLÉE (benne amenée dans l'état requis pour
+    // ce maintien joystick), on n'arme plus dive-open / ascent-close -&gt; la perte de
+    // l'état ouvert/fermé EN MOUVEMENT ne relance aucune correction benne et ne bloque
+    // plus le mouvement couplé ("descente/montée interdite" fantôme).
     WinchBothDiveBucketOpenArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+        AND NOT Context.CoupledPhaseLocked
         AND Context.MotionActive AND Context.ReqDescend
         AND NOT Context.BucketIsOpen;
     WinchBothAscentBucketCloseArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+        AND NOT Context.CoupledPhaseLocked
         AND Context.MotionActive AND Context.ReqAscent
         AND NOT Context.BucketIsClosed;
 
@@ -31404,7 +31434,53 @@ ET frein serré, redondés par la mesure de vitesse.
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T248 : benne amenee dans l'etat requis pour ce maintien joystick -&gt; reste en couple (0) jusqu'au relachement (anti-chatter du selecteur au bord de bande)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T248 : benne amenee dans l'etat requis pour ce maintien joystick -&gt; VERROU de phase couple jusqu'au relachement confirme (la perte d'etat en mouvement ne relance rien)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonJoyNeutralT248">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T248 : manche au neutre CONFIRME (&gt;200 ms) avant d'effacer le verrou de phase (anti-blip)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonWinchSelSettle">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T248 : arret CONFIRME des 2 treuils avant de lever le hold de transition</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSelPrevT248">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T248 : selecteur arbitre du scan precedent (detection de changement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T248JoyNeutralConfirm">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#200ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : duree neutre pour relacher le verrou de phase</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_T248TransitionSettle">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#300ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : duree arret confirme pour lever le hold de transition</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -31509,6 +31585,9 @@ IF NOT Enable THEN
     Auth.InhibitM2 := FALSE;
     Auth.HomingApproachEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
+    Auth.CoupledBucketPhaseLocked := FALSE;
+    Auth.WinchSelTransitionHold := FALSE;
+    BucketSeqSatisfied := FALSE;
     Auth.MaintenanceM3TargetEnable := FALSE;
     // Faits persistants : PUBLIÉS même neutralisé (l'IHM doit continuer à voir
     // qu'un re-homing est requis tant que la machine n'est pas réarmée). Aucune autorisation
@@ -31661,7 +31740,11 @@ Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproach
 //   manche poussé (descente) + benne pas ouverte -&gt; 2 (ouvre), puis 0 (descend couplé)
 // BucketSeqSatisfied verrouille le retour à 0 jusqu'au relâchement joystick -&gt; pas de
 // va-et-vient du sélecteur au bord de la bande de détection.
-IF NOT (JoystickPull OR JoystickPush) THEN
+// VERROU DE PHASE : n'est effacé que par un manche au neutre CONFIRMÉ (&gt;200 ms) -&gt; un
+// passage bref par le neutre (ajustement de prise, dip sous deadzone) NE relance PAS la
+// correction benne. Hors maintenance : effacement immédiat.
+TonJoyNeutralT248(IN := NOT (JoystickPull OR JoystickPush), PT := CST_T248JoyNeutralConfirm);
+IF TonJoyNeutralT248.Q THEN
     BucketSeqSatisfied := FALSE;
 END_IF;
 
@@ -31669,14 +31752,16 @@ IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
     IF CoupledBucketSeqEnable
        AND (JoystickWinchSelectRequest = 0)
        AND (JoystickPull XOR JoystickPush) THEN
+        // SET du verrou dès que la benne est dans l'état requis par le sens (une fois).
         IF (JoystickPull AND BucketIsClosed) OR (JoystickPush AND BucketIsOpen) THEN
             BucketSeqSatisfied := TRUE;
         END_IF;
-        IF NOT BucketSeqSatisfied
-           AND ((JoystickPull AND NOT BucketIsClosed) OR (JoystickPush AND NOT BucketIsOpen)) THEN
-            Auth.JoystickWinchSelectArbitrated := 2;   // amener la benne dans l'état requis
+        IF BucketSeqSatisfied THEN
+            Auth.JoystickWinchSelectArbitrated := 0;   // phase COUPLÉE VERROUILLÉE : on ne
+                                                       // recorrige plus la benne, la perte
+                                                       // d'état en mouvement est ignorée.
         ELSE
-            Auth.JoystickWinchSelectArbitrated := 0;   // benne OK -&gt; couplé
+            Auth.JoystickWinchSelectArbitrated := 2;   // phase JOG : amener la benne dans l'état
         END_IF;
     ELSE
         Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
@@ -31684,6 +31769,26 @@ IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
 ELSE
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
     BucketSeqSatisfied := FALSE;
+END_IF;
+
+// Image consommée par PRG_04 (FB_BucketCmdArbitration, permis) : tant que TRUE, aucun
+// blocage / réarmement d'ouverture-fermeture sur l'état benne temps réel.
+Auth.CoupledBucketPhaseLocked := BucketSeqSatisfied;
+
+// HOLD DE TRANSITION : à CHAQUE changement du sélecteur arbitré (jog&lt;-&gt;couplé, ou manuel),
+// on force l'arrêt des requêtes M1/M2 (PRG_04) puis on attend l'arrêt CONFIRMÉ des 2
+// treuils (vitesse &lt; seuil) + 300 ms avant de relâcher -&gt; pas de hand-off en mouvement,
+// redémarrage rampé depuis l'arrêt.
+IF Auth.JoystickWinchSelectArbitrated &lt;&gt; WinchSelPrevT248 THEN
+    Auth.WinchSelTransitionHold := TRUE;
+END_IF;
+WinchSelPrevT248 := Auth.JoystickWinchSelectArbitrated;
+TonWinchSelSettle(IN := Auth.WinchSelTransitionHold
+                        AND (M1SpeedAbsMps &lt; MovementSpeedThresholdMps)
+                        AND (M2SpeedAbsMps &lt; MovementSpeedThresholdMps),
+                  PT := CST_T248TransitionSettle);
+IF TonWinchSelSettle.Q THEN
+    Auth.WinchSelTransitionHold := FALSE;
 END_IF;
 
 // 4quinquies. CIBLE TRANSLATION MAINTENANCE
@@ -31697,6 +31802,8 @@ IF (Auth.Mode &lt;&gt; E_Mode.MAINT_N2) AND (Auth.Mode &lt;&gt; E_Mode.MAINT_N1)
     Auth.MaintenanceM3TargetEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;
     BucketSeqSatisfied := FALSE;
+    Auth.CoupledBucketPhaseLocked := FALSE;
+    Auth.WinchSelTransitionHold := FALSE;
 END_IF;
 {endregion}
 </xhtml>
@@ -49631,6 +49738,7 @@ ArbBucketContext.ReqAscent      := WinchBothReqAscent;
 ArbBucketContext.ReqDescend     := WinchBothReqDescend;
 ArbBucketContext.BucketIsOpen   := _BucketState.IsOpen;
 ArbBucketContext.BucketIsClosed := _BucketState.IsClosed;
+ArbBucketContext.CoupledPhaseLocked := PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked;
 
 instArbBucket(
     Enable    := TRUE,
@@ -49837,6 +49945,14 @@ M2LogicRunRequest := instArbM2.RunRequest;
 M2LogicReqAscent  := instArbM2.ReqAscent;
 M2LogicReqDescend := instArbM2.ReqDescend;
 M2LogicRequestStepTgt := instArbM2.StepTgt;
+
+// T248 — HOLD DE TRANSITION : changement de selecteur en cours -&gt; requetes M1/M2 forcees
+// a 0 (arret rampe normale) jusqu'a l'arret confirme des 2 treuils. Pas de hand-off en
+// mouvement jog&lt;-&gt;couple -&gt; supprime l'a-coup. Le mouvement suivant redemarre de zero.
+IF PRG_03_Modes_Cycle.Data.Auth.WinchSelTransitionHold THEN
+    M1LogicRunRequest := FALSE; M1LogicReqAscent := FALSE; M1LogicReqDescend := FALSE; M1LogicRequestStepTgt := 0;
+    M2LogicRunRequest := FALSE; M2LogicReqAscent := FALSE; M2LogicReqDescend := FALSE; M2LogicRequestStepTgt := 0;
+END_IF;
 // Diagnostic % (palier→%) pour IHM / simu — borne haute du palier arbitré.
 IF (M2LogicRequestStepTgt &gt;= 1) AND (M2LogicRequestStepTgt &lt;= 5) THEN
     M2LogicRequestSpeedCmd_Pct := _WinchSpeedStepTable.StepThreshold_Pct[M2LogicRequestStepTgt];
@@ -50061,7 +50177,10 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq
                      OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
                      OR (GVL_IHM.Modes.Cmd.SelJoystickWinch = 2),
                       0.0,
-                      (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
+                      // Marge 1.5 m au-dessus de M1 + OffsetCloseM : en hoist COUPLE benne
+                      // fermee, M2 doit rester a M1+OffsetCloseM sans taper son plafond haut
+                      // meme si le shift suit M1 avec un leger retard -&gt; evite le NoMovement M2.
+                      (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 1.5)
                       - _CommunCfgPersist.CfgCableLimitAscent_M);
 
 {endregion}

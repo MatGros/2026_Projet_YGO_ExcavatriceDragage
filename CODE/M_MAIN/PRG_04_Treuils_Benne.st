@@ -304,6 +304,7 @@ ArbBucketContext.ReqAscent      := WinchBothReqAscent;
 ArbBucketContext.ReqDescend     := WinchBothReqDescend;
 ArbBucketContext.BucketIsOpen   := _BucketState.IsOpen;
 ArbBucketContext.BucketIsClosed := _BucketState.IsClosed;
+ArbBucketContext.CoupledPhaseLocked := PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked;
 
 instArbBucket(
     Enable    := TRUE,
@@ -510,6 +511,14 @@ M2LogicRunRequest := instArbM2.RunRequest;
 M2LogicReqAscent  := instArbM2.ReqAscent;
 M2LogicReqDescend := instArbM2.ReqDescend;
 M2LogicRequestStepTgt := instArbM2.StepTgt;
+
+// T248 — HOLD DE TRANSITION : changement de selecteur en cours -> requetes M1/M2 forcees
+// a 0 (arret rampe normale) jusqu'a l'arret confirme des 2 treuils. Pas de hand-off en
+// mouvement jog<->couple -> supprime l'a-coup. Le mouvement suivant redemarre de zero.
+IF PRG_03_Modes_Cycle.Data.Auth.WinchSelTransitionHold THEN
+    M1LogicRunRequest := FALSE; M1LogicReqAscent := FALSE; M1LogicReqDescend := FALSE; M1LogicRequestStepTgt := 0;
+    M2LogicRunRequest := FALSE; M2LogicReqAscent := FALSE; M2LogicReqDescend := FALSE; M2LogicRequestStepTgt := 0;
+END_IF;
 // Diagnostic % (palier→%) pour IHM / simu — borne haute du palier arbitré.
 IF (M2LogicRequestStepTgt >= 1) AND (M2LogicRequestStepTgt <= 5) THEN
     M2LogicRequestSpeedCmd_Pct := _WinchSpeedStepTable.StepThreshold_Pct[M2LogicRequestStepTgt];
@@ -734,7 +743,10 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq
                      OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
                      OR (GVL_IHM.Modes.Cmd.SelJoystickWinch = 2),
                       0.0,
-                      (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
+                      // Marge 1.5 m au-dessus de M1 + OffsetCloseM : en hoist COUPLE benne
+                      // fermee, M2 doit rester a M1+OffsetCloseM sans taper son plafond haut
+                      // meme si le shift suit M1 avec un leger retard -> evite le NoMovement M2.
+                      (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 1.5)
                       - _CommunCfgPersist.CfgCableLimitAscent_M);
 
 {endregion}

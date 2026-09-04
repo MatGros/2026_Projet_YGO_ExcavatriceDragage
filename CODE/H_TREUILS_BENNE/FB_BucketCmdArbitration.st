@@ -42,12 +42,18 @@ IF NOT Enable THEN
 ELSE
     // ── Règle absolue en pilotage both normal (bit-identique PRG_04 §1) ──
     // Descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
+    // T248 : une fois la phase couplée VERROUILLÉE (benne amenée dans l'état requis pour
+    // ce maintien joystick), on n'arme plus dive-open / ascent-close -> la perte de
+    // l'état ouvert/fermé EN MOUVEMENT ne relance aucune correction benne et ne bloque
+    // plus le mouvement couplé ("descente/montée interdite" fantôme).
     WinchBothDiveBucketOpenArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode <> E_Mode.SEMI_AUTO)
+        AND NOT Context.CoupledPhaseLocked
         AND Context.MotionActive AND Context.ReqDescend
         AND NOT Context.BucketIsOpen;
     WinchBothAscentBucketCloseArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode <> E_Mode.SEMI_AUTO)
+        AND NOT Context.CoupledPhaseLocked
         AND Context.MotionActive AND Context.ReqAscent
         AND NOT Context.BucketIsClosed;
 

@@ -18,5 +18,6 @@ STRUCT
     ReqDescend                       : BOOL;  // --> [CMD] Intention both descente
     BucketIsOpen                     : BOOL;  // --> [STAT] Benne ouverte (BucketState.IsOpen)
     BucketIsClosed                   : BOOL;  // --> [STAT] Benne fermée (BucketState.IsClosed)
+    CoupledPhaseLocked               : BOOL;  // --> [STAT] T248 : phase couplée verrouillée (Auth.CoupledBucketPhaseLocked) -> ne PAS (ré)armer dive-open/ascent-close : plus de correction benne ni de blocage sur l'état temps réel une fois le mouvement lancé
 END_STRUCT
 END_TYPE

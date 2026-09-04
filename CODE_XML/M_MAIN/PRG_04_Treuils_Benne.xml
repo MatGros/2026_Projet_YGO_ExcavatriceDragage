@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T08:15:54.949592" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T08:15:54.949592">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T08:50:11.118719" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T08:50:11.118719">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1755,6 +1755,14 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne fermée (BucketState.IsClosed)</xhtml>
               </documentation>
             </variable>
+            <variable name="CoupledPhaseLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] T248 : phase couplée verrouillée (Auth.CoupledBucketPhaseLocked) -&gt; ne PAS (ré)armer dive-open/ascent-close : plus de correction benne ni de blocage sur l'état temps réel une fois le mouvement lancé</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -2869,6 +2877,22 @@ TRUE = relais sens + C1..C4 tous retombés (ex-FwdRevSpeedFeedbackOff)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couples nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoupledBucketPhaseLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : phase mouvement couple VERROUILLEE pour ce maintien joystick -&gt; la perte de l'etat ouvert/ferme en mouvement ne relance PAS de correction benne, ni de blocage "descente/montee interdite". Efface au relachement joystick confirme.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSelTransitionHold">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : changement de selecteur en cours -&gt; requetes mouvement M1/M2 forcees a 0 jusqu'a l'arret confirme (pas de hand-off en mouvement)</xhtml>
               </documentation>
             </variable>
             <variable name="HomingApproachEnable">
@@ -5965,6 +5989,7 @@ ArbBucketContext.ReqAscent      := WinchBothReqAscent;
 ArbBucketContext.ReqDescend     := WinchBothReqDescend;
 ArbBucketContext.BucketIsOpen   := _BucketState.IsOpen;
 ArbBucketContext.BucketIsClosed := _BucketState.IsClosed;
+ArbBucketContext.CoupledPhaseLocked := PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked;
 
 instArbBucket(
     Enable    := TRUE,
@@ -6171,6 +6196,14 @@ M2LogicRunRequest := instArbM2.RunRequest;
 M2LogicReqAscent  := instArbM2.ReqAscent;
 M2LogicReqDescend := instArbM2.ReqDescend;
 M2LogicRequestStepTgt := instArbM2.StepTgt;
+
+// T248 — HOLD DE TRANSITION : changement de selecteur en cours -&gt; requetes M1/M2 forcees
+// a 0 (arret rampe normale) jusqu'a l'arret confirme des 2 treuils. Pas de hand-off en
+// mouvement jog&lt;-&gt;couple -&gt; supprime l'a-coup. Le mouvement suivant redemarre de zero.
+IF PRG_03_Modes_Cycle.Data.Auth.WinchSelTransitionHold THEN
+    M1LogicRunRequest := FALSE; M1LogicReqAscent := FALSE; M1LogicReqDescend := FALSE; M1LogicRequestStepTgt := 0;
+    M2LogicRunRequest := FALSE; M2LogicReqAscent := FALSE; M2LogicReqDescend := FALSE; M2LogicRequestStepTgt := 0;
+END_IF;
 // Diagnostic % (palier→%) pour IHM / simu — borne haute du palier arbitré.
 IF (M2LogicRequestStepTgt &gt;= 1) AND (M2LogicRequestStepTgt &lt;= 5) THEN
     M2LogicRequestSpeedCmd_Pct := _WinchSpeedStepTable.StepThreshold_Pct[M2LogicRequestStepTgt];
@@ -6395,7 +6428,10 @@ M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq
                      OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
                      OR (GVL_IHM.Modes.Cmd.SelJoystickWinch = 2),
                       0.0,
-                      (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
+                      // Marge 1.5 m au-dessus de M1 + OffsetCloseM : en hoist COUPLE benne
+                      // fermee, M2 doit rester a M1+OffsetCloseM sans taper son plafond haut
+                      // meme si le shift suit M1 avec un leger retard -&gt; evite le NoMovement M2.
+                      (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 1.5)
                       - _CommunCfgPersist.CfgCableLimitAscent_M);
 
 {endregion}
@@ -8800,12 +8836,18 @@ IF NOT Enable THEN
 ELSE
     // ── Règle absolue en pilotage both normal (bit-identique PRG_04 §1) ──
     // Descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
+    // T248 : une fois la phase couplée VERROUILLÉE (benne amenée dans l'état requis pour
+    // ce maintien joystick), on n'arme plus dive-open / ascent-close -&gt; la perte de
+    // l'état ouvert/fermé EN MOUVEMENT ne relance aucune correction benne et ne bloque
+    // plus le mouvement couplé ("descente/montée interdite" fantôme).
     WinchBothDiveBucketOpenArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+        AND NOT Context.CoupledPhaseLocked
         AND Context.MotionActive AND Context.ReqDescend
         AND NOT Context.BucketIsOpen;
     WinchBothAscentBucketCloseArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+        AND NOT Context.CoupledPhaseLocked
         AND Context.MotionActive AND Context.ReqAscent
         AND NOT Context.BucketIsClosed;
 
