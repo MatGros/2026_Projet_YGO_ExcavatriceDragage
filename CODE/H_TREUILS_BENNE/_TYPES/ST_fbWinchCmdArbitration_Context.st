@@ -16,7 +16,6 @@ STRUCT
     BucketM2ReqAscent              : BOOL;  // --> [CMD] Demande montée M2 issue benne
     BucketM2ReqDescend             : BOOL;  // --> [CMD] Demande descente M2 issue benne
     WinchBothMotionBlockedByBucket : BOOL;  // --> [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)
-    CoupledBucketSeqActive         : BOOL;  // --> [STAT] Séquencement auto benne EN COURS en couplé (dive-open OU ascent-close armé) : autorise l'override M2 benne même en WinchSel=0
     SyncBlocksAscent                   : BOOL;  // --> [STAT] Synchro bloque la montée (SyncMinorDeviationBlocksUp)
     SyncBlocksDescent                 : BOOL;  // --> [STAT] Synchro bloque la descente (SyncMinorDeviationBlocksDown)
 

@@ -64,6 +64,12 @@ instModes(
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState <> DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState <> DEVICE_STATE.RUNNING),
     JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess,
+    // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
+    CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
+    JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
+    JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
+    BucketIsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
+    BucketIsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     // Arrêt mécanique confirmé des treuils (condition de bascule N1/N2, AF-05 §4bis)
     M1ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     M1BrakeIsOpen             := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,

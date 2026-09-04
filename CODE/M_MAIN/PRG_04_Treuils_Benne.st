@@ -88,7 +88,6 @@ VAR
     // déjà utilisées par instBucket/instDiveSearch/instExtractionAssist.
     WinchBothDiveBucketOpenArmed     : BOOL;  // CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)
     WinchBothMotionBlockedByBucket   : BOOL;  // Garde-fou direct -- voir §3
-    CoupledBucketSeqActive           : BOOL;  // Séquencement auto benne en couplé EN COURS (dive-open OU ascent-close armé, toggle Commun.Cfg)
     WinchBothAscentBucketCloseArmed  : BOOL;  // CmdClose_IHM déclenché par ce mécanisme (diagnostic IHM)
     BucketBusyRiseEdge             : R_TRIG; // Détecte le début d'une action benne (Busy monté)
     BucketBusyFallEdge             : F_TRIG; // Détecte la fin d'une action benne (Busy retombé)
@@ -317,11 +316,6 @@ WinchBothDiveBucketOpenArmed    := instArbBucket.WinchBothDiveBucketOpenArmed;
 WinchBothAscentBucketCloseArmed := instArbBucket.WinchBothAscentBucketCloseArmed;
 CmdBucketCloseArbitrated        := instArbBucket.CmdClose_IHM;
 KoboldContactorCmdArbitrated    := instArbBucket.KoboldContactorCmdArbitrated;
-// Séquencement auto benne actif en couplé : une des 2 phases est armée (donc benne
-// pas encore dans l'état requis par le sens joystick). Reste TRUE jusqu'à ce que la
-// benne atteigne l'état cible (IsOpen pour descendre / IsClosed pour monter) -> les
-// flags d'arbitrage retombent alors d'eux-mêmes.
-CoupledBucketSeqActive := WinchBothDiveBucketOpenArmed OR WinchBothAscentBucketCloseArmed;
 
 {endregion}
 
@@ -348,7 +342,6 @@ instBucket(
     HomingSuspectM1     := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     HomingSuspectM2     := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     WinchSelBucket      := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
-    CoupledBucketSeqActive := CoupledBucketSeqActive,
     ProgramBucketDriveActive := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
                                 OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose,
     M1_Busy             := (instWinchM1.StepNumber > 0),
@@ -377,11 +370,7 @@ instBucket(
 // protégeant ainsi la mécanique même en pilotage unitaire ou si l'auto-séquencement est désactivé.
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
-// Séquencement strict : le mouvement couplé M1/M2 est bloqué tant que la benne n'est
-// pas dans l'état requis par le sens joystick (dive-open OU ascent-close armé). Dès
-// que la benne atteint l'état cible, les flags armés retombent -> déblocage -> descente
-// / remontée synchronisée. (Avant : dive-open seulement, + AND NOT Busy.)
-WinchBothMotionBlockedByBucket := CoupledBucketSeqActive;
+WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
 BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
 
 // === GATE CANONIQUE SURVEILLANCE ECART M1/M2 ===============================================
@@ -466,7 +455,6 @@ ArbContext.BucketM2RunRequest             := instBucket.M2_RunRequest;
 ArbContext.BucketM2ReqAscent              := BucketM2ReqAscent;
 ArbContext.BucketM2ReqDescend             := BucketM2ReqDescend;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
-ArbContext.CoupledBucketSeqActive        := CoupledBucketSeqActive;
 ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
 ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
 // 🔗 Atomicité Both : agrégats consommés par la commande both (§5 calcule
@@ -1058,10 +1046,7 @@ ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM3TremieAvail OR ArmM3MaintenanceAvail;
 
 // Conditions de base (AC1) — priorite decroissante pour le motif.
-// Pendant le séquencement auto benne en couplé (T248), le Busy benne EST l'auto-arm
-// de la séquence (l'opérateur tient déjà le joystick couplé) : ne pas désarmer le
-// homme-mort, sinon WinchBothIntent tombe et la séquence s'avorte elle-même.
-ArmBucketBusy := (instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q) AND NOT CoupledBucketSeqActive;
+ArmBucketBusy := instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q;
 ArmModeDisabled := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE);
 ArmContactorOff := NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 ArmPowerCutOff := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
