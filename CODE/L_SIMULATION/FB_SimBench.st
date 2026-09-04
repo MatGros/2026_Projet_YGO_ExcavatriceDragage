@@ -134,6 +134,12 @@ VAR
 
     M3_ActualFreqHz            : UINT;   (* . [LOC] Fréquence simulée M3 *)
     M3_StatusWordSim           : WORD;   (* . [LOC] StatusWord simulé M3 *)
+
+    // Roulis dynamique avec dispersion pseudo-aléatoire (±0.1m autour de l'anticipation)
+    M2_RelayFwdPrev            : BOOL;   (* . [LOC] Mémoire relais Fwd N-1 *)
+    M2_RelayRevPrev            : BOOL;   (* . [LOC] Mémoire relais Rev N-1 *)
+    RandomSeed                 : UDINT := 123456789; (* . [LOC] Générateur LCG pseudo-aléatoire *)
+    M2_EffectiveCoastM         : REAL := 0.35;       (* . [LOC] Distance de roulis M2 courante *)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -185,7 +191,17 @@ instSimEncoderM1(
     RawPos           := RawPosM1
 );
 
-// Instance modèle codeur M2
+// Détection coupure relais M2 pour renouveler la dispersion pseudo-aléatoire (±0.1m)
+IF (M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev) THEN
+    // Générateur LCG 32-bit standard : X_{n+1} = (1103515245 * X_n + 12345) MOD 2^31
+    RandomSeed := (RandomSeed * 1103515245 + 12345) AND 16#7FFFFFFF;
+    // Dispersion pseudo-aléatoire entre -0.10 m et +0.10 m
+    M2_EffectiveCoastM := SimWinchCoast_M + (UDINT_TO_REAL(RandomSeed MOD 2000) / 10000.0) - 0.10;
+END_IF;
+M2_RelayFwdPrev := M2_RelayFwd;
+M2_RelayRevPrev := M2_RelayRev;
+
+// Instance modèle codeur M2 (avec roulis et dispersion)
 instSimEncoderM2(
     Enable           := TRUE,
     RelayFwd         := M2_RelayFwd,
@@ -194,7 +210,7 @@ instSimEncoderM2(
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
-    CoastDistanceM   := SimWinchCoast_M,
+    CoastDistanceM   := M2_EffectiveCoastM,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
     RawPos           := RawPosM2
