@@ -57,6 +57,8 @@ VAR_INPUT
     CycleAutoBusy        : BOOL;   // --> [HW] Cycle auto actif
     M3AtP1               : BOOL;   // --> [STAT] M3 positionné stable au Point 1 (conservé, compat)
     M3StatusText         : STRING(80);   // --> [STAT] T249-B : texte statut position M3 (PRG_05) — "M3 a P1", "M3 entre P2 et P1 -> Maintenance"...
+    TranslationMotionErrorId       : WORD;   // --> [DIAG] Code défaut MOUVEMENT M3 (FB_Translation.Fault.ErrorId) : bit0 frein, bit3 variateur AC600, bit6 limite extrême
+    TranslationFinalInterlockErrorId : WORD; // --> [DIAG] Code défaut barrière finale M3 (frein / redémarrage)
 
     // 🚨 Bandeau d'alarme défilant (§5) — diagnostics safety et ErrorId machine entière
     WinchM1Safety        : ST_SafetyWinch;       // --> [SAFE] Diagnostic sécurité treuil M1
@@ -727,6 +729,22 @@ IF TranslationSafety.ErrorLimitSwitch AND Vh0808Valid AND (AlarmCount < CST_NbMa
 END_IF;
 IF TranslationSafety.ErrorSensorIncoherent AND Vh0808Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] ErrorID:08 - capteurs incoherents'; AlarmCount := AlarmCount + 1;
+END_IF;
+// 5c-bis. Defauts MOUVEMENT M3 (FB_Translation.Fault) — distincts des defauts SAFETY
+//    ci-dessus. Ils n'avaient AUCUN chemin vers le carrousel d'alarmes (regression MES
+//    2026-09-04 : "M3 chariot fault" invisible). Bits FB_FaultCore : 0=frein, 3=variateur
+//    AC600 (latching), 6=limite extreme. + barriere finale (frein/redemarrage).
+IF ((TranslationMotionErrorId AND 16#0001) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] Defaut sequence / retour frein translation'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((TranslationMotionErrorId AND 16#0008) <> 16#0000) AND VarM3Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] Defaut variateur translation AC600'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((TranslationMotionErrorId AND 16#0040) <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] Limite extreme translation atteinte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (TranslationFinalInterlockErrorId <> 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] Barriere finale translation (frein / redemarrage) - Reset'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)

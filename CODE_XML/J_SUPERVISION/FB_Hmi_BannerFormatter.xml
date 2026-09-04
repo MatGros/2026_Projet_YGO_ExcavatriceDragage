@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T10:08:54.968305" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T10:08:54.968305">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T10:17:18.496021" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T10:17:18.496021">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1776,6 +1776,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] T249-B : texte statut position M3 (PRG_05) — "M3 a P1", "M3 entre P2 et P1 -&gt; Maintenance"...</xhtml>
               </documentation>
             </variable>
+            <variable name="TranslationMotionErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut MOUVEMENT M3 (FB_Translation.Fault.ErrorId) : bit0 frein, bit3 variateur AC600, bit6 limite extrême</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationFinalInterlockErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut barrière finale M3 (frein / redémarrage)</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchM1Safety">
               <type>
                 <derived name="ST_SafetyWinch" />
@@ -3001,6 +3017,22 @@ IF TranslationSafety.ErrorLimitSwitch AND Vh0808Valid AND (AlarmCount &lt; CST_N
 END_IF;
 IF TranslationSafety.ErrorSensorIncoherent AND Vh0808Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M3] ErrorID:08 - capteurs incoherents'; AlarmCount := AlarmCount + 1;
+END_IF;
+// 5c-bis. Defauts MOUVEMENT M3 (FB_Translation.Fault) — distincts des defauts SAFETY
+//    ci-dessus. Ils n'avaient AUCUN chemin vers le carrousel d'alarmes (regression MES
+//    2026-09-04 : "M3 chariot fault" invisible). Bits FB_FaultCore : 0=frein, 3=variateur
+//    AC600 (latching), 6=limite extreme. + barriere finale (frein/redemarrage).
+IF ((TranslationMotionErrorId AND 16#0001) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] Defaut sequence / retour frein translation'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((TranslationMotionErrorId AND 16#0008) &lt;&gt; 16#0000) AND VarM3Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] Defaut variateur translation AC600'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((TranslationMotionErrorId AND 16#0040) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] Limite extreme translation atteinte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (TranslationFinalInterlockErrorId &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M3] Barriere finale translation (frein / redemarrage) - Reset'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5d. Collecte — benne (FB_Bucket.ErrorId, bits décodés)

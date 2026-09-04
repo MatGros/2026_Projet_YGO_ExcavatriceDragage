@@ -670,6 +670,8 @@ instHmiBannerFormatter(
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
     M3AtP1                      := GVL_IHM.TranslationM3.State.AtP1,
     M3StatusText                := GVL_IHM.TranslationM3.State.M3StatusText,
+    TranslationMotionErrorId    := GVL_IHM.TranslationM3.State.ErrorId,
+    TranslationFinalInterlockErrorId := GVL_IHM.TranslationM3.State.FinalInterlockErrorId,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
