@@ -224,6 +224,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     HoldOffsetM := 0.0;          // R8 : ne pas ressortir un HOLD d'avant la coupure a la reprise
     DeltaPosition_M := 0.0;
     RemainingTravelM := 0.0;
+    BucketOpening_Pct := 0.0;
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
     M2_RunRequest := FALSE;
@@ -470,7 +471,18 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
     ELSIF BucketState.IsOpen AND NOT BucketState.IsClosed THEN
         RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
     ELSE
-        RemainingTravelM := 0.0;
+        // Position intermediaire (post-T247 : IsOpen/IsClosed temps reel, tous deux FALSE
+        // des la sortie de bande). Le "reste a parcourir" reste utile en jog unitaire M2 :
+        // on decompte vers la cible donnee par le sens du jog, sinon vers la plus proche.
+        IF ReqAscent AND NOT ReqDescend THEN
+            RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
+        ELSIF ReqDescend AND NOT ReqAscent THEN
+            RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
+        ELSIF DeltaPosition_M > (0.5 * (Config.OffsetOpenM + Config.OffsetCloseM)) THEN
+            RemainingTravelM := MAX(0.0, (CablePosM1 + Config.OffsetCloseM) - CablePosM2);
+        ELSE
+            RemainingTravelM := MAX(0.0, CablePosM2 - (CablePosM1 + Config.OffsetOpenM));
+        END_IF;
     END_IF;
 END_IF;
 

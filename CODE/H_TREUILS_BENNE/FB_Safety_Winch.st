@@ -116,6 +116,7 @@ VAR
 
     // === VARIABLES LOCALES CALCULÉES ===
     RefWindowActive                 : BOOL;                           // . [LOC] Fenetre de reference active : gardes derive/synchro re-basees (preset codeur = saut CablePosM)
+    WinchStandstill                 : BOOL;                           // . [LOC] Treuil physiquement a l'arret : contacteurs retombes + frein serre + joystick neutre + aucun ordre + vitesse ~0 -> aucun emballement possible
     PosStepDetected                 : BOOL;                           // . [LOC] Saut de position non physique detecte ce scan (preset codeur, ce treuil ou l'autre)
     CablePosMPrev                   : REAL;                           // . [LOC] CablePosM scan precedent (detection de saut)
     ExpectedOtherWinchPosMPrev      : REAL;                           // . [LOC] ExpectedOtherWinchPosM scan precedent (detection de saut de l'autre treuil)
@@ -237,6 +238,17 @@ IF NOT BypassGlobal THEN
         MecaEFaultLatched         := FALSE;
         MecaEEscaladeFaultLatched := FALSE;
     END_IF;
+
+    // Treuil physiquement a l'arret : contacteurs retombes, frein serre, joystick neutre,
+    // aucun ordre de sens, vitesse mesuree quasi nulle. Dans cet etat, l'ecart croise M1/M2
+    // est une lecture geometrique statique (benne posee a un Delta quelconque), PAS un
+    // emballement -> on n'ARME pas le latch Meca E (l'operateur doit pouvoir acquitter par
+    // Reset sans que le defaut se re-pose au scan suivant). La protection redevient vive
+    // des qu'un contacteur de sens est commande. Aucun redemarrage auto : latch deja pose
+    // reste pose jusqu'au Reset explicite.
+    WinchStandstill := FwdRevSpeedFeedbackOff AND NOT BrakeFeedback
+                       AND JoystickYNeutral AND NOT MovementCommanded
+                       AND (NOT MeasuredSpeedValid OR (ABS(MeasuredSpeedMps) < 0.05));
 
     // Cause 0 : Perte com opérateur (live)
     IF TonStartupWarmup.Q AND NOT (BypassProcess OR BypassOperatorComm) THEN
@@ -361,6 +373,7 @@ IF NOT BypassGlobal THEN
     // il est inhibe. TonMecaE (:362) ne s'escalade que si MecaEFaultLatched est pose ici,
     // donc gater ce seul point suffit. Le mou-de-cable (:508/:520) reste sur SyncEnable.
     IF Enable AND NOT (BypassProcess OR BypassMecaE) AND CrossCheckEnable AND NOT RefWindowActive AND NOT OtherWinchInhibited
+       AND NOT WinchStandstill
        AND (ABS(CablePosM - ExpectedOtherWinchPosM) > CriticalSyncToleranceM) THEN
         MecaEFaultLatched := TRUE;
     END_IF;
