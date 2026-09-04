@@ -99,7 +99,14 @@ VAR
     SemiAutoCycleNotReadyHoming       : BOOL;   // . [LOC] Diag live : SEMI_AUTO sélectionné mais re-homing requis (cycle non prêt)
     SemiAutoCycleNotReadyMachineHoming : BOOL;  // . [LOC] Diag live : SEMI_AUTO sélectionné mais référencement incomplet (cycle non prêt)
     FirstScanDone           : BOOL;   // . [LOC] Initialisation premier scan (restauration PERSISTENT)
-    BucketSeqSatisfied      : BOOL;   // . [LOC] T248 : benne amenee dans l'etat requis pour ce maintien joystick -> reste en couple (0) jusqu'au relachement (anti-chatter du selecteur au bord de bande)
+    BucketSeqSatisfied      : BOOL;   // . [LOC] T248 : benne amenee dans l'etat requis pour ce maintien joystick -> VERROU de phase couple jusqu'au relachement confirme (la perte d'etat en mouvement ne relance rien)
+    TonJoyNeutralT248       : TON;    // . [LOC] T248 : manche au neutre CONFIRME (>200 ms) avant d'effacer le verrou de phase (anti-blip)
+    TonWinchSelSettle       : TON;    // . [LOC] T248 : arret CONFIRME des 2 treuils avant de lever le hold de transition
+    WinchSelPrevT248        : INT;    // . [LOC] T248 : selecteur arbitre du scan precedent (detection de changement)
+END_VAR
+VAR CONSTANT
+    CST_T248JoyNeutralConfirm : TIME := T#200ms;  // T248 : duree neutre pour relacher le verrou de phase
+    CST_T248TransitionSettle  : TIME := T#300ms;  // T248 : duree arret confirme pour lever le hold de transition
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -181,6 +188,9 @@ IF NOT Enable THEN
     Auth.InhibitM2 := FALSE;
     Auth.HomingApproachEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal par défaut
+    Auth.CoupledBucketPhaseLocked := FALSE;
+    Auth.WinchSelTransitionHold := FALSE;
+    BucketSeqSatisfied := FALSE;
     Auth.MaintenanceM3TargetEnable := FALSE;
     // Faits persistants : PUBLIÉS même neutralisé (l'IHM doit continuer à voir
     // qu'un re-homing est requis tant que la machine n'est pas réarmée). Aucune autorisation
@@ -333,7 +343,11 @@ Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproach
 //   manche poussé (descente) + benne pas ouverte -> 2 (ouvre), puis 0 (descend couplé)
 // BucketSeqSatisfied verrouille le retour à 0 jusqu'au relâchement joystick -> pas de
 // va-et-vient du sélecteur au bord de la bande de détection.
-IF NOT (JoystickPull OR JoystickPush) THEN
+// VERROU DE PHASE : n'est effacé que par un manche au neutre CONFIRMÉ (>200 ms) -> un
+// passage bref par le neutre (ajustement de prise, dip sous deadzone) NE relance PAS la
+// correction benne. Hors maintenance : effacement immédiat.
+TonJoyNeutralT248(IN := NOT (JoystickPull OR JoystickPush), PT := CST_T248JoyNeutralConfirm);
+IF TonJoyNeutralT248.Q THEN
     BucketSeqSatisfied := FALSE;
 END_IF;
 
@@ -341,14 +355,16 @@ IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
     IF CoupledBucketSeqEnable
        AND (JoystickWinchSelectRequest = 0)
        AND (JoystickPull XOR JoystickPush) THEN
+        // SET du verrou dès que la benne est dans l'état requis par le sens (une fois).
         IF (JoystickPull AND BucketIsClosed) OR (JoystickPush AND BucketIsOpen) THEN
             BucketSeqSatisfied := TRUE;
         END_IF;
-        IF NOT BucketSeqSatisfied
-           AND ((JoystickPull AND NOT BucketIsClosed) OR (JoystickPush AND NOT BucketIsOpen)) THEN
-            Auth.JoystickWinchSelectArbitrated := 2;   // amener la benne dans l'état requis
+        IF BucketSeqSatisfied THEN
+            Auth.JoystickWinchSelectArbitrated := 0;   // phase COUPLÉE VERROUILLÉE : on ne
+                                                       // recorrige plus la benne, la perte
+                                                       // d'état en mouvement est ignorée.
         ELSE
-            Auth.JoystickWinchSelectArbitrated := 0;   // benne OK -> couplé
+            Auth.JoystickWinchSelectArbitrated := 2;   // phase JOG : amener la benne dans l'état
         END_IF;
     ELSE
         Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
@@ -356,6 +372,26 @@ IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
 ELSE
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
     BucketSeqSatisfied := FALSE;
+END_IF;
+
+// Image consommée par PRG_04 (FB_BucketCmdArbitration, permis) : tant que TRUE, aucun
+// blocage / réarmement d'ouverture-fermeture sur l'état benne temps réel.
+Auth.CoupledBucketPhaseLocked := BucketSeqSatisfied;
+
+// HOLD DE TRANSITION : à CHAQUE changement du sélecteur arbitré (jog<->couplé, ou manuel),
+// on force l'arrêt des requêtes M1/M2 (PRG_04) puis on attend l'arrêt CONFIRMÉ des 2
+// treuils (vitesse < seuil) + 300 ms avant de relâcher -> pas de hand-off en mouvement,
+// redémarrage rampé depuis l'arrêt.
+IF Auth.JoystickWinchSelectArbitrated <> WinchSelPrevT248 THEN
+    Auth.WinchSelTransitionHold := TRUE;
+END_IF;
+WinchSelPrevT248 := Auth.JoystickWinchSelectArbitrated;
+TonWinchSelSettle(IN := Auth.WinchSelTransitionHold
+                        AND (M1SpeedAbsMps < MovementSpeedThresholdMps)
+                        AND (M2SpeedAbsMps < MovementSpeedThresholdMps),
+                  PT := CST_T248TransitionSettle);
+IF TonWinchSelSettle.Q THEN
+    Auth.WinchSelTransitionHold := FALSE;
 END_IF;
 
 // 4quinquies. CIBLE TRANSLATION MAINTENANCE
@@ -369,6 +405,8 @@ IF (Auth.Mode <> E_Mode.MAINT_N2) AND (Auth.Mode <> E_Mode.MAINT_N1) THEN
     Auth.MaintenanceM3TargetEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;
     BucketSeqSatisfied := FALSE;
+    Auth.CoupledBucketPhaseLocked := FALSE;
+    Auth.WinchSelTransitionHold := FALSE;
 END_IF;
 {endregion}
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:26:41.961053" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:26:41.961053">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T08:49:22.331041" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T08:49:22.331041">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -64,6 +64,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">0=M1+M2 couples nominal, 1=M1, 2=M2 (unitaires MAINT_N2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoupledBucketPhaseLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : phase mouvement couple VERROUILLEE pour ce maintien joystick -&gt; la perte de l'etat ouvert/ferme en mouvement ne relance PAS de correction benne, ni de blocage "descente/montee interdite". Efface au relachement joystick confirme.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSelTransitionHold">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : changement de selecteur en cours -&gt; requetes mouvement M1/M2 forcees a 0 jusqu'a l'arret confirme (pas de hand-off en mouvement)</xhtml>
               </documentation>
             </variable>
             <variable name="HomingApproachEnable">
@@ -317,6 +333,14 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne fermée (BucketState.IsClosed)</xhtml>
               </documentation>
             </variable>
+            <variable name="CoupledPhaseLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] T248 : phase couplée verrouillée (Auth.CoupledBucketPhaseLocked) -&gt; ne PAS (ré)armer dive-open/ascent-close : plus de correction benne ni de blocage sur l'état temps réel une fois le mouvement lancé</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -556,12 +580,18 @@ IF NOT Enable THEN
 ELSE
     // ── Règle absolue en pilotage both normal (bit-identique PRG_04 §1) ──
     // Descente autorisée UNIQUEMENT benne ouverte, montée UNIQUEMENT benne fermée.
+    // T248 : une fois la phase couplée VERROUILLÉE (benne amenée dans l'état requis pour
+    // ce maintien joystick), on n'arme plus dive-open / ascent-close -&gt; la perte de
+    // l'état ouvert/fermé EN MOUVEMENT ne relance aucune correction benne et ne bloque
+    // plus le mouvement couplé ("descente/montée interdite" fantôme).
     WinchBothDiveBucketOpenArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+        AND NOT Context.CoupledPhaseLocked
         AND Context.MotionActive AND Context.ReqDescend
         AND NOT Context.BucketIsOpen;
     WinchBothAscentBucketCloseArmed := Context.TglEnableCoupledBucketSequencing
         AND (Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO)
+        AND NOT Context.CoupledPhaseLocked
         AND Context.MotionActive AND Context.ReqAscent
         AND NOT Context.BucketIsClosed;
 

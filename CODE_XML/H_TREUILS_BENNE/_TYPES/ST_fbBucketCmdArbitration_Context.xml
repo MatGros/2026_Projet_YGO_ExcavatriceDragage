@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:26:41.656377" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:26:41.656377">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T08:49:09.622084" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T08:49:09.622084">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -72,6 +72,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne fermée (BucketState.IsClosed)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoupledPhaseLocked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] T248 : phase couplée verrouillée (Auth.CoupledBucketPhaseLocked) -&gt; ne PAS (ré)armer dive-open/ascent-close : plus de correction benne ni de blocage sur l'état temps réel une fois le mouvement lancé</xhtml>
               </documentation>
             </variable>
           </struct>
