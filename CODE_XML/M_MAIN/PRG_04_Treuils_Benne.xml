@@ -632,6 +632,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Absence de mouvement malgré commande (bit15)</xhtml>
               </documentation>
             </variable>
+            <variable name="ErrorOverspeed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Survitesse treuil mesurée au-delà du palier 5 (latchée, acquittée au Reset)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -13098,6 +13106,7 @@ WinchM1Safety.ErrorMecaD         := (SafetyM1.Fault.ErrorId AND 16#0800) &lt;&gt
 WinchM1Safety.ErrorMecaE         := (SafetyM1.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
 WinchM1Safety.ErrorOppositeDir   := (SafetyM1.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
 WinchM1Safety.ErrorNoMovement    := (SafetyM1.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM1Safety.ErrorOverspeed     := SafetyM1.OverspeedFault;
 WinchM1Safety.PowerCutOffSafety  := M1PowerCutOffSafetyInfo;
 WinchM1Safety.SafeStopSafety     := M1SafeStopSafetyInfo;
 WinchM1Safety.BlockedBySafety    := M1BlockedBySafetyInfo;
@@ -13125,6 +13134,7 @@ WinchM2Safety.ErrorMecaD         := (SafetyM2.Fault.ErrorId AND 16#0800) &lt;&gt
 WinchM2Safety.ErrorMecaE         := (SafetyM2.Fault.ErrorId AND 16#3000) &lt;&gt; 0;
 WinchM2Safety.ErrorOppositeDir   := (SafetyM2.Fault.ErrorId AND 16#4000) &lt;&gt; 0;
 WinchM2Safety.ErrorNoMovement    := (SafetyM2.Fault.ErrorId AND 16#8000) &lt;&gt; 0;
+WinchM2Safety.ErrorOverspeed     := SafetyM2.OverspeedFault;
 WinchM2Safety.PowerCutOffSafety  := M2PowerCutOffSafetyInfo;
 WinchM2Safety.SafeStopSafety     := M2SafeStopSafetyInfo;
 WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;

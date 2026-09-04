@@ -5012,6 +5012,14 @@ jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) �
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Absence de mouvement malgré commande (bit15)</xhtml>
               </documentation>
             </variable>
+            <variable name="ErrorOverspeed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Survitesse treuil mesurée au-delà du palier 5 (latchée, acquittée au Reset)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
