@@ -5827,3 +5827,29 @@ tasks:
   - Guard CI anti-regression en place ; TC CI par blocker
   contrat: 'TASK_CONTRACT_T250_position_offset_aware.yaml (a rediger - C3)'
   bloque_par: []
+
+- id: T251
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS M1/M2 - CONFORT/MECANIQUE
+  agent: ''
+  date: '2026-09-04T19:50:00+02:00'
+  titre: Arret plus doux sur FdC haut (rampe deceleration au capteur haut)
+  contexte: >-
+    MES 2026-09-04. Note operateur : l'arret au fin de course haut (capteur
+    M1M2_TopPositionFree_DI / TopPositionSensor) est actuellement un arret sec, pas
+    de rampe de ralentissement dediee avant contact capteur. A investiguer : FB_Winch
+    zone de ralentissement (TopLimitM/BottomLimitM, deja utilisee pour la butee
+    logicielle) - voir si applicable/etendue au capteur physique, ou palier reduit
+    dans les derniers cm avant FdC haut.
+  description: >-
+    A cadrer : mesurer la distance/temps reel entre debut de ralentissement souhaite
+    et le capteur haut ; verifier si une zone de ralentissement existe deja pour le
+    capteur physique (distincte de la butee logicielle TopLimitM) ; sinon proposer
+    un palier reduit dans les X derniers cm avant FdC haut cote FB_Winch.
+  objectifs:
+  - Arret au FdC haut moins brutal (rampe/palier reduit avant contact capteur)
+  - Ne pas degrader la protection FdC haut materiel (reste barriere dure independante)
+  contrat: ''
+  bloque_par: []
