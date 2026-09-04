@@ -80,6 +80,8 @@ VAR
     FirstScanDone               : BOOL;   // . [LOC] Initialisation premier scan
     TonBrakeRealFreqTimeout     : TON;
     EffectiveSafeStop           : BOOL;   // . [LOC] SafeStop effectif = SafeStop OR sens non permis (gate de sens)
+    OverrunLimitSwitch          : BOOL;   // . [LOC] Depassement reel FdC (mouvement soutenu), pas juste arrivee normale
+    TonLimitSwitchOverrun       : TON;    // . [LOC] Persistance avant fault Cause 6 (evite le faux defaut sur arrivee nominale)
 
     // Défauts
     DriveFaultLatching          : BOOL;   // . [LOC] Latch défaut variateur
@@ -109,11 +111,20 @@ instCauses[3].Active   := DriveFaultLatching;
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Defaut variateur translation AC600';
 
-IF NOT BypassLimitSwitch AND ((CommandedTremie AND LimitSwitchTremie) OR (CommandedMaintenance AND LimitSwitchMaintenance)) THEN
-    instCauses[6].Active := TRUE;
-ELSE
-    instCauses[6].Active := FALSE;
-END_IF;
+// REX MES 2026-09-04 (trace Suivi_TranslationM3bug_20260904_27) : ce test se declenchait
+// INSTANTANEMENT a chaque arrivee NOMINALE sur le FdC (CommandedTremie ET LimitSwitchTremie
+// sont vrais des le 1er scan d'une arrivee normale, avant meme que la decel soit terminee)
+// -> Fault.Error pulse -> §6 force BrakeReleaseRequest:=FALSE en ecrasant Brake.BrakeCmd
+// pendant que FB_Brake pense toujours commander l'ouverture (son propre MovementRequested
+// reste vrai le temps du coast ~600ms) -> incoherence commande/retour frein -> latch
+// definitif dans FB_Brake. On ne fault desormais que sur un DEPASSEMENT REEL : encore
+// commande vers le FdC, sur le FdC, ET reellement en train de tourner (pas juste en decel),
+// soutenu 1.5s (meme garde que FB_Safety_Translation Cause 6).
+OverrunLimitSwitch := NOT BypassLimitSwitch
+    AND ((CommandedTremie AND LimitSwitchTremie) OR (CommandedMaintenance AND LimitSwitchMaintenance))
+    AND (ABS(DriveActualFreqHz) > 0.5);
+TonLimitSwitchOverrun(IN := OverrunLimitSwitch, PT := T#1S500MS);
+instCauses[6].Active := TonLimitSwitchOverrun.Q;
 instCauses[6].Latching := FALSE;
 instCauses[6].Texte    := 'Limite extreme translation atteinte';
 
