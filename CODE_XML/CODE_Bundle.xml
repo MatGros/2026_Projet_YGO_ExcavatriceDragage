@@ -33949,16 +33949,12 @@ IF NOT BypassGlobal THEN
     instCauses[5].Texte    := 'Mouvement non commande translation (Meca A)';
 
     // Cause 6 : Limite extrême escalade (live)
-    // DriveStatusWord.0 ("ready to switch on") retire du declencheur (meme raison qu'a la
-    // Cause 4 MecaB ci-dessus : a 1 des que le variateur est alimente, ne prouve PAS un
-    // mouvement). En le gardant, chaque arrivee normale au FdC Tremie/P1 avec la requete
-    // encore active quelques instants (joystick tenu, cycle qui n'a pas encore coupe la
-    // demande) latchait ce defaut apres 1.5 s alors que M3 est a l'ARRET (REX MES
-    // 2026-09-04 : "M3 en defaut quand il stop sur FdC Tremie ou P1"). Seule la frequence
-    // reelle mesuree prouve un depassement effectif.
+    // REVERT 2026-09-04 : le retrait de DriveStatusWord.0 n'a jamais ete confirme comme la
+    // cause reelle d'un defaut terrain (le defaut rapporte etait en realite bit0/MecaB,
+    // pas cette cause 6) -&gt; pas de modif safety sans confirmation terrain, retour a l'origine.
     IF NOT (BypassSafety OR BypassLimitSwitch) THEN
-        OverrunCondition := (LimitSwitchTremie AND ReqTremie AND (ABS(DriveActualFreqHz) &gt; 0.5))
-                         OR (LimitSwitchMaintenance AND ReqMaintenance AND (ABS(DriveActualFreqHz) &gt; 0.5));
+        OverrunCondition := (LimitSwitchTremie AND ReqTremie AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
+                         OR (LimitSwitchMaintenance AND ReqMaintenance AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));
         TonLimitSwitchOverrun(IN := OverrunCondition, PT := T#1S500MS);
         instCauses[6].Active := TonLimitSwitchOverrun.Q;
     ELSE
