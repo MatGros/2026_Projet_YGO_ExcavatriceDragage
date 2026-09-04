@@ -70,7 +70,8 @@ VAR_OUTPUT
     // === DIAGNOSTICS ET MESURES ===
     M1SlipDetected                  : BOOL;                           // <-- [DIAG] Glissement M1 detecte
     ActiveOffsetM                   : REAL;                           // <-- [DIAG] Decalage cible pour FB_WinchSync
-    DeltaPosition_M                 : REAL;                           // <-- [DIAG] Ecart reel signe M2 - M1 (m)
+    DeltaPosition_M                 : REAL;                           // <-- [DIAG] Ecart reel signe M2 - M1 (m) — MESURE brute, alimente l'etat benne (NearClosed/NearOpen, %, sync)
+    DeltaPositionCorrected_M        : REAL;                           // <-- [DIAG] Ecart M1/M2 CORRIGE de la geometrie benne : DeltaPosition_M - ActiveOffsetM = CablePosM2 - (CablePosM1 + ActiveOffsetM). ~0 = treuils synchro ; != 0 = derive treuil ou benne pas a l'etat memorise. Pour l'operateur (pas la logique d'etat).
     RemainingTravelM                : REAL;                           // <-- [DIAG] Distance restante avant cible (m)
     BucketOpening_Pct               : REAL;                           // <-- [DIAG] Ouverture benne 0..100 % (0 % = fermee a OffsetCloseM, 100 % = ouverte a OffsetOpenM) ; calcul continu sur l'ecart M2-M1 mesure
     OffsetStateMismatchWarn         : BOOL;                           // <-- [DIAG] Avertissement : ecart mesure M2-M1 incoherent avec l'offset de l'etat memorise (non bloquant)
@@ -233,6 +234,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DeltaPosition_M := 0.0;
     RemainingTravelM := 0.0;
     BucketOpening_Pct := 0.0;
+    DeltaPositionCorrected_M := 0.0;
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
     M2_RunRequest := FALSE;
@@ -641,6 +643,11 @@ TonOffsetMismatch(
           AND (BucketState.TooOpen OR BucketState.TooClosed),
     PT := T#2s);
 OffsetStateMismatchWarn := TonOffsetMismatch.Q;
+
+// --- Ecart M1/M2 CORRIGE de la geometrie benne (operateur, lecture seule) --------------
+// = Delta mesure - offset benne attendu. ~0 : treuils synchro quel que soit l'etat benne.
+// != 0 : derive d'un treuil, OU benne pas a l'etat memorise (ActiveOffsetM tenu).
+DeltaPositionCorrected_M := DeltaPosition_M - ActiveOffsetM;
 {endregion}
 
 END_FUNCTION_BLOCK

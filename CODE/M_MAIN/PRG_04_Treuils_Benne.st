@@ -1503,6 +1503,7 @@ BucketState.Error := instBucket.Fault.Error;
 BucketState.ErrorId := instBucket.Fault.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
 BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
+BucketState.DeltaPositionCorrected_M := instBucket.DeltaPositionCorrected_M;
 BucketState.BucketOpening_Pct := instBucket.BucketOpening_Pct;
 BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;

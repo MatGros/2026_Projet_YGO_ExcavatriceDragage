@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T08:16:20.352329" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T08:16:20.352329">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T10:35:29.894975" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T10:35:29.894975">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -796,7 +796,15 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecart reel signe M2 - M1 (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecart reel signe M2 - M1 (m) — MESURE brute, alimente l'etat benne (NearClosed/NearOpen, %, sync)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaPositionCorrected_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ecart M1/M2 CORRIGE de la geometrie benne : DeltaPosition_M - ActiveOffsetM = CablePosM2 - (CablePosM1 + ActiveOffsetM). ~0 = treuils synchro ; != 0 = derive treuil ou benne pas a l'etat memorise. Pour l'operateur (pas la logique d'etat).</xhtml>
               </documentation>
             </variable>
             <variable name="RemainingTravelM">
@@ -1320,6 +1328,7 @@ IF NOT Enable OR NOT PowerContactorEngaged THEN
     DeltaPosition_M := 0.0;
     RemainingTravelM := 0.0;
     BucketOpening_Pct := 0.0;
+    DeltaPositionCorrected_M := 0.0;
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
     M2_RunRequest := FALSE;
@@ -1728,6 +1737,11 @@ TonOffsetMismatch(
           AND (BucketState.TooOpen OR BucketState.TooClosed),
     PT := T#2s);
 OffsetStateMismatchWarn := TonOffsetMismatch.Q;
+
+// --- Ecart M1/M2 CORRIGE de la geometrie benne (operateur, lecture seule) --------------
+// = Delta mesure - offset benne attendu. ~0 : treuils synchro quel que soit l'etat benne.
+// != 0 : derive d'un treuil, OU benne pas a l'etat memorise (ActiveOffsetM tenu).
+DeltaPositionCorrected_M := DeltaPosition_M - ActiveOffsetM;
 {endregion}
 </xhtml>
           </ST>
