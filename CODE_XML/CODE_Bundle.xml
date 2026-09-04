@@ -28884,6 +28884,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] T249-A : descente M1/M2 verrouillée, chariot M3 pas à P1/Maintenance (info, pas alarme)</xhtml>
               </documentation>
             </variable>
+            <variable name="M3AtTremieStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] M3 arrêté stable à la Trémie (latch FdC) — mode benne dispo, prioritaire sur WinchDescentLockedByM3</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchM1Safety">
               <type>
                 <derived name="ST_SafetyWinch" />
@@ -29691,6 +29699,12 @@ ELSIF SyncDegradedActive THEN
     SpecialConditionCandidate := 'ATTENTION: Synchro bridée';
 ELSIF LegalLimitReached THEN
     SpecialConditionCandidate := 'ATTENTION: Limite légale';
+ELSIF M3AtTremieStable THEN
+    // A la Tremie, le mode benne (WinchSel=2) reste dispo (exempte du verrou T249-A,
+    // commit bb2bf240) -&gt; priorite sur le message descente verrouillee ci-dessous, qui
+    // etait le seul affiche a la Tremie et faisait croire a l'operateur que TOUT etait
+    // bloque, y compris la benne (REX MES 2026-09-04).
+    SpecialConditionCandidate := 'M3 a la Tremie : mode benne actif (ouverture/fermeture disponible)';
 ELSIF WinchDescentLockedByM3 THEN
     // T249-A : verrou GENERAL en MAINT (pas seulement DumpAtTremie) — sans ce message
     // l'operateur ne comprend pas pourquoi la descente est refusee (REX MES 2026-09-04).
@@ -31243,6 +31257,14 @@ repasse a 0 pour le mouvement couple. Meme sel. joystick, un seul mecanisme.
 --&gt; [CFG] Toggle "gestion bucket auto" (Commun.Cfg)</xhtml>
               </documentation>
             </variable>
+            <variable name="M3AtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chariot M3 arrete stable a la Tremie (FdC latche) -&gt; selecteur FORCE a 2 (benne seule), jamais couple (REX MES 2026-09-04 : M1 descendu a la Tremie via sequence T248)</xhtml>
+              </documentation>
+            </variable>
             <variable name="JoystickPull">
               <type>
                 <BOOL />
@@ -31913,7 +31935,15 @@ END_IF;
 
 Auth.CoupledBucketPhaseLocked := FALSE;
 
-IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
+// GARDE ABSOLUE Tremie : a la Tremie, seul le pilotage benne (WinchSel=2) est permis -
+// le couple (0) ne doit JAMAIS s'y engager, meme via la sequence T248 (BucketSeqSatisfied
+// pouvait se lever a tort si la benne etait deja ouverte d'une action precedente -&gt;
+// bascule 0 -&gt; tentative descente couplee -&gt; M1 a bouge a la Tremie, REX MES 2026-09-04).
+// Priorite absolue sur tout le reste : force 2, jamais de sequence couplee tant qu'on y est.
+IF M3AtTremie THEN
+    Auth.JoystickWinchSelectArbitrated := 2;
+    BucketSeqSatisfied := FALSE;
+ELSIF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
     IF CoupledBucketSeqEnable
        AND (JoystickWinchSelectRequest = 0)
        AND (JoystickPull XOR JoystickPush) THEN
@@ -48285,6 +48315,7 @@ instModes(
     SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess,
     // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
     CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
+    M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
     BucketIsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
@@ -54318,6 +54349,7 @@ instHmiBannerFormatter(
     TranslationMotionErrorId    := GVL_IHM.TranslationM3.State.ErrorId,
     TranslationFinalInterlockErrorId := GVL_IHM.TranslationM3.State.FinalInterlockErrorId,
     WinchDescentLockedByM3 := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked,
+    M3AtTremieStable := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,

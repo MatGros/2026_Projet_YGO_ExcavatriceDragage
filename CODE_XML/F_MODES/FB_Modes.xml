@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T14:57:10.727377" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T14:57:10.727377">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T15:45:20.885283" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T15:45:20.885283">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -465,6 +465,14 @@ En sel. operateur COUPLE (0), le sequenceur force temporairement le sel. a 2
 (jog benne) pour amener la benne dans l'etat requis par le sens joystick, puis
 repasse a 0 pour le mouvement couple. Meme sel. joystick, un seul mecanisme.
 --&gt; [CFG] Toggle "gestion bucket auto" (Commun.Cfg)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3AtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chariot M3 arrete stable a la Tremie (FdC latche) -&gt; selecteur FORCE a 2 (benne seule), jamais couple (REX MES 2026-09-04 : M1 descendu a la Tremie via sequence T248)</xhtml>
               </documentation>
             </variable>
             <variable name="JoystickPull">
@@ -1137,7 +1145,15 @@ END_IF;
 
 Auth.CoupledBucketPhaseLocked := FALSE;
 
-IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
+// GARDE ABSOLUE Tremie : a la Tremie, seul le pilotage benne (WinchSel=2) est permis -
+// le couple (0) ne doit JAMAIS s'y engager, meme via la sequence T248 (BucketSeqSatisfied
+// pouvait se lever a tort si la benne etait deja ouverte d'une action precedente -&gt;
+// bascule 0 -&gt; tentative descente couplee -&gt; M1 a bouge a la Tremie, REX MES 2026-09-04).
+// Priorite absolue sur tout le reste : force 2, jamais de sequence couplee tant qu'on y est.
+IF M3AtTremie THEN
+    Auth.JoystickWinchSelectArbitrated := 2;
+    BucketSeqSatisfied := FALSE;
+ELSIF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
     IF CoupledBucketSeqEnable
        AND (JoystickWinchSelectRequest = 0)
        AND (JoystickPull XOR JoystickPush) THEN

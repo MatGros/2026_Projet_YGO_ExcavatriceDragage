@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T12:40:41.392437" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T12:40:41.392437">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T15:46:15.494761" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T15:46:15.494761">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2004,6 +2004,7 @@ instModes(
     SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess,
     // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
     CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
+    M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
     BucketIsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
@@ -5875,6 +5876,14 @@ repasse a 0 pour le mouvement couple. Meme sel. joystick, un seul mecanisme.
 --&gt; [CFG] Toggle "gestion bucket auto" (Commun.Cfg)</xhtml>
               </documentation>
             </variable>
+            <variable name="M3AtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chariot M3 arrete stable a la Tremie (FdC latche) -&gt; selecteur FORCE a 2 (benne seule), jamais couple (REX MES 2026-09-04 : M1 descendu a la Tremie via sequence T248)</xhtml>
+              </documentation>
+            </variable>
             <variable name="JoystickPull">
               <type>
                 <BOOL />
@@ -6267,7 +6276,7 @@ ET frein serré, redondés par la mesure de vitesse.
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#2s0ms" />
+                <simpleValue value="TIME#1s200ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : pause fixe apres bascule du selecteur jog&lt;-&gt;couple. DOIT couvrir le
@@ -6275,7 +6284,7 @@ dead-time D18 du treuil qui vient de s'arreter (FB_WinchDirectionInterlock,
 DirectionInterlockDelayAscent/Descent) + retombee/settle contacteurs, sinon
 l'autre treuil (immobile depuis longtemps, dispo immediatement) part SEUL -&gt;
 decalage tambours (REX MES 2026-09-04 : M1 seul 63 cm, ecart final 50 cm).
-MES 2026-09-04 : 2 s pour valider, a REDUIRE apres essais banc</xhtml>
+MES 2026-09-04 : reduit de 2s (validation initiale) -&gt; plancher = delai D18 montee (900ms) + marge ~300ms</xhtml>
               </documentation>
             </variable>
           </localVars>
@@ -6545,7 +6554,15 @@ END_IF;
 
 Auth.CoupledBucketPhaseLocked := FALSE;
 
-IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
+// GARDE ABSOLUE Tremie : a la Tremie, seul le pilotage benne (WinchSel=2) est permis -
+// le couple (0) ne doit JAMAIS s'y engager, meme via la sequence T248 (BucketSeqSatisfied
+// pouvait se lever a tort si la benne etait deja ouverte d'une action precedente -&gt;
+// bascule 0 -&gt; tentative descente couplee -&gt; M1 a bouge a la Tremie, REX MES 2026-09-04).
+// Priorite absolue sur tout le reste : force 2, jamais de sequence couplee tant qu'on y est.
+IF M3AtTremie THEN
+    Auth.JoystickWinchSelectArbitrated := 2;
+    BucketSeqSatisfied := FALSE;
+ELSIF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
     IF CoupledBucketSeqEnable
        AND (JoystickWinchSelectRequest = 0)
        AND (JoystickPull XOR JoystickPush) THEN

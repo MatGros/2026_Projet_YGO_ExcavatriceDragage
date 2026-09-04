@@ -60,6 +60,7 @@ VAR_INPUT
     TranslationMotionErrorId       : WORD;   // --> [DIAG] Code défaut MOUVEMENT M3 (FB_Translation.Fault.ErrorId) : bit0 frein, bit3 variateur AC600, bit6 limite extrême
     TranslationFinalInterlockErrorId : WORD; // --> [DIAG] Code défaut barrière finale M3 (frein / redémarrage)
     WinchDescentLockedByM3 : BOOL;   // --> [STAT] T249-A : descente M1/M2 verrouillée, chariot M3 pas à P1/Maintenance (info, pas alarme)
+    M3AtTremieStable     : BOOL;   // --> [STAT] M3 arrêté stable à la Trémie (latch FdC) — mode benne dispo, prioritaire sur WinchDescentLockedByM3
 
     // 🚨 Bandeau d'alarme défilant (§5) — diagnostics safety et ErrorId machine entière
     WinchM1Safety        : ST_SafetyWinch;       // --> [SAFE] Diagnostic sécurité treuil M1
@@ -312,6 +313,12 @@ ELSIF SyncDegradedActive THEN
     SpecialConditionCandidate := 'ATTENTION: Synchro bridée';
 ELSIF LegalLimitReached THEN
     SpecialConditionCandidate := 'ATTENTION: Limite légale';
+ELSIF M3AtTremieStable THEN
+    // A la Tremie, le mode benne (WinchSel=2) reste dispo (exempte du verrou T249-A,
+    // commit bb2bf240) -> priorite sur le message descente verrouillee ci-dessous, qui
+    // etait le seul affiche a la Tremie et faisait croire a l'operateur que TOUT etait
+    // bloque, y compris la benne (REX MES 2026-09-04).
+    SpecialConditionCandidate := 'M3 a la Tremie : mode benne actif (ouverture/fermeture disponible)';
 ELSIF WinchDescentLockedByM3 THEN
     // T249-A : verrou GENERAL en MAINT (pas seulement DumpAtTremie) — sans ce message
     // l'operateur ne comprend pas pourquoi la descente est refusee (REX MES 2026-09-04).
