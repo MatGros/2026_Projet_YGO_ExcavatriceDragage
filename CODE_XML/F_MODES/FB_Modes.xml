@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T09:23:32.994798" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T09:23:32.994798">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T11:15:45.587531" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T11:15:45.587531">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -859,10 +859,14 @@ ET frein serré, redondés par la mesure de vitesse.
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#300ms" />
+                <simpleValue value="TIME#1s500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : duree arret confirme pour lever le hold de transition</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : pause fixe apres bascule du selecteur jog&lt;-&gt;couple. DOIT couvrir le
+dead-time D18 du treuil qui vient de s'arreter (FB_WinchDirectionInterlock,
+DirectionInterlockDelayAscent/Descent) + retombee/settle contacteurs, sinon
+l'autre treuil (immobile depuis longtemps, dispo immediatement) part SEUL -&gt;
+decalage tambours (REX MES 2026-09-04 : M1 seul 63 cm, ecart final 50 cm).</xhtml>
               </documentation>
             </variable>
           </localVars>
