@@ -31,7 +31,7 @@ STRUCT
     CaptorDebounce              : TIME := T#100ms; // --> [CFG] Filtrage capteur position cible
     BrakeDelayContactClose      : TIME := T#100ms; // --> [CFG] Voir FB_Brake
     BrakeDelayMagnetise         : TIME := T#100ms; // --> [CFG] Voir FB_Brake
-    BrakeDelayMotorDecel        : TIME := T#500ms; // --> [CFG] Voir FB_Brake
-    BrakeFeedbackTimeout        : TIME := T#300ms; // --> [CFG] Strictement sous watchdog final 500 ms
+    BrakeDelayMotorDecel        : TIME := T#2s;    // --> [CFG] Voir FB_Brake - MES 2026-09-04 : monte 500ms -> 2s (confirme operateur)
+    BrakeFeedbackTimeout        : TIME := T#800ms; // --> [CFG] MES 2026-09-04 : 300ms trop court pour un arret dur au FdC (coast reel ~600ms) -> latch spurieux. Monte a 800ms (confirme operateur).
 END_STRUCT
 END_TYPE

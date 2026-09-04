@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T01:24:42.760571" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T01:24:42.760571">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T15:20:49.203152" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T15:20:49.203152">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -156,10 +156,10 @@
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#500ms" />
+                <simpleValue value="TIME#2s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Voir FB_Brake - MES 2026-09-04 : monte 500ms -&gt; 2s (confirme operateur)</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeFeedbackTimeout">
@@ -167,10 +167,10 @@
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#300ms" />
+                <simpleValue value="TIME#800ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Strictement sous watchdog final 500 ms</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] MES 2026-09-04 : 300ms trop court pour un arret dur au FdC (coast reel ~600ms) -&gt; latch spurieux. Monte a 800ms (confirme operateur).</xhtml>
               </documentation>
             </variable>
           </struct>
