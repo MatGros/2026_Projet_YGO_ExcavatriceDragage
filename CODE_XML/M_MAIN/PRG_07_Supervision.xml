@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T10:17:26.658381" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T10:17:26.658381">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T14:55:49.615794" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T14:55:49.615794">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -8974,6 +8974,7 @@ instHmiBannerFormatter(
     M3StatusText                := GVL_IHM.TranslationM3.State.M3StatusText,
     TranslationMotionErrorId    := GVL_IHM.TranslationM3.State.ErrorId,
     TranslationFinalInterlockErrorId := GVL_IHM.TranslationM3.State.FinalInterlockErrorId,
+    WinchDescentLockedByM3 := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
@@ -10790,6 +10791,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut barrière finale M3 (frein / redémarrage)</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchDescentLockedByM3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] T249-A : descente M1/M2 verrouillée, chariot M3 pas à P1/Maintenance (info, pas alarme)</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchM1Safety">
               <type>
                 <derived name="ST_SafetyWinch" />
@@ -11597,6 +11606,10 @@ ELSIF SyncDegradedActive THEN
     SpecialConditionCandidate := 'ATTENTION: Synchro bridée';
 ELSIF LegalLimitReached THEN
     SpecialConditionCandidate := 'ATTENTION: Limite légale';
+ELSIF WinchDescentLockedByM3 THEN
+    // T249-A : verrou GENERAL en MAINT (pas seulement DumpAtTremie) — sans ce message
+    // l'operateur ne comprend pas pourquoi la descente est refusee (REX MES 2026-09-04).
+    SpecialConditionCandidate := 'Descente treuil verrouillee : chariot M3 pas a P1/Maintenance';
 ELSE
     SpecialConditionCandidate := '';
 END_IF;

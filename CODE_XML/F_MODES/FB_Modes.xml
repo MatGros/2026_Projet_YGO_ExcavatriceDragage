@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T11:45:30.912155" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T11:45:30.912155">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T14:57:10.727377" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T14:57:10.727377">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -859,7 +859,7 @@ ET frein serré, redondés par la mesure de vitesse.
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#2s0ms" />
+                <simpleValue value="TIME#1s200ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : pause fixe apres bascule du selecteur jog&lt;-&gt;couple. DOIT couvrir le
@@ -867,7 +867,7 @@ dead-time D18 du treuil qui vient de s'arreter (FB_WinchDirectionInterlock,
 DirectionInterlockDelayAscent/Descent) + retombee/settle contacteurs, sinon
 l'autre treuil (immobile depuis longtemps, dispo immediatement) part SEUL -&gt;
 decalage tambours (REX MES 2026-09-04 : M1 seul 63 cm, ecart final 50 cm).
-MES 2026-09-04 : 2 s pour valider, a REDUIRE apres essais banc</xhtml>
+MES 2026-09-04 : reduit de 2s (validation initiale) -&gt; plancher = delai D18 montee (900ms) + marge ~300ms</xhtml>
               </documentation>
             </variable>
           </localVars>

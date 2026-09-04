@@ -59,6 +59,7 @@ VAR_INPUT
     M3StatusText         : STRING(80);   // --> [STAT] T249-B : texte statut position M3 (PRG_05) — "M3 a P1", "M3 entre P2 et P1 -> Maintenance"...
     TranslationMotionErrorId       : WORD;   // --> [DIAG] Code défaut MOUVEMENT M3 (FB_Translation.Fault.ErrorId) : bit0 frein, bit3 variateur AC600, bit6 limite extrême
     TranslationFinalInterlockErrorId : WORD; // --> [DIAG] Code défaut barrière finale M3 (frein / redémarrage)
+    WinchDescentLockedByM3 : BOOL;   // --> [STAT] T249-A : descente M1/M2 verrouillée, chariot M3 pas à P1/Maintenance (info, pas alarme)
 
     // 🚨 Bandeau d'alarme défilant (§5) — diagnostics safety et ErrorId machine entière
     WinchM1Safety        : ST_SafetyWinch;       // --> [SAFE] Diagnostic sécurité treuil M1
@@ -311,6 +312,10 @@ ELSIF SyncDegradedActive THEN
     SpecialConditionCandidate := 'ATTENTION: Synchro bridée';
 ELSIF LegalLimitReached THEN
     SpecialConditionCandidate := 'ATTENTION: Limite légale';
+ELSIF WinchDescentLockedByM3 THEN
+    // T249-A : verrou GENERAL en MAINT (pas seulement DumpAtTremie) — sans ce message
+    // l'operateur ne comprend pas pourquoi la descente est refusee (REX MES 2026-09-04).
+    SpecialConditionCandidate := 'Descente treuil verrouillee : chariot M3 pas a P1/Maintenance';
 ELSE
     SpecialConditionCandidate := '';
 END_IF;
