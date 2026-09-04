@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-31T13:19:04.169157" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-31T13:19:04.169157">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T12:39:56.368677" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T12:39:56.368677">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -101,6 +101,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable en zone Maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_AtWorkPositionStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 arrete a une position de travail (P1 ou Maintenance) — STATIQUE (mot capteurs), vrai des le boot sans franchissement. Consomme par le verrou descente treuil T249-A.</xhtml>
               </documentation>
             </variable>
             <variable name="TranslationTrace">

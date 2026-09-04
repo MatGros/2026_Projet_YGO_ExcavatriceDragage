@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T06:04:08.843581" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T06:04:08.843581">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T12:41:00.662236" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T12:41:00.662236">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -258,21 +258,23 @@ Distances NON-linéaires : 0→5 (PV), 5→15 (P2), 15→20 (P1), 20→30 (Maint
 
 {region "§1 Gate"}
 IF NOT Enable THEN
-    // Prochain démarrage déterministe sur la Trémie (0 m), pour un état de départ propre.
-    PositionProgress := CST_PositionAtTremie;
+    // Démarrage déterministe au P1 (20 m) = position de travail : mot capteurs 00011
+    // (P1 + Maintenance faits). Evite qu'un boot sim en 00000 (tout FALSE) fasse croire
+    // au decodeur "extreme Maintenance" et bloque le verrou descente treuil (T249-A).
+    PositionProgress := CST_PositionAtP1;
     Initialized := FALSE;
     PosTremie := FALSE;
     PosPV := FALSE;
     PosP2 := FALSE;
-    PosP1 := FALSE;
-    PosMaintenance := FALSE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
     RETURN;
 END_IF;
 {endregion}
 
 {region "§2 Initialisation"}
 IF NOT Initialized THEN
-    PositionProgress := CST_PositionAtTremie;
+    PositionProgress := CST_PositionAtP1;   // etat de depart = position de travail P1 (voir §1)
     Initialized := TRUE;
 END_IF;
 {endregion}

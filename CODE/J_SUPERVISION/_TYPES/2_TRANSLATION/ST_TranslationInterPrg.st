@@ -29,6 +29,7 @@ STRUCT
     M3_AtTremieStable         : BOOL; // 🎯 M3 positionne stable a la Tremie
     M3_AtP1Stable             : BOOL; // 🎯 M3 positionne stable au Point 1
     M3_AtMaintenanceStable    : BOOL; // 🎯 M3 positionne stable en zone Maintenance
+    M3_AtWorkPositionStable   : BOOL; // 🎯 M3 arrete a une position de travail (P1 ou Maintenance) — STATIQUE (mot capteurs), vrai des le boot sans franchissement. Consomme par le verrou descente treuil T249-A.
 
     // === 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView) ===
     TranslationTrace             : ST_TraceTranslation; // 🕵️ Trace blocage translation M3 (cause priorisée + horodatage)

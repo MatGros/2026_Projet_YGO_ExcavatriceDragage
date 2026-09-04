@@ -12561,6 +12561,14 @@ Cause de blocage prioritaire</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 positionne stable en zone Maintenance</xhtml>
               </documentation>
             </variable>
+            <variable name="M3_AtWorkPositionStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 M3 arrete a une position de travail (P1 ou Maintenance) — STATIQUE (mot capteurs), vrai des le boot sans franchissement. Consomme par le verrou descente treuil T249-A.</xhtml>
+              </documentation>
+            </variable>
             <variable name="TranslationTrace">
               <type>
                 <derived name="ST_TraceTranslation" />
@@ -37951,21 +37959,23 @@ Distances NON-linéaires : 0→5 (PV), 5→15 (P2), 15→20 (P1), 20→30 (Maint
 
 {region "§1 Gate"}
 IF NOT Enable THEN
-    // Prochain démarrage déterministe sur la Trémie (0 m), pour un état de départ propre.
-    PositionProgress := CST_PositionAtTremie;
+    // Démarrage déterministe au P1 (20 m) = position de travail : mot capteurs 00011
+    // (P1 + Maintenance faits). Evite qu'un boot sim en 00000 (tout FALSE) fasse croire
+    // au decodeur "extreme Maintenance" et bloque le verrou descente treuil (T249-A).
+    PositionProgress := CST_PositionAtP1;
     Initialized := FALSE;
     PosTremie := FALSE;
     PosPV := FALSE;
     PosP2 := FALSE;
-    PosP1 := FALSE;
-    PosMaintenance := FALSE;
+    PosP1 := TRUE;
+    PosMaintenance := TRUE;
     RETURN;
 END_IF;
 {endregion}
 
 {region "§2 Initialisation"}
 IF NOT Initialized THEN
-    PositionProgress := CST_PositionAtTremie;
+    PositionProgress := CST_PositionAtP1;   // etat de depart = position de travail P1 (voir §1)
     Initialized := TRUE;
 END_IF;
 {endregion}
@@ -48617,8 +48627,12 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // descente M1/M2 interdite tant que le pont M3 n'est pas ARRETE STABLE a P1 (travail)
     // ou a Maintenance. En transit / PV / P2 / Tremie -&gt; pas de paye de cable. Echappatoire
     // MES : bypass FdC M3 (LimitSwitch) ou bypass global M3.
+    // Position de travail = STATIQUE (mot capteurs M3), pas le jeton de franchissement :
+    // au boot PLC, pont deja pose a P1/Maintenance -&gt; descente autorisee sans devoir
+    // franchir un capteur d'abord (M3_AtWorkPositionStable couvre M3_AtP1/Maint jetons
+    // + lecture directe mot 00011 / 00000).
     Data.SequenceState.DumpAtTremieDescentLocked     :=
-        NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable)
+        NOT PRG_05_Translation.Data.M3_AtWorkPositionStable
         AND NOT GVL_IHM.TranslationM3.Bypass.LimitSwitch
         AND NOT GVL_IHM.TranslationM3.Bypass.Global;
     Data.SequenceState.BypassDiveActive            := GVL_IHM.CycleDiveSearch.Cmd.TglBypassDiveSearchSequence;
@@ -51565,6 +51579,14 @@ front capteur (M3_AtXxxStable) sinon zone entre 2 capteurs (SensorsWord).</xhtml
                 <BOOL />
               </type>
             </variable>
+            <variable name="M3_AtWorkPositionStable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">M3 arrete P1 ou Maintenance — lecture STATIQUE mot capteurs (vrai des le boot)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonTremieProcessBlock">
               <type>
                 <derived name="TON" />
@@ -51720,6 +51742,17 @@ ELSIF M3_SensorsWordChanged THEN
     // Le mot capteurs a change sans que ce soit une arrivee -&gt; on a quitte le dernier point.
     M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
 END_IF;
+
+// --- M3 a une position de travail : STATIQUE (mot capteurs), pas un jeton de franchissement ---
+// Les jetons M3_AtXxxStable ne se posent que sur un FRONT capteur : au boot PLC, pont deja
+// pose a P1 ou Maintenance sans mouvement -&gt; jetons FALSE -&gt; le verrou descente treuil
+// (T249-A) resterait bloque jusqu'a devoir franchir un capteur. On complete donc par une
+// lecture STATIQUE du mot : 00011 = arret au P1 (capteur P1 fait, P2 depasse) ; 00000 =
+// extreme Maintenance. Tremie / PV / P2 / transit -&gt; pas une position de travail.
+M3_AtWorkPositionStable := (NOT instPosDecoderM3.Incoherent)
+    AND ( M3_AtP1Stable OR M3_AtMaintenanceStable
+          OR (instPosDecoderM3.SensorsWord = 2#00011)
+          OR (instPosDecoderM3.SensorsWord = 2#00000) );
 
 {endregion}
 
@@ -52169,6 +52202,7 @@ Data.TranslationDone                  := instTranslationM3.TargetReached;
 Data.M3_AtTremieStable                := M3_AtTremieStable;
 Data.M3_AtP1Stable                    := M3_AtP1Stable;
 Data.M3_AtMaintenanceStable           := M3_AtMaintenanceStable;
+Data.M3_AtWorkPositionStable          := M3_AtWorkPositionStable;
 // 🕵️ Trace de blocage terrain (consommée FB_TroubleshootingView)
 Data.TranslationTrace                 := TranslationTrace;
 

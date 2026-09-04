@@ -490,8 +490,12 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // descente M1/M2 interdite tant que le pont M3 n'est pas ARRETE STABLE a P1 (travail)
     // ou a Maintenance. En transit / PV / P2 / Tremie -> pas de paye de cable. Echappatoire
     // MES : bypass FdC M3 (LimitSwitch) ou bypass global M3.
+    // Position de travail = STATIQUE (mot capteurs M3), pas le jeton de franchissement :
+    // au boot PLC, pont deja pose a P1/Maintenance -> descente autorisee sans devoir
+    // franchir un capteur d'abord (M3_AtWorkPositionStable couvre M3_AtP1/Maint jetons
+    // + lecture directe mot 00011 / 00000).
     Data.SequenceState.DumpAtTremieDescentLocked     :=
-        NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable)
+        NOT PRG_05_Translation.Data.M3_AtWorkPositionStable
         AND NOT GVL_IHM.TranslationM3.Bypass.LimitSwitch
         AND NOT GVL_IHM.TranslationM3.Bypass.Global;
     Data.SequenceState.BypassDiveActive            := GVL_IHM.CycleDiveSearch.Cmd.TglBypassDiveSearchSequence;

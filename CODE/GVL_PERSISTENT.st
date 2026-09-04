@@ -148,10 +148,10 @@ VAR_GLOBAL PERSISTENT RETAIN
 
     // 📏 RÉGLEMENTATION / LÉGAL
     _CommunCfgPersist : ST_CommunCfg := (
-        LimitLegalDepthMinAllowed_M := -15.0,
+        LimitLegalDepthMinAllowed_M := -19.0,
         LimitLegalEnabled := TRUE,
         SelHomingApproachEnable := FALSE,
-        WinchMaxStepDescent := 5,
+        WinchMaxStepDescent := 4,
         WinchMaxStepAscent := 5,
         WinchSlowdownDistanceTop_M := 0.0,
         WinchSlowdownDistanceBottom_M := 1.0,
