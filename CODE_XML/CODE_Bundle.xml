@@ -11907,6 +11907,14 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Maintenance/P1 (reflet lecture seule)</xhtml>
               </documentation>
             </variable>
+            <variable name="TremieProcessBlockActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Approche trémie interdite par process (trémie pleine / grille levée) — recul libre. Motif du permis trémie rouge.</xhtml>
+              </documentation>
+            </variable>
             <variable name="HeightInterlockBlocking">
               <type>
                 <BOOL />
@@ -31461,6 +31469,14 @@ ET frein serré, redondés par la mesure de vitesse.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T248 : selecteur arbitre du scan precedent (detection de changement)</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchSelChangedT248">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T248 : le selecteur arbitre a change ce scan -&gt; relance la pause fixe</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_T248JoyNeutralConfirm">
               <type>
                 <TIME />
@@ -31775,21 +31791,15 @@ END_IF;
 // blocage / réarmement d'ouverture-fermeture sur l'état benne temps réel.
 Auth.CoupledBucketPhaseLocked := BucketSeqSatisfied;
 
-// HOLD DE TRANSITION : à CHAQUE changement du sélecteur arbitré (jog&lt;-&gt;couplé, ou manuel),
-// on force l'arrêt des requêtes M1/M2 (PRG_04) puis on attend l'arrêt CONFIRMÉ des 2
-// treuils (vitesse &lt; seuil) + 300 ms avant de relâcher -&gt; pas de hand-off en mouvement,
-// redémarrage rampé depuis l'arrêt.
-IF Auth.JoystickWinchSelectArbitrated &lt;&gt; WinchSelPrevT248 THEN
-    Auth.WinchSelTransitionHold := TRUE;
-END_IF;
+// HOLD DE TRANSITION : à chaque changement du sélecteur arbitré (jog&lt;-&gt;couplé), on force
+// l'arrêt des requêtes M1/M2 (PRG_04) pendant une PAUSE FIXE de 300 ms -&gt; pas de hand-off
+// en mouvement, redémarrage rampé. Dwell fixe (pas de condition vitesse) : auto-libéré,
+// impossible à bloquer, aucun retour au neutre requis. Le verrou de phase empêche le
+// sélecteur d'osciller, donc au plus une pause par changement franc.
+WinchSelChangedT248 := (Auth.JoystickWinchSelectArbitrated &lt;&gt; WinchSelPrevT248);
 WinchSelPrevT248 := Auth.JoystickWinchSelectArbitrated;
-TonWinchSelSettle(IN := Auth.WinchSelTransitionHold
-                        AND (M1SpeedAbsMps &lt; MovementSpeedThresholdMps)
-                        AND (M2SpeedAbsMps &lt; MovementSpeedThresholdMps),
-                  PT := CST_T248TransitionSettle);
-IF TonWinchSelSettle.Q THEN
-    Auth.WinchSelTransitionHold := FALSE;
-END_IF;
+TonWinchSelSettle(IN := NOT WinchSelChangedT248, PT := CST_T248TransitionSettle);
+Auth.WinchSelTransitionHold := NOT TonWinchSelSettle.Q;
 
 // 4quinquies. CIBLE TRANSLATION MAINTENANCE
 Auth.MaintenanceM3TargetEnable := ((Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1)) AND SelMaintenanceZoneAccess;
@@ -51385,6 +51395,22 @@ indépendant du mouvement réel (rebond capteur mal filtré).</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="M3_TremieProcessBlock">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">FdC "soft" DIRECTIONNEL approche trémie : trémie pleine OU grille levée -&gt; approche
+trémie interdite, recul (Maintenance/P1) toujours libre. Distinct de la position
+physique (M3_LimitSwitchTremieStable). PAS de latch sur recul (signal process :
+dès qu'il retombe l'approche est re-permise). Débounce anti-parasite. Bypass N2.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonTremieProcessBlock">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
             <variable name="TranslationTrace">
               <type>
                 <derived name="ST_TraceTranslation" />
@@ -51475,6 +51501,21 @@ IF instPosDecoderM3.LimitSwitchTremie THEN
 ELSIF M3_ReqMaintenance_Active THEN
     M3_LimitSwitchTremieStable := FALSE;
 END_IF;
+
+// 🔒 §0quater FdC SOFT DIRECTIONNEL — APPROCHE TRÉMIE INTERDITE (trémie pleine / grille)
+// Bloque UNIQUEMENT le sens trémie via EffectivePermitM3_Tremie ; le recul vers
+// Maintenance/P1 reste libre (EffectivePermitM3_Maintenance non touché). N'entre PAS
+// dans M3_LimitSwitchTremieStable -&gt; l'info position / le voyant IHM « pont au FdC
+// trémie » restent fidèles à la position physique. Aucun latch sur recul : dès que
+// TremieFull_OR_GateRaised_DI retombe, l'approche est re-permise. Débounce 200 ms.
+// Bypass N2 : LimitSwitch ou Global.
+// ⚠️ Signal PAS ENCORE CÂBLÉ (ST_HwMachine) : polarité TRUE = bloqué à CONFIRMER au câblage.
+TonTremieProcessBlock(
+    IN := PRG_02_Acquisition.HwIn.Machine.TremieFull_OR_GateRaised_DI
+          AND NOT GVL_IHM.TranslationM3.Bypass.LimitSwitch
+          AND NOT GVL_IHM.TranslationM3.Bypass.Global,
+    PT := T#200ms);
+M3_TremieProcessBlock := TonTremieProcessBlock.Q;
 
 IF M3_LimitSwitchMaintenanceEffective THEN
     M3_LimitSwitchMaintenanceStable := TRUE;
@@ -51660,7 +51701,8 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active
 // coupure dure M3_LimitSwitchMaintenanceEffective.
 EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremieLimitClear
                                AND NOT M3_SafeStop_Aggregate
-                               AND NOT instSafetyTranslationM3.PowerCutOff;
+                               AND NOT instSafetyTranslationM3.PowerCutOff
+                               AND NOT M3_TremieProcessBlock;
 EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenanceLimitClear
                                   AND NOT M3_SafeStop_Aggregate
                                   AND NOT instSafetyTranslationM3.PowerCutOff;
@@ -51871,6 +51913,7 @@ TranslationTrace.DriveOperational         := PRG_02_Acquisition.Data.Network.Dri
 TranslationTrace.FinalInterlockError      := TranslationState.FinalInterlockError;
 // 🟢 Permis directionnels par sens EFFECTIFS (D1 — Safety AND Process, §1ter) — reflet exact des permis appliqués
 TranslationTrace.EffectivePermitM3_Tremie      := EffectivePermitM3_Tremie;
+TranslationTrace.TremieProcessBlockActive      := M3_TremieProcessBlock;
 TranslationTrace.EffectivePermitM3_Maintenance := EffectivePermitM3_Maintenance;
 
 // Permis de mouvement effectif = toutes les barrières levées (agrégat diagnostic)

@@ -79,6 +79,13 @@ VAR
     TonM3ConfirmedMoving : TON;
     M3_ConfirmedMoving   : BOOL;
 
+    // FdC "soft" DIRECTIONNEL approche trémie : trémie pleine OU grille levée -> approche
+    // trémie interdite, recul (Maintenance/P1) toujours libre. Distinct de la position
+    // physique (M3_LimitSwitchTremieStable). PAS de latch sur recul (signal process :
+    // dès qu'il retombe l'approche est re-permise). Débounce anti-parasite. Bypass N2.
+    M3_TremieProcessBlock : BOOL;
+    TonTremieProcessBlock : TON;
+
     // 🕵️ Trace de blocage terrain (publiée via Data.TranslationTrace, consommée FB_TroubleshootingView)
     TranslationTrace           : ST_TraceTranslation;        // . [LOC] Trace blocage translation M3
     TraceTranslation_PrevReason : E_TranslationTraceBlockReason; // . [LOC] Cause précédente M3 (détection de changement)
@@ -140,6 +147,21 @@ IF instPosDecoderM3.LimitSwitchTremie THEN
 ELSIF M3_ReqMaintenance_Active THEN
     M3_LimitSwitchTremieStable := FALSE;
 END_IF;
+
+// 🔒 §0quater FdC SOFT DIRECTIONNEL — APPROCHE TRÉMIE INTERDITE (trémie pleine / grille)
+// Bloque UNIQUEMENT le sens trémie via EffectivePermitM3_Tremie ; le recul vers
+// Maintenance/P1 reste libre (EffectivePermitM3_Maintenance non touché). N'entre PAS
+// dans M3_LimitSwitchTremieStable -> l'info position / le voyant IHM « pont au FdC
+// trémie » restent fidèles à la position physique. Aucun latch sur recul : dès que
+// TremieFull_OR_GateRaised_DI retombe, l'approche est re-permise. Débounce 200 ms.
+// Bypass N2 : LimitSwitch ou Global.
+// ⚠️ Signal PAS ENCORE CÂBLÉ (ST_HwMachine) : polarité TRUE = bloqué à CONFIRMER au câblage.
+TonTremieProcessBlock(
+    IN := PRG_02_Acquisition.HwIn.Machine.TremieFull_OR_GateRaised_DI
+          AND NOT GVL_IHM.TranslationM3.Bypass.LimitSwitch
+          AND NOT GVL_IHM.TranslationM3.Bypass.Global,
+    PT := T#200ms);
+M3_TremieProcessBlock := TonTremieProcessBlock.Q;
 
 IF M3_LimitSwitchMaintenanceEffective THEN
     M3_LimitSwitchMaintenanceStable := TRUE;
@@ -325,7 +347,8 @@ M3_SafeStop_Aggregate := M3_SafeStop_Active
 // coupure dure M3_LimitSwitchMaintenanceEffective.
 EffectivePermitM3_Tremie    := instSafetyTranslationM3.TremieLimitClear
                                AND NOT M3_SafeStop_Aggregate
-                               AND NOT instSafetyTranslationM3.PowerCutOff;
+                               AND NOT instSafetyTranslationM3.PowerCutOff
+                               AND NOT M3_TremieProcessBlock;
 EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenanceLimitClear
                                   AND NOT M3_SafeStop_Aggregate
                                   AND NOT instSafetyTranslationM3.PowerCutOff;
@@ -536,6 +559,7 @@ TranslationTrace.DriveOperational         := PRG_02_Acquisition.Data.Network.Dri
 TranslationTrace.FinalInterlockError      := TranslationState.FinalInterlockError;
 // 🟢 Permis directionnels par sens EFFECTIFS (D1 — Safety AND Process, §1ter) — reflet exact des permis appliqués
 TranslationTrace.EffectivePermitM3_Tremie      := EffectivePermitM3_Tremie;
+TranslationTrace.TremieProcessBlockActive      := M3_TremieProcessBlock;
 TranslationTrace.EffectivePermitM3_Maintenance := EffectivePermitM3_Maintenance;
 
 // Permis de mouvement effectif = toutes les barrières levées (agrégat diagnostic)

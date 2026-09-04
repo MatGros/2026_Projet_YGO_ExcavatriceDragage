@@ -103,6 +103,7 @@ VAR
     TonJoyNeutralT248       : TON;    // . [LOC] T248 : manche au neutre CONFIRME (>200 ms) avant d'effacer le verrou de phase (anti-blip)
     TonWinchSelSettle       : TON;    // . [LOC] T248 : arret CONFIRME des 2 treuils avant de lever le hold de transition
     WinchSelPrevT248        : INT;    // . [LOC] T248 : selecteur arbitre du scan precedent (detection de changement)
+    WinchSelChangedT248     : BOOL;   // . [LOC] T248 : le selecteur arbitre a change ce scan -> relance la pause fixe
 END_VAR
 VAR CONSTANT
     CST_T248JoyNeutralConfirm : TIME := T#200ms;  // T248 : duree neutre pour relacher le verrou de phase
@@ -378,21 +379,15 @@ END_IF;
 // blocage / réarmement d'ouverture-fermeture sur l'état benne temps réel.
 Auth.CoupledBucketPhaseLocked := BucketSeqSatisfied;
 
-// HOLD DE TRANSITION : à CHAQUE changement du sélecteur arbitré (jog<->couplé, ou manuel),
-// on force l'arrêt des requêtes M1/M2 (PRG_04) puis on attend l'arrêt CONFIRMÉ des 2
-// treuils (vitesse < seuil) + 300 ms avant de relâcher -> pas de hand-off en mouvement,
-// redémarrage rampé depuis l'arrêt.
-IF Auth.JoystickWinchSelectArbitrated <> WinchSelPrevT248 THEN
-    Auth.WinchSelTransitionHold := TRUE;
-END_IF;
+// HOLD DE TRANSITION : à chaque changement du sélecteur arbitré (jog<->couplé), on force
+// l'arrêt des requêtes M1/M2 (PRG_04) pendant une PAUSE FIXE de 300 ms -> pas de hand-off
+// en mouvement, redémarrage rampé. Dwell fixe (pas de condition vitesse) : auto-libéré,
+// impossible à bloquer, aucun retour au neutre requis. Le verrou de phase empêche le
+// sélecteur d'osciller, donc au plus une pause par changement franc.
+WinchSelChangedT248 := (Auth.JoystickWinchSelectArbitrated <> WinchSelPrevT248);
 WinchSelPrevT248 := Auth.JoystickWinchSelectArbitrated;
-TonWinchSelSettle(IN := Auth.WinchSelTransitionHold
-                        AND (M1SpeedAbsMps < MovementSpeedThresholdMps)
-                        AND (M2SpeedAbsMps < MovementSpeedThresholdMps),
-                  PT := CST_T248TransitionSettle);
-IF TonWinchSelSettle.Q THEN
-    Auth.WinchSelTransitionHold := FALSE;
-END_IF;
+TonWinchSelSettle(IN := NOT WinchSelChangedT248, PT := CST_T248TransitionSettle);
+Auth.WinchSelTransitionHold := NOT TonWinchSelSettle.Q;
 
 // 4quinquies. CIBLE TRANSLATION MAINTENANCE
 Auth.MaintenanceM3TargetEnable := ((Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1)) AND SelMaintenanceZoneAccess;

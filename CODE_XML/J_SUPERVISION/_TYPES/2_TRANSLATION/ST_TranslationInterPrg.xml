@@ -323,6 +323,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Permis canonique M3 vers Maintenance/P1 (reflet lecture seule)</xhtml>
               </documentation>
             </variable>
+            <variable name="TremieProcessBlockActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Approche trémie interdite par process (trémie pleine / grille levée) — recul libre. Motif du permis trémie rouge.</xhtml>
+              </documentation>
+            </variable>
             <variable name="HeightInterlockBlocking">
               <type>
                 <BOOL />

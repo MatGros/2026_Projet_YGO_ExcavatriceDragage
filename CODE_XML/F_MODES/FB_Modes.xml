@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T08:48:53.516737" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T08:48:53.516737">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T09:10:27.159723" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T09:10:27.159723">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -835,6 +835,14 @@ ET frein serré, redondés par la mesure de vitesse.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T248 : selecteur arbitre du scan precedent (detection de changement)</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchSelChangedT248">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T248 : le selecteur arbitre a change ce scan -&gt; relance la pause fixe</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_T248JoyNeutralConfirm">
               <type>
                 <TIME />
@@ -1149,21 +1157,15 @@ END_IF;
 // blocage / réarmement d'ouverture-fermeture sur l'état benne temps réel.
 Auth.CoupledBucketPhaseLocked := BucketSeqSatisfied;
 
-// HOLD DE TRANSITION : à CHAQUE changement du sélecteur arbitré (jog&lt;-&gt;couplé, ou manuel),
-// on force l'arrêt des requêtes M1/M2 (PRG_04) puis on attend l'arrêt CONFIRMÉ des 2
-// treuils (vitesse &lt; seuil) + 300 ms avant de relâcher -&gt; pas de hand-off en mouvement,
-// redémarrage rampé depuis l'arrêt.
-IF Auth.JoystickWinchSelectArbitrated &lt;&gt; WinchSelPrevT248 THEN
-    Auth.WinchSelTransitionHold := TRUE;
-END_IF;
+// HOLD DE TRANSITION : à chaque changement du sélecteur arbitré (jog&lt;-&gt;couplé), on force
+// l'arrêt des requêtes M1/M2 (PRG_04) pendant une PAUSE FIXE de 300 ms -&gt; pas de hand-off
+// en mouvement, redémarrage rampé. Dwell fixe (pas de condition vitesse) : auto-libéré,
+// impossible à bloquer, aucun retour au neutre requis. Le verrou de phase empêche le
+// sélecteur d'osciller, donc au plus une pause par changement franc.
+WinchSelChangedT248 := (Auth.JoystickWinchSelectArbitrated &lt;&gt; WinchSelPrevT248);
 WinchSelPrevT248 := Auth.JoystickWinchSelectArbitrated;
-TonWinchSelSettle(IN := Auth.WinchSelTransitionHold
-                        AND (M1SpeedAbsMps &lt; MovementSpeedThresholdMps)
-                        AND (M2SpeedAbsMps &lt; MovementSpeedThresholdMps),
-                  PT := CST_T248TransitionSettle);
-IF TonWinchSelSettle.Q THEN
-    Auth.WinchSelTransitionHold := FALSE;
-END_IF;
+TonWinchSelSettle(IN := NOT WinchSelChangedT248, PT := CST_T248TransitionSettle);
+Auth.WinchSelTransitionHold := NOT TonWinchSelSettle.Q;
 
 // 4quinquies. CIBLE TRANSLATION MAINTENANCE
 Auth.MaintenanceM3TargetEnable := ((Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1)) AND SelMaintenanceZoneAccess;
