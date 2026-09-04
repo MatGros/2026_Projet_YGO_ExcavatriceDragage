@@ -806,6 +806,20 @@ TopLimitM1_M := SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff,
 TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
                     _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
                     _WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift);
+// EXEMPTION jog benne seule (WinchSel=2) : la formule ci-dessus, une fois M2_LimitShift
+// applique, revient exactement a tester la position REELLE de M1 (M2_raw - ActiveOffsetM
+// = M1). Resultat : quand M1 est deja au-dessus de CfgCableLimitAscent_M, fermer/ouvrir
+// la benne (M2 seul, M1 IMMOBILE) est bloque par la meme limite que la montee de M1,
+// alors que manipuler la benne ne fait jamais monter l'ensemble plus haut que M1 courant
+// (REX MES 2026-09-04 : "le treuil ne change pas d'altimetrie en mvt benne"). En jog
+// benne pur, on remplace donc la butee ALTITUDE ABSOLUE par une butee GEOMETRIQUE relative
+// a M1 courant (OffsetCloseM + marge) : c'est deja le vrai limiteur mecanique de la benne
+// (ManualBucketLimitsActive/anticipation, PRG_04 ~710-735). Le FdC haut MATERIEL
+// (TopPositionSensor, FB_Safety_Winch) reste une barriere INDEPENDANTE et non affectee.
+IF ManualBucketJogActive THEN
+    TopLimitM2_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
+                     + _BucketCfgPersist.Config.OffsetCloseM + 2.0;
+END_IF;
 
 // --- Usage effectif d'un override/bypass de position → re-homing obligatoire ---------------
 // Publié vers PRG_03 (rang 03) ➔ FB_Modes arme HomingRequiredMx à la sortie du mode maintenance.
