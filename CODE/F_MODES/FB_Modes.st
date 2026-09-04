@@ -36,6 +36,7 @@ VAR_INPUT
     // repasse a 0 pour le mouvement couple. Meme sel. joystick, un seul mecanisme.
     CoupledBucketSeqEnable  : BOOL;   // --> [CFG] Toggle "gestion bucket auto" (Commun.Cfg)
     M3AtTremie              : BOOL;   // --> [SAFE] Chariot M3 arrete stable a la Tremie (FdC latche) -> selecteur FORCE a 2 (benne seule), jamais couple (REX MES 2026-09-04 : M1 descendu a la Tremie via sequence T248)
+    AllowWinchMoveAtTremie  : BOOL;   // --> [CFG] T249 : autorisation CONSCIENTE (bouton IHM) leve la garde M3AtTremie -> couple (0) re-autorise a la Tremie
     JoystickPull            : BOOL;   // --> [HW] Manche tire (Y+, montee demandee)
     JoystickPush            : BOOL;   // --> [HW] Manche pousse (Y-, descente demandee)
     BucketIsOpen            : BOOL;   // --> [STAT] Benne ouverte (comparaison temps reel Delta)
@@ -360,16 +361,18 @@ END_IF;
 
 Auth.CoupledBucketPhaseLocked := FALSE;
 
-// GARDE ABSOLUE Tremie : a la Tremie, seul le pilotage benne (WinchSel=2) est permis -
-// le couple (0) ne doit JAMAIS s'y engager, meme via la sequence T248 (BucketSeqSatisfied
-// pouvait se lever a tort si la benne etait deja ouverte d'une action precedente ->
-// bascule 0 -> tentative descente couplee -> M1 a bouge a la Tremie, REX MES 2026-09-04).
-// Priorite absolue sur tout le reste : force 2, jamais de sequence couplee tant qu'on y est.
-IF M3AtTremie THEN
-    Auth.JoystickWinchSelectArbitrated := 2;
-    BucketSeqSatisfied := FALSE;
-ELSIF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
-    IF CoupledBucketSeqEnable
+IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
+    // GARDE Tremie (MAINT uniquement -- ne doit PAS interferer avec SEMI_AUTO/cycle auto,
+    // qui pilote la benne via ReqProgram.ReqBucket, pas ce selecteur) : a la Tremie, seul
+    // le pilotage benne (WinchSel=2) est permis - le couple (0) ne doit JAMAIS s'y engager
+    // manuellement, meme via T248 (BucketSeqSatisfied pouvait se lever a tort si la benne
+    // etait deja ouverte d'une action precedente -> bascule 0 -> tentative descente couplee
+    // -> M1 a bouge a la Tremie, REX MES 2026-09-04). Echappatoire consciente : bit IHM
+    // AllowWinchMoveAtTremie (T249) leve la garde -> retour au comportement T248 normal.
+    IF M3AtTremie AND NOT AllowWinchMoveAtTremie THEN
+        Auth.JoystickWinchSelectArbitrated := 2;
+        BucketSeqSatisfied := FALSE;
+    ELSIF CoupledBucketSeqEnable
        AND (JoystickWinchSelectRequest = 0)
        AND (JoystickPull XOR JoystickPush) THEN
         // TOUTE la séquence T248 (jog ET couplé) "possède" la benne : elle est pilotée
