@@ -15835,14 +15835,6 @@ fournie par la configuration persistante de l'appelant.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledBucketSeqActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Séquencement auto benne EN COURS en couplé (dive-open OU ascent-close armé) : autorise l'override M2 benne même en WinchSel=0</xhtml>
-              </documentation>
-            </variable>
             <variable name="SyncBlocksAscent">
               <type>
                 <BOOL />
@@ -17805,17 +17797,6 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Contexte de pilotage benne actif (WinchSel=2) ; FALSE hors contexte -&gt; abandon d'une open/close restee Busy</xhtml>
               </documentation>
             </variable>
-            <variable name="CoupledBucketSeqActive">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sequencement auto benne en couple en cours -&gt; NE PAS abandonner l'open/close meme hors WinchSel=2</xhtml>
-              </documentation>
-            </variable>
             <variable name="ProgramBucketDriveActive">
               <type>
                 <BOOL />
@@ -18682,7 +18663,6 @@ ELSE
     // pendant un pilotage COUPLÉ WinchSel=0 -&gt; désynchro des câbles (REX MES 2026-09-04).
     IF Lifecycle.Busy
        AND NOT WinchSelBucket
-       AND NOT CoupledBucketSeqActive
        AND NOT ProgramBucketDriveActive
        AND NOT MachineHomingActive
        AND NOT (Mode = E_Mode.SEMI_AUTO) THEN
@@ -31071,6 +31051,50 @@ Prev := Hmi;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorisation acces zone maintenance M3</xhtml>
               </documentation>
             </variable>
+            <variable name="CoupledBucketSeqEnable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SEQUENCEMENT AUTO BENNE EN COUPLE (T248) ===
+En sel. operateur COUPLE (0), le sequenceur force temporairement le sel. a 2
+(jog benne) pour amener la benne dans l'etat requis par le sens joystick, puis
+repasse a 0 pour le mouvement couple. Meme sel. joystick, un seul mecanisme.
+--&gt; [CFG] Toggle "gestion bucket auto" (Commun.Cfg)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickPull">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Manche tire (Y+, montee demandee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickPush">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Manche pousse (Y-, descente demandee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne ouverte (comparaison temps reel Delta)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketIsClosed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Benne fermee (comparaison temps reel Delta)</xhtml>
+              </documentation>
+            </variable>
             <variable name="EncoderFaultPresent">
               <type>
                 <BOOL />
@@ -31375,6 +31399,14 @@ ET frein serré, redondés par la mesure de vitesse.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Initialisation premier scan (restauration PERSISTENT)</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketSeqSatisfied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] T248 : benne amenee dans l'etat requis pour ce maintien joystick -&gt; reste en couple (0) jusqu'au relachement (anti-chatter du selecteur au bord de bande)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -31622,10 +31654,36 @@ Auth.InhibitM2 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM2;
 Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproachEnable;
 
 // 4quater. SÉLECTEUR JOYSTICK TREUIL
+// T248 — Gestion bucket auto : en sél. opérateur COUPLÉ (0) + toggle actif, le sens
+// joystick impose d'abord l'état benne requis en forçant le sél. à 2 (jog benne),
+// puis retour à 0 pour le mouvement couplé. Un seul mécanisme = le sélecteur réel.
+//   manche tiré (montée)  + benne pas fermée -&gt; 2 (ferme), puis 0 (remonte couplé)
+//   manche poussé (descente) + benne pas ouverte -&gt; 2 (ouvre), puis 0 (descend couplé)
+// BucketSeqSatisfied verrouille le retour à 0 jusqu'au relâchement joystick -&gt; pas de
+// va-et-vient du sélecteur au bord de la bande de détection.
+IF NOT (JoystickPull OR JoystickPush) THEN
+    BucketSeqSatisfied := FALSE;
+END_IF;
+
 IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
-    Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+    IF CoupledBucketSeqEnable
+       AND (JoystickWinchSelectRequest = 0)
+       AND (JoystickPull XOR JoystickPush) THEN
+        IF (JoystickPull AND BucketIsClosed) OR (JoystickPush AND BucketIsOpen) THEN
+            BucketSeqSatisfied := TRUE;
+        END_IF;
+        IF NOT BucketSeqSatisfied
+           AND ((JoystickPull AND NOT BucketIsClosed) OR (JoystickPush AND NOT BucketIsOpen)) THEN
+            Auth.JoystickWinchSelectArbitrated := 2;   // amener la benne dans l'état requis
+        ELSE
+            Auth.JoystickWinchSelectArbitrated := 0;   // benne OK -&gt; couplé
+        END_IF;
+    ELSE
+        Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+    END_IF;
 ELSE
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
+    BucketSeqSatisfied := FALSE;
 END_IF;
 
 // 4quinquies. CIBLE TRANSLATION MAINTENANCE
@@ -31638,6 +31696,7 @@ IF (Auth.Mode &lt;&gt; E_Mode.MAINT_N2) AND (Auth.Mode &lt;&gt; E_Mode.MAINT_N1)
     Auth.HomingApproachEnable := FALSE;
     Auth.MaintenanceM3TargetEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;
+    BucketSeqSatisfied := FALSE;
 END_IF;
 {endregion}
 </xhtml>
@@ -43016,8 +43075,7 @@ ELSE
     // -&gt; câbles désynchronisés (REX MES 2026-09-04, quasi-casse machine).
     IF Context.BucketBusy AND Context.BucketM2RunRequest
        AND ((Auth.JoystickWinchSelectArbitrated = 2)
-            OR (Auth.Mode = E_Mode.SEMI_AUTO)
-            OR Context.CoupledBucketSeqActive) THEN
+            OR (Auth.Mode = E_Mode.SEMI_AUTO)) THEN
         RunRequest := Context.BucketM2RunRequest;
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;
@@ -47924,6 +47982,12 @@ instModes(
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState &lt;&gt; DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState &lt;&gt; DEVICE_STATE.RUNNING),
     JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess,
+    // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
+    CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
+    JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
+    JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
+    BucketIsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
+    BucketIsClosed          := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
     // Arrêt mécanique confirmé des treuils (condition de bascule N1/N2, AF-05 §4bis)
     M1ContactorsReleased      := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
     M1BrakeIsOpen             := PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
@@ -48750,14 +48814,6 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Garde-fou direct -- voir §3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CoupledBucketSeqActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquencement auto benne en couplé EN COURS (dive-open OU ascent-close armé, toggle Commun.Cfg)</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothAscentBucketCloseArmed">
@@ -49587,11 +49643,6 @@ WinchBothDiveBucketOpenArmed    := instArbBucket.WinchBothDiveBucketOpenArmed;
 WinchBothAscentBucketCloseArmed := instArbBucket.WinchBothAscentBucketCloseArmed;
 CmdBucketCloseArbitrated        := instArbBucket.CmdClose_IHM;
 KoboldContactorCmdArbitrated    := instArbBucket.KoboldContactorCmdArbitrated;
-// Séquencement auto benne actif en couplé : une des 2 phases est armée (donc benne
-// pas encore dans l'état requis par le sens joystick). Reste TRUE jusqu'à ce que la
-// benne atteigne l'état cible (IsOpen pour descendre / IsClosed pour monter) -&gt; les
-// flags d'arbitrage retombent alors d'eux-mêmes.
-CoupledBucketSeqActive := WinchBothDiveBucketOpenArmed OR WinchBothAscentBucketCloseArmed;
 
 {endregion}
 
@@ -49618,7 +49669,6 @@ instBucket(
     HomingSuspectM1     := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     HomingSuspectM2     := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     WinchSelBucket      := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
-    CoupledBucketSeqActive := CoupledBucketSeqActive,
     ProgramBucketDriveActive := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
                                 OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose,
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
@@ -49647,11 +49697,7 @@ instBucket(
 // protégeant ainsi la mécanique même en pilotage unitaire ou si l'auto-séquencement est désactivé.
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
-// Séquencement strict : le mouvement couplé M1/M2 est bloqué tant que la benne n'est
-// pas dans l'état requis par le sens joystick (dive-open OU ascent-close armé). Dès
-// que la benne atteint l'état cible, les flags armés retombent -&gt; déblocage -&gt; descente
-// / remontée synchronisée. (Avant : dive-open seulement, + AND NOT Busy.)
-WinchBothMotionBlockedByBucket := CoupledBucketSeqActive;
+WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
 BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
 
 // === GATE CANONIQUE SURVEILLANCE ECART M1/M2 ===============================================
@@ -49736,7 +49782,6 @@ ArbContext.BucketM2RunRequest             := instBucket.M2_RunRequest;
 ArbContext.BucketM2ReqAscent              := BucketM2ReqAscent;
 ArbContext.BucketM2ReqDescend             := BucketM2ReqDescend;
 ArbContext.WinchBothMotionBlockedByBucket := WinchBothMotionBlockedByBucket;
-ArbContext.CoupledBucketSeqActive        := CoupledBucketSeqActive;
 ArbContext.SyncBlocksAscent                   := SyncMinorDeviationBlocksUp;
 ArbContext.SyncBlocksDescent                 := SyncMinorDeviationBlocksDown;
 // 🔗 Atomicité Both : agrégats consommés par la commande both (§5 calcule
@@ -50328,10 +50373,7 @@ ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM3TremieAvail OR ArmM3MaintenanceAvail;
 
 // Conditions de base (AC1) — priorite decroissante pour le motif.
-// Pendant le séquencement auto benne en couplé (T248), le Busy benne EST l'auto-arm
-// de la séquence (l'opérateur tient déjà le joystick couplé) : ne pas désarmer le
-// homme-mort, sinon WinchBothIntent tombe et la séquence s'avorte elle-même.
-ArmBucketBusy := (instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q) AND NOT CoupledBucketSeqActive;
+ArmBucketBusy := instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q;
 ArmModeDisabled := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE);
 ArmContactorOff := NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 ArmPowerCutOff := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff

@@ -30,6 +30,16 @@ VAR_INPUT
     JoystickWinchSelectRequest : INT; // --> [CMD] Selection treuils joystick (0=Couple, 1=M1, 2=M2)
     SelMaintenanceZoneAccess: BOOL;   // --> [CMD] Autorisation acces zone maintenance M3
 
+    // === SEQUENCEMENT AUTO BENNE EN COUPLE (T248) ===
+    // En sel. operateur COUPLE (0), le sequenceur force temporairement le sel. a 2
+    // (jog benne) pour amener la benne dans l'etat requis par le sens joystick, puis
+    // repasse a 0 pour le mouvement couple. Meme sel. joystick, un seul mecanisme.
+    CoupledBucketSeqEnable  : BOOL;   // --> [CFG] Toggle "gestion bucket auto" (Commun.Cfg)
+    JoystickPull            : BOOL;   // --> [HW] Manche tire (Y+, montee demandee)
+    JoystickPush            : BOOL;   // --> [HW] Manche pousse (Y-, descente demandee)
+    BucketIsOpen            : BOOL;   // --> [STAT] Benne ouverte (comparaison temps reel Delta)
+    BucketIsClosed          : BOOL;   // --> [STAT] Benne fermee (comparaison temps reel Delta)
+
     // === RETOURS CAPTEURS & DIAGNOSTICS ===
     EncoderFaultPresent     : BOOL;   // --> [HW] Defaut codeur agrege (1 cycle retard)
 
@@ -89,6 +99,7 @@ VAR
     SemiAutoCycleNotReadyHoming       : BOOL;   // . [LOC] Diag live : SEMI_AUTO sélectionné mais re-homing requis (cycle non prêt)
     SemiAutoCycleNotReadyMachineHoming : BOOL;  // . [LOC] Diag live : SEMI_AUTO sélectionné mais référencement incomplet (cycle non prêt)
     FirstScanDone           : BOOL;   // . [LOC] Initialisation premier scan (restauration PERSISTENT)
+    BucketSeqSatisfied      : BOOL;   // . [LOC] T248 : benne amenee dans l'etat requis pour ce maintien joystick -> reste en couple (0) jusqu'au relachement (anti-chatter du selecteur au bord de bande)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -315,10 +326,36 @@ Auth.InhibitM2 := (Auth.Mode = E_Mode.MAINT_N2) AND Auth.InhibitM2;
 Auth.HomingApproachEnable := (Auth.Mode = E_Mode.MAINT_N2) AND SelHomingApproachEnable;
 
 // 4quater. SÉLECTEUR JOYSTICK TREUIL
+// T248 — Gestion bucket auto : en sél. opérateur COUPLÉ (0) + toggle actif, le sens
+// joystick impose d'abord l'état benne requis en forçant le sél. à 2 (jog benne),
+// puis retour à 0 pour le mouvement couplé. Un seul mécanisme = le sélecteur réel.
+//   manche tiré (montée)  + benne pas fermée -> 2 (ferme), puis 0 (remonte couplé)
+//   manche poussé (descente) + benne pas ouverte -> 2 (ouvre), puis 0 (descend couplé)
+// BucketSeqSatisfied verrouille le retour à 0 jusqu'au relâchement joystick -> pas de
+// va-et-vient du sélecteur au bord de la bande de détection.
+IF NOT (JoystickPull OR JoystickPush) THEN
+    BucketSeqSatisfied := FALSE;
+END_IF;
+
 IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
-    Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+    IF CoupledBucketSeqEnable
+       AND (JoystickWinchSelectRequest = 0)
+       AND (JoystickPull XOR JoystickPush) THEN
+        IF (JoystickPull AND BucketIsClosed) OR (JoystickPush AND BucketIsOpen) THEN
+            BucketSeqSatisfied := TRUE;
+        END_IF;
+        IF NOT BucketSeqSatisfied
+           AND ((JoystickPull AND NOT BucketIsClosed) OR (JoystickPush AND NOT BucketIsOpen)) THEN
+            Auth.JoystickWinchSelectArbitrated := 2;   // amener la benne dans l'état requis
+        ELSE
+            Auth.JoystickWinchSelectArbitrated := 0;   // benne OK -> couplé
+        END_IF;
+    ELSE
+        Auth.JoystickWinchSelectArbitrated := JoystickWinchSelectRequest;
+    END_IF;
 ELSE
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
+    BucketSeqSatisfied := FALSE;
 END_IF;
 
 // 4quinquies. CIBLE TRANSLATION MAINTENANCE
@@ -331,6 +368,7 @@ IF (Auth.Mode <> E_Mode.MAINT_N2) AND (Auth.Mode <> E_Mode.MAINT_N1) THEN
     Auth.HomingApproachEnable := FALSE;
     Auth.MaintenanceM3TargetEnable := FALSE;
     Auth.JoystickWinchSelectArbitrated := 0;
+    BucketSeqSatisfied := FALSE;
 END_IF;
 {endregion}
 
