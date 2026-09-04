@@ -54,7 +54,15 @@ IF NOT Enable THEN
     StepTgt   := 0;
 ELSE
     // ── Chemin benne : M2 piloté par l'action benne (override) ──
-    IF Context.BucketBusy AND Context.BucketM2RunRequest THEN
+    // ⚠️ SÉCURITÉ : l'override benne ne s'applique QUE là où la benne est censée
+    // bouger seule (M2 relatif à M1) : jog benne unitaire (WinchSel=2) ou cycle
+    // AUTO/SEMI_AUTO qui séquence la benne délibérément. En pilotage COUPLÉ manuel
+    // (WinchSel=0) ou unitaire M1 (WinchSel=1), une benne restée Busy NE DOIT PAS
+    // détourner M2 : sinon M2 suit la benne pendant que M1 suit le both-intent
+    // -> câbles désynchronisés (REX MES 2026-09-04, quasi-casse machine).
+    IF Context.BucketBusy AND Context.BucketM2RunRequest
+       AND ((Auth.JoystickWinchSelectArbitrated = 2)
+            OR (Auth.Mode = E_Mode.SEMI_AUTO) OR (Auth.Mode = E_Mode.AUTO)) THEN
         RunRequest := Context.BucketM2RunRequest;
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;

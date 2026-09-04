@@ -36,6 +36,7 @@ VAR_INPUT
     HomedAndReliableM2              : BOOL;                           // --> [HW] Codeur M2 reference ET fiable (hors suspect / incoherent)
     HomingSuspectM1                 : BOOL;                           // --> [HW] Datum M1 explicitement suspect (perd la reference benne persistante)
     HomingSuspectM2                 : BOOL;                           // --> [HW] Datum M2 explicitement suspect (perd la reference benne persistante)
+    WinchSelBucket                  : BOOL := TRUE;                   // --> [CMD] Contexte de pilotage benne actif (WinchSel=2) ; FALSE hors contexte -> abandon d'une open/close restee Busy
     M1_Busy                         : BOOL;                           // --> [HW] Treuil M1 en mouvement (Busy)
     M2_Busy                         : BOOL;                           // --> [HW] Treuil M2 en mouvement (Busy)
     InhibitM1                       : BOOL;                           // --> [HW] Treuil M1 inhibe
@@ -378,6 +379,24 @@ IF SevereError THEN
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
 ELSE
+    // ⚠️ SÉCURITÉ : abandon propre si une open/close est restée Busy HORS de tout contexte
+    // de pilotage benne (opérateur a quitté WinchSel=2 sans que le mouvement soit fini,
+    // hors cycle AUTO/SEMI_AUTO, hors homing machine). Sinon M2 continue de suivre la benne
+    // pendant un pilotage COUPLÉ WinchSel=0 -> désynchro des câbles (REX MES 2026-09-04).
+    IF Lifecycle.Busy
+       AND NOT WinchSelBucket
+       AND NOT MachineHomingActive
+       AND NOT ((Mode = E_Mode.AUTO) OR (Mode = E_Mode.SEMI_AUTO)) THEN
+        M2_RunRequest := FALSE;
+        M2_ReqAscent := FALSE;
+        M2_ReqDescend := FALSE;
+        M2_BucketJogLimit := FALSE;
+        CloseReq := FALSE;
+        OpenReq := FALSE;
+        Lifecycle.Busy := FALSE;
+        Lifecycle.Done := FALSE;
+    END_IF;
+
     // Prise en compte des demandes IHM — anti-traversée (TC-P10-025) :
     // demande benne refusée si un treuil agit (M1_Busy OR M2_Busy) à l'entrée READY.
     IF CmdOpen_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
