@@ -13,7 +13,8 @@ STRUCT
     IsIntermediate  : BOOL;                                           // Position intermediaire (entre Ouvert et Ferme)
     LastPosM2Open   : REAL;                                           // Derniere position M2 memorisee ouvert (m)
     LastPosM2Close  : REAL;                                           // Derniere position M2 memorisee ferme (m)
-    ActiveOffsetValid : BOOL;                                         // Validite offset actif calcule a jour
+    ActiveOffsetValid : BOOL;                                         // Validite offset actif calcule a jour (LIVE : exige puissance + BucketReferenced)
+    BucketReferenced : BOOL;                                          // Reference benne PERSISTANTE (RETAIN) : offsets calibres + datum M1/M2 fiables lors de la calibration. Survit a une coupure puissance. Retombe si M1/M2 suspect/incoherent, CfgFault, ou recalibration explicite.
     StateIncoherent : BOOL;                                           // Etat non sur (divergence boot/reel)
 END_STRUCT
 END_TYPE

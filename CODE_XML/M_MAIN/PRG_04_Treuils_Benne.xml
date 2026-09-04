@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T06:31:03.084592" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T06:31:03.084592">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T07:31:28.358013" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T07:31:28.358013">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2793,7 +2793,15 @@ TRUE = relais sens + C1..C4 tous retombés (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour (LIVE : exige puissance + BucketReferenced)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketReferenced">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference benne PERSISTANTE (RETAIN) : offsets calibres + datum M1/M2 fiables lors de la calibration. Survit a une coupure puissance. Retombe si M1/M2 suspect/incoherent, CfgFault, ou recalibration explicite.</xhtml>
               </documentation>
             </variable>
             <variable name="StateIncoherent">
@@ -5982,6 +5990,10 @@ instBucket(
     CablePosM2          := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
     HomedM1             := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomedM2             := PRG_02_Acquisition.Data.EncoderM2.Homed,
+    HomedAndReliableM1  := PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable,
+    HomedAndReliableM2  := PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable,
+    HomingSuspectM1     := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
+    HomingSuspectM2     := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
     M2_Busy             := (instWinchM2.StepNumber &gt; 0),
     // Confirmations visuelles N2 : publication et offset benne. Le preset
@@ -7467,6 +7479,38 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur M2 reference</xhtml>
               </documentation>
             </variable>
+            <variable name="HomedAndReliableM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur M1 reference ET fiable (hors suspect / incoherent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomedAndReliableM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Codeur M2 reference ET fiable (hors suspect / incoherent)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspectM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Datum M1 explicitement suspect (perd la reference benne persistante)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingSuspectM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Datum M2 explicitement suspect (perd la reference benne persistante)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M1_Busy">
               <type>
                 <BOOL />
@@ -7772,6 +7816,22 @@ Data.BothBlockReason              := BothBlockReason;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Persistance avant latch OffsetMax (anti-pic bruit codeur)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TonDatumUnreliable">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce datum M1/M2 suspect avant effacement de BucketReferenced (anti-transitoire boot/EtherCAT)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketRefRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande de referencement benne latchee (bouton N2 / commit homing) en attente que M1+M2 soient fiables</xhtml>
               </documentation>
             </variable>
             <variable name="ClassCanRun">
@@ -8209,6 +8269,45 @@ IF MachineHomingCommitClose AND NOT Lifecycle.Busy THEN
     BucketState.LastPosM2Close := CablePosM2;
     BucketState.StateIncoherent := FALSE;
 END_IF;
+
+// --- Reference benne PERSISTANTE (RETAIN via GVL_PERSISTENT._BucketState) --------------
+// Decouple la "reference benne" (position franche confirmee + datum M1/M2 fiables lors de
+// la confirmation) de la validite LIVE (puissance). Survit a une coupure puissance :
+// codeurs absolus M1/M2 -&gt; Delta = M2-M1 reste connu au retour, aucune re-calibration.
+//
+// SET en 2 temps (anti-race, challenge Q7) : on LATCHE la demande (bouton N2 a l'arret,
+// ou impulsion commit homing machine), puis on pose BucketReferenced des que M1 ET M2
+// sont fiables. La demande ne survit pas a un reboot (intention transitoire) et est
+// purgee sur Reset ou hors maintenance.
+IF (ConfirmOpenEdge.Q OR ConfirmCloseEdge.Q)
+   AND (Mode = E_Mode.MAINT_N2)
+   AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
+    BucketRefRequest := TRUE;
+END_IF;
+IF MachineHomingCommitOpen OR MachineHomingCommitClose THEN
+    BucketRefRequest := TRUE;
+END_IF;
+IF ResetEdge.Q
+   OR NOT ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
+    BucketRefRequest := FALSE;
+END_IF;
+IF BucketRefRequest AND NOT CfgFaultLatched
+   AND HomedAndReliableM1 AND HomedAndReliableM2 THEN
+    BucketState.BucketReferenced := TRUE;
+    BucketRefRequest := FALSE;
+END_IF;
+//
+// RESET : UNIQUEMENT sur cause dure = datum M1/M2 explicitement SUSPECT, confirme &gt;=2 s.
+//  - PAS sur NOT HomedAndReliable seul (peut n'etre qu'un bus EtherCAT down au boot ;
+//    le blocage SEMI_AUTO "M2 suspect" est deja assure par BothAxesHomed cote cycle homing).
+//  - PAS sur CfgFault (challenge Q2) : une config persistante momentanement invalide au
+//    chargement effacerait la ref a tort ; CfgFault bloque deja ActiveOffsetValid LIVE.
+//  - HomingSuspect n'est pose qu'apres le controle de coherence au demarrage (bus up) -&gt;
+//    pas de faux positif pendant l'enum EtherCAT. Aucun redemarrage auto : re-confirmer.
+TonDatumUnreliable(IN := HomingSuspectM1 OR HomingSuspectM2, PT := T#2s);
+IF TonDatumUnreliable.Q THEN
+    BucketState.BucketReferenced := FALSE;
+END_IF;
 {endregion}
 
 {region "§4 Séquencement mouvement benne"}
@@ -8486,11 +8585,12 @@ TonOffsetResettle(IN := (ABS(OffsetTargetM - ActiveOffsetM) &lt;= CST_OffsetStep
                   PT := CST_OffsetResettleTime);
 ActiveOffsetSettled := TonOffsetResettle.Q;
 
-// --- ActiveOffsetValid : offset semantiquement fiable (consommateurs cycle/homing) -----
-// L'offset benne est valide des lors que le bloc est actif, les codeurs M1 et M2 references,
-// et qu'aucun defaut n'invalide la mesure physique. L'etat intermediaire n'invalide PAS la reference.
+// --- ActiveOffsetValid : validite LIVE de l'offset (consommateur synchro PRG_04) -------
+// = reference benne PERSISTANTE + conditions du moment (bloc actif, puissance, pas de
+// defaut, etat coherent). Retombe a la coupure puissance ; la REFERENCE (BucketReferenced)
+// est ce qui persiste et alimente le cycle homing. L'etat intermediaire n'invalide rien.
 ActiveOffsetValid := Enable AND PowerContactorEngaged
-                     AND HomedM1 AND HomedM2
+                     AND BucketState.BucketReferenced
                      AND NOT BucketState.StateIncoherent
                      AND (Fault.ErrorId = 0);
 BucketState.ActiveOffsetValid := ActiveOffsetValid;

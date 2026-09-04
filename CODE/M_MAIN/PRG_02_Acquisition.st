@@ -457,7 +457,10 @@ instCycleMachineHoming(
     WinchesMechanicallyStopped  := MachineHomingMechanicalStopOk,
     M1Status                   := MachineHomingM1Status,
     M2Status                   := MachineHomingM2Status,
-    BucketOffsetValid          := PRG_04_Treuils_Benne.Data.BucketState.MechState.ActiveOffsetValid,
+    // Reference benne PERSISTANTE (survit coupure puissance) et non le flag LIVE
+    // ActiveOffsetValid (qui exige la puissance) -> pas de HX1 parasite apres une
+    // simple coupure secteur si le datum absolu M1/M2 est intact.
+    BucketOffsetValid          := PRG_04_Treuils_Benne.Data.BucketState.MechState.BucketReferenced,
     // Permis operateur maintenu (meme source que l'arbitrage joystick) : sens montee = manche
     // tire (Y+), sens descente = manche pousse (Y-) ; ref. baseline continuite C1.
     DeadmanArmed               := Data.Joystick.DeadmanArmed,
