@@ -349,6 +349,8 @@ instBucket(
     HomingSuspectM2     := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     WinchSelBucket      := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
     CoupledBucketSeqActive := CoupledBucketSeqActive,
+    ProgramBucketDriveActive := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
+                                OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose,
     M1_Busy             := (instWinchM1.StepNumber > 0),
     M2_Busy             := (instWinchM2.StepNumber > 0),
     // Confirmations visuelles N2 : publication et offset benne. Le preset
@@ -391,10 +393,12 @@ BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT 
 //   - instSafetyWinchM1/M2.CrossCheckEnable (latch MecaE)
 //   - + FB_WinchSync purge ses latch a Enable=FALSE, + FB_Safety_Winch ouvre RefWindow sur
 //     NOT CrossCheckEnable (RAZ continue MecaA/E).
-// Tempo de RÉACTIVATION synchro : la surveillance d'écart M1/M2 ne se ré-arme pas
-// dans les 2 s qui suivent la fin d'une action benne (Lifecycle.Busy OU jog unitaire
-// WinchSel=2). Le TOF prolonge le masquage : à l'arrêt, les treuils continuent de
-// bouger (coast) et les codeurs se stabilisent -> sinon faux [SYNC] ErrorID:01.
+// Tempo de RÉACTIVATION : 2 s après la fin d'une action benne (Lifecycle.Busy OU jog
+// WinchSel=2), les treuils coastent encore et les codeurs se stabilisent -> l'écart
+// serré 0,1 m de FB_WinchSync (SyncDeviationWarn, [SYNC] ErrorID:01) se déclenche à
+// tort. Le TOF ne masque QUE FB_WinchSync (gate sur instWinchSync.Enable §4). MecaE
+// croisé (tolérance ~2,5 m, absorbe le coast), MecaA et survitesse restent ACTIFS via
+// CrossCheckEnable := SyncOperationPermit (inchangé) -> aucun trou de sécurité.
 BucketActivityHold(IN := instBucket.Lifecycle.Busy OR ManualBucketJogActive, PT := T#2s);
 
 SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
@@ -402,7 +406,8 @@ SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND NOT PRG_02_Acquisition.Data.MachineHoming.Active
     AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
     AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
-    AND NOT BucketActivityHold.Q
+    AND NOT instBucket.Lifecycle.Busy
+    AND NOT ManualBucketJogActive
     AND instBucket.ActiveOffsetValid;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
@@ -577,6 +582,7 @@ instWinchSync(
     // coupee A LA SOURCE. + ActiveOffsetSettled (transitoire de recalage offset) + inhibitions.
     Enable          := SyncOperationPermit
                         AND instBucket.ActiveOffsetSettled
+                        AND NOT BucketActivityHold.Q
                         AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
     Mode            := PRG_03_Modes_Cycle.Data.Auth.Mode,
@@ -1052,7 +1058,10 @@ ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM3TremieAvail OR ArmM3MaintenanceAvail;
 
 // Conditions de base (AC1) — priorite decroissante pour le motif.
-ArmBucketBusy := instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q;
+// Pendant le séquencement auto benne en couplé (T248), le Busy benne EST l'auto-arm
+// de la séquence (l'opérateur tient déjà le joystick couplé) : ne pas désarmer le
+// homme-mort, sinon WinchBothIntent tombe et la séquence s'avorte elle-même.
+ArmBucketBusy := (instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q) AND NOT CoupledBucketSeqActive;
 ArmModeDisabled := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE);
 ArmContactorOff := NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 ArmPowerCutOff := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
