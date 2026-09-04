@@ -254,7 +254,10 @@ GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := Wi
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx306_AscentPermitEffective := WinchM2.Safety.AscentPermit;
-GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := HwIn.Winch.M2_TensionedCable_DI;
+// Bug affichage MES 2026-09-04 : publiait TensionedCable_DI sans l'inverser -> cable
+// tendu (bon) s'affichait comme "mou detecte". Logique securite reelle (PRG_04) deja
+// correcte (NOT TensionedCable_DI) ; seul ce mirroir troubleshooting etait faux.
+GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := NOT HwIn.Winch.M2_TensionedCable_DI;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx309_DescendPermitEffective := WinchM2.Safety.DescendPermit;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx310_ErrorOperatorComm := WinchM2.Safety.ErrorOperatorComm;
