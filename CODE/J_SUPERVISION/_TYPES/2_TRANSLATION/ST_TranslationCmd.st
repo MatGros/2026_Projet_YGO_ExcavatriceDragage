@@ -15,6 +15,7 @@ STRUCT
     // 🔀 Switch machine unique : GVL_IHM.Modes.Cmd.TglJoystickMaster (ST_ModesCmd), applicable à M1/M2 ET M3.
     InvertDirection    : BOOL;    (* 🔄 TRUE = inverse Fwd→Maintenance / Rev→Trémie (mise en service) *)
     TglMaintenanceZoneAccess : BOOL; (* : autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable) *)
+    TglAllowWinchMoveAtTremie : BOOL; (* T249 : autorisation CONSCIENTE montee/descente treuil couple (WinchSel=0) a la Tremie, EN PLUS de la garde WinchSel=2 forcee (FB_Modes) *)
     Initialized        : BOOL := FALSE; (* 🚦 TRUE = SetFreq_Hz restauré depuis GVL_PERSISTENT ce boot *)
 END_STRUCT
 END_TYPE

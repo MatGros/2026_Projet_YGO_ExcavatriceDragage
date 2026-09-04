@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T15:46:15.494761" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T15:46:15.494761">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T16:24:51.073570" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T16:24:51.073570">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2005,6 +2005,7 @@ instModes(
     // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
     CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
     M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
+    AllowWinchMoveAtTremie  := GVL_IHM.TranslationM3.Cmd.TglAllowWinchMoveAtTremie,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
     BucketIsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
@@ -5884,6 +5885,14 @@ repasse a 0 pour le mouvement couple. Meme sel. joystick, un seul mecanisme.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chariot M3 arrete stable a la Tremie (FdC latche) -&gt; selecteur FORCE a 2 (benne seule), jamais couple (REX MES 2026-09-04 : M1 descendu a la Tremie via sequence T248)</xhtml>
               </documentation>
             </variable>
+            <variable name="AllowWinchMoveAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] T249 : autorisation CONSCIENTE (bouton IHM) leve la garde M3AtTremie -&gt; couple (0) re-autorise a la Tremie</xhtml>
+              </documentation>
+            </variable>
             <variable name="JoystickPull">
               <type>
                 <BOOL />
@@ -6554,16 +6563,18 @@ END_IF;
 
 Auth.CoupledBucketPhaseLocked := FALSE;
 
-// GARDE ABSOLUE Tremie : a la Tremie, seul le pilotage benne (WinchSel=2) est permis -
-// le couple (0) ne doit JAMAIS s'y engager, meme via la sequence T248 (BucketSeqSatisfied
-// pouvait se lever a tort si la benne etait deja ouverte d'une action precedente -&gt;
-// bascule 0 -&gt; tentative descente couplee -&gt; M1 a bouge a la Tremie, REX MES 2026-09-04).
-// Priorite absolue sur tout le reste : force 2, jamais de sequence couplee tant qu'on y est.
-IF M3AtTremie THEN
-    Auth.JoystickWinchSelectArbitrated := 2;
-    BucketSeqSatisfied := FALSE;
-ELSIF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
-    IF CoupledBucketSeqEnable
+IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
+    // GARDE Tremie (MAINT uniquement -- ne doit PAS interferer avec SEMI_AUTO/cycle auto,
+    // qui pilote la benne via ReqProgram.ReqBucket, pas ce selecteur) : a la Tremie, seul
+    // le pilotage benne (WinchSel=2) est permis - le couple (0) ne doit JAMAIS s'y engager
+    // manuellement, meme via T248 (BucketSeqSatisfied pouvait se lever a tort si la benne
+    // etait deja ouverte d'une action precedente -&gt; bascule 0 -&gt; tentative descente couplee
+    // -&gt; M1 a bouge a la Tremie, REX MES 2026-09-04). Echappatoire consciente : bit IHM
+    // AllowWinchMoveAtTremie (T249) leve la garde -&gt; retour au comportement T248 normal.
+    IF M3AtTremie AND NOT AllowWinchMoveAtTremie THEN
+        Auth.JoystickWinchSelectArbitrated := 2;
+        BucketSeqSatisfied := FALSE;
+    ELSIF CoupledBucketSeqEnable
        AND (JoystickWinchSelectRequest = 0)
        AND (JoystickPull XOR JoystickPush) THEN
         // TOUTE la séquence T248 (jog ET couplé) "possède" la benne : elle est pilotée

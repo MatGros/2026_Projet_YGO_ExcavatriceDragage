@@ -12304,6 +12304,14 @@ Cause de blocage prioritaire</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable)</xhtml>
               </documentation>
             </variable>
+            <variable name="TglAllowWinchMoveAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T249 : autorisation CONSCIENTE montee/descente treuil couple (WinchSel=0) a la Tremie, EN PLUS de la garde WinchSel=2 forcee (FB_Modes)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -31273,6 +31281,14 @@ repasse a 0 pour le mouvement couple. Meme sel. joystick, un seul mecanisme.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Chariot M3 arrete stable a la Tremie (FdC latche) -&gt; selecteur FORCE a 2 (benne seule), jamais couple (REX MES 2026-09-04 : M1 descendu a la Tremie via sequence T248)</xhtml>
               </documentation>
             </variable>
+            <variable name="AllowWinchMoveAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] T249 : autorisation CONSCIENTE (bouton IHM) leve la garde M3AtTremie -&gt; couple (0) re-autorise a la Tremie</xhtml>
+              </documentation>
+            </variable>
             <variable name="JoystickPull">
               <type>
                 <BOOL />
@@ -31943,16 +31959,18 @@ END_IF;
 
 Auth.CoupledBucketPhaseLocked := FALSE;
 
-// GARDE ABSOLUE Tremie : a la Tremie, seul le pilotage benne (WinchSel=2) est permis -
-// le couple (0) ne doit JAMAIS s'y engager, meme via la sequence T248 (BucketSeqSatisfied
-// pouvait se lever a tort si la benne etait deja ouverte d'une action precedente -&gt;
-// bascule 0 -&gt; tentative descente couplee -&gt; M1 a bouge a la Tremie, REX MES 2026-09-04).
-// Priorite absolue sur tout le reste : force 2, jamais de sequence couplee tant qu'on y est.
-IF M3AtTremie THEN
-    Auth.JoystickWinchSelectArbitrated := 2;
-    BucketSeqSatisfied := FALSE;
-ELSIF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
-    IF CoupledBucketSeqEnable
+IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
+    // GARDE Tremie (MAINT uniquement -- ne doit PAS interferer avec SEMI_AUTO/cycle auto,
+    // qui pilote la benne via ReqProgram.ReqBucket, pas ce selecteur) : a la Tremie, seul
+    // le pilotage benne (WinchSel=2) est permis - le couple (0) ne doit JAMAIS s'y engager
+    // manuellement, meme via T248 (BucketSeqSatisfied pouvait se lever a tort si la benne
+    // etait deja ouverte d'une action precedente -&gt; bascule 0 -&gt; tentative descente couplee
+    // -&gt; M1 a bouge a la Tremie, REX MES 2026-09-04). Echappatoire consciente : bit IHM
+    // AllowWinchMoveAtTremie (T249) leve la garde -&gt; retour au comportement T248 normal.
+    IF M3AtTremie AND NOT AllowWinchMoveAtTremie THEN
+        Auth.JoystickWinchSelectArbitrated := 2;
+        BucketSeqSatisfied := FALSE;
+    ELSIF CoupledBucketSeqEnable
        AND (JoystickWinchSelectRequest = 0)
        AND (JoystickPull XOR JoystickPush) THEN
         // TOUTE la séquence T248 (jog ET couplé) "possède" la benne : elle est pilotée
@@ -48324,6 +48342,7 @@ instModes(
     // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
     CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
     M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
+    AllowWinchMoveAtTremie  := GVL_IHM.TranslationM3.Cmd.TglAllowWinchMoveAtTremie,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
     BucketIsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
@@ -50491,6 +50510,20 @@ TopLimitM1_M := SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff,
 TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
                     _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
                     _WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift);
+// EXEMPTION jog benne seule (WinchSel=2) : la formule ci-dessus, une fois M2_LimitShift
+// applique, revient exactement a tester la position REELLE de M1 (M2_raw - ActiveOffsetM
+// = M1). Resultat : quand M1 est deja au-dessus de CfgCableLimitAscent_M, fermer/ouvrir
+// la benne (M2 seul, M1 IMMOBILE) est bloque par la meme limite que la montee de M1,
+// alors que manipuler la benne ne fait jamais monter l'ensemble plus haut que M1 courant
+// (REX MES 2026-09-04 : "le treuil ne change pas d'altimetrie en mvt benne"). En jog
+// benne pur, on remplace donc la butee ALTITUDE ABSOLUE par une butee GEOMETRIQUE relative
+// a M1 courant (OffsetCloseM + marge) : c'est deja le vrai limiteur mecanique de la benne
+// (ManualBucketLimitsActive/anticipation, PRG_04 ~710-735). Le FdC haut MATERIEL
+// (TopPositionSensor, FB_Safety_Winch) reste une barriere INDEPENDANTE et non affectee.
+IF ManualBucketJogActive THEN
+    TopLimitM2_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
+                     + _BucketCfgPersist.Config.OffsetCloseM + 2.0;
+END_IF;
 
 // --- Usage effectif d'un override/bypass de position → re-homing obligatoire ---------------
 // Publié vers PRG_03 (rang 03) ➔ FB_Modes arme HomingRequiredMx à la sortie du mode maintenance.
