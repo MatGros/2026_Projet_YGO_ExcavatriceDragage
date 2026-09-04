@@ -63,11 +63,11 @@ VAR_GLOBAL PERSISTENT RETAIN
     // Offset M1/M2 en fermeture benne (m) — valeur à reconfirmer au premier essai benne en charge.
     _BucketCfgPersist : ST_BucketCfg := (
         Config := (
-            OffsetOpenM      := 0.0,
+            OffsetOpenM      := 2.25,
             OffsetCloseM     := 15.0,
             // Avec l'anticipation inertie, un écart résiduel après arrêt est normal :
             // le seuil de cohérence tolère cet écart résiduel.
-            CoherenceLimitM  := 1.0,
+            CoherenceLimitM  := 2.0,
             // Anticipations d'inertie + zone de ralentissement jog — réglables IHM
             // (méca dynamique évolutive). Le point d'arrêt jog unitaire M2 et
             // l'acceptation d'état ouvert/fermé sont à Offset ± Anticipation ;

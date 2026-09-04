@@ -73,6 +73,7 @@ VAR
     ArmingPermit                 : BOOL;                         // . [LOC] Permission d'armement homme-mort (combiné interlock benne, Option B)
 
     WinchBothMotionActive : BOOL;
+    WinchBothMotionReady         : BOOL;                         // . [LOC] Verrou atomicite demarrage couple : les 2 treuils prets (hors dead-time D18, hors defaut latche)
     WinchBothReqAscent           : BOOL;
     WinchBothReqDescend          : BOOL;
     ManualBottomPositionConfirmed  : BOOL;
@@ -1212,6 +1213,26 @@ ReqM1Winch.RunRequest               := M1LogicRunRequest;
 ReqM1Winch.ReqAscent                := M1LogicReqAscent;
 ReqM1Winch.ReqDescend               := M1LogicReqDescend;
 ReqM1Winch.SpeedStepReq             := M1LogicRequestStepTgt;
+
+// === ATOMICITE DU DEMARRAGE COUPLE (verrou boucle fermee, remplace le timer aveugle) ===
+// En intention both (WinchSel=0), TANT QU'un des deux treuils n'est pas pret a bouger
+// -- encore dans son dead-time D18 (FB_WinchDirectionInterlock, arme apres un arret, ex.
+// fin de jog benne) OU en defaut latche -- on FIGE la commande FINALE des DEUX. Le treuil
+// qui vient de s'arreter garde ainsi son delai en cours ; quand il est pret, les deux
+// contacteurs s'enclenchent au MEME cycle -> 0 cm de decalage tambours (REX MES 2026-09-04 :
+// M1 parti seul 59 cm apres ouverture benne). instWinchM2.* = valeur du scan precedent
+// (lag 1 scan assume : la garde tient juste 1 scan de plus, sans risque).
+//
+// REGLE : on fige UNIQUEMENT le treuil PRET, jamais celui qui purge son dead-time.
+// Zeroter la requete d'un treuil efface son propre DeadTimeArmed (NOT RequestActive) ->
+// si on figeait les deux, M2 perdrait son delai D18 et la garde s'effondrerait en 1 scan.
+// Donc : M1 pret + M2 en dead-time -> on fige M1, on laisse M2 finir son delai ; au scan
+// ou M2 devient pret, les deux demarrent ensemble.
+WinchBothMotionReady := NOT (instWinchM1.DirectionChangePending OR instWinchM2.DirectionChangePending)
+                        AND NOT instWinchM1.Fault.Latched AND NOT instWinchM2.Fault.Latched;
+IF WinchBothMotionActive AND (instWinchM2.DirectionChangePending OR instWinchM2.Fault.Latched) THEN
+    ReqM1Winch.RunRequest := FALSE; ReqM1Winch.ReqAscent := FALSE; ReqM1Winch.ReqDescend := FALSE; ReqM1Winch.SpeedStepReq := 0;
+END_IF;
 ReqM1Winch.MaxStepUp                := CommonMaxStepAscent;
 ReqM1Winch.MaxStepDown              := CommonMaxStepDescent;
 // Plancher palier descente plongée Kobold : plancher plongée agrégé en §5ter, injecté
@@ -1293,6 +1314,14 @@ ReqM2Winch.HomingApproachActive     := PRG_03_Modes_Cycle.Data.Auth.HomingApproa
 ReqM2Winch.TopLimitM                := TopLimitM2_M;
 ReqM2Winch.BottomLimitM             := BottomLimitM2_Active;
 ReqM2Winch.SyncCoupled              := instWinchSync.SyncActive;
+
+// === ATOMICITE DU DEMARRAGE COUPLE (volet M2, symetrique du volet M1 ~ligne 1225) ===
+// Meme verrou : en intention both, si l'un des deux treuils n'est pas pret, on fige AUSSI
+// la commande finale M2. Cas symetrique du REX : M2 relance seul pendant que M1 est en
+// dead-time D18 -> cable qui file. On fige M2 UNIQUEMENT si M1 est le treuil pas pret.
+IF WinchBothMotionActive AND (instWinchM1.DirectionChangePending OR instWinchM1.Fault.Latched) THEN
+    ReqM2Winch.RunRequest := FALSE; ReqM2Winch.ReqAscent := FALSE; ReqM2Winch.ReqDescend := FALSE; ReqM2Winch.SpeedStepReq := 0;
+END_IF;
 
 M2WinchSensors.CablePosM          := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 M2WinchSensors.Homed              := PRG_02_Acquisition.Data.EncoderM2.Homed;
