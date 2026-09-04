@@ -531,7 +531,11 @@ instWinchSync(
     // pilotage couple. En unitaire M1 ou M2 (JoystickWinchSelectArbitrated <> 0) les
     // deux treuils sont volontairement independants : comparer M1/M2 declencherait un
     // faux ContactorMismatch (M2 commande seul, M1 non) -> SafeStop.
+    // R2 : synchro inhibee tant que l'offset benne n'est pas stabilise + concordant
+    // (etat latche == bande mesuree). Un recalage de ActiveOffsetM en cours injecterait
+    // un ecart position fantome -> SyncDeviationWarn latche (RAZ sur Reset seulement).
     Enable          := PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND NOT instBucket.Lifecycle.Busy
+                        AND instBucket.ActiveOffsetSettled
                         AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
                         AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
                         AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
