@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T07:31:15.089312" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T07:31:15.089312">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T07:51:18.221627" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T07:51:18.221627">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -594,6 +594,17 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Datum M2 explicitement suspect (perd la reference benne persistante)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchSelBucket">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Contexte de pilotage benne actif (WinchSel=2) ; FALSE hors contexte -&gt; abandon d'une open/close restee Busy</xhtml>
               </documentation>
             </variable>
             <variable name="M1_Busy">
@@ -1445,6 +1456,24 @@ IF SevereError THEN
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
 ELSE
+    // ⚠️ SÉCURITÉ : abandon propre si une open/close est restée Busy HORS de tout contexte
+    // de pilotage benne (opérateur a quitté WinchSel=2 sans que le mouvement soit fini,
+    // hors cycle AUTO/SEMI_AUTO, hors homing machine). Sinon M2 continue de suivre la benne
+    // pendant un pilotage COUPLÉ WinchSel=0 -&gt; désynchro des câbles (REX MES 2026-09-04).
+    IF Lifecycle.Busy
+       AND NOT WinchSelBucket
+       AND NOT MachineHomingActive
+       AND NOT ((Mode = E_Mode.AUTO) OR (Mode = E_Mode.SEMI_AUTO)) THEN
+        M2_RunRequest := FALSE;
+        M2_ReqAscent := FALSE;
+        M2_ReqDescend := FALSE;
+        M2_BucketJogLimit := FALSE;
+        CloseReq := FALSE;
+        OpenReq := FALSE;
+        Lifecycle.Busy := FALSE;
+        Lifecycle.Done := FALSE;
+    END_IF;
+
     // Prise en compte des demandes IHM — anti-traversée (TC-P10-025) :
     // demande benne refusée si un treuil agit (M1_Busy OR M2_Busy) à l'entrée READY.
     IF CmdOpen_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN

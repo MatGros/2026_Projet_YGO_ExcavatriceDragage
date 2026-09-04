@@ -132,6 +132,7 @@ VAR
     SafeStopM2_Raw          : BOOL;
     WinchContactorMismatchLvl1 : BOOL;   // . [LOC] niveau 1 : discordance contacteurs M1/M2 confirmee (amont OU vecteurs finaux) -> SafeStop
     SyncOperationPermit        : BOOL;   // . [LOC] Gate canonique : la surveillance d'ecart M1/M2 (synchro process + MecaE croise) est autorisee. FAUX pendant tout homing / toute manipulation benne.
+    BucketActivityHold         : TOF;    // . [LOC] Maintien de la coupure surveillance synchro ~2 s APRES la fin d'une action benne (transitoire d'arret treuils : coast + settle codeur -> faux ecart M1/M2)
     SafeStopM1_Active       : BOOL;
     SafeStopM2_Active       : BOOL;
     // Disponibilité de mouvement par axe/sens + conditions de base ArmingPermit
@@ -340,6 +341,7 @@ instBucket(
     HomedAndReliableM2  := PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable,
     HomingSuspectM1     := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     HomingSuspectM2     := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
+    WinchSelBucket      := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
     M1_Busy             := (instWinchM1.StepNumber > 0),
     M2_Busy             := (instWinchM2.StepNumber > 0),
     // Confirmations visuelles N2 : publication et offset benne. Le preset
@@ -378,13 +380,18 @@ BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT 
 //   - instSafetyWinchM1/M2.CrossCheckEnable (latch MecaE)
 //   - + FB_WinchSync purge ses latch a Enable=FALSE, + FB_Safety_Winch ouvre RefWindow sur
 //     NOT CrossCheckEnable (RAZ continue MecaA/E).
+// Tempo de RÉACTIVATION synchro : la surveillance d'écart M1/M2 ne se ré-arme pas
+// dans les 2 s qui suivent la fin d'une action benne (Lifecycle.Busy OU jog unitaire
+// WinchSel=2). Le TOF prolonge le masquage : à l'arrêt, les treuils continuent de
+// bouger (coast) et les codeurs se stabilisent -> sinon faux [SYNC] ErrorID:01.
+BucketActivityHold(IN := instBucket.Lifecycle.Busy OR ManualBucketJogActive, PT := T#2s);
+
 SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
     AND NOT PRG_02_Acquisition.Data.MachineHoming.Active
     AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
     AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
-    AND NOT instBucket.Lifecycle.Busy
-    AND NOT ManualBucketJogActive
+    AND NOT BucketActivityHold.Q
     AND instBucket.ActiveOffsetValid;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T07:31:28.358013" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T07:31:28.358013">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T07:52:23.371108" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T07:52:23.371108">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -5380,6 +5380,14 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Gate canonique : la surveillance d'ecart M1/M2 (synchro process + MecaE croise) est autorisee. FAUX pendant tout homing / toute manipulation benne.</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketActivityHold">
+              <type>
+                <derived name="TOF" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien de la coupure surveillance synchro ~2 s APRES la fin d'une action benne (transitoire d'arret treuils : coast + settle codeur -&gt; faux ecart M1/M2)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SafeStopM1_Active">
               <type>
                 <BOOL />
@@ -5994,6 +6002,7 @@ instBucket(
     HomedAndReliableM2  := PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable,
     HomingSuspectM1     := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     HomingSuspectM2     := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
+    WinchSelBucket      := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
     M1_Busy             := (instWinchM1.StepNumber &gt; 0),
     M2_Busy             := (instWinchM2.StepNumber &gt; 0),
     // Confirmations visuelles N2 : publication et offset benne. Le preset
@@ -6032,13 +6041,18 @@ BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT 
 //   - instSafetyWinchM1/M2.CrossCheckEnable (latch MecaE)
 //   - + FB_WinchSync purge ses latch a Enable=FALSE, + FB_Safety_Winch ouvre RefWindow sur
 //     NOT CrossCheckEnable (RAZ continue MecaA/E).
+// Tempo de RÉACTIVATION synchro : la surveillance d'écart M1/M2 ne se ré-arme pas
+// dans les 2 s qui suivent la fin d'une action benne (Lifecycle.Busy OU jog unitaire
+// WinchSel=2). Le TOF prolonge le masquage : à l'arrêt, les treuils continuent de
+// bouger (coast) et les codeurs se stabilisent -&gt; sinon faux [SYNC] ErrorID:01.
+BucketActivityHold(IN := instBucket.Lifecycle.Busy OR ManualBucketJogActive, PT := T#2s);
+
 SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
     AND NOT PRG_02_Acquisition.Data.MachineHoming.Active
     AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
     AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
-    AND NOT instBucket.Lifecycle.Busy
-    AND NOT ManualBucketJogActive
+    AND NOT BucketActivityHold.Q
     AND instBucket.ActiveOffsetValid;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
@@ -7511,6 +7525,17 @@ Data.BothBlockReason              := BothBlockReason;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Datum M2 explicitement suspect (perd la reference benne persistante)</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchSelBucket">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Contexte de pilotage benne actif (WinchSel=2) ; FALSE hors contexte -&gt; abandon d'une open/close restee Busy</xhtml>
+              </documentation>
+            </variable>
             <variable name="M1_Busy">
               <type>
                 <BOOL />
@@ -8360,6 +8385,24 @@ IF SevereError THEN
     Lifecycle.Busy := FALSE;
     Lifecycle.Done := FALSE;
 ELSE
+    // ⚠️ SÉCURITÉ : abandon propre si une open/close est restée Busy HORS de tout contexte
+    // de pilotage benne (opérateur a quitté WinchSel=2 sans que le mouvement soit fini,
+    // hors cycle AUTO/SEMI_AUTO, hors homing machine). Sinon M2 continue de suivre la benne
+    // pendant un pilotage COUPLÉ WinchSel=0 -&gt; désynchro des câbles (REX MES 2026-09-04).
+    IF Lifecycle.Busy
+       AND NOT WinchSelBucket
+       AND NOT MachineHomingActive
+       AND NOT ((Mode = E_Mode.AUTO) OR (Mode = E_Mode.SEMI_AUTO)) THEN
+        M2_RunRequest := FALSE;
+        M2_ReqAscent := FALSE;
+        M2_ReqDescend := FALSE;
+        M2_BucketJogLimit := FALSE;
+        CloseReq := FALSE;
+        OpenReq := FALSE;
+        Lifecycle.Busy := FALSE;
+        Lifecycle.Done := FALSE;
+    END_IF;
+
     // Prise en compte des demandes IHM — anti-traversée (TC-P10-025) :
     // demande benne refusée si un treuil agit (M1_Busy OR M2_Busy) à l'entrée READY.
     IF CmdOpen_IHM AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
@@ -11434,7 +11477,15 @@ IF NOT Enable THEN
     StepTgt   := 0;
 ELSE
     // ── Chemin benne : M2 piloté par l'action benne (override) ──
-    IF Context.BucketBusy AND Context.BucketM2RunRequest THEN
+    // ⚠️ SÉCURITÉ : l'override benne ne s'applique QUE là où la benne est censée
+    // bouger seule (M2 relatif à M1) : jog benne unitaire (WinchSel=2) ou cycle
+    // AUTO/SEMI_AUTO qui séquence la benne délibérément. En pilotage COUPLÉ manuel
+    // (WinchSel=0) ou unitaire M1 (WinchSel=1), une benne restée Busy NE DOIT PAS
+    // détourner M2 : sinon M2 suit la benne pendant que M1 suit le both-intent
+    // -&gt; câbles désynchronisés (REX MES 2026-09-04, quasi-casse machine).
+    IF Context.BucketBusy AND Context.BucketM2RunRequest
+       AND ((Auth.JoystickWinchSelectArbitrated = 2)
+            OR (Auth.Mode = E_Mode.SEMI_AUTO) OR (Auth.Mode = E_Mode.AUTO)) THEN
         RunRequest := Context.BucketM2RunRequest;
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;
