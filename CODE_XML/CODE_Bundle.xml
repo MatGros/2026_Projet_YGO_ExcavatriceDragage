@@ -51575,14 +51575,12 @@ M3_LimitSwitchMaintenanceEffective := SEL(PRG_03_Modes_Cycle.Data.Auth.Maintenan
 // 🔒 §0ter STABILISATION BISTABLE FINS DE COURSE EXTRÊMES (Trémie &amp; Maintenance/P1)
 // Maintient la détection stable à 1 même si le capteur physique vibre ou saute brièvement.
 // Se libère uniquement sur un mouvement effectif dans le SENS INVERSE (dégagement).
+// FdC LATCHE : un rebond capteur ne libere RIEN. On ne perd l'extreme Tremie qu'en
+// commandant le SENS INVERSE (M3_ReqMaintenance_Active). (Ne pas rajouter de liberation
+// sur mot capteurs : rebond 11111&lt;-&gt;01111 -&gt; flicker autorisation translation, REX MES.)
 IF instPosDecoderM3.LimitSwitchTremie THEN
     M3_LimitSwitchTremieStable := TRUE;
-ELSIF NOT instPosDecoderM3.LimitSwitchTremie
-      AND (M3_ReqMaintenance_Active OR (instPosDecoderM3.SensorsWord = 2#01111)) THEN
-    // Liberation : le pont a QUITTE l'extreme Tremie (mot != 11111) ET soit une demande
-    // Maintenance, soit le pont est franchement une zone plus loin (mot = 01111). Sinon
-    // un joystick qui eloigne le pont sans commande cible laissait le bistable colle -&gt;
-    // EffectivePermitM3_Tremie FALSE en permanence (approche Tremie impossible). Pas un defaut.
+ELSIF M3_ReqMaintenance_Active THEN
     M3_LimitSwitchTremieStable := FALSE;
 END_IF;
 
@@ -51601,14 +51599,12 @@ TonTremieProcessBlock(
     PT := T#200ms);
 M3_TremieProcessBlock := TonTremieProcessBlock.Q;
 
+// FdC LATCHE (idem Tremie) : rebond capteur ne libere rien. Perte de l'extreme
+// Maintenance uniquement sur commande sens inverse (Tremie) ou sortie de la zone
+// Maintenance en positionnement cible.
 IF M3_LimitSwitchMaintenanceEffective THEN
     M3_LimitSwitchMaintenanceStable := TRUE;
-ELSIF NOT instPosDecoderM3.LimitSwitchMaintenance
-      AND (M3_ReqTremie_Active
-           OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchMaintenance)
-           OR (instPosDecoderM3.SensorsWord = 2#00001)) THEN
-    // Symetrique du bistable Tremie : liberation des que le pont a quitte l'extreme
-    // Maintenance (mot != 00000) et est franchement une zone plus loin (mot = 00001).
+ELSIF M3_ReqTremie_Active OR (PRG_03_Modes_Cycle.Data.Auth.MaintenanceM3TargetEnable AND NOT instPosDecoderM3.LimitSwitchMaintenance) THEN
     M3_LimitSwitchMaintenanceStable := FALSE;
 END_IF;
 

@@ -56,6 +56,7 @@ VAR
     m3SpeedTgt              : REAL;
     m3HeightOk              : BOOL;
     initDone                : BOOL := FALSE;
+    m3LimitSwitchTremieStable : BOOL;   // §0ter PRG_05 (guard REX MES 2026-09-04) : FdC latche, rebond capteur ne libere rien
 END_VAR
 
 {region "Corps d'exécution PRG_05 encapsulé"}
@@ -168,6 +169,15 @@ Data.TranslationFinalInterlockRequest.PowerCutOff               := Data.Translat
 Data.TranslationFinalInterlockRequest.BrakeReleaseRequest       := instTranslationM3.BrakeReleaseRequest;
 Data.TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz      := instTranslationM3.RequestedDriveFreqHz;
+
+// §0ter PRG_05 : bistable FdC Tremie LATCHE. Un rebond capteur (mot 11111 <-> 01111)
+// ne libere RIEN. Perte de la butee UNIQUEMENT sur commande sens inverse (Maintenance).
+IF instPosDecoderM3.LimitSwitchTremie THEN
+    m3LimitSwitchTremieStable := TRUE;
+ELSIF (m3Direction = -1) THEN
+    m3LimitSwitchTremieStable := FALSE;
+END_IF;
+Data.TranslationState.LimitSwitchTremie := m3LimitSwitchTremieStable;
 
 Data.TranslationState.ActiveTremie := (m3Direction = 1);
 Data.TranslationState.ActiveMaintenance := (m3Direction = -1);
