@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T15:29:51.399945" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T15:29:51.399945">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T15:35:42.757609" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T15:35:42.757609">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6678,7 +6678,9 @@ ProcessAndSafetyPermitM2_Descend := ProcessPermitM2_Descend AND SafetyPermitM2_D
 // Décision et calcul centralisés dans PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked
 IF PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked THEN
     ProcessAndSafetyPermitM1_Descend := FALSE;
-    IF NOT (ManualBucketJogActive OR ProgramBucketDriveActive) THEN
+    IF NOT (ManualBucketJogActive
+            OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
+            OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose) THEN
         ProcessAndSafetyPermitM2_Descend := FALSE;
     END_IF;
 END_IF;

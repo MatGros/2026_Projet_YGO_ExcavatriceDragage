@@ -50624,7 +50624,9 @@ ProcessAndSafetyPermitM2_Descend := ProcessPermitM2_Descend AND SafetyPermitM2_D
 // Décision et calcul centralisés dans PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked
 IF PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked THEN
     ProcessAndSafetyPermitM1_Descend := FALSE;
-    IF NOT (ManualBucketJogActive OR ProgramBucketDriveActive) THEN
+    IF NOT (ManualBucketJogActive
+            OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
+            OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose) THEN
         ProcessAndSafetyPermitM2_Descend := FALSE;
     END_IF;
 END_IF;
