@@ -48524,7 +48524,14 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.DumpAtTremieAssistActive      := DumpAtTremieAssistActive;
     Data.SequenceState.DumpAtTremieAtTremie          := PRG_05_Translation.Data.M3_AtTremieStable;
     Data.SequenceState.DumpAtTremieBucketOpenArmed   := DumpAtTremieBucketOpenArmed;
-    Data.SequenceState.DumpAtTremieDescentLocked     := DumpAtTremieAssistActive AND NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable);
+    // Verrou descente treuil = GENERAL en MAINT (plus seulement pendant l'assist vidage) :
+    // descente M1/M2 interdite tant que le pont M3 n'est pas ARRETE STABLE a P1 (travail)
+    // ou a Maintenance. En transit / PV / P2 / Tremie -&gt; pas de paye de cable. Echappatoire
+    // MES : bypass FdC M3 (LimitSwitch) ou bypass global M3.
+    Data.SequenceState.DumpAtTremieDescentLocked     :=
+        NOT (PRG_05_Translation.Data.M3_AtP1Stable OR PRG_05_Translation.Data.M3_AtMaintenanceStable)
+        AND NOT GVL_IHM.TranslationM3.Bypass.LimitSwitch
+        AND NOT GVL_IHM.TranslationM3.Bypass.Global;
     Data.SequenceState.BypassDiveActive            := GVL_IHM.CycleDiveSearch.Cmd.TglBypassDiveSearchSequence;
     Data.SequenceState.BypassKoboldBottomTouched   := BypassKoboldBottomTouched;
 
