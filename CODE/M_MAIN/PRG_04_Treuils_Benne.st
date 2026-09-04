@@ -336,6 +336,10 @@ instBucket(
     CablePosM2          := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
     HomedM1             := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomedM2             := PRG_02_Acquisition.Data.EncoderM2.Homed,
+    HomedAndReliableM1  := PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable,
+    HomedAndReliableM2  := PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable,
+    HomingSuspectM1     := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
+    HomingSuspectM2     := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     M1_Busy             := (instWinchM1.StepNumber > 0),
     M2_Busy             := (instWinchM2.StepNumber > 0),
     // Confirmations visuelles N2 : publication et offset benne. Le preset

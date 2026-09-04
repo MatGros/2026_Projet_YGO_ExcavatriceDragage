@@ -7262,7 +7262,15 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour (LIVE : exige puissance + BucketReferenced)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketReferenced">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference benne PERSISTANTE (RETAIN) : offsets calibres + datum M1/M2 fiables lors de la calibration. Survit a une coupure puissance. Retombe si M1/M2 suspect/incoherent, CfgFault, ou recalibration explicite.</xhtml>
               </documentation>
             </variable>
             <variable name="StateIncoherent">

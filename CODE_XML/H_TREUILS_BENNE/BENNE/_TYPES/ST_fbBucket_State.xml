@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-27T21:45:59.556413" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-27T21:45:59.556413">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T07:08:02.466395" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T07:08:02.466395">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -87,7 +87,15 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Validite offset actif calcule a jour (LIVE : exige puissance + BucketReferenced)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketReferenced">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reference benne PERSISTANTE (RETAIN) : offsets calibres + datum M1/M2 fiables lors de la calibration. Survit a une coupure puissance. Retombe si M1/M2 suspect/incoherent, CfgFault, ou recalibration explicite.</xhtml>
               </documentation>
             </variable>
             <variable name="StateIncoherent">

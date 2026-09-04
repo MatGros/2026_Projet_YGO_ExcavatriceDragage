@@ -32,6 +32,10 @@ VAR_INPUT
     CablePosM2                      : REAL;                           // --> [HW] Position reelle cable treuil M2 (m)
     HomedM1                         : BOOL;                           // --> [HW] Codeur M1 reference
     HomedM2                         : BOOL;                           // --> [HW] Codeur M2 reference
+    HomedAndReliableM1              : BOOL;                           // --> [HW] Codeur M1 reference ET fiable (hors suspect / incoherent)
+    HomedAndReliableM2              : BOOL;                           // --> [HW] Codeur M2 reference ET fiable (hors suspect / incoherent)
+    HomingSuspectM1                 : BOOL;                           // --> [HW] Datum M1 explicitement suspect (perd la reference benne persistante)
+    HomingSuspectM2                 : BOOL;                           // --> [HW] Datum M2 explicitement suspect (perd la reference benne persistante)
     M1_Busy                         : BOOL;                           // --> [HW] Treuil M1 en mouvement (Busy)
     M2_Busy                         : BOOL;                           // --> [HW] Treuil M2 en mouvement (Busy)
     InhibitM1                       : BOOL;                           // --> [HW] Treuil M1 inhibe
@@ -86,6 +90,8 @@ VAR
     TonOffsetResettle               : TON;                            // . [LOC] Stabilisation apres recalage de ActiveOffsetM (synchro re-autorisee)
     TonOffsetMismatch               : TON;                            // . [LOC] Persistance avant avertissement incoherence offset/mesure
     TonOffsetMaxViol                : TON;                            // . [LOC] Persistance avant latch OffsetMax (anti-pic bruit codeur)
+    TonDatumUnreliable              : TON;                            // . [LOC] Debounce datum M1/M2 suspect avant effacement de BucketReferenced (anti-transitoire boot/EtherCAT)
+    BucketRefRequest                : BOOL;                            // . [LOC] Demande de referencement benne latchee (bouton N2 / commit homing) en attente que M1+M2 soient fiables
     ClassCanRun                     : BOOL;                           // . [LOC] Conditions reunies pour classer l'etat sur la mesure (tout arrete + reference + hors homing)
     NearClosed                      : BOOL;                           // . [LOC] Mesure dans la bande "fermee" (instantane)
     NearOpen                        : BOOL;                           // . [LOC] Mesure dans la bande "ouverte" (instantane)
@@ -280,6 +286,45 @@ IF MachineHomingCommitClose AND NOT Lifecycle.Busy THEN
     BucketState.IsClosed := TRUE;
     BucketState.LastPosM2Close := CablePosM2;
     BucketState.StateIncoherent := FALSE;
+END_IF;
+
+// --- Reference benne PERSISTANTE (RETAIN via GVL_PERSISTENT._BucketState) --------------
+// Decouple la "reference benne" (position franche confirmee + datum M1/M2 fiables lors de
+// la confirmation) de la validite LIVE (puissance). Survit a une coupure puissance :
+// codeurs absolus M1/M2 -> Delta = M2-M1 reste connu au retour, aucune re-calibration.
+//
+// SET en 2 temps (anti-race, challenge Q7) : on LATCHE la demande (bouton N2 a l'arret,
+// ou impulsion commit homing machine), puis on pose BucketReferenced des que M1 ET M2
+// sont fiables. La demande ne survit pas a un reboot (intention transitoire) et est
+// purgee sur Reset ou hors maintenance.
+IF (ConfirmOpenEdge.Q OR ConfirmCloseEdge.Q)
+   AND (Mode = E_Mode.MAINT_N2)
+   AND NOT Lifecycle.Busy AND NOT M1_Busy AND NOT M2_Busy THEN
+    BucketRefRequest := TRUE;
+END_IF;
+IF MachineHomingCommitOpen OR MachineHomingCommitClose THEN
+    BucketRefRequest := TRUE;
+END_IF;
+IF ResetEdge.Q
+   OR NOT ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
+    BucketRefRequest := FALSE;
+END_IF;
+IF BucketRefRequest AND NOT CfgFaultLatched
+   AND HomedAndReliableM1 AND HomedAndReliableM2 THEN
+    BucketState.BucketReferenced := TRUE;
+    BucketRefRequest := FALSE;
+END_IF;
+//
+// RESET : UNIQUEMENT sur cause dure = datum M1/M2 explicitement SUSPECT, confirme >=2 s.
+//  - PAS sur NOT HomedAndReliable seul (peut n'etre qu'un bus EtherCAT down au boot ;
+//    le blocage SEMI_AUTO "M2 suspect" est deja assure par BothAxesHomed cote cycle homing).
+//  - PAS sur CfgFault (challenge Q2) : une config persistante momentanement invalide au
+//    chargement effacerait la ref a tort ; CfgFault bloque deja ActiveOffsetValid LIVE.
+//  - HomingSuspect n'est pose qu'apres le controle de coherence au demarrage (bus up) ->
+//    pas de faux positif pendant l'enum EtherCAT. Aucun redemarrage auto : re-confirmer.
+TonDatumUnreliable(IN := HomingSuspectM1 OR HomingSuspectM2, PT := T#2s);
+IF TonDatumUnreliable.Q THEN
+    BucketState.BucketReferenced := FALSE;
 END_IF;
 {endregion}
 
@@ -558,11 +603,12 @@ TonOffsetResettle(IN := (ABS(OffsetTargetM - ActiveOffsetM) <= CST_OffsetStepThr
                   PT := CST_OffsetResettleTime);
 ActiveOffsetSettled := TonOffsetResettle.Q;
 
-// --- ActiveOffsetValid : offset semantiquement fiable (consommateurs cycle/homing) -----
-// L'offset benne est valide des lors que le bloc est actif, les codeurs M1 et M2 references,
-// et qu'aucun defaut n'invalide la mesure physique. L'etat intermediaire n'invalide PAS la reference.
+// --- ActiveOffsetValid : validite LIVE de l'offset (consommateur synchro PRG_04) -------
+// = reference benne PERSISTANTE + conditions du moment (bloc actif, puissance, pas de
+// defaut, etat coherent). Retombe a la coupure puissance ; la REFERENCE (BucketReferenced)
+// est ce qui persiste et alimente le cycle homing. L'etat intermediaire n'invalide rien.
 ActiveOffsetValid := Enable AND PowerContactorEngaged
-                     AND HomedM1 AND HomedM2
+                     AND BucketState.BucketReferenced
                      AND NOT BucketState.StateIncoherent
                      AND (Fault.ErrorId = 0);
 BucketState.ActiveOffsetValid := ActiveOffsetValid;
