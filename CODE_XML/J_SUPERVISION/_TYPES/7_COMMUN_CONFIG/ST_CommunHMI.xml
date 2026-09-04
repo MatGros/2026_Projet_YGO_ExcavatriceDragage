@@ -454,7 +454,7 @@ pas une vitesse continue.
                 <simpleValue value="TRUE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquencement auto benne en pilotage couplé (WinchSel=0, MAINT/MANUEL/AUTO) :
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquencement auto benne en pilotage couplé (WinchSel=0, MAINT_N1/N2) :
 pousser le joystick benne pas ouverte -&gt; ouvre d'abord puis descend couplé ;
 tirer benne pas fermée -&gt; ferme d'abord puis remonte couplé.
 Défaut TRUE (activé) ; 1 bouton IHM pour désactiver -&gt; comportement brut

@@ -62,7 +62,7 @@ ELSE
     // -> câbles désynchronisés (REX MES 2026-09-04, quasi-casse machine).
     IF Context.BucketBusy AND Context.BucketM2RunRequest
        AND ((Auth.JoystickWinchSelectArbitrated = 2)
-            OR (Auth.Mode = E_Mode.SEMI_AUTO) OR (Auth.Mode = E_Mode.AUTO)
+            OR (Auth.Mode = E_Mode.SEMI_AUTO)
             OR Context.CoupledBucketSeqActive) THEN
         RunRequest := Context.BucketM2RunRequest;
         ReqAscent  := Context.BucketM2ReqAscent;

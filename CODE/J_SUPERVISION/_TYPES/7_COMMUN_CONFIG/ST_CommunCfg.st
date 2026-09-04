@@ -20,7 +20,7 @@ STRUCT
     WinchSlowdownMaxStep        : INT := 1;     (* : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2 *)
     CfgCableLimitAscent_M       : REAL := 7.5;  (* 📐 Limite haute d'exploitation NORMALE (m), commun M1/M2 *)
     TglEnableKoboldAutoStopDescent : BOOL := FALSE; (* : Arrêt auto descente sur détection fond Kobold (pilotage normal) *)
-    // Séquencement auto benne en pilotage couplé (WinchSel=0, MAINT/MANUEL/AUTO) :
+    // Séquencement auto benne en pilotage couplé (WinchSel=0, MAINT_N1/N2) :
     // pousser le joystick benne pas ouverte -> ouvre d'abord puis descend couplé ;
     // tirer benne pas fermée -> ferme d'abord puis remonte couplé.
     // Défaut TRUE (activé) ; 1 bouton IHM pour désactiver -> comportement brut
