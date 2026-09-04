@@ -626,12 +626,20 @@ END_IF;
 // (FB_Safety_Winch, 0.5 m) -> RAZ + inhibition MecaA/MecaE. On converge donc a pente
 // bornee ; pendant la convergence l'offset n'est pas "fiable" (voir ActiveOffsetSettled)
 // et la synchro est inhibee cote PRG_04.
-// Convergence a pente bornee en mouvement physique (seq auto / jog M2 / basculement de
-// mode) -> supprime le PAS de M2PositionCorrected au basculement WinchSel (voir plus haut).
-// EXCEPTION : ReferencePresetActive (saut preset IHM, ci-dessus) -> suivi IMMEDIAT, pas de
-// pente : CablePosM2 vient de sauter reellement, ActiveOffsetM doit sauter avec lui pour
-// que SyncDeviation/MecaE restent coherents des le scan suivant la confirmation.
-IF ReferencePresetActive THEN
+// REVISION 2026-09-04 : suivi IMMEDIAT (pas de pente) pendant toute manoeuvre PHYSIQUE
+// reelle (Lifecycle.Busy / jog M2 / preset IHM). Historique : la pente etait generalisee
+// a TOUT (y compris en jog) pour eviter un PAS visuel sur l'affichage benne au
+// basculement de mode -> mais ActiveOffsetM alimente aussi des CONSOMMATEURS SECURITE
+// (SyncDeviation, MecaE cross-check, ET la compensation de limite haute M2 -
+// M2_LimitShift, PRG_04) : en pente pendant un jog reel, ces surveillances retardent
+// derriere la vraie position -> faux "[TREUIL] Montee interdite - limite haute" en
+// fermant la benne en jog (REX MES 2026-09-04). Le probleme d'affichage est desormais
+// regle AUTREMENT (DeltaPositionCorrected_M/M2PositionCorrected lisent OffsetTargetM,
+// pas ActiveOffsetM, voir plus bas) -> on peut donc suivre ActiveOffsetM en direct
+// pendant le mouvement reel SANS reintroduire le PAS visuel. La pente ne reste utile
+// QUE pour les transitions SANS mouvement physique (reclassification d'etat franc,
+// basculement de mode a l'arret) -> cas non couvert par Busy/Jog/ReferencePresetActive.
+IF Lifecycle.Busy OR BucketJogActive OR ReferencePresetActive THEN
     ActiveOffsetM := OffsetTargetM;
 ELSE
     ActiveOffsetM := ActiveOffsetM
