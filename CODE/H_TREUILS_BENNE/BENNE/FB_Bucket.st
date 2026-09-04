@@ -40,7 +40,7 @@ VAR_INPUT
     ProgramBucketDriveActive        : BOOL := FALSE;                  // --> [CMD] Une demande benne PROGRAMME est active (DumpAtTremie / ExtractionAssist / homing) -> NE PAS abandonner l'open/close
     M1_Busy                         : BOOL;                           // --> [HW] Treuil M1 en mouvement (Busy)
     M2_Busy                         : BOOL;                           // --> [HW] Treuil M2 en mouvement (Busy)
-    BucketJogActive                 : BOOL := FALSE;                  // --> [CMD] Jog benne unitaire M2 en cours (WinchSel=2) : l'offset actif doit SUIVRE l'ecart mesure comme en Lifecycle.Busy (pas de figeage -> pas de rampe/a-coup a la fin du jog). Sur en WinchSel=2 : sync/MecaE deja OFF.
+    BucketJogActive                 : BOOL := FALSE;                  // --> [CMD] Jog benne unitaire M2 en cours (WinchSel=2) : OffsetTargetM suit le Delta mesure live comme en Lifecycle.Busy (pas de figeage). ActiveOffsetM converge a pente bornee (jamais de PAS au basculement de mode). En WinchSel=2 : sync/MecaE deja OFF.
     InhibitM1                       : BOOL;                           // --> [HW] Treuil M1 inhibe
     InhibitM2                       : BOOL;                           // --> [HW] Treuil M2 inhibe
 
@@ -608,14 +608,17 @@ END_IF;
 // (FB_Safety_Winch, 0.5 m) -> RAZ + inhibition MecaA/MecaE. On converge donc a pente
 // bornee ; pendant la convergence l'offset n'est pas "fiable" (voir ActiveOffsetSettled)
 // et la synchro est inhibee cote PRG_04.
-IF Lifecycle.Busy OR BucketJogActive THEN
-    ActiveOffsetM := OffsetTargetM;                                   // suit l'ecart reel (deplacement lent du treuil, aucun pas) -- seq auto OU jog M2
-ELSE
-    ActiveOffsetM := ActiveOffsetM
-                     + LIMIT(-CST_OffsetSlewMPerScan,
-                              OffsetTargetM - ActiveOffsetM,
-                              CST_OffsetSlewMPerScan);
-END_IF;
+// Convergence TOUJOURS a pente bornee, y compris a l'ENTREE d'une manoeuvre (seq auto
+// ou jog M2). Auparavant Busy/Jog forcait ActiveOffsetM := OffsetTargetM en un scan :
+// au basculement mode 0 -> 2, si la reference franche (OffsetOpenM / HoldOffsetM) ne
+// collait pas au Delta mesure, M2PositionCorrected faisait un PAS (jusqu'a ~15 m si
+// HoldOffsetM perime). OffsetTargetM suit deja le Delta live pendant la manoeuvre
+// (voir plus haut) ; le treuil bouge lentement -> 0.08 m/scan (8 m/s) rattrape sans
+// lag visible pendant la manoeuvre ET supprime le pas au basculement.
+ActiveOffsetM := ActiveOffsetM
+                 + LIMIT(-CST_OffsetSlewMPerScan,
+                          OffsetTargetM - ActiveOffsetM,
+                          CST_OffsetSlewMPerScan);
 HoldOffsetM := ActiveOffsetM;
 
 // --- ActiveOffsetSettled : ActiveOffsetM n'est PAS en cours de recalage --------------
