@@ -70,7 +70,8 @@ VAR_OUTPUT
 
     // === DIAGNOSTICS ET MESURES ===
     M1SlipDetected                  : BOOL;                           // <-- [DIAG] Glissement M1 detecte
-    ActiveOffsetM                   : REAL;                           // <-- [DIAG] Decalage cible pour FB_WinchSync
+    ActiveOffsetM                   : REAL;                           // <-- [DIAG] Decalage cible pour FB_WinchSync — PENTE BORNEE (securite : SyncDeviation, MecaE cross-check)
+    OffsetTargetM                   : REAL;                           // <-- [DIAG] Cible d'offset INSTANTANEE (avant pente) — pour affichage seul (DeltaPositionCorrected_M/M2PositionCorrected), jamais pour la logique de securite
     DeltaPosition_M                 : REAL;                           // <-- [DIAG] Ecart reel signe M2 - M1 (m) — MESURE brute, alimente l'etat benne (NearClosed/NearOpen, %, sync)
     DeltaPositionCorrected_M        : REAL;                           // <-- [DIAG] Ecart M1/M2 CORRIGE de la geometrie benne : DeltaPosition_M - ActiveOffsetM = CablePosM2 - (CablePosM1 + ActiveOffsetM). ~0 = treuils synchro ; != 0 = derive treuil ou benne pas a l'etat memorise. Pour l'operateur (pas la logique d'etat).
     RemainingTravelM                : REAL;                           // <-- [DIAG] Distance restante avant cible (m)
@@ -88,6 +89,8 @@ VAR
     BusyEdge                        : R_TRIG;                         // . [LOC] Detecteur entree en etat Busy
     ConfirmOpenEdge                 : R_TRIG;                         // . [LOC] Detecteur front confirmation ouverture IHM
     ConfirmCloseEdge                : R_TRIG;                         // . [LOC] Detecteur front confirmation fermeture IHM
+    TofReferencePreset              : TOF;                            // . [LOC] Fenetre de grace suivi immediat ActiveOffsetM apres preset IHM (1.5 s)
+    ReferencePresetActive           : BOOL;                           // . [LOC] TRUE pendant la fenetre de grace post-confirmation
     TonTimeout                      : TON;                            // . [LOC] Temporisateur timeout de mouvement
     TonBandClosed                   : TON;                            // . [LOC] Debounce court bande "fermee" -> cible offset (anti-chatter au bord de bande)
     TonBandOpen                     : TON;                            // . [LOC] Debounce court bande "ouverte" -> cible offset
@@ -102,7 +105,6 @@ VAR
     NearClosedStable                : BOOL;                           // . [LOC] Bande "fermee" confirmee CST_BandStableTime (cible offset)
     NearOpenStable                  : BOOL;                           // . [LOC] Bande "ouverte" confirmee CST_BandStableTime
     BandLatchConcord                : BOOL;                           // . [LOC] Etat latche ET bande mesuree concordent -> offset benne fiable
-    OffsetTargetM                   : REAL;                           // . [LOC] Cible de ActiveOffsetM avant limitation de pente
     StateOffsetM                    : REAL;                           // . [LOC] Offset issu de l'ETAT LATCHE seul (reference du filet §5a, independant du recalage)
     OffsetMaxViolNow                : BOOL;                           // . [LOC] Ecart M2-M1 hors plage plausible ce scan
 
@@ -166,18 +168,17 @@ IF NOT BypassGlobal THEN
 
     // Cause 1 : Depassement ecart max (plage physique plausible M2 - M1).
     // Borne haute : offset ferme + 2 m de marge inertie. Borne basse : offset ouvert
-    // MOINS la tolerance de coherence, MAIS bornee a -0.5 m au minimum : la borne basse
-    // ne doit JAMAIS remonter au-dessus de M1. Avec OffsetOpenM > CoherenceLimitM (ex.
-    // 2.25 > 2.0) l'ancienne formule donnait une borne basse POSITIVE (+0.25) -> tout
-    // Delta ~ 0 latchait ErrorID:02, notamment le PRESET homing machine (M1 et M2
-    // references a la meme position -> Delta = 0 volontaire). On tolere donc toujours
-    // M2 un peu au-dessus de M1 (bruit codeur / sur-jog ouverture / preset), et on
-    // desarme completement la surveillance pendant le homing conjoint.
+    // MOINS la tolerance de coherence (bruit codeur / leger sur-jog a l'ouverture) ->
+    // ne latche plus un defaut pour quelques cm de M2 sous M1.
+    // (REVERT 2026-09-04 : le MIN(...,-0.5) + NOT MachineHomingActive introduits plus tot
+    // compensaient OffsetOpenM=2.25, une valeur ERRONEE. OffsetOpenM=0.0 / CoherenceLimitM=1.0
+    // sont les vraies valeurs physiques, confirmees operateur, ne doivent plus changer.
+    // Avec ces valeurs MinAllowedOffset=-1.0 -> Delta=0 au preset homing n'a jamais ete un
+    // probleme -> plus besoin de ce contournement.)
     MaxAllowedOffset := Config.OffsetCloseM + 2.0;
-    MinAllowedOffset := MIN(Config.OffsetOpenM - Config.CoherenceLimitM, -0.5);
-    OffsetMaxViolNow := ( (CablePosM2 > (CablePosM1 + MaxAllowedOffset))
-                          OR (CablePosM2 < (CablePosM1 + MinAllowedOffset)) )
-                        AND NOT MachineHomingActive;
+    MinAllowedOffset := Config.OffsetOpenM - Config.CoherenceLimitM;
+    OffsetMaxViolNow := (CablePosM2 > (CablePosM1 + MaxAllowedOffset))
+                     OR (CablePosM2 < (CablePosM1 + MinAllowedOffset));
     // Anti-pic : ne latche que si l'ecart reste hors plage > 500 ms (bruit codeur / glitch).
     TonOffsetMaxViol(IN := OffsetMaxViolNow, PT := T#500ms);
     IF TonOffsetMaxViol.Q THEN
@@ -588,8 +589,19 @@ TonBandOpen(IN := NearOpen,   PT := CST_BandStableTime);
 NearClosedStable := TonBandClosed.Q;
 NearOpenStable   := TonBandOpen.Q;
 
-IF Lifecycle.Busy OR BucketJogActive THEN
-    // Sequence auto OU jog unitaire M2 : l'offset suit l'ecart reel au rythme du treuil.
+// Fenetre de grace apres une CONFIRMATION IHM (preset benne, §3) : CablePosM2 vient
+// d'etre reecrit INSTANTANEMENT par le preset (PRG_02, encodeur M2 := M1 + Offset).
+// Contrairement a un mouvement physique (Busy/Jog), ce n'est pas une position qui glisse
+// lentement -> ActiveOffsetM doit suivre le saut IMMEDIATEMENT, sinon SyncDeviation ET
+// MecaE cross-check (tous deux bases sur ActiveOffsetM) voient un ecart transitoire faux
+// pendant la convergence a pente bornee (REX MES 2026-09-04 : [SYNC] ErrorID:01 juste
+// apres homing benne open, meme sync desactive -> MecaE reste actif independamment).
+TofReferencePreset(IN := ConfirmOpenEdge.Q OR ConfirmCloseEdge.Q, PT := T#1s500ms);
+ReferencePresetActive := TofReferencePreset.Q;
+
+IF Lifecycle.Busy OR BucketJogActive OR ReferencePresetActive THEN
+    // Sequence auto OU jog unitaire M2 OU fenetre de grace preset : l'offset suit
+    // l'ecart reel (mouvement physique lent, ou saut preset qu'il faut refleter tout de suite).
     OffsetTargetM := CablePosM2 - CablePosM1;
 ELSIF NearClosedStable THEN
     OffsetTargetM := Config.OffsetCloseM;
@@ -614,17 +626,19 @@ END_IF;
 // (FB_Safety_Winch, 0.5 m) -> RAZ + inhibition MecaA/MecaE. On converge donc a pente
 // bornee ; pendant la convergence l'offset n'est pas "fiable" (voir ActiveOffsetSettled)
 // et la synchro est inhibee cote PRG_04.
-// Convergence TOUJOURS a pente bornee, y compris a l'ENTREE d'une manoeuvre (seq auto
-// ou jog M2). Auparavant Busy/Jog forcait ActiveOffsetM := OffsetTargetM en un scan :
-// au basculement mode 0 -> 2, si la reference franche (OffsetOpenM / HoldOffsetM) ne
-// collait pas au Delta mesure, M2PositionCorrected faisait un PAS (jusqu'a ~15 m si
-// HoldOffsetM perime). OffsetTargetM suit deja le Delta live pendant la manoeuvre
-// (voir plus haut) ; le treuil bouge lentement -> 0.08 m/scan (8 m/s) rattrape sans
-// lag visible pendant la manoeuvre ET supprime le pas au basculement.
-ActiveOffsetM := ActiveOffsetM
-                 + LIMIT(-CST_OffsetSlewMPerScan,
-                          OffsetTargetM - ActiveOffsetM,
-                          CST_OffsetSlewMPerScan);
+// Convergence a pente bornee en mouvement physique (seq auto / jog M2 / basculement de
+// mode) -> supprime le PAS de M2PositionCorrected au basculement WinchSel (voir plus haut).
+// EXCEPTION : ReferencePresetActive (saut preset IHM, ci-dessus) -> suivi IMMEDIAT, pas de
+// pente : CablePosM2 vient de sauter reellement, ActiveOffsetM doit sauter avec lui pour
+// que SyncDeviation/MecaE restent coherents des le scan suivant la confirmation.
+IF ReferencePresetActive THEN
+    ActiveOffsetM := OffsetTargetM;
+ELSE
+    ActiveOffsetM := ActiveOffsetM
+                     + LIMIT(-CST_OffsetSlewMPerScan,
+                              OffsetTargetM - ActiveOffsetM,
+                              CST_OffsetSlewMPerScan);
+END_IF;
 HoldOffsetM := ActiveOffsetM;
 
 // --- ActiveOffsetSettled : ActiveOffsetM n'est PAS en cours de recalage --------------
@@ -658,7 +672,11 @@ OffsetStateMismatchWarn := TonOffsetMismatch.Q;
 // --- Ecart M1/M2 CORRIGE de la geometrie benne (operateur, lecture seule) --------------
 // = Delta mesure - offset benne attendu. ~0 : treuils synchro quel que soit l'etat benne.
 // != 0 : derive d'un treuil, OU benne pas a l'etat memorise (ActiveOffsetM tenu).
-DeltaPositionCorrected_M := DeltaPosition_M - ActiveOffsetM;
+// AFFICHAGE OPERATEUR SEUL (non consomme par la logique de securite -> voir SYNC/MecaE qui
+// lisent ActiveOffsetM directement) : on utilise la cible INSTANTANEE OffsetTargetM, pas
+// ActiveOffsetM (pente bornee 0.08 m/scan). La pente n'a aucune utilite ici -> rampe visuelle
+// perturbante de ~2 s a chaque recalage/preset benne (REX MES 2026-09-04).
+DeltaPositionCorrected_M := DeltaPosition_M - OffsetTargetM;
 {endregion}
 
 END_FUNCTION_BLOCK
