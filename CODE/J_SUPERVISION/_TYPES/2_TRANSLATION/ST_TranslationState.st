@@ -41,11 +41,19 @@ STRUCT
     PositionP1              : BOOL;
     PositionMaintenance     : BOOL;
     (* : mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement) *)
-    AtTremie                : BOOL;
+    AtTremie                : BOOL;    (* jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) — logique de positionnement *)
     AtPV                    : BOOL;
     AtP2                    : BOOL;
     AtP1                    : BOOL;
     AtMaintenance           : BOOL;
+    (* T249-B : "at position" par PLAGE = capteur ON ET position estimée à ±0.5 m du point calibré.
+       Fiable sans dépendance à la fréquence variateur (contrairement à AtXxx). Affichage IHM. *)
+    AtBandTremie            : BOOL;
+    AtBandPV                : BOOL;
+    AtBandP2                : BOOL;
+    AtBandP1                : BOOL;
+    AtBandMaintenance       : BOOL;
+    M3StatusText            : STRING(80);  (* Texte statut position M3 (INFO, lecture seule) — ex "M3 au capteur P1 -> Maintenance", "M3 entre P2 et P1" *)
     EstimatedPosM3_M        : REAL;    (* 📏 Position continue estimée en mètres (0.0 m Maint -> +X m Trémie) — persistante, survit reboot *)
     SensorsWord             : BYTE;    (* bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance *)
     SensorWordIncoherent    : BOOL;

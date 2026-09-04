@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T08:06:18.180898" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T08:06:18.180898">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T09:43:33.447528" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T09:43:33.447528">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -261,7 +261,8 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: mot EXACT — front franc arrivée/cible (voir PositionXxx ci-dessus = cumulatif zone, réservé ralentissement)
+jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) — logique de positionnement</xhtml>
               </documentation>
             </variable>
             <variable name="AtPV">
@@ -283,6 +284,43 @@
               <type>
                 <BOOL />
               </type>
+            </variable>
+            <variable name="AtBandTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T249-B : "at position" par PLAGE = capteur ON ET position estimée à ±0.5 m du point calibré.
+       Fiable sans dépendance à la fréquence variateur (contrairement à AtXxx). Affichage IHM.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AtBandPV">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AtBandP2">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AtBandP1">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="AtBandMaintenance">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3StatusText">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte statut position M3 (INFO, lecture seule) — ex "M3 au capteur P1 -&gt; Maintenance", "M3 entre P2 et P1"</xhtml>
+              </documentation>
             </variable>
             <variable name="EstimatedPosM3_M">
               <type>
