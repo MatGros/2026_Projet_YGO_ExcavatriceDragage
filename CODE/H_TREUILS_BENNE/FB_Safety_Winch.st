@@ -45,7 +45,7 @@ VAR_INPUT
     HomingSuspect                   : BOOL;                           // --> [CFG] Referencement suspect
     TopLimitM                       : REAL;                           // --> [CFG] Position limite haute active (m)
     UncommandedSpeedThresholdMps    : REAL := 0.02;                   // --> [CFG] Seuil vitesse non commandee Meca A (m/s)
-    UncommandedDriftToleranceM      : REAL := 2.0;                    // --> [CFG] Tolerance derive position Meca A (m)
+    UncommandedDriftToleranceM      : REAL := 5.0;                    // --> [CFG] Tolerance derive position Meca A (m) - MES 2026-09-04 : 2.0 -> 5.0 (confirme operateur)
     PostRampTimeout                 : TIME := T#3s;                   // --> [CFG] Delai attente retombee contacteurs/frein Meca B
     BenneSlipToleranceM             : REAL := 2.0;                    // --> [CFG] Tolerance glissement M1 pendant benne (m)
     ExpectedOtherWinchPosM          : REAL;                           // --> [CFG] Position attendue de l'autre treuil (m)

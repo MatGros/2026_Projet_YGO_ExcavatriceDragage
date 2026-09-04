@@ -16,7 +16,7 @@ END_SETUP
 
 (* ── Remise à zéro commune : pulse Enable+Reset, puis Reset retombé ── *)
 
-TEST 'TC-P10-001 Meca A : derive >2.0m a l arret (joystick neutre) -> SafeStop + PowerCutOff'
+TEST 'TC-P10-001 Meca A : derive >5.0m a l arret (joystick neutre) -> SafeStop + PowerCutOff'
     (* Scan 1 : Enable=TRUE, regime nominal, joystick neutre, contacteurs+frein confirmes coupes *)
     fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
        PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
@@ -35,17 +35,17 @@ TEST 'TC-P10-001 Meca A : derive >2.0m a l arret (joystick neutre) -> SafeStop +
     ASSERT_FALSE(fb.SafeStop, 'Nominal : pas de SafeStop');
     ASSERT_FALSE(fb.PowerCutOff, 'Nominal : pas de PowerCutOff');
     ASSERT_FALSE(fb.Fault.Error, 'Nominal : pas d erreur');
-    (* Scan 3 : derive injectee > 2.0m (mono-canal position) *)
+    (* Scan 3 : derive injectee > 5.0m (mono-canal position) - MES 2026-09-04 : seuil 2.0->5.0m *)
     ADVANCE_TIME(10000000);
     fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
        PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
        HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
-       CablePosM := 3.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
-    ASSERT_TRUE(fb.SafeStop, 'Derive >2.0m -> SafeStop');
-    ASSERT_TRUE(fb.PowerCutOff, 'Derive >2.0m -> PowerCutOff (bit7 dans masque 16#2F84)');
-    ASSERT_TRUE(fb.Fault.Error, 'Derive >2.0m -> Error');
+       CablePosM := 6.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+    ASSERT_TRUE(fb.SafeStop, 'Derive >5.0m -> SafeStop');
+    ASSERT_TRUE(fb.PowerCutOff, 'Derive >5.0m -> PowerCutOff (bit7 dans masque 16#2F84)');
+    ASSERT_TRUE(fb.Fault.Error, 'Derive >5.0m -> Error');
     ASSERT_TRUE(fb.Fault.Latched, 'Meca A latchee (defaut a acquitter)');
 END_TEST
 
@@ -438,13 +438,13 @@ TEST 'TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
        CablePosM := 0.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
     ADVANCE_TIME(10000000);
-    (* Scan 2 : declenche Meca A (derive >2.0m) *)
+    (* Scan 2 : declenche Meca A (derive >5.0m) - MES 2026-09-04 : seuil 2.0->5.0m *)
     fb(Enable := TRUE, Reset := FALSE, SyncEnable := FALSE,
        PowerContactorEngaged := TRUE, JoystickOnline := TRUE, JoystickOperational := TRUE,
        HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
-       CablePosM := 3.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+       CablePosM := 6.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
     ASSERT_TRUE(fb.Fault.Error, 'Precondition : Meca A latchee');
     (* Scan 3 : Enable=FALSE -> sorties forcees FALSE, latch preserve *)
     ADVANCE_TIME(10000000);
@@ -453,7 +453,7 @@ TEST 'TC-P10-037.1 Gate Enable=FALSE : sorties forcees FALSE, latches preserves,
        HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
-       CablePosM := 3.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+       CablePosM := 6.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
     ASSERT_FALSE(fb.SafeStop, 'Enable=FALSE -> SafeStop force FALSE');
     ASSERT_FALSE(fb.PowerCutOff, 'Enable=FALSE -> PowerCutOff force FALSE');
     ASSERT_FALSE(fb.Ready, 'Enable=FALSE -> Ready=FALSE');
@@ -534,7 +534,7 @@ TEST 'TC-P10-051.1 Chaine PowerCutOff bout-en-bout : FB produit la coupure, chai
        HeartbeatIhmOk := TRUE, EncoderAvailable := TRUE, PhaseRotationOk := TRUE,
        TopPositionSensor := TRUE, FwdRevSpeedFeedbackOff := TRUE, BrakeFeedback := FALSE,
        JoystickYNeutral := TRUE, BenneHoldStillActive := FALSE, InReferencingMode := FALSE,
-       CablePosM := 3.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
+       CablePosM := 6.0, CfgCableLimitDescentM := -20.0, Homed := TRUE, TopLimitM := 8.5);
     ASSERT_TRUE(fb.PowerCutOff, 'Cause masque 16#2F84 -> PowerCutOff produit (brique amont de la chaine)');
     ASSERT_TRUE(fb.SafeStop, 'Cause masque -> SafeStop');
 END_TEST

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:10:12.533630" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:10:12.533630">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T17:44:25.030002" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T17:44:25.030002">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -4378,6 +4378,14 @@ fournie par la configuration persistante de l'appelant.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: autorisation CONSCIENTE zone Maintenance, EN PLUS de MAINT_N2 (Auth.MaintenanceM3TargetEnable)</xhtml>
               </documentation>
             </variable>
+            <variable name="TglAllowWinchMoveAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T249 : autorisation CONSCIENTE montee/descente treuil couple (WinchSel=0) a la Tremie, EN PLUS de la garde WinchSel=2 forcee (FB_Modes)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -8087,7 +8095,10 @@ GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx303_PowerCutOffActive := Wi
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx304_TopSensorPhysical_DI := HwIn.Winch.M1M2_TopPositionFree_DI;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx305_TopSensorBypassActive := Commun.SimTopSensorBypassActive;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx306_AscentPermitEffective := WinchM2.Safety.AscentPermit;
-GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := HwIn.Winch.M2_TensionedCable_DI;
+// Bug affichage MES 2026-09-04 : publiait TensionedCable_DI sans l'inverser -&gt; cable
+// tendu (bon) s'affichait comme "mou detecte". Logique securite reelle (PRG_04) deja
+// correcte (NOT TensionedCable_DI) ; seul ce mirroir troubleshooting etait faux.
+GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx307_SlackCablePhysical_DI := NOT HwIn.Winch.M2_TensionedCable_DI;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx308_SlackCableBypassActive := Commun.SimSlackCableBypassActive;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx309_DescendPermitEffective := WinchM2.Safety.DescendPermit;
 GVL_Troubleshooting.J_LevageUnitaireM2.Safety_300.Idx310_ErrorOperatorComm := WinchM2.Safety.ErrorOperatorComm;
