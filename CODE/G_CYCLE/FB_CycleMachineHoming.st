@@ -139,6 +139,7 @@ VAR
     MachineWasHomed             : BOOL;                                    // . [LOC] Memorise un datum valide (detection de perte)
     HomingLossLatched           : BOOL;                                    // . [LOC] Perte de datum en mouvement latchee jusqu'a l'arret
     MachineHomedRaw             : BOOL;                                    // . [LOC] Qualification hors Fault (detection de perte, evite circularite)
+    AxesDatumRaw                : BOOL;                                    // . [LOC] Reference codeurs M1/M2 seule (base de la detection de perte de datum, sans l'offset benne)
 END_VAR
 VAR CONSTANT
     // === INDICES DE CAUSES (instCauses[]) ===
@@ -266,13 +267,20 @@ END_IF;
 MachineHomedRaw := BothAxesHomed AND CommitOrOffsetValid
                    AND NOT MachineHomingFailed AND NOT ReHomingAckRequired;
 
-IF MachineHomedRaw THEN
+// La PERTE DE DATUM (SafeStop + acquittement conscient) ne concerne QUE la reference
+// des codeurs M1/M2. Un offset benne devenu invalide (benne mi-course pendant une
+// ouverture/fermeture) N'EST PAS une perte de reference machine : il se traite par une
+// reconfirmation position benne, pas par un arret controle + re-homing.
+AxesDatumRaw := BothAxesHomed
+                AND NOT MachineHomingFailed AND NOT ReHomingAckRequired;
+
+IF AxesDatumRaw THEN
     MachineWasHomed := TRUE;
 END_IF;
-IF MachineWasHomed AND NOT MachineHomedRaw AND NOT WinchesMechanicallyStopped THEN
+IF MachineWasHomed AND NOT AxesDatumRaw AND NOT WinchesMechanicallyStopped THEN
     HomingLossLatched := TRUE;
 END_IF;
-IF NOT MachineHomedRaw AND WinchesMechanicallyStopped THEN
+IF NOT AxesDatumRaw AND WinchesMechanicallyStopped THEN
     MachineWasHomed := FALSE;
 END_IF;
 IF HomingLossLatched AND WinchesMechanicallyStopped THEN

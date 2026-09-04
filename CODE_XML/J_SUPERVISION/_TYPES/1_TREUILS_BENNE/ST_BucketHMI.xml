@@ -310,6 +310,14 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) pour jauge/bargraphe IHM</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketOpening_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Ouverture benne 0..100 % (0 = fermée, 100 = ouverte) — calcul continu sur l'écart mesuré</xhtml>
+              </documentation>
+            </variable>
             <variable name="CloseActive">
               <type>
                 <BOOL />

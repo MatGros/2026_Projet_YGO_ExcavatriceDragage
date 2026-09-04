@@ -1474,6 +1474,7 @@ BucketState.Error := instBucket.Fault.Error;
 BucketState.ErrorId := instBucket.Fault.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
 BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
+BucketState.BucketOpening_Pct := instBucket.BucketOpening_Pct;
 BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
 // Reflète le séquencement auto : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase

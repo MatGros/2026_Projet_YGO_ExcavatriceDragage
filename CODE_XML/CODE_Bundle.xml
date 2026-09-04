@@ -2036,6 +2036,14 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) pour jauge/bargraphe IHM</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketOpening_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Ouverture benne 0..100 % (0 = fermée, 100 = ouverte) — calcul continu sur l'écart mesuré</xhtml>
+              </documentation>
+            </variable>
             <variable name="CloseActive">
               <type>
                 <BOOL />
@@ -17924,6 +17932,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Distance restante avant cible (m)</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketOpening_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ouverture benne 0..100 % (0 % = fermee a OffsetCloseM, 100 % = ouverte a OffsetOpenM) ; calcul continu sur l'ecart M2-M1 mesure</xhtml>
+              </documentation>
+            </variable>
             <variable name="OffsetStateMismatchWarn">
               <type>
                 <BOOL />
@@ -18722,6 +18738,19 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
     ELSE
         RemainingTravelM := 0.0;
     END_IF;
+END_IF;
+
+// --- Ouverture benne en % (0..100), calcul CONTINU sur l'ecart mesure ------------------
+// 0 % = benne fermee (Delta ~ OffsetCloseM), 100 % = benne ouverte (Delta ~ OffsetOpenM).
+// Independant de l'etat latche : donne toujours la position reelle, meme mi-course / non
+// confirme. Borne [0..100]. (Config invalide OffsetOpenM &gt;= OffsetCloseM -&gt; deja CfgFault.)
+IF (Config.OffsetCloseM - Config.OffsetOpenM) &gt; 0.001 THEN
+    BucketOpening_Pct := LIMIT(0.0,
+        100.0 * (Config.OffsetCloseM - DeltaPosition_M)
+              / (Config.OffsetCloseM - Config.OffsetOpenM),
+        100.0);
+ELSE
+    BucketOpening_Pct := 0.0;
 END_IF;
 
 {endregion}
@@ -20659,6 +20688,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Qualification hors Fault (detection de perte, evite circularite)</xhtml>
               </documentation>
             </variable>
+            <variable name="AxesDatumRaw">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Reference codeurs M1/M2 seule (base de la detection de perte de datum, sans l'offset benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_CauseHomingLostInMotion">
               <type>
                 <INT />
@@ -20921,13 +20958,20 @@ END_IF;
 MachineHomedRaw := BothAxesHomed AND CommitOrOffsetValid
                    AND NOT MachineHomingFailed AND NOT ReHomingAckRequired;
 
-IF MachineHomedRaw THEN
+// La PERTE DE DATUM (SafeStop + acquittement conscient) ne concerne QUE la reference
+// des codeurs M1/M2. Un offset benne devenu invalide (benne mi-course pendant une
+// ouverture/fermeture) N'EST PAS une perte de reference machine : il se traite par une
+// reconfirmation position benne, pas par un arret controle + re-homing.
+AxesDatumRaw := BothAxesHomed
+                AND NOT MachineHomingFailed AND NOT ReHomingAckRequired;
+
+IF AxesDatumRaw THEN
     MachineWasHomed := TRUE;
 END_IF;
-IF MachineWasHomed AND NOT MachineHomedRaw AND NOT WinchesMechanicallyStopped THEN
+IF MachineWasHomed AND NOT AxesDatumRaw AND NOT WinchesMechanicallyStopped THEN
     HomingLossLatched := TRUE;
 END_IF;
-IF NOT MachineHomedRaw AND WinchesMechanicallyStopped THEN
+IF NOT AxesDatumRaw AND WinchesMechanicallyStopped THEN
     MachineWasHomed := FALSE;
 END_IF;
 IF HomingLossLatched AND WinchesMechanicallyStopped THEN
@@ -50549,6 +50593,7 @@ BucketState.Error := instBucket.Fault.Error;
 BucketState.ErrorId := instBucket.Fault.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
 BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
+BucketState.BucketOpening_Pct := instBucket.BucketOpening_Pct;
 BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
 // Reflète le séquencement auto : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase
