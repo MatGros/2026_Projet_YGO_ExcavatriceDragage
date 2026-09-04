@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T08:03:33.209677" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T08:03:33.209677">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T08:08:48.125246" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T08:08:48.125246">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -616,6 +616,17 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sequencement auto benne en couple en cours -&gt; NE PAS abandonner l'open/close meme hors WinchSel=2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProgramBucketDriveActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Une demande benne PROGRAMME est active (DumpAtTremie / ExtractionAssist / homing) -&gt; NE PAS abandonner l'open/close</xhtml>
               </documentation>
             </variable>
             <variable name="M1_Busy">
@@ -1474,6 +1485,7 @@ ELSE
     IF Lifecycle.Busy
        AND NOT WinchSelBucket
        AND NOT CoupledBucketSeqActive
+       AND NOT ProgramBucketDriveActive
        AND NOT MachineHomingActive
        AND NOT (Mode = E_Mode.SEMI_AUTO) THEN
         M2_RunRequest := FALSE;
