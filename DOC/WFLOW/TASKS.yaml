@@ -5853,3 +5853,59 @@ tasks:
   - Ne pas degrader la protection FdC haut materiel (reste barriere dure independante)
   contrat: ''
   bloque_par: []
+
+- id: T252
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: REGISTRE MES 2026-09-04 - A TRAITER DEMAIN
+  agent: ''
+  date: '2026-09-04T20:10:00+02:00'
+  titre: Registre des points ouverts session MES 2026-09-04 (a traiter/verifier demain)
+  contexte: >-
+    Session MES longue 2026-09-04. Point general : validation operateur confirmee -
+    pilotage benne fonctionne en MAINT y compris benne en position haute et benne a
+    la Tremie (garde WinchSel=2 forcee + bouton override T249). Plusieurs points
+    restent ouverts, non resolus faute de trace/donnees suffisantes en session.
+  description: >-
+    A TRACER/DIAGNOSTIQUER (pas de donnees suffisantes aujourd'hui) :
+    1. A-coup a la fermeture benne au moment du passage en couple (transition
+       WinchSel 2->0) - cause non tranchee (transition logicielle WinchSelTransitionHold
+       vs mecanique). Grille de lecture donnee a l'operateur (WinchSelTransitionHold,
+       DirectionChangePending, MeasuredSpeed) - a appliquer sur prochaine trace ciblee.
+    2. [M2] ErrorID:16 absence mouvement en debut de montee, ressenti quasi-immediat
+       par l'operateur alors que le timer est 3s (NoMovementTimeout) - hypothese
+       sequence frein qui grignote le delai avant mouvement reel, OU treuil sous 0.02
+       m/s (MovementSpeedThresholdMps) plus longtemps que prevu sous charge. Trace
+       ciblee necessaire (MeasuredSpeedSignedMps, RelayFwd/Rev, BrakeCommandOpenConfirmed).
+
+    A VERIFIER (config live forcee aujourd'hui, a confirmer apres reload/persistance) :
+    3. GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M / CfgSyncCriticalTolerance_M - forcer
+       2.0/4.0 en live si pas deja fait ; confirmer apres reload complet.
+    4. OffsetOpenM=0.0 / CoherenceLimitM=1.0 / LimitLegal=-19 / WinchMaxStepDescent=4 -
+       confirmer que le reload complet a bien remis ces valeurs (RETAIN).
+    5. FB_Safety_Winch.UncommandedDriftToleranceM=5.0 (MecaA) - confirmer apres reload.
+    6. BrakeFeedbackTimeout M3=800ms / BrakeDelayMotorDecel M3=2s - confirmer apres reload,
+       tester un arret M3 dur (FdC) sans defaut sequence/frein.
+
+    DETTES TECHNIQUES / OUTILLAGE (non bloquant MES, a faire quand possible) :
+    7. OverspeedFaultLatched (M1/M2) non publie dans GVL_Troubleshooting - angle mort
+       de diagnostic identifie en cherchant un SafeStop sans cause visible.
+    8. Harnais de test casses (hors scope aujourd'hui, deja signales) : FB_Bucket
+       (MOTIONDIRECTION obsolete), FB_Sim_Translation (ACTUALPOSITIONM/DRIVECONTROLWORD
+       obsoletes), FB_Hmi_BannerFormatter (3 TC pre-existants rouges), FB_Safety_Winch
+       TC-P10-001 (injection derive en 1 scan absorbee par PosStepDetected/RefWindowActive
+       - design de test a revoir, pas la logique produit).
+    9. Renommage DumpAtTremieDescentLocked -> WinchVerticalMoveLockedByM3 (nom trompeur,
+       cosmetique, differe depuis T249).
+
+    BACKLOG DEJA TRACE (non refait ici, voir taches dediees) : T249 (reste : rename +
+    branche SEMI_AUTO), T250 (position M2 offset-aware, cycle SEMI_AUTO/DiveSearch/
+    LimitLegal - audit complet deja fait, pas encore implemente), T251 (arret doux FdC
+    haut M1/M2).
+  objectifs:
+  - Chaque point trace/diagnostique avec une vraie trace avant toute nouvelle modif
+  - Config live confirmee persistante apres reload complet
+  - Dette outillage (harnais casses) planifiee
+  contrat: ''
+  bloque_par: []
