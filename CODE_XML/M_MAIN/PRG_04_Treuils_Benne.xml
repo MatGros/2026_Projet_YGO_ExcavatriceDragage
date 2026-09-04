@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T04:53:52.719546" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T04:53:52.719546">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T05:50:46.727641" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T05:50:46.727641">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -245,6 +245,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) pour jauge/bargraphe IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketOpening_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 Ouverture benne 0..100 % (0 = fermée, 100 = ouverte) — calcul continu sur l'écart mesuré</xhtml>
               </documentation>
             </variable>
             <variable name="CloseActive">
@@ -7112,6 +7120,7 @@ BucketState.Error := instBucket.Fault.Error;
 BucketState.ErrorId := instBucket.Fault.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
 BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;
+BucketState.BucketOpening_Pct := instBucket.BucketOpening_Pct;
 BucketState.CloseActive := instBucket.CloseReq;
 BucketState.OpenActive := instBucket.OpenReq;
 // Reflète le séquencement auto : occupé sur une ouverture/fermeture qu'IL a armée, ou en phase
@@ -7645,6 +7654,14 @@ Data.BothBlockReason              := BothBlockReason;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Distance restante avant cible (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketOpening_Pct">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Ouverture benne 0..100 % (0 % = fermee a OffsetCloseM, 100 % = ouverte a OffsetOpenM) ; calcul continu sur l'ecart M2-M1 mesure</xhtml>
               </documentation>
             </variable>
             <variable name="OffsetStateMismatchWarn">
@@ -8445,6 +8462,19 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
     ELSE
         RemainingTravelM := 0.0;
     END_IF;
+END_IF;
+
+// --- Ouverture benne en % (0..100), calcul CONTINU sur l'ecart mesure ------------------
+// 0 % = benne fermee (Delta ~ OffsetCloseM), 100 % = benne ouverte (Delta ~ OffsetOpenM).
+// Independant de l'etat latche : donne toujours la position reelle, meme mi-course / non
+// confirme. Borne [0..100]. (Config invalide OffsetOpenM &gt;= OffsetCloseM -&gt; deja CfgFault.)
+IF (Config.OffsetCloseM - Config.OffsetOpenM) &gt; 0.001 THEN
+    BucketOpening_Pct := LIMIT(0.0,
+        100.0 * (Config.OffsetCloseM - DeltaPosition_M)
+              / (Config.OffsetCloseM - Config.OffsetOpenM),
+        100.0);
+ELSE
+    BucketOpening_Pct := 0.0;
 END_IF;
 
 {endregion}

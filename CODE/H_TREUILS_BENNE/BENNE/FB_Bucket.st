@@ -66,6 +66,7 @@ VAR_OUTPUT
     ActiveOffsetM                   : REAL;                           // <-- [DIAG] Decalage cible pour FB_WinchSync
     DeltaPosition_M                 : REAL;                           // <-- [DIAG] Ecart reel signe M2 - M1 (m)
     RemainingTravelM                : REAL;                           // <-- [DIAG] Distance restante avant cible (m)
+    BucketOpening_Pct               : REAL;                           // <-- [DIAG] Ouverture benne 0..100 % (0 % = fermee a OffsetCloseM, 100 % = ouverte a OffsetOpenM) ; calcul continu sur l'ecart M2-M1 mesure
     OffsetStateMismatchWarn         : BOOL;                           // <-- [DIAG] Avertissement : ecart mesure M2-M1 incoherent avec l'offset de l'etat memorise (non bloquant)
     ActiveOffsetSettled             : BOOL;                           // <-- [STAT] ActiveOffsetM stabilise sur sa cible ET concordance etat/bande -> synchro autorisable (consomme par PRG_04)
 END_VAR
@@ -512,6 +513,19 @@ IF NOT Lifecycle.Busy AND NOT SevereError THEN
     ELSE
         RemainingTravelM := 0.0;
     END_IF;
+END_IF;
+
+// --- Ouverture benne en % (0..100), calcul CONTINU sur l'ecart mesure ------------------
+// 0 % = benne fermee (Delta ~ OffsetCloseM), 100 % = benne ouverte (Delta ~ OffsetOpenM).
+// Independant de l'etat latche : donne toujours la position reelle, meme mi-course / non
+// confirme. Borne [0..100]. (Config invalide OffsetOpenM >= OffsetCloseM -> deja CfgFault.)
+IF (Config.OffsetCloseM - Config.OffsetOpenM) > 0.001 THEN
+    BucketOpening_Pct := LIMIT(0.0,
+        100.0 * (Config.OffsetCloseM - DeltaPosition_M)
+              / (Config.OffsetCloseM - Config.OffsetOpenM),
+        100.0);
+ELSE
+    BucketOpening_Pct := 0.0;
 END_IF;
 
 {endregion}
