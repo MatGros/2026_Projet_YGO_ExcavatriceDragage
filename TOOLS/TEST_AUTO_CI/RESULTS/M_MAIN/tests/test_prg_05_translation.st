@@ -131,3 +131,49 @@ TEST 'PRG_05_Translation : Interdiction Mouvement Translation si Treuils en Bas'
     ASSERT_FALSE(harness.Data.TranslationState.ActiveMaintenance, 'Mouvement interdit');
 END_TEST
 
+
+TEST 'PRG_05_Translation : FdC Tremie LATCHE - un rebond capteur ne libere pas (guard REX MES 2026-09-04)'
+    // REGRESSION : un rebond du capteur de butee Tremie (mot 11111 -> 01111 -> 11111)
+    // ne doit JAMAIS liberer le bistable M3_LimitSwitchTremieStable ni reautoriser la
+    // translation vers la Tremie. On ne perd la butee QU'EN commandant le sens inverse.
+    modesAuth.Mode := E_Mode.MAINT_N1;
+    acqData.Joystick.DeadmanArmed := TRUE;
+    acqData.Joystick.AxisX.Direction := 0;
+    acqData.Joystick.AxisX.SpeedTgt := 0.0;
+
+    // 1. Pont sur la butee Tremie : mot 11111 -> bistable latche
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ADVANCE_TIME(500000000);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ASSERT_TRUE(harness.Data.TranslationState.LimitSwitchTremie, 'Butee Tremie latchee sur mot 11111');
+
+    // 2. REBOND capteur Tremie : DI tombe 2 scans (mot 01111), AUCUNE commande sens inverse
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := FALSE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := FALSE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ASSERT_TRUE(harness.Data.TranslationState.LimitSwitchTremie, 'Rebond capteur -> butee Tremie RESTE latchee (pas de flicker autorisation)');
+
+    // 3. Capteur revient : toujours latche
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := TRUE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ASSERT_TRUE(harness.Data.TranslationState.LimitSwitchTremie, 'Capteur revenu -> toujours latchee');
+
+    // 4. Commande SENS INVERSE (Maintenance, joystick X negatif) -> liberation legitime
+    acqData.Joystick.AxisX.Direction := -1;
+    acqData.Joystick.AxisX.SpeedTgt := 50.0;
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := FALSE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchM1CablePosM := 5.0, WinchM2CablePosM := 5.0,
+        M3_PosTremie_DI := FALSE, M3_PosPV_DI := TRUE, M3_PosPVP2_DI := TRUE, M3_PosP1_DI := TRUE, M3_PosMaintenance_DI := TRUE,
+        PowerContactorEngaged := TRUE, DriveOnline := TRUE, DriveOperational := TRUE);
+    ASSERT_FALSE(harness.Data.TranslationState.LimitSwitchTremie, 'Commande sens inverse (Maintenance) -> butee Tremie liberee');
+END_TEST
