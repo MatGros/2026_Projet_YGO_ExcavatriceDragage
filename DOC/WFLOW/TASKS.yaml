@@ -5698,3 +5698,49 @@ tasks:
   - Bascule banniere M3 <-> treuil selon contexte, niveau INFO (jamais alarme)
   contrat: ''
   bloque_par: []
+
+- id: T248
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: BENNE / MODES / SEQUENCE COUPLEE
+  agent: 'CC'
+  date: '2026-09-04T15:30:00+02:00'
+  titre: Gestion bucket auto en MAINT couple (WinchSel=0) - ouverture/fermeture benne auto via le VRAI selecteur
+  contexte: >-
+    MES 2026-09-04. Mode "gestion bucket auto" actif par defaut (1 bouton IHM pour
+    desactiver : GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing). En MAINT
+    couple (JoystickWinchSelectRequest=0), si l'operateur pousse (descente) et benne
+    pas ouverte -> bascule auto WinchSel=2, ouvre benne, puis WinchSel=0 descente
+    couplee. Tire (montee) + pas fermee -> WinchSel=2 ferme, puis WinchSel=0 montee
+    couplee. Contrainte forte : passer par le VRAI selecteur arbitre
+    (JoystickWinchSelectArbitrated), pas un mecanisme parallele. Une fois le
+    mouvement couple lance, ne PLUS recorriger la benne meme si IsOpen/IsClosed est
+    perdu momentanement. La pause entre benne mode=2 et both mode=0 ne doit pas
+    desarmer le joystick.
+  description: >-
+    FB_Modes 4quater : BucketSeqSatisfied (phase latch), Auth.CoupledBucketPhaseLocked
+    (toute la fenetre T248 -> FB_BucketCmdArbitration n'arme jamais dive-open/ascent-
+    close -> pas de blip instBucket.Busy -> deadman preserve), Auth.WinchSelTransitionHold
+    (dwell fixe TonWinchSelSettle apres tout changement de JoystickWinchSelectArbitrated).
+    PRG_04:519 : si WinchSelTransitionHold -> zero des requetes logiques M1/M2.
+    FAIT : sequencement selecteur reel, phase-lock deadman, exemption programme
+    (DumpAtTremie/ExtractionAssist via ProgramBucketDriveActive), TOF MecaA/overspeed
+    non masque, dwell fixe (remplace la condition vitesse signee qui deadlockait).
+    FAIT 2026-09-04 (racine) : OffsetOpenM 0.0 -> 2.25 (butee ouverte reelle) - avec
+    0.0 IsOpen structurellement FALSE -> T248 chassait Delta=0 -> NoMovement 16#8000.
+    FAIT 2026-09-04 : verrou atomicite demarrage couple (PRG_04 ~1225/1315) - fige la
+    commande finale du treuil PRET tant que l'autre purge son dead-time D18 (fin de
+    jog benne) -> contacteurs au meme scan, plus de M1 seul 59 cm. Remplace le timer
+    aveugle 2s.
+    RESTE : valider banc avec OffsetOpenM=2.25 force en live ; reduire
+    CST_T248TransitionSettle (2s -> valeur mini viable) ; TC CI atomicite couple +
+    TC CI sequencement selecteur ; verifier continuite deadman sur toute la fenetre.
+  objectifs:
+  - Pousser/tirer en MAINT couple ouvre/ferme la benne puis lance le mouvement couple, sans rearmement joystick
+  - Aucun treuil ne part seul apres l'ouverture benne (ecart tambours ~0)
+  - Une fois le couple lance, la benne n'est plus recorrigee
+  - Mode desactivable par 1 bouton IHM ; actif par defaut
+  - TC CI : atomicite demarrage couple + sequencement selecteur reel
+  contrat: ''
+  bloque_par: []
