@@ -5727,15 +5727,29 @@ tasks:
     FAIT : sequencement selecteur reel, phase-lock deadman, exemption programme
     (DumpAtTremie/ExtractionAssist via ProgramBucketDriveActive), TOF MecaA/overspeed
     non masque, dwell fixe (remplace la condition vitesse signee qui deadlockait).
-    FAIT 2026-09-04 (racine) : OffsetOpenM 0.0 -> 2.25 (butee ouverte reelle) - avec
-    0.0 IsOpen structurellement FALSE -> T248 chassait Delta=0 -> NoMovement 16#8000.
-    FAIT 2026-09-04 : verrou atomicite demarrage couple (PRG_04 ~1225/1315) - fige la
-    commande finale du treuil PRET tant que l'autre purge son dead-time D18 (fin de
-    jog benne) -> contacteurs au meme scan, plus de M1 seul 59 cm. Remplace le timer
-    aveugle 2s.
-    RESTE : valider banc avec OffsetOpenM=2.25 force en live ; reduire
-    CST_T248TransitionSettle (2s -> valeur mini viable) ; TC CI atomicite couple +
-    TC CI sequencement selecteur ; verifier continuite deadman sur toute la fenetre.
+    REVERT 2026-09-04 (important) : la piste "OffsetOpenM 0.0 -> 2.25" ci-dessus etait
+    FAUSSE - confirme operateur sur machine reelle : OffsetOpenM=0.0 et OffsetCloseM=15.0
+    sont les vraies positions physiques, NE DOIVENT JAMAIS CHANGER. Remis a 0.0 (et
+    CoherenceLimitM a 1.0) commit abbd0aa2. Consequence de l'erreur : tout Confirm
+    Open/Close presse pendant la fenetre a 2.25 a injecte ~2.25 m d'erreur dans la
+    reference encodeur M2 (necessite un re-Confirm apres coup). La cause racine reelle
+    du NoMovement 16#8000 / IsOpen jamais TRUE observee initialement reste A IDENTIFIER
+    (ce n'etait PAS OffsetOpenM).
+    FAIT 2026-09-04 (reste valide, independant de l'erreur ci-dessus) : verrou atomicite
+    demarrage couple (PRG_04 ~1225/1315) - fige la commande finale du treuil PRET tant
+    que l'autre purge son dead-time D18 (fin de jog benne) -> contacteurs au meme scan,
+    plus de M1 seul 59 cm. Remplace le timer aveugle 2s. ActiveOffsetM toujours a pente
+    bornee (M2PositionCorrected sans pas au basculement) ; limites haute/basse M2
+    corrigees (comparaison sur position corrigee, pas brute) ; fenetre de grace
+    ReferencePresetActive (ActiveOffsetM suit immediatement un preset IHM, pas de faux
+    ecart SYNC/MecaE) ; affichage benne (DeltaPositionCorrected_M/M2PositionCorrected)
+    sans rampe visuelle (OffsetTargetM instantane, ActiveOffsetM pente bornee reserve a
+    la securite).
+    RESTE : identifier la vraie cause du NoMovement/IsOpen initial (hors OffsetOpenM) ;
+    reduire CST_T248TransitionSettle (2s -> valeur mini viable, plancher D18 ~900ms) ;
+    calibrer OpenAnticipationM/CloseAnticipationM sur la distance de coast reelle ;
+    TC CI atomicite couple + TC CI sequencement selecteur ; verifier continuite deadman
+    sur toute la fenetre.
   objectifs:
   - Pousser/tirer en MAINT couple ouvre/ferme la benne puis lance le mouvement couple, sans rearmement joystick
   - Aucun treuil ne part seul apres l'ouverture benne (ecart tambours ~0)
