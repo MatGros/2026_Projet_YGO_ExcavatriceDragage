@@ -26,6 +26,8 @@ FB_Encoder:
   - CODE/E_CODEURS/FB_Encoder_Safety.st
   - CODE/E_CODEURS/FB_EncoderReliability.st
   - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
+  - CODE/A_COMMUN/FB_CycleTime.st
+  - CODE/A_COMMUN/FB_Filter.st
   - CODE/A_COMMUN/FB_FaultCore.st
   - CODE/E_CODEURS/FB_Encoder.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/E_CODEURS/tests/test_fb_encoder.st
