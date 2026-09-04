@@ -18,6 +18,7 @@ STRUCT
     // Permis directionnels par sens (reflet exact des permis appliqués au mouvement M3)
     EffectivePermitM3_Tremie      : BOOL;   // 🟢 Permis canonique M3 vers Trémie (reflet lecture seule)
     EffectivePermitM3_Maintenance : BOOL;   // 🟢 Permis canonique M3 vers Maintenance/P1 (reflet lecture seule)
+    TremieProcessBlockActive : BOOL;   // 🛑 Approche trémie interdite par process (trémie pleine / grille levée) — recul libre. Motif du permis trémie rouge.
     HeightInterlockBlocking  : BOOL;   // 🚧 Interlock hauteur M1/M2 actif (risque collision)
 
     // Source de blocage — pour distinguer l'origine
