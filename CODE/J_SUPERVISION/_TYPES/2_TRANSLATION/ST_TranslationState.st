@@ -46,14 +46,7 @@ STRUCT
     AtP2                    : BOOL;
     AtP1                    : BOOL;
     AtMaintenance           : BOOL;
-    (* T249-B : "at position" par PLAGE = capteur ON ET position estimée à ±0.5 m du point calibré.
-       Fiable sans dépendance à la fréquence variateur (contrairement à AtXxx). Affichage IHM. *)
-    AtBandTremie            : BOOL;
-    AtBandPV                : BOOL;
-    AtBandP2                : BOOL;
-    AtBandP1                : BOOL;
-    AtBandMaintenance       : BOOL;
-    M3StatusText            : STRING(80);  (* Texte statut position M3 (INFO, lecture seule) — ex "M3 au capteur P1 -> Maintenance", "M3 entre P2 et P1" *)
+    M3StatusText            : STRING(80);  (* T249-B : texte statut position M3 (INFO, lecture seule) — jeton "at position" sur front capteur sinon zone SensorsWord. Ex "M3 a P1 -> Maintenance", "M3 entre P2 et P1" *)
     EstimatedPosM3_M        : REAL;    (* 📏 Position continue estimée en mètres (0.0 m Maint -> +X m Trémie) — persistante, survit reboot *)
     SensorsWord             : BYTE;    (* bit4=Trémie, bit3=PV, bit2=P2, bit1=P1, bit0=Maintenance *)
     SensorWordIncoherent    : BOOL;

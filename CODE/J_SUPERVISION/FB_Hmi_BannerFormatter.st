@@ -55,7 +55,8 @@ VAR_INPUT
     DeadmanArmed         : BOOL;   // --> [SAFE] Homme-mort armé
     JoystickAtNeutral    : BOOL;   // --> [HW] Joystick au neutre
     CycleAutoBusy        : BOOL;   // --> [HW] Cycle auto actif
-    M3AtP1               : BOOL;   // --> [STAT] M3 positionné stable au Point 1
+    M3AtP1               : BOOL;   // --> [STAT] M3 positionné stable au Point 1 (conservé, compat)
+    M3StatusText         : STRING(80);   // --> [STAT] T249-B : texte statut position M3 (PRG_05) — "M3 a P1", "M3 entre P2 et P1 -> Maintenance"...
 
     // 🚨 Bandeau d'alarme défilant (§5) — diagnostics safety et ErrorId machine entière
     WinchM1Safety        : ST_SafetyWinch;       // --> [SAFE] Diagnostic sécurité treuil M1
@@ -280,12 +281,10 @@ END_IF;
 
 {region "§2bis Position M3"}
 // État indépendant : ne participe pas aux arbitrages des quatre champs historiques
-// ni au carrousel des défauts. M3AtP1 est publié par PRG_05 puis projeté par PRG_07.
-IF M3AtP1 THEN
-    Banner.PositionM3Text := 'Position M3 : P1';
-ELSE
-    Banner.PositionM3Text := '';
-END_IF;
+// ni au carrousel des défauts. Texte statut position M3 calculé par PRG_05 (T249-B) :
+// jeton "at position" sur front capteur, sinon zone entre 2 capteurs (SensorsWord),
+// + suffixe sens de déplacement. Niveau INFO, jamais alarme.
+Banner.PositionM3Text := M3StatusText;
 {endregion}
 
 {region "§3 Condition spéciale"}
