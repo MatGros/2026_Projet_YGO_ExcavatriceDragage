@@ -20,10 +20,13 @@ STRUCT
     WinchSlowdownMaxStep        : INT := 1;     (* : Plafond palier dans la zone de ralentissement (1..5), commun M1/M2 *)
     CfgCableLimitAscent_M       : REAL := 7.5;  (* 📐 Limite haute d'exploitation NORMALE (m), commun M1/M2 *)
     TglEnableKoboldAutoStopDescent : BOOL := FALSE; (* : Arrêt auto descente sur détection fond Kobold (pilotage normal) *)
-    // Coupe-circuit d'urgence pour le séquencement auto benne.
-    // Défaut FALSE = mouvement M1/M2 synchro jamais
-    // gouverné par instBucket.Busy sauf action MANUELLE benne/DumpAtTremie/ExtractionAssist).
-    TglEnableCoupledBucketSequencing : BOOL := FALSE;
+    // Séquencement auto benne en pilotage couplé (WinchSel=0, MAINT/MANUEL/AUTO) :
+    // pousser le joystick benne pas ouverte -> ouvre d'abord puis descend couplé ;
+    // tirer benne pas fermée -> ferme d'abord puis remonte couplé.
+    // Défaut TRUE (activé) ; 1 bouton IHM pour désactiver -> comportement brut
+    // (2 treuils sans condition). OFF = jamais gouverné par instBucket.Busy hors
+    // action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.
+    TglEnableCoupledBucketSequencing : BOOL := TRUE;
     Initialized                 : BOOL := FALSE; (* 🚦 flag restauration boot *)
 END_STRUCT
 END_TYPE

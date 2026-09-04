@@ -37,6 +37,7 @@ VAR_INPUT
     HomingSuspectM1                 : BOOL;                           // --> [HW] Datum M1 explicitement suspect (perd la reference benne persistante)
     HomingSuspectM2                 : BOOL;                           // --> [HW] Datum M2 explicitement suspect (perd la reference benne persistante)
     WinchSelBucket                  : BOOL := TRUE;                   // --> [CMD] Contexte de pilotage benne actif (WinchSel=2) ; FALSE hors contexte -> abandon d'une open/close restee Busy
+    CoupledBucketSeqActive          : BOOL := FALSE;                  // --> [CMD] Sequencement auto benne en couple en cours -> NE PAS abandonner l'open/close meme hors WinchSel=2
     M1_Busy                         : BOOL;                           // --> [HW] Treuil M1 en mouvement (Busy)
     M2_Busy                         : BOOL;                           // --> [HW] Treuil M2 en mouvement (Busy)
     InhibitM1                       : BOOL;                           // --> [HW] Treuil M1 inhibe
@@ -385,6 +386,7 @@ ELSE
     // pendant un pilotage COUPLÉ WinchSel=0 -> désynchro des câbles (REX MES 2026-09-04).
     IF Lifecycle.Busy
        AND NOT WinchSelBucket
+       AND NOT CoupledBucketSeqActive
        AND NOT MachineHomingActive
        AND NOT ((Mode = E_Mode.AUTO) OR (Mode = E_Mode.SEMI_AUTO)) THEN
         M2_RunRequest := FALSE;
