@@ -1,15 +1,15 @@
 @echo off
+cd /d "%~dp0\..\.."
 chcp 65001 >nul
 echo =======================================================================
-echo 🧪 GROUPE 5 : SUPERVISION, IHM ET SIMULATION
-echo    (J_SUPERVISION, L_SIMULATION)
+echo ⚡ LANCEMENT RAPIDE DU BANC DE TESTS CI (ASSERTIONS SEULES SANS HTML)
 echo =======================================================================
 echo.
 
-python TOOLS\TEST_AUTO_CI\run_tests.py --domain J_SUPERVISION L_SIMULATION
+python TOOLS\TEST_AUTO_CI\run_tests.py --all --fast
 
 echo.
 echo =======================================================================
-echo 📄 Tableau de bord mis a jour : TOOLS\TEST_AUTO_CI\index.html
+echo ✅ Execution rapide terminee.
 echo =======================================================================
 pause

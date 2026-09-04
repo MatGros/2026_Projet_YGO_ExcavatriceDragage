@@ -7,7 +7,7 @@ echo 📦 GENERATION DU BUNDLE PLCopenXML
 echo ============================================================
 echo.
 
-cd /d "%~dp0"
+cd /d "%~dp0\..\.."
 python TOOLS\AGENT_WORKFLOW\scripts\generate_codesys_bundle.py .
 set _RC=%ERRORLEVEL%
 

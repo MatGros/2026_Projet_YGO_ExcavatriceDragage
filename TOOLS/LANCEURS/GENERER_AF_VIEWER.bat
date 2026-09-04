@@ -7,7 +7,7 @@ echo 📋 GENERATION ^& SYNCHRONISATION DU VISUALISEUR AF
 echo ============================================================
 echo.
 
-cd /d "%~dp0"
+cd /d "%~dp0\..\.."
 
 echo [1/3] 🔍 Synchronisation cartouches FB (check_fb_cartouche_sync)...
 python TOOLS\AGENT_WORKFLOW\scripts\check_fb_cartouche_sync.py
