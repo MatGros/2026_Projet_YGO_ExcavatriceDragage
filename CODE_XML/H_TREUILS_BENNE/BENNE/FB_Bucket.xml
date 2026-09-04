@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T07:51:18.221627" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T07:51:18.221627">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T07:55:41.883703" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T07:55:41.883703">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -605,6 +605,17 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Contexte de pilotage benne actif (WinchSel=2) ; FALSE hors contexte -&gt; abandon d'une open/close restee Busy</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoupledBucketSeqActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Sequencement auto benne en couple en cours -&gt; NE PAS abandonner l'open/close meme hors WinchSel=2</xhtml>
               </documentation>
             </variable>
             <variable name="M1_Busy">
@@ -1462,6 +1473,7 @@ ELSE
     // pendant un pilotage COUPLÉ WinchSel=0 -&gt; désynchro des câbles (REX MES 2026-09-04).
     IF Lifecycle.Busy
        AND NOT WinchSelBucket
+       AND NOT CoupledBucketSeqActive
        AND NOT MachineHomingActive
        AND NOT ((Mode = E_Mode.AUTO) OR (Mode = E_Mode.SEMI_AUTO)) THEN
         M2_RunRequest := FALSE;

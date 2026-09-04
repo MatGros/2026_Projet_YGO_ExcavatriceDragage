@@ -468,6 +468,14 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Mouvement both bloqué par benne (ex CoupledMotionBlockedByBucket)</xhtml>
               </documentation>
             </variable>
+            <variable name="CoupledBucketSeqActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Séquencement auto benne EN COURS en couplé (dive-open OU ascent-close armé) : autorise l'override M2 benne même en WinchSel=0</xhtml>
+              </documentation>
+            </variable>
             <variable name="SyncBlocksAscent">
               <type>
                 <BOOL />
