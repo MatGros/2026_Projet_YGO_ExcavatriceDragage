@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0\..\.."
 chcp 65001 >nul
 echo =======================================================================
 echo 🧪 GROUPE 2 : MODES ET CYCLES D'AUTOMATISME

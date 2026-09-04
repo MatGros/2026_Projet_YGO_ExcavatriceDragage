@@ -7,7 +7,7 @@ echo 🚦 LANCEMENT DE TOUS LES GATES
 echo ============================================================
 echo.
 
-cd /d "%~dp0"
+cd /d "%~dp0\..\.."
 python TOOLS\AGENT_WORKFLOW\scripts\run_all_gates.py %*
 set _RC=%ERRORLEVEL%
 
