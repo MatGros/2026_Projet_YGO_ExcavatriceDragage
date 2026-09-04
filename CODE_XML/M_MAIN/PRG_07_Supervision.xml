@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:46:04.008562" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:46:04.008562">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T10:09:02.124118" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T10:09:02.124118">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6078,41 +6078,12 @@ jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) �
                 <BOOL />
               </type>
             </variable>
-            <variable name="AtBandTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T249-B : "at position" par PLAGE = capteur ON ET position estimée à ±0.5 m du point calibré.
-       Fiable sans dépendance à la fréquence variateur (contrairement à AtXxx). Affichage IHM.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AtBandPV">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="AtBandP2">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="AtBandP1">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="AtBandMaintenance">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
             <variable name="M3StatusText">
               <type>
                 <string length="80" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte statut position M3 (INFO, lecture seule) — ex "M3 au capteur P1 -&gt; Maintenance", "M3 entre P2 et P1"</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T249-B : texte statut position M3 (INFO, lecture seule) — jeton "at position" sur front capteur sinon zone SensorsWord. Ex "M3 a P1 -&gt; Maintenance", "M3 entre P2 et P1"</xhtml>
               </documentation>
             </variable>
             <variable name="EstimatedPosM3_M">
@@ -8992,6 +8963,7 @@ instHmiBannerFormatter(
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
     M3AtP1                      := GVL_IHM.TranslationM3.State.AtP1,
+    M3StatusText                := GVL_IHM.TranslationM3.State.M3StatusText,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
     TranslationSafety           := GVL_IHM.TranslationM3.Safety,
@@ -10781,7 +10753,15 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] M3 positionné stable au Point 1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] M3 positionné stable au Point 1 (conservé, compat)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3StatusText">
+              <type>
+                <string length="80" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] T249-B : texte statut position M3 (PRG_05) — "M3 a P1", "M3 entre P2 et P1 -&gt; Maintenance"...</xhtml>
               </documentation>
             </variable>
             <variable name="WinchM1Safety">
@@ -11563,12 +11543,10 @@ END_IF;
 
 {region "§2bis Position M3"}
 // État indépendant : ne participe pas aux arbitrages des quatre champs historiques
-// ni au carrousel des défauts. M3AtP1 est publié par PRG_05 puis projeté par PRG_07.
-IF M3AtP1 THEN
-    Banner.PositionM3Text := 'Position M3 : P1';
-ELSE
-    Banner.PositionM3Text := '';
-END_IF;
+// ni au carrousel des défauts. Texte statut position M3 calculé par PRG_05 (T249-B) :
+// jeton "at position" sur front capteur, sinon zone entre 2 capteurs (SensorsWord),
+// + suffixe sens de déplacement. Niveau INFO, jamais alarme.
+Banner.PositionM3Text := M3StatusText;
 {endregion}
 
 {region "§3 Condition spéciale"}
