@@ -388,7 +388,7 @@ ELSE
        AND NOT WinchSelBucket
        AND NOT CoupledBucketSeqActive
        AND NOT MachineHomingActive
-       AND NOT ((Mode = E_Mode.AUTO) OR (Mode = E_Mode.SEMI_AUTO)) THEN
+       AND NOT (Mode = E_Mode.SEMI_AUTO) THEN
         M2_RunRequest := FALSE;
         M2_ReqAscent := FALSE;
         M2_ReqDescend := FALSE;

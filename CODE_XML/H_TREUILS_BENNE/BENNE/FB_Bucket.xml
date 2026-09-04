@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T07:55:41.883703" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T07:55:41.883703">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T08:03:33.209677" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T08:03:33.209677">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1475,7 +1475,7 @@ ELSE
        AND NOT WinchSelBucket
        AND NOT CoupledBucketSeqActive
        AND NOT MachineHomingActive
-       AND NOT ((Mode = E_Mode.AUTO) OR (Mode = E_Mode.SEMI_AUTO)) THEN
+       AND NOT (Mode = E_Mode.SEMI_AUTO) THEN
         M2_RunRequest := FALSE;
         M2_ReqAscent := FALSE;
         M2_ReqDescend := FALSE;
