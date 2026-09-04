@@ -1,0 +1,32 @@
+(* ═══════════════════════════════════════════════════════════════
+   🚦 ST_CycleState — États et diagnostics IHM du cycle semi-automatique
+   ═══════════════════════════════════════════════════════════════ *)
+TYPE ST_CycleState :
+STRUCT
+    Ready                  : BOOL;        (* 🟢 Séquenceur prêt *)
+    Busy                   : BOOL;        (* ⚙️ Cycle en cours *)
+    Done                   : BOOL;        (* ✅ Cycle terminé *)
+    Error                  : BOOL;        (* Défaut cycle *)
+    ErrorId                : WORD;        (* ❌ Code défaut cycle *)
+    CycleStep              : E_AutoCycleStep; (* 🔄 Étape courante du Grafcet *)
+    CycleStateStr          : STRING(80);  (* 📝 Libellé texte de l'étape courante *)
+    SelTarget              : INT;         (* 🎯 Miroir lecture seule de GVL_IHM.TranslationM3.Cmd.SelTarget *)
+    KoboldContactFond      : BOOL;        (* 🔌 Retour physique réel capteur contact de fond Kobold *)
+    KoboldContactorCmd     : BOOL;        (* 🔌 Commande contacteur Kobold (calculée par FB_Cycle) *)
+    LimitLegalReached      : BOOL;        (* 📐 Miroir de GVL_IHM.Commun.LimitLegalReached *)
+    LimitLegalDepth_M      : REAL;        (* 📐 Miroir de GVL_IHM.Commun.Cfg.LimitLegalDepthMinAllowed_M *)
+    WinchSyncError         : BOOL;        (* ⚖️ Miroir de l'erreur synchro M1/M2 *)
+    WinchSyncDelta_M       : REAL;        (* ⚖️ Miroir de l'écart synchro M1/M2 *)
+    SpeedMismatch_Mps      : REAL;        (* 🐢 Écart de vitesse mesuré  *)
+    SpeedMismatchActive    : BOOL;        (* 🐢 Écart de vitesse détecté *)
+    SpeedMismatchConfirmed : BOOL;        (* 🐢 Écart de vitesse confirmé *)
+    M1Position_M           : REAL;        (* 📊 Position câble M1 *)
+    M2Position_M           : REAL;        (* 📊 Position câble M2 *)
+    DeadmanArmed           : BOOL;        (* 🔫 Homme-mort joystick armé *)
+    JoystickDeflected      : BOOL;        (* 🕹️ Joystick défléchi (non centré) — même signal que JoystickDeflected (FB_Cycle) ; SANS homme-mort *)
+    CycleStepAtError       : E_AutoCycleStep; (* 🧊 Étape spécifique au moment du défaut  *)
+    SampleCount            : INT;         (* Compteur de prélèvements (RETAIN, Q3bis) *)
+    CurrentCycleElapsed    : TIME;        (* ⏱️ Durée écoulée du cycle en cours *)
+    LastCycleDuration      : TIME;        (* ⏱️ Durée du dernier cycle achevé (figée à X13) *)
+END_STRUCT
+END_TYPE
