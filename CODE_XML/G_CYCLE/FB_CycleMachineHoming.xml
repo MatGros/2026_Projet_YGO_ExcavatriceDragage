@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T16:13:56.386785" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T16:13:56.386785">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T04:26:58.846578" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T04:26:58.846578">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1816,9 +1816,13 @@ CASE SeqStep OF
         // deja homed. Les gestes indirects (3 appuis BP joystick, auto-armement) sont
         // ignores si M1 ET M2 sont deja references -&gt; evite le passage en homing pendant
         // un travail benne en MAINT (appuis repetes du BP homme-mort).
+        // D : la perte de datum ne RELANCE le cycle que si un CODEUR a reellement perdu sa
+        // reference (NOT BothAxesHomed). Une simple invalidation de l'offset benne
+        // (ActiveOffsetValid -&gt; MachineHomed FALSE) ne doit PAS reproposer le homing : elle
+        // se traite par une reconfirmation position benne, pas par un cycle machine.
         IF (StartEdge.Q
             OR ((ExplicitValidationPulse OR AutoArmTimer.Q) AND NOT BothAxesHomed)
-            OR (MachineWasHomed AND NOT MachineHomedRaw))
+            OR (MachineWasHomed AND NOT MachineHomedRaw AND NOT BothAxesHomed))
            AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
             HomeReqDone := FALSE;
             SeqStep     := E_MachineHomingTxState.HX1_CHOICE;

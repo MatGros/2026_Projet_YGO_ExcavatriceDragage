@@ -84,6 +84,7 @@ VAR
     TonClassOpen                    : TON;                            // . [LOC] Debounce classification "benne ouverte" sur mesure
     TonBandClosed                   : TON;                            // . [LOC] Debounce court bande "fermee" -> cible offset (anti-chatter au bord de bande)
     TonBandOpen                     : TON;                            // . [LOC] Debounce court bande "ouverte" -> cible offset
+    TonClassInter                   : TON;                            // . [LOC] Debounce intermediaire franc / depassement -> efface le latch d'etat stale
     TonOffsetResettle               : TON;                            // . [LOC] Stabilisation apres recalage de ActiveOffsetM (synchro re-autorisee)
     TonOffsetMismatch               : TON;                            // . [LOC] Persistance avant avertissement incoherence offset/mesure
     TonOffsetMaxViol                : TON;                            // . [LOC] Persistance avant latch OffsetMax (anti-pic bruit codeur)
@@ -341,6 +342,23 @@ ELSIF TonClassOpen.Q AND NOT BucketState.IsOpen THEN
     BucketState.StateIncoherent := FALSE;
 END_IF;
 
+// A : intermediaire franc / depassement CONFIRME (debounce 1 s) -> l'etat latche ne peut
+// plus etre tenu pour vrai (benne reellement entre-deux). On efface IsClosed/IsOpen :
+// l'etat logique redevient le miroir de la cinematique (evite IsClosed + IsIntermediate
+// simultanes et le M2_LimitShift sur un latch stale). ActiveOffsetValid tombe (§5) ->
+// OffsetStateMismatchWarn / reconfirmer position.
+// LIMITE AUX MODES MAINT : en AUTO/SEMI_AUTO c'est la sequence (Lifecycle.Busy) qui gere
+// l'etat benne ; effacer le latch en plein cycle -> MachineHomedRaw FALSE -> SafeStop
+// "reference perdue" parasite (challenge 2026-09-04). En cycle, seul le WARN signale.
+TonClassInter(IN := ClassCanRun
+                    AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
+                    AND (BucketState.IsIntermediate OR BucketState.TooOpen OR BucketState.TooClosed),
+              PT := T#1s);
+IF TonClassInter.Q AND (BucketState.IsClosed OR BucketState.IsOpen) THEN
+    BucketState.IsClosed := FALSE;
+    BucketState.IsOpen   := FALSE;
+END_IF;
+
 MotionRequestConflict := ReqAscent AND ReqDescend;
 MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
 
@@ -521,6 +539,11 @@ ELSIF CloseReq OR BucketState.IsClosed THEN
 ELSIF OpenReq OR BucketState.IsOpen THEN
     OffsetTargetM := Config.OffsetOpenM;
 ELSE
+    // Etat indetermine (latch efface par A, ou jamais latche) : on GELE le dernier offset
+    // franc connu (HoldOffsetM). Ne PAS suivre l'ecart mesure ici -> sinon
+    // ExpectedOtherWinchPosM (FB_Safety_Winch) suivrait la mesure et rendrait la
+    // surveillance d'ecart croise M1/M2 aveugle en mouvement couple (challenge 2026-09-04).
+    // L'incoherence est signalee par OffsetStateMismatchWarn (§5a).
     OffsetTargetM := HoldOffsetM;
 END_IF;
 

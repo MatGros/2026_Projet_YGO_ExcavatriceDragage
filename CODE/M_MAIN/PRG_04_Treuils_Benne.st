@@ -131,6 +131,7 @@ VAR
     SafeStopM1_Raw          : BOOL;
     SafeStopM2_Raw          : BOOL;
     WinchContactorMismatchLvl1 : BOOL;   // . [LOC] niveau 1 : discordance contacteurs M1/M2 confirmee (amont OU vecteurs finaux) -> SafeStop
+    SyncOperationPermit        : BOOL;   // . [LOC] Gate canonique : la surveillance d'ecart M1/M2 (synchro process + MecaE croise) est autorisee. FAUX pendant tout homing / toute manipulation benne.
     SafeStopM1_Active       : BOOL;
     SafeStopM2_Active       : BOOL;
     // Disponibilité de mouvement par axe/sens + conditions de base ArmingPermit
@@ -364,6 +365,24 @@ instBucket(
 WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
 BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
 
+// === GATE CANONIQUE SURVEILLANCE ECART M1/M2 ===============================================
+// REGLE MES : aucun defaut/alarme d'ecart M1/M2 (synchro process, MecaE croise, concordance
+// contacteurs) ne doit apparaitre pendant un HOMING (machine ou codeur) ni pendant une
+// MANIPULATION BENNE (auto Lifecycle.Busy OU jog unitaire) : dans ces phases M2-M1 varie
+// volontairement jusqu'a ~15 m. Ce signal unique coupe la surveillance A LA SOURCE :
+//   - instWinchSync.Enable
+//   - instSafetyWinchM1/M2.CrossCheckEnable (latch MecaE)
+//   - + FB_WinchSync purge ses latch a Enable=FALSE, + FB_Safety_Winch ouvre RefWindow sur
+//     NOT CrossCheckEnable (RAZ continue MecaA/E).
+SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
+    AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
+    AND NOT PRG_02_Acquisition.Data.MachineHoming.Active
+    AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
+    AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
+    AND NOT instBucket.Lifecycle.Busy
+    AND NOT ManualBucketJogActive
+    AND instBucket.ActiveOffsetValid;
+
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
 // 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
@@ -531,14 +550,10 @@ instWinchSync(
     // pilotage couple. En unitaire M1 ou M2 (JoystickWinchSelectArbitrated <> 0) les
     // deux treuils sont volontairement independants : comparer M1/M2 declencherait un
     // faux ContactorMismatch (M2 commande seul, M1 non) -> SafeStop.
-    // R2 : synchro inhibee tant que l'offset benne n'est pas stabilise + concordant
-    // (etat latche == bande mesuree). Un recalage de ActiveOffsetM en cours injecterait
-    // un ecart position fantome -> SyncDeviationWarn latche (RAZ sur Reset seulement).
-    Enable          := PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND NOT instBucket.Lifecycle.Busy
+    // Gate canonique SyncOperationPermit (calcule §1) : homing OU benne -> surveillance
+    // coupee A LA SOURCE. + ActiveOffsetSettled (transitoire de recalage offset) + inhibitions.
+    Enable          := SyncOperationPermit
                         AND instBucket.ActiveOffsetSettled
-                        AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
-                        AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
-                        AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
                         AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
     Mode            := PRG_03_Modes_Cycle.Data.Auth.Mode,
@@ -687,7 +702,20 @@ M2JogApproachClose := ManualBucketJogActive
              - _BucketCfgPersist.Config.CloseAnticipationM
              - _BucketCfgPersist.Config.JogSlowdownZoneM));
 
-M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
+// Decalage de la limite haute logicielle M2 : la benne pend jusqu'a OffsetCloseM sous M1,
+// donc en pilotage benne (WinchSel=2) OU si la benne est/va etre fermee, M2 doit avoir la
+// marge de montee pour atteindre M1 + OffsetCloseM (pas seulement sa position courante).
+// Le latch _BucketState.IsClosed n'est plus stale grace au fix A (§4a efface un latch
+// contredit par la mesure). En etat indetermine (jamais latche), le terme WinchSel=2
+// garantit quand meme la marge pendant l'operation benne.
+// La marge (BIG) est donnee si la benne est/va etre fermee OU des que l'operateur
+// SELECTIONNE le mode benne (select joystick BRUT = 2, avant meme l'arbitrage WinchSel) :
+// M2 doit pouvoir monter jusqu'a M1 + OffsetCloseM pour fermer. Sinon (benne ouverte,
+// M2 suit M1) la limite M2 = celle de M1. Le FDC haut PHYSIQUE reste la barriere dure
+// (non bypassable, FB_Safety_Winch:528-531) independamment de cette limite soft.
+M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq
+                     OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
+                     OR (GVL_IHM.Modes.Cmd.SelJoystickWinch = 2),
                       0.0,
                       (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
                       - _CommunCfgPersist.CfgCableLimitAscent_M);
@@ -768,14 +796,11 @@ instSafetyWinchM1(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
-    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : ACTIF seulement quand
-    // les treuils sont reellement solidaires (couple joystick OU boutons both) et HORS
-    // operation benne unitaire (jog M2 -> M2-M1 varie volontairement de ~15 m). N'affecte
-    // PAS le routage mou-de-cable (:508/:520) qui reste sur SyncEnable brut.
-    CrossCheckEnable       := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
-                              AND ((PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
-                                   OR WinchBothMotionActive)
-                              AND NOT ManualBucketJogActive,
+    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : gate canonique
+    // SyncOperationPermit (homing/benne -> OFF). N'affecte PAS le routage mou-de-cable
+    // (:508/:520) qui reste sur SyncEnable brut. Le mouvement couple par boutons-both
+    // (WinchBothMotionActive sans WinchSel=0) est un cas residuel -> voir T-tache.
+    CrossCheckEnable       := SyncOperationPermit,
     JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
@@ -838,14 +863,11 @@ instSafetyWinchM2(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
-    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : ACTIF seulement quand
-    // les treuils sont reellement solidaires (couple joystick OU boutons both) et HORS
-    // operation benne unitaire (jog M2 -> M2-M1 varie volontairement de ~15 m). N'affecte
-    // PAS le routage mou-de-cable (:508/:520) qui reste sur SyncEnable brut.
-    CrossCheckEnable       := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
-                              AND ((PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
-                                   OR WinchBothMotionActive)
-                              AND NOT ManualBucketJogActive,
+    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : gate canonique
+    // SyncOperationPermit (homing/benne -> OFF). N'affecte PAS le routage mou-de-cable
+    // (:508/:520) qui reste sur SyncEnable brut. Le mouvement couple par boutons-both
+    // (WinchBothMotionActive sans WinchSel=0) est un cas residuel -> voir T-tache.
+    CrossCheckEnable       := SyncOperationPermit,
     JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,

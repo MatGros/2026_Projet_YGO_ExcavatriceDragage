@@ -4281,8 +4281,12 @@ IF NOT BypassGlobal THEN
                     OR (ABS(ExpectedOtherWinchPosM - ExpectedOtherWinchPosMPrev) &gt; CST_RefPosStepM);
     CablePosMPrev := CablePosM;
     ExpectedOtherWinchPosMPrev := ExpectedOtherWinchPosM;
-    TonRefSettle(IN := NOT (InReferencingMode OR BenneBusy OR PosStepDetected), PT := T#2s);
-    RefWindowActive := InReferencingMode OR BenneBusy OR PosStepDetected OR NOT TonRefSettle.Q;
+    // NOT CrossCheckEnable : homing machine, manipulation benne, pilotage unitaire -&gt;
+    // l'ecart croise M1/M2 est volontairement grand ; la fenetre de reference reste
+    // ouverte (RAZ continue des latch Meca A/E) tant que le controle croise est coupe.
+    TonRefSettle(IN := NOT (InReferencingMode OR BenneBusy OR PosStepDetected OR NOT CrossCheckEnable), PT := T#2s);
+    RefWindowActive := InReferencingMode OR BenneBusy OR PosStepDetected OR NOT TonRefSettle.Q
+                       OR NOT CrossCheckEnable;
     IF RefWindowActive THEN
         MecaAFaultLatched         := FALSE;
         MecaEFaultLatched         := FALSE;

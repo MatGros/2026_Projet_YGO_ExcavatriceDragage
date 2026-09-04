@@ -18026,6 +18026,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce court bande "ouverte" -&gt; cible offset</xhtml>
               </documentation>
             </variable>
+            <variable name="TonClassInter">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce intermediaire franc / depassement -&gt; efface le latch d'etat stale</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonOffsetResettle">
               <type>
                 <derived name="TON" />
@@ -18544,6 +18552,23 @@ ELSIF TonClassOpen.Q AND NOT BucketState.IsOpen THEN
     BucketState.StateIncoherent := FALSE;
 END_IF;
 
+// A : intermediaire franc / depassement CONFIRME (debounce 1 s) -&gt; l'etat latche ne peut
+// plus etre tenu pour vrai (benne reellement entre-deux). On efface IsClosed/IsOpen :
+// l'etat logique redevient le miroir de la cinematique (evite IsClosed + IsIntermediate
+// simultanes et le M2_LimitShift sur un latch stale). ActiveOffsetValid tombe (§5) -&gt;
+// OffsetStateMismatchWarn / reconfirmer position.
+// LIMITE AUX MODES MAINT : en AUTO/SEMI_AUTO c'est la sequence (Lifecycle.Busy) qui gere
+// l'etat benne ; effacer le latch en plein cycle -&gt; MachineHomedRaw FALSE -&gt; SafeStop
+// "reference perdue" parasite (challenge 2026-09-04). En cycle, seul le WARN signale.
+TonClassInter(IN := ClassCanRun
+                    AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
+                    AND (BucketState.IsIntermediate OR BucketState.TooOpen OR BucketState.TooClosed),
+              PT := T#1s);
+IF TonClassInter.Q AND (BucketState.IsClosed OR BucketState.IsOpen) THEN
+    BucketState.IsClosed := FALSE;
+    BucketState.IsOpen   := FALSE;
+END_IF;
+
 MotionRequestConflict := ReqAscent AND ReqDescend;
 MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
 
@@ -18724,6 +18749,11 @@ ELSIF CloseReq OR BucketState.IsClosed THEN
 ELSIF OpenReq OR BucketState.IsOpen THEN
     OffsetTargetM := Config.OffsetOpenM;
 ELSE
+    // Etat indetermine (latch efface par A, ou jamais latche) : on GELE le dernier offset
+    // franc connu (HoldOffsetM). Ne PAS suivre l'ecart mesure ici -&gt; sinon
+    // ExpectedOtherWinchPosM (FB_Safety_Winch) suivrait la mesure et rendrait la
+    // surveillance d'ecart croise M1/M2 aveugle en mouvement couple (challenge 2026-09-04).
+    // L'incoherence est signalee par OffsetStateMismatchWarn (§5a).
     OffsetTargetM := HoldOffsetM;
 END_IF;
 
@@ -21058,9 +21088,13 @@ CASE SeqStep OF
         // deja homed. Les gestes indirects (3 appuis BP joystick, auto-armement) sont
         // ignores si M1 ET M2 sont deja references -&gt; evite le passage en homing pendant
         // un travail benne en MAINT (appuis repetes du BP homme-mort).
+        // D : la perte de datum ne RELANCE le cycle que si un CODEUR a reellement perdu sa
+        // reference (NOT BothAxesHomed). Une simple invalidation de l'offset benne
+        // (ActiveOffsetValid -&gt; MachineHomed FALSE) ne doit PAS reproposer le homing : elle
+        // se traite par une reconfirmation position benne, pas par un cycle machine.
         IF (StartEdge.Q
             OR ((ExplicitValidationPulse OR AutoArmTimer.Q) AND NOT BothAxesHomed)
-            OR (MachineWasHomed AND NOT MachineHomedRaw))
+            OR (MachineWasHomed AND NOT MachineHomedRaw AND NOT BothAxesHomed))
            AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
             HomeReqDone := FALSE;
             SeqStep     := E_MachineHomingTxState.HX1_CHOICE;
@@ -34703,8 +34737,12 @@ IF NOT BypassGlobal THEN
                     OR (ABS(ExpectedOtherWinchPosM - ExpectedOtherWinchPosMPrev) &gt; CST_RefPosStepM);
     CablePosMPrev := CablePosM;
     ExpectedOtherWinchPosMPrev := ExpectedOtherWinchPosM;
-    TonRefSettle(IN := NOT (InReferencingMode OR BenneBusy OR PosStepDetected), PT := T#2s);
-    RefWindowActive := InReferencingMode OR BenneBusy OR PosStepDetected OR NOT TonRefSettle.Q;
+    // NOT CrossCheckEnable : homing machine, manipulation benne, pilotage unitaire -&gt;
+    // l'ecart croise M1/M2 est volontairement grand ; la fenetre de reference reste
+    // ouverte (RAZ continue des latch Meca A/E) tant que le controle croise est coupe.
+    TonRefSettle(IN := NOT (InReferencingMode OR BenneBusy OR PosStepDetected OR NOT CrossCheckEnable), PT := T#2s);
+    RefWindowActive := InReferencingMode OR BenneBusy OR PosStepDetected OR NOT TonRefSettle.Q
+                       OR NOT CrossCheckEnable;
     IF RefWindowActive THEN
         MecaAFaultLatched         := FALSE;
         MecaEFaultLatched         := FALSE;
@@ -35306,6 +35344,17 @@ palier est encore engagé (fausse condition d'armement Méca A).
 --&gt; [CFG] Facteur vitesse codeur</xhtml>
               </documentation>
             </variable>
+            <variable name="SimWinchCoast_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimTopPositionActive">
               <type>
                 <BOOL />
@@ -35778,6 +35827,7 @@ instSimEncoderM1(
     PresetCmd        := M1_PresetCmd,
     PresetValue      := M1_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
+    CoastDistanceM   := SimWinchCoast_M,
     TestOffsetCmd    := SimSyncDeviationInjectM1,
     TestOffsetPts    := M1_OffsetPts,
     RawPos           := RawPosM1
@@ -35792,6 +35842,7 @@ instSimEncoderM2(
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
+    CoastDistanceM   := SimWinchCoast_M,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
     RawPos           := RawPosM2
@@ -36028,6 +36079,17 @@ Done := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Facteur fin de confort (défaut 1.0)</xhtml>
               </documentation>
             </variable>
+            <variable name="CoastDistanceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Distance de roulis inertiel apres coupure des relais (m). 0 = arret net (defaut). &gt;0 = le treuil continue a vitesse palier 1 dans le dernier sens sur CoastDistanceM metres -&gt; modelise l'anticipation d'arret mecanique (ex. benne).</xhtml>
+              </documentation>
+            </variable>
             <variable name="PresetLatencyCycles">
               <type>
                 <INT />
@@ -36193,6 +36255,30 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Compteur cycles de latence restants</xhtml>
               </documentation>
             </variable>
+            <variable name="IncrStep1">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Increment par cycle a vitesse palier 1 (pour le roulis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MovingDir">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoastPtsLeft">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Roulis inertiel restant (points bruts)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -36252,6 +36338,8 @@ EffStep  := MAX(StepNumber, 1);
 SpeedMps := MinSpeedMps + (INT_TO_REAL(EffStep) - 1.0) * ((MaxSpeedMps - MinSpeedMps) / 4.0);
 // Points par cycle = vitesse (m/s) × points par mètre × période tâche (s) × facteur confort.
 Increment := REAL_TO_UDINT(SpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
+// Increment "lent" (palier 1) : vitesse du roulis inertiel apres coupure des relais.
+IncrStep1 := REAL_TO_UDINT(MinSpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
 
 // Front du preset : lance la latence de referencement (le codeur réel n'est pas
 // instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).
@@ -36273,11 +36361,31 @@ IF PresetPending THEN
     END_IF;
 ELSIF RelayFwd THEN
     RawPos := RawPos + Increment;
+    MovingDir := 1;
+    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
 ELSIF RelayRev THEN
     IF RawPos &gt;= Increment THEN
         RawPos := RawPos - Increment;
     ELSE
         RawPos := 0;
+    END_IF;
+    MovingDir := -1;
+    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+ELSE
+    // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
+    // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
+    IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
+        IF MovingDir = 1 THEN
+            RawPos := RawPos + IncrStep1;
+        ELSIF RawPos &gt;= IncrStep1 THEN
+            RawPos := RawPos - IncrStep1;
+        ELSE
+            RawPos := 0;
+        END_IF;
+        CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
+    ELSE
+        MovingDir := 0;
+        CoastPtsLeft := 0.0;
     END_IF;
 END_IF;
 {endregion}
@@ -46035,11 +46143,22 @@ END_IF;
 
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE
+// Enable=FALSE = phase ou l'ecart M1/M2 est volontairement grand (homing, benne, unitaire).
+// On PURGE inconditionnellement : aucune cause ni aucun latch de FB_FaultCore ne doit
+// survivre a la desactivation, sinon un seul scan d'armement avant que le gate ne se ferme
+// laisserait Fault.Latched cote PRG_04 (RAZ = Reset explicite seulement). La concordance
+// contacteurs "physique" reste couverte par instSyncContactorFinal (PRG_06), independant.
 IF NOT Enable THEN
     Ready := FALSE;
     DeltaPosM := 0.0; SignedDeltaPosM := 0.0;
     SyncActive := FALSE;
     SyncWarn := FALSE; SyncDeviationWarn := FALSE; SyncDeviationFault := FALSE;
+    ContactorMismatch := FALSE;
+    instCauses[0].Active := FALSE;
+    instCauses[1].Active := FALSE;
+    instCauses[2].Active := FALSE;
+    instFault(Enable := FALSE, Reset := TRUE, Causes := instCauses);
+    Fault := instFault.Fault;
     RETURN;
 END_IF;
 
@@ -47106,6 +47225,7 @@ instSimBench(
     // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
     SimChainOkBit            := GVL_Simulation.SimChainOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
+    SimWinchCoast_M          := GVL_Simulation.SimWinchCoast_M,
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
@@ -48673,6 +48793,14 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] niveau 1 : discordance contacteurs M1/M2 confirmee (amont OU vecteurs finaux) -&gt; SafeStop</xhtml>
               </documentation>
             </variable>
+            <variable name="SyncOperationPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Gate canonique : la surveillance d'ecart M1/M2 (synchro process + MecaE croise) est autorisee. FAUX pendant tout homing / toute manipulation benne.</xhtml>
+              </documentation>
+            </variable>
             <variable name="SafeStopM1_Active">
               <type>
                 <BOOL />
@@ -49312,6 +49440,24 @@ instBucket(
 WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
 BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
 
+// === GATE CANONIQUE SURVEILLANCE ECART M1/M2 ===============================================
+// REGLE MES : aucun defaut/alarme d'ecart M1/M2 (synchro process, MecaE croise, concordance
+// contacteurs) ne doit apparaitre pendant un HOMING (machine ou codeur) ni pendant une
+// MANIPULATION BENNE (auto Lifecycle.Busy OU jog unitaire) : dans ces phases M2-M1 varie
+// volontairement jusqu'a ~15 m. Ce signal unique coupe la surveillance A LA SOURCE :
+//   - instWinchSync.Enable
+//   - instSafetyWinchM1/M2.CrossCheckEnable (latch MecaE)
+//   - + FB_WinchSync purge ses latch a Enable=FALSE, + FB_Safety_Winch ouvre RefWindow sur
+//     NOT CrossCheckEnable (RAZ continue MecaA/E).
+SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
+    AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
+    AND NOT PRG_02_Acquisition.Data.MachineHoming.Active
+    AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
+    AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
+    AND NOT instBucket.Lifecycle.Busy
+    AND NOT ManualBucketJogActive
+    AND instBucket.ActiveOffsetValid;
+
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
 // la montée/enroulement est autorisée mais bridée au Palier 1 pour retendre le tambour en sécurité.
 // 📌 Note d'architecture (lag 1 scan) : instSafetyWinchM1/M2.ErrorId est consommé ici avant l'exécution du FB
@@ -49479,14 +49625,10 @@ instWinchSync(
     // pilotage couple. En unitaire M1 ou M2 (JoystickWinchSelectArbitrated &lt;&gt; 0) les
     // deux treuils sont volontairement independants : comparer M1/M2 declencherait un
     // faux ContactorMismatch (M2 commande seul, M1 non) -&gt; SafeStop.
-    // R2 : synchro inhibee tant que l'offset benne n'est pas stabilise + concordant
-    // (etat latche == bande mesuree). Un recalage de ActiveOffsetM en cours injecterait
-    // un ecart position fantome -&gt; SyncDeviationWarn latche (RAZ sur Reset seulement).
-    Enable          := PRG_03_Modes_Cycle.Data.Auth.SyncEnable AND NOT instBucket.Lifecycle.Busy
+    // Gate canonique SyncOperationPermit (calcule §1) : homing OU benne -&gt; surveillance
+    // coupee A LA SOURCE. + ActiveOffsetSettled (transitoire de recalage offset) + inhibitions.
+    Enable          := SyncOperationPermit
                         AND instBucket.ActiveOffsetSettled
-                        AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
-                        AND NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy
-                        AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
                         AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1 AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM2,
     Reset           := PRG_07_Supervision.FaultMachineReset_IHM,
     Mode            := PRG_03_Modes_Cycle.Data.Auth.Mode,
@@ -49635,7 +49777,20 @@ M2JogApproachClose := ManualBucketJogActive
              - _BucketCfgPersist.Config.CloseAnticipationM
              - _BucketCfgPersist.Config.JogSlowdownZoneM));
 
-M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
+// Decalage de la limite haute logicielle M2 : la benne pend jusqu'a OffsetCloseM sous M1,
+// donc en pilotage benne (WinchSel=2) OU si la benne est/va etre fermee, M2 doit avoir la
+// marge de montee pour atteindre M1 + OffsetCloseM (pas seulement sa position courante).
+// Le latch _BucketState.IsClosed n'est plus stale grace au fix A (§4a efface un latch
+// contredit par la mesure). En etat indetermine (jamais latche), le terme WinchSel=2
+// garantit quand meme la marge pendant l'operation benne.
+// La marge (BIG) est donnee si la benne est/va etre fermee OU des que l'operateur
+// SELECTIONNE le mode benne (select joystick BRUT = 2, avant meme l'arbitrage WinchSel) :
+// M2 doit pouvoir monter jusqu'a M1 + OffsetCloseM pour fermer. Sinon (benne ouverte,
+// M2 suit M1) la limite M2 = celle de M1. Le FDC haut PHYSIQUE reste la barriere dure
+// (non bypassable, FB_Safety_Winch:528-531) independamment de cette limite soft.
+M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq
+                     OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
+                     OR (GVL_IHM.Modes.Cmd.SelJoystickWinch = 2),
                       0.0,
                       (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 0.5)
                       - _CommunCfgPersist.CfgCableLimitAscent_M);
@@ -49716,14 +49871,11 @@ instSafetyWinchM1(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
-    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : ACTIF seulement quand
-    // les treuils sont reellement solidaires (couple joystick OU boutons both) et HORS
-    // operation benne unitaire (jog M2 -&gt; M2-M1 varie volontairement de ~15 m). N'affecte
-    // PAS le routage mou-de-cable (:508/:520) qui reste sur SyncEnable brut.
-    CrossCheckEnable       := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
-                              AND ((PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
-                                   OR WinchBothMotionActive)
-                              AND NOT ManualBucketJogActive,
+    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : gate canonique
+    // SyncOperationPermit (homing/benne -&gt; OFF). N'affecte PAS le routage mou-de-cable
+    // (:508/:520) qui reste sur SyncEnable brut. Le mouvement couple par boutons-both
+    // (WinchBothMotionActive sans WinchSel=0) est un cas residuel -&gt; voir T-tache.
+    CrossCheckEnable       := SyncOperationPermit,
     JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
@@ -49786,14 +49938,11 @@ instSafetyWinchM2(
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
-    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : ACTIF seulement quand
-    // les treuils sont reellement solidaires (couple joystick OU boutons both) et HORS
-    // operation benne unitaire (jog M2 -&gt; M2-M1 varie volontairement de ~15 m). N'affecte
-    // PAS le routage mou-de-cable (:508/:520) qui reste sur SyncEnable brut.
-    CrossCheckEnable       := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
-                              AND ((PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
-                                   OR WinchBothMotionActive)
-                              AND NOT ManualBucketJogActive,
+    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : gate canonique
+    // SyncOperationPermit (homing/benne -&gt; OFF). N'affecte PAS le routage mou-de-cable
+    // (:508/:520) qui reste sur SyncEnable brut. Le mouvement couple par boutons-both
+    // (WinchBothMotionActive sans WinchSel=0) est un cas residuel -&gt; voir T-tache.
+    CrossCheckEnable       := SyncOperationPermit,
     JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
     HeartbeatIhmOk         := GVL_IHM.Commun.HeartbeatIhmOk,
@@ -52063,8 +52212,11 @@ M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 //    palier), et remontee decodee. La coupure effective (SafeStop niveau 1,
 //    PowerCutOff niveau 2 via MecaE bit13) est appliquee par la chaine safety
 //    (PRG_04) au scan suivant. Bypass = GVL_IHM.M1M2Sync.Bypass.Global.
-WinchOutputCoupled := PRG_04_Treuils_Benne.Data.SyncState.SyncActive
-                      OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active;
+// Concordance contacteurs M1/M2 : jamais armee pendant un homing machine (M2-M1 varie
+// volontairement de ~15 m -&gt; faux ContactorMismatch -&gt; escalade MecaE bit13 / PowerCutOff).
+WinchOutputCoupled := (PRG_04_Treuils_Benne.Data.SyncState.SyncActive
+                       OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active)
+                      AND NOT PRG_02_Acquisition.Data.MachineHoming.Active;
 
 // Frein = OR des relais de sens GATES (jamais desserre sans un sens valide).
 M1BrakeCmd := M1RelayFwd OR M1RelayRev;
@@ -54383,6 +54535,17 @@ TRUE = bouton IHM "vers Trémie" simulé appuyé</xhtml>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
 Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimWinchCoast_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net (défaut). Régler ~1.3 pour que la benne finisse dans la bande ouvert/fermé malgré l'anticipation d'arrêt.</xhtml>
           </documentation>
         </variable>
         <variable name="SimSyncDeviationInjectM1">

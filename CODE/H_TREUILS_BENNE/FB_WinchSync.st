@@ -78,11 +78,22 @@ END_VAR
 
 {region "§1 Gate neutralisation"}
 // 🛑 1. GATE
+// Enable=FALSE = phase ou l'ecart M1/M2 est volontairement grand (homing, benne, unitaire).
+// On PURGE inconditionnellement : aucune cause ni aucun latch de FB_FaultCore ne doit
+// survivre a la desactivation, sinon un seul scan d'armement avant que le gate ne se ferme
+// laisserait Fault.Latched cote PRG_04 (RAZ = Reset explicite seulement). La concordance
+// contacteurs "physique" reste couverte par instSyncContactorFinal (PRG_06), independant.
 IF NOT Enable THEN
     Ready := FALSE;
     DeltaPosM := 0.0; SignedDeltaPosM := 0.0;
     SyncActive := FALSE;
     SyncWarn := FALSE; SyncDeviationWarn := FALSE; SyncDeviationFault := FALSE;
+    ContactorMismatch := FALSE;
+    instCauses[0].Active := FALSE;
+    instCauses[1].Active := FALSE;
+    instCauses[2].Active := FALSE;
+    instFault(Enable := FALSE, Reset := TRUE, Causes := instCauses);
+    Fault := instFault.Fault;
     RETURN;
 END_IF;
 

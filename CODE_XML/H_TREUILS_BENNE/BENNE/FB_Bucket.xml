@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T21:55:09.168465" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T21:55:09.168465">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T04:52:29.071521" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T04:52:29.071521">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -847,6 +847,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce court bande "ouverte" -&gt; cible offset</xhtml>
               </documentation>
             </variable>
+            <variable name="TonClassInter">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Debounce intermediaire franc / depassement -&gt; efface le latch d'etat stale</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonOffsetResettle">
               <type>
                 <derived name="TON" />
@@ -1365,6 +1373,23 @@ ELSIF TonClassOpen.Q AND NOT BucketState.IsOpen THEN
     BucketState.StateIncoherent := FALSE;
 END_IF;
 
+// A : intermediaire franc / depassement CONFIRME (debounce 1 s) -&gt; l'etat latche ne peut
+// plus etre tenu pour vrai (benne reellement entre-deux). On efface IsClosed/IsOpen :
+// l'etat logique redevient le miroir de la cinematique (evite IsClosed + IsIntermediate
+// simultanes et le M2_LimitShift sur un latch stale). ActiveOffsetValid tombe (§5) -&gt;
+// OffsetStateMismatchWarn / reconfirmer position.
+// LIMITE AUX MODES MAINT : en AUTO/SEMI_AUTO c'est la sequence (Lifecycle.Busy) qui gere
+// l'etat benne ; effacer le latch en plein cycle -&gt; MachineHomedRaw FALSE -&gt; SafeStop
+// "reference perdue" parasite (challenge 2026-09-04). En cycle, seul le WARN signale.
+TonClassInter(IN := ClassCanRun
+                    AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2))
+                    AND (BucketState.IsIntermediate OR BucketState.TooOpen OR BucketState.TooClosed),
+              PT := T#1s);
+IF TonClassInter.Q AND (BucketState.IsClosed OR BucketState.IsOpen) THEN
+    BucketState.IsClosed := FALSE;
+    BucketState.IsOpen   := FALSE;
+END_IF;
+
 MotionRequestConflict := ReqAscent AND ReqDescend;
 MotionRequestActive := (ReqAscent OR ReqDescend) AND NOT MotionRequestConflict;
 
@@ -1545,6 +1570,11 @@ ELSIF CloseReq OR BucketState.IsClosed THEN
 ELSIF OpenReq OR BucketState.IsOpen THEN
     OffsetTargetM := Config.OffsetOpenM;
 ELSE
+    // Etat indetermine (latch efface par A, ou jamais latche) : on GELE le dernier offset
+    // franc connu (HoldOffsetM). Ne PAS suivre l'ecart mesure ici -&gt; sinon
+    // ExpectedOtherWinchPosM (FB_Safety_Winch) suivrait la mesure et rendrait la
+    // surveillance d'ecart croise M1/M2 aveugle en mouvement couple (challenge 2026-09-04).
+    // L'incoherence est signalee par OffsetStateMismatchWarn (§5a).
     OffsetTargetM := HoldOffsetM;
 END_IF;
 

@@ -34,6 +34,7 @@ VAR_INPUT
     PresetCmd        : BOOL;   (* --> [CMD] Applique un preset (homing) *)
     PresetValue      : UDINT;   (* --> [CFG] Valeur brute à charger au preset *)
     SpeedScaleFactor : REAL := 1.0;   (* --> [CFG] Facteur fin de confort (défaut 1.0) *)
+    CoastDistanceM   : REAL := 0.0;   (* --> [CFG] Distance de roulis inertiel apres coupure des relais (m). 0 = arret net (defaut). >0 = le treuil continue a vitesse palier 1 dans le dernier sens sur CoastDistanceM metres -> modelise l'anticipation d'arret mecanique (ex. benne). *)
     PresetLatencyCycles : INT := 3;   (* --> [CFG] Nb cycles automate avant application du preset (referencement non instantane) *)
     TestOffsetCmd    : BOOL;          (* --> [TST] Front montant = applique TestOffsetPts (test banc) *)
     TestOffsetPts    : DINT := 0;     (* --> [TST] Décalage signé à appliquer (points bruts) *)
@@ -59,6 +60,9 @@ VAR
     PresetEdge     : R_TRIG;             (* . [LOC] Front montant PresetCmd *)
     PresetPending  : BOOL;               (* . [LOC] Preset en attente d'application (latence) *)
     PresetCount    : INT;                (* . [LOC] Compteur cycles de latence restants *)
+    IncrStep1      : UDINT;              (* . [LOC] Increment par cycle a vitesse palier 1 (pour le roulis) *)
+    MovingDir      : INT;                (* . [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret *)
+    CoastPtsLeft   : REAL;               (* . [LOC] Roulis inertiel restant (points bruts) *)
 END_VAR
 
 // === IMPLEMENTATION (à coller dans le corps ST du POU FB_Sim_Encoder) ===
@@ -87,6 +91,8 @@ EffStep  := MAX(StepNumber, 1);
 SpeedMps := MinSpeedMps + (INT_TO_REAL(EffStep) - 1.0) * ((MaxSpeedMps - MinSpeedMps) / 4.0);
 // Points par cycle = vitesse (m/s) × points par mètre × période tâche (s) × facteur confort.
 Increment := REAL_TO_UDINT(SpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
+// Increment "lent" (palier 1) : vitesse du roulis inertiel apres coupure des relais.
+IncrStep1 := REAL_TO_UDINT(MinSpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
 
 // Front du preset : lance la latence de referencement (le codeur réel n'est pas
 // instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).
@@ -108,11 +114,31 @@ IF PresetPending THEN
     END_IF;
 ELSIF RelayFwd THEN
     RawPos := RawPos + Increment;
+    MovingDir := 1;
+    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
 ELSIF RelayRev THEN
     IF RawPos >= Increment THEN
         RawPos := RawPos - Increment;
     ELSE
         RawPos := 0;
+    END_IF;
+    MovingDir := -1;
+    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+ELSE
+    // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
+    // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
+    IF (CoastPtsLeft >= 1.0) AND (MovingDir <> 0) THEN
+        IF MovingDir = 1 THEN
+            RawPos := RawPos + IncrStep1;
+        ELSIF RawPos >= IncrStep1 THEN
+            RawPos := RawPos - IncrStep1;
+        ELSE
+            RawPos := 0;
+        END_IF;
+        CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
+    ELSE
+        MovingDir := 0;
+        CoastPtsLeft := 0.0;
     END_IF;
 END_IF;
 {endregion}
