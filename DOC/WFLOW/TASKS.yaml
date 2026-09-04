@@ -5744,3 +5744,72 @@ tasks:
   - TC CI : atomicite demarrage couple + sequencement selecteur reel
   contrat: ''
   bloque_par: []
+
+- id: T250
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: MESURE POSITION / REFERENTIEL BENNE (ActiveOffsetM) - TRANSVERSE
+  agent: ''
+  date: '2026-09-04T17:30:00+02:00'
+  titre: Rendre offset-aware tous les consommateurs de la position M2 (cycle, safety dure, legal, dive, HMI)
+  contexte: >-
+    MES 2026-09-04. Audit position par 3 agents (treuils/benne, M3, cycle/modes/safety).
+    Cause racine des petites modifications a repetition : seule la couche FB_Winch
+    (ralentissement) et FB_SyncDeviation / cross-check MecaE sont offset-aware. Le
+    cycle SEMI_AUTO, les coupures dures FB_Safety_Winch cote descente, le flag legal
+    global et FB_DiveSearch comparent CablePosM2 BRUTE a des seuils exprimes en
+    referentiel outil (= M1). Benne fermee -> biais ~OffsetCloseM (15 m) ; benne
+    ouverte -> ~OffsetOpenM (2.25 m). 1re passe (benne fermee sortie homing) OK,
+    passes suivantes en defaut latching. Repere corrige = CablePosM2 - ActiveOffsetM ;
+    DeltaPositionCorrected_M et BucketState.ActiveOffset_M deja publies par PRG_04.
+    Fixes deja poses hors T250 : M2_LimitShift, BottomLimitM2_Active += ActiveOffsetM
+    (FB_Winch), M3_AtWorkPositionStable + garde arret, limite legale -19 m, palier
+    descente 4.
+  description: >-
+    BLOCKERS.
+    B1 PRG_07:373-374 - LimitLegalReached global calcule sur M2 brute -> corriger le
+    terme M2 (- ActiveOffset_M) ou ne garder que M1. Reglementaire + coupe
+    DescendPermit M1+M2 trop tot.
+    B2 PRG_04:917 - CfgCableLimitDescentM (vers FB_Safety_Winch:305/536, coupure DURE
+    descente M2) fourni brut -> += instBucket.ActiveOffsetM (symetrique de
+    M2_LimitShift ligne 807). Sous-protection jusqu a 15 m aujourd hui.
+    B3 FB_CycleSemiAuto:318 - anti-telescopage ABS(M1raw-M2raw)>0.5 phases AX4..AX9
+    benne ouverte -> DeltaPositionCorrected_M.
+    B4 FB_CycleSemiAuto:333 + PRG_03:125-127 - fenetre haute treuils sur M2 brute ;
+    rebouclage AX18->AX2 benne ouverte -> treuils hors FdC haut latch sortie cycle
+    des la 2e passe. Corriger terme M2 (M2_raw - ActiveOffset_M) ; envisager fallback
+    OR TopPositionSensor (deja fait en AX_DIVING_RETRY:766).
+    B5 FB_CycleSemiAuto:310 + :854 - AX11 ABS(M1raw-M2raw)>0.25 -> latch instCauses[5],
+    sortie AX11 jamais franchie -> DeltaPositionCorrected_M (+ verifier collapse
+    ActiveOffsetM post-fermeture AX10, delai de grace eventuel).
+    MAJOR.
+    M1 PRG_03:130 CycleInitPositionOk sur jeton front M3_AtMaintenanceStable aveugle
+    au boot -> publier + consommer lecture statique zone Maintenance
+    (M3_AtMaintenanceStable OR mot 00000 OR 00001), gardee arret.
+    M2 PRG_05:179-183 M3_LimitSwitchMaintenanceStable liberable par rebond capteur
+    -> ne garder que ELSIF M3_ReqTremie_Active (latch direction-only, comme Tremie).
+    M3 FB_CycleSemiAuto:795 AX9 decollement fond teste sur M2 brute vs cible frame-M1
+    -> (M2_raw - ActiveOffsetM).
+    M4 FB_DiveSearch:196/228-241 fenetre immersion + DiveStartMin sur M2 brute
+    (PRG_03:166) -> alimenter M2Position_M corrige, ou evaluer sur M1 seul.
+    M5 FB_WinchStateProjection:250 fait public limite basse M2 non decale (asymetrie
+    vs :220) -> + M2_LimitShift. HMI/troubleshooting seulement.
+    M6 PRG_02:439 preset OPEN = M1 (Delta=0) au lieu de M1 + OffsetOpenM -> etat benne
+    publie juste apres confirmation classe TooOpen. A TRANCHER METIER.
+    MINOR. FB_CycleSemiAuto:637/852-853 seuils profondeur jambe M2 biaises ;
+    PRG_07:597-598 IHM affiche M2 brute non etiquetee -> exposer M2PositionCorrected
+    profondeur ; PRG_05:564-565 commentaire perime ; M3StatusText suffixe conflit.
+    GUARD. Gate mecanique TOOLS/AGENT_WORKFLOW/scripts/ interdisant toute comparaison
+    directe EncoderM2...CablePosM a un seuil dans CODE/G_CYCLE/ et FB_DiveSearch sans
+    soustraction d ActiveOffsetM.
+  objectifs:
+  - B1..B5 corriges - cycle SEMI_AUTO enchaine >= 3 passes benne ouverte sans defaut latching position
+  - Coupure dure descente M2 (FB_Safety_Winch) au bon endroit benne fermee ET ouverte
+  - Limite legale evaluee sur la profondeur outil (M1 / M2 corrige), pas la M2 brute
+  - M1/M2 latch FdC Maintenance direction-only (rebond ne libere pas) ; CycleInitPositionOk OK au boot
+  - FB_DiveSearch fenetre immersion coherente benne ouverte
+  - IHM profondeur affichee = referentiel outil, brut etiquete si conserve
+  - Guard CI anti-regression en place ; TC CI par blocker
+  contrat: 'TASK_CONTRACT_T250_position_offset_aware.yaml (a rediger - C3)'
+  bloque_par: []
