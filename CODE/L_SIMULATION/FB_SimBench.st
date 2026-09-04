@@ -64,6 +64,7 @@ VAR_INPUT
 
     // ── Stimuli & Paramètres de banc ─────────────────────────────────────────
     SimEncoderSpeedFactor      : REAL := 1.0;   (* --> [CFG] Facteur vitesse codeur *)
+    SimWinchCoast_M            : REAL := 0.0;   (* --> [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne) *)
     SimTopPositionActive       : BOOL := FALSE; (* --> [TST] Injection manuelle capteur haut actif (essai ciblé) *)
     SimSyncDeviationInjectM1   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M1 *)
     SimSyncDeviationInjectM2   : BOOL := FALSE;   (* --> [TST] Injection écart synchro M2 *)
@@ -178,6 +179,7 @@ instSimEncoderM1(
     PresetCmd        := M1_PresetCmd,
     PresetValue      := M1_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
+    CoastDistanceM   := SimWinchCoast_M,
     TestOffsetCmd    := SimSyncDeviationInjectM1,
     TestOffsetPts    := M1_OffsetPts,
     RawPos           := RawPosM1
@@ -192,6 +194,7 @@ instSimEncoderM2(
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
+    CoastDistanceM   := SimWinchCoast_M,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
     RawPos           := RawPosM2

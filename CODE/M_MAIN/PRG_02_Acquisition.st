@@ -290,6 +290,7 @@ instSimBench(
     // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
     SimChainOkBit            := GVL_Simulation.SimChainOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
+    SimWinchCoast_M          := GVL_Simulation.SimWinchCoast_M,
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,

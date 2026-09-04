@@ -241,8 +241,11 @@ M2BrakeCmd        := M2RelayFwd OR M2RelayRev;
 //    palier), et remontee decodee. La coupure effective (SafeStop niveau 1,
 //    PowerCutOff niveau 2 via MecaE bit13) est appliquee par la chaine safety
 //    (PRG_04) au scan suivant. Bypass = GVL_IHM.M1M2Sync.Bypass.Global.
-WinchOutputCoupled := PRG_04_Treuils_Benne.Data.SyncState.SyncActive
-                      OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active;
+// Concordance contacteurs M1/M2 : jamais armee pendant un homing machine (M2-M1 varie
+// volontairement de ~15 m -> faux ContactorMismatch -> escalade MecaE bit13 / PowerCutOff).
+WinchOutputCoupled := (PRG_04_Treuils_Benne.Data.SyncState.SyncActive
+                       OR PRG_03_Modes_Cycle.Data.WinchBothIntent.Active)
+                      AND NOT PRG_02_Acquisition.Data.MachineHoming.Active;
 
 // Frein = OR des relais de sens GATES (jamais desserre sans un sens valide).
 M1BrakeCmd := M1RelayFwd OR M1RelayRev;

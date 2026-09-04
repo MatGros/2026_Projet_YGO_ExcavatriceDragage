@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T04:06:49.976295" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T04:06:49.976295">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T04:12:27.256668" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T04:12:27.256668">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3258,6 +3258,7 @@ instSimBench(
     // 🧪 Contrôle granulaire de la chaîne AU : bit opérateur (GVL_Simulation.SimChainOk).
     SimChainOkBit            := GVL_Simulation.SimChainOk,
     SimEncoderSpeedFactor    := GVL_Simulation.SimEncoderSpeedFactor,
+    SimWinchCoast_M          := GVL_Simulation.SimWinchCoast_M,
     SimTopPositionActive     := GVL_Simulation.SimTopPositionActive,
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
@@ -4706,9 +4707,13 @@ CASE SeqStep OF
         // deja homed. Les gestes indirects (3 appuis BP joystick, auto-armement) sont
         // ignores si M1 ET M2 sont deja references -&gt; evite le passage en homing pendant
         // un travail benne en MAINT (appuis repetes du BP homme-mort).
+        // D : la perte de datum ne RELANCE le cycle que si un CODEUR a reellement perdu sa
+        // reference (NOT BothAxesHomed). Une simple invalidation de l'offset benne
+        // (ActiveOffsetValid -&gt; MachineHomed FALSE) ne doit PAS reproposer le homing : elle
+        // se traite par une reconfirmation position benne, pas par un cycle machine.
         IF (StartEdge.Q
             OR ((ExplicitValidationPulse OR AutoArmTimer.Q) AND NOT BothAxesHomed)
-            OR (MachineWasHomed AND NOT MachineHomedRaw))
+            OR (MachineWasHomed AND NOT MachineHomedRaw AND NOT BothAxesHomed))
            AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
             HomeReqDone := FALSE;
             SeqStep     := E_MachineHomingTxState.HX1_CHOICE;
@@ -7083,6 +7088,17 @@ palier est encore engagé (fausse condition d'armement Méca A).
 --&gt; [CFG] Facteur vitesse codeur</xhtml>
               </documentation>
             </variable>
+            <variable name="SimWinchCoast_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis inertiel treuils simules apres coupure relais (m) — modelise l'anticipation d'arret meca (benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimTopPositionActive">
               <type>
                 <BOOL />
@@ -7555,6 +7571,7 @@ instSimEncoderM1(
     PresetCmd        := M1_PresetCmd,
     PresetValue      := M1_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
+    CoastDistanceM   := SimWinchCoast_M,
     TestOffsetCmd    := SimSyncDeviationInjectM1,
     TestOffsetPts    := M1_OffsetPts,
     RawPos           := RawPosM1
@@ -7569,6 +7586,7 @@ instSimEncoderM2(
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
+    CoastDistanceM   := SimWinchCoast_M,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
     RawPos           := RawPosM2
@@ -9877,6 +9895,17 @@ OutPct := LIMIT(-100.0, OutPct, 100.0);
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Facteur fin de confort (défaut 1.0)</xhtml>
               </documentation>
             </variable>
+            <variable name="CoastDistanceM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Distance de roulis inertiel apres coupure des relais (m). 0 = arret net (defaut). &gt;0 = le treuil continue a vitesse palier 1 dans le dernier sens sur CoastDistanceM metres -&gt; modelise l'anticipation d'arret mecanique (ex. benne).</xhtml>
+              </documentation>
+            </variable>
             <variable name="PresetLatencyCycles">
               <type>
                 <INT />
@@ -10042,6 +10071,30 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Compteur cycles de latence restants</xhtml>
               </documentation>
             </variable>
+            <variable name="IncrStep1">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Increment par cycle a vitesse palier 1 (pour le roulis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MovingDir">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Dernier sens actif : +1 avant, -1 arriere, 0 arret</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CoastPtsLeft">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Roulis inertiel restant (points bruts)</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -10101,6 +10154,8 @@ EffStep  := MAX(StepNumber, 1);
 SpeedMps := MinSpeedMps + (INT_TO_REAL(EffStep) - 1.0) * ((MaxSpeedMps - MinSpeedMps) / 4.0);
 // Points par cycle = vitesse (m/s) × points par mètre × période tâche (s) × facteur confort.
 Increment := REAL_TO_UDINT(SpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
+// Increment "lent" (palier 1) : vitesse du roulis inertiel apres coupure des relais.
+IncrStep1 := REAL_TO_UDINT(MinSpeedMps * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev) * CycleTimeS * SpeedScaleFactor);
 
 // Front du preset : lance la latence de referencement (le codeur réel n'est pas
 // instantane — il met PresetLatencyCycles cycles a se re-referencer apres le front).
@@ -10122,11 +10177,31 @@ IF PresetPending THEN
     END_IF;
 ELSIF RelayFwd THEN
     RawPos := RawPos + Increment;
+    MovingDir := 1;
+    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
 ELSIF RelayRev THEN
     IF RawPos &gt;= Increment THEN
         RawPos := RawPos - Increment;
     ELSE
         RawPos := 0;
+    END_IF;
+    MovingDir := -1;
+    CoastPtsLeft := CoastDistanceM * (UDINT_TO_REAL(PointsPerRev) / CableM_PerRev);
+ELSE
+    // Relais coupes : roulis inertiel (anticipation d'arret mecanique). Le treuil
+    // continue a vitesse palier 1 dans le dernier sens jusqu'a epuisement de CoastPtsLeft.
+    IF (CoastPtsLeft &gt;= 1.0) AND (MovingDir &lt;&gt; 0) THEN
+        IF MovingDir = 1 THEN
+            RawPos := RawPos + IncrStep1;
+        ELSIF RawPos &gt;= IncrStep1 THEN
+            RawPos := RawPos - IncrStep1;
+        ELSE
+            RawPos := 0;
+        END_IF;
+        CoastPtsLeft := CoastPtsLeft - UDINT_TO_REAL(IncrStep1);
+    ELSE
+        MovingDir := 0;
+        CoastPtsLeft := 0.0;
     END_IF;
 END_IF;
 {endregion}

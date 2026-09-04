@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T06:52:02.119208" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T06:52:02.119208">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T04:11:40.918494" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T04:11:40.918494">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -274,6 +274,17 @@ TRUE = bouton IHM "vers Trémie" simulé appuyé</xhtml>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 STIMULI TREUILS — paramètres du modèle codeur et injection ponctuelle d'un défaut synchro.
 Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimWinchCoast_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis inertiel treuils simulés après coupure des relais (m). 0 = arrêt net (défaut). Régler ~1.3 pour que la benne finisse dans la bande ouvert/fermé malgré l'anticipation d'arrêt.</xhtml>
           </documentation>
         </variable>
         <variable name="SimSyncDeviationInjectM1">

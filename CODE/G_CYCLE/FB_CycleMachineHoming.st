@@ -433,9 +433,13 @@ CASE SeqStep OF
         // deja homed. Les gestes indirects (3 appuis BP joystick, auto-armement) sont
         // ignores si M1 ET M2 sont deja references -> evite le passage en homing pendant
         // un travail benne en MAINT (appuis repetes du BP homme-mort).
+        // D : la perte de datum ne RELANCE le cycle que si un CODEUR a reellement perdu sa
+        // reference (NOT BothAxesHomed). Une simple invalidation de l'offset benne
+        // (ActiveOffsetValid -> MachineHomed FALSE) ne doit PAS reproposer le homing : elle
+        // se traite par une reconfirmation position benne, pas par un cycle machine.
         IF (StartEdge.Q
             OR ((ExplicitValidationPulse OR AutoArmTimer.Q) AND NOT BothAxesHomed)
-            OR (MachineWasHomed AND NOT MachineHomedRaw))
+            OR (MachineWasHomed AND NOT MachineHomedRaw AND NOT BothAxesHomed))
            AND ((Mode = E_Mode.MAINT_N1) OR (Mode = E_Mode.MAINT_N2)) THEN
             HomeReqDone := FALSE;
             SeqStep     := E_MachineHomingTxState.HX1_CHOICE;
