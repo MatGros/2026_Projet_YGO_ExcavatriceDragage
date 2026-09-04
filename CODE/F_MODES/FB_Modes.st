@@ -352,18 +352,25 @@ IF TonJoyNeutralT248.Q THEN
     BucketSeqSatisfied := FALSE;
 END_IF;
 
+Auth.CoupledBucketPhaseLocked := FALSE;
+
 IF (Auth.Mode = E_Mode.MAINT_N2) OR (Auth.Mode = E_Mode.MAINT_N1) THEN
     IF CoupledBucketSeqEnable
        AND (JoystickWinchSelectRequest = 0)
        AND (JoystickPull XOR JoystickPush) THEN
-        // SET du verrou dès que la benne est dans l'état requis par le sens (une fois).
+        // TOUTE la séquence T248 (jog ET couplé) "possède" la benne : elle est pilotée
+        // par le jog WinchSel=2, jamais par instBucket. -> on inhibe pour toute la durée
+        // l'armement dive-open/ascent-close de FB_BucketCmdArbitration : plus de blip
+        // instBucket.Lifecycle.Busy sur la bascule 2->0 -> plus de perte du deadman via
+        // ArmBucketBusy (PRG_04), plus de blocage/correction sur l'état benne temps réel.
+        Auth.CoupledBucketPhaseLocked := TRUE;
+        // SET du verrou de phase dès que la benne est dans l'état requis par le sens.
         IF (JoystickPull AND BucketIsClosed) OR (JoystickPush AND BucketIsOpen) THEN
             BucketSeqSatisfied := TRUE;
         END_IF;
         IF BucketSeqSatisfied THEN
-            Auth.JoystickWinchSelectArbitrated := 0;   // phase COUPLÉE VERROUILLÉE : on ne
-                                                       // recorrige plus la benne, la perte
-                                                       // d'état en mouvement est ignorée.
+            Auth.JoystickWinchSelectArbitrated := 0;   // phase COUPLÉE : on ne recorrige
+                                                       // plus la benne, perte d'état ignorée.
         ELSE
             Auth.JoystickWinchSelectArbitrated := 2;   // phase JOG : amener la benne dans l'état
         END_IF;
@@ -374,10 +381,6 @@ ELSE
     Auth.JoystickWinchSelectArbitrated := 0;  // Couplé nominal forcé
     BucketSeqSatisfied := FALSE;
 END_IF;
-
-// Image consommée par PRG_04 (FB_BucketCmdArbitration, permis) : tant que TRUE, aucun
-// blocage / réarmement d'ouverture-fermeture sur l'état benne temps réel.
-Auth.CoupledBucketPhaseLocked := BucketSeqSatisfied;
 
 // HOLD DE TRANSITION : à chaque changement du sélecteur arbitré (jog<->couplé), on force
 // l'arrêt des requêtes M1/M2 (PRG_04) pendant une PAUSE FIXE de 300 ms -> pas de hand-off
