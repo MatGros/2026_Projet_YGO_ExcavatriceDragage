@@ -40,6 +40,7 @@ VAR_INPUT
     ProgramBucketDriveActive        : BOOL := FALSE;                  // --> [CMD] Une demande benne PROGRAMME est active (DumpAtTremie / ExtractionAssist / homing) -> NE PAS abandonner l'open/close
     M1_Busy                         : BOOL;                           // --> [HW] Treuil M1 en mouvement (Busy)
     M2_Busy                         : BOOL;                           // --> [HW] Treuil M2 en mouvement (Busy)
+    BucketJogActive                 : BOOL := FALSE;                  // --> [CMD] Jog benne unitaire M2 en cours (WinchSel=2) : l'offset actif doit SUIVRE l'ecart mesure comme en Lifecycle.Busy (pas de figeage -> pas de rampe/a-coup a la fin du jog). Sur en WinchSel=2 : sync/MecaE deja OFF.
     InhibitM1                       : BOOL;                           // --> [HW] Treuil M1 inhibe
     InhibitM2                       : BOOL;                           // --> [HW] Treuil M2 inhibe
 
@@ -581,7 +582,8 @@ TonBandOpen(IN := NearOpen,   PT := CST_BandStableTime);
 NearClosedStable := TonBandClosed.Q;
 NearOpenStable   := TonBandOpen.Q;
 
-IF Lifecycle.Busy THEN
+IF Lifecycle.Busy OR BucketJogActive THEN
+    // Sequence auto OU jog unitaire M2 : l'offset suit l'ecart reel au rythme du treuil.
     OffsetTargetM := CablePosM2 - CablePosM1;
 ELSIF NearClosedStable THEN
     OffsetTargetM := Config.OffsetCloseM;
@@ -606,8 +608,8 @@ END_IF;
 // (FB_Safety_Winch, 0.5 m) -> RAZ + inhibition MecaA/MecaE. On converge donc a pente
 // bornee ; pendant la convergence l'offset n'est pas "fiable" (voir ActiveOffsetSettled)
 // et la synchro est inhibee cote PRG_04.
-IF Lifecycle.Busy THEN
-    ActiveOffsetM := OffsetTargetM;                                   // suit l'ecart reel (deplacement lent du treuil, aucun pas)
+IF Lifecycle.Busy OR BucketJogActive THEN
+    ActiveOffsetM := OffsetTargetM;                                   // suit l'ecart reel (deplacement lent du treuil, aucun pas) -- seq auto OU jog M2
 ELSE
     ActiveOffsetM := ActiveOffsetM
                      + LIMIT(-CST_OffsetSlewMPerScan,

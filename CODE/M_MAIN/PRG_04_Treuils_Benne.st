@@ -343,6 +343,7 @@ instBucket(
     HomingSuspectM1     := PRG_02_Acquisition.Data.EncoderM1.HomingSuspect,
     HomingSuspectM2     := PRG_02_Acquisition.Data.EncoderM2.HomingSuspect,
     WinchSelBucket      := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2),
+    BucketJogActive     := ManualBucketJogActive,
     ProgramBucketDriveActive := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
                                 OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose,
     M1_Busy             := (instWinchM1.StepNumber > 0),
