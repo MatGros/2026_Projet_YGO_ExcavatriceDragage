@@ -5471,11 +5471,26 @@ tasks:
       (TON anti-pic). CfgFault : tolere OffsetOpenM legerement negatif (>= -2 m)
       pour recalibration.
     - PRG_04 : publication OffsetStateMismatchWarn.
+    Complement commit b6837198 (solution utilisateur) : §4a classification
+    INSTANTANEE (NearClosed/NearOpen/IsIntermediate/TooOpen/TooClosed) +
+    §5 SNAP IMMEDIAT de ActiveOffsetM sur la bande mesuree (M2 corrige ~ M1
+    des l'arret, avant le latch debounce 1 s). IsIntermediate (declare mais
+    jamais ecrit) restaure -> Benne_IsRoughlyClosed (PRG_04, tolerance galets).
   reste_a_faire:
   - Test banc du classifieur continu (recalage auto etat a l'arret)
-  - Recalibration OffsetOpenM (~ -0.13) / OffsetCloseM (~ 13.95) aux vrais FDC
-  - Reparer le test unitaire FB_Bucket (harness reference MotionDirection,
-    input supprime a un refactor anterieur) - ROUGE pre-existant
+  - >-
+    CALIBRATION ORDRE OBLIGATOIRE. Recalibrer OffsetCloseM (~13.95) et
+    OffsetOpenM (~ -0.13) aux vrais FDC AVANT tout. Sinon avec OffsetCloseM=15
+    et CoherenceLimitM=1.0 la bande fermee vaut 14 a 16 m, or Delta reel ~13.95
+    tombe HORS bande -> classe intermediaire, offset ne se recale pas.
+    Alternative, elargir CoherenceLimitM a 1.5 (tassement galets + allongement
+    charge).
+  - >-
+    Valider au banc un arret VOLONTAIRE a mi-course (Delta ~7.5 m). Doit rester
+    sur le dernier etat franc + HoldOffsetM (continuite geometrique voulue).
+  - >-
+    Reparer le test unitaire FB_Bucket (harness reference MotionDirection,
+    input supprime a un refactor anterieur) - ROUGE pre-existant.
   - Widget IHM warn OffsetStateMismatchWarn
   objectifs:
   - Etat benne reflete la realite mecanique sans intervention MAINT_N2
@@ -5609,3 +5624,36 @@ tasks:
   bloque_par:
   - T240
   - T241
+
+- id: T246
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: SECURITE / SYNCHRO TREUILS M1-M2
+  agent: ''
+  date: '2026-09-04T00:30:00+02:00'
+  titre: Garde de re-couplage M1/M2 - interdire le retour couple si ecart reel > tolerance
+  contexte: >
+    Suite au challenge du gate Meca E (commit a venir). Le controle d'ecart croise
+    M1/M2 (Meca E) est desormais inhibe en jog benne unitaire (M2-M1 varie de ~15 m
+    volontairement). Trou identifie par l'agent : si l'operateur eloigne M2 en jog
+    unitaire puis rebascule en couple (WinchSel 2 -> 0) sans avoir reconfirme l'etat
+    benne, Meca E se relatche INSTANTANEMENT a l'instant du re-couplage sur ~15 m
+    d'ecart -> SafeStop des 2 treuils puis PowerCutOff 3 s (PostRampTimeout) -> charge
+    potentiellement en l'air. Le gate deplace le probleme a la transition.
+  description: >
+    Ajouter un garde PROCESS (pas SafeStop / pas PowerCutOff) qui interdit
+    l'autorisation du pilotage couple (retour WinchSel=0 ou armement homme-mort
+    both) tant que ABS(CablePosM1 - CablePosM2 - ActiveOffsetM) > CriticalSyncToleranceM.
+    Message operateur explicite. Alternative / complement : imposer un
+    ConfirmClosePosition/ConfirmOpenPosition (mise a jour ActiveOffsetM) en sortie de
+    jog M2 avant re-autorisation du couple - point d'accroche : detection d'etat
+    passive sur jog M2 deja presente (classifieur FB_Bucket §4a). A minima : router
+    le re-latch Meca E post-transition WinchSel vers SafeStop seul (jamais escalade
+    PowerCutOff) pendant N secondes apres un changement de WinchSel.
+  objectifs:
+  - Pas de PowerCutOff sec au re-couplage apres une excursion unitaire
+  - Retour en couple bloque (niveau process) tant que l'ecart reel M1/M2 depasse la tolerance
+  - Message operateur clair ; recalage offset benne impose avant re-autorisation
+  contrat: ''
+  bloque_par: []

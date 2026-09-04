@@ -46,7 +46,13 @@
 | BK-3 | **HomingFault** (`ErrorID:10`) — codeurs non réf. pour séquence benne | `FB_Bucket` §1 c.4 | `NOT HomedM1 OR NOT HomedM2` | attendu (protège la séquence). | ✅ | garder ; pour utilisation partielle non-réf. → bit forcé provisoire `HomedM1/M2` (cf. `T244`). |
 | BK-4 | **Timeout** (`ErrorID:04`) | `FB_Bucket` §1 c.2 | `CfgTimeoutDuration` (T#60s, réglable IHM) | ❓ | ❓ | vérifier suffisant en jog lent. |
 | BK-5 | **M1Slip** (`ErrorID:08`) | `FB_Bucket` §1 c.3 | `ABS(M1 − M1RefPos) > M1SlipToleranceM` (1.0 m) pendant `Busy` | ❓ | 🔧 ? | à confirmer benne en charge. |
-| BK-6 | **StateIncoherent** (boot : ni ouvert ni fermé, ou les deux) | `FB_Bucket` §3 | `FirstCycle` | apparaît si datum benne perdu au boot. | 🕒 | `T241` §4a doit recaler l'état dès arrêt machine ; `T244` bit forcé pour usage partiel. |
+| BK-6 | **StateIncoherent** (boot : ni ouvert ni fermé, ou les deux) | `FB_Bucket` §3 | `FirstCycle` | apparaît si datum benne perdu au boot. | 🕒 | `T241` §4a (commit `b6837198`) recale l'état dès arrêt machine + réf. ; `T244` bit forcé pour usage partiel. |
+
+### 2.2bis Calibration bandes de classification (`T241` §4a — dépendance directe)
+
+> ⚠️ La classification `NearClosed`/`NearOpen` = `|Δ − Offset| ≤ CoherenceLimitM`. Avec `OffsetCloseM = 15` (non calibré) et `CoherenceLimitM = 1.0` → bande fermée = **[14.0, 16.0]**. Or Δ réel benne fermée sur FDC ≈ **13.95** (MES-045) → **hors bande** → classe intermédiaire, `ActiveOffsetM` ne snape pas.
+> **Ordre banc obligatoire** : (1) recalibrer `OffsetCloseM ≈ 13.95` / `OffsetOpenM ≈ −0.13` aux vrais FDC ; (2) sinon élargir `CoherenceLimitM` → **1.5** (tassement galets + allongement sous charge).
+> Point 1 (arrêt volontaire mi-course, Δ ≈ 7.5) : retombe sur dernier état franc + `HoldOffsetM` — continuité géométrique voulue, à valider banc. (Revue expert externe 2026-09-03.)
 
 ### 2.3 Cycle homing machine — `FB_CycleMachineHoming`
 
