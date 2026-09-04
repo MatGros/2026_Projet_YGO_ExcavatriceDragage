@@ -687,6 +687,9 @@ END_IF;
 IF WinchM1Safety.ErrorNoMovement AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
+IF WinchM1Safety.ErrorOverspeed AND EncM1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] Survitesse treuil detectee (SafeStop)'; AlarmCount := AlarmCount + 1;
+END_IF;
 
 // 5b. Collecte — treuil M2 (mêmes bits que M1, tri bloquant/warning identique)
 IF WinchM2Safety.ErrorOperatorComm AND Joy1Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
@@ -718,6 +721,9 @@ IF WinchM2Safety.ErrorOppositeDir AND EncM2Valid AND (AlarmCount < CST_NbMaxAlar
 END_IF;
 IF WinchM2Safety.ErrorNoMovement AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.ErrorOverspeed AND EncM2Valid AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] Survitesse treuil detectee (SafeStop)'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5c. Collecte — translation M3 (ST_SafetyTranslation, tri bloquant/warning identique)
