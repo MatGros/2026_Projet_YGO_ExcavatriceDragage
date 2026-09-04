@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T05:50:39.964635" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T05:50:39.964635">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T10:35:38.104142" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T10:35:38.104142">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -151,7 +151,15 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) pour jauge/bargraphe IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) — MESURE brute, base de l'état benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaPositionCorrected_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart M1/M2 corrigé de la géométrie benne (Delta - ActiveOffsetM) — ~0 = treuils synchro quel que soit l'état benne. Pour l'opérateur.</xhtml>
               </documentation>
             </variable>
             <variable name="BucketOpening_Pct">

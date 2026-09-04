@@ -633,7 +633,15 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) pour jauge/bargraphe IHM</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart réel signé M2 - M1 (mètres) — MESURE brute, base de l'état benne</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DeltaPositionCorrected_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Écart M1/M2 corrigé de la géométrie benne (Delta - ActiveOffsetM) — ~0 = treuils synchro quel que soit l'état benne. Pour l'opérateur.</xhtml>
               </documentation>
             </variable>
             <variable name="BucketOpening_Pct">
