@@ -31562,10 +31562,14 @@ ET frein serré, redondés par la mesure de vitesse.
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#300ms" />
+                <simpleValue value="TIME#1s500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : duree arret confirme pour lever le hold de transition</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">T248 : pause fixe apres bascule du selecteur jog&lt;-&gt;couple. DOIT couvrir le
+dead-time D18 du treuil qui vient de s'arreter (FB_WinchDirectionInterlock,
+DirectionInterlockDelayAscent/Descent) + retombee/settle contacteurs, sinon
+l'autre treuil (immobile depuis longtemps, dispo immediatement) part SEUL -&gt;
+decalage tambours (REX MES 2026-09-04 : M1 seul 63 cm, ecart final 50 cm).</xhtml>
               </documentation>
             </variable>
           </localVars>

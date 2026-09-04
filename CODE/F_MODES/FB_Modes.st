@@ -107,7 +107,12 @@ VAR
 END_VAR
 VAR CONSTANT
     CST_T248JoyNeutralConfirm : TIME := T#200ms;  // T248 : duree neutre pour relacher le verrou de phase
-    CST_T248TransitionSettle  : TIME := T#300ms;  // T248 : duree arret confirme pour lever le hold de transition
+    // T248 : pause fixe apres bascule du selecteur jog<->couple. DOIT couvrir le
+    // dead-time D18 du treuil qui vient de s'arreter (FB_WinchDirectionInterlock,
+    // DirectionInterlockDelayAscent/Descent) + retombee/settle contacteurs, sinon
+    // l'autre treuil (immobile depuis longtemps, dispo immediatement) part SEUL ->
+    // decalage tambours (REX MES 2026-09-04 : M1 seul 63 cm, ecart final 50 cm).
+    CST_T248TransitionSettle  : TIME := T#1s500ms;
 END_VAR
 
 // === IMPLEMENTATION ===
