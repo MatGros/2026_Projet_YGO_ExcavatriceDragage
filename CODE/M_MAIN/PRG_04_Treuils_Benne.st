@@ -625,12 +625,16 @@ instWinchSync(
 // (MAX de 2 valeurs négatives = celle la moins profonde = atteinte en premier) : le ralentissement
 // (FB_Winch §"RALENTISSEMENT AUTOMATIQUE SUR BORDURES") s'enclenche alors sur la bonne limite,
 // légale ou câble, sans dupliquer le mécanisme.
+// M2 : la limite basse est comparee a CablePosM2 BRUTE cote FB_Winch -> on la decale de
+// l'offset benne actif (idem M2_LimitShift cote haut). Benne fermee, M2 a deroule
+// ~OffsetCloseM de plus que M1 : sans ce decalage la limite basse M2 se declenche
+// ~15 m trop tot (REX MES 2026-09-04). ActiveOffsetM est continu (pente bornee).
 IF _CommunCfgPersist.LimitLegalEnabled THEN
     BottomLimitM1_Active := MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
-    BottomLimitM2_Active := MAX(_WinchM2CfgPersist.CfgCableLimitDescent_M, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
+    BottomLimitM2_Active := MAX(_WinchM2CfgPersist.CfgCableLimitDescent_M, _CommunCfgPersist.LimitLegalDepthMinAllowed_M) + instBucket.ActiveOffsetM;
 ELSE
     BottomLimitM1_Active := _WinchM1CfgPersist.CfgCableLimitDescent_M;
-    BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M;
+    BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M + instBucket.ActiveOffsetM;
 END_IF;
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
@@ -741,15 +745,14 @@ M2JogApproachClose := ManualBucketJogActive
 // M2 doit pouvoir monter jusqu'a M1 + OffsetCloseM pour fermer. Sinon (benne ouverte,
 // M2 suit M1) la limite M2 = celle de M1. Le FDC haut PHYSIQUE reste la barriere dure
 // (non bypassable, FB_Safety_Winch:528-531) independamment de cette limite soft.
-M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq
-                     OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
-                     OR (GVL_IHM.Modes.Cmd.SelJoystickWinch = 2),
-                      0.0,
-                      // Marge 1.5 m au-dessus de M1 + OffsetCloseM : en hoist COUPLE benne
-                      // fermee, M2 doit rester a M1+OffsetCloseM sans taper son plafond haut
-                      // meme si le shift suit M1 avec un leger retard -> evite le NoMovement M2.
-                      (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 1.5)
-                      - _CommunCfgPersist.CfgCableLimitAscent_M);
+// Le decalage de la limite M2 = l'offset benne ACTIF, point. Comparer CablePosM2 brute a
+// (limite + M2_LimitShift) revient exactement a comparer la position M2 CORRIGEE
+// (CablePosM2 - ActiveOffsetM) a la limite nominale - meme reference que M1. L'ancienne
+// formule (M1 + OffsetCloseM + 1.5 - CfgCableLimitAscent) suivait M1 avec du retard et
+// s'alignait mal selon l'etat benne -> faux declenchement "cable ascent limite" (REX MES
+// 2026-09-04 : benne fermee, 15 m deroules, comparaison sur la brute). ActiveOffsetM est
+// continu (pente bornee) et suit deja l'ouverture reelle.
+M2_LimitShift := instBucket.ActiveOffsetM;
 
 {endregion}
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T12:15:03.446936" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T12:15:03.446936">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T12:48:04.938877" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T12:48:04.938877">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6325,12 +6325,16 @@ instWinchSync(
 // (MAX de 2 valeurs négatives = celle la moins profonde = atteinte en premier) : le ralentissement
 // (FB_Winch §"RALENTISSEMENT AUTOMATIQUE SUR BORDURES") s'enclenche alors sur la bonne limite,
 // légale ou câble, sans dupliquer le mécanisme.
+// M2 : la limite basse est comparee a CablePosM2 BRUTE cote FB_Winch -&gt; on la decale de
+// l'offset benne actif (idem M2_LimitShift cote haut). Benne fermee, M2 a deroule
+// ~OffsetCloseM de plus que M1 : sans ce decalage la limite basse M2 se declenche
+// ~15 m trop tot (REX MES 2026-09-04). ActiveOffsetM est continu (pente bornee).
 IF _CommunCfgPersist.LimitLegalEnabled THEN
     BottomLimitM1_Active := MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
-    BottomLimitM2_Active := MAX(_WinchM2CfgPersist.CfgCableLimitDescent_M, _CommunCfgPersist.LimitLegalDepthMinAllowed_M);
+    BottomLimitM2_Active := MAX(_WinchM2CfgPersist.CfgCableLimitDescent_M, _CommunCfgPersist.LimitLegalDepthMinAllowed_M) + instBucket.ActiveOffsetM;
 ELSE
     BottomLimitM1_Active := _WinchM1CfgPersist.CfgCableLimitDescent_M;
-    BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M;
+    BottomLimitM2_Active := _WinchM2CfgPersist.CfgCableLimitDescent_M + instBucket.ActiveOffsetM;
 END_IF;
 
 // 🩺 InputModuleFault (AF06 §3bis) : un module DI TOR hors service rend indisponibles
@@ -6441,15 +6445,14 @@ M2JogApproachClose := ManualBucketJogActive
 // M2 doit pouvoir monter jusqu'a M1 + OffsetCloseM pour fermer. Sinon (benne ouverte,
 // M2 suit M1) la limite M2 = celle de M1. Le FDC haut PHYSIQUE reste la barriere dure
 // (non bypassable, FB_Safety_Winch:528-531) independamment de cette limite soft.
-M2_LimitShift := SEL(_BucketState.IsClosed OR instBucket.CloseReq
-                     OR (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
-                     OR (GVL_IHM.Modes.Cmd.SelJoystickWinch = 2),
-                      0.0,
-                      // Marge 1.5 m au-dessus de M1 + OffsetCloseM : en hoist COUPLE benne
-                      // fermee, M2 doit rester a M1+OffsetCloseM sans taper son plafond haut
-                      // meme si le shift suit M1 avec un leger retard -&gt; evite le NoMovement M2.
-                      (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM + _BucketCfgPersist.Config.OffsetCloseM + 1.5)
-                      - _CommunCfgPersist.CfgCableLimitAscent_M);
+// Le decalage de la limite M2 = l'offset benne ACTIF, point. Comparer CablePosM2 brute a
+// (limite + M2_LimitShift) revient exactement a comparer la position M2 CORRIGEE
+// (CablePosM2 - ActiveOffsetM) a la limite nominale - meme reference que M1. L'ancienne
+// formule (M1 + OffsetCloseM + 1.5 - CfgCableLimitAscent) suivait M1 avec du retard et
+// s'alignait mal selon l'etat benne -&gt; faux declenchement "cable ascent limite" (REX MES
+// 2026-09-04 : benne fermee, 15 m deroules, comparaison sur la brute). ActiveOffsetM est
+// continu (pente bornee) et suit deja l'ouverture reelle.
+M2_LimitShift := instBucket.ActiveOffsetM;
 
 {endregion}
 
@@ -7659,7 +7662,7 @@ Data.BothBlockReason              := BothBlockReason;
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Jog benne unitaire M2 en cours (WinchSel=2) : l'offset actif doit SUIVRE l'ecart mesure comme en Lifecycle.Busy (pas de figeage -&gt; pas de rampe/a-coup a la fin du jog). Sur en WinchSel=2 : sync/MecaE deja OFF.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Jog benne unitaire M2 en cours (WinchSel=2) : OffsetTargetM suit le Delta mesure live comme en Lifecycle.Busy (pas de figeage). ActiveOffsetM converge a pente bornee (jamais de PAS au basculement de mode). En WinchSel=2 : sync/MecaE deja OFF.</xhtml>
               </documentation>
             </variable>
             <variable name="InhibitM1">
@@ -8729,14 +8732,17 @@ END_IF;
 // (FB_Safety_Winch, 0.5 m) -&gt; RAZ + inhibition MecaA/MecaE. On converge donc a pente
 // bornee ; pendant la convergence l'offset n'est pas "fiable" (voir ActiveOffsetSettled)
 // et la synchro est inhibee cote PRG_04.
-IF Lifecycle.Busy OR BucketJogActive THEN
-    ActiveOffsetM := OffsetTargetM;                                   // suit l'ecart reel (deplacement lent du treuil, aucun pas) -- seq auto OU jog M2
-ELSE
-    ActiveOffsetM := ActiveOffsetM
-                     + LIMIT(-CST_OffsetSlewMPerScan,
-                              OffsetTargetM - ActiveOffsetM,
-                              CST_OffsetSlewMPerScan);
-END_IF;
+// Convergence TOUJOURS a pente bornee, y compris a l'ENTREE d'une manoeuvre (seq auto
+// ou jog M2). Auparavant Busy/Jog forcait ActiveOffsetM := OffsetTargetM en un scan :
+// au basculement mode 0 -&gt; 2, si la reference franche (OffsetOpenM / HoldOffsetM) ne
+// collait pas au Delta mesure, M2PositionCorrected faisait un PAS (jusqu'a ~15 m si
+// HoldOffsetM perime). OffsetTargetM suit deja le Delta live pendant la manoeuvre
+// (voir plus haut) ; le treuil bouge lentement -&gt; 0.08 m/scan (8 m/s) rattrape sans
+// lag visible pendant la manoeuvre ET supprime le pas au basculement.
+ActiveOffsetM := ActiveOffsetM
+                 + LIMIT(-CST_OffsetSlewMPerScan,
+                          OffsetTargetM - ActiveOffsetM,
+                          CST_OffsetSlewMPerScan);
 HoldOffsetM := ActiveOffsetM;
 
 // --- ActiveOffsetSettled : ActiveOffsetM n'est PAS en cours de recalage --------------
