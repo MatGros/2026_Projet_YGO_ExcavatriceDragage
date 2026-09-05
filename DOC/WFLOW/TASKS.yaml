@@ -5901,3 +5901,28 @@ tasks:
   - Assurer la conservation en NVRAM/RETAIN et la liaison G200 100% PASS
   bloque_par: []
 
+- id: T254
+  parent_id: ''
+  statut: ⏳
+  criticite: C4
+  domaine: CODEURS_VITESSE
+  agent: AGY-01
+  date: '2026-09-05T09:05:00+02:00'
+  titre: Conversion directe vitesse codeur EtherCAT (m/s) — suppression dérivation/filtre
+  contexte: >-
+    La vitesse câble actuelle est calculée par dérivation numérique (ΔP / Δt) avec un filtre PT1 100ms.
+    Le codeur EtherCAT délivre nativement le mot COD1_SpdValue / COD2_SpdValue (0x6031:01 en 0.1 RPM).
+    Sur tambour 2.0 m/tr, la formule exacte validée est : V(m/s) = (SpdValue * 0.1 * 2.0) / 60.0 = SpdValue / 300.0.
+  description: >-
+    1. Raccorder SpdValueIn dans ST_fbEncoder_HwIn et PRG_02_Acquisition.
+    2. Supprimer la dérivation numérique et le filtre PT1 dans FB_Encoder_SpeedMeasure au profit du calcul direct.
+    3. Unifier ST_fbEncoder_Measurement sur Speed_Mps / SignedSpeed_Mps (suppression RawSpeed_Mps obsolète).
+    4. Adapter FB_SimBench et vérifier l'ensemble des consommateurs de vitesse (FB_Safety_Winch, IHM, Troubleshooting).
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T254_CONVERSION_DIRECTE_VITESSE_CODEUR.yaml
+  objectifs:
+  - Conversion directe native codeur V(m/s) = (SpdValue * 0.1 * CableM_PerRev) / 60.0
+  - Suppression du déphasage/filtre PT1 sur la mesure de vitesse
+  - Épuration des structures et validation G200 100% PASS
+  bloque_par: []
+
+
