@@ -153,7 +153,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         SelHomingApproachEnable := FALSE,
         WinchMaxStepDescent := 4,
         WinchMaxStepAscent := 5,
-        WinchSlowdownDistanceTop_M := 0.0,
+        WinchSlowdownDistanceTop_M := 0.5,
         WinchSlowdownDistanceBottom_M := 1.0,
         WinchSlowdownMaxStep := 1,
         CfgCableLimitAscent_M := 7.5

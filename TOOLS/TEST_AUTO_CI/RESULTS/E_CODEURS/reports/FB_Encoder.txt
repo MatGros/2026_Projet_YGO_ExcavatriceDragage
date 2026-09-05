@@ -1,0 +1,10 @@
+Error compiling source files:
+
+FB_Encoder_SpeedMeasure.st:34:27: error: Undefined type 'FB_CYCLETIME' in FUNCTION_BLOCK 'FB_ENCODER_SPEEDMEASURE'
+  34 |     instCycleTime       : FB_CycleTime; // * [INST] Mesure du dt reel par scan (tache 20ms)
+     |                           ^
+
+FB_Encoder_SpeedMeasure.st:35:27: error: Undefined type 'FB_FILTER' in FUNCTION_BLOCK 'FB_ENCODER_SPEEDMEASURE'
+  35 |     instFilter          : FB_Filter;    // * [INST] Filtre PT1 pour la mesure lissée
+     |                           ^
+

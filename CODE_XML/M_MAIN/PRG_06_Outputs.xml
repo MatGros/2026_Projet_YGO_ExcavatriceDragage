@@ -4470,7 +4470,7 @@ SEULE la publication est homogénéisée sur Fault:ST_Fault (§6bis2).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#700ms" />
+                <simpleValue value="TIME#400ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher DUR de cadence de montee de palier a la barriere finale, INDEPENDANT
@@ -4583,7 +4583,7 @@ END_IF;
 IF NOT MotorRequest THEN
     RestartRequired := TRUE;
 END_IF;
-RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
+RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#750ms);
 RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;

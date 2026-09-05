@@ -4,6 +4,26 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `MES_048_TRACE_WINCH_PLEINE_VITESSE` — 2026-09-05 — validation descente/montée synchro 100% vitesse à vide
+- **Branche** : `backup/mes-septembre-20260902` (HEAD `35fe44ff`).
+- **Preuve terrain** : `Suivi_Winch_D_M_PleineVitesse_Avide_20260905_31.trace` (45.8 s / 459 scans @ 100 ms).
+- **Validation fonctionnelle** : Descente synchro à 100% de consigne ($V_1=1.90\text{ m/s}, V_2=1.61\text{ m/s}$), fermeture fond ($P_1=-0.21\text{m}, P_2=0.40\text{m} \rightarrow \Delta P=14.80\text{m}$), remontée synchro 100% ($V=1.51\text{ m/s}$, synchro $<0.06\text{ m}$), arrêt haut sans dépassement.
+- **Sécurité & Défauts** : **0 défaut** actif sur 45.8 s (`Error=0`, `Safety.Error=0`), barrière survitesse ($2.0\text{ m/s}$) vérifiée.
+- **Registre MES** : Entrée [MES-048](WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService_20260905.md).
+
+### `MES_047_TRACE_WINCH_OUVERTURE_BENNE_HAUT` — 2026-09-05 — validation ouverture benne en position haute après FdC
+- **Branche** : `backup/mes-septembre-20260902` (HEAD `35fe44ff`).
+- **Preuve terrain** : `Suivi_WinchOuvertureBenneApresFdcHaut_20260905_30.trace` (22.9 s / 230 scans @ 100 ms).
+- **Validation fonctionnelle** : Ouverture complète benne en zone haute ($P_2: 23.18\text{m} \rightarrow 7.93\text{m}$, $\Delta P: 15.12\text{m} \rightarrow -0.13\text{m}$) avec maintien strict de M1 fixe ($P_1=8.06\text{m}$). Vitesse M2 $1.55\text{ m/s}$, arrêt net sans défaut.
+- **Registre MES** : Entrée [MES-047](WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService_20260905.md).
+
+### `MES_046_TRACE_WINCH_CYCLE_M1M2` — 2026-09-05 — validation manœuvre complète treuils M1/M2 & benne sur trace réelle
+- **Branche** : `backup/mes-septembre-20260902` (HEAD `35fe44ff`).
+- **Preuve terrain** : `Suivi_WinchMatinDescMontee_20260905_29.trace` (71.4 s / 715 scans @ 100 ms).
+- **Validation fonctionnelle** : Ouverture benne ($15\text{m}\rightarrow 0\text{m}$), descente synchro fond ($9.0\text{m}\rightarrow 1.64\text{m}$), fermeture benne ($0\text{m}\rightarrow 15\text{m}$), remontée synchro ($V=1.47\text{ m/s}$, synchro $<0.10\text{m}$), décélération & arrêt haut propre ($P_1=8.06\text{m}$, $P_2=23.18\text{m}$).
+- **Sécurité & Défauts** : **0 défaut** actif sur 71.4 s (`Error=0`, `Safety.Error=0`), survitesse respectée ($V_{\max}=1.95\text{ m/s} < 2.00\text{ m/s}$).
+- **Registre MES** : Entrée [MES-046](WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService_20260905.md).
+
 ### `GRAFCET_HOMING_HX0-HX6_T146` — 2026-09-03 — refonte séquentielle homing machine + fix cible M2 + plafond palier hors homing
 - **Branche** : `backup/mes-septembre-20260902` (application CODESYS manuelle par l'humain).
 - **`FB_MachineHomingCycle`** réécrit en **GRAFCET séquentiel `HX0..HX6` + `HXF`** (spec : `DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md`).

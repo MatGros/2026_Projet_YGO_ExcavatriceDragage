@@ -17,18 +17,18 @@ STRUCT
 
     // === INTERLOCK CHANGEMENT DE SENS ===
     DirectionInterlockDelayAscent       : TIME := T#900ms;   // Delai interlock changement de sens montee
-    DirectionInterlockDelayDescent     : TIME := T#400ms;   // Delai interlock changement de sens descente
+    DirectionInterlockDelayDescent     : TIME := T#200ms;   // Delai interlock changement de sens descente
 
     // === CADENCE DE RAMPE PALIER ===
-    StepRampDelay                   : TIME := T#1000ms;  // [cible] Tempo de rampe palier (usage aval)
-    StepRampDelayAscent             : TIME := T#1000ms;  // [08a] Cadence palier montee (D10, dedie)
+    StepRampDelay                   : TIME := T#900ms;   // [cible] Tempo de rampe palier (usage aval)
+    StepRampDelayAscent             : TIME := T#900ms;   // [08a] Cadence palier montee (D10, dedie)
     StepRampDelayDescent         : TIME := T#500ms;   // [08a] Cadence palier descending (D10, dedie)
 
     // === RETOMBÉE CONTACTEURS ===
     ContactorFeedbackTimeout        : TIME := T#500ms;   // Delai d'attente retombee des contacteurs
 
     // === RALENTISSEMENT BORDURE ===
-    SlowdownDistanceTop_M           : REAL := 0.0;   // Distance avant limite haute pour ralentir (m) : 0 = arrêt au seuil
+    SlowdownDistanceTop_M           : REAL := 0.5;   // Distance avant limite haute pour ralentir (m) : 0 = arrêt au seuil
     SlowdownDistanceBottom_M        : REAL := 1.0;   // Distance avant limite basse pour ralentir (m)
     SlowdownMaxStep                 : INT := 1;      // Plafond palier dans zone de ralentissement (1..5)
 

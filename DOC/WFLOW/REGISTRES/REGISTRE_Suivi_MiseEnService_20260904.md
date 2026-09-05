@@ -3,6 +3,8 @@
 > 🎯 **Rôle** : Historique factuel de la séance banc du 2026-09-04 (actions, mesures, constats, décisions).
 > 📌 **Reliquats & Actions** : `DOC/WFLOW/TASKS.yaml` §3 (registre maître `Txx`).
 > 🔗 **Séance précédente** : `REGISTRE_Suivi_MiseEnService_20260903.md` (MES-039 → MES-045).
+> 🔗 **Séance suivante** : `REGISTRE_Suivi_MiseEnService_20260905.md`.
+> ⚠️ Séance tenue (constats versés dans `T248`/`T249`/`T250`/`T251`/`T252`) mais **aucune entrée MES posée** → numérotation MES-046+ réutilisée le 2026-09-05.
 > 📅 *Fiche demandée le 2026-09-03. Renommer en `_20260903` si la séance a lieu le jour même.*
 
 ---

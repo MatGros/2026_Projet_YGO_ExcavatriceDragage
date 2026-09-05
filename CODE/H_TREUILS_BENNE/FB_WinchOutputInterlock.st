@@ -132,7 +132,7 @@ VAR CONSTANT
     // ce plancher n'ajoute qu'un leger retard borne par cran. Il ne devient decisif
     // QUE si le shaper deraille (rampe a 0 -> palier 5 instantane, decodage inverse) :
     // la barriere ramene alors la montee a +1 cran / ce delai. Descente non limitee.
-    CST_StepRampFloorDelay          : TIME := T#700ms;
+    CST_StepRampFloorDelay          : TIME := T#400ms;
 END_VAR
 
 // ── 1. FRONT RESET AVANT GATE ───────────────────────────────────────────
@@ -220,7 +220,7 @@ END_IF;
 IF NOT MotorRequest THEN
     RestartRequired := TRUE;
 END_IF;
-RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
+RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#750ms);
 RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;
