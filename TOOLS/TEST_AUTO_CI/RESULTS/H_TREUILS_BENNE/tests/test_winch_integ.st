@@ -1229,7 +1229,7 @@ TEST 'HARN-82 : CAS-002 AU pendant transition d etape -> coupure propre, pas d e
         EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE);
     ASSERT_TRUE(machine.BusOutputs.M1RelayFwd = FALSE, 'HARN-82: coupure propre a l AU');
 
-    seqReqM1.RunRequest := FALSE; seqReqM2.ReqStartStop := FALSE;
+    seqReqM1.RunRequest := FALSE; seqReqM2.RunRequest := FALSE;
     machine(CanBusOperational := TRUE, JoyOperational := TRUE, EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE, HeartbeatIhmOk := TRUE, BtnResetMachine := TRUE,
             SeqReqWinchM1 := seqReqM1, SeqReqWinchM2 := seqReqM2, SeqReqBucket := seqReqBucket);
     ADVANCE_TIME(10000000);

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T13:26:34.700297" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T13:26:34.700297">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T17:57:47.151749" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T17:57:47.151749">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -114,6 +114,7 @@ un interlock qu'on ne voit pas est un interlock qu'on contourne.
               <value name="AX18_DONE_SYNC" value="18" />
               <value name="AX_STAB" value="19" />
               <value name="AX_DIVING_RETRY" value="20" />
+              <value name="AX3_WAIT_DIVE_START" value="21" />
             </values>
           </enum>
         </baseType>
@@ -248,6 +249,12 @@ un interlock qu'on ne voit pas est un interlock qu'on contourne.
                 <Name>AX_DIVING_RETRY</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Reprise diving : remontee assistee palier lent jusqu'au FDC haut puis retour AX4 ; sur erreur Kobold / joystick relache / palier &lt;&gt; 4 en AX5..AX7</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX3_WAIT_DIVE_START</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition benne-&gt;plongee : sorties neutres jusqu'a l'arret mecanique confirme M1/M2, joystick pousse maintenu</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -1461,6 +1468,7 @@ instCycleSemiAuto(
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState &lt;&gt; DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState &lt;&gt; DEVICE_STATE.RUNNING),
     Mode                    := instModes.Auth.Mode,
     JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
+    JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
@@ -1479,6 +1487,12 @@ instCycleSemiAuto(
     M2_CablePosM            := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
     M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps,
     M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps,
+    M1_SpeedValid           := PRG_02_Acquisition.Data.EncoderM1.Measurement.SpeedValid,
+    M2_SpeedValid           := PRG_02_Acquisition.Data.EncoderM2.Measurement.SpeedValid,
+    M1_ContactorsReleased   := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
+    M2_ContactorsReleased   := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
+    M1_BrakeApplied         := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
+    M2_BrakeApplied         := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
@@ -1536,6 +1550,23 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // champ-à-champ ni de DUT ST_fbCycle_*CmdDemand redondants (NC-090).
     Data.ReqProgram.ReqWinchM1 := instCycleSemiAuto.WinchM1Cmd;
     Data.ReqProgram.ReqWinchM2 := instCycleSemiAuto.WinchM2Cmd;
+
+    // Une demande programme symetrique est une intention couplee au meme titre que le
+    // pilotage manuel both. Publication le meme scan vers PRG_04 pour l'atomicite aval.
+    WinchBothMotionActive := instCycleSemiAuto.WinchM1Cmd.RunRequest
+                             AND instCycleSemiAuto.WinchM2Cmd.RunRequest
+                             AND ((instCycleSemiAuto.WinchM1Cmd.ReqAscent AND instCycleSemiAuto.WinchM2Cmd.ReqAscent)
+                               OR (instCycleSemiAuto.WinchM1Cmd.ReqDescend AND instCycleSemiAuto.WinchM2Cmd.ReqDescend));
+    IF instCycleSemiAuto.WinchM1Cmd.ReqAscent AND instCycleSemiAuto.WinchM2Cmd.ReqAscent THEN
+        WinchBothMotionDirection := 1;
+    ELSIF instCycleSemiAuto.WinchM1Cmd.ReqDescend AND instCycleSemiAuto.WinchM2Cmd.ReqDescend THEN
+        WinchBothMotionDirection := -1;
+    ELSE
+        WinchBothMotionDirection := 0;
+    END_IF;
+    Data.WinchBothIntent.Active     := WinchBothMotionActive;
+    Data.WinchBothIntent.ReqAscent  := WinchBothMotionDirection &gt; 0;
+    Data.WinchBothIntent.ReqDescend := WinchBothMotionDirection &lt; 0;
 
     // Demande translation M3
     Data.ReqProgram.ReqTranslation := instCycleSemiAuto.TranslationCmd;
@@ -1774,6 +1805,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Manche deflecte (non centre)</xhtml>
               </documentation>
             </variable>
+            <variable name="JoystickPush">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention Y descente qualifiee (axe Y pousse uniquement)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DeadmanArmed">
               <type>
                 <BOOL />
@@ -1919,6 +1958,54 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse lineaire mesuree M2 (m/s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mesure vitesse M1 valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_SpeedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Mesure vitesse M2 valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Tous contacteurs M1 retombes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ContactorsReleased">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Tous contacteurs M2 retombes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Frein M1 mecaniquement serre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeApplied">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Frein M2 mecaniquement serre</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchThresholdMps">
@@ -2737,12 +2824,28 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo max d'etape</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketOpenStabTimer">
+            <variable name="DiveStartStopTimer">
               <type>
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation benne ouverte avant plongee (AX3-&gt;AX4)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation arret mecanique avant depart couple</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveStartTimeoutTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Plafond attente arret mecanique (sanction defaut)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveStartStopped">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Les deux treuils sont physiquement arretes et mesures valides</xhtml>
               </documentation>
             </variable>
             <variable name="CST_KoboldStabTime">
@@ -2834,15 +2937,37 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Fenetre max de confirmation retour contacteur Kobold en AX5</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_BucketOpenStabTime">
+            <variable name="CST_DiveStartStopConfirmTime">
               <type>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1s0ms" />
+                <simpleValue value="TIME#300ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Stabilisation benne ouverte avant plongee couplee (AX3-&gt;AX4)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirmation stable des 6 faits d'arret + validite vitesses</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DiveStartStopTimeout">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#5s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond anti-blocage ; timeout -&gt; defaut latche, jamais depart</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_DiveStartSpeedThresholdMps">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse quasi nulle, alignee FB_Modes</xhtml>
               </documentation>
             </variable>
             <variable name="CST_RaiseOffBottomDefaultM">
@@ -2897,6 +3022,16 @@ SkipDrainEdge(CLK := SkipDrainRequest);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 JoyDeflectedEdge(CLK := JoystickDeflected);
+
+DiveStartStopped := M1_SpeedValid AND M2_SpeedValid
+                    AND M1_ContactorsReleased AND M2_ContactorsReleased
+                    AND M1_BrakeApplied AND M2_BrakeApplied
+                    AND (ABS(M1_MeasuredSpeedMps) &lt; CST_DiveStartSpeedThresholdMps)
+                    AND (ABS(M2_MeasuredSpeedMps) &lt; CST_DiveStartSpeedThresholdMps);
+DiveStartStopTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START) AND DiveStartStopped,
+                   PT := CST_DiveStartStopConfirmTime);
+DiveStartTimeoutTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START),
+                      PT := CST_DiveStartStopTimeout);
 
 // Config diving/extraction bornee (repli defaut interne si non reglee / valeur implausible).
 // DiveStartMinM = altimetrie de lancement Kobold dans le referentiel M1_CablePosM
@@ -3033,6 +3168,11 @@ instCauses[9].Active   := NOT WinchesAtDiveStep
                             OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM));
 instCauses[9].Latching := TRUE;
 instCauses[9].Texte    := 'Palier 4 non confirme sur M1 et/ou M2 pendant la recherche Kobold';
+
+instCauses[10].Active   := DiveStartTimeoutTimer.Q
+                           AND (State = E_AutoCycleStep.AX3_WAIT_DIVE_START);
+instCauses[10].Latching := TRUE;
+instCauses[10].Texte    := 'Arret mecanique M1/M2 non confirme avant plongee';
 
 // Appel du socle de defaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -3361,24 +3501,35 @@ CASE State OF
             BucketCmd.ReqOpen := FALSE;
         END_IF;
 
-        // Benne ouverte atteinte : mouvements a l'arret (treuils deja neutralises ci-dessus,
-        // benne coupee ici), stabilisation 2s avant plongee couplee.
-        IF (Benne_IsOpen OR Benne_Done) AND NOT Benne_Busy THEN
+        // Benne ouverte atteinte : seul l'etat mecanique IsOpen autorise la transition.
+        // Done seul est insuffisant (fin de manoeuvre sans preuve d'ouverture).
+        IF Benne_IsOpen AND NOT Benne_Busy THEN
             BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX3_WAIT_DIVE_START;
         END_IF;
-        BucketOpenStabTimer(IN := (Benne_IsOpen OR Benne_Done) AND NOT Benne_Busy,
-                            PT := CST_BucketOpenStabTime);
 
-        // Apres stabilisation : geste operateur franc exige (relacher au centre PUIS
-        // repousser) - transition sur front JoystickDeflected, pas sur maintien.
-        IF BucketOpenStabTimer.Q THEN
-            WaitingForOperator := NOT JoystickDeflected;
-            WaitingForProcess := FALSE;
-            OperatorActionId := 16#0403;
-            OperatorAction := 'AX3 - Relacher puis repousser le joystick pour lancer la plongee.';
-            IF JoyDeflectedEdge.Q THEN
-                State := E_AutoCycleStep.AX4_DESCEND_DIVING;
-            END_IF;
+    E_AutoCycleStep.AX3_WAIT_DIVE_START:
+        CycleStep := E_AutoCycleStep.AX3_WAIT_DIVE_START;
+        CycleStateStr := 'AX3 - Arret mecanique avant plongee';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+        WaitingForProcess := NOT DiveStartStopTimer.Q;
+        OperatorActionId := 16#0403;
+        OperatorAction := 'AX3 - Maintenir le joystick pousse : attente arret M1/M2 avant plongee.';
+
+        // Separation mecanique stricte : aucune demande pendant la retombee M2.
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE;
+
+        // Continuation normale uniquement si le geste n'a jamais ete interrompu et si
+        // l'arret est confirme. Une perte d'homme-mort desarme FB_Joystick et exige son
+        // nouveau front physique avant que DeadmanArmed puisse redevenir vrai.
+        IF DiveStartStopTimer.Q AND DeadmanArmed AND JoystickPush THEN
+            State := E_AutoCycleStep.AX4_DESCEND_DIVING;
         END_IF;
 
     (* ===================== DIVING (AX4..AX8 + AX_DIVING_RETRY) ===================== *)
@@ -3390,24 +3541,24 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+        WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#0404;
         OperatorAction := 'AX4 - Maintenir la descente palier 4 (Kobold pas encore enclenche).';
 
         // Palier 4 MINI ET MAXI (CST_StepDive), palier 5 interdit (cause 8). Tempo
         // sequencement contacteurs conservee en aval (PRG_04 : montee progressive 1-&gt;4).
         // Contacteur Kobold PAS enclenche a cette etape.
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
         WinchM1Cmd.StepTgt  := CST_StepDive;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
         WinchM2Cmd.StepTgt  := CST_StepDive;
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
         // AT4 : altimetrie de lancement atteinte (M1 &lt;= DiveStartMinEff).
-        IF JoystickDeflected
+        IF DeadmanArmed AND JoystickPush
            AND (M1_CablePosM &lt;= DiveStartMinEff) THEN
             State := E_AutoCycleStep.AX5_KOBOLD_INIT;
         END_IF;

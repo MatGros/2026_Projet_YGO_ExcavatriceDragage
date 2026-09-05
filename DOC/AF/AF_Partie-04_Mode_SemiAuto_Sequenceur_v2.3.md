@@ -1,7 +1,9 @@
 # Analyse Fonctionnelle - Partie 4 : Mode Semi-Auto & Sequenceur (v2.3)
 
 > La traçabilité des versions programme/document est portée par `DOC/VERSION_HISTORY.md`.
-> 🆕 v2.3 (2026-08-28) : Intégration du cycle Kobold 4 temps à la volée, bridage strict Palier $\le$ 4, enchaînement fluide d'extraction sous maintien continu joystick, gestion des bascules de mode sans perte d'étape et raccordement diagnostic Troubleshooting (`ST_ChainCycleSemiAuto`). Suite complète de tests unitaires STruCpp validée (14/14 PASS).
+> 🆕 v2.3 (2026-08-28) : Intégration du cycle Kobold 4 temps à la volée, bridage strict Palier $\le$ 4, enchaînement fluide d'extraction sous maintien continu joystick, gestion des bascules de mode sans perte d'étape et raccordement diagnostic Troubleshooting (`ST_ChainCycleSemiAuto`).
+>
+> 🔒 Addendum T257 (2026-09-05) : handoff `AX3_OPEN_BUCKET` → `AX3_WAIT_DIVE_START` → `AX4_DESCEND_DIVING` sous maintien joystick, avec arrêt mécanique confirmé et publication atomique M1/M2 exclusivement en `SEMI_AUTO`.
 
 ## 🎯 Rôle et périmètre
 
@@ -11,6 +13,22 @@
 - 🆕 Refonte du séquenceur conforme `GUIDE_SEQUENCEUR_v1.2.md` (§11bis R1-R9) : instance unique,
   homme-mort fenêtre 3 s, tempo max d'étape, `STABILIZING`.
   Conception : `DOC/WFLOW/AUDITS/DESIGN/DESIGN_SEMI_AUTO_CYCLE_v0.1.md`.
+
+### Addendum T257 — transfert benne ouverte vers plongée
+
+Le composant actif est `FB_CycleSemiAuto`; les anciens noms `FB_Cycle`, `FB_DiveSearch` et `FB_ExtractionAssist` ne décrivent pas le flux programmé actuel.
+
+| Phase | Condition / action obligatoire | Propriété de sûreté |
+|---|---|---|
+| `AX3_OPEN_BUCKET` | Ouverture seulement avec `DeadmanArmed AND JoystickPush` (`Y−`) | Une déflexion X ou traction Y+ ne peut ouvrir ni autoriser la plongée. |
+| `AX3_WAIT_DIVE_START` | Après `Benne_IsOpen AND NOT Benne_Busy`, toutes demandes benne/M1/M2 à zéro | Pause mécanique sans demander le relâchement du joystick. |
+| Confirmation | M1/M2 : `SpeedValid`, contacteurs retombés, freins appliqués, vitesse absolue `< 0,02 m/s`, stable `300 ms` | Aucun départ sur `Done` seul, vitesse inconnue ou arrêt incomplet. |
+| Défaut attente | Absence de confirmation durant `5 s` → défaut latché et `AX_STAB` | Aucun départ automatique ni reprise par joystick maintenu. |
+| `AX4…AX7` | Descente et transitions Kobold uniquement avec `DeadmanArmed AND JoystickPush` | Le sens de plongée reste qualifié sur toute la phase. |
+| Chaîne aval | `PRG_03` publie l'intention programme BOTH; `PRG_04` ne libère les sorties que si readiness et demandes physiques M1/M2 identiques | Aucun scan `SEMI_AUTO` ne publie un départ M1 ou M2 isolé. |
+| Maintenance | La nouvelle barrière d'atomicité est explicitement bornée à `E_Mode.SEMI_AUTO` | `MAINT_N1` et `MAINT_N2` conservent leur chemin existant. |
+
+Flux vérifié : `PRG_02` (joystick/retours qualifiés) → `PRG_03` (cycle et intention BOTH) → `PRG_04` (interlocks et atomicité) → `PRG_06` (sorties).
 
 ## 📑 Sommaire
 

@@ -1,6 +1,0 @@
-Error compiling source files:
-
-FB_MachineHomingCycle.st:318:10: error: CASE selector must be an integer, bit, or enum type, got ANY_ELEMENTARY
- 318 |     CASE LIMIT(0, CfgForceStepTarget, 9) OF
-     |          ^
-

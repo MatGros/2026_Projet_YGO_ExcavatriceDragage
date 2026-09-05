@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:01:59.136597" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:01:59.136597">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T17:55:57.727455" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T17:55:57.727455">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -48,6 +48,7 @@
               <value name="AX18_DONE_SYNC" value="18" />
               <value name="AX_STAB" value="19" />
               <value name="AX_DIVING_RETRY" value="20" />
+              <value name="AX3_WAIT_DIVE_START" value="21" />
             </values>
           </enum>
         </baseType>
@@ -182,6 +183,12 @@
                 <Name>AX_DIVING_RETRY</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Reprise diving : remontee assistee palier lent jusqu'au FDC haut puis retour AX4 ; sur erreur Kobold / joystick relache / palier &lt;&gt; 4 en AX5..AX7</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX3_WAIT_DIVE_START</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition benne-&gt;plongee : sorties neutres jusqu'a l'arret mecanique confirme M1/M2, joystick pousse maintenu</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

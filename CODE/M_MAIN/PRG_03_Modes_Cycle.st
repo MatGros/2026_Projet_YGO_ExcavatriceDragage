@@ -160,6 +160,7 @@ instCycleSemiAuto(
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState <> DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState <> DEVICE_STATE.RUNNING),
     Mode                    := instModes.Auth.Mode,
     JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
+    JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
@@ -178,6 +179,12 @@ instCycleSemiAuto(
     M2_CablePosM            := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
     M1_MeasuredSpeedMps     := PRG_02_Acquisition.Data.EncoderM1.Measurement.Speed_Mps,
     M2_MeasuredSpeedMps     := PRG_02_Acquisition.Data.EncoderM2.Measurement.Speed_Mps,
+    M1_SpeedValid           := PRG_02_Acquisition.Data.EncoderM1.Measurement.SpeedValid,
+    M2_SpeedValid           := PRG_02_Acquisition.Data.EncoderM2.Measurement.SpeedValid,
+    M1_ContactorsReleased   := PRG_02_Acquisition.HwIn.Winch.M1_ContactorsReleased_DI,
+    M2_ContactorsReleased   := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
+    M1_BrakeApplied         := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
+    M2_BrakeApplied         := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
@@ -235,6 +242,23 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // champ-à-champ ni de DUT ST_fbCycle_*CmdDemand redondants (NC-090).
     Data.ReqProgram.ReqWinchM1 := instCycleSemiAuto.WinchM1Cmd;
     Data.ReqProgram.ReqWinchM2 := instCycleSemiAuto.WinchM2Cmd;
+
+    // Une demande programme symetrique est une intention couplee au meme titre que le
+    // pilotage manuel both. Publication le meme scan vers PRG_04 pour l'atomicite aval.
+    WinchBothMotionActive := instCycleSemiAuto.WinchM1Cmd.RunRequest
+                             AND instCycleSemiAuto.WinchM2Cmd.RunRequest
+                             AND ((instCycleSemiAuto.WinchM1Cmd.ReqAscent AND instCycleSemiAuto.WinchM2Cmd.ReqAscent)
+                               OR (instCycleSemiAuto.WinchM1Cmd.ReqDescend AND instCycleSemiAuto.WinchM2Cmd.ReqDescend));
+    IF instCycleSemiAuto.WinchM1Cmd.ReqAscent AND instCycleSemiAuto.WinchM2Cmd.ReqAscent THEN
+        WinchBothMotionDirection := 1;
+    ELSIF instCycleSemiAuto.WinchM1Cmd.ReqDescend AND instCycleSemiAuto.WinchM2Cmd.ReqDescend THEN
+        WinchBothMotionDirection := -1;
+    ELSE
+        WinchBothMotionDirection := 0;
+    END_IF;
+    Data.WinchBothIntent.Active     := WinchBothMotionActive;
+    Data.WinchBothIntent.ReqAscent  := WinchBothMotionDirection > 0;
+    Data.WinchBothIntent.ReqDescend := WinchBothMotionDirection < 0;
 
     // Demande translation M3
     Data.ReqProgram.ReqTranslation := instCycleSemiAuto.TranslationCmd;

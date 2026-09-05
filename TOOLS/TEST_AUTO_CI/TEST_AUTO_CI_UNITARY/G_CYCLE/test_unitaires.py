@@ -37,20 +37,5 @@ def _run_fb_test(fb_name: str):
         pytest.fail(error_msg)
     assert proc.returncode == 0
 
-
-@pytest.mark.ci_fb
-@pytest.mark.unit
-def test_FB_Cycle():
-    _run_fb_test("FB_Cycle")
-
-
-@pytest.mark.ci_fb
-@pytest.mark.unit
-def test_FB_DiveSearch():
-    _run_fb_test("FB_DiveSearch")
-
-
-@pytest.mark.ci_fb
-@pytest.mark.unit
-def test_FB_ExtractionSequence():
-    _run_fb_test("FB_ExtractionSequence")
+# FB_Cycle, FB_DiveSearch et FB_ExtractionAssist retirés de la CI le 2026-09-05
+# (retrait des entrées registry.yaml correspondantes).
