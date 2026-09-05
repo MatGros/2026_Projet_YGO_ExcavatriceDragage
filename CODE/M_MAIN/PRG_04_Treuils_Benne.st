@@ -331,8 +331,8 @@ instBucket(
     Mode                := PRG_03_Modes_Cycle.Data.Auth.Mode,
     CmdOpen_IHM         := instArbBucket.CmdOpen_IHM,
     CmdClose_IHM        := CmdBucketCloseArbitrated,
-    ReqAscent           := WinchBothReqAscent,
-    ReqDescend          := WinchBothReqDescend,
+    ReqAscent           := WinchBothReqAscent OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_02_Acquisition.Data.Joystick.AxisY.Direction > 0),
+    ReqDescend          := WinchBothReqDescend OR (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO AND PRG_02_Acquisition.Data.Joystick.AxisY.Direction < 0),
     EffectivePermitBucket_Open := EffectivePermitBucket_Open,
     EffectivePermitBucket_Close := EffectivePermitBucket_Close,
     CablePosM1          := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
@@ -608,6 +608,14 @@ instWinchSync(
     Contactor4_M1   := instWinchM1.Contactor4,
     Contactor4_M2   := instWinchM2.Contactor4,
     BypassGlobal    := GVL_IHM.M1M2Sync.Bypass.Global
+                       OR GVL_IHM.M1TreuilRetenue.Bypass.Global
+                       OR GVL_IHM.M2TreuilBenne.Bypass.Global
+                       OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback
+                       OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback
+                       OR GVL_IHM.M1TreuilRetenue.Bypass.Safety
+                       OR GVL_IHM.M2TreuilBenne.Bypass.Safety
+                       OR GVL_IHM.M1TreuilRetenue.Bypass.Process
+                       OR GVL_IHM.M2TreuilBenne.Bypass.Process
 );
 
 // Pas de reconstruction de table M2 : le clamp §5ter (M2MaxStep* := 1) suffit

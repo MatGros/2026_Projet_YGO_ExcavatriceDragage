@@ -155,7 +155,7 @@ BottomPositionConfirmed := FALSE;
 
 instCycleSemiAuto(
     Enable                  := (instModes.Auth.Mode = E_Mode.SEMI_AUTO),
-    Reset                   := GVL_IHM.CycleSemiAuto.Cmd.BtnReset,
+    Reset                   := GVL_IHM.CycleSemiAuto.Cmd.BtnReset OR PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState <> DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState <> DEVICE_STATE.RUNNING),
     Mode                    := instModes.Auth.Mode,

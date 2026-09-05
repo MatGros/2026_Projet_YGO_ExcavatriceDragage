@@ -484,7 +484,11 @@ ELSIF EmergencyArmingFailed THEN
 ELSIF NOT PowerContactorEngaged THEN
     OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN
-    OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
+    IF SyncContactorDiag.MismatchLevel >= 1 THEN
+        OperatorActionCandidate := '[SYNC] Discordance contacteurs M1/M2 - Acquitter SafeStop';
+    ELSE
+        OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
+    END_IF;
 ELSIF DirectionBlocked THEN
     IF CurrentDirection < 0 THEN
         OperatorActionCandidate := '[TREUIL] Descente interdite';
