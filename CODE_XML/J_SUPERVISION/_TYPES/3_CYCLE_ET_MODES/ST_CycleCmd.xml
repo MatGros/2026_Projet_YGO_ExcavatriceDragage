@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T04:57:07.359765" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T04:57:07.359765">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T09:48:08.622171" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T09:48:08.622171">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -72,6 +72,25 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ Option maintenue : repositionnement couplé M1+M2 pendant le vidage trémie (X11b &lt;-&gt; X11c)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglCommissioning">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Case mise en service : déverrouille le forçage de step (front/impulsion). NON persisté.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnForceStepApply">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Applique le forçage de step (front) — impulsion ; cible = ST_CycleCfg.ForceStepTarget</xhtml>
               </documentation>
             </variable>
           </struct>

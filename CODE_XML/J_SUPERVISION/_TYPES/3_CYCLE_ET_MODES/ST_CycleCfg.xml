@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T13:36:52.457260" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T13:36:52.457260">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T09:48:20.595929" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T09:48:20.595929">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -79,6 +79,17 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Palier max montée contrôle AX11, borné [1..2] côté FB (GEL Q16)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepTarget">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=AX0 .. 20=AX_DIVING_RETRY), borné côté FB</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">

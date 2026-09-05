@@ -342,6 +342,17 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Palier max montée contrôle AX11, borné [1..2] côté FB (GEL Q16)</xhtml>
               </documentation>
             </variable>
+            <variable name="ForceStepTarget">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=AX0 .. 20=AX_DIVING_RETRY), borné côté FB</xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -11845,53 +11856,53 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
     // (priorités AU/puissance/SafeStop/DirectionBlocked ci-dessus dominent).
     CASE CycleStep OF
         E_AutoCycleStep.AX0_REPOS:
-            OperatorActionCandidate := '[IHM/JOYSTICK] Démarrer le cycle (bouton Start ou homme-mort)';
+            OperatorActionCandidate := '[IHM-JOY] Appuyer Start Cycle (ou homme-mort) pour initialiser';
         E_AutoCycleStep.AX1_INIT:
             IF CycleStateStr &lt;&gt; '' THEN
                 OperatorActionCandidate := CONCAT('[INIT] ', CycleStateStr);
             ELSE
-                OperatorActionCandidate := '[IHM] Vérifier conditions initiales (référencement, treuil FDC haut)';
+                OperatorActionCandidate := '[INIT] Verifier conditions initiales (referencement, FDC haut)';
             END_IF;
         E_AutoCycleStep.AX2_TRANSLATE_P1:
-            OperatorActionCandidate := '[JOYSTICK] Pousser vers la droite : translation vers P1';
+            OperatorActionCandidate := '[JOY] Pousser a droite : translation vers P1';
         E_AutoCycleStep.AX3_OPEN_BUCKET:
-            OperatorActionCandidate := '[IHM] Ouverture benne en cours';
+            OperatorActionCandidate := '[JOY] Pousser descente : ouverture benne jusqu au FDC';
         E_AutoCycleStep.AX4_DESCEND_DIVING:
-            OperatorActionCandidate := '[JOYSTICK] Descendre palier 4 jusqu a l altimetrie de lancement';
+            OperatorActionCandidate := '[JOY] Pousser descente : plongee palier 4';
         E_AutoCycleStep.AX5_KOBOLD_INIT:
-            OperatorActionCandidate := '[JOYSTICK] Maintenir descente : init Kobold en cours';
+            OperatorActionCandidate := '[JOY] Maintenir descente : init Kobold';
         E_AutoCycleStep.AX6_SEARCH_IMMERSION:
-            OperatorActionCandidate := '[JOYSTICK] Maintenir descente : entree dans l eau attendue';
+            OperatorActionCandidate := '[JOY] Maintenir descente : recherche immersion';
         E_AutoCycleStep.AX7_SEARCH_BOTTOM:
-            OperatorActionCandidate := '[JOYSTICK] Maintenir descente : detection du fond';
+            OperatorActionCandidate := '[JOY] Maintenir descente : recherche fond (Kobold)';
         E_AutoCycleStep.AX8_BOTTOM_CONFIRMED:
-            OperatorActionCandidate := '[IHM] Fond touche';
+            OperatorActionCandidate := '[JOY] Fond atteint : relacher puis tirer pour extraire';
         E_AutoCycleStep.AX_DIVING_RETRY:
-            OperatorActionCandidate := '[JOYSTICK] Reprise plongee : remonter au FDC haut';
+            OperatorActionCandidate := '[JOY] Reprise plongee : remonter au FDC haut';
         E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM:
-            OperatorActionCandidate := '[JOYSTICK] Retente des cables (palier 1)';
+            OperatorActionCandidate := '[JOY] Tirer montee (P1) : retente et decollage';
         E_AutoCycleStep.AX10_CLOSE_BUCKET:
-            OperatorActionCandidate := '[IHM] Fermeture benne en cours';
+            OperatorActionCandidate := '[JOY] Tirer montee : fermeture de la benne';
         E_AutoCycleStep.AX11_CTRL_ASCENT:
-            OperatorActionCandidate := '[JOYSTICK] Remontee de controle';
+            OperatorActionCandidate := '[JOY] Tirer montee : remontee de controle';
         E_AutoCycleStep.AX12_LOADED_ASCENT:
-            OperatorActionCandidate := '[IHM] Remontee en charge';
+            OperatorActionCandidate := '[JOY] Tirer montee : remontee en charge';
         E_AutoCycleStep.AX13_DRAIN_PAUSE:
-            OperatorActionCandidate := '[IHM] Attendre egouttage (ou bypass IHM)';
+            OperatorActionCandidate := '[CYCLE] Egouttage en cours (attendre tempo ou bouton Passer)';
         E_AutoCycleStep.AX14_TRANSLATE_DUMP:
-            OperatorActionCandidate := '[JOYSTICK] Deplacer vers tremie';
+            OperatorActionCandidate := '[JOY] Pousser a gauche : translation vers tremie';
         E_AutoCycleStep.AX15A_DUMP_ARRIVE, E_AutoCycleStep.AX15B_DUMP_OPEN:
-            OperatorActionCandidate := '[IHM] Vidage benne';
+            OperatorActionCandidate := '[JOY] Pousser descente : vidage benne a la tremie';
         E_AutoCycleStep.AX15C_DUMP_REPOSITION:
-            OperatorActionCandidate := '[IHM] Vidage benne';
+            OperatorActionCandidate := '[JOY] Pousser descente : vidage benne a la tremie';
         E_AutoCycleStep.AX18_DONE_SYNC:
-            OperatorActionCandidate := '[JOYSTICK] Cycle termine : aller en P1 pour recommencer';
+            OperatorActionCandidate := '[JOY] Cycle termine : pousser a droite vers P1';
         E_AutoCycleStep.AX_STAB:
             // Libellé de l'étape d'origine du défaut (CycleStepAtError).
             CASE CycleStepAtError OF
-                E_AutoCycleStep.AX0_REPOS: StepAtErrorStr := 'X0 (préparation)';
-                E_AutoCycleStep.AX1_INIT: StepAtErrorStr := 'X1 (référencement)';
-                E_AutoCycleStep.AX2_TRANSLATE_P1: StepAtErrorStr := 'X2 (sélection position)';
+                E_AutoCycleStep.AX0_REPOS: StepAtErrorStr := 'X0 (preparation)';
+                E_AutoCycleStep.AX1_INIT: StepAtErrorStr := 'X1 (referencement)';
+                E_AutoCycleStep.AX2_TRANSLATE_P1: StepAtErrorStr := 'X2 (selection position)';
                 E_AutoCycleStep.AX3_OPEN_BUCKET: StepAtErrorStr := 'X3 (ouverture benne)';
                 E_AutoCycleStep.AX4_DESCEND_DIVING: StepAtErrorStr := 'AX4 (plongee palier 4)';
                 E_AutoCycleStep.AX5_KOBOLD_INIT: StepAtErrorStr := 'AX5 (init Kobold)';
@@ -11915,9 +11926,9 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             END_CASE;
             // Message compact : ID défaut (ErrorId) + étape d'origine + acquitter.
             // Le détail de la cause est consultable dans le dépannage (GVL_Troubleshooting).
-            OperatorActionCandidate := CONCAT('[PUPITRE] Défaut #', CONCAT(WORD_TO_STRING(CycleErrorId), CONCAT(' (étape ', CONCAT(StepAtErrorStr, ') - acquitter'))));
+            OperatorActionCandidate := CONCAT('[PUPITRE] Defaut #', CONCAT(WORD_TO_STRING(CycleErrorId), CONCAT(' (etape ', CONCAT(StepAtErrorStr, ') - acquitter'))));
         ELSE
-            OperatorActionCandidate := '[IHM] Cycle en cours...';
+            OperatorActionCandidate := '[CYCLE] Cycle en cours...';
     END_CASE;
 ELSIF DiveActive AND CurrentDirection &lt; 0 THEN
     OperatorActionCandidate := '[TREUIL] Attendre fin du Dive';

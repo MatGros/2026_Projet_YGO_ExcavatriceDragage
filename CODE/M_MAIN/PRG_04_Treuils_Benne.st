@@ -400,6 +400,8 @@ SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
     AND NOT instBucket.Lifecycle.Busy
     AND NOT ManualBucketJogActive
+    AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
+    AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose
     AND instBucket.ActiveOffsetValid;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
@@ -1087,7 +1089,12 @@ ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
                OR ArmM3TremieAvail OR ArmM3MaintenanceAvail;
 
 // Conditions de base (AC1) — priorite decroissante pour le motif.
-ArmBucketBusy := instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q;
+// En SEMI_AUTO ou lors d'une commande benne programme (AX3_OPEN_BUCKET / vidage), l'operateur
+// doit pouvoir armer l'homme-mort (DeadmanArmed) pour autoriser le mouvement benne !
+ArmBucketBusy := (instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q)
+                 AND (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.SEMI_AUTO)
+                 AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
+                 AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
 ArmModeDisabled := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.DISABLE);
 ArmContactorOff := NOT PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
 ArmPowerCutOff := instSafetyWinchM1.PowerCutOff OR instSafetyWinchM2.PowerCutOff
