@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:31:30.145411" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:31:30.145411">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T12:12:25.610205" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T12:12:25.610205">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -5199,6 +5199,30 @@ jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) �
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Reset + neutre + nouvelle demande obligatoires</xhtml>
               </documentation>
             </variable>
+            <variable name="FinalRestartRequired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Purge anti-redemarrage armee : AuthorizedStep force a 0 tant que non purgee (distinct de RestartInhibit)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalMotorRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Demande moteur vue par la barriere finale (palier&gt;0 ET un seul sens)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalNeutralRequestSeen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Passage au neutre observe pendant un RestartInhibit</xhtml>
+              </documentation>
+            </variable>
             <variable name="BrakeCommandOpenConfirmed">
               <type>
                 <BOOL />
@@ -7443,6 +7467,10 @@ GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx411_StepDelayElapsed := Wi
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx412_InTopSlowdownZone := WinchM1.State.InTopSlowdownZone;
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx413_InBottomSlowdownZone := WinchM1.State.InBottomSlowdownZone;
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx414_BottomLimitActiveM := WinchM1.State.BottomLimitActiveM;
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx415_MotorRequest := WinchM1.State.FinalMotorRequest;
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired := WinchM1.State.FinalRestartRequired;
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx417_RestartInhibit := WinchM1.State.FinalRestartInhibit;
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx418_NeutralRequestSeen := WinchM1.State.FinalNeutralRequestSeen;
 
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_DQ := WinchM1.State.RelayFwd;
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_DQ := WinchM1.State.RelayRev;
@@ -7518,6 +7546,10 @@ GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx411_StepDelayElapsed := Wi
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx412_InTopSlowdownZone := WinchM2.State.InTopSlowdownZone;
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx413_InBottomSlowdownZone := WinchM2.State.InBottomSlowdownZone;
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx414_BottomLimitActiveM := WinchM2.State.BottomLimitActiveM;
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx415_MotorRequest := WinchM2.State.FinalMotorRequest;
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx416_RestartRequired := WinchM2.State.FinalRestartRequired;
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx417_RestartInhibit := WinchM2.State.FinalRestartInhibit;
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx418_NeutralRequestSeen := WinchM2.State.FinalNeutralRequestSeen;
 
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_DQ := WinchM2.State.RelayFwd;
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_DQ := WinchM2.State.RelayRev;

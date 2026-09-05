@@ -1029,6 +1029,30 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Reset + neutre + nouvelle demande obligatoires</xhtml>
               </documentation>
             </variable>
+            <variable name="FinalRestartRequired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Purge anti-redemarrage armee : AuthorizedStep force a 0 tant que non purgee (distinct de RestartInhibit)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalMotorRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Demande moteur vue par la barriere finale (palier&gt;0 ET un seul sens)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalNeutralRequestSeen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Passage au neutre observe pendant un RestartInhibit</xhtml>
+              </documentation>
+            </variable>
             <variable name="BrakeCommandOpenConfirmed">
               <type>
                 <BOOL />

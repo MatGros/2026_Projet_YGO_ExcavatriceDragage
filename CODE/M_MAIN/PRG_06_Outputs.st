@@ -158,7 +158,9 @@ instWinchOutputInterlockM1(
     RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor2,
     RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor3,
     RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep,
+    DeadTimeSameDir             := T#0ms, // ESSAI 2026-09-05 : temps mort directionnel neutralise (diagnostic blocage AX3)
+    DeadTimeOppositeDir         := T#0ms  // ESSAI 2026-09-05 : idem
 );
 
 M1RelayFwd        := instWinchOutputInterlockM1.RelayFwd;
@@ -217,7 +219,9 @@ instWinchOutputInterlockM2(
     RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor2,
     RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor3,
     RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep,
+    DeadTimeSameDir             := T#0ms, // ESSAI 2026-09-05 : temps mort directionnel neutralise (diagnostic blocage AX3)
+    DeadTimeOppositeDir         := T#0ms  // ESSAI 2026-09-05 : idem
 );
 
 M2RelayFwd        := instWinchOutputInterlockM2.RelayFwd;

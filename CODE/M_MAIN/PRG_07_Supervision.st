@@ -116,7 +116,8 @@ instDiagIhmHeartbeat(
 FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
                     OR GVL_IHM.M1TreuilRetenue.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset
-                    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;
+                    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset
+                    OR GVL_IHM.CycleSemiAuto.Cmd.BtnReset; // T -> alimente aussi PRG_03.instCycleSemiAuto.Reset (retour, scan suivant)
 
 
 {endregion}

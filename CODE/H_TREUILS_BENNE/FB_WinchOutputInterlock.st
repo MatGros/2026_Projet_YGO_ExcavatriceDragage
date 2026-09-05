@@ -67,7 +67,10 @@ VAR_OUTPUT
 
     // === DIAGNOSTICS ET TEMPORISATIONS ===
     BrakeTimeoutElapsed             : TIME;                           // <-- [DIAG] Ecoule temporisation watchdog frein
-    RestartInhibit                  : BOOL;                           // <-- [DIAG] Inhibition redemarrage actif
+    RestartInhibit                  : BOOL;                           // <-- [DIAG] Inhibition redemarrage actif (latch, exige Reset)
+    RestartRequired                 : BOOL;                           // <-- [DIAG] Purge anti-redemarrage armee (AuthorizedStep force a 0 tant que non purgee)
+    MotorRequest                    : BOOL;                           // <-- [DIAG] Demande moteur vue par la barriere (palier>0 ET un seul sens)
+    NeutralRequestSeen              : BOOL;                           // <-- [DIAG] Passage au neutre observe pendant un RestartInhibit
     RestartDelayElapsed             : TIME;                           // <-- [DIAG] Ecoule temporisation anti-court-cycle
     DeadTimeElapsed                 : TIME;                           // <-- [DIAG] Ecoule temps mort directionnel
     StepDelayElapsed                : TIME;                           // <-- [DIAG] Ecoule temporisation palier
@@ -97,12 +100,10 @@ VAR
     ReleaseOrderDone                : BOOL;                           // . [LOC] One-shot ordre de relachement effectue (anti-bouclage)
 
     // === VARIABLES LOCALES CALCULÉES ===
-    RestartRequired                 : BOOL;                           // . [LOC] Exigence de retour au neutre pour redemarrage
+    // (RestartRequired, MotorRequest, NeutralRequestSeen promus en VAR_OUTPUT diagnostics ci-dessus)
     ResetRequired                   : BOOL;                           // . [LOC] Exigence d'acquittement Reset conscient
-    NeutralRequestSeen              : BOOL;                           // . [LOC] Observation passage consigne au neutre
     RequestedStepClamped            : INT;                            // . [LOC] Palier demande borne dans [0..5]
     StepDelayTarget                 : INT;                            // . [LOC] Cible palier memorisee
-    MotorRequest                    : BOOL;                           // . [LOC] Demande mouvement moteur active
     BrakeTimeoutCause               : BOOL;                           // . [LOC] Cause timeout frein presente
     BrakeTimeoutAck                 : BOOL := TRUE;                  // . [LOC] Acquittement cause timeout frein
     LastDirection                   : INT;                            // . [LOC] Dernier sens commande (1 montee / -1 descente)
