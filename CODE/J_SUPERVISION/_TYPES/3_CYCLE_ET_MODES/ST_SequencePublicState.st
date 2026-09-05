@@ -25,29 +25,7 @@ STRUCT
     SpeedMismatchConfirmed : BOOL;          // Écart vitesse confirmé pendant timeout
     CurrentCycleElapsed : TIME;             // Durée écoulée du cycle SEMI_AUTO en cours
     LastCycleDuration   : TIME;             // Durée du dernier cycle SEMI_AUTO achevé (figée à X13)
-
-    // === 🤿 ÉTATS ASSISTANTS DE DRAGAGE (CENTRALISÉS PRG_03) ===
-    DiveReady                   : BOOL;                    // Assistance plongée prête
-    DiveBusy                    : BOOL;                    // Assistance plongée active
-    DiveDone                    : BOOL;                    // Assistance plongée terminée
-    DiveError                   : BOOL;                    // Défaut assistance plongée
-    DiveErrorId                 : WORD;                    // Code défaut plongée
-    DiveState                   : E_DiveSearchState;       // Phase interne de recherche fond Kobold
-    DiveStepAtFault             : E_DiveSearchState;       // Phase interne mémorisée au défaut plongée
-    BottomTouchConfirmed        : BOOL;                    // Contact fond Kobold confirmé
-    ExtractionReady             : BOOL;                    // Assistance extraction prête
-    ExtractionBusy              : BOOL;                    // Assistance extraction active
-    ExtractionDone              : BOOL;                    // Assistance extraction terminée
-    ExtractionError             : BOOL;                    // Défaut assistance extraction
-    ExtractionErrorId           : WORD;                    // Code défaut extraction
-    ExtractionState             : E_ExtractionAssistState;// Phase interne séquence extraction
-    ExtractionStepAtFault       : E_ExtractionAssistState;// Phase interne mémorisée au défaut extraction
-    DumpAtTremieArmed           : BOOL;                    // Option vidage trémie armée IHM
-    DumpAtTremieAssistActive    : BOOL;                    // Assistance vidage trémie active
-    DumpAtTremieAtTremie        : BOOL;                    // Chariot M3 positionné à la trémie
-    DumpAtTremieBucketOpenArmed : BOOL;                    // Commande ouverture benne à la trémie
-    DumpAtTremieDescentLocked   : BOOL;                    // Descending treuil verrouillée à la trémie
-    BypassDiveActive            : BOOL;                    // Bypass séquence plongée armé
-    BypassKoboldBottomTouched   : BOOL;                    // Fond touché sous bypass
+    BottomTouchConfirmed        : BOOL;                    // Contact fond Kobold confirmé (manuel + bypass)
+    DumpAtTremieDescentLocked   : BOOL;                    // Verrou descente treuil "vidage à la trémie" (PRG_04 §5)
 END_STRUCT
 END_TYPE

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T08:45:21.925224" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T08:45:21.925224">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:47:52.652032" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:47:52.652032">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -23,67 +23,6 @@
   </contentHeader>
   <types>
     <dataTypes>
-      <dataType name="ST_CycleAssistToggles">
-        <baseType>
-          <struct>
-            <variable name="TglEnableDiveSearch">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance plongée mémorisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableExtractionSequence">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance extraction mémorisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglEnableDumpAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode assistance vidage trémie mémorisé</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b8d5367f-703e-50e4-b308-00377a6188b7</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎛️ ST_CycleAssistToggles — Toggles assistance mémorisés au boot
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
       <dataType name="ST_BucketCfg">
         <baseType>
           <struct>
@@ -375,133 +314,6 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_CycleCfg — Configuration du cycle semi-automatique
    SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleDiveSearchCfg">
-        <baseType>
-          <struct>
-            <variable name="DiveStartMin_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position mini M1/M2 avant plongée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionUpper_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute fenêtre front immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionLower_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="-0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse fenêtre front immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>42ebb53a-45c2-5353-807e-c73f913cfb78</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_CycleDiveSearchCfg — Réglages persistants cycle plongée (DiveSearch)
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleDumpAtTremieCfg">
-        <baseType>
-          <struct>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b2ec5a9c-7e18-56a8-be1d-202932b2b8c1</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_CycleDumpAtTremieCfg — Réglages persistants cycle vidage trémie (legacy)
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleExtractionCfg">
-        <baseType>
-          <struct>
-            <variable name="ExtractionControlDistance_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 avant accélération</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>4c14feb8-ddba-5e35-a2e4-6711b9795a14</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_CycleExtractionCfg — Réglages persistants cycle extraction
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -1080,136 +892,6 @@ fournie par la configuration persistante de l'appelant.
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>6e89b113-d6f1-5719-b130-7af999a1c7fd</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_DiveSearchState">
-        <baseType>
-          <enum>
-            <values>
-              <value name="WAIT_PRECONDITIONS" value="0" />
-              <value name="READY_TO_DESCEND" value="1" />
-              <value name="SEARCHING_IMMERSION" value="2" />
-              <value name="SEARCHING_BOTTOM" value="3" />
-              <value name="BOTTOM_CONFIRMED" value="4" />
-              <value name="ERROR_HOLD" value="5" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>WAIT_PRECONDITIONS</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente benne ouverte, positions et Kobold au repos</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY_TO_DESCEND</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt à assister une demande de descente</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEARCHING_IMMERSION</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descending : attente front 0-&gt;1 dans fenêtre eau</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEARCHING_BOTTOM</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1-&gt;0 au fond</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BOTTOM_CONFIRMED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé ; extraction peut être demandée</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>ERROR_HOLD</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquence invalide, descente assistée interdite</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>31b3ae05-ab16-51e7-b786-307d668b63e5</ObjectId>
-          </data>
-        </addData>
-      </dataType>
-      <dataType name="E_ExtractionAssistState">
-        <baseType>
-          <enum>
-            <values>
-              <value name="WAIT_BOTTOM_CONFIRMATION" value="0" />
-              <value name="READY_TO_CLOSE" value="1" />
-              <value name="CLOSING_BUCKET" value="2" />
-              <value name="CONTROL_ASCENT" value="3" />
-              <value name="NOMINAL_ASCENT" value="4" />
-              <value name="ERROR_HOLD" value="5" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>WAIT_BOTTOM_CONFIRMATION</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente fond Kobold ou attestation opérateur</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY_TO_CLOSE</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt à fermer la benne</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>CLOSING_BUCKET</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">FB_Bucket ferme M2 seul</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>CONTROL_ASCENT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">M1/M2 synchronisés au palier sans contacteur vitesse</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>NOMINAL_ASCENT</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Ascending couplée avec vitesse demandée opérateur</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>ERROR_HOLD</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut extraction, reprise interdite avant reset</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>52924d25-cfcc-5dc2-a673-d7581dfb2d37</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -2229,99 +1911,6 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    information machine destinée à l'opérateur) — reste seul dans GVL_IHM.
    🧭 Structuration homogène : états → Cfg → Bypass (Cfg au-dessus de Bypass,
    Bypass en bas), cohérent avec ST_WinchHMI / ST_SyncHMI.
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleDiveSearchHMI">
-        <baseType>
-          <struct>
-            <variable name="Cmd">
-              <type>
-                <derived name="ST_CycleDiveSearchCmd" />
-              </type>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="ST_CycleDiveSearchState" />
-              </type>
-            </variable>
-            <variable name="Cfg">
-              <type>
-                <derived name="ST_CycleDiveSearchCfg" />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>f71b4459-210c-5e4b-970e-b20dee0f8d37</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🪨 ST_CycleDiveSearchHMI — Échange IHM cycle plongée (DiveSearch)
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleDumpAtTremieHMI">
-        <baseType>
-          <struct>
-            <variable name="Cmd">
-              <type>
-                <derived name="ST_CycleDumpAtTremieCmd" />
-              </type>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="ST_CycleDumpAtTremieState" />
-              </type>
-            </variable>
-            <variable name="Cfg">
-              <type>
-                <derived name="ST_CycleDumpAtTremieCfg" />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>c0587c83-3078-56cd-86a5-3e7ffbe0c663</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🪨 ST_CycleDumpAtTremieHMI — Échange IHM cycle vidage trémie (legacy)
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleExtractionHMI">
-        <baseType>
-          <struct>
-            <variable name="Cmd">
-              <type>
-                <derived name="ST_CycleExtractionCmd" />
-              </type>
-            </variable>
-            <variable name="State">
-              <type>
-                <derived name="ST_CycleExtractionState" />
-              </type>
-            </variable>
-            <variable name="Cfg">
-              <type>
-                <derived name="ST_CycleExtractionCfg" />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>98302889-117c-5dc5-ac5b-a8da53553282</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🪨 ST_CycleExtractionHMI — Échange IHM cycle extraction
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -4411,304 +4000,6 @@ Seuils de changement de palier (0..100%)</xhtml>
             <ObjectId>53f9b377-a390-54de-9b7c-d1db8711e403</ObjectId>
           </data>
         </addData>
-      </dataType>
-      <dataType name="ST_CycleDiveSearchCmd">
-        <baseType>
-          <struct>
-            <variable name="TglEnableDiveSearch">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance plongée active</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglBypassDiveSearchSequence">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass séquence DiveSearch</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TglBucketAtBottomConfirmed">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Attestation manuelle fond</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>539dd136-1eb8-5d15-aa53-4b386fa9db25</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎮 ST_CycleDiveSearchCmd — Sélections IHM cycle plongée (DiveSearch)
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleDiveSearchState">
-        <baseType>
-          <struct>
-            <variable name="DiveReady">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DiveBusy">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DiveDone">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DiveError">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="DiveErrorId">
-              <type>
-                <WORD />
-              </type>
-            </variable>
-            <variable name="DiveState">
-              <type>
-                <derived name="E_DiveSearchState" />
-              </type>
-            </variable>
-            <variable name="DiveStepAtFault">
-              <type>
-                <derived name="E_DiveSearchState" />
-              </type>
-            </variable>
-            <variable name="BottomTouchConfirmed">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="BypassDiveActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TglBypassDiveSearchSequence armé (descente couplée en cours)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="BypassKoboldBottomTouched">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirmé par le bypass (front montant Kobold en descente)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OperatorActionId">
-              <type>
-                <WORD />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Une seule consigne conduite, arbitré en PRG_03</xhtml>
-              </documentation>
-            </variable>
-            <variable name="OperatorAction">
-              <type>
-                <string length="120" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Texte de secours ; IHM peut mapper l'identifiant</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b30ad366-6fd5-5713-9050-b1453c43c4d4</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🚦 ST_CycleDiveSearchState — États publics cycle plongée (DiveSearch)
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleDumpAtTremieCmd">
-        <baseType>
-          <struct>
-            <variable name="TglEnableDumpAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode vidage à la trémie — RESTREINT des mouvements dès le boot</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>8fac4fdd-32e8-5449-81b4-b99cc55e1ec1</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎮 ST_CycleDumpAtTremieCmd — Sélections IHM cycle vidage trémie (legacy)
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleDumpAtTremieState">
-        <baseType>
-          <struct>
-            <variable name="DumpAtTremieArmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">TglEnableDumpAtTremie (bit IHM brut)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DumpAtTremieAssistActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Armé ET Mode MAINT_N1/N2 (mode réellement actif)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DumpAtTremieAtTremie">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">M3_AtTremieStable</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DumpAtTremieBucketOpenArmed">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">CmdOpen_IHM déclenché par ce mode</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DumpAtTremieDescentLocked">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">DescendPermit M1/M2 forcé par ce mode (hors P1/Maintenance)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>c03dda17-2edb-57d1-b08b-ac95d74ba904</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🚦 ST_CycleDumpAtTremieState — États publics cycle vidage trémie (legacy)
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleExtractionCmd">
-        <baseType>
-          <struct>
-            <variable name="TglEnableExtractionSequence">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance extraction active</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>29dd1311-31ec-5709-92c5-68797776d6cb</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🎮 ST_CycleExtractionCmd — Sélections IHM cycle extraction
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleExtractionState">
-        <baseType>
-          <struct>
-            <variable name="ExtractionReady">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ExtractionBusy">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ExtractionDone">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ExtractionError">
-              <type>
-                <BOOL />
-              </type>
-            </variable>
-            <variable name="ExtractionErrorId">
-              <type>
-                <WORD />
-              </type>
-            </variable>
-            <variable name="ExtractionState">
-              <type>
-                <derived name="E_ExtractionAssistState" />
-              </type>
-            </variable>
-            <variable name="ExtractionStepAtFault">
-              <type>
-                <derived name="E_ExtractionAssistState" />
-              </type>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>1b6c66ac-378b-5183-a476-1f29ec042a66</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   🚦 ST_CycleExtractionState — États publics cycle extraction
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
       </dataType>
       <dataType name="ST_HwMachine">
         <baseType>
@@ -8003,38 +7294,6 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle homing machine</xhtml>
               </documentation>
             </variable>
-            <variable name="instCfgPersistBridgeCycleDiveSearchCfg">
-              <type>
-                <derived name="FB_CfgPersistBridge_CycleDiveSearchCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle plongée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instCfgPersistBridgeCycleExtractionCfg">
-              <type>
-                <derived name="FB_CfgPersistBridge_CycleExtractionCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle extraction</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instCfgPersistBridgeCycleDumpAtTremieCfg">
-              <type>
-                <derived name="FB_CfgPersistBridge_CycleDumpAtTremieCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config cycle vidage trémie</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instCfgPersistBridgeCycleAssistToggles">
-              <type>
-                <derived name="FB_CfgPersistBridge_CycleAssistToggles" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance toggles assistance</xhtml>
-              </documentation>
-            </variable>
             <variable name="instCfgPersistBridgeCommun">
               <type>
                 <derived name="FB_CfgPersistBridge_CommunCfg" />
@@ -8089,14 +7348,6 @@ Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Pont persistance config codeur commune M1/M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="AssistTogglesHmi">
-              <type>
-                <derived name="ST_CycleAssistToggles" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Toggles assistance (Hmi du pont toggles, répartis dans les 3 Cmd)</xhtml>
               </documentation>
             </variable>
             <variable name="instDiagIhmHeartbeat">
@@ -8532,7 +7783,7 @@ IF instCfgPersistBridgeCommun.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-instCfgPersistBridgeCycle(Hmi := GVL_IHM.Cycle.Cfg, Persist := _CycleCfgPersist);
+instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
 IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
@@ -8540,34 +7791,6 @@ END_IF;
 instCfgPersistBridgeCycleMachineHoming(Hmi := GVL_IHM.CycleMachineHoming.Cfg, Persist := _CycleMachineHomingCfgPersist);
 IF instCfgPersistBridgeCycleMachineHoming.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
-END_IF;
-
-// Ponts persistance configs cycle (DiveSearch / Extraction / DumpAtTremie)
-instCfgPersistBridgeCycleDiveSearchCfg(Hmi := GVL_IHM.CycleDiveSearch.Cfg, Persist := _CycleDiveSearchCfgPersist);
-IF instCfgPersistBridgeCycleDiveSearchCfg.JustRestored THEN
-    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
-END_IF;
-
-instCfgPersistBridgeCycleExtractionCfg(Hmi := GVL_IHM.CycleExtraction.Cfg, Persist := _CycleExtractionCfgPersist);
-IF instCfgPersistBridgeCycleExtractionCfg.JustRestored THEN
-    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
-END_IF;
-
-instCfgPersistBridgeCycleDumpAtTremieCfg(Hmi := GVL_IHM.CycleDumpAtTremie.Cfg, Persist := _CycleDumpAtTremieCfgPersist);
-IF instCfgPersistBridgeCycleDumpAtTremieCfg.JustRestored THEN
-    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
-END_IF;
-
-// Pont persistance toggles assistance (répartis dans les 3 Cmd, mémorisés via _CycleAssistTogglesPersist)
-AssistTogglesHmi.TglEnableDiveSearch         := GVL_IHM.CycleDiveSearch.Cmd.TglEnableDiveSearch;
-AssistTogglesHmi.TglEnableExtractionSequence := GVL_IHM.CycleExtraction.Cmd.TglEnableExtractionSequence;
-AssistTogglesHmi.TglEnableDumpAtTremie       := GVL_IHM.CycleDumpAtTremie.Cmd.TglEnableDumpAtTremie;
-instCfgPersistBridgeCycleAssistToggles(Hmi := AssistTogglesHmi, Persist := _CycleAssistTogglesPersist);
-IF instCfgPersistBridgeCycleAssistToggles.JustRestored THEN
-    GVL_IHM.CycleDiveSearch.Cmd.TglEnableDiveSearch         := AssistTogglesHmi.TglEnableDiveSearch;
-    GVL_IHM.CycleExtraction.Cmd.TglEnableExtractionSequence := AssistTogglesHmi.TglEnableExtractionSequence;
-    GVL_IHM.CycleDumpAtTremie.Cmd.TglEnableDumpAtTremie       := AssistTogglesHmi.TglEnableDumpAtTremie;
-    GVL_IHM.Commun.ConfigRestoredFromPersistent            := TRUE;
 END_IF;
 
 // Consigne variateur M3 (SetFreq_Hz) : pas de bridge Cfg dédié (c'est une Cmd, pas une
@@ -8861,7 +8084,7 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
                                       OR GVL_IHM.TranslationM3.Safety.Error
                                       OR GVL_IHM.M1M2Sync.State.Error
                                       OR GVL_IHM.M2TreuilBenne.Bucket.State.Error
-                                      OR GVL_IHM.Cycle.State.Error
+                                      OR GVL_IHM.CycleSemiAuto.State.Error
                                       OR GVL_IHM.JOY1Joystick.State.Error;
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
 GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;
@@ -8917,65 +8140,35 @@ GVL_IHM.Network.InputModules.Vh0008Er1Ok      := PRG_02_Acquisition.Data.InputMo
 GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputModules.Fault;
 
 // ---------- §3g. État cycle semi-auto &amp; bandeau ----------
-GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.Data.SequenceState.Ready;
-GVL_IHM.Cycle.State.Busy                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy;
-GVL_IHM.Cycle.State.Done                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done;
-GVL_IHM.Cycle.State.Error                  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error;
-GVL_IHM.Cycle.State.ErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId;
-GVL_IHM.Cycle.State.CycleStep              := PRG_03_Modes_Cycle.Data.SequenceState.Step;
-GVL_IHM.Cycle.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.SequenceState.StepStr;
-GVL_IHM.Cycle.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
-GVL_IHM.Cycle.State.SampleCount            := _CycleSampleCount;
-GVL_IHM.Cycle.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
-GVL_IHM.Cycle.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
-GVL_IHM.Cycle.State.SelTarget              := GVL_IHM.TranslationM3.Cmd.SelTarget;
-GVL_IHM.Cycle.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;
-GVL_IHM.Cycle.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
-GVL_IHM.Cycle.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
-GVL_IHM.Cycle.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
-GVL_IHM.Cycle.State.WinchSyncError         := PRG_04_Treuils_Benne.Data.WinchSyncError;
-GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.Data.WinchSyncSignedDeltaPosM;
-GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
-GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
-GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
+GVL_IHM.CycleSemiAuto.State.Ready                  := PRG_03_Modes_Cycle.Data.SequenceState.Ready;
+GVL_IHM.CycleSemiAuto.State.Busy                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy;
+GVL_IHM.CycleSemiAuto.State.Done                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done;
+GVL_IHM.CycleSemiAuto.State.Error                  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error;
+GVL_IHM.CycleSemiAuto.State.ErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId;
+GVL_IHM.CycleSemiAuto.State.CycleStep              := PRG_03_Modes_Cycle.Data.SequenceState.Step;
+GVL_IHM.CycleSemiAuto.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.SequenceState.StepStr;
+GVL_IHM.CycleSemiAuto.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
+GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
+GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
+GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
+GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.TranslationM3.Cmd.SelTarget;
+GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;
+GVL_IHM.CycleSemiAuto.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
+GVL_IHM.CycleSemiAuto.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
+GVL_IHM.CycleSemiAuto.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
+GVL_IHM.CycleSemiAuto.State.WinchSyncError         := PRG_04_Treuils_Benne.Data.WinchSyncError;
+GVL_IHM.CycleSemiAuto.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.Data.WinchSyncSignedDeltaPosM;
+GVL_IHM.CycleSemiAuto.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
+GVL_IHM.CycleSemiAuto.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
+GVL_IHM.CycleSemiAuto.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
 // Position cycle : meme gel affichage que M1TreuilRetenue/M2TreuilBenne pendant le preset codeur.
-GVL_IHM.Cycle.State.M1Position_M           := SEL(M1PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM, M1PosHmiHeld_M);
-GVL_IHM.Cycle.State.M2Position_M           := SEL(M2PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM, M2PosHmiHeld_M);
-GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
+GVL_IHM.CycleSemiAuto.State.M1Position_M           := SEL(M1PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM, M1PosHmiHeld_M);
+GVL_IHM.CycleSemiAuto.State.M2Position_M           := SEL(M2PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM, M2PosHmiHeld_M);
+GVL_IHM.CycleSemiAuto.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
 // 🕹️ JoystickDeflected = déflexion joystick seule (SANS homme-mort) — même signal que
 // JoystickDeflected (FB_CycleSemiAuto, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
 // « joystick défléchi » est projeté à l'IHM.
-GVL_IHM.Cycle.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
-
-// 🔄 Miroir parfait GVL_IHM.CycleSemiAuto (compatibilité IHM)
-GVL_IHM.CycleSemiAuto.State := GVL_IHM.Cycle.State;
-GVL_IHM.CycleSemiAuto.Cfg   := GVL_IHM.Cycle.Cfg;
-
-// Projection Assistance Dragage (CycleDiveSearch / CycleExtraction / CycleDumpAtTremie)
-GVL_IHM.CycleDiveSearch.State.DiveReady                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveReady;
-GVL_IHM.CycleDiveSearch.State.DiveBusy                   := PRG_03_Modes_Cycle.Data.SequenceState.DiveBusy;
-GVL_IHM.CycleDiveSearch.State.DiveDone                   := PRG_03_Modes_Cycle.Data.SequenceState.DiveDone;
-GVL_IHM.CycleDiveSearch.State.DiveError                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveError;
-GVL_IHM.CycleDiveSearch.State.DiveErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.DiveErrorId;
-GVL_IHM.CycleDiveSearch.State.DiveState                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveState;
-GVL_IHM.CycleDiveSearch.State.DiveStepAtFault            := PRG_03_Modes_Cycle.Data.SequenceState.DiveStepAtFault;
-GVL_IHM.CycleDiveSearch.State.BottomTouchConfirmed       := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
-GVL_IHM.CycleExtraction.State.ExtractionReady             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionReady;
-GVL_IHM.CycleExtraction.State.ExtractionBusy              := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionBusy;
-GVL_IHM.CycleExtraction.State.ExtractionDone              := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionDone;
-GVL_IHM.CycleExtraction.State.ExtractionError             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionError;
-GVL_IHM.CycleExtraction.State.ExtractionErrorId           := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionErrorId;
-GVL_IHM.CycleExtraction.State.ExtractionState             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionState;
-GVL_IHM.CycleExtraction.State.ExtractionStepAtFault       := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionStepAtFault;
-GVL_IHM.CycleDiveSearch.State.OperatorActionId           := PRG_03_Modes_Cycle.Data.SequenceState.OperatorActionId;
-GVL_IHM.CycleDiveSearch.State.OperatorAction             := PRG_03_Modes_Cycle.Data.SequenceState.OperatorAction;
-GVL_IHM.CycleDumpAtTremie.State.DumpAtTremieArmed           := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieArmed;
-GVL_IHM.CycleDumpAtTremie.State.DumpAtTremieAssistActive      := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieAssistActive;
-GVL_IHM.CycleDumpAtTremie.State.DumpAtTremieAtTremie          := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieAtTremie;
-GVL_IHM.CycleDumpAtTremie.State.DumpAtTremieBucketOpenArmed   := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieBucketOpenArmed;
-GVL_IHM.CycleDumpAtTremie.State.DumpAtTremieDescentLocked     := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked;
-GVL_IHM.CycleDiveSearch.State.BypassDiveActive            := PRG_03_Modes_Cycle.Data.SequenceState.BypassDiveActive;
-GVL_IHM.CycleDiveSearch.State.BypassKoboldBottomTouched   := PRG_03_Modes_Cycle.Data.SequenceState.BypassKoboldBottomTouched;
+GVL_IHM.CycleSemiAuto.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
 instHmiBannerFormatter(
     Enable                := TRUE,
@@ -8983,12 +8176,10 @@ instHmiBannerFormatter(
     CurrentMode           := PRG_03_Modes_Cycle.Data.Auth.Mode,
     BothAxesCoupled       := (GVL_IHM.Modes.Cmd.SelJoystickWinch = 0),
     WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
-    CycleStep             := GVL_IHM.Cycle.State.CycleStep,
-    CycleStateStr         := GVL_IHM.Cycle.State.CycleStateStr,
+    CycleStep             := GVL_IHM.CycleSemiAuto.State.CycleStep,
+    CycleStateStr         := GVL_IHM.CycleSemiAuto.State.CycleStateStr,
     CycleErrorId          := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
     CycleStepAtError      := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
-    DiveState             := GVL_IHM.CycleDiveSearch.State.DiveState,
-    ExtractionState       := GVL_IHM.CycleExtraction.State.ExtractionState,
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
@@ -9008,7 +8199,7 @@ instHmiBannerFormatter(
     AscentPermit                := GVL_IHM.M1TreuilRetenue.Safety.AscentPermit AND GVL_IHM.M2TreuilBenne.Safety.AscentPermit,
     BucketIsOpen                := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     BucketIsClosed              := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
-    DiveActive                  := GVL_IHM.CycleDiveSearch.State.DiveBusy,
+    DiveActive                  := FALSE,
     TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent OR GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
     WinchBothMotionDirection := SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqAscent, SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend, 0, -1), 1),
     M1LogicRequestDirection := SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedAscent, SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedDescend, 0, -1), 1),
@@ -9029,8 +8220,8 @@ instHmiBannerFormatter(
     BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
     SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
     SyncContactorDiag           := PRG_06_Outputs.Data.SyncContactorDiag,
-    DiveErrorId                 := GVL_IHM.CycleDiveSearch.State.DiveErrorId,
-    ExtractionErrorId           := GVL_IHM.CycleExtraction.State.ExtractionErrorId,
+    DiveErrorId                 := 0,
+    ExtractionErrorId           := 0,
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
     RedundancyTestFailed         := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed,
     EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
@@ -9127,9 +8318,6 @@ instTroubleshootingView(
     Translation          := GVL_IHM.TranslationM3,
     Commun               := GVL_IHM.Commun,
     Network              := GVL_IHM.Network,
-    CycleDiveSearch      := GVL_IHM.CycleDiveSearch,
-    CycleExtraction      := GVL_IHM.CycleExtraction,
-    CycleDumpAtTremie    := GVL_IHM.CycleDumpAtTremie,
     JoystickHMI          := GVL_IHM.JOY1Joystick,
     Permits              := GVL_IHM.Permits,
     EmergencyState       := PRG_06_Outputs.EmergencyState,
@@ -9151,9 +8339,9 @@ instTroubleshootingView(
     CycleOperatorAction := PRG_03_Modes_Cycle.Data.SequenceState.OperatorAction,
     CycleExpectedAxis := PRG_03_Modes_Cycle.Data.SequenceState.ExpectedAxis,
     CycleExpectedDirection := PRG_03_Modes_Cycle.Data.SequenceState.ExpectedDirection,
-    CycleStartRequest    := GVL_IHM.Cycle.Cmd.BtnStart,
-    CycleAbortRequest    := GVL_IHM.Cycle.Cmd.BtnAbort,
-    CycleTargetDepth_M   := GVL_IHM.Cycle.Cfg.SetDepth_M,
+    CycleStartRequest    := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
+    CycleAbortRequest    := GVL_IHM.CycleSemiAuto.Cmd.BtnAbort,
+    CycleTargetDepth_M   := GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M,
     CycleKoboldBottomTouch := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     CycleSpeedMismatchActive := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive,
     CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
@@ -9595,70 +8783,6 @@ END_IF;
           </data>
         </addData>
       </pou>
-      <pou name="FB_CfgPersistBridge_CycleAssistToggles" pouType="functionBlock">
-        <interface>
-          <inputVars />
-          <outputVars>
-            <variable name="JustRestored">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
-&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <inOutVars>
-            <variable name="Hmi">
-              <type>
-                <derived name="ST_CycleAssistToggles" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
-&lt;-&gt; [BUS] Structure de toggles IHM</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Persist">
-              <type>
-                <derived name="ST_CycleAssistToggles" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de toggles persistante</xhtml>
-              </documentation>
-            </variable>
-          </inOutVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_CycleAssistToggles — Pont persistance toggles assistance
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
-   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
-   =======================================================================</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-JustRestored := FALSE;
-IF NOT Hmi.Initialized THEN
-    Hmi := Persist;
-    Hmi.Initialized := TRUE;
-    JustRestored := TRUE;
-ELSE
-    Persist := Hmi;
-END_IF;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>55437875-df03-58d3-90f0-d55c313c64e3</ObjectId>
-          </data>
-        </addData>
-      </pou>
       <pou name="FB_CfgPersistBridge_CycleCfg" pouType="functionBlock">
         <interface>
           <inputVars />
@@ -9720,198 +8844,6 @@ END_IF;
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>8d6e7f94-2d43-5ea3-b409-34f87f99a9e5</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_CfgPersistBridge_CycleDiveSearchCfg" pouType="functionBlock">
-        <interface>
-          <inputVars />
-          <outputVars>
-            <variable name="JustRestored">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
-&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <inOutVars>
-            <variable name="Hmi">
-              <type>
-                <derived name="ST_CycleDiveSearchCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
-&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Persist">
-              <type>
-                <derived name="ST_CycleDiveSearchCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
-              </documentation>
-            </variable>
-          </inOutVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_CycleDiveSearchCfg — Pont persistance cycle plongée
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
-   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
-   =======================================================================</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-JustRestored := FALSE;
-IF NOT Hmi.Initialized THEN
-    Hmi := Persist;
-    Hmi.Initialized := TRUE;
-    JustRestored := TRUE;
-ELSE
-    Persist := Hmi;
-END_IF;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>a92cb09a-e287-5430-8474-ac8533ffbe1a</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_CfgPersistBridge_CycleDumpAtTremieCfg" pouType="functionBlock">
-        <interface>
-          <inputVars />
-          <outputVars>
-            <variable name="JustRestored">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
-&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <inOutVars>
-            <variable name="Hmi">
-              <type>
-                <derived name="ST_CycleDumpAtTremieCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
-&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Persist">
-              <type>
-                <derived name="ST_CycleDumpAtTremieCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
-              </documentation>
-            </variable>
-          </inOutVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_CycleDumpAtTremieCfg — Pont persistance cycle vidage trémie
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
-   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
-   =======================================================================</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-JustRestored := FALSE;
-IF NOT Hmi.Initialized THEN
-    Hmi := Persist;
-    Hmi.Initialized := TRUE;
-    JustRestored := TRUE;
-ELSE
-    Persist := Hmi;
-END_IF;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>958f5330-cfab-5326-8351-b214608cfa61</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_CfgPersistBridge_CycleExtractionCfg" pouType="functionBlock">
-        <interface>
-          <inputVars />
-          <outputVars>
-            <variable name="JustRestored">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ETATS RESTAURATION ===
-&lt;-- [STAT] Vrai sur le cycle de restauration initiale</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <inOutVars>
-            <variable name="Hmi">
-              <type>
-                <derived name="ST_CycleExtractionCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== BUS CONFIGURATION ET PERSISTANCE ===
-&lt;-&gt; [BUS] Structure de configuration IHM</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Persist">
-              <type>
-                <derived name="ST_CycleExtractionCfg" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-&gt; [BUS] Structure de configuration persistante</xhtml>
-              </documentation>
-            </variable>
-          </inOutVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   💾 FB_CfgPersistBridge_CycleExtractionCfg — Pont persistance cycle extraction
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Restauration et synchronisation bidirectionnelle IHM / Persist
-   💾 Persistance : Transfert GVL_PERSISTENT &lt;-&gt; GVL_IHM sur Initialized
-   📄 Doc métier : DOC/AF/AF_Partie-03_Contrats_Composants_v2.3.md §3
-   =======================================================================</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-JustRestored := FALSE;
-IF NOT Hmi.Initialized THEN
-    Hmi := Persist;
-    Hmi.Initialized := TRUE;
-    JustRestored := TRUE;
-ELSE
-    Persist := Hmi;
-END_IF;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>99243b20-8012-5d76-ac19-bd7ef00af05b</ObjectId>
           </data>
         </addData>
       </pou>
@@ -10563,22 +9495,6 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Dernière étape avant le défaut (FB_CycleSemiAuto.CycleStepAtError)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="DiveState">
-              <type>
-                <derived name="E_DiveSearchState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] RESERVE : etat plongee FB_DiveSearch. Plus consomme depuis GRAFCET SEMI_AUTO 20 steps (diving = AX4..AX8). Conserve pour l'assistant hors SEMI_AUTO.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ExtractionState">
-              <type>
-                <derived name="E_ExtractionAssistState" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] État extraction</xhtml>
               </documentation>
             </variable>
             <variable name="MachineHomingStep">
@@ -12702,30 +11618,6 @@ Prev := Hmi;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.Network</xhtml>
               </documentation>
             </variable>
-            <variable name="CycleDiveSearch">
-              <type>
-                <derived name="ST_CycleDiveSearchHMI" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.CycleDiveSearch</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CycleExtraction">
-              <type>
-                <derived name="ST_CycleExtractionHMI" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.CycleExtraction</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CycleDumpAtTremie">
-              <type>
-                <derived name="ST_CycleDumpAtTremieHMI" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] GVL_IHM.CycleDumpAtTremie</xhtml>
-              </documentation>
-            </variable>
             <variable name="JoystickHMI">
               <type>
                 <derived name="ST_JoystickHMI" />
@@ -13295,42 +12187,8 @@ GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // T
 
 {endregion}
 
-{region "§4 Assistance dragage"}
-// === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist ===
-GVL_Troubleshooting.M_AssistanceDragage.Idx101_EnableDiveSearch         := CycleDiveSearch.Cmd.TglEnableDiveSearch;
-GVL_Troubleshooting.M_AssistanceDragage.Idx102_EnableExtractionSequence := CycleExtraction.Cmd.TglEnableExtractionSequence;
-GVL_Troubleshooting.M_AssistanceDragage.Idx103_EnableDumpAtTremie       := CycleDumpAtTremie.Cmd.TglEnableDumpAtTremie;
-
-GVL_Troubleshooting.M_AssistanceDragage.Idx201_DiveReady               := CycleDiveSearch.State.DiveReady;
-GVL_Troubleshooting.M_AssistanceDragage.Idx202_DiveBusy                := CycleDiveSearch.State.DiveBusy;
-GVL_Troubleshooting.M_AssistanceDragage.Idx203_DiveDone                := CycleDiveSearch.State.DiveDone;
-GVL_Troubleshooting.M_AssistanceDragage.Idx204_DiveState                := CycleDiveSearch.State.DiveState;
-GVL_Troubleshooting.M_AssistanceDragage.Idx205_DiveError                := CycleDiveSearch.State.DiveError;
-GVL_Troubleshooting.M_AssistanceDragage.Idx206_DiveErrorId              := CycleDiveSearch.State.DiveErrorId;
-GVL_Troubleshooting.M_AssistanceDragage.Idx207_BottomTouchConfirmed    := CycleDiveSearch.State.BottomTouchConfirmed;
-GVL_Troubleshooting.M_AssistanceDragage.Idx208_DiveStepAtFault          := CycleDiveSearch.State.DiveStepAtFault;
-
-GVL_Troubleshooting.M_AssistanceDragage.Idx301_ExtractionReady          := CycleExtraction.State.ExtractionReady;
-GVL_Troubleshooting.M_AssistanceDragage.Idx302_ExtractionBusy           := CycleExtraction.State.ExtractionBusy;
-GVL_Troubleshooting.M_AssistanceDragage.Idx303_ExtractionDone           := CycleExtraction.State.ExtractionDone;
-GVL_Troubleshooting.M_AssistanceDragage.Idx304_ExtractionState          := CycleExtraction.State.ExtractionState;
-GVL_Troubleshooting.M_AssistanceDragage.Idx305_ExtractionError          := CycleExtraction.State.ExtractionError;
-GVL_Troubleshooting.M_AssistanceDragage.Idx306_ExtractionErrorId        := CycleExtraction.State.ExtractionErrorId;
-GVL_Troubleshooting.M_AssistanceDragage.Idx307_ExtractionStepAtFault    := CycleExtraction.State.ExtractionStepAtFault;
-
-GVL_Troubleshooting.M_AssistanceDragage.Idx401_OperatorActionId        := CycleDiveSearch.State.OperatorActionId;
-GVL_Troubleshooting.M_AssistanceDragage.Idx402_OperatorAction          := CycleDiveSearch.State.OperatorAction;
-
-GVL_Troubleshooting.M_AssistanceDragage.Idx501_DumpAtTremieArmed          := CycleDumpAtTremie.State.DumpAtTremieArmed;
-GVL_Troubleshooting.M_AssistanceDragage.Idx502_DumpAtTremieAssistActive   := CycleDumpAtTremie.State.DumpAtTremieAssistActive;
-GVL_Troubleshooting.M_AssistanceDragage.Idx503_DumpAtTremieAtTremie       := CycleDumpAtTremie.State.DumpAtTremieAtTremie;
-GVL_Troubleshooting.M_AssistanceDragage.Idx504_DumpAtTremieBucketOpenArmed := CycleDumpAtTremie.State.DumpAtTremieBucketOpenArmed;
-GVL_Troubleshooting.M_AssistanceDragage.Idx505_DumpAtTremieDescentLocked := CycleDumpAtTremie.State.DumpAtTremieDescentLocked;
-
-GVL_Troubleshooting.M_AssistanceDragage.Idx601_BypassDiveActive          := CycleDiveSearch.State.BypassDiveActive;
-GVL_Troubleshooting.M_AssistanceDragage.Idx602_BypassKoboldBottomTouched := CycleDiveSearch.State.BypassKoboldBottomTouched;
-
-{endregion}
+// §4 Assistance dragage retire : GVL_Troubleshooting ne porte plus ce slot (M_Réserve),
+// FB_DiveSearch/FB_ExtractionAssist supprimés (legacy, jamais actifs).
 
 {region "§5 Translation pont M3"}
 // === ↔️ 4. TranslationPontM3 : ST_ChainTranslation (fiche §5.5, source Translation) ===
@@ -14356,11 +13214,7 @@ TimeLast := TimeCurrent;
           <Folder Name="_BRIDGES">
             <Object Name="FB_CfgPersistBridge_BucketCfg" ObjectId="92413952-2771-5afc-8a20-3321f99627f5" />
             <Object Name="FB_CfgPersistBridge_CommunCfg" ObjectId="b0d11d68-8853-56c7-85fa-cb0f8b6449b6" />
-            <Object Name="FB_CfgPersistBridge_CycleAssistToggles" ObjectId="55437875-df03-58d3-90f0-d55c313c64e3" />
             <Object Name="FB_CfgPersistBridge_CycleCfg" ObjectId="8d6e7f94-2d43-5ea3-b409-34f87f99a9e5" />
-            <Object Name="FB_CfgPersistBridge_CycleDiveSearchCfg" ObjectId="a92cb09a-e287-5430-8474-ac8533ffbe1a" />
-            <Object Name="FB_CfgPersistBridge_CycleDumpAtTremieCfg" ObjectId="958f5330-cfab-5326-8351-b214608cfa61" />
-            <Object Name="FB_CfgPersistBridge_CycleExtractionCfg" ObjectId="99243b20-8012-5d76-ac19-bd7ef00af05b" />
             <Object Name="FB_CfgPersistBridge_CycleMachineHomingCfg" ObjectId="c53fccdf-77fc-5d34-9ea6-2dba0c058397" />
             <Object Name="FB_CfgPersistBridge_SyncCfg" ObjectId="13a2c158-675a-51ae-9722-c0aab6c4c8b0" />
             <Object Name="FB_CfgPersistBridge_TranslationCfg" ObjectId="38d43e50-d468-567a-8c85-9b295bf88c4c" />
@@ -14373,21 +13227,6 @@ TimeLast := TimeCurrent;
           <Object Name="FB_TroubleshootingView" ObjectId="8681430a-0c7a-5f33-90d9-9615a5f55572" />
           <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
           <Folder Name="_TYPES">
-            <Folder Name="5_ASSISTANCE_DRAGAGE">
-              <Object Name="ST_CycleAssistToggles" ObjectId="b8d5367f-703e-50e4-b308-00377a6188b7" />
-              <Object Name="ST_CycleDiveSearchCfg" ObjectId="42ebb53a-45c2-5353-807e-c73f913cfb78" />
-              <Object Name="ST_CycleDumpAtTremieCfg" ObjectId="b2ec5a9c-7e18-56a8-be1d-202932b2b8c1" />
-              <Object Name="ST_CycleExtractionCfg" ObjectId="4c14feb8-ddba-5e35-a2e4-6711b9795a14" />
-              <Object Name="ST_CycleDiveSearchHMI" ObjectId="f71b4459-210c-5e4b-970e-b20dee0f8d37" />
-              <Object Name="ST_CycleDumpAtTremieHMI" ObjectId="c0587c83-3078-56cd-86a5-3e7ffbe0c663" />
-              <Object Name="ST_CycleExtractionHMI" ObjectId="98302889-117c-5dc5-ac5b-a8da53553282" />
-              <Object Name="ST_CycleDiveSearchCmd" ObjectId="539dd136-1eb8-5d15-aa53-4b386fa9db25" />
-              <Object Name="ST_CycleDiveSearchState" ObjectId="b30ad366-6fd5-5713-9050-b1453c43c4d4" />
-              <Object Name="ST_CycleDumpAtTremieCmd" ObjectId="8fac4fdd-32e8-5449-81b4-b99cc55e1ec1" />
-              <Object Name="ST_CycleDumpAtTremieState" ObjectId="c03dda17-2edb-57d1-b08b-ac95d74ba904" />
-              <Object Name="ST_CycleExtractionCmd" ObjectId="29dd1311-31ec-5709-92c5-68797776d6cb" />
-              <Object Name="ST_CycleExtractionState" ObjectId="1b6c66ac-378b-5183-a476-1f29ec042a66" />
-            </Folder>
             <Folder Name="1_TREUILS_BENNE">
               <Object Name="ST_BucketCfg" ObjectId="51266ef6-8a4b-5d43-bb90-88297b050ea8" />
               <Object Name="ST_WinchCfg" ObjectId="239338a1-0092-5a3b-aef0-6597a3358ff4" />
@@ -14489,8 +13328,6 @@ TimeLast := TimeCurrent;
         <Folder Name="G_CYCLE">
           <Folder Name="_TYPES">
             <Object Name="E_AutoCycleStep" ObjectId="6e89b113-d6f1-5719-b130-7af999a1c7fd" />
-            <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
-            <Object Name="E_ExtractionAssistState" ObjectId="52924d25-cfcc-5dc2-a673-d7581dfb2d37" />
             <Object Name="E_OperatorAxis" ObjectId="07a48a82-b7c8-54f5-9041-14c13244835f" />
           </Folder>
         </Folder>

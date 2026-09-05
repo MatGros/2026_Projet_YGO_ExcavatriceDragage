@@ -19,7 +19,7 @@ VAR_GLOBAL
     J_LevageUnitaireM2      : ST_ChainWinch;         // 🛗 9. Levage Unitaire M2 (Treuil Benne)
     K_BenneOuvertureFermeture: ST_ChainBucket;        // 🪣 10. Ouverture / Fermeture Benne
     L_TranslationPontM3     : ST_ChainTranslation;   // ↔️ 11. Translation Pont M3 (Variateur AC600)
-    M_AssistanceDragage     : ST_ChainDredgingAssist; // 🌊 12. Assistance Plongée/Extraction/Vidage Trémie
+    // M_Réserve
     N_MotionM1              : ST_MotionChecklist;   // ⚙️ 13. Diagnostic chronologique Mouvement M1 (Treuil Retenue)
     O_MotionM2              : ST_MotionChecklist;   // ⚙️ 14. Diagnostic chronologique Mouvement M2 (Treuil Benne)
     P_MotionM3              : ST_MotionChecklist;   // ⚙️ 15. Diagnostic chronologique Mouvement M3 (Translation)

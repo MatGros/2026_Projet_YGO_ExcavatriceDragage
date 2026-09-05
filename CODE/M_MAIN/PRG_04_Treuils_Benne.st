@@ -283,8 +283,8 @@ BottomPositionConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConf
 MaintN1 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1);
 // Séquence d'extraction active (mode MAINT + toggle) : gate le permis de montée assistée (§5).
 // Le permis lui-même (AscentPermit) est produit par FB_ExtractionAssist et consommé via le contrat benne.
-ExtractionAssistActive := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N1 OR PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                          AND GVL_IHM.CycleExtraction.Cmd.TglEnableExtractionSequence;
+// FB_ExtractionAssist retire (legacy, plus de toggle IHM) : gate desormais toujours ferme.
+ExtractionAssistActive := FALSE;
 
 // Jog benne unitaire M2 : joystick dédié M2 (WinchSel=2) en maintenance. Autorise
 // l'ouverture (descente M2) hors mode Dive + active la détection passive d'état benne
@@ -548,8 +548,8 @@ IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
     ControlAscentStartM2PosM := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 END_IF;
 IF ExtractionControlActive THEN
-    IF (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - ControlAscentStartM1PosM) >= GVL_IHM.CycleExtraction.Cfg.ExtractionControlDistance_M)
-       AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - ControlAscentStartM2PosM) >= GVL_IHM.CycleExtraction.Cfg.ExtractionControlDistance_M) THEN
+    IF (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - ControlAscentStartM1PosM) >= _CycleExtractionCfgPersist.ExtractionControlDistance_M)
+       AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - ControlAscentStartM2PosM) >= _CycleExtractionCfgPersist.ExtractionControlDistance_M) THEN
         ExtractionControlActive := FALSE;         // Distance de contrôle parcourue : paliers normaux
     ELSIF NOT (WinchBothMotionActive AND WinchBothReqAscent) THEN
         ExtractionControlActive := FALSE;         // Ascending relâchée/interrompue : annule la phase

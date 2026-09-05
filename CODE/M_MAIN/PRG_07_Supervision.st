@@ -25,10 +25,6 @@ VAR
     instCfgPersistBridgeSync           : FB_CfgPersistBridge_SyncCfg;            // * [INST] Pont persistance config synchro
     instCfgPersistBridgeCycle          : FB_CfgPersistBridge_CycleCfg;            // * [INST] Pont persistance config cycle
     instCfgPersistBridgeCycleMachineHoming  : FB_CfgPersistBridge_CycleMachineHomingCfg;    // * [INST] Pont persistance config cycle homing machine
-    instCfgPersistBridgeCycleDiveSearchCfg   : FB_CfgPersistBridge_CycleDiveSearchCfg;   // * [INST] Pont persistance config cycle plongée
-    instCfgPersistBridgeCycleExtractionCfg   : FB_CfgPersistBridge_CycleExtractionCfg;   // * [INST] Pont persistance config cycle extraction
-    instCfgPersistBridgeCycleDumpAtTremieCfg : FB_CfgPersistBridge_CycleDumpAtTremieCfg; // * [INST] Pont persistance config cycle vidage trémie
-    instCfgPersistBridgeCycleAssistToggles  : FB_CfgPersistBridge_CycleAssistToggles;  // * [INST] Pont persistance toggles assistance
     instCfgPersistBridgeCommun         : FB_CfgPersistBridge_CommunCfg;           // * [INST] Pont persistance config commune
     instCfgPersistBridgeBucket         : FB_CfgPersistBridge_BucketCfg;           // * [INST] Pont persistance config benne
     instCfgPersistBridgeWinchM1        : FB_CfgPersistBridge_WinchCfg;            // * [INST] Pont persistance config treuil M1
@@ -36,7 +32,6 @@ VAR
     instCfgPersistBridgeTranslation    : FB_CfgPersistBridge_TranslationCfg;      // * [INST] Pont persistance config translation
     instCfgPersistBridgeJoystick       : FB_CfgPersistBridge_fbJoystick_Cfg;      // * [INST] Pont persistance config joystick
     instCfgPersistBridgeEncoder        : FB_CfgPersistBridge_fbEncoder_Cfg;       // * [INST] Pont persistance config codeur commune M1/M2
-    AssistTogglesHmi                   : ST_CycleAssistToggles;                   // . [LOC] Toggles assistance (Hmi du pont toggles, répartis dans les 3 Cmd)
     instDiagIhmHeartbeat   : FB_Diag_IhmHeartbeat;            // * [INST] Surveillance heartbeat IHM
     instPreflight          : FB_Acquisition_Preflight;        // * [INST] Preflight acquisition avant demarrage
     instWinchSymmetry      : FB_Winch_Symmetry;               // * [INST] Diagnostic passif symetrie M1/M2 (observateur strict)
@@ -187,7 +182,7 @@ IF instCfgPersistBridgeCommun.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-instCfgPersistBridgeCycle(Hmi := GVL_IHM.Cycle.Cfg, Persist := _CycleCfgPersist);
+instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
 IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
@@ -195,34 +190,6 @@ END_IF;
 instCfgPersistBridgeCycleMachineHoming(Hmi := GVL_IHM.CycleMachineHoming.Cfg, Persist := _CycleMachineHomingCfgPersist);
 IF instCfgPersistBridgeCycleMachineHoming.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
-END_IF;
-
-// Ponts persistance configs cycle (DiveSearch / Extraction / DumpAtTremie)
-instCfgPersistBridgeCycleDiveSearchCfg(Hmi := GVL_IHM.CycleDiveSearch.Cfg, Persist := _CycleDiveSearchCfgPersist);
-IF instCfgPersistBridgeCycleDiveSearchCfg.JustRestored THEN
-    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
-END_IF;
-
-instCfgPersistBridgeCycleExtractionCfg(Hmi := GVL_IHM.CycleExtraction.Cfg, Persist := _CycleExtractionCfgPersist);
-IF instCfgPersistBridgeCycleExtractionCfg.JustRestored THEN
-    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
-END_IF;
-
-instCfgPersistBridgeCycleDumpAtTremieCfg(Hmi := GVL_IHM.CycleDumpAtTremie.Cfg, Persist := _CycleDumpAtTremieCfgPersist);
-IF instCfgPersistBridgeCycleDumpAtTremieCfg.JustRestored THEN
-    GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
-END_IF;
-
-// Pont persistance toggles assistance (répartis dans les 3 Cmd, mémorisés via _CycleAssistTogglesPersist)
-AssistTogglesHmi.TglEnableDiveSearch         := GVL_IHM.CycleDiveSearch.Cmd.TglEnableDiveSearch;
-AssistTogglesHmi.TglEnableExtractionSequence := GVL_IHM.CycleExtraction.Cmd.TglEnableExtractionSequence;
-AssistTogglesHmi.TglEnableDumpAtTremie       := GVL_IHM.CycleDumpAtTremie.Cmd.TglEnableDumpAtTremie;
-instCfgPersistBridgeCycleAssistToggles(Hmi := AssistTogglesHmi, Persist := _CycleAssistTogglesPersist);
-IF instCfgPersistBridgeCycleAssistToggles.JustRestored THEN
-    GVL_IHM.CycleDiveSearch.Cmd.TglEnableDiveSearch         := AssistTogglesHmi.TglEnableDiveSearch;
-    GVL_IHM.CycleExtraction.Cmd.TglEnableExtractionSequence := AssistTogglesHmi.TglEnableExtractionSequence;
-    GVL_IHM.CycleDumpAtTremie.Cmd.TglEnableDumpAtTremie       := AssistTogglesHmi.TglEnableDumpAtTremie;
-    GVL_IHM.Commun.ConfigRestoredFromPersistent            := TRUE;
 END_IF;
 
 // Consigne variateur M3 (SetFreq_Hz) : pas de bridge Cfg dédié (c'est une Cmd, pas une
@@ -516,7 +483,7 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
                                       OR GVL_IHM.TranslationM3.Safety.Error
                                       OR GVL_IHM.M1M2Sync.State.Error
                                       OR GVL_IHM.M2TreuilBenne.Bucket.State.Error
-                                      OR GVL_IHM.Cycle.State.Error
+                                      OR GVL_IHM.CycleSemiAuto.State.Error
                                       OR GVL_IHM.JOY1Joystick.State.Error;
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
 GVL_IHM.Modes.State.ModeChangePendingBlocked := PRG_03_Modes_Cycle.Data.Auth.ModeChangePendingBlocked;
@@ -572,65 +539,35 @@ GVL_IHM.Network.InputModules.Vh0008Er1Ok      := PRG_02_Acquisition.Data.InputMo
 GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputModules.Fault;
 
 // ---------- §3g. État cycle semi-auto & bandeau ----------
-GVL_IHM.Cycle.State.Ready                  := PRG_03_Modes_Cycle.Data.SequenceState.Ready;
-GVL_IHM.Cycle.State.Busy                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy;
-GVL_IHM.Cycle.State.Done                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done;
-GVL_IHM.Cycle.State.Error                  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error;
-GVL_IHM.Cycle.State.ErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId;
-GVL_IHM.Cycle.State.CycleStep              := PRG_03_Modes_Cycle.Data.SequenceState.Step;
-GVL_IHM.Cycle.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.SequenceState.StepStr;
-GVL_IHM.Cycle.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
-GVL_IHM.Cycle.State.SampleCount            := _CycleSampleCount;
-GVL_IHM.Cycle.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
-GVL_IHM.Cycle.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
-GVL_IHM.Cycle.State.SelTarget              := GVL_IHM.TranslationM3.Cmd.SelTarget;
-GVL_IHM.Cycle.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;
-GVL_IHM.Cycle.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
-GVL_IHM.Cycle.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
-GVL_IHM.Cycle.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
-GVL_IHM.Cycle.State.WinchSyncError         := PRG_04_Treuils_Benne.Data.WinchSyncError;
-GVL_IHM.Cycle.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.Data.WinchSyncSignedDeltaPosM;
-GVL_IHM.Cycle.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
-GVL_IHM.Cycle.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
-GVL_IHM.Cycle.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
+GVL_IHM.CycleSemiAuto.State.Ready                  := PRG_03_Modes_Cycle.Data.SequenceState.Ready;
+GVL_IHM.CycleSemiAuto.State.Busy                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy;
+GVL_IHM.CycleSemiAuto.State.Done                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done;
+GVL_IHM.CycleSemiAuto.State.Error                  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error;
+GVL_IHM.CycleSemiAuto.State.ErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId;
+GVL_IHM.CycleSemiAuto.State.CycleStep              := PRG_03_Modes_Cycle.Data.SequenceState.Step;
+GVL_IHM.CycleSemiAuto.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.SequenceState.StepStr;
+GVL_IHM.CycleSemiAuto.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
+GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
+GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
+GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
+GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.TranslationM3.Cmd.SelTarget;
+GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;
+GVL_IHM.CycleSemiAuto.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
+GVL_IHM.CycleSemiAuto.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
+GVL_IHM.CycleSemiAuto.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
+GVL_IHM.CycleSemiAuto.State.WinchSyncError         := PRG_04_Treuils_Benne.Data.WinchSyncError;
+GVL_IHM.CycleSemiAuto.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.Data.WinchSyncSignedDeltaPosM;
+GVL_IHM.CycleSemiAuto.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
+GVL_IHM.CycleSemiAuto.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
+GVL_IHM.CycleSemiAuto.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
 // Position cycle : meme gel affichage que M1TreuilRetenue/M2TreuilBenne pendant le preset codeur.
-GVL_IHM.Cycle.State.M1Position_M           := SEL(M1PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM, M1PosHmiHeld_M);
-GVL_IHM.Cycle.State.M2Position_M           := SEL(M2PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM, M2PosHmiHeld_M);
-GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
+GVL_IHM.CycleSemiAuto.State.M1Position_M           := SEL(M1PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM, M1PosHmiHeld_M);
+GVL_IHM.CycleSemiAuto.State.M2Position_M           := SEL(M2PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM, M2PosHmiHeld_M);
+GVL_IHM.CycleSemiAuto.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.DeadmanArmed;
 // 🕹️ JoystickDeflected = déflexion joystick seule (SANS homme-mort) — même signal que
 // JoystickDeflected (FB_CycleSemiAuto, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
 // « joystick défléchi » est projeté à l'IHM.
-GVL_IHM.Cycle.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
-
-// 🔄 Miroir parfait GVL_IHM.CycleSemiAuto (compatibilité IHM)
-GVL_IHM.CycleSemiAuto.State := GVL_IHM.Cycle.State;
-GVL_IHM.CycleSemiAuto.Cfg   := GVL_IHM.Cycle.Cfg;
-
-// Projection Assistance Dragage (CycleDiveSearch / CycleExtraction / CycleDumpAtTremie)
-GVL_IHM.CycleDiveSearch.State.DiveReady                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveReady;
-GVL_IHM.CycleDiveSearch.State.DiveBusy                   := PRG_03_Modes_Cycle.Data.SequenceState.DiveBusy;
-GVL_IHM.CycleDiveSearch.State.DiveDone                   := PRG_03_Modes_Cycle.Data.SequenceState.DiveDone;
-GVL_IHM.CycleDiveSearch.State.DiveError                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveError;
-GVL_IHM.CycleDiveSearch.State.DiveErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.DiveErrorId;
-GVL_IHM.CycleDiveSearch.State.DiveState                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveState;
-GVL_IHM.CycleDiveSearch.State.DiveStepAtFault            := PRG_03_Modes_Cycle.Data.SequenceState.DiveStepAtFault;
-GVL_IHM.CycleDiveSearch.State.BottomTouchConfirmed       := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
-GVL_IHM.CycleExtraction.State.ExtractionReady             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionReady;
-GVL_IHM.CycleExtraction.State.ExtractionBusy              := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionBusy;
-GVL_IHM.CycleExtraction.State.ExtractionDone              := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionDone;
-GVL_IHM.CycleExtraction.State.ExtractionError             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionError;
-GVL_IHM.CycleExtraction.State.ExtractionErrorId           := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionErrorId;
-GVL_IHM.CycleExtraction.State.ExtractionState             := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionState;
-GVL_IHM.CycleExtraction.State.ExtractionStepAtFault       := PRG_03_Modes_Cycle.Data.SequenceState.ExtractionStepAtFault;
-GVL_IHM.CycleDiveSearch.State.OperatorActionId           := PRG_03_Modes_Cycle.Data.SequenceState.OperatorActionId;
-GVL_IHM.CycleDiveSearch.State.OperatorAction             := PRG_03_Modes_Cycle.Data.SequenceState.OperatorAction;
-GVL_IHM.CycleDumpAtTremie.State.DumpAtTremieArmed           := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieArmed;
-GVL_IHM.CycleDumpAtTremie.State.DumpAtTremieAssistActive      := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieAssistActive;
-GVL_IHM.CycleDumpAtTremie.State.DumpAtTremieAtTremie          := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieAtTremie;
-GVL_IHM.CycleDumpAtTremie.State.DumpAtTremieBucketOpenArmed   := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieBucketOpenArmed;
-GVL_IHM.CycleDumpAtTremie.State.DumpAtTremieDescentLocked     := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked;
-GVL_IHM.CycleDiveSearch.State.BypassDiveActive            := PRG_03_Modes_Cycle.Data.SequenceState.BypassDiveActive;
-GVL_IHM.CycleDiveSearch.State.BypassKoboldBottomTouched   := PRG_03_Modes_Cycle.Data.SequenceState.BypassKoboldBottomTouched;
+GVL_IHM.CycleSemiAuto.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
 instHmiBannerFormatter(
     Enable                := TRUE,
@@ -638,12 +575,10 @@ instHmiBannerFormatter(
     CurrentMode           := PRG_03_Modes_Cycle.Data.Auth.Mode,
     BothAxesCoupled       := (GVL_IHM.Modes.Cmd.SelJoystickWinch = 0),
     WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
-    CycleStep             := GVL_IHM.Cycle.State.CycleStep,
-    CycleStateStr         := GVL_IHM.Cycle.State.CycleStateStr,
+    CycleStep             := GVL_IHM.CycleSemiAuto.State.CycleStep,
+    CycleStateStr         := GVL_IHM.CycleSemiAuto.State.CycleStateStr,
     CycleErrorId          := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
     CycleStepAtError      := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
-    DiveState             := GVL_IHM.CycleDiveSearch.State.DiveState,
-    ExtractionState       := GVL_IHM.CycleExtraction.State.ExtractionState,
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
@@ -663,7 +598,7 @@ instHmiBannerFormatter(
     AscentPermit                := GVL_IHM.M1TreuilRetenue.Safety.AscentPermit AND GVL_IHM.M2TreuilBenne.Safety.AscentPermit,
     BucketIsOpen                := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     BucketIsClosed              := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed,
-    DiveActive                  := GVL_IHM.CycleDiveSearch.State.DiveBusy,
+    DiveActive                  := FALSE,
     TopLimitReached             := GVL_IHM.M1TreuilRetenue.Safety.CableLimitAscent OR GVL_IHM.M2TreuilBenne.Safety.CableLimitAscent,
     WinchBothMotionDirection := SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqAscent, SEL(PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend, 0, -1), 1),
     M1LogicRequestDirection := SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedAscent, SEL(PRG_04_Treuils_Benne.Data.WinchM1State.CommandedDescend, 0, -1), 1),
@@ -684,8 +619,8 @@ instHmiBannerFormatter(
     BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
     SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
     SyncContactorDiag           := PRG_06_Outputs.Data.SyncContactorDiag,
-    DiveErrorId                 := GVL_IHM.CycleDiveSearch.State.DiveErrorId,
-    ExtractionErrorId           := GVL_IHM.CycleExtraction.State.ExtractionErrorId,
+    DiveErrorId                 := 0,
+    ExtractionErrorId           := 0,
     EmergencyErrorId            := PRG_06_Outputs.EmergencyDiag.ErrorId,
     RedundancyTestFailed         := PRG_06_Outputs.EmergencyDiag.RedundancyTestFailed,
     EmergencyArmingFailed        := PRG_06_Outputs.EmergencyDiag.ArmFailed,
@@ -782,9 +717,6 @@ instTroubleshootingView(
     Translation          := GVL_IHM.TranslationM3,
     Commun               := GVL_IHM.Commun,
     Network              := GVL_IHM.Network,
-    CycleDiveSearch      := GVL_IHM.CycleDiveSearch,
-    CycleExtraction      := GVL_IHM.CycleExtraction,
-    CycleDumpAtTremie    := GVL_IHM.CycleDumpAtTremie,
     JoystickHMI          := GVL_IHM.JOY1Joystick,
     Permits              := GVL_IHM.Permits,
     EmergencyState       := PRG_06_Outputs.EmergencyState,
@@ -806,9 +738,9 @@ instTroubleshootingView(
     CycleOperatorAction := PRG_03_Modes_Cycle.Data.SequenceState.OperatorAction,
     CycleExpectedAxis := PRG_03_Modes_Cycle.Data.SequenceState.ExpectedAxis,
     CycleExpectedDirection := PRG_03_Modes_Cycle.Data.SequenceState.ExpectedDirection,
-    CycleStartRequest    := GVL_IHM.Cycle.Cmd.BtnStart,
-    CycleAbortRequest    := GVL_IHM.Cycle.Cmd.BtnAbort,
-    CycleTargetDepth_M   := GVL_IHM.Cycle.Cfg.SetDepth_M,
+    CycleStartRequest    := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
+    CycleAbortRequest    := GVL_IHM.CycleSemiAuto.Cmd.BtnAbort,
+    CycleTargetDepth_M   := GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M,
     CycleKoboldBottomTouch := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     CycleSpeedMismatchActive := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive,
     CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
