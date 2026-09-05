@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-02T23:10:51.019404" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-02T23:10:51.019404">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T23:50:39.696291" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T23:50:39.696291">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -922,7 +922,7 @@ SEULE la publication est homogénéisée sur Fault:ST_Fault (§6bis2).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#700ms" />
+                <simpleValue value="TIME#400ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher DUR de cadence de montee de palier a la barriere finale, INDEPENDANT
@@ -1035,7 +1035,7 @@ END_IF;
 IF NOT MotorRequest THEN
     RestartRequired := TRUE;
 END_IF;
-RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
+RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#750ms);
 RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;

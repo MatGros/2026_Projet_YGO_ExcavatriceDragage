@@ -5909,3 +5909,29 @@ tasks:
   - Dette outillage (harnais casses) planifiee
   contrat: ''
   bloque_par: []
+
+- id: T253
+  parent_id: ''
+  statut: ⏳
+  criticite: C4
+  domaine: BENNE_PERSISTANCE
+  agent: AGY-01
+  date: '2026-09-05T08:11:00+02:00'
+  titre: Calibration géométrie benne réelle et fiabilisation persistance NVRAM
+  contexte: >-
+    Constat terrain 2026-09-05 : au démarrage matin, après homing à 0m, la benne est
+    reconnue 'ouverte' au lieu de 'fermée' car Delta=M2-M1 (~0m) matche OffsetOpenM (0m)
+    au lieu de OffsetCloseM par défaut (15m). Nécessité de verrouiller la calibration
+    physique réelle et la rémanence NVRAM pour le SAT.
+  description: >-
+    1. Mesurer sur site l'écart Delta = M2 - M1 benne fermée.
+    2. Renseigner OffsetCloseM et CoherenceLimitM dans GVL_PERSISTENT / IHM.
+    3. Valider le pont FB_CfgPersistBridge_BucketCfg et la survie après reboot sans écrasement.
+    4. Valider le verrou BucketReferenced := TRUE sur confirmation explicite N2 ou homing conjoint.
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T253_CALIB_BENNE_PERSISTANTE.yaml
+  objectifs:
+  - Caler les seuils géométriques réels de la benne (OffsetOpenM, OffsetCloseM, CoherenceLimitM)
+  - Garantir la reconnaissance déterministe IsClosed/IsOpen sans bascule intempestive au reboot
+  - Assurer la conservation en NVRAM/RETAIN et la liaison G200 100% PASS
+  bloque_par: []
+

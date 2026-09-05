@@ -44,7 +44,16 @@
     },
     {
       "name": "TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "FB.MEASUREMENT.SPEED_MPS expected 1.5 +/- 0.05, got 0.568064",
+        "file": "test_fb_encoder.st",
+        "line": 230,
+        "message": "Vitesse nominale filtree = 1.50 m/s",
+        "expected": "1.5",
+        "actual": "0.568064"
+      }
     },
     {
       "name": "TC-P09-010.1 Abs gel sur doute : perte bus -> EncoderAvailable=FALSE, RawPos gele",
@@ -160,12 +169,21 @@
     },
     {
       "name": "TC-P09-050.6 Speed : SignedSpeed=(P[5]-P[0])/WindowElapsed, Speed=ABS",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_NEAR",
+        "detail": "FB.MEASUREMENT.SPEED_MPS expected 1.5 +/- 0.05, got 0.568064",
+        "file": "test_fb_encoder.st",
+        "line": 930,
+        "message": "SignedSpeed=(P[5]-P[0])/0.05 = 1.50 m/s",
+        "expected": "1.5",
+        "actual": "0.568064"
+      }
     }
   ],
   "summary": {
     "total": 40,
-    "passed": 40,
-    "failed": 0
+    "passed": 38,
+    "failed": 2
   }
 }

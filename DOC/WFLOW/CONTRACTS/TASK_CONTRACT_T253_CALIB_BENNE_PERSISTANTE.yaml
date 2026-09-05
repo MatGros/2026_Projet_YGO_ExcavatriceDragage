@@ -1,0 +1,66 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TÂCHE : CALIBRATION GÉOMÉTRIE BENNE & PERSISTANCE NVRAM
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T253_CALIB_BENNE_PERSISTANTE
+  criticality: C4
+  strategy: patch
+  objective: >
+    Valider et figer la chaîne complète de calibration, classification physique et
+    persistance rémanente (NVRAM / RETAIN) de l'état et de l'offset de la benne (M2 vs M1),
+    afin de garantir qu'au reboot ou après homing machine, la benne conserve ou retrouve
+    instantanément son état physique réel (fermé/ouvert) sans fausse bascule en IsOpen.
+
+  acceptance:
+    - id: AC1
+      statement: "La mesure Delta = CablePosM2 - CablePosM1 reflète la cinématique réelle et permet de classer de manière déterministe IsClosed, IsOpen ou IsIntermediate selon les seuils configurés."
+      verified_by: "Observation Watch CODESYS sur PRG_04.Data.BucketState.DeltaPosition_M et BucketState.IsClosed/IsOpen."
+    - id: AC2
+      statement: "Les valeurs de réglage géométrie (OffsetOpenM, OffsetCloseM, CoherenceLimitM) sont correctement initialisées depuis GVL_PERSISTENT._BucketCfgPersist au boot via FB_CfgPersistBridge_BucketCfg et ne sont pas écrasées par des zéros."
+      verified_by: "Test reboot contrôlé CODESYS et persistance des valeurs saisies dans GVL_IHM.M2TreuilBenne.Bucket.Cfg."
+    - id: AC3
+      statement: "Une confirmation manuelle fermée (BtnConfirmClosePos en MAINT_N2) ou issue du homing conjoint (MachineHomingCommitClose) verrouille BucketReferenced := TRUE sans écrasement parasite au scan suivant."
+      verified_by: "Validation du front de confirmation et observation du verrou BucketReferenced dans ST_fbBucket_State."
+    - id: AC4
+      statement: "Le bundle PLCopenXML est régénéré, G200 Linkage est 100% PASS (0 erreur) et aucun TC de non-régression sur FB_Bucket ou PRG_04 ne régresse."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py --report."
+    - id: AC5
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU ; aucun suffixe de langage _CFC/_LD n'est ajouté et le suffixe reste identique au langage généré dans le bundle."
+      verified_by: "G310 structure + génération bundle PLCopenXML."
+
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_Config.st
+      - CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketCfg.st
+      - CODE/J_SUPERVISION/_BRIDGES/FB_CfgPersistBridge_BucketCfg.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "inherit"
+    - "omni/cx/gpt-5.6-terra"
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

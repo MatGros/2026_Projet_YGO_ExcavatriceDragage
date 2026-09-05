@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T15:47:51.100488" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T15:47:51.100488">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T06:01:24.602948" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T06:01:24.602948">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -131,7 +131,7 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="0.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite haute : 0 = arrêt au seuil (m), commun M1/M2</xhtml>

@@ -4975,7 +4975,7 @@ erreur -- il faut régler la vraie cote pour que la protection devienne active.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="0.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Distance avant limite haute : 0 = arrêt au seuil (m), commun M1/M2</xhtml>
@@ -16333,7 +16333,7 @@ Delai interlock changement de sens montee</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#400ms" />
+                <simpleValue value="TIME#200ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock changement de sens descente</xhtml>
@@ -16344,7 +16344,7 @@ Delai interlock changement de sens montee</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1000ms" />
+                <simpleValue value="TIME#900ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CADENCE DE RAMPE PALIER ===
@@ -16356,7 +16356,7 @@ Delai interlock changement de sens montee</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1000ms" />
+                <simpleValue value="TIME#900ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier montee (D10, dedie)</xhtml>
@@ -16390,7 +16390,7 @@ Delai d'attente retombee des contacteurs</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="0.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RALENTISSEMENT BORDURE ===
@@ -44767,7 +44767,7 @@ SEULE la publication est homogénéisée sur Fault:ST_Fault (§6bis2).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#700ms" />
+                <simpleValue value="TIME#400ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Plancher DUR de cadence de montee de palier a la barriere finale, INDEPENDANT
@@ -44880,7 +44880,7 @@ END_IF;
 IF NOT MotorRequest THEN
     RestartRequired := TRUE;
 END_IF;
-RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#1500ms);
+RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#750ms);
 RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;

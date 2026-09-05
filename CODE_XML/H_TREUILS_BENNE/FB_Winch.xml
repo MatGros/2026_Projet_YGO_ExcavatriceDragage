@@ -214,7 +214,7 @@ Delai interlock changement de sens montee</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#400ms" />
+                <simpleValue value="TIME#200ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock changement de sens descente</xhtml>
@@ -225,7 +225,7 @@ Delai interlock changement de sens montee</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1000ms" />
+                <simpleValue value="TIME#900ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CADENCE DE RAMPE PALIER ===
@@ -237,7 +237,7 @@ Delai interlock changement de sens montee</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1000ms" />
+                <simpleValue value="TIME#900ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier montee (D10, dedie)</xhtml>
@@ -271,7 +271,7 @@ Delai d'attente retombee des contacteurs</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0" />
+                <simpleValue value="0.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== RALENTISSEMENT BORDURE ===
