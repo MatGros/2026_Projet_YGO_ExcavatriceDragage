@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T16:03:07.226431" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T16:03:07.226431">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T12:42:27.725454" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T12:42:27.725454">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1606,15 +1606,6 @@ ELSE
                 CloseReq := FALSE;
                 Lifecycle.Busy := FALSE;
                 Lifecycle.Done := TRUE;
-            ELSIF LeftStartSinceArm AND (CablePosM2 &lt;= M2StartPosM) THEN
-                M2_RunRequest := FALSE;
-                M2_ReqAscent := FALSE;
-                M2_ReqDescend := FALSE;
-                BucketState.IsOpen := WasOpenAtStart;
-                BucketState.IsClosed := WasClosedAtStart;
-                CloseReq := FALSE;
-                Lifecycle.Busy := FALSE;
-                Lifecycle.Done := TRUE;
             END_IF;
         END_IF;
 
@@ -1628,15 +1619,6 @@ ELSE
                 BucketState.IsClosed := FALSE;
                 BucketState.LastPosM2Open := CablePosM2;
                 BucketState.StateIncoherent := FALSE;
-                OpenReq := FALSE;
-                Lifecycle.Busy := FALSE;
-                Lifecycle.Done := TRUE;
-            ELSIF LeftStartSinceArm AND (CablePosM2 &gt;= M2StartPosM) THEN
-                M2_RunRequest := FALSE;
-                M2_ReqAscent := FALSE;
-                M2_ReqDescend := FALSE;
-                BucketState.IsOpen := WasOpenAtStart;
-                BucketState.IsClosed := WasClosedAtStart;
                 OpenReq := FALSE;
                 Lifecycle.Busy := FALSE;
                 Lifecycle.Done := TRUE;

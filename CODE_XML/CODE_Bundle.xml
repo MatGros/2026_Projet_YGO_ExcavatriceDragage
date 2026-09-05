@@ -4121,6 +4121,39 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: Limite basse active (m) — câble physique OU légale, la plus restrictive</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx415_MotorRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔎 Diagnostic anti-redémarrage — "commande active mais rien ne tourne"
+1 = demande moteur active (palier&gt;0 ET un seul sens) | 0 = pas de demande vue par la barrière</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx416_RestartRequired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = purge anti-redémarrage armée, AuthorizedStep force a 0 tant que non purgee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx417_RestartInhibit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = verrou latché (frein non confirmé), exige Reset conscient — distinct de Idx416</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx418_NeutralRequestSeen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = passage au neutre observé pendant un RestartInhibit (réarmement en cours)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -13086,6 +13119,30 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Reset + neutre + nouvelle demande obligatoires</xhtml>
               </documentation>
             </variable>
+            <variable name="FinalRestartRequired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Purge anti-redemarrage armee : AuthorizedStep force a 0 tant que non purgee (distinct de RestartInhibit)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalMotorRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Demande moteur vue par la barriere finale (palier&gt;0 ET un seul sens)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FinalNeutralRequestSeen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Passage au neutre observe pendant un RestartInhibit</xhtml>
+              </documentation>
+            </variable>
             <variable name="BrakeCommandOpenConfirmed">
               <type>
                 <BOOL />
@@ -17634,15 +17691,6 @@ ELSE
                 CloseReq := FALSE;
                 Lifecycle.Busy := FALSE;
                 Lifecycle.Done := TRUE;
-            ELSIF LeftStartSinceArm AND (CablePosM2 &lt;= M2StartPosM) THEN
-                M2_RunRequest := FALSE;
-                M2_ReqAscent := FALSE;
-                M2_ReqDescend := FALSE;
-                BucketState.IsOpen := WasOpenAtStart;
-                BucketState.IsClosed := WasClosedAtStart;
-                CloseReq := FALSE;
-                Lifecycle.Busy := FALSE;
-                Lifecycle.Done := TRUE;
             END_IF;
         END_IF;
 
@@ -17656,15 +17704,6 @@ ELSE
                 BucketState.IsClosed := FALSE;
                 BucketState.LastPosM2Open := CablePosM2;
                 BucketState.StateIncoherent := FALSE;
-                OpenReq := FALSE;
-                Lifecycle.Busy := FALSE;
-                Lifecycle.Done := TRUE;
-            ELSIF LeftStartSinceArm AND (CablePosM2 &gt;= M2StartPosM) THEN
-                M2_RunRequest := FALSE;
-                M2_ReqAscent := FALSE;
-                M2_ReqDescend := FALSE;
-                BucketState.IsOpen := WasOpenAtStart;
-                BucketState.IsClosed := WasClosedAtStart;
                 OpenReq := FALSE;
                 Lifecycle.Busy := FALSE;
                 Lifecycle.Done := TRUE;
@@ -38946,6 +38985,10 @@ GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx411_StepDelayElapsed := Wi
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx412_InTopSlowdownZone := WinchM1.State.InTopSlowdownZone;
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx413_InBottomSlowdownZone := WinchM1.State.InBottomSlowdownZone;
 GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx414_BottomLimitActiveM := WinchM1.State.BottomLimitActiveM;
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx415_MotorRequest := WinchM1.State.FinalMotorRequest;
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx416_RestartRequired := WinchM1.State.FinalRestartRequired;
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx417_RestartInhibit := WinchM1.State.FinalRestartInhibit;
+GVL_Troubleshooting.I_LevageUnitaireM1.Control_400.Idx418_NeutralRequestSeen := WinchM1.State.FinalNeutralRequestSeen;
 
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx501_CmdRelayAscent_DQ := WinchM1.State.RelayFwd;
 GVL_Troubleshooting.I_LevageUnitaireM1.Outputs_500.Idx502_CmdRelayDescent_DQ := WinchM1.State.RelayRev;
@@ -39021,6 +39064,10 @@ GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx411_StepDelayElapsed := Wi
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx412_InTopSlowdownZone := WinchM2.State.InTopSlowdownZone;
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx413_InBottomSlowdownZone := WinchM2.State.InBottomSlowdownZone;
 GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx414_BottomLimitActiveM := WinchM2.State.BottomLimitActiveM;
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx415_MotorRequest := WinchM2.State.FinalMotorRequest;
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx416_RestartRequired := WinchM2.State.FinalRestartRequired;
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx417_RestartInhibit := WinchM2.State.FinalRestartInhibit;
+GVL_Troubleshooting.J_LevageUnitaireM2.Control_400.Idx418_NeutralRequestSeen := WinchM2.State.FinalNeutralRequestSeen;
 
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx501_CmdRelayAscent_DQ := WinchM2.State.RelayFwd;
 GVL_Troubleshooting.J_LevageUnitaireM2.Outputs_500.Idx502_CmdRelayDescent_DQ := WinchM2.State.RelayRev;
@@ -41608,7 +41655,31 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (400 ms), les 2 modifiables (AC8
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif (latch, exige Reset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartRequired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Purge anti-redemarrage armee (AuthorizedStep force a 0 tant que non purgee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotorRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Demande moteur vue par la barriere (palier&gt;0 ET un seul sens)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralRequestSeen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Passage au neutre observe pendant un RestartInhibit</xhtml>
               </documentation>
             </variable>
             <variable name="RestartDelayElapsed">
@@ -41776,29 +41847,14 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (400 ms), les 2 modifiables (AC8
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] One-shot ordre de relachement effectue (anti-bouclage)</xhtml>
               </documentation>
             </variable>
-            <variable name="RestartRequired">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
-. [LOC] Exigence de retour au neutre pour redemarrage</xhtml>
-              </documentation>
-            </variable>
             <variable name="ResetRequired">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Exigence d'acquittement Reset conscient</xhtml>
-              </documentation>
-            </variable>
-            <variable name="NeutralRequestSeen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Observation passage consigne au neutre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
+(RestartRequired, MotorRequest, NeutralRequestSeen promus en VAR_OUTPUT diagnostics ci-dessus)
+. [LOC] Exigence d'acquittement Reset conscient</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedStepClamped">
@@ -41815,14 +41871,6 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (400 ms), les 2 modifiables (AC8
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible palier memorisee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MotorRequest">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande mouvement moteur active</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeTimeoutCause">
@@ -43263,6 +43311,9 @@ WinchM1State.FinalInterlockReason := InterlockM1.Reason;
 WinchM1State.FinalInterlockError := InterlockM1.Fault.Error;
 WinchM1State.FinalInterlockErrorId := InterlockM1.Fault.ErrorId;
 WinchM1State.FinalRestartInhibit := InterlockM1.RestartInhibit;
+WinchM1State.FinalRestartRequired := InterlockM1.RestartRequired;
+WinchM1State.FinalMotorRequest := InterlockM1.MotorRequest;
+WinchM1State.FinalNeutralRequestSeen := InterlockM1.NeutralRequestSeen;
 WinchM1State.FinalBrakeTimeoutElapsed := InterlockM1.BrakeTimeoutElapsed;
 WinchM1State.FinalRestartDelayElapsed := InterlockM1.RestartDelayElapsed;
 WinchM1State.FinalStepDelayElapsed := InterlockM1.StepDelayElapsed;
@@ -43327,6 +43378,9 @@ WinchM2State.FinalInterlockReason := InterlockM2.Reason;
 WinchM2State.FinalInterlockError := InterlockM2.Fault.Error;
 WinchM2State.FinalInterlockErrorId := InterlockM2.Fault.ErrorId;
 WinchM2State.FinalRestartInhibit := InterlockM2.RestartInhibit;
+WinchM2State.FinalRestartRequired := InterlockM2.RestartRequired;
+WinchM2State.FinalMotorRequest := InterlockM2.MotorRequest;
+WinchM2State.FinalNeutralRequestSeen := InterlockM2.NeutralRequestSeen;
 WinchM2State.FinalBrakeTimeoutElapsed := InterlockM2.BrakeTimeoutElapsed;
 WinchM2State.FinalRestartDelayElapsed := InterlockM2.RestartDelayElapsed;
 WinchM2State.FinalStepDelayElapsed := InterlockM2.StepDelayElapsed;
@@ -49978,7 +50032,9 @@ instWinchOutputInterlockM1(
     RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor2,
     RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor3,
     RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep,
+    DeadTimeSameDir             := T#0ms, // ESSAI 2026-09-05 : temps mort directionnel neutralise (diagnostic blocage AX3)
+    DeadTimeOppositeDir         := T#0ms  // ESSAI 2026-09-05 : idem
 );
 
 M1RelayFwd        := instWinchOutputInterlockM1.RelayFwd;
@@ -50037,7 +50093,9 @@ instWinchOutputInterlockM2(
     RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor2,
     RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor3,
     RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep,
+    DeadTimeSameDir             := T#0ms, // ESSAI 2026-09-05 : temps mort directionnel neutralise (diagnostic blocage AX3)
+    DeadTimeOppositeDir         := T#0ms  // ESSAI 2026-09-05 : idem
 );
 
 M2RelayFwd        := instWinchOutputInterlockM2.RelayFwd;
@@ -50797,7 +50855,8 @@ instDiagIhmHeartbeat(
 FaultMachineReset_IHM := GVL_IHM.Modes.Cmd.BtnFaultReset
                     OR GVL_IHM.M1TreuilRetenue.Cmd.BtnReset
                     OR GVL_IHM.M2TreuilBenne.Cmd.BtnReset
-                    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset;
+                    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnReset
+                    OR GVL_IHM.CycleSemiAuto.Cmd.BtnReset; // T -&gt; alimente aussi PRG_03.instCycleSemiAuto.Reset (retour, scan suivant)
 
 
 {endregion}
