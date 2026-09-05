@@ -1405,28 +1405,18 @@ tasks:
   bloque_par: []
 - id: T157
   parent_id: ''
-  statut: ⏸️
+  statut: ⏳
   criticite: C4
   domaine: SÉCURITÉ
-  agent: —
-  date: '2026-08-25T19:00:44'
-  titre: Câblage réel ArmingPermit (Q1) + asymétrie homme-mort treuils boutons IHM (Q2)
-  contexte: ArmingPermit câblé en dur TRUE dans PRG_02_Acquisition.st:303 (aucun producteur réel, câblage temporaire). PRG_04_Treuils_Benne.st:442,486
-    n'exige DeadmanArmed qu'en mode Joystick Maître, contrairement à Translation qui l'exige dans tous les modes (PRG_05_Translation.st:186-187)
-    — asymétrie non tranchée, bug ou voulu (trouvé en revue indépendante 2026-08-25).
-  description: 'Étude de conception livrée (lecture seule, aucun code touché) : DOC/WFLOW/AUDITS/PRG02_20260824/PROPOSITION_ArmingPermit_Cablage_v0.1.md.
-    Piste retenue : calculer ArmingPermit dans PRG_04_Treuils_Benne (réutilise le F_TRIG BenneBusyFallEdge déjà écrit, Mode
-    déjà à jour à ce rang), publier sur le bus Data, PRG_02_Acquisition consomme avec 1 scan de retard explicite. Points non
-    tranchés avant tout code : acceptabilité du retard (10-20ms) sur un signal de désarmement homme-mort — filet de sécurité
-    potentiel (PRG_04/05 réarbitrent chaque consigne contre Auth.Mode du scan courant) à prouver par audit, pas supposé ;
-    modification de contrat DUT Data (AF03) à documenter ; asymétrie Q2 à trancher (bug ou voulu) avant de modifier PRG_04.
-    ⏸️ En attente d''arbitrage humain — pas d''autorisation de coder. Documenté dans AF_Partie-08_Fonction_Joystick_v2.2.md
-    §10 (Q1, Q2).'
-  contrat: ''
+  agent: HUM
+  date: '2026-09-05T08:46:00+02:00'
+  titre: Permis d'armement joystick (ArmingPermit) — [Asymétrie Q2 traitée, reste gestion fine permis armement]
+  contexte: 'Asymétrie homme-mort treuils/translation (Q2) déjà arbitrée et mergée dans l''architecture 7 POU. Reste à finaliser la gestion fine et le câblage dynamique de ArmingPermit pour l''armement du joystick.'
+  description: '⏳ **Partiellement mergé & Requalifié** : L''alignement des arbitrages de mouvement contre DeadmanArmed dans PRG_04/PRG_05 est en place. Le point ouvert restant concerne la condition dynamique de `ArmingPermit` dans PRG_02_Acquisition (actuellement forcé/simplifié) pour éviter les armements hors conditions sûres.'
   objectifs:
-  - 'Décision humaine : Q1 (producteur ArmingPermit) et Q2 (asymétrie treuils/translation) tranchés'
-  - 'Si validé : audit du filet de sécurité PRG_04/PRG_05 (réarbitrage contre Auth.Mode du scan courant) avant tout code'
-  - Contrat de tâche C4 rédigé avant implémentation (task_contract.yaml)
+  - 'Clos : Arbitrage et symétrie homme-mort sur l''ensemble des actionneurs (PRG_04/PRG_05).'
+  - 'Restant : Définir et raccorder le calcul dynamique de ArmingPermit (position neutre, absence de défaut bloquant, mode valide).'
+  contrat: ''
   bloque_par: []
 - id: T158
   parent_id: ''
