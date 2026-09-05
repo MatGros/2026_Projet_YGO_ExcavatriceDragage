@@ -188,7 +188,7 @@ DiveSearchInputs.BypassPreconditions   := GVL_IHM.CycleDiveSearch.Cmd.TglBypassD
 // TimeoutMarginFactor=1.5, TimeoutMinCourse_M=1.0, TimeoutMaxCourse_M=200.0, SecToMs=1000.0).
 
 instDiveSearch(
-    Enable := (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2)
+    Enable := (FALSE) //Désactivé legacy
               AND GVL_IHM.CycleDiveSearch.Cmd.TglEnableDiveSearch,
     Reset  := PRG_07_Supervision.FaultMachineReset_IHM,
     Inputs := DiveSearchInputs
@@ -199,7 +199,7 @@ BottomPositionConfirmed := instDiveSearch.Outputs.BottomTouchConfirmed OR Manual
 
 // 4. Instance FB_ExtractionAssist (Fermeture et décollage assisté)
 instExtractionAssist(
-    Enable := (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2)
+    Enable := (FALSE) //Désactivé legacy
               AND GVL_IHM.CycleExtraction.Cmd.TglEnableExtractionSequence,
     Reset := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
