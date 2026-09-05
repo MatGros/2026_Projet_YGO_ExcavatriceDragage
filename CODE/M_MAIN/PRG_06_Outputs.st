@@ -322,6 +322,12 @@ instSyncContactorFinal(
     BypassGlobal  := GVL_IHM.M1M2Sync.Bypass.Global
                      OR GVL_IHM.M1TreuilRetenue.Bypass.Global
                      OR GVL_IHM.M2TreuilBenne.Bypass.Global
+                     OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback
+                     OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback
+                     OR GVL_IHM.M1TreuilRetenue.Bypass.Safety
+                     OR GVL_IHM.M2TreuilBenne.Bypass.Safety
+                     OR GVL_IHM.M1TreuilRetenue.Bypass.Process
+                     OR GVL_IHM.M2TreuilBenne.Bypass.Process
 );
 Data.ContactorMismatch          := instSyncContactorFinal.ContactorMismatch;
 Data.ContactorMismatchEscalated := instSyncContactorFinal.ContactorMismatchEscalated;

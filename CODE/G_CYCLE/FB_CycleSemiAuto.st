@@ -185,10 +185,9 @@ VAR CONSTANT
     CST_KoboldInitTimeout : TIME := T#3s;   // Fenetre max de confirmation retour contacteur Kobold en AX5
     CST_RaiseOffBottomDefaultM : REAL := 0.5;   // Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM <= 0
     // Backstop anti-telescopage : ecart de position M1/M2 max tolere pendant les phases
-    // reellement couplees hors X7 (qui a deja son propre controle a 0,25 m). Aligne sur
-    // CfgSyncCriticalToleranceM = 0,50 m (AF-04 §5). FB_SyncDeviation (PRG_04) reste la
-    // surveillance primaire ; ceci est un garde-fou local au sequenceur.
-    CST_CoupledPosBacklashM : REAL := 0.5;
+    // reellement couplees hors X7. Porte a 1,50 m pour absorber la dynamique benne ouverte
+    // en plongee rapide palier 4 sans decrochage intempestif vers AX_STAB.
+    CST_CoupledPosBacklashM : REAL := 1.5;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -225,11 +224,11 @@ CurrentCycleElapsed := CycleRunTimer.ET;
 DrainTimeEff := SEL(CfgDrainTime <= T#0s, CfgDrainTime, DrainingTime);
 
 // ⏱️ Surveillance indépendante de la remontée lente de controle
-// AX11_CTRL_ASCENT -> AX12_LOADED_ASCENT : TON de stabilisation palier lent.
-StabilizationTimer(IN := (State = E_AutoCycleStep.AX11_CTRL_ASCENT), PT := CtrlAscentTimeout);
+// AX11_CTRL_ASCENT -> AX12_LOADED_ASCENT : TON de stabilisation palier lent (DÉSACTIVÉ).
+StabilizationTimer(IN := FALSE, PT := CtrlAscentTimeout);
 
-// ⏱️ AX5_KOBOLD_INIT : fenetre de confirmation du retour contacteur Kobold.
-KoboldInitTimer(IN := (State = E_AutoCycleStep.AX5_KOBOLD_INIT), PT := CST_KoboldInitTimeout);
+// ⏱️ AX5_KOBOLD_INIT : fenetre de confirmation du retour contacteur Kobold (DÉSACTIVÉ).
+KoboldInitTimer(IN := FALSE, PT := CST_KoboldInitTimeout);
 
 // 📏 Comparaison vitesse réelle M1/M2
 SpeedMismatchMps := ABS(M1_MeasuredSpeedMps - M2_MeasuredSpeedMps);
@@ -242,48 +241,23 @@ SpeedMismatchActive := (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
 SpeedMismatchTimer(IN := SpeedMismatchActive, PT := SpeedMismatchTimeout);
 SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 
-// Tempo max d'étape (R5) — backstop durée d'état, lancé SEULEMENT si pilotage joystick actif.
-// Xi -> AX_STAB sur dépassement. Réarmé à CHAQUE changement d'étape (IN=FALSE 1 scan) :
-// chaque étape dispose de sa propre fenêtre StepMaxTimeout, la tempo n'est PAS cumulative
-// sur l'ensemble du cycle (un cycle réel long ne tombe plus en AX_STAB intempestif).
-StepMaxTimer(IN := (State = StepMaxPrevState)
-                  AND JoystickDeflected
-                  AND (State <> E_AutoCycleStep.AX0_REPOS)
-                  AND (State <> E_AutoCycleStep.AX18_DONE_SYNC)
-                  AND (State <> E_AutoCycleStep.AX_STAB)
-                  AND (State <> E_AutoCycleStep.AX_DIVING_RETRY),
-             PT := StepMaxTimeout);
+// Tempo max d'étape (R5) — DÉSACTIVÉE (pour éviter toute coupure/repli AX_STAB intempestif sur durée)
+StepMaxTimer(IN := FALSE, PT := StepMaxTimeout);
 StepMaxPrevState := State;
 
 // Egouttage AX13 : TON gaté sur l'étape (remis à 0 hors AX13). Remplace l'ancien IN:=TRUE câblé
 // qui pouvait laisser Q déjà vrai à l'entrée en AX13 (temps d'égouttage non respecté).
 DrainingTimer(IN := (State = E_AutoCycleStep.AX13_DRAIN_PAUSE), PT := DrainTimeEff);
 
-// GT-dive-retry (GEL Q11) : en AX5/AX6/AX7, erreur sequence Kobold (retour contacteur
-// absent apres CST_KoboldInitTimeout) OU joystick relache (>= 200 ms, anti-rebond) OU
-// palier applique <> 4 sur M1 ou M2 (feedback si cable) -> reprise AX_DIVING_RETRY
-// (PAS un defaut latche).
+// GT-dive-retry (GEL Q11) : en AX5/AX6/AX7, erreur sequence Kobold / joystick relache / palier < 4
 RetryJoyReleaseTimer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                              OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
                              OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                             AND NOT JoystickDeflected,
                      PT := T#200ms);
-// Palier bloque SOUS 4 pendant la plongee : on TOLERE la rampe 1->4 (tempo contacteurs,
-// GEL AX4) ; seul un blocage confirme > 4 s en AX5..AX7 declenche la reprise. Palier 5
-// (> 4) est traite instantanement par la cause de defaut 8 (latche), pas ici.
-PalierNot4Timer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
-                        OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
-                        OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
-                       AND JoystickDeflected
-                       AND ( ((M1_SpeedStepApplied > 0) AND (M1_SpeedStepApplied < CST_StepDive))
-                          OR ((M2_SpeedStepApplied > 0) AND (M2_SpeedStepApplied < CST_StepDive)) ),
-                PT := T#5s);
-DivingRetryTrig := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
-                     OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
-                     OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
-                   AND ( (KoboldInitTimer.Q AND NOT KoboldContactorFeedback)
-                         OR RetryJoyReleaseTimer.Q
-                         OR PalierNot4Timer.Q );
+// Palier bloque SOUS 4 pendant la plongee (DÉSACTIVÉ en reprise auto)
+PalierNot4Timer(IN := FALSE, PT := T#5s);
+DivingRetryTrig := FALSE;
 
 // Table des causes de défaut
 instCauses[0].Active   := LimitLegalReached
@@ -316,9 +290,10 @@ instCauses[5].Latching := TRUE;
 instCauses[5].Texte    := 'Defaut de stabilisation / tolerance ecart codeurs en remontee controle';
 
 // Backstop anti-telescopage : ecart de position M1/M2 excessif pendant une phase
-// reellement couplee. AX11 a deja son propre controle (instCauses[5]). Seuil grossier
-// (0,50 m) : filet local si FB_SyncDeviation (PRG_04) ne coupe pas.
-instCauses[6].Active   := (ABS(M1_CablePosM - M2_CablePosM) > CST_CoupledPosBacklashM)
+// reellement couplee (prend en compte l'offset benne active via WinchSyncDeltaM).
+// AX11 a deja son propre controle (instCauses[5]). Seuil grossier (0,50 m) : filet local
+// si FB_SyncDeviation (PRG_04) ne coupe pas.
+instCauses[6].Active   := (ABS(WinchSyncDeltaM) > CST_CoupledPosBacklashM)
                           AND JoystickDeflected
                           AND ((State = E_AutoCycleStep.AX4_DESCEND_DIVING)
                             OR (State = E_AutoCycleStep.AX5_KOBOLD_INIT)
@@ -482,14 +457,12 @@ CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
 IF WaitingResume THEN
-    // 🔒 Sécurité anti-redémarrage automatique (AF-04 §4.1) : le cycle ne reprend
-    // PAS sur manche + homme-mort seuls. Il reste en attente d'un geste conscient
-    // (StartCycle) avant de restaurer l'étape mémorisée, ou d'un abandon (AbortCycle).
+    // 🔒 Sécurité anti-redémarrage automatique (AF-04 §4.1) : reprise sur StartCycle OU Homme-Mort
     IF AbortEdge.Q THEN
         State := E_AutoCycleStep.AX0_REPOS;
         WaitingResume := FALSE;
         PausedState := E_AutoCycleStep.AX0_REPOS;
-    ELSIF StartEdge.Q THEN
+    ELSIF StartEdge.Q OR DeadmanArmedEdge.Q THEN
         State := PausedState;   // reprise consciente : restaure l'étape mémorisée
         WaitingResume := FALSE;
     ELSE
@@ -499,7 +472,7 @@ IF WaitingResume THEN
         TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
         BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
         CycleStep := PausedState;
-        CycleStateStr := 'Cycle en pause : reprise consciente requise (StartCycle)';
+        CycleStateStr := 'Cycle en pause : reprise requise (StartCycle ou Homme-Mort)';
         Lifecycle.Busy := FALSE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -507,7 +480,7 @@ IF WaitingResume THEN
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0400;
-        OperatorAction := 'Reprendre le cycle (StartCycle) ou Abandonner (Exit/Abort).';
+        OperatorAction := 'Reprendre le cycle (StartCycle ou armer Homme-Mort) ou Abandonner (Exit/Abort).';
         RequestActive := FALSE;
     END_IF;
 END_IF;
@@ -676,7 +649,7 @@ CASE State OF
         END_IF;
 
         // Transition vers AX4 : benne ouverte atteinte et confirmée
-        IF Benne_IsOpen AND (Benne_Done OR NOT Benne_Busy) THEN
+        IF (Benne_IsOpen OR Benne_Done) AND NOT Benne_Busy THEN
             BucketCmd.ReqOpen := FALSE;
             State := E_AutoCycleStep.AX4_DESCEND_DIVING;
         END_IF;
@@ -706,9 +679,9 @@ CASE State OF
         WinchM2Cmd.StepTgt  := CST_StepDive;
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
-        // AT4 : altimetrie de lancement atteinte (M1 ET M2 <= DiveStartMinEff).
+        // AT4 : altimetrie de lancement atteinte (M1 <= DiveStartMinEff).
         IF JoystickDeflected
-           AND (M1_CablePosM <= DiveStartMinEff) AND (M2_CablePosM <= DiveStartMinEff) THEN
+           AND (M1_CablePosM <= DiveStartMinEff) THEN
             State := E_AutoCycleStep.AX5_KOBOLD_INIT;
         END_IF;
 

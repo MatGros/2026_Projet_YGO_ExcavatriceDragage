@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T12:41:14.084250" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T12:41:14.084250">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T13:15:47.055351" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T13:15:47.055351">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1602,6 +1602,12 @@ instSyncContactorFinal(
     BypassGlobal  := GVL_IHM.M1M2Sync.Bypass.Global
                      OR GVL_IHM.M1TreuilRetenue.Bypass.Global
                      OR GVL_IHM.M2TreuilBenne.Bypass.Global
+                     OR GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback
+                     OR GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback
+                     OR GVL_IHM.M1TreuilRetenue.Bypass.Safety
+                     OR GVL_IHM.M2TreuilBenne.Bypass.Safety
+                     OR GVL_IHM.M1TreuilRetenue.Bypass.Process
+                     OR GVL_IHM.M2TreuilBenne.Bypass.Process
 );
 Data.ContactorMismatch          := instSyncContactorFinal.ContactorMismatch;
 Data.ContactorMismatchEscalated := instSyncContactorFinal.ContactorMismatchEscalated;

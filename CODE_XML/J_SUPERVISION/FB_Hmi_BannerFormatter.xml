@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:47:37.551746" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:47:37.551746">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T13:16:06.290591" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T13:16:06.290591">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2650,7 +2650,11 @@ ELSIF EmergencyArmingFailed THEN
 ELSIF NOT PowerContactorEngaged THEN
     OperatorActionCandidate := '[PUPITRE] Réarmer AU et puissance';
 ELSIF SafeStopActive THEN
-    OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
+    IF SyncContactorDiag.MismatchLevel &gt;= 1 THEN
+        OperatorActionCandidate := '[SYNC] Discordance contacteurs M1/M2 - Acquitter SafeStop';
+    ELSE
+        OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
+    END_IF;
 ELSIF DirectionBlocked THEN
     IF CurrentDirection &lt; 0 THEN
         OperatorActionCandidate := '[TREUIL] Descente interdite';
