@@ -3034,48 +3034,50 @@ instCauses[9].Active   := NOT WinchesAtDiveStep
 instCauses[9].Latching := TRUE;
 instCauses[9].Texte    := 'Palier 4 non confirme sur M1 et/ou M2 pendant la recherche Kobold';
 
-// // Appel du socle de défaut
-// instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
-// Fault := instFault.Fault;
-// ErrorEdge(CLK := Fault.Error);
-// {endregion}
+// Appel du socle de defaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+ErrorEdge(CLK := Fault.Error);
+{endregion}
 
-// {region "§2 Gate securite &amp; Bascule Mode"}
-// // 🛑 1bis. ABANDON &amp; RESET EXPLICITES (Priorité absolue, même hors mode ou en pause)
-// IF AbortEdge.Q THEN
-//     State := E_AutoCycleStep.AX0_REPOS;
-//     WaitingResume := FALSE;
-//     PausedState := E_AutoCycleStep.AX0_REPOS;
-// END_IF;
+{region "§2 Gate securite &amp; Bascule Mode"}
+// 🛑 1bis. ABANDON &amp; RESET EXPLICITES (Priorité absolue, même hors mode ou en pause)
+IF AbortEdge.Q THEN
+    State := E_AutoCycleStep.AX0_REPOS;
+    WaitingResume := FALSE;
+    PausedState := E_AutoCycleStep.AX0_REPOS;
+END_IF;
 
 // 🔧 1ter. FORCAGE DE STEP (Mise en service / dérogation)
 // Déverrouillé UNIQUEMENT si : case IHM mise en service (ou bouton forcer appuyé).
 // Impulsion sur front montant : réinitialise les commandes résiduelles et saute à l'étape cible.
 ForceStepApplyEdge(CLK := CfgForceStepApply);
 IF ForceStepApplyEdge.Q AND CfgCommissioningEnable THEN
-    CASE LIMIT(0, CfgForceStepTarget, 20) OF
-        0:  State := E_AutoCycleStep.AX0_REPOS;
-        1:  State := E_AutoCycleStep.AX1_INIT;
-        2:  State := E_AutoCycleStep.AX2_TRANSLATE_P1;
-        3:  State := E_AutoCycleStep.AX3_OPEN_BUCKET;
-        4:  State := E_AutoCycleStep.AX4_DESCEND_DIVING;
-        5:  State := E_AutoCycleStep.AX5_KOBOLD_INIT;
-        6:  State := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
-        7:  State := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
-        8:  State := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
-        9:  State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
-        10: State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
-        11: State := E_AutoCycleStep.AX11_CTRL_ASCENT;
-        12: State := E_AutoCycleStep.AX12_LOADED_ASCENT;
-        13: State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
-        14: State := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
-        15: State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
-        16: State := E_AutoCycleStep.AX15B_DUMP_OPEN;
-        17: State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
-        18: State := E_AutoCycleStep.AX18_DONE_SYNC;
-        19: State := E_AutoCycleStep.AX_STAB;
-        20: State := E_AutoCycleStep.AX_DIVING_RETRY;
-    END_CASE;
+    IF (CfgForceStepTarget &gt;= 0) AND (CfgForceStepTarget &lt;= 20) THEN
+        CASE CfgForceStepTarget OF
+            0:  State := E_AutoCycleStep.AX0_REPOS;
+            1:  State := E_AutoCycleStep.AX1_INIT;
+            2:  State := E_AutoCycleStep.AX2_TRANSLATE_P1;
+            3:  State := E_AutoCycleStep.AX3_OPEN_BUCKET;
+            4:  State := E_AutoCycleStep.AX4_DESCEND_DIVING;
+            5:  State := E_AutoCycleStep.AX5_KOBOLD_INIT;
+            6:  State := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
+            7:  State := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
+            8:  State := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
+            9:  State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
+            10: State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+            11: State := E_AutoCycleStep.AX11_CTRL_ASCENT;
+            12: State := E_AutoCycleStep.AX12_LOADED_ASCENT;
+            13: State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
+            14: State := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
+            15: State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
+            16: State := E_AutoCycleStep.AX15B_DUMP_OPEN;
+            17: State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
+            18: State := E_AutoCycleStep.AX18_DONE_SYNC;
+            19: State := E_AutoCycleStep.AX_STAB;
+            20: State := E_AutoCycleStep.AX_DIVING_RETRY;
+        END_CASE;
+    END_IF;
     CycleStep := State;
     WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
     WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;

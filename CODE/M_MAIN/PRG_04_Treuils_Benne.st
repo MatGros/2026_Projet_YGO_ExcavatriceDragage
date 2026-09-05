@@ -402,6 +402,9 @@ SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND NOT ManualBucketJogActive
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose
+    // 🛡️ Pas de surveillance d'ecart M1/M2 aux etapes de contact fond et retente (AX8 + AX9)
+    AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
+    AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
     AND instBucket.ActiveOffsetValid;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
@@ -912,6 +915,7 @@ instSafetyWinchM1(
     BypassMecaC            := GVL_IHM.M1TreuilRetenue.Bypass.MecaC,
     BypassMecaD            := BypassM1MecaDEff,
     BypassMecaE            := GVL_IHM.M1TreuilRetenue.Bypass.MecaE,
+    CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
 );
 
@@ -976,6 +980,7 @@ instSafetyWinchM2(
     BypassMecaC            := GVL_IHM.M2TreuilBenne.Bypass.MecaC,
     BypassMecaD            := BypassM2MecaDEff,
     BypassMecaE            := GVL_IHM.M2TreuilBenne.Bypass.MecaE,
+    CriticalSyncToleranceM := _WinchCriticalSyncTolerance_M,
     ExternalSyncEscalation := PRG_06_Outputs.Data.ContactorMismatchEscalated
 );
 
