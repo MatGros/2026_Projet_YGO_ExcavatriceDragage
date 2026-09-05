@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T07:59:14.276115" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T07:59:14.276115">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T12:17:00.149612" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T12:17:00.149612">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -583,7 +583,31 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (400 ms), les 2 modifiables (AC8
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Inhibition redemarrage actif (latch, exige Reset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RestartRequired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Purge anti-redemarrage armee (AuthorizedStep force a 0 tant que non purgee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MotorRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Demande moteur vue par la barriere (palier&gt;0 ET un seul sens)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NeutralRequestSeen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Passage au neutre observe pendant un RestartInhibit</xhtml>
               </documentation>
             </variable>
             <variable name="RestartDelayElapsed">
@@ -751,29 +775,14 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (400 ms), les 2 modifiables (AC8
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] One-shot ordre de relachement effectue (anti-bouclage)</xhtml>
               </documentation>
             </variable>
-            <variable name="RestartRequired">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
-. [LOC] Exigence de retour au neutre pour redemarrage</xhtml>
-              </documentation>
-            </variable>
             <variable name="ResetRequired">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Exigence d'acquittement Reset conscient</xhtml>
-              </documentation>
-            </variable>
-            <variable name="NeutralRequestSeen">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Observation passage consigne au neutre</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES CALCULÉES ===
+(RestartRequired, MotorRequest, NeutralRequestSeen promus en VAR_OUTPUT diagnostics ci-dessus)
+. [LOC] Exigence d'acquittement Reset conscient</xhtml>
               </documentation>
             </variable>
             <variable name="RequestedStepClamped">
@@ -790,14 +799,6 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (400 ms), les 2 modifiables (AC8
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible palier memorisee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="MotorRequest">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande mouvement moteur active</xhtml>
               </documentation>
             </variable>
             <variable name="BrakeTimeoutCause">

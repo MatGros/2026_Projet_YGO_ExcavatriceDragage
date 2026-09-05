@@ -3080,6 +3080,39 @@ bit0 Perte communication opérateur (joystick CAN / heartbeat IHM)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">: Limite basse active (m) — câble physique OU légale, la plus restrictive</xhtml>
               </documentation>
             </variable>
+            <variable name="Idx415_MotorRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔎 Diagnostic anti-redémarrage — "commande active mais rien ne tourne"
+1 = demande moteur active (palier&gt;0 ET un seul sens) | 0 = pas de demande vue par la barrière</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx416_RestartRequired">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = purge anti-redémarrage armée, AuthorizedStep force a 0 tant que non purgee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx417_RestartInhibit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = verrou latché (frein non confirmé), exige Reset conscient — distinct de Idx416</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx418_NeutralRequestSeen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = passage au neutre observé pendant un RestartInhibit (réarmement en cours)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
