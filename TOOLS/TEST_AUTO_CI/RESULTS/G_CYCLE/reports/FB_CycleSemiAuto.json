@@ -23,7 +23,7 @@
       "passed": true
     },
     {
-      "name": "TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur AX13_DONE_SYNC",
+      "name": "TC-P04-012 : Compteur de prelevements SampleCount RETAIN incremente sur AX18_DONE_SYNC",
       "passed": true
     },
     {
@@ -35,7 +35,7 @@
       "passed": true
     },
     {
-      "name": "TC-P04-021 : Fond jamais atteint -> timeout tempo max d etape (60 s) -> AX_STAB, pas de redemarrage auto (T169-A S4)",
+      "name": "TC-P04-021 : Fond jamais atteint -> maintien AX4 car tempo max etape desactivee",
       "passed": true
     },
     {

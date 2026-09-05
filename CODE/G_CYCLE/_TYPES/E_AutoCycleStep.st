@@ -40,6 +40,7 @@ TYPE E_AutoCycleStep :
 
   (* --- STEPS SPECIAUX --- *)
   AX_STAB              := 19,   (* Repli defaut / stabilisation - pas une erreur *)
-  AX_DIVING_RETRY      := 20    (* Reprise diving : remontee assistee palier lent jusqu'au FDC haut puis retour AX4 ; sur erreur Kobold / joystick relache / palier <> 4 en AX5..AX7 *)
+  AX_DIVING_RETRY      := 20,   (* Reprise diving : remontee assistee palier lent jusqu'au FDC haut puis retour AX4 ; sur erreur Kobold / joystick relache / palier <> 4 en AX5..AX7 *)
+  AX3_WAIT_DIVE_START  := 21    (* Transition benne->plongee : sorties neutres jusqu'a l'arret mecanique confirme M1/M2, joystick pousse maintenu *)
 );
 END_TYPE

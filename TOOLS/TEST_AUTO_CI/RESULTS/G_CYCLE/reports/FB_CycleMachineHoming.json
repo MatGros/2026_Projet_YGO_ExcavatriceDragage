@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "file": "test_fb_cyclemachinehoming.st",
+  "results": [
+    {
+      "name": "TC-P09-H001 : HX0 n emet aucune sortie (hors maintenance, pas d auto-armement)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H002 : auto-armement HX0 -> HX1 en maintenance (N1) non-homed",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H010 : validation 3 appuis HX1 -> HX2 en MAINT_N2 (pas sur capteur)",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H012 : entree cycle sur front commande IHM StartRequest, en MAINT_N2",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H011 : hors maintenance, ni auto ni motif ni StartRequest n arment",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H080 : NOT Enable -> sorties sures + MachineHomed FALSE + HX0",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H082 : perte de datum EN MOUVEMENT -> SafeStop latche jusqu a arret + Reset",
+      "passed": true
+    },
+    {
+      "name": "TC-P09-H090 : guide BOTH_NOT_HOMED, entree cycle, AC4, HomingError -> FAILED",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0
+  }
+}

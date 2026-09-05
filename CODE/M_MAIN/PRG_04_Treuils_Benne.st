@@ -74,6 +74,7 @@ VAR
 
     WinchBothMotionActive : BOOL;
     WinchBothMotionReady         : BOOL;                         // . [LOC] Verrou atomicite demarrage couple : les 2 treuils prets (hors dead-time D18, hors defaut latche)
+    WinchBothFinalRequestsCoherent : BOOL;                       // . [LOC] Egalite effective des demandes physiques M1/M2 du scan
     WinchBothReqAscent           : BOOL;
     WinchBothReqDescend          : BOOL;
     ManualBottomPositionConfirmed  : BOOL;
@@ -1402,6 +1403,12 @@ instWinchM2(
     BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
+// Atomicite de sortie couplee : les deux FB_Winch ont maintenant traite la demande du
+// scan. Leur readiness directionnelle courante est donc connue avant publication vers
+// PRG_06. La barriere finale ne recevra aucun relais/contacteur tant qu'un axe attend.
+WinchBothMotionReady := NOT (instWinchM1.DirectionChangePending OR instWinchM2.DirectionChangePending)
+                        AND NOT instWinchM1.Fault.Latched AND NOT instWinchM2.Fault.Latched;
+
 // ── Collecteurs passifs d'apprentissage vitesse par palier ──
 // Appelés APRÈS instWinchM1/M2 : StepNumber lu = palier courant du scan (pas de lag).
 // Dérivations des entrées de collecte :
@@ -1488,6 +1495,37 @@ WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitApplied;
 WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitApplied;
+
+WinchBothFinalRequestsCoherent :=
+    (WinchM1FinalInterlockRequest.RequestedRelayFwd = WinchM2FinalInterlockRequest.RequestedRelayFwd)
+    AND (WinchM1FinalInterlockRequest.RequestedRelayRev = WinchM2FinalInterlockRequest.RequestedRelayRev)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor1 = WinchM2FinalInterlockRequest.RequestedContactor1)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor2 = WinchM2FinalInterlockRequest.RequestedContactor2)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor3 = WinchM2FinalInterlockRequest.RequestedContactor3)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor4 = WinchM2FinalInterlockRequest.RequestedContactor4)
+    AND (WinchM1FinalInterlockRequest.RequestedStep = WinchM2FinalInterlockRequest.RequestedStep);
+
+// Defense en profondeur apres les deux FB : en intention couplee, aucun actionneur ne
+// peut etre publie seul. Les FB continuent d'evaluer leurs interlocks internes, mais les
+// deux demandes physiques restent neutres jusqu'a readiness commune.
+IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+   AND WinchBothMotionActive
+   AND (NOT WinchBothMotionReady OR NOT WinchBothFinalRequestsCoherent) THEN
+    WinchM1FinalInterlockRequest.RequestedRelayFwd := FALSE;
+    WinchM1FinalInterlockRequest.RequestedRelayRev := FALSE;
+    WinchM1FinalInterlockRequest.RequestedContactor1 := FALSE;
+    WinchM1FinalInterlockRequest.RequestedContactor2 := FALSE;
+    WinchM1FinalInterlockRequest.RequestedContactor3 := FALSE;
+    WinchM1FinalInterlockRequest.RequestedContactor4 := FALSE;
+    WinchM1FinalInterlockRequest.RequestedStep := 0;
+    WinchM2FinalInterlockRequest.RequestedRelayFwd := FALSE;
+    WinchM2FinalInterlockRequest.RequestedRelayRev := FALSE;
+    WinchM2FinalInterlockRequest.RequestedContactor1 := FALSE;
+    WinchM2FinalInterlockRequest.RequestedContactor2 := FALSE;
+    WinchM2FinalInterlockRequest.RequestedContactor3 := FALSE;
+    WinchM2FinalInterlockRequest.RequestedContactor4 := FALSE;
+    WinchM2FinalInterlockRequest.RequestedStep := 0;
+END_IF;
 
 {endregion}
 

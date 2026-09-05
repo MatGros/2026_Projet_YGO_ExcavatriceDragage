@@ -134,6 +134,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "491", "G491 - Anti-orphelin bypass RETAIN (relais PRG_07, REX 2026-09-01 BypassNetworkGlobal)", [sys.executable, f"{S}/G491_check_bypass_retain_relayed.py"]),
     ("C", "492", "G492 - Verrou inversion joystick inter-scan (T222)", [sys.executable, f"{S}/G492_check_joystick_inversion_lock.py", "."]),
     ("C", "493", "G493 - Table paliers centrale vers joystick (T223)", [sys.executable, f"{S}/G493_check_joystick_speedstep_table_link.py", "."]),
+    ("C", "494", "G494 - Handoff AX3/AX4 joystick maintenu et neutralite maintenance (T257)", [sys.executable, f"{S}/G494_check_cycle_dive_handoff.py"]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

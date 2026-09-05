@@ -1,0 +1,92 @@
+contract:
+  task_id: T257
+  criticality: C3
+  strategy: patch
+  objective: >
+    En cycle semi-automatique, conserver la poussee Y et l'homme-mort maintenus pendant
+    l'ouverture de la benne, separer la manoeuvre M2 du depart de plongee par un arret
+    mecanique confirme, puis demarrer M1 et M2 atomiquement sans deroulement M2 ni defaut sync.
+  acceptance:
+    - id: AC1
+      statement: "Neutralite stricte MAINT_N1/MAINT_N2 : la nouvelle barriere de sortie PRG_04 est bornee a SEMI_AUTO et les tests de matrice maintenance restent verts."
+      verified_by: "Diff PRG_03/PRG_04, G483 et revue independante ciblee"
+    - id: AC12
+      statement: "AX3 ne se termine que sur Benne_IsOpen AND NOT Benne_Busy; Benne_Done seul ne suffit pas."
+      verified_by: "test FB_CycleSemiAuto scan-par-scan"
+    - id: AC2
+      statement: "La phase intermediaire maintient toutes les demandes benne/M1/M2 a zero tant que l'arret mecanique valide et stable n'est pas confirme."
+      verified_by: "test FB_CycleSemiAuto avec chute individuelle de chaque feedback"
+    - id: AC3
+      statement: "L'arret confirme exige pour M1 et M2 contacteurs retombes, freins appliques, vitesse valide et vitesse sous seuil."
+      verified_by: "test FB_Modes/FB_CycleSemiAuto + revue cablage PRG_02 vers PRG_03"
+    - id: AC4
+      statement: "Joystick Y pousse et DeadmanArmed peuvent rester vrais sans relacher; une deflexion X, le neutre ou Y tire n'autorise pas la plongee."
+      verified_by: "tests directionnels FB_CycleSemiAuto"
+    - id: AC5
+      statement: "La premiere commande de plongee programmee est atomique: aucun scan ne peut autoriser M1 ou M2 seul avant readiness commune."
+      verified_by: "WINCH_INTEG PRG_03->PRG_04->PRG_06 avec readiness asymetrique"
+    - id: AC6
+      statement: "Le timeout de stabilisation, un defaut, Abort, perte homme-mort ou vitesse invalide neutralisent les sorties et ne provoquent jamais le depart."
+      verified_by: "tests frontieres et timeout FB_CycleSemiAuto/WINCH_INTEG"
+    - id: AC7
+      statement: "Apres faute ou interruption de securite, aucune reprise automatique n'est possible par maintien du joystick."
+      verified_by: "test Cause disparue + Reset front + nouvelle action consciente"
+    - id: AC8
+      statement: "Les harnais FB_CycleSemiAuto et WINCH_INTEG compilent et passent; bundle, G200 et gates palier C passent."
+      verified_by: "run_tests.py, generate_codesys_bundle.py, G200_check_linkage.py --report, run_all_gates.py --palier C"
+    - id: AC9
+      statement: "Chaque fichier sous CODE/M_MAIN conserve un nom de fichier strictement identique au nom du POU qu'il declare."
+      verified_by: "inspection source et gate structurel"
+    - id: AC10
+      statement: "Critere structurel CODE/MAIN : aucun suffixe de langage _CFC/_LD n'est appose ; le suffixe reste identique au langage genere dans le bundle, soit du ST pur."
+      verified_by: "inspection CODE_XML/CODE_Bundle.xml et gates bundle"
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
+      - CODE/F_MODES/FB_Modes.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_Modes_Autorisations.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_winch_integ.st
+      - TOOLS/TEST_AUTO_CI/registry.yaml
+      - TOOLS/AGENT_WORKFLOW/scripts/G494_check_cycle_dive_handoff.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_ContinuiteJoystick_AX3_AX4_20260905.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+  conservation:
+    must_survive:
+      - "Enable FALSE, SafeStop, PowerCutOff et perte homme-mort neutralisent les mouvements."
+      - "Reset reste traite sur front et aucun defaut ne redemarre automatiquement."
+      - "Le palier de plongee reste borne au palier 4."
+      - "Les barrieres finales PRG_06 restent les seuls producteurs des sorties physiques."
+      - "Nom de chaque POU identique au fichier et langage ST conserve dans le bundle."
+    dropped_on_purpose:
+      - "Obligation operateur de relacher puis repousser le joystick entre AX3 et AX4."
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - targeted_tests
+    - independent_non_regression_review
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute incoherence de spec, interface, signal de securite ou regression est bloquante
+    et remontee avant poursuite. Aucun essai puissance n'est autorise par ce contrat.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex"
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

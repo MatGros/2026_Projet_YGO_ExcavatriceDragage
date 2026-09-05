@@ -194,51 +194,6 @@
     ],
     "updated_at": "2026-09-03 07:57:50"
   },
-  "FB_Cycle": {
-    "ok": true,
-    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\G_CYCLE\\reports\\FB_Cycle.html",
-    "report_group": null,
-    "section_kwargs": {
-      "domain": "G_CYCLE"
-    },
-    "tests": [
-      {
-        "name": "Statut sauvegarde",
-        "passed": true
-      }
-    ],
-    "updated_at": "2026-09-03 07:58:19"
-  },
-  "FB_DiveSearch": {
-    "ok": true,
-    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\G_CYCLE\\reports\\FB_DiveSearch.html",
-    "report_group": null,
-    "section_kwargs": {
-      "domain": "G_CYCLE"
-    },
-    "tests": [
-      {
-        "name": "Statut sauvegarde",
-        "passed": true
-      }
-    ],
-    "updated_at": "2026-09-03 07:52:05"
-  },
-  "FB_ExtractionAssist": {
-    "ok": true,
-    "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\G_CYCLE\\reports\\FB_ExtractionAssist.html",
-    "report_group": null,
-    "section_kwargs": {
-      "domain": "G_CYCLE"
-    },
-    "tests": [
-      {
-        "name": "Statut sauvegarde",
-        "passed": true
-      }
-    ],
-    "updated_at": "2026-09-03 07:52:05"
-  },
   "FB_WinchLoadEstimator": {
     "ok": false,
     "report": "TOOLS\\TEST_AUTO_CI\\RESULTS\\H_TREUILS_BENNE\\reports\\H_TREUILS_BENNE.html",

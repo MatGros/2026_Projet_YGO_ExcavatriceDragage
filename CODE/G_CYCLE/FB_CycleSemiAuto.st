@@ -16,6 +16,7 @@ VAR_INPUT
     EncoderFaultPresent     : BOOL;         // --> [SAFE] Defaut codeur agrege (cycle non autorise)
     Mode                    : E_Mode;       // --> [CMD] Mode arbitre (SEMI_AUTO pour instance cycle)
     JoystickDeflected       : BOOL;         // --> [CMD] Manche deflecte (non centre)
+    JoystickPush            : BOOL;         // --> [CMD] Intention Y descente qualifiee (axe Y pousse uniquement)
     DeadmanArmed            : BOOL;         // --> [CMD] Appui homme-mort (fenetre 3 s)
     HeartbeatIhmOk          : BOOL;         // --> [SAFE] IHM<->PLC valide
 
@@ -40,6 +41,12 @@ VAR_INPUT
     M2_CablePosM            : REAL;         // --> [HW] Position cable treuil M2 (recalee)
     M1_MeasuredSpeedMps     : REAL;         // --> [HW] Vitesse lineaire mesuree M1 (m/s)
     M2_MeasuredSpeedMps     : REAL;         // --> [HW] Vitesse lineaire mesuree M2 (m/s)
+    M1_SpeedValid           : BOOL;         // --> [HW] Mesure vitesse M1 valide
+    M2_SpeedValid           : BOOL;         // --> [HW] Mesure vitesse M2 valide
+    M1_ContactorsReleased   : BOOL;         // --> [HW] Tous contacteurs M1 retombes
+    M2_ContactorsReleased   : BOOL;         // --> [HW] Tous contacteurs M2 retombes
+    M1_BrakeApplied         : BOOL;         // --> [HW] Frein M1 mecaniquement serre
+    M2_BrakeApplied         : BOOL;         // --> [HW] Frein M2 mecaniquement serre
     SpeedMismatchThresholdMps : REAL;       // --> [CFG] Seuil ecart vitesse ; 0 = controle desactive
     SpeedMismatchTimeout    : TIME;         // --> [CFG] Duree de confirmation ; 0 = controle desactive
     CableLimitM1AscentM     : REAL;         // --> [CFG] Limite haute d'exploitation M1
@@ -175,7 +182,9 @@ VAR
     CtrlAscentTimeout       : TIME := T#30s;    // . [LOC] Temps max pour zone de stabilisation
     DrainingTime            : TIME := T#5s;     // . [LOC] Temps d'egouttage par defaut
     StepMaxTimeout          : TIME := T#60s;    // . [LOC] Tempo max d'etape
-    BucketOpenStabTimer     : TON;              // . [LOC] Stabilisation benne ouverte avant plongee (AX3->AX4)
+    DiveStartStopTimer      : TON;              // . [LOC] Confirmation arret mecanique avant depart couple
+    DiveStartTimeoutTimer   : TON;              // . [LOC] Plafond attente arret mecanique (sanction defaut)
+    DiveStartStopped        : BOOL;              // . [LOC] Les deux treuils sont physiquement arretes et mesures valides
     CST_KoboldStabTime      : TIME := T#500ms;  // . [LOC] Stabilisation feedback Kobold
     CST_BottomTouchStabTime : TIME := T#2s;     // . [LOC] Stabilisation arret apres contact fond
 
@@ -189,7 +198,9 @@ VAR CONSTANT
     CST_StepDive   : INT := 4;   // Palier plongee Kobold AX4..AX7 : palier 4 MINI ET MAXI impose, palier 5 interdit (GEL Q9)
     CST_StepLoaded : INT := 4;   // Palier montee en charge AX12 (bridage strict <= 4, jamais palier 5)
     CST_KoboldInitTimeout : TIME := T#3s;   // Fenetre max de confirmation retour contacteur Kobold en AX5
-    CST_BucketOpenStabTime : TIME := T#1s;  // Stabilisation benne ouverte avant plongee couplee (AX3->AX4)
+    CST_DiveStartStopConfirmTime : TIME := T#300ms; // Confirmation stable des 6 faits d'arret + validite vitesses
+    CST_DiveStartStopTimeout : TIME := T#5s; // Plafond anti-blocage ; timeout -> defaut latche, jamais depart
+    CST_DiveStartSpeedThresholdMps : REAL := 0.02; // Vitesse quasi nulle, alignee FB_Modes
     CST_RaiseOffBottomDefaultM : REAL := 0.5;   // Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM <= 0
     // Backstop anti-telescopage : ecart de position M1/M2 max tolere pendant les phases
     // reellement couplees hors X7. Porte a 1,50 m pour absorber la dynamique benne ouverte
@@ -209,6 +220,16 @@ SkipDrainEdge(CLK := SkipDrainRequest);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 JoyDeflectedEdge(CLK := JoystickDeflected);
+
+DiveStartStopped := M1_SpeedValid AND M2_SpeedValid
+                    AND M1_ContactorsReleased AND M2_ContactorsReleased
+                    AND M1_BrakeApplied AND M2_BrakeApplied
+                    AND (ABS(M1_MeasuredSpeedMps) < CST_DiveStartSpeedThresholdMps)
+                    AND (ABS(M2_MeasuredSpeedMps) < CST_DiveStartSpeedThresholdMps);
+DiveStartStopTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START) AND DiveStartStopped,
+                   PT := CST_DiveStartStopConfirmTime);
+DiveStartTimeoutTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START),
+                      PT := CST_DiveStartStopTimeout);
 
 // Config diving/extraction bornee (repli defaut interne si non reglee / valeur implausible).
 // DiveStartMinM = altimetrie de lancement Kobold dans le referentiel M1_CablePosM
@@ -257,7 +278,7 @@ StepMaxPrevState := State;
 DrainingTimer(IN := (State = E_AutoCycleStep.AX13_DRAIN_PAUSE), PT := DrainTimeEff);
 
 // ⏱️ Stabilisation alimentation Kobold (500ms en AX6 avant surveillance fond)
-KoboldStabTimer(IN := (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) AND JoystickDeflected AND KoboldImmersed, PT := CST_KoboldStabTime);
+KoboldStabTimer(IN := (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) AND DeadmanArmed AND JoystickPush AND KoboldImmersed, PT := CST_KoboldStabTime);
 
 // ⏱️ Stabilisation à l'arrêt fond touché (2s en AX8 freins serrés avant montée AX9)
 BottomTouchStabTimer(IN := (State = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED), PT := CST_BottomTouchStabTime);
@@ -266,7 +287,7 @@ BottomTouchStabTimer(IN := (State = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED), PT :=
 RetryJoyReleaseTimer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                              OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
                              OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
-                            AND NOT JoystickDeflected,
+                            AND NOT (DeadmanArmed AND JoystickPush),
                      PT := T#200ms);
 // Palier bloque SOUS 4 pendant la plongee (DÉSACTIVÉ en reprise auto)
 PalierNot4Timer(IN := FALSE, PT := T#5s);
@@ -345,6 +366,11 @@ instCauses[9].Active   := NOT WinchesAtDiveStep
                             OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM));
 instCauses[9].Latching := TRUE;
 instCauses[9].Texte    := 'Palier 4 non confirme sur M1 et/ou M2 pendant la recherche Kobold';
+
+instCauses[10].Active   := DiveStartTimeoutTimer.Q
+                           AND (State = E_AutoCycleStep.AX3_WAIT_DIVE_START);
+instCauses[10].Latching := TRUE;
+instCauses[10].Texte    := 'Arret mecanique M1/M2 non confirme avant plongee';
 
 // Appel du socle de defaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -657,8 +683,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1; // Sens principal attendu : pousser pour ouvrir
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+        WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#0403;
         OperatorAction := 'AX3 - Pousser le joystick pour ouvrir la benne (tirer pour refermer si besoin).';
 
@@ -667,30 +693,41 @@ CASE State OF
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
         // Pilotage benne 2 sens : pousse (Y-) -> ouvre, tire (Y+) -> ferme
-        IF CycleMotionPermit THEN
+        IF DeadmanArmed AND JoystickPush THEN
             BucketCmd.ReqOpen := TRUE; // Piloté via ReqDescend dans FB_Bucket
         ELSE
             BucketCmd.ReqOpen := FALSE;
         END_IF;
 
-        // Benne ouverte atteinte : mouvements a l'arret (treuils deja neutralises ci-dessus,
-        // benne coupee ici), stabilisation 2s avant plongee couplee.
-        IF (Benne_IsOpen OR Benne_Done) AND NOT Benne_Busy THEN
+        // Benne ouverte atteinte : seul l'etat mecanique IsOpen autorise la transition.
+        // Done seul est insuffisant (fin de manoeuvre sans preuve d'ouverture).
+        IF Benne_IsOpen AND NOT Benne_Busy THEN
             BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX3_WAIT_DIVE_START;
         END_IF;
-        BucketOpenStabTimer(IN := (Benne_IsOpen OR Benne_Done) AND NOT Benne_Busy,
-                            PT := CST_BucketOpenStabTime);
 
-        // Apres stabilisation : geste operateur franc exige (relacher au centre PUIS
-        // repousser) - transition sur front JoystickDeflected, pas sur maintien.
-        IF BucketOpenStabTimer.Q THEN
-            WaitingForOperator := NOT JoystickDeflected;
-            WaitingForProcess := FALSE;
-            OperatorActionId := 16#0403;
-            OperatorAction := 'AX3 - Relacher puis repousser le joystick pour lancer la plongee.';
-            IF JoyDeflectedEdge.Q THEN
-                State := E_AutoCycleStep.AX4_DESCEND_DIVING;
-            END_IF;
+    E_AutoCycleStep.AX3_WAIT_DIVE_START:
+        CycleStep := E_AutoCycleStep.AX3_WAIT_DIVE_START;
+        CycleStateStr := 'AX3 - Arret mecanique avant plongee';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := -1;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+        WaitingForProcess := NOT DiveStartStopTimer.Q;
+        OperatorActionId := 16#0403;
+        OperatorAction := 'AX3 - Maintenir le joystick pousse : attente arret M1/M2 avant plongee.';
+
+        // Separation mecanique stricte : aucune demande pendant la retombee M2.
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE;
+
+        // Continuation normale uniquement si le geste n'a jamais ete interrompu et si
+        // l'arret est confirme. Une perte d'homme-mort desarme FB_Joystick et exige son
+        // nouveau front physique avant que DeadmanArmed puisse redevenir vrai.
+        IF DiveStartStopTimer.Q AND DeadmanArmed AND JoystickPush THEN
+            State := E_AutoCycleStep.AX4_DESCEND_DIVING;
         END_IF;
 
     (* ===================== DIVING (AX4..AX8 + AX_DIVING_RETRY) ===================== *)
@@ -702,24 +739,24 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+        WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#0404;
         OperatorAction := 'AX4 - Maintenir la descente palier 4 (Kobold pas encore enclenche).';
 
         // Palier 4 MINI ET MAXI (CST_StepDive), palier 5 interdit (cause 8). Tempo
         // sequencement contacteurs conservee en aval (PRG_04 : montee progressive 1->4).
         // Contacteur Kobold PAS enclenche a cette etape.
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
         WinchM1Cmd.StepTgt  := CST_StepDive;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
         WinchM2Cmd.StepTgt  := CST_StepDive;
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
         // AT4 : altimetrie de lancement atteinte (M1 <= DiveStartMinEff).
-        IF JoystickDeflected
+        IF DeadmanArmed AND JoystickPush
            AND (M1_CablePosM <= DiveStartMinEff) THEN
             State := E_AutoCycleStep.AX5_KOBOLD_INIT;
         END_IF;
@@ -731,25 +768,25 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+        WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#0405;
         OperatorAction := 'AX5 - Maintenir la descente palier 4 : initialisation Kobold en cours.';
 
         // Descente palier 4 maintenue ; enclenche le contacteur Kobold et attend le retour.
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
         WinchM1Cmd.StepTgt  := CST_StepDive;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
         WinchM2Cmd.StepTgt  := CST_StepDive;
-        BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
+        BucketCmd.ReqKoboldMeasureEnable := DeadmanArmed AND JoystickPush;
 
         // AT5 : retour contacteur Kobold coherent -> recherche immersion.
         // Palier 4 M1/M2 non atteint = cause de defaut (instCauses[9]), pas un blocage
         // silencieux de la transition.
         // (echec init / joystick relache / palier <> 4 -> AX_DIVING_RETRY via GT-dive-retry §1)
-        IF JoystickDeflected AND KoboldContactorFeedback THEN
+        IF DeadmanArmed AND JoystickPush AND KoboldContactorFeedback THEN
             State := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
         END_IF;
 
@@ -760,21 +797,21 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+        WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#0406;
         OperatorAction := 'AX6 - Maintenir la descente palier 4 : stabilisation signal Kobold (500ms).';
 
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
         WinchM1Cmd.StepTgt  := CST_StepDive;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
         WinchM2Cmd.StepTgt  := CST_StepDive;
-        BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
+        BucketCmd.ReqKoboldMeasureEnable := DeadmanArmed AND JoystickPush;
 
         // AT6 : signal Kobold sous tension confirme haut (DI=1) pendant 500ms -> recherche du fond.
-        IF JoystickDeflected AND KoboldStabTimer.Q THEN
+        IF DeadmanArmed AND JoystickPush AND KoboldStabTimer.Q THEN
             State := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
         END_IF;
 
@@ -785,21 +822,21 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+        WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#0407;
         OperatorAction := 'AX7 - Maintenir la descente palier 4 sous l eau : detection du fond.';
 
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
         WinchM1Cmd.StepTgt  := CST_StepDive;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
         WinchM2Cmd.StepTgt  := CST_StepDive;
-        BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
+        BucketCmd.ReqKoboldMeasureEnable := DeadmanArmed AND JoystickPush;
 
         // AT7 : coupure signal Kobold (front descendant 1->0 ou DI=0) = fond touche.
-        IF JoystickDeflected AND (KoboldFallEdge.Q OR NOT KoboldImmersed) THEN
+        IF DeadmanArmed AND JoystickPush AND (KoboldFallEdge.Q OR NOT KoboldImmersed) THEN
             TouchPositionM := M1_CablePosM;
             BottomTouched  := TRUE;   // variable d'info latchee (GEL AX8) - effacee a AX0 / AX_STAB / Reset
             IF LimitLegalDepthM < -0.01 THEN

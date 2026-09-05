@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T17:39:52.710437" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T17:39:52.710437">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T17:59:34.224488" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T17:59:34.224488">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -7150,6 +7150,12 @@ instWinchM2(
     BypassGlobal            := GVL_IHM.M2TreuilBenne.Bypass.Global
 );
 
+// Atomicite de sortie couplee : les deux FB_Winch ont maintenant traite la demande du
+// scan. Leur readiness directionnelle courante est donc connue avant publication vers
+// PRG_06. La barriere finale ne recevra aucun relais/contacteur tant qu'un axe attend.
+WinchBothMotionReady := NOT (instWinchM1.DirectionChangePending OR instWinchM2.DirectionChangePending)
+                        AND NOT instWinchM1.Fault.Latched AND NOT instWinchM2.Fault.Latched;
+
 // ── Collecteurs passifs d'apprentissage vitesse par palier ──
 // Appelés APRÈS instWinchM1/M2 : StepNumber lu = palier courant du scan (pas de lag).
 // Dérivations des entrées de collecte :
@@ -7236,6 +7242,27 @@ WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
 WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitApplied;
 WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitApplied;
+
+// Defense en profondeur apres les deux FB : en intention couplee, aucun actionneur ne
+// peut etre publie seul. Les FB continuent d'evaluer leurs interlocks internes, mais les
+// deux demandes physiques restent neutres jusqu'a readiness commune.
+IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+   AND WinchBothMotionActive AND NOT WinchBothMotionReady THEN
+    WinchM1FinalInterlockRequest.RequestedRelayFwd := FALSE;
+    WinchM1FinalInterlockRequest.RequestedRelayRev := FALSE;
+    WinchM1FinalInterlockRequest.RequestedContactor1 := FALSE;
+    WinchM1FinalInterlockRequest.RequestedContactor2 := FALSE;
+    WinchM1FinalInterlockRequest.RequestedContactor3 := FALSE;
+    WinchM1FinalInterlockRequest.RequestedContactor4 := FALSE;
+    WinchM1FinalInterlockRequest.RequestedStep := 0;
+    WinchM2FinalInterlockRequest.RequestedRelayFwd := FALSE;
+    WinchM2FinalInterlockRequest.RequestedRelayRev := FALSE;
+    WinchM2FinalInterlockRequest.RequestedContactor1 := FALSE;
+    WinchM2FinalInterlockRequest.RequestedContactor2 := FALSE;
+    WinchM2FinalInterlockRequest.RequestedContactor3 := FALSE;
+    WinchM2FinalInterlockRequest.RequestedContactor4 := FALSE;
+    WinchM2FinalInterlockRequest.RequestedStep := 0;
+END_IF;
 
 {endregion}
 
