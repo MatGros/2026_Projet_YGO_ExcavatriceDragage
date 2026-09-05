@@ -3937,7 +3937,7 @@ DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz)
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1s0ms" />
+                <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
@@ -3949,7 +3949,7 @@ DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz)
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1s0ms" />
+                <simpleValue value="TIME#700ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps mort redemarrage inversion sens apres arret</xhtml>
@@ -3966,7 +3966,7 @@ DriveFreqCmdWord := REAL_TO_WORD(LIMIT(0.0, DriveFreqCmd_Hz, DriveFreqWordMaxHz)
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MAINTIEN BORNÉ DU CONTACTEUR DE SENS (§3bis / AC6-AC8) ===
 Paramètres DÉDIÉS, distincts de DeadTimeSameDir/OppositeDir et de tout délai
 d'interlock direction (ne pas réutiliser ni recouvrir D10). Ordre garanti :
-DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
+DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (400 ms), les 2 modifiables (AC8).
 --&gt; [CFG] Debounce confirmation retombee contacteurs (AC7)</xhtml>
               </documentation>
             </variable>
@@ -3975,7 +3975,7 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1s0ms" />
+                <simpleValue value="TIME#400ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] T_max : borne superieure du maintien §3bis (AC7)</xhtml>
@@ -3986,11 +3986,11 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#100ms" />
+                <simpleValue value="TIME#50ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRE DE RELACHEMENT CONTACTEURS (vitesse avant direction) ===
---&gt; [CFG] Decalage relachement direction apres vitesse (&gt;= 100ms)</xhtml>
+--&gt; [CFG] Decalage relachement direction apres vitesse</xhtml>
               </documentation>
             </variable>
           </inputVars>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-01T09:05:25.779051" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-01T09:05:25.779051">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T07:59:48.254107" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T07:59:48.254107">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -202,11 +202,11 @@ Table de seuils des paliers de vitesse</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#900ms" />
+                <simpleValue value="TIME#800ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTERLOCK CHANGEMENT DE SENS ===
-Delai interlock changement de sens montee</xhtml>
+Delai interlock changement de sens montee (DeadTimeOppositeDir 700ms + 100ms)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionInterlockDelayDescent">
@@ -214,10 +214,10 @@ Delai interlock changement de sens montee</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#200ms" />
+                <simpleValue value="TIME#800ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock changement de sens descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock changement de sens descente (DeadTimeOppositeDir 700ms + 100ms)</xhtml>
               </documentation>
             </variable>
             <variable name="StepRampDelay">
@@ -1485,9 +1485,8 @@ ELSIF (PrevStepNumber &gt; 0) AND (StepNumber = 0) AND (CommandedAscent OR Comma
     SenseHoldActiveInt := TRUE;   // front de chute de palier a 0 avec sens encore actif
 END_IF;
 
-// T_hold_internal PROVISOIRE essai site (base physique : inertie moteur + chute de couple) ;
-// tenu &lt; MaxSenseHoldTime de FB_WinchOutputInterlock pour que la barriere garde le dernier mot.
-SenseHoldTimer(IN := SenseHoldActiveInt, PT := T#900ms);
+// Maintien interne aligné sur MaxSenseHoldTime de FB_WinchOutputInterlock (T#400ms).
+SenseHoldTimer(IN := SenseHoldActiveInt, PT := T#400ms);
 IF SenseHoldTimer.Q OR (StepNumber &gt; 0) THEN
     SenseHoldActiveInt := FALSE;  // borne de temps atteinte, ou nouveau mouvement demande
 END_IF;

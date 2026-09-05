@@ -32,18 +32,18 @@ VAR_INPUT
     RequestedStep                   : INT;                            // --> [CMD] Palier de vitesse demande
 
     // === TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
-    DeadTimeSameDir                 : TIME := T#1s;                  // --> [CFG] Temps mort redemarrage meme sens apres arret
-    DeadTimeOppositeDir             : TIME := T#1s;                  // --> [CFG] Temps mort redemarrage inversion sens apres arret
+    DeadTimeSameDir                 : TIME := T#500ms;               // --> [CFG] Temps mort redemarrage meme sens apres arret
+    DeadTimeOppositeDir             : TIME := T#700ms;               // --> [CFG] Temps mort redemarrage inversion sens apres arret
 
     // === MAINTIEN BORNÉ DU CONTACTEUR DE SENS (§3bis / AC6-AC8) ===
     // Paramètres DÉDIÉS, distincts de DeadTimeSameDir/OppositeDir et de tout délai
     // d'interlock direction (ne pas réutiliser ni recouvrir D10). Ordre garanti :
-    // DropConfirmDelay (100 ms) < MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
+    // DropConfirmDelay (100 ms) < MaxSenseHoldTime (400 ms), les 2 modifiables (AC8).
     DropConfirmDelay                : TIME := T#100ms;               // --> [CFG] Debounce confirmation retombee contacteurs (AC7)
-    MaxSenseHoldTime                : TIME := T#1s;                  // --> [CFG] T_max : borne superieure du maintien §3bis (AC7)
+    MaxSenseHoldTime                : TIME := T#400ms;               // --> [CFG] T_max : borne superieure du maintien §3bis (AC7)
 
     // === ORDRE DE RELACHEMENT CONTACTEURS (vitesse avant direction) ===
-    ReleaseOrderDelay               : TIME := T#100ms;               // --> [CFG] Decalage relachement direction apres vitesse (>= 100ms)
+    ReleaseOrderDelay               : TIME := T#50ms;                // --> [CFG] Decalage relachement direction apres vitesse
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===

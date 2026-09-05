@@ -16,8 +16,8 @@ STRUCT
     SpeedStepTable                  : ST_SpeedStepTable;   // Table de seuils des paliers de vitesse
 
     // === INTERLOCK CHANGEMENT DE SENS ===
-    DirectionInterlockDelayAscent       : TIME := T#900ms;   // Delai interlock changement de sens montee
-    DirectionInterlockDelayDescent     : TIME := T#200ms;   // Delai interlock changement de sens descente
+    DirectionInterlockDelayAscent       : TIME := T#800ms;   // Delai interlock changement de sens montee (DeadTimeOppositeDir 700ms + 100ms)
+    DirectionInterlockDelayDescent     : TIME := T#800ms;   // Delai interlock changement de sens descente (DeadTimeOppositeDir 700ms + 100ms)
 
     // === CADENCE DE RAMPE PALIER ===
     StepRampDelay                   : TIME := T#900ms;   // [cible] Tempo de rampe palier (usage aval)
