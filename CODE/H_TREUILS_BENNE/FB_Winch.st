@@ -339,9 +339,8 @@ ELSIF (PrevStepNumber > 0) AND (StepNumber = 0) AND (CommandedAscent OR Commande
     SenseHoldActiveInt := TRUE;   // front de chute de palier a 0 avec sens encore actif
 END_IF;
 
-// T_hold_internal PROVISOIRE essai site (base physique : inertie moteur + chute de couple) ;
-// tenu < MaxSenseHoldTime de FB_WinchOutputInterlock pour que la barriere garde le dernier mot.
-SenseHoldTimer(IN := SenseHoldActiveInt, PT := T#900ms);
+// Maintien interne aligné sur MaxSenseHoldTime de FB_WinchOutputInterlock (T#400ms).
+SenseHoldTimer(IN := SenseHoldActiveInt, PT := T#400ms);
 IF SenseHoldTimer.Q OR (StepNumber > 0) THEN
     SenseHoldActiveInt := FALSE;  // borne de temps atteinte, ou nouveau mouvement demande
 END_IF;

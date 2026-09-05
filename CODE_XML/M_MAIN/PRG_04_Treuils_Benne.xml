@@ -2095,11 +2095,11 @@ Table de seuils des paliers de vitesse</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#900ms" />
+                <simpleValue value="TIME#800ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTERLOCK CHANGEMENT DE SENS ===
-Delai interlock changement de sens montee</xhtml>
+Delai interlock changement de sens montee (DeadTimeOppositeDir 700ms + 100ms)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionInterlockDelayDescent">
@@ -2107,10 +2107,10 @@ Delai interlock changement de sens montee</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#200ms" />
+                <simpleValue value="TIME#800ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock changement de sens descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock changement de sens descente (DeadTimeOppositeDir 700ms + 100ms)</xhtml>
               </documentation>
             </variable>
             <variable name="StepRampDelay">
@@ -11249,9 +11249,8 @@ ELSIF (PrevStepNumber &gt; 0) AND (StepNumber = 0) AND (CommandedAscent OR Comma
     SenseHoldActiveInt := TRUE;   // front de chute de palier a 0 avec sens encore actif
 END_IF;
 
-// T_hold_internal PROVISOIRE essai site (base physique : inertie moteur + chute de couple) ;
-// tenu &lt; MaxSenseHoldTime de FB_WinchOutputInterlock pour que la barriere garde le dernier mot.
-SenseHoldTimer(IN := SenseHoldActiveInt, PT := T#900ms);
+// Maintien interne aligné sur MaxSenseHoldTime de FB_WinchOutputInterlock (T#400ms).
+SenseHoldTimer(IN := SenseHoldActiveInt, PT := T#400ms);
 IF SenseHoldTimer.Q OR (StepNumber &gt; 0) THEN
     SenseHoldActiveInt := FALSE;  // borne de temps atteinte, ou nouveau mouvement demande
 END_IF;
@@ -14630,7 +14629,7 @@ END_IF;
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1s0ms" />
+                <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== TEMPS MORT DIRECTIONNEL (TC-P10-021/022) ===
@@ -14642,7 +14641,7 @@ END_IF;
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1s0ms" />
+                <simpleValue value="TIME#700ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps mort redemarrage inversion sens apres arret</xhtml>
@@ -14659,7 +14658,7 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MAINTIEN BORNÉ DU CONTACTEUR DE SENS (§3bis / AC6-AC8) ===
 Paramètres DÉDIÉS, distincts de DeadTimeSameDir/OppositeDir et de tout délai
 d'interlock direction (ne pas réutiliser ni recouvrir D10). Ordre garanti :
-DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
+DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (400 ms), les 2 modifiables (AC8).
 --&gt; [CFG] Debounce confirmation retombee contacteurs (AC7)</xhtml>
               </documentation>
             </variable>
@@ -14668,7 +14667,7 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#1s0ms" />
+                <simpleValue value="TIME#400ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] T_max : borne superieure du maintien §3bis (AC7)</xhtml>
@@ -14679,11 +14678,11 @@ DropConfirmDelay (100 ms) &lt; MaxSenseHoldTime (1 s), les 2 modifiables (AC8).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#100ms" />
+                <simpleValue value="TIME#50ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ORDRE DE RELACHEMENT CONTACTEURS (vitesse avant direction) ===
---&gt; [CFG] Decalage relachement direction apres vitesse (&gt;= 100ms)</xhtml>
+--&gt; [CFG] Decalage relachement direction apres vitesse</xhtml>
               </documentation>
             </variable>
           </inputVars>

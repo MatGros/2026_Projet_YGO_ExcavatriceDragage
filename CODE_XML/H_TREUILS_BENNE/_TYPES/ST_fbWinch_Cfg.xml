@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T06:01:21.248534" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T06:01:21.248534">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T07:59:56.669957" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T07:59:56.669957">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -40,11 +40,11 @@ Table de seuils des paliers de vitesse</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#900ms" />
+                <simpleValue value="TIME#800ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTERLOCK CHANGEMENT DE SENS ===
-Delai interlock changement de sens montee</xhtml>
+Delai interlock changement de sens montee (DeadTimeOppositeDir 700ms + 100ms)</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionInterlockDelayDescent">
@@ -52,10 +52,10 @@ Delai interlock changement de sens montee</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#200ms" />
+                <simpleValue value="TIME#800ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock changement de sens descente</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock changement de sens descente (DeadTimeOppositeDir 700ms + 100ms)</xhtml>
               </documentation>
             </variable>
             <variable name="StepRampDelay">
