@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:47:14.098664" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:47:14.098664">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:57:24.120158" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:57:24.120158">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1502,7 +1502,7 @@ instCycleSemiAuto(
     CfgForceStepTarget      := GVL_IHM.CycleSemiAuto.Cfg.ForceStepTarget,
     CfgForceStepApply       := GVL_IHM.CycleSemiAuto.Cmd.BtnForceStepApply,
     // Config diving / extraction (GEL 2026-09-03)
-    DiveStartMinM           := _CycleDiveSearchCfgPersist.DiveStartMin_M, // altimetrie lancement Kobold (AT4) — plus de Cfg IHM (assistant retire), lecture directe RETAIN
+    DiveStartMinM           := GVL_IHM.CycleSemiAuto.Cfg.DiveStartMin_M, // altimetrie lancement Kobold (AT4)
     CfgRaiseOffBottomM      := GVL_IHM.CycleSemiAuto.Cfg.RaiseOffBottom_M,   // GEL Q16 : decollement du fond AX8 (reglable IHM)
     CfgCtrlAscentMaxStep    := GVL_IHM.CycleSemiAuto.Cfg.CtrlAscentMaxStep,  // GEL Q16 : palier max montee controle AX11 [1..2]
     M1_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber, // palier applique (0..5) : garde palier&lt;&gt;4 en plongee (GT-dive-retry) + cause 8 (palier 5)

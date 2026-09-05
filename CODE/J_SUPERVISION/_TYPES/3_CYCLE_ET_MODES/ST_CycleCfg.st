@@ -10,6 +10,10 @@ STRUCT
     RaiseOffBottom_M   : REAL := 0.5;   (* 📐 Décollement du fond en AX8 : RaiseTarget = TouchPosition + ce champ (réglable essais, GEL Q16) *)
     CtrlAscentMaxStep  : INT  := 1;     (* 🚀 Palier max montée contrôle AX11, borné [1..2] côté FB (GEL Q16) *)
     ForceStepTarget    : INT  := 0;     (* 🔧 Step GRAFCET cible du forçage (0=AX0 .. 20=AX_DIVING_RETRY), borné côté FB *)
+    DiveStartMin_M     : REAL := 1.0;   (* 📐 Altimétrie lancement Kobold (AT4, PRG_03) *)
+    ImmersionUpper_M   : REAL := 0.5;   (* 📐 Altimétrie Kobold haute confirmation immersion (AT4, PRG_04) *)
+    ImmersionLower_M   : REAL := -0.5;  (* 📐 Altimétrie Kobold basse confirmation immersion (AT4, PRG_04) *)
+    ExtractionControlDistance_M : REAL := 2.0; (* 📐 Distance palier contrôle montée assistée (PRG_04) *)
     Initialized        : BOOL := FALSE; (* 🚦 flag restauration boot *)
 END_STRUCT
 END_TYPE
