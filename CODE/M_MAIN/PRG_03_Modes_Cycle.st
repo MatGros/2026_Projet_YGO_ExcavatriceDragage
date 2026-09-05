@@ -120,13 +120,14 @@ ELSE
     WinchBothMotionActive := (WinchBothMotionDirection <> 0);
 END_IF;
 
-// Posture de départ du cycle SEMI_AUTO (condition AX1_INIT) : treuils M1/M2 dans la
+// Posture de départ du cycle SEMI_AUTO (condition AX1_INIT) : treuil porteur M1 dans la
 // plage de position haute (± CST_CycleInitWindowM autour de la limite haute configurée)
+// ET état mécanique benne qualifié (IsClosed ou IsOpen via FB_Bucket, sans forcer un range M2 rigide)
 // ET chariot M3 PAS à droite de P1 (côté maintenance interdit). Le positionnement fin
 // sur P1 est fait ensuite en AX2. Calculé ici — FB_CycleSemiAuto ne fait que consommer.
 CycleWinchesAtTopOk :=
     (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - _CommunCfgPersist.CfgCableLimitAscent_M) <= CST_CycleInitWindowM)
-    AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - _CommunCfgPersist.CfgCableLimitAscent_M) <= CST_CycleInitWindowM);
+    AND (PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed OR PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
 
 // Posture de départ complète (AX1_INIT) = treuils en haut ET chariot M3 PAS à droite de P1.
 CycleInitPositionOk := NOT PRG_05_Translation.Data.M3_AtMaintenanceStable AND CycleWinchesAtTopOk;
@@ -234,15 +235,15 @@ END_IF;
 
 instCycleSemiAuto(
     Enable                  := (instModes.Auth.Mode = E_Mode.SEMI_AUTO),
-    Reset                   := GVL_IHM.Cycle.Cmd.BtnReset,
+    Reset                   := GVL_IHM.Cycle.Cmd.BtnReset OR GVL_IHM.CycleSemiAuto.Cmd.BtnReset,
     PowerContactorEngaged   := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState <> DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState <> DEVICE_STATE.RUNNING),
     Mode                    := instModes.Auth.Mode,
     JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
-    StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart,
-    AbortCycle              := GVL_IHM.Cycle.Cmd.BtnAbort,
+    StartCycle              := GVL_IHM.Cycle.Cmd.BtnStart OR GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
+    AbortCycle              := GVL_IHM.Cycle.Cmd.BtnAbort OR GVL_IHM.CycleSemiAuto.Cmd.BtnAbort,
     SelTarget               := GVL_IHM.TranslationM3.Cmd.SelTarget,
     SetDepthM               := GVL_IHM.Cycle.Cfg.SetDepth_M,
     SetOffsetM              := GVL_IHM.Cycle.Cfg.SetOffset_M,

@@ -509,7 +509,11 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
         E_AutoCycleStep.AX0_REPOS:
             OperatorActionCandidate := '[IHM/JOYSTICK] Démarrer le cycle (bouton Start ou homme-mort)';
         E_AutoCycleStep.AX1_INIT:
-            OperatorActionCandidate := '[IHM] Vérifier conditions initiales (référencement, treuils FDC haut)';
+            IF CycleStateStr <> '' THEN
+                OperatorActionCandidate := CONCAT('[INIT] ', CycleStateStr);
+            ELSE
+                OperatorActionCandidate := '[IHM] Vérifier conditions initiales (référencement, treuil FDC haut)';
+            END_IF;
         E_AutoCycleStep.AX2_TRANSLATE_P1:
             OperatorActionCandidate := '[JOYSTICK] Pousser vers la droite : translation vers P1';
         E_AutoCycleStep.AX3_OPEN_BUCKET:

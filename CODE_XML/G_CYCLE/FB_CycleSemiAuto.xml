@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T14:56:11.107232" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T14:56:11.107232">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T08:46:25.501983" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T08:46:25.501983">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1849,6 +1849,21 @@ ErrorEdge(CLK := Fault.Error);
 {endregion}
 
 {region "§2 Gate securite &amp; Bascule Mode"}
+// 🛑 1bis. ABANDON &amp; RESET EXPLICITES (Priorité absolue, même hors mode ou en pause)
+IF AbortEdge.Q THEN
+    State := E_AutoCycleStep.AX0_REPOS;
+    WaitingResume := FALSE;
+    PausedState := E_AutoCycleStep.AX0_REPOS;
+END_IF;
+
+IF ResetEdge.Q THEN
+    SavedState := E_AutoCycleStep.AX0_REPOS;
+    BottomTouched := FALSE;
+    IF State = E_AutoCycleStep.AX_STAB THEN
+        State := E_AutoCycleStep.AX0_REPOS;
+    END_IF;
+END_IF;
+
 // 🛑 2. GATES DE SÉCURITÉ ET NEUTRALISATION
 // Le mode SEMI_AUTO peut être sélectionné sous AU/défaut (FB_Modes), mais le cycle
 // ne tourne JAMAIS sans puissance (PowerContactorEngaged) ni avec un codeur défaillant
@@ -1871,10 +1886,17 @@ IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     BucketCmd.ReqClose        := FALSE;
     BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
-    // Si on quitte le semi-auto alors qu'un cycle était en cours, on mémorise l'étape pour la pause
-    IF (State &lt;&gt; E_AutoCycleStep.AX0_REPOS) AND (State &lt;&gt; E_AutoCycleStep.AX18_DONE_SYNC) AND (State &lt;&gt; E_AutoCycleStep.AX_STAB) THEN
+    // Si on quitte le semi-auto alors qu'un cycle de MOUVEMENT était en cours (AX2 à AX15), on mémorise pour la pause.
+    // Les étapes de repos (AX0) et d'initialisation (AX1) ne sont PAS mises en pause -&gt; retour direct à AX0.
+    IF (State &lt;&gt; E_AutoCycleStep.AX0_REPOS) 
+       AND (State &lt;&gt; E_AutoCycleStep.AX1_INIT)
+       AND (State &lt;&gt; E_AutoCycleStep.AX18_DONE_SYNC) 
+       AND (State &lt;&gt; E_AutoCycleStep.AX_STAB) THEN
         PausedState := State;
         WaitingResume := TRUE;
+    ELSE
+        WaitingResume := FALSE;
+        PausedState := E_AutoCycleStep.AX0_REPOS;
     END_IF;
 
     CycleStep            := State;
@@ -1912,8 +1934,12 @@ CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
 IF WaitingResume THEN
     // 🔒 Sécurité anti-redémarrage automatique (AF-04 §4.1) : le cycle ne reprend
     // PAS sur manche + homme-mort seuls. Il reste en attente d'un geste conscient
-    // (StartCycle) avant de restaurer l'étape mémorisée.
-    IF StartEdge.Q THEN
+    // (StartCycle) avant de restaurer l'étape mémorisée, ou d'un abandon (AbortCycle).
+    IF AbortEdge.Q THEN
+        State := E_AutoCycleStep.AX0_REPOS;
+        WaitingResume := FALSE;
+        PausedState := E_AutoCycleStep.AX0_REPOS;
+    ELSIF StartEdge.Q THEN
         State := PausedState;   // reprise consciente : restaure l'étape mémorisée
         WaitingResume := FALSE;
     ELSE
@@ -1931,7 +1957,7 @@ IF WaitingResume THEN
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0400;
-        OperatorAction := 'Reprendre le cycle : appuyer sur StartCycle (geste conscient).';
+        OperatorAction := 'Reprendre le cycle (StartCycle) ou Abandonner (Exit/Abort).';
         RequestActive := FALSE;
     END_IF;
 END_IF;
@@ -1949,22 +1975,8 @@ IF DivingRetryTrig AND (State &lt;&gt; E_AutoCycleStep.AX_STAB) THEN
     State := E_AutoCycleStep.AX_DIVING_RETRY;
 END_IF;
 
-IF ResetEdge.Q THEN
-    SavedState := E_AutoCycleStep.AX0_REPOS;
-    BottomTouched := FALSE;
-    IF State = E_AutoCycleStep.AX_STAB THEN
-        State := E_AutoCycleStep.AX0_REPOS;
-    END_IF;
-END_IF;
-
-// Gestion de l'Abandon explicite
-IF AbortEdge.Q THEN
-    State := E_AutoCycleStep.AX0_REPOS;
-    WaitingResume := FALSE;
-    PausedState := E_AutoCycleStep.AX0_REPOS;
-END_IF;
-
 // SEMI_AUTO : FB_CycleSemiAuto est le SEUL producteur des demandes benne. Les champs
+
 // assistants (DiveSearch/ExtractionAssist) sont inactifs en cycle automatique
 // -&gt; valeurs neutres déterministes (identiques à la branche SEMI_AUTO de PRG_03).
 BucketCmd.DescendPermitDiveBucketOpen := TRUE;
@@ -2013,9 +2025,9 @@ CASE State OF
         // AX1_INIT : verification des CONDITIONS INITIALES du cycle. AUCUN ordre de
         // mouvement, aucun referencement (datum M1/M2/benne = responsabilite exclusive
         // FB_CycleMachineHoming). Conditions : codeurs M1/M2 references, aucun defaut
-        // latche, treuils au FDC logiciel haut (TopPositionSensor), et posture de depart
-        // OK (InitPositionOk : chariot M3 PAS a droite de P1 + treuils dans la plage
-        // +/- 0,4 m autour du FDC haut, calcul PRG_03 ; positionnement fin P1 = AX2).
+        // latche, treuil M1 au FDC haut (TopPositionSensor + InitPositionOk), et posture de depart
+        // OK (InitPositionOk : chariot M3 PAS a droite de P1 + treuil M1 dans la plage
+        // +/- 0,4 m autour du FDC haut + benne qualifiee IsClosed ou IsOpen ; positionnement fin P1 = AX2).
         InitConditionsOk := HomedM1 AND HomedM2 AND NOT Fault.Latched
                             AND TopPositionSensor AND InitPositionOk;
         IF InitConditionsOk THEN
@@ -2027,19 +2039,40 @@ CASE State OF
             OperatorAction := '';
             State := E_AutoCycleStep.AX2_TRANSLATE_P1;   // franchie sans mouvement
         ELSIF NOT (HomedM1 AND HomedM2) THEN
-            CycleStateStr := 'AX1 - Machine non referencee';
+            CycleStateStr := 'AX1 - Codeurs M1/M2 non references';
             ExpectedAxis := E_OperatorAxis.BUTTON;
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'AX1 - Machine non referencee : passer en maintenance pour le referencement.';
+            OperatorAction := 'AX1 - Machine non referencee : referencer codeurs M1/M2.';
+        ELSIF Fault.Latched THEN
+            CycleStateStr := 'AX1 - Defaut cycle present';
+            ExpectedAxis := E_OperatorAxis.BUTTON;
+            WaitingForOperator := TRUE;
+            WaitingForProcess := FALSE;
+            OperatorActionId := 16#0401;
+            OperatorAction := 'AX1 - Defaut cycle actif : acquitter avec Reset.';
+        ELSIF NOT TopPositionSensor THEN
+            CycleStateStr := 'AX1 - Treuil hors capteur FDC haut';
+            ExpectedAxis := E_OperatorAxis.BUTTON;
+            WaitingForOperator := TRUE;
+            WaitingForProcess := FALSE;
+            OperatorActionId := 16#0401;
+            OperatorAction := 'AX1 - Monter le treuil M1 sur le capteur haut.';
+        ELSIF NOT InitPositionOk THEN
+            CycleStateStr := 'AX1 - Posture depart incorrecte (M3 ou position M1)';
+            ExpectedAxis := E_OperatorAxis.BUTTON;
+            WaitingForOperator := TRUE;
+            WaitingForProcess := FALSE;
+            OperatorActionId := 16#0401;
+            OperatorAction := 'AX1 - Verifier position M1 (FDC haut +-0.4m) et chariot M3 hors maintenance.';
         ELSE
             CycleStateStr := 'AX1 - Conditions initiales non remplies';
             ExpectedAxis := E_OperatorAxis.BUTTON;
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'AX1 - Amener les treuils au FDC haut.';
+            OperatorAction := 'AX1 - Amener le treuil M1 au FDC haut.';
         END_IF;
 
     E_AutoCycleStep.AX2_TRANSLATE_P1:

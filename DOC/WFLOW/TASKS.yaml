@@ -5712,3 +5712,86 @@ tasks:
   - Suppression du déphasage/filtre PT1 sur la mesure de vitesse
   - Épuration des structures et validation G200 100% PASS
   bloque_par: []
+- id: T255
+  parent_id: ''
+  statut: 🔒
+  criticite: C2
+  domaine: SUPERVISION_IHM
+  agent: AGY-01
+  date: '2026-09-05T10:25:00+02:00'
+  locked_at: '2026-09-05T10:25:00+02:00'
+  titre: Guidage dynamique précis des messages opérateur et conditions IHM (Retours essais MES)
+  contexte: 'Lors des essais de mise en service (MES cycle semi-auto / homing / maintenance), certains messages
+    affichés dans le bandeau IHM (Action opérateur et Condition spéciale) sont trop génériques ou statiques
+    (ex: "[IHM] Vérifier conditions initiales (référencement, treuils FDC haut)"). L''opérateur ne sait pas
+    immédiatement quelle condition exacte bloque l''étape (Homed M1/M2, capteur physique FDC haut,
+    fenêtre d''altimétrie ±0.4m, ou chariot M3 garé en maintenance).
+    Cette tâche sert de réceptacle pour collecter, consigner et implémenter au fur et à mesure des essais
+    les formulations précises et dynamiques sur l''ensemble des étapes et bandeaux IHM.'
+  description: '1. Recenser au fil des essais terrain les messages imprécis ou bloquants.
+    2. Rendre le diagnostic des conditions initiales (AX1_INIT) dynamique et explicite dans FB_CycleSemiAuto et FB_Hmi_BannerFormatter.
+    3. Séparer nettement la ''Condition bloquante'' (SpecialConditionText) de l''''Action physique'' requise (OperatorActionText).
+    4. Enrichir les retours d''étapes (AX0..AX18, AX_STAB, Homing, Verrous M3/Treuils) selon les retours réels.
+    5. Valider systématiquement la compilation, la liaison mécanique G200 (PASS 0 erreur) et régénérer le bundle PLCopenXML.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255_DYN_USER_MESSAGES_IHM.yaml
+  objectifs:
+  - Dynamisation du diagnostic d'étape AX1_INIT (affichage de la cause bloquante exacte parmi les 5 conditions)
+  - Clarté contextuelle : Action opérateur concrète + Condition spéciale explicite
+  - Recueil et intégration incrémentale des besoins de formulation tout au long des essais MES
+  - Zéro régression sur la chaîne de sécurité et liaison G200 100% PASS
+  bloque_par: []
+- id: T255-A
+  parent_id: T255
+  statut: ⏳
+  criticite: C2
+  domaine: CYCLE_SEMIAUTO
+  agent: AGY-01
+  date: '2026-09-05T10:33:00+02:00'
+  titre: Déblocage commande Exit / Abort en état pause (WaitingResume) et hors mode
+  contexte: 'Constat terrain MES : quand le cycle est en pause (WaitingResume), l''appui sur Exit/BtnAbort ne réinitialise
+    pas le cycle à AX0_REPOS. Nécessité de basculer en manuel/maintenance. La gestion Abort doit être prioritaire et active
+    en tête de bloc.'
+  description: '1. Placer le traitement de AbortEdge et ResetEdge avant la neutralisation et dans le bloc WaitingResume.
+    2. Permettre à BtnAbort de forcer State := AX0_REPOS et WaitingResume := FALSE.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255_DYN_USER_MESSAGES_IHM.yaml
+  objectifs:
+  - Réactivité immédiate du bouton Exit / Abort en pause
+  - Sortie propre sans blocage vers AX0_REPOS
+  bloque_par: []
+- id: T255-B
+  parent_id: T255
+  statut: ⏳
+  criticite: C2
+  domaine: CYCLE_SEMIAUTO
+  agent: AGY-01
+  date: '2026-09-05T10:33:00+02:00'
+  titre: Assouplissement condition départ cycle AX1_INIT (état benne qualifié vs range rigide M2)
+  contexte: 'Constat terrain MES : au départ cycle, PRG_03 impose M1 ET M2 dans ±0.4m du FDC haut. Si la benne est entre-ouverte
+    ou fermée avec un léger jeu, M2 sort de la fenêtre et bloque AX1_INIT. M1 seul porte la position FDC haut, M2 doit s''appuyer
+    sur l''état FB_Bucket (IsClosed ou IsOpen).'
+  description: '1. Modifier CycleWinchesAtTopOk dans PRG_03_Modes_Cycle.st pour tester M1 au FDC haut ET benne qualifiée.
+    2. Supprimer la butée géométrique rigide arbitraire sur M2.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255_DYN_USER_MESSAGES_IHM.yaml
+  objectifs:
+  - Tolérance physique de la géométrie benne à l'initialisation AX1
+  - Démarrage fluide du cycle
+  bloque_par: []
+- id: T255-C
+  parent_id: T255
+  statut: ⏳
+  criticite: C2
+  domaine: SUPERVISION_IHM
+  agent: AGY-01
+  date: '2026-09-05T10:33:00+02:00'
+  titre: Dynamisation des messages de conditions et actions opérateur (Bandeau IHM)
+  contexte: 'Les messages affichés lors d''une attente ou d''un blocage sont trop génériques. Nécessité d''exposer
+    la condition exacte (SpecialConditionText) et l''action requise (OperatorActionText).'
+  description: '1. Rendre le diagnostic des conditions initiales d''AX1 dynamique dans FB_CycleSemiAuto et FB_Hmi_BannerFormatter.
+    2. Enrichir les messages au fil des retours d''essais.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255_DYN_USER_MESSAGES_IHM.yaml
+  objectifs:
+  - Messages ciblés et actionnables pour l'opérateur
+  - Zéro ambigüité lors des essais MES
+  bloque_par: []
+
+

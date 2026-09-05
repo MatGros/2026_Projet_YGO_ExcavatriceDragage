@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T22:21:59.971124" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T22:21:59.971124">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T08:38:26.830349" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T08:38:26.830349">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2819,7 +2819,11 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
         E_AutoCycleStep.AX0_REPOS:
             OperatorActionCandidate := '[IHM/JOYSTICK] Démarrer le cycle (bouton Start ou homme-mort)';
         E_AutoCycleStep.AX1_INIT:
-            OperatorActionCandidate := '[IHM] Vérifier conditions initiales (référencement, treuils FDC haut)';
+            IF CycleStateStr &lt;&gt; '' THEN
+                OperatorActionCandidate := CONCAT('[INIT] ', CycleStateStr);
+            ELSE
+                OperatorActionCandidate := '[IHM] Vérifier conditions initiales (référencement, treuil FDC haut)';
+            END_IF;
         E_AutoCycleStep.AX2_TRANSLATE_P1:
             OperatorActionCandidate := '[JOYSTICK] Pousser vers la droite : translation vers P1';
         E_AutoCycleStep.AX3_OPEN_BUCKET:

@@ -602,6 +602,10 @@ GVL_IHM.Cycle.State.DeadmanArmed           := PRG_02_Acquisition.Data.Joystick.D
 // « joystick défléchi » est projeté à l'IHM.
 GVL_IHM.Cycle.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
+// 🔄 Miroir parfait GVL_IHM.CycleSemiAuto (compatibilité IHM)
+GVL_IHM.CycleSemiAuto.State := GVL_IHM.Cycle.State;
+GVL_IHM.CycleSemiAuto.Cfg   := GVL_IHM.Cycle.Cfg;
+
 // Projection Assistance Dragage (CycleDiveSearch / CycleExtraction / CycleDumpAtTremie)
 GVL_IHM.CycleDiveSearch.State.DiveReady                  := PRG_03_Modes_Cycle.Data.SequenceState.DiveReady;
 GVL_IHM.CycleDiveSearch.State.DiveBusy                   := PRG_03_Modes_Cycle.Data.SequenceState.DiveBusy;
