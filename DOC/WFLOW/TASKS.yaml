@@ -5793,5 +5793,24 @@ tasks:
   - Messages ciblés et actionnables pour l'opérateur
   - Zéro ambigüité lors des essais MES
   bloque_par: []
-
-
+- id: T256
+  parent_id: ''
+  statut: ⬜
+  criticite: C1
+  domaine: SECURITE_CYCLE
+  agent: ''
+  date: '2026-09-05T16:00:00+02:00'
+  titre: Reactiver instFault + gate Abort/Reset dans FB_CycleSemiAuto (desactives pour essai)
+  contexte: 'Session MES 2026-09-05. Commit 2666cde1 a commente l''appel instFault(...)/ErrorEdge et le bloc Abort/Reset
+    (section 1bis) dans FB_CycleSemiAuto.st pour un essai terrain (desynchro contacteurs M1/M2 a AX3->AX4).
+    G200_check_linkage.py signale deja l''instance instFault orpheline (L1 KO) tant que ce n''est pas corrige.'
+  description: 'Decommenter le bloc instFault(Enable:=Enable, Reset:=Reset, Causes:=instCauses) / Fault:=instFault.Fault /
+    ErrorEdge(CLK:=Fault.Error) et le bloc §2 Abort/Reset (AbortEdge.Q -> retour AX0_REPOS) dans CODE/G_CYCLE/FB_CycleSemiAuto.st.
+    Ne PAS oublier avant tout essai avec puissance engagee ou toute exploitation reelle : sans ce bloc, plus aucun defaut
+    de cycle n''est detecte/latche et AbortCycle/Reset ne ramenent plus en AX0.'
+  objectifs:
+  - instFault de nouveau appelee (G200 L1 orpheline -> PASS)
+  - Gate Abort/Reset (section 1bis) restauree
+  - Bundle regenere + G200/gates verts
+  contrat: ''
+  bloque_par: []

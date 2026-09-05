@@ -5185,7 +5185,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="4" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Altimétrie lancement Kobold (AT4, PRG_03)</xhtml>
@@ -20864,6 +20864,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
 . [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme) ; gate commun a toutes les commandes d'actionneur du sequenceur. Le sens du mouvement reste porte par ReqAscent/ReqDescend de chaque etape.</xhtml>
               </documentation>
             </variable>
+            <variable name="WinchesAtDiveStep">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] M1 ET M2 confirmes au palier 4 (mesure Kobold fiable seulement a vitesse stabilisee)</xhtml>
+              </documentation>
+            </variable>
             <variable name="SampleCountDone">
               <type>
                 <BOOL />
@@ -21148,6 +21156,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo max d'etape</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketOpenStabTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation benne ouverte avant plongee (AX3-&gt;AX4)</xhtml>
+              </documentation>
+            </variable>
             <variable name="instFault">
               <type>
                 <derived name="FB_FaultCore" />
@@ -21213,6 +21229,17 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Fenetre max de confirmation retour contacteur Kobold en AX5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_BucketOpenStabTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Stabilisation benne ouverte avant plongee couplee (AX3-&gt;AX4)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_RaiseOffBottomDefaultM">
@@ -21387,6 +21414,16 @@ instCauses[8].Active   := (((M1_SpeedStepApplied &gt; CST_StepDive) OR (M2_Speed
                             OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM));
 instCauses[8].Latching := TRUE;
 instCauses[8].Texte    := 'Palier vitesse &gt; 4 (palier 5) pendant la plongee - interdit';
+
+// GEL cause 9 : mesure Kobold fiable seulement a vitesse de descente stabilisee
+// palier 4 sur LES DEUX treuils. Recherche immersion/fond (AX6/AX7) avec un des
+// deux hors palier 4 -&gt; defaut latche (pas un blocage silencieux de transition).
+WinchesAtDiveStep := (M1_SpeedStepApplied = CST_StepDive) AND (M2_SpeedStepApplied = CST_StepDive);
+instCauses[9].Active   := NOT WinchesAtDiveStep
+                          AND ((State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+                            OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM));
+instCauses[9].Latching := TRUE;
+instCauses[9].Texte    := 'Palier 4 non confirme sur M1 et/ou M2 pendant la recherche Kobold';
 
 // Appel du socle de défaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -21713,9 +21750,17 @@ CASE State OF
             BucketCmd.ReqOpen := FALSE;
         END_IF;
 
-        // Transition vers AX4 : benne ouverte atteinte et confirmée
+        // Benne ouverte atteinte : mouvements a l'arret (treuils deja neutralises ci-dessus,
+        // benne coupee ici), stabilisation 2s avant plongee couplee.
         IF (Benne_IsOpen OR Benne_Done) AND NOT Benne_Busy THEN
             BucketCmd.ReqOpen := FALSE;
+        END_IF;
+        BucketOpenStabTimer(IN := (Benne_IsOpen OR Benne_Done) AND NOT Benne_Busy,
+                            PT := CST_BucketOpenStabTime);
+
+        // Transition vers AX4 : stabilisation 2s ecoulee. Pas de geste franc exige -
+        // le joystick peut rester maintenu depuis l'ouverture benne.
+        IF BucketOpenStabTimer.Q THEN
             State := E_AutoCycleStep.AX4_DESCEND_DIVING;
         END_IF;
 
@@ -21772,6 +21817,8 @@ CASE State OF
         BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
 
         // AT5 : retour contacteur Kobold coherent -&gt; recherche immersion.
+        // Palier 4 M1/M2 non atteint = cause de defaut (instCauses[9]), pas un blocage
+        // silencieux de la transition.
         // (echec init / joystick relache / palier &lt;&gt; 4 -&gt; AX_DIVING_RETRY via GT-dive-retry §1)
         IF JoystickDeflected AND KoboldContactorFeedback THEN
             State := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
@@ -50027,9 +50074,7 @@ instWinchOutputInterlockM1(
     RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor2,
     RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor3,
     RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep,
-    DeadTimeSameDir             := T#0ms, // ESSAI 2026-09-05 : temps mort directionnel neutralise (diagnostic blocage AX3)
-    DeadTimeOppositeDir         := T#0ms  // ESSAI 2026-09-05 : idem
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep
 );
 
 M1RelayFwd        := instWinchOutputInterlockM1.RelayFwd;
@@ -50088,9 +50133,7 @@ instWinchOutputInterlockM2(
     RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor2,
     RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor3,
     RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep,
-    DeadTimeSameDir             := T#0ms, // ESSAI 2026-09-05 : temps mort directionnel neutralise (diagnostic blocage AX3)
-    DeadTimeOppositeDir         := T#0ms  // ESSAI 2026-09-05 : idem
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep
 );
 
 M2RelayFwd        := instWinchOutputInterlockM2.RelayFwd;

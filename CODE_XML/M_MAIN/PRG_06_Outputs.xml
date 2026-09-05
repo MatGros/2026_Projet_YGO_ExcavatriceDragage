@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T13:15:47.055351" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T13:15:47.055351">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T13:58:23.257202" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T13:58:23.257202">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1438,9 +1438,7 @@ instWinchOutputInterlockM1(
     RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor2,
     RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor3,
     RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep,
-    DeadTimeSameDir             := T#0ms, // ESSAI 2026-09-05 : temps mort directionnel neutralise (diagnostic blocage AX3)
-    DeadTimeOppositeDir         := T#0ms  // ESSAI 2026-09-05 : idem
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedStep
 );
 
 M1RelayFwd        := instWinchOutputInterlockM1.RelayFwd;
@@ -1499,9 +1497,7 @@ instWinchOutputInterlockM2(
     RequestedContactor2        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor2,
     RequestedContactor3        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor3,
     RequestedContactor4        := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedContactor4,
-    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep,
-    DeadTimeSameDir             := T#0ms, // ESSAI 2026-09-05 : temps mort directionnel neutralise (diagnostic blocage AX3)
-    DeadTimeOppositeDir         := T#0ms  // ESSAI 2026-09-05 : idem
+    RequestedStep               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedStep
 );
 
 M2RelayFwd        := instWinchOutputInterlockM2.RelayFwd;
