@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T09:48:42.528585" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T09:48:42.528585">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T13:11:05.899164" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T13:11:05.899164">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1881,7 +1881,7 @@ IF AbortEdge.Q THEN
 END_IF;
 
 // 🔧 1ter. FORCAGE DE STEP (Mise en service / dérogation)
-// Déverrouillé UNIQUEMENT si : case IHM mise en service ET mode SEMI_AUTO (ou MAINT).
+// Déverrouillé UNIQUEMENT si : case IHM mise en service (ou bouton forcer appuyé).
 // Impulsion sur front montant : réinitialise les commandes résiduelles et saute à l'étape cible.
 ForceStepApplyEdge(CLK := CfgForceStepApply);
 IF ForceStepApplyEdge.Q AND CfgCommissioningEnable THEN
@@ -1908,12 +1908,20 @@ IF ForceStepApplyEdge.Q AND CfgCommissioningEnable THEN
         19: State := E_AutoCycleStep.AX_STAB;
         20: State := E_AutoCycleStep.AX_DIVING_RETRY;
     END_CASE;
+    CycleStep := State;
     WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
     WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
     TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
     BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
     WaitingResume := FALSE;
     PausedState := State;
+    IF State = E_AutoCycleStep.AX0_REPOS THEN
+        Lifecycle.Busy := FALSE;
+        Lifecycle.Done := FALSE;
+    ELSE
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+    END_IF;
 END_IF;
 
 IF ResetEdge.Q THEN
