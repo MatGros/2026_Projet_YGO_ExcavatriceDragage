@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T14:51:17.505621" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T14:51:17.505621">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T16:32:48.697496" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T16:32:48.697496">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1448,6 +1448,22 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fenetre de verif retour contacteur Kobold en AX5</xhtml>
               </documentation>
             </variable>
+            <variable name="KoboldStabTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation feedback Kobold sous tension (500ms en AX6)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomTouchStabTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation arret fond touche (2s en AX8)</xhtml>
+              </documentation>
+            </variable>
             <variable name="RetryJoyReleaseTimer">
               <type>
                 <derived name="TON" />
@@ -1617,6 +1633,28 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation benne ouverte avant plongee (AX3-&gt;AX4)</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_KoboldStabTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation feedback Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_BottomTouchStabTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation arret apres contact fond</xhtml>
+              </documentation>
+            </variable>
             <variable name="instFault">
               <type>
                 <derived name="FB_FaultCore" />
@@ -1689,7 +1727,7 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#2s0ms" />
+                <simpleValue value="TIME#1s0ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Stabilisation benne ouverte avant plongee couplee (AX3-&gt;AX4)</xhtml>
@@ -1794,6 +1832,12 @@ StepMaxPrevState := State;
 // qui pouvait laisser Q déjà vrai à l'entrée en AX13 (temps d'égouttage non respecté).
 DrainingTimer(IN := (State = E_AutoCycleStep.AX13_DRAIN_PAUSE), PT := DrainTimeEff);
 
+// ⏱️ Stabilisation alimentation Kobold (500ms en AX6 avant surveillance fond)
+KoboldStabTimer(IN := (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) AND JoystickDeflected AND KoboldImmersed, PT := CST_KoboldStabTime);
+
+// ⏱️ Stabilisation à l'arrêt fond touché (2s en AX8 freins serrés avant montée AX9)
+BottomTouchStabTimer(IN := (State = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED), PT := CST_BottomTouchStabTime);
+
 // GT-dive-retry (GEL Q11) : en AX5/AX6/AX7, erreur sequence Kobold / joystick relache / palier &lt; 4
 RetryJoyReleaseTimer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                              OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
@@ -1878,19 +1922,19 @@ instCauses[9].Active   := NOT WinchesAtDiveStep
 instCauses[9].Latching := TRUE;
 instCauses[9].Texte    := 'Palier 4 non confirme sur M1 et/ou M2 pendant la recherche Kobold';
 
-// Appel du socle de défaut
-instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
-Fault := instFault.Fault;
-ErrorEdge(CLK := Fault.Error);
-{endregion}
+// // Appel du socle de défaut
+// instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+// Fault := instFault.Fault;
+// ErrorEdge(CLK := Fault.Error);
+// {endregion}
 
-{region "§2 Gate securite &amp; Bascule Mode"}
-// 🛑 1bis. ABANDON &amp; RESET EXPLICITES (Priorité absolue, même hors mode ou en pause)
-IF AbortEdge.Q THEN
-    State := E_AutoCycleStep.AX0_REPOS;
-    WaitingResume := FALSE;
-    PausedState := E_AutoCycleStep.AX0_REPOS;
-END_IF;
+// {region "§2 Gate securite &amp; Bascule Mode"}
+// // 🛑 1bis. ABANDON &amp; RESET EXPLICITES (Priorité absolue, même hors mode ou en pause)
+// IF AbortEdge.Q THEN
+//     State := E_AutoCycleStep.AX0_REPOS;
+//     WaitingResume := FALSE;
+//     PausedState := E_AutoCycleStep.AX0_REPOS;
+// END_IF;
 
 // 🔧 1ter. FORCAGE DE STEP (Mise en service / dérogation)
 // Déverrouillé UNIQUEMENT si : case IHM mise en service (ou bouton forcer appuyé).
@@ -2211,10 +2255,16 @@ CASE State OF
         BucketOpenStabTimer(IN := (Benne_IsOpen OR Benne_Done) AND NOT Benne_Busy,
                             PT := CST_BucketOpenStabTime);
 
-        // Transition vers AX4 : stabilisation 2s ecoulee. Pas de geste franc exige -
-        // le joystick peut rester maintenu depuis l'ouverture benne.
+        // Apres stabilisation : geste operateur franc exige (relacher au centre PUIS
+        // repousser) - transition sur front JoystickDeflected, pas sur maintien.
         IF BucketOpenStabTimer.Q THEN
-            State := E_AutoCycleStep.AX4_DESCEND_DIVING;
+            WaitingForOperator := NOT JoystickDeflected;
+            WaitingForProcess := FALSE;
+            OperatorActionId := 16#0403;
+            OperatorAction := 'AX3 - Relacher puis repousser le joystick pour lancer la plongee.';
+            IF JoyDeflectedEdge.Q THEN
+                State := E_AutoCycleStep.AX4_DESCEND_DIVING;
+            END_IF;
         END_IF;
 
     (* ===================== DIVING (AX4..AX8 + AX_DIVING_RETRY) ===================== *)
@@ -2279,7 +2329,7 @@ CASE State OF
 
     E_AutoCycleStep.AX6_SEARCH_IMMERSION:
         CycleStep := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
-        CycleStateStr := 'AX6 - Recherche entree dans l eau (front DI Kobold 0-&gt;1)';
+        CycleStateStr := 'AX6 - Stabilisation mesure Kobold et immersion';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -2287,7 +2337,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0406;
-        OperatorAction := 'AX6 - Maintenir la descente palier 4 : entree dans l eau attendue.';
+        OperatorAction := 'AX6 - Maintenir la descente palier 4 : stabilisation signal Kobold (500ms).';
 
         WinchM1Cmd.RunRequest := CycleMotionPermit;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
@@ -2297,14 +2347,14 @@ CASE State OF
         WinchM2Cmd.StepTgt  := CST_StepDive;
         BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
 
-        // AT6 : front montant DI Kobold (immersion confirmee) -&gt; recherche du fond.
-        IF JoystickDeflected AND KoboldRiseEdge.Q THEN
+        // AT6 : signal Kobold sous tension confirme haut (DI=1) pendant 500ms -&gt; recherche du fond.
+        IF JoystickDeflected AND KoboldStabTimer.Q THEN
             State := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
         END_IF;
 
     E_AutoCycleStep.AX7_SEARCH_BOTTOM:
         CycleStep := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
-        CycleStateStr := 'AX7 - Recherche du fond (front DI Kobold 1-&gt;0)';
+        CycleStateStr := 'AX7 - Recherche du fond (front descendant DI Kobold 1-&gt;0)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -2322,14 +2372,21 @@ CASE State OF
         WinchM2Cmd.StepTgt  := CST_StepDive;
         BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
 
-        // AT7 : front descendant DI Kobold (ou retour dedie KoboldContactFond) = fond.
-        IF JoystickDeflected AND (KoboldFallEdge.Q OR KoboldContactFond) THEN
+        // AT7 : coupure signal Kobold (front descendant 1-&gt;0 ou DI=0) = fond touche.
+        IF JoystickDeflected AND (KoboldFallEdge.Q OR NOT KoboldImmersed) THEN
+            TouchPositionM := M1_CablePosM;
+            BottomTouched  := TRUE;   // variable d'info latchee (GEL AX8) - effacee a AX0 / AX_STAB / Reset
+            IF LimitLegalDepthM &lt; -0.01 THEN
+                RaiseTargetM := MAX(TouchPositionM + RaiseOffBottomEff, LimitLegalDepthM + RaiseOffBottomEff);
+            ELSE
+                RaiseTargetM := TouchPositionM + RaiseOffBottomEff;
+            END_IF;
             State := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
         END_IF;
 
     E_AutoCycleStep.AX8_BOTTOM_CONFIRMED:
         CycleStep := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
-        CycleStateStr := 'AX8 - Fond confirme : coupure treuils, memorisation';
+        CycleStateStr := 'AX8 - Fond confirme : arret treuils et stabilisation (2s)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.NONE;
@@ -2337,21 +2394,17 @@ CASE State OF
         WaitingForOperator := FALSE;
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0408;
-        OperatorAction := 'AX8 - Fond touche.';
+        OperatorAction := 'AX8 - Fond touche : stabilisation et arret des treuils.';
 
-        // Coupure INSTANTANEE de toutes les commandes treuils (meme scan) + Kobold coupe.
+        // Coupure INSTANTANEE de toutes les commandes treuils + Kobold coupe.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
-        TouchPositionM := M1_CablePosM;
-        BottomTouched  := TRUE;   // variable d'info latchee (GEL AX8) - effacee a AX0 / AX_STAB / Reset
-        IF LimitLegalDepthM &lt; -0.01 THEN
-            RaiseTargetM := MAX(TouchPositionM + RaiseOffBottomEff, LimitLegalDepthM + RaiseOffBottomEff);
-        ELSE
-            RaiseTargetM := TouchPositionM + RaiseOffBottomEff;
+        // Transition vers AX9 apres 2 secondes de stabilisation a l arret (freins serres)
+        IF BottomTouchStabTimer.Q THEN
+            State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
         END_IF;
-        State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
 
     E_AutoCycleStep.AX_DIVING_RETRY:
         CycleStep := E_AutoCycleStep.AX_DIVING_RETRY;

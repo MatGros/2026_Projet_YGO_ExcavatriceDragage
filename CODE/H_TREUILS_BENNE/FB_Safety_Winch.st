@@ -50,12 +50,12 @@ VAR_INPUT
     BenneSlipToleranceM             : REAL := 2.0;                    // --> [CFG] Tolerance glissement M1 pendant benne (m)
     ExpectedOtherWinchPosM          : REAL;                           // --> [CFG] Position attendue de l'autre treuil (m)
     CriticalSyncToleranceM          : REAL := 2.5;                    // --> [CFG] Tolerance ecart critique synchro (m)
-    MovementSpeedThresholdMps       : REAL := 0.02;                   // --> [CFG] Seuil vitesse mesurable (m/s)
+    MovementSpeedThresholdMps       : REAL := 0.10;                   // --> [CFG] Seuil vitesse mesurable (m/s)
     MeasuredSpeedMps                : REAL;                           // --> [CFG] Mesure absolue vitesse (m/s)
     MeasuredSpeedSignedMps          : REAL;                           // --> [CFG] Mesure signee vitesse (m/s)
     MeasuredSpeedValid              : BOOL;                           // --> [CFG] Mesure vitesse valide
     SpeedBandMaxMps                 : REAL;                           // --> [CFG] Seuil survitesse (max bande apprise , m/s)
-    OppositeDirectionTimeout        : TIME := T#500ms;                // --> [CFG] Delai confirmation sens oppose
+    OppositeDirectionTimeout        : TIME := T#1s;                   // --> [CFG] Delai confirmation sens oppose
     NoMovementTimeout               : TIME := T#3s;                   // --> [CFG] Delai confirmation absence mouvement
 
     // === ESCALADE EXTERNE ===
@@ -397,7 +397,10 @@ IF NOT BypassGlobal THEN
     instCauses[13].Texte    := 'Escalade ecart synchronisation (Meca E)';
 
     // Cause 14 : Sens opposé (latched)
-    OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
+    // Convention de signe SignedSpeed_Mps confirmee machine reelle (MES 2026-09-05,
+    // DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md) : + montee (enroulement cable),
+    // - descente (deroulement cable).
+    OppositeDirectionActive := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
         AND ((ReqAscent AND (MeasuredSpeedSignedMps < -MovementSpeedThresholdMps))
           OR (ReqDescend AND (MeasuredSpeedSignedMps > MovementSpeedThresholdMps))));
     TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);

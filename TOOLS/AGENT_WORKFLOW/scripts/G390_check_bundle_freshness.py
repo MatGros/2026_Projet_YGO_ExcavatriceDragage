@@ -7,7 +7,6 @@ import argparse
 import shutil
 import subprocess
 import sys
-import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -39,8 +38,16 @@ def main() -> int:
         print("ERROR: bundle timestamp missing", file=sys.stderr)
         return 2
 
-    with tempfile.TemporaryDirectory(prefix="codesys-bundle-") as temp:
-        temp_root = Path(temp)
+    # Repertoire de travail manuel sous le projet (jamais tempfile.TemporaryDirectory) :
+    # le sandbox DSH (Windows) refuse toute ecriture dans les repertoires crees par
+    # tempfile.mkdtemp/TemporaryDirectory (WinError 5, acces refuse), ce qui faisait
+    # echouer la copie de CODE/ en aveugle. Un sous-dossier du projet reste writable.
+    scratch = root / (out_dir.name + ".freshness")
+    if scratch.exists():
+        shutil.rmtree(scratch, ignore_errors=True)
+    scratch.mkdir(parents=True, exist_ok=True)
+    try:
+        temp_root = scratch
         temp_code = temp_root / "CODE"
         shutil.copytree(code_dir, temp_code, ignore=shutil.ignore_patterns("CODE_Bundle.xml"))
         command = [
@@ -70,6 +77,8 @@ def main() -> int:
         if generated.read_bytes() != bundle.read_bytes():
             print("FAIL: CODE_XML/CODE_Bundle.xml is stale")
             return 1
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
 
     print("PASS: CODE_XML/CODE_Bundle.xml is fresh")
     return 0

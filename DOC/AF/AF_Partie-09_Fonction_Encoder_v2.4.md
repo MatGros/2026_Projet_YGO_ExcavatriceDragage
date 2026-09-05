@@ -524,6 +524,13 @@ Consommateurs directs de la façade (hors AF06) :
   `Speed_Mps`/`SignedSpeed_Mps` (entrée `FB_Safety_Winch`, détection mouvement non commandé —
   Méca A).
 
+> 🚨 **Convention de signe `SignedSpeed_Mps` — confirmée sur machine réelle (MES 2026-09-05)** :
+> `+ montée` (enroulement câble) / `- descente` (déroulement câble). Un incident de mise en
+> service a vu cette convention inversée par erreur dans un correctif de `FB_Safety_Winch`
+> (cause `OppositeDirection`), provoquant un faux défaut sur descente normale. Toute logique
+> consommant `SignedSpeed_Mps` (`FB_Safety_Winch`, diagnostics) doit respecter **cette** convention
+> — ne jamais la re-déduire d'une supposition sur le protocole EtherCAT/CoE.
+
 ---
 
 ## 9 · 🖥️ IHM, Configuration & Dépannage

@@ -119,6 +119,26 @@
 - 🛠️ **Action ouverte** : instrumenter ces états dans `GVL_Troubleshooting` + `FB_TroubleshootingView` et régénérer la liste snapshot, sous contrat C4 et validation humaine préalable. Aucun forçage PLC et aucune correction logique à l'aveugle.
 - 📄 **Fiche** : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_BenneOuverture_BlocageCouplage_20260905.md`.
 
+### MES-050 — Session après-midi : DeadTime M1/M2, stabilisation AX3→AX4, sens opposé M2
+- 📅 **Date** : 2026-09-05 14:00–17:30 | 📍 **Lieu** : Banc / Machine, cycle SEMI_AUTO (plongée) | 🏷️ **Version** : `backup/mes-septembre-20260902` (commits `2666cde1`, `57e98c03`)
+- 🎯 **Périmètre** : `PRG_06_Outputs`, `FB_CycleSemiAuto`, `FB_Safety_Winch`, `ST_CycleCfg`
+- 🚦 **Statut** : 🟡 **À surveiller** — corrections appliquées, validation terrain du sens M2 en attente.
+- 🔍 **Constat / Actions** :
+  1. **DeadTime M1/M2 forcé à `T#0ms`** (essai précédent du 05/09, commit `33e4eadb`) cassait l'atomicité de démarrage couplé (`WinchBothMotionReady`) → désynchro contacteurs constatée à l'entrée en plongée (AX3→AX4). Restauré à `T#500ms`/`T#700ms` dans `PRG_06_Outputs.st`.
+  2. **`instFault` + gate Abort/Reset désactivés dans `FB_CycleSemiAuto.st`** pour un essai — toujours désactivés en fin de séance, tracé en `T256` (réactivation obligatoire avant exploitation réelle).
+  3. **Transition AX3→AX4** retravaillée : stabilisation benne ouverte 1 s (`CST_BucketOpenStabTime`), puis geste opérateur franc exigé (relâcher le joystick au centre PUIS repousser, front `JoyDeflectedEdge`) — pas de maintien continu.
+  4. **Nouvelle cause de défaut `instCauses[9]`** : palier 4 non confirmé sur M1 ET M2 pendant recherche immersion/fond (AX6/AX7) — mesure Kobold jugée fiable seulement à vitesse stabilisée.
+  5. **`DiveStartMin_M`** : défaut déclaré passé de `1.0` à `4.0` m dans `ST_CycleCfg.st` (activation Kobold trop précoce à 1 m) — **valeur persistée RETAIN sur machine reste à régler manuellement en IHM**, le nouveau défaut ne s'applique qu'au prochain boot/reset config.
+  6. **Défaut `[M2] ErrorID:15 - sens oppose`** apparu en pleine descente normale après le fix DeadTime. Cause racine identifiée : condition `OppositeDirectionActive` (`FB_Safety_Winch.st`, cause 14) avec comparateurs `</>` inversés par rapport à la convention réelle du codeur (confirmée machine : **`+` montée, `-` descente**), introduite dès `a1843f0d` (27/08) — bug latent, pas lié aux modifs du jour. Une correction intermédiaire (autre agent) a inversé le sens dans le mauvais sens (contredisait `FB_Encoder_SpeedMeasure.st`) ; comparateurs restaurés dans le bon sens (`ReqAscent AND speed < -seuil` / `ReqDescend AND speed > seuil`). Convention documentée dans `DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md`.
+  7. Effet domino observé : le faux défaut M2 coupait M2 seul pendant que M1 continuait → écart réel de position → `FB_WinchSync` déclenchait légitimement → utilisateur a dû désactiver `FB_WinchSync` en urgence (pas de bypass utilisateur actif en SEMI_AUTO par design, `SyncActive` forcé `TRUE`, seul `BypassGlobal` diagnostique agit).
+- 🛠️ **Solution / Décision** :
+  - Sens M2 corrigé et bundle régénéré ; validation terrain du comportement (plus de faux défaut en descente normale) **à faire par l'utilisateur**.
+  - `FB_WinchSync` à réactiver dès confirmation du fix M2.
+- 📌 **Action différée** :
+  - `T256` (réactiver `instFault` + gate Abort/Reset `FB_CycleSemiAuto`) — bloquant avant exploitation réelle.
+  - Régler `DiveStartMin_M` en IHM à 4 m sur la machine (valeur RETAIN non couverte par le nouveau défaut code).
+  - Confirmer sens M2 sur descente réelle, puis réactiver `FB_WinchSync`.
+
 ---
 
 ## 4. ✅ Procédure de Clôture `Txx`
