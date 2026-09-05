@@ -111,71 +111,6 @@
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
-      <dataType name="E_DiveSearchState">
-        <baseType>
-          <enum>
-            <values>
-              <value name="WAIT_PRECONDITIONS" value="0" />
-              <value name="READY_TO_DESCEND" value="1" />
-              <value name="SEARCHING_IMMERSION" value="2" />
-              <value name="SEARCHING_BOTTOM" value="3" />
-              <value name="BOTTOM_CONFIRMED" value="4" />
-              <value name="ERROR_HOLD" value="5" />
-            </values>
-          </enum>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
-            <EnumValueDocumentation>
-              <EnumValue>
-                <Name>WAIT_PRECONDITIONS</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Attente benne ouverte, positions et Kobold au repos</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>READY_TO_DESCEND</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Prêt à assister une demande de descente</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEARCHING_IMMERSION</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Descending : attente front 0-&gt;1 dans fenêtre eau</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>SEARCHING_BOTTOM</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Immersion validée : attente front 1-&gt;0 au fond</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>BOTTOM_CONFIRMED</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond validé ; extraction peut être demandée</xhtml>
-                </Documentation>
-              </EnumValue>
-              <EnumValue>
-                <Name>ERROR_HOLD</Name>
-                <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Séquence invalide, descente assistée interdite</xhtml>
-                </Documentation>
-              </EnumValue>
-            </EnumValueDocumentation>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
-            <Attributes>
-              <Attribute Name="qualified_only" Value="" />
-              <Attribute Name="strict" Value="" />
-            </Attributes>
-          </data>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>31b3ae05-ab16-51e7-b786-307d668b63e5</ObjectId>
-          </data>
-        </addData>
-      </dataType>
     </dataTypes>
     <pous />
   </types>
@@ -190,11 +125,6 @@
             <Folder Name="5_ASSISTANCE_DRAGAGE">
               <Object Name="ST_CycleDiveSearchState" ObjectId="b30ad366-6fd5-5713-9050-b1453c43c4d4" />
             </Folder>
-          </Folder>
-        </Folder>
-        <Folder Name="G_CYCLE">
-          <Folder Name="_TYPES">
-            <Object Name="E_DiveSearchState" ObjectId="31b3ae05-ab16-51e7-b786-307d668b63e5" />
           </Folder>
         </Folder>
       </ProjectStructure>

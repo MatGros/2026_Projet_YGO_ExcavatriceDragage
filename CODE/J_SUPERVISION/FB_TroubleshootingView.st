@@ -59,9 +59,6 @@ VAR_INPUT
     Translation              : ST_TranslationHMI;(* --> [HW] GVL_IHM.TranslationM3 *)
     Commun                   : ST_CommunHMI;     (* --> [HW] GVL_IHM.Commun *)
     Network                  : ST_NetworkDiagHMI;(* --> [HW] GVL_IHM.Network *)
-    CycleDiveSearch          : ST_CycleDiveSearchHMI;   (* --> [HW] GVL_IHM.CycleDiveSearch *)
-    CycleExtraction          : ST_CycleExtractionHMI;   (* --> [HW] GVL_IHM.CycleExtraction *)
-    CycleDumpAtTremie        : ST_CycleDumpAtTremieHMI; (* --> [HW] GVL_IHM.CycleDumpAtTremie *)
     JoystickHMI              : ST_JoystickHMI;   (* --> [HW] GVL_IHM.JOY1Joystick *)
     Permits                  : ST_PermitVisibilityHMI; (* --> [DIAG] Vue unique des permis produite par PRG_07 *)
 
@@ -351,42 +348,8 @@ GVL_Troubleshooting.K_BenneOuvertureFermeture.Idx501_M2_CmdRev_DQ := FALSE; // T
 
 {endregion}
 
-{region "§4 Assistance dragage"}
-// === 🌊 5bis. AssistanceDragage : ST_ChainDredgingAssist ===
-GVL_Troubleshooting.M_AssistanceDragage.Idx101_EnableDiveSearch         := CycleDiveSearch.Cmd.TglEnableDiveSearch;
-GVL_Troubleshooting.M_AssistanceDragage.Idx102_EnableExtractionSequence := CycleExtraction.Cmd.TglEnableExtractionSequence;
-GVL_Troubleshooting.M_AssistanceDragage.Idx103_EnableDumpAtTremie       := CycleDumpAtTremie.Cmd.TglEnableDumpAtTremie;
-
-GVL_Troubleshooting.M_AssistanceDragage.Idx201_DiveReady               := CycleDiveSearch.State.DiveReady;
-GVL_Troubleshooting.M_AssistanceDragage.Idx202_DiveBusy                := CycleDiveSearch.State.DiveBusy;
-GVL_Troubleshooting.M_AssistanceDragage.Idx203_DiveDone                := CycleDiveSearch.State.DiveDone;
-GVL_Troubleshooting.M_AssistanceDragage.Idx204_DiveState                := CycleDiveSearch.State.DiveState;
-GVL_Troubleshooting.M_AssistanceDragage.Idx205_DiveError                := CycleDiveSearch.State.DiveError;
-GVL_Troubleshooting.M_AssistanceDragage.Idx206_DiveErrorId              := CycleDiveSearch.State.DiveErrorId;
-GVL_Troubleshooting.M_AssistanceDragage.Idx207_BottomTouchConfirmed    := CycleDiveSearch.State.BottomTouchConfirmed;
-GVL_Troubleshooting.M_AssistanceDragage.Idx208_DiveStepAtFault          := CycleDiveSearch.State.DiveStepAtFault;
-
-GVL_Troubleshooting.M_AssistanceDragage.Idx301_ExtractionReady          := CycleExtraction.State.ExtractionReady;
-GVL_Troubleshooting.M_AssistanceDragage.Idx302_ExtractionBusy           := CycleExtraction.State.ExtractionBusy;
-GVL_Troubleshooting.M_AssistanceDragage.Idx303_ExtractionDone           := CycleExtraction.State.ExtractionDone;
-GVL_Troubleshooting.M_AssistanceDragage.Idx304_ExtractionState          := CycleExtraction.State.ExtractionState;
-GVL_Troubleshooting.M_AssistanceDragage.Idx305_ExtractionError          := CycleExtraction.State.ExtractionError;
-GVL_Troubleshooting.M_AssistanceDragage.Idx306_ExtractionErrorId        := CycleExtraction.State.ExtractionErrorId;
-GVL_Troubleshooting.M_AssistanceDragage.Idx307_ExtractionStepAtFault    := CycleExtraction.State.ExtractionStepAtFault;
-
-GVL_Troubleshooting.M_AssistanceDragage.Idx401_OperatorActionId        := CycleDiveSearch.State.OperatorActionId;
-GVL_Troubleshooting.M_AssistanceDragage.Idx402_OperatorAction          := CycleDiveSearch.State.OperatorAction;
-
-GVL_Troubleshooting.M_AssistanceDragage.Idx501_DumpAtTremieArmed          := CycleDumpAtTremie.State.DumpAtTremieArmed;
-GVL_Troubleshooting.M_AssistanceDragage.Idx502_DumpAtTremieAssistActive   := CycleDumpAtTremie.State.DumpAtTremieAssistActive;
-GVL_Troubleshooting.M_AssistanceDragage.Idx503_DumpAtTremieAtTremie       := CycleDumpAtTremie.State.DumpAtTremieAtTremie;
-GVL_Troubleshooting.M_AssistanceDragage.Idx504_DumpAtTremieBucketOpenArmed := CycleDumpAtTremie.State.DumpAtTremieBucketOpenArmed;
-GVL_Troubleshooting.M_AssistanceDragage.Idx505_DumpAtTremieDescentLocked := CycleDumpAtTremie.State.DumpAtTremieDescentLocked;
-
-GVL_Troubleshooting.M_AssistanceDragage.Idx601_BypassDiveActive          := CycleDiveSearch.State.BypassDiveActive;
-GVL_Troubleshooting.M_AssistanceDragage.Idx602_BypassKoboldBottomTouched := CycleDiveSearch.State.BypassKoboldBottomTouched;
-
-{endregion}
+// §4 Assistance dragage retire : GVL_Troubleshooting ne porte plus ce slot (M_Réserve),
+// FB_DiveSearch/FB_ExtractionAssist supprimés (legacy, jamais actifs).
 
 {region "§5 Translation pont M3"}
 // === ↔️ 4. TranslationPontM3 : ST_ChainTranslation (fiche §5.5, source Translation) ===
