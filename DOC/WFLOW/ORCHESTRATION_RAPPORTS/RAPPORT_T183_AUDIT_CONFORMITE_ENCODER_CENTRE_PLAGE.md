@@ -226,8 +226,8 @@ Repris de `TASKS.yaml` T183 + complétés :
 | `CODE/GVL_PERSISTENT.st:148-149` | Départ simu ~1 M pts (3 % de la plage) |
 | `git show 26217dd9:CODE/E_CODEURS/FB_Encoder_Homing.st` | Centre-plage d'origine + référence physique (incohérence §2.2 pt 3) |
 | `git show 73fa758d -- CODE/E_CODEURS/FB_Encoder_Homing.st` | Bascule vers le neutre |
-| `DOC/WFLOW/CONTRACTS/DECISION_ENCODER_PRESET_TRANSACTION.md` | Variante C actée — transaction readback |
-| `DOC/WFLOW/CONTRACTS/DECISION_ENCODER_CFG_OWNERSHIP.md` | `Calib` IN_OUT, constantes non IHM |
+| `DOC/WFLOW/AUDITS/DECISION_ENCODER_PRESET_TRANSACTION.md` | Variante C actée — transaction readback |
+| `DOC/WFLOW/AUDITS/DECISION_ENCODER_CFG_OWNERSHIP.md` | `Calib` IN_OUT, constantes non IHM |
 | `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_PresetCodeurHorsCentrePlage_20260830.md` | Diagnostic complet (scénarios wrap, options A/B/C, chronologie git) |
 
 ---
