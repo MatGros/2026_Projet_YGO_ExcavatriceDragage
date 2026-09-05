@@ -129,6 +129,7 @@ VAR
 
     // === GATE CONTINU HOMME-MORT ===
     CycleMotionPermit       : BOOL; // . [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme) ; gate commun a toutes les commandes d'actionneur du sequenceur. Le sens du mouvement reste porte par ReqAscent/ReqDescend de chaque etape.
+    WinchesAtDiveStep       : BOOL; // . [LOC] M1 ET M2 confirmes au palier 4 (mesure Kobold fiable seulement a vitesse stabilisee)
 
     // === COMPTEUR PRELEVEMENTS (garde de front) ===
     SampleCountDone         : BOOL := FALSE; // . [LOC] F2: front de comptage SampleCount (1 seul increment par cycle)
@@ -172,6 +173,7 @@ VAR
     CtrlAscentTimeout       : TIME := T#30s;    // . [LOC] Temps max pour zone de stabilisation
     DrainingTime            : TIME := T#5s;     // . [LOC] Temps d'egouttage par defaut
     StepMaxTimeout          : TIME := T#60s;    // . [LOC] Tempo max d'etape
+    BucketOpenStabTimer     : TON;              // . [LOC] Stabilisation benne ouverte avant plongee (AX3->AX4)
 
     // === SOCLE DEFAUT TRANSVERSE ===
     instFault               : FB_FaultCore;                  // * [INST] Socle defaut transverse
@@ -183,6 +185,7 @@ VAR CONSTANT
     CST_StepDive   : INT := 4;   // Palier plongee Kobold AX4..AX7 : palier 4 MINI ET MAXI impose, palier 5 interdit (GEL Q9)
     CST_StepLoaded : INT := 4;   // Palier montee en charge AX12 (bridage strict <= 4, jamais palier 5)
     CST_KoboldInitTimeout : TIME := T#3s;   // Fenetre max de confirmation retour contacteur Kobold en AX5
+    CST_BucketOpenStabTime : TIME := T#2s;  // Stabilisation benne ouverte avant plongee couplee (AX3->AX4)
     CST_RaiseOffBottomDefaultM : REAL := 0.5;   // Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM <= 0
     // Backstop anti-telescopage : ecart de position M1/M2 max tolere pendant les phases
     // reellement couplees hors X7. Porte a 1,50 m pour absorber la dynamique benne ouverte
@@ -323,19 +326,29 @@ instCauses[8].Active   := (((M1_SpeedStepApplied > CST_StepDive) OR (M2_SpeedSte
 instCauses[8].Latching := TRUE;
 instCauses[8].Texte    := 'Palier vitesse > 4 (palier 5) pendant la plongee - interdit';
 
-// // Appel du socle de défaut
-// instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
-// Fault := instFault.Fault;
-// ErrorEdge(CLK := Fault.Error);
-// {endregion}
+// GEL cause 9 : mesure Kobold fiable seulement a vitesse de descente stabilisee
+// palier 4 sur LES DEUX treuils. Recherche immersion/fond (AX6/AX7) avec un des
+// deux hors palier 4 -> defaut latche (pas un blocage silencieux de transition).
+WinchesAtDiveStep := (M1_SpeedStepApplied = CST_StepDive) AND (M2_SpeedStepApplied = CST_StepDive);
+instCauses[9].Active   := NOT WinchesAtDiveStep
+                          AND ((State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+                            OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM));
+instCauses[9].Latching := TRUE;
+instCauses[9].Texte    := 'Palier 4 non confirme sur M1 et/ou M2 pendant la recherche Kobold';
 
-// {region "§2 Gate securite & Bascule Mode"}
-// // 🛑 1bis. ABANDON & RESET EXPLICITES (Priorité absolue, même hors mode ou en pause)
-// IF AbortEdge.Q THEN
-//     State := E_AutoCycleStep.AX0_REPOS;
-//     WaitingResume := FALSE;
-//     PausedState := E_AutoCycleStep.AX0_REPOS;
-// END_IF;
+// Appel du socle de défaut
+instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+Fault := instFault.Fault;
+ErrorEdge(CLK := Fault.Error);
+{endregion}
+
+{region "§2 Gate securite & Bascule Mode"}
+// 🛑 1bis. ABANDON & RESET EXPLICITES (Priorité absolue, même hors mode ou en pause)
+IF AbortEdge.Q THEN
+    State := E_AutoCycleStep.AX0_REPOS;
+    WaitingResume := FALSE;
+    PausedState := E_AutoCycleStep.AX0_REPOS;
+END_IF;
 
 // 🔧 1ter. FORCAGE DE STEP (Mise en service / dérogation)
 // Déverrouillé UNIQUEMENT si : case IHM mise en service (ou bouton forcer appuyé).
@@ -648,9 +661,17 @@ CASE State OF
             BucketCmd.ReqOpen := FALSE;
         END_IF;
 
-        // Transition vers AX4 : benne ouverte atteinte et confirmée
+        // Benne ouverte atteinte : mouvements a l'arret (treuils deja neutralises ci-dessus,
+        // benne coupee ici), stabilisation 2s avant plongee couplee.
         IF (Benne_IsOpen OR Benne_Done) AND NOT Benne_Busy THEN
             BucketCmd.ReqOpen := FALSE;
+        END_IF;
+        BucketOpenStabTimer(IN := (Benne_IsOpen OR Benne_Done) AND NOT Benne_Busy,
+                            PT := CST_BucketOpenStabTime);
+
+        // Transition vers AX4 : stabilisation 2s ecoulee. Pas de geste franc exige -
+        // le joystick peut rester maintenu depuis l'ouverture benne.
+        IF BucketOpenStabTimer.Q THEN
             State := E_AutoCycleStep.AX4_DESCEND_DIVING;
         END_IF;
 
@@ -707,6 +728,8 @@ CASE State OF
         BucketCmd.ReqKoboldMeasureEnable := CycleMotionPermit;
 
         // AT5 : retour contacteur Kobold coherent -> recherche immersion.
+        // Palier 4 M1/M2 non atteint = cause de defaut (instCauses[9]), pas un blocage
+        // silencieux de la transition.
         // (echec init / joystick relache / palier <> 4 -> AX_DIVING_RETRY via GT-dive-retry §1)
         IF JoystickDeflected AND KoboldContactorFeedback THEN
             State := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
