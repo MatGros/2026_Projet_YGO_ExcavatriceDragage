@@ -10,14 +10,15 @@
 
 Le catalogue DOC/WFLOW/TASKS.yaml formalise l'intégralité des chantiers techniques du projet avec leur criticité (C0 à C4), leurs dépendances et leurs critères de validation formelle.
 
-### 📊 Snapshot des Statuts (259 Tâches)
+### 📊 Snapshot des Statuts (260 Tâches au Total)
 
 | Catégorie de Statut | Icône / Repère | Volume | Signification & Rôle |
 |---|:---:|:---:|---|
-| **Tâches Terminées & Validées** | ✅ | **238** | Chantiers clôturés, revus, audités et intégrés dans CODE/ et DOC/ |
-| **Tâches Clôturées / Remplacées** | ❌ | **5** | Tâches supersédées par des refactors plus récents ou devenues caduques |
-| **Tâches en Cours / Verrouillées** | 🔒 / ⏳ | **4** | Lots en exécution active sous contrat |
-| **Tâches en Attente / Terrain** | ⏸️ / ⬜ | **12** | Points de mise en service (MES), mesures site ou arbitrages différés |
+| **Tâches Terminées & Validées** | ✅ | **187** | Chantiers clôturés, audités, intégrés dans `CODE/` et validés (inclus `T015`, `T125`, `T146`) |
+| **Tâches en Cours / Verrouillées** | ⏳ / 🔒 | **27** | Lots actifs ou requalifiés sous contrat (inclus `T092`, `T157`, `T243`, `T253`) |
+| **Tâches en Attente / Reliquats** | ⏸️ / ⬜ | **38** | Points de mise en service (MES), inventaires ou chantiers différés post-SAT |
+| **Tâches Clôturées / Remplacées** | ❌ / ⛔ | **7** | Tâches supersédées par des refactors plus récents ou devenues caduques |
+| **Sous investigation** | 🔎 | **1** | Point d'analyse isolé |
 
 ## 🧭 2. ARGUMENTAIRE & PLAN DE BATAILLE CHANTIER J-2 (SAT & RÉCEPTION)
 
@@ -51,58 +52,67 @@ flowchart TD
 
 ### ⏱️ Les 3 Paliers d'Action pour les Prochaines 48 Heures
 
-#### 🔴 PALIER 1 : Socle Physique & Déverrouillage des Axes (Ce matin — 2h max)
-* **1. Calage géométrie Benne dans la NVRAM (`_BucketCfgPersist.Config.OffsetCloseM`)** :
-  * *Pourquoi* : Hier la benne fermait mais ce matin elle est vue "ouverte" car le delta réel ne matche pas la valeur par défaut. Mesurer le $\Delta$ physique fermé et ajuster `OffsetCloseM` + `CoherenceLimitM` dans l'IHM.
-* **2. Validation physique Capteur Haut & Cible Homing (`T022` / `T090`)** :
-  * *Pourquoi* : S'assurer que le capteur haut M1/M2 est physiquement positionné et que la cote dans `_WinchM1/M2CfgPersist.CfgTopSensorPos_M` correspond au millimètre (8.0m à 8.5m).
+#### 🔴 PALIER 1 : Socle Physique & Déverrouillage des Axes (En cours)
+* **1. Calage géométrie Benne dans la NVRAM (`T253` sous contrat C4)** :
+  * *Pourquoi* : Ajuster `OffsetCloseM` et `CoherenceLimitM` dans la rémanence NVRAM / IHM pour garantir la reconnaissance univoque `IsClosed` / `IsOpen` sans bascule au redémarrage.
+* **2. Persistance & Homing à 0m (`T092`)** :
+  * *Pourquoi* : Qualifier la rémanence des bypass et le comportement du référencement 0m avec benne raccordée.
 * **3. Contrôle Chaîne AU & Réarmement Électrique (`T015`)** :
-  * *Pourquoi* : Valider que le bouton physique d'armement réarme sans rebond intempestif (`CST_PreArmDelay = 500ms`, `ArmPulseInhibitActive = 5s`).
+  * *Statut* : ✅ **Validé sur site** (chaîne physique `EmergencyStopOk_DI` et tempo anti-staccato opérationnelles).
+* **4. Homing Machine & Codeurs Absolus (`T146`)** :
+  * *Statut* : ✅ **Validé** (séquenceur `HX0..HX6` validé, bridage Palier 1 hors homing en place).
 
-#### 🟡 PALIER 2 : Fonctionnalité Métier « Sortir la Matière » en Maintenance (Après-midi J-1)
+#### 🟡 PALIER 2 : Fonctionnalité Métier « Sortir la Matière » en Maintenance (Après-midi)
 * **1. Maintien et pilotage Treuils M1 / M2 / Benne (`MAINT_N1`)** :
-  * Valider que l'opérateur peut descendre, poser au fond, fermer la benne et remonter en pleine charge sans déclenchement intempestif de `SyncDeviationWarn` ou `MecaE`.
-  * *Sécurité vérifiée* : Ralentissement haut à 0.5m effectif (`SlowdownDistanceTop_M := 0.5`).
-* **2. Translation M3 & Vidage Trémie (`DumpAtTremie`)** :
-  * Valider la translation du chariot M3 entre la zone de dragage (P1) et la trémie, avec décélération propre sur les capteurs `PosPV` et `PosTremie`.
+  * *Statut* : ✅ **Validé par traces réelles 29, 30, 31 (MES-046..048)** :
+    - Descente/Remontée pleine vitesse ($1.90\text{ m/s}$ sur M1, $1.61\text{ m/s}$ sur M2 sans fausse coupure de survitesse).
+    - Synchronisation dynamique remarquable ($< 6\text{ cm}$ d'écart en pleine montée).
+    - Ouverture/Fermeture benne opérationnelle en position haute.
+    - Ralentissement FdC haut à $0.5\text{ m}$ effectif.
+* **2. Translation M3 & Vidage Trémie (`DumpAtTremie` / `T249`)** :
+  * Valider la translation du chariot M3 entre la zone de dragage (P1) et la trémie, avec décélération propre et verrouillage vertical treuils.
 * **3. Lisibilité du Bandeau d'Alarmes IHM (`FB_Hmi_BannerFormatter`)** :
   * Aucune alarme muette ou bloquante sans explication : l'opérateur doit lire instantanément la cause (ex. *"M3 pas à P1 : descente refusée"*).
 
 #### 🟢 PALIER 3 : Qualification du Cycle Semi-Auto Basique (J-2)
-* **1. Séquence nominale simple (`X0` ➔ `X13`)** :
-  * Descente couplée M1/M2 ➔ Détection fond (Kobold / Mou de câble) ➔ Fermeture benne M2 ➔ Remontée nominale palier 4/5 ➔ Arrêt haut.
-* **2. Ergonomie Homme-Mort & Anti-Panique** :
-  * Lâcher de manche = arrêt immédiat en rampe sans défaut.
-  * Ré-appui manche = reprise directe de l'étape sans redémarrage brutal.
+* **1. Séquence nominale simple (`FB_CycleSemiAuto`)** :
+  * Descente couplée M1/M2 ➔ Détection fond (Kobold / Mou de câble) ➔ Fermeture benne M2 ➔ Remontée nominale ➔ Arrêt haut.
+  * *Note d'architecture* : Abandon des sous-GRAFCETs éclatés `DiveSearch`/`ExtractionSequence` (**`T125` clôturé en legacy**), logique centralisée dans `FB_CycleSemiAuto`.
+* **2. Ergonomie Homme-Mort & Permis Joystick (`T157`)** :
+  * Asymétrie treuils/translation déjà mergée.
+  * Câblage dynamique de `ArmingPermit` pour sécuriser les réarmements manche au neutre.
 
 ---
 
 ## 🔍 3. État des Lieux par Domaine Métier
 
 ### A. Sécurité Machine & Arrêt d'Urgence (AF01, AF03, AF14)
-- **Chaîne AU & Bypass MES (T173C)** : Formalisation et validation des 3 modes de bypass orthogonaux (BypassArmingPreconditions, BypassRedundancyTest, BypassPowerCutOff), tempo 500 ms et anti-staccato 5 s.
-- **Actions Terrain Ouvertes** :
-  - T015 (C2) : Validation câblage physique EmergencyStopOk_DI sur armoire.
-  - T092 (C4) : Qualification terrain de la persistance bypass RETAIN et reprise après coupure.
+- **Chaîne AU & Bypass MES** : 3 modes de bypass orthogonaux validés, temporisations normatives 500 ms / 5 s.
+- **Tâches associées** :
+  - `T015` (C2) : ✅ **Validé** (câblage physique `EmergencyStopOk_DI` et réarmement opérationnels).
+  - `T092` (C4) : ⏳ **En cours** (qualification terrain de la persistance RETAIN et reprise après coupure avec benne).
 
 ### B. Instrumentation & Codeurs Absolus (AF09)
-- **Homing Machine & Repères (T146, T185)** : Séquenceur de référencement machine HX0..HX6 validé, prise en compte de la cible haute dynamique pour M2 (_WinchM2CfgPersist.CfgTopSensorPos_M).
-- **Garde ISO 13849** : Bridage palier 1 en cas de perte de référence codeur.
-- **Action Terrain Ouverte** :
-  - T022 / T090 : Mesure physique de la position exacte du capteur haut (ajustement 8.0 m à 8.5 m dans la NVRAM).
+- **Homing Machine & Repères** : Séquenceur `HX0..HX6` opérationnel, cible dynamique M2 calculée sur config propre.
+- **Tâches associées** :
+  - `T146` (C4) : ✅ **Validé** (arbitrage vitesse hors homing bridé Palier 1, synchronisation Homed unifiée).
+  - `T253` (C4) : ⏳ **En cours sous contrat C4** (Calibration géométrie benne et rémanence NVRAM).
 
 ### C. Modes de Marche & Séquenceur Automatique (AF04, AF05)
-- **Séquenceur Semi-Auto (T127)** : Grafcet X0..X13 opérationnel, gestion des sous-cycles Plongée / Extraction / Kobold (bridage Palier $\le 4$), arrêt propre en maintien joystick.
-- **Revue de Conception (T125)** : Audit livré (REVUE_T125_MODES_DRAGAGE_v0.2.md), implémentation programmée pour validation post-essais.
+- **Séquenceur Semi-Auto** : Centralisation dans `PRG_03_Modes_Cycle`, structure unifiée prête pour les essais.
+- **Tâches associées** :
+  - `T125` (C4) : ✅ **Clôturé [LEGACY / OBSOLÈTE]** (sous-blocs séparés abandonnés au profit de `FB_CycleSemiAuto`).
+  - `T157` (C4) : ⏳ **En cours** (asymétrie Q2 résolue/mergée, reste câblage fin de `ArmingPermit`).
 
 ### D. Treuils, Benne & Translation (AF10, AF11)
-- **Treuils M1/M2 (T166-T170)** : Allègement de PRG_04 en actionneur exécutif pur, centralisation de la logique de décision dans PRG_03.
-- **Translation M3 (T129)** : Exposition complète du mot de diagnostic Idx317_ErrorId dans la raquette Troubleshooting et validation du décodage de position 5 capteurs.
+- **Treuils M1/M2 & Benne** : Validés sur traces terrain réelles (`MES-046`, `MES-047`, `MES-048`).
+- **Translation M3** : Diagnostic complet et gestion des fins de course opérationnels.
 
 ---
 
-## 📑 3. Santé des Contrats et Outillage CI/CD
+## 📑 4. Santé des Contrats et Outillage CI/CD
 
-- **Couverture des Contrats** : 42 contrats formels actifs (TASK_CONTRACT_*.yaml) sous DOC/WFLOW/CONTRACTS/.
-- **Règle de Gouvernance** : Obligation de spécification TASK_CONTRACT dès la criticité C2, avec arrêt technique obligatoire avant édition de code.
-- **Auto-Vérification** : Liaison G200_check_linkage.py systématiquement validée (0 erreur de câblage).
+- **Couverture des Contrats** : 43 contrats formels actifs (`TASK_CONTRACT_*.yaml`) sous `DOC/WFLOW/CONTRACTS/` (dont `TASK_CONTRACT_T253_CALIB_BENNE_PERSISTANTE.yaml`).
+- **Auto-Vérification** : Liaison `G200_check_linkage.py` systématiquement validée (**0 erreur de câblage**).
+- **Bundle CODESYS** : `CODE_XML/CODE_Bundle.xml` synchronisé à 100% avec les sources ST.
+
