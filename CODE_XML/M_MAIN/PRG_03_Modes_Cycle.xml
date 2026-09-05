@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:57:24.120158" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:57:24.120158">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:10:47.852417" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:10:47.852417">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1072,12 +1072,12 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact fond Kobold confirmé (manuel + bypass)</xhtml>
               </documentation>
             </variable>
-            <variable name="DumpAtTremieDescentLocked">
+            <variable name="WinchDescentAuth_M3">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrou descente treuil "vidage à la trémie" (PRG_04 §5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation positive descente treuil selon position M3 (P1/Maintenance) — PRG_04 §5</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1571,7 +1571,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
-    Data.SequenceState.DumpAtTremieDescentLocked     := FALSE;
+    Data.SequenceState.WinchDescentAuth_M3           := TRUE;
 
 ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2) THEN
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
@@ -1598,8 +1598,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;
 
-    // Requêtes benne et assistants — DumpAtTremie retire (legacy, plus de commande IHM)
-    DumpAtTremieActive := FALSE;
+    // Requêtes benne et assistants — DumpAtTremie recode (toggle IHM independant du verrou descente)
+    DumpAtTremieActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglEnableDumpAtTremie;
     DumpAtTremieAssistActive := DumpAtTremieActive;
     DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
 
@@ -1655,10 +1655,10 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // au boot PLC, pont deja pose a P1/Maintenance -&gt; descente autorisee sans devoir
     // franchir un capteur d'abord (M3_AtWorkPositionStable couvre M3_AtP1/Maint jetons
     // + lecture directe mot 00011 / 00000).
-    Data.SequenceState.DumpAtTremieDescentLocked     :=
-        NOT PRG_05_Translation.Data.M3_AtWorkPositionStable
-        AND NOT GVL_IHM.TranslationM3.Bypass.LimitSwitch
-        AND NOT GVL_IHM.TranslationM3.Bypass.Global;
+    Data.SequenceState.WinchDescentAuth_M3     :=
+        PRG_05_Translation.Data.M3_AtWorkPositionStable
+        OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
+        OR GVL_IHM.TranslationM3.Bypass.Global;
 
 ELSE
     // Neutralisation déterministe (DISABLE)
@@ -1707,7 +1707,7 @@ ELSE
     Data.SequenceState.CurrentCycleElapsed     := T#0s;
     Data.SequenceState.LastCycleDuration       := T#0s;
     Data.SequenceState.BottomTouchConfirmed       := FALSE;
-    Data.SequenceState.DumpAtTremieDescentLocked     := FALSE;
+    Data.SequenceState.WinchDescentAuth_M3           := TRUE;
 END_IF;
 
 {endregion}

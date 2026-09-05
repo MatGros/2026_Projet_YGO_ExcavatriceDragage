@@ -270,7 +270,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
-    Data.SequenceState.DumpAtTremieDescentLocked     := FALSE;
+    Data.SequenceState.WinchDescentAuth_M3           := TRUE;
 
 ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2) THEN
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
@@ -297,8 +297,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;
 
-    // Requêtes benne et assistants — DumpAtTremie retire (legacy, plus de commande IHM)
-    DumpAtTremieActive := FALSE;
+    // Requêtes benne et assistants — DumpAtTremie recode (toggle IHM independant du verrou descente)
+    DumpAtTremieActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglEnableDumpAtTremie;
     DumpAtTremieAssistActive := DumpAtTremieActive;
     DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
 
@@ -354,10 +354,10 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // au boot PLC, pont deja pose a P1/Maintenance -> descente autorisee sans devoir
     // franchir un capteur d'abord (M3_AtWorkPositionStable couvre M3_AtP1/Maint jetons
     // + lecture directe mot 00011 / 00000).
-    Data.SequenceState.DumpAtTremieDescentLocked     :=
-        NOT PRG_05_Translation.Data.M3_AtWorkPositionStable
-        AND NOT GVL_IHM.TranslationM3.Bypass.LimitSwitch
-        AND NOT GVL_IHM.TranslationM3.Bypass.Global;
+    Data.SequenceState.WinchDescentAuth_M3     :=
+        PRG_05_Translation.Data.M3_AtWorkPositionStable
+        OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
+        OR GVL_IHM.TranslationM3.Bypass.Global;
 
 ELSE
     // Neutralisation déterministe (DISABLE)
@@ -406,7 +406,7 @@ ELSE
     Data.SequenceState.CurrentCycleElapsed     := T#0s;
     Data.SequenceState.LastCycleDuration       := T#0s;
     Data.SequenceState.BottomTouchConfirmed       := FALSE;
-    Data.SequenceState.DumpAtTremieDescentLocked     := FALSE;
+    Data.SequenceState.WinchDescentAuth_M3           := TRUE;
 END_IF;
 
 {endregion}

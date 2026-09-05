@@ -5947,6 +5947,18 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
 Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </documentation>
             </variable>
+            <variable name="TglEnableDumpAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance "vidage à la trémie" (MAINT_N1/N2) : arme l'ouverture auto de la benne quand
+M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescentAuth_M3).</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

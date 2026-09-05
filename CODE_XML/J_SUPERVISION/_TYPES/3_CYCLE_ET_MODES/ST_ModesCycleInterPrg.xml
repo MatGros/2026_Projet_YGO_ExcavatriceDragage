@@ -547,12 +547,12 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact fond Kobold confirmé (manuel + bypass)</xhtml>
               </documentation>
             </variable>
-            <variable name="DumpAtTremieDescentLocked">
+            <variable name="WinchDescentAuth_M3">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrou descente treuil "vidage à la trémie" (PRG_04 §5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation positive descente treuil selon position M3 (P1/Maintenance) — PRG_04 §5</xhtml>
               </documentation>
             </variable>
           </struct>

@@ -991,8 +991,8 @@ ProcessAndSafetyPermitM2_Descend := ProcessPermitM2_Descend AND SafetyPermitM2_D
 // benne permis"). Sans cette exemption, EffectivePermitBucket_Open/Close (cable sur
 // EffectivePermitM2_Descend/Ascent, ligne ~1004) heritait du meme verrou par accident de
 // cablage -> ouverture benne bloquee a la Tremie (REX MES 2026-09-04).
-// Décision et calcul centralisés dans PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked
-IF PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked THEN
+// Décision et calcul centralisés dans PRG_03_Modes_Cycle.Data.SequenceState.WinchDescentAuth_M3
+IF NOT PRG_03_Modes_Cycle.Data.SequenceState.WinchDescentAuth_M3 THEN
     ProcessAndSafetyPermitM1_Descend := FALSE;
     IF NOT (ManualBucketJogActive
             OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen

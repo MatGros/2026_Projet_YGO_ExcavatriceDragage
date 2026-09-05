@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:46:21.985213" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:46:21.985213">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:09:58.548756" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:09:58.548756">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -186,12 +186,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact fond Kobold confirmé (manuel + bypass)</xhtml>
               </documentation>
             </variable>
-            <variable name="DumpAtTremieDescentLocked">
+            <variable name="WinchDescentAuth_M3">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrou descente treuil "vidage à la trémie" (PRG_04 §5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation positive descente treuil selon position M3 (P1/Maintenance) — PRG_04 §5</xhtml>
               </documentation>
             </variable>
           </struct>
