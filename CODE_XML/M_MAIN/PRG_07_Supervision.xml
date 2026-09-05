@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:11:15.487766" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:11:15.487766">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:31:41.495694" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:31:41.495694">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -8386,6 +8386,8 @@ instTroubleshootingView(
     CycleDone            := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done,
     CycleError           := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error,
     CycleErrorId         := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
+    CycleFaultLatched    := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched,
+    CycleFaultLatchedId  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId,
     CycleStep            := PRG_03_Modes_Cycle.Data.SequenceState.Step,
     CycleStepStr         := PRG_03_Modes_Cycle.Data.SequenceState.StepStr,
     CycleStepAtError     := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
@@ -11772,6 +11774,22 @@ Prev := Hmi;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code erreur séquenceur</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleFaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Défaut latché séquenceur (bloque AX0-&gt;AX1, exige Reset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleFaultLatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Bitfield défaut latché figé</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleStep">
               <type>
                 <derived name="E_AutoCycleStep" />
@@ -12558,6 +12576,8 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx202_Busy                      := CycleAut
 GVL_Troubleshooting.G_CycleSemiAuto.Idx203_Done                      := CycleDone;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx204_Error                     := CycleError;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFaultLatched;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;

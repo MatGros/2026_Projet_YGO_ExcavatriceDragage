@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T10:40:18.594798" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T10:40:18.594798">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:31:08.172698" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:31:08.172698">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -121,7 +121,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut ou anomalie bloquante sur le cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut vue LIVE (retombe seul avec la cause)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx205_ErrorId">
@@ -130,6 +130,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur interne FB_Cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx217_FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut vue LATCHÉE (bloque AX0-&gt;AX1 même si Idx204=0, exige Reset conscient)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx218_FaultLatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield fige a l'apparition du defaut latche</xhtml>
               </documentation>
             </variable>
             <variable name="Idx206_Step">

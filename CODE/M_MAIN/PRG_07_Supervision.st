@@ -729,6 +729,8 @@ instTroubleshootingView(
     CycleDone            := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done,
     CycleError           := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error,
     CycleErrorId         := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
+    CycleFaultLatched    := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched,
+    CycleFaultLatchedId  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId,
     CycleStep            := PRG_03_Modes_Cycle.Data.SequenceState.Step,
     CycleStepStr         := PRG_03_Modes_Cycle.Data.SequenceState.StepStr,
     CycleStepAtError     := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
