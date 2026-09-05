@@ -139,11 +139,13 @@ HwReal.Winch.M1M2_TopPositionFree_DI  := M1M2_TopPositionFree_DI;
 HwReal.Winch.M2_TensionedCable_DI     := M2_TensionedCable_DI;
 
 HwReal.Winch.COD1_PosValue            := COD1_PosValue;
+HwReal.Winch.COD1_SpdValue            := COD1_SpdValue;
 HwReal.Winch.COD1_Alarms              := COD1_Alarms;
 HwReal.Winch.COD1_Warnings            := COD1_Warnings;
 HwReal.Winch.COD1_DeviceState         := COD1_CODEUR.GetDeviceState();
 
 HwReal.Winch.COD2_PosValue            := COD2_PosValue;
+HwReal.Winch.COD2_SpdValue            := COD2_SpdValue;
 HwReal.Winch.COD2_Alarms              := COD2_Alarms;
 HwReal.Winch.COD2_Warnings            := COD2_Warnings;
 HwReal.Winch.COD2_DeviceState         := COD2_CODEUR.GetDeviceState();
@@ -495,6 +497,7 @@ Data.MachineHoming.CmdWinchM2       := instCycleMachineHoming.CmdWinchM2;
 Data.MachineHoming.CmdBucketOpen    := instCycleMachineHoming.CmdBucketOpen;
 Data.MachineHoming.CmdBucketClose   := instCycleMachineHoming.CmdBucketClose;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
+HwInM1.SpdValueIn        := HwIn.Winch.COD1_SpdValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
 HwInM1.SlaveOperational  := instDiagEthercat.DeviceEncoderM1.Operational;
@@ -549,6 +552,7 @@ COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
 
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
 HwInM2.RawPosIn          := HwIn.Winch.COD2_PosValue;
+HwInM2.SpdValueIn        := HwIn.Winch.COD2_SpdValue;
 HwInM2.AlarmsIn          := HwIn.Winch.COD2_Alarms;
 HwInM2.WarningsIn        := HwIn.Winch.COD2_Warnings;
 HwInM2.SlaveOperational  := instDiagEthercat.DeviceEncoderM2.Operational;

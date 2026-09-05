@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T06:03:51.963757" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T06:03:51.963757">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T07:10:10.613499" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T07:10:10.613499">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -192,6 +192,14 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Position brute simulée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RawSpdOut">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM)</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -399,6 +407,17 @@ END_IF;
 
 {region "§4 Sortie"}
 RawPosOut := RawPos;
+// Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
+// SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
+IF (MovingDir &lt;&gt; 0) AND (CableM_PerRev &gt; 0.0) THEN
+    IF MovingDir = 1 THEN
+        RawSpdOut := REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
+    ELSE
+        RawSpdOut := -REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
+    END_IF;
+ELSE
+    RawSpdOut := 0;
+END_IF;
 {endregion}
 </xhtml>
           </ST>

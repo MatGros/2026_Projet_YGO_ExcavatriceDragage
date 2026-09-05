@@ -18,10 +18,8 @@ STRUCT
     EncoderIncoherent : BOOL;         // TRUE = incoherence redemarrage ou hors bornes
 
     // === MESURES DE VITESSE CABLE ===
-    Speed_Mps         : REAL;         // Vitesse absolue sur fenetre glissante / filtree (m/s)
-    SignedSpeed_Mps   : REAL;         // Vitesse signee (m/s, + montee, - descente)
-    RawSpeed_Mps      : REAL;         // Vitesse absolue brute instantanee (m/s)
-    RawSignedSpeed_Mps: REAL;         // Vitesse signee brute instantanee (m/s)
+    Speed_Mps         : REAL;         // Vitesse absolue câble (m/s)
+    SignedSpeed_Mps   : REAL;         // Vitesse signee câble (m/s, + montee, - descente)
     SpeedValid        : BOOL;         // TRUE si mesure valide et codeur operationnel
 
     // === STATUTS DES SOUS-FB & REFERENCE ===

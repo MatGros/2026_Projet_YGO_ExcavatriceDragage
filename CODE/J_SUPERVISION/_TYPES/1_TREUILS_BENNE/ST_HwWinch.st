@@ -17,11 +17,13 @@ STRUCT
     M2_TensionedCable_DI     : BOOL; (* Capteur mou de câble M2 (câble tendu) *)
 
     COD1_PosValue            : UDINT;        (* Valeur brute position codeur COD1 (M1) *)
+    COD1_SpdValue            : DINT;         (* Valeur brute vitesse codeur COD1 (0x6031:01 en 0.1 RPM) *)
     COD1_Alarms              : UINT;         (* Alarmes brutes COD1 *)
     COD1_Warnings            : UINT;         (* Avertissements bruts COD1 *)
     COD1_DeviceState         : DEVICE_STATE; (* État device COD1 (GetDeviceState) *)
 
     COD2_PosValue            : UDINT;        (* Valeur brute position codeur COD2 (M2) *)
+    COD2_SpdValue            : DINT;         (* Valeur brute vitesse codeur COD2 (0x6031:01 en 0.1 RPM) *)
     COD2_Alarms              : UINT;         (* Alarmes brutes COD2 *)
     COD2_Warnings            : UINT;         (* Avertissements bruts COD2 *)
     COD2_DeviceState         : DEVICE_STATE; (* État device COD2 (GetDeviceState) *)

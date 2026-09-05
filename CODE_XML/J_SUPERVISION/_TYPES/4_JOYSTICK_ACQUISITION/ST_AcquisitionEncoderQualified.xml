@@ -274,7 +274,7 @@ Position cable (m, signee, + enroule)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE VITESSE CABLE ===
-Vitesse absolue sur fenetre glissante / filtree (m/s)</xhtml>
+Vitesse absolue câble (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SignedSpeed_Mps">
@@ -282,23 +282,7 @@ Vitesse absolue sur fenetre glissante / filtree (m/s)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee (m/s, + montee, - descente)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse absolue brute instantanee (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawSignedSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee brute instantanee (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee câble (m/s, + montee, - descente)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedValid">

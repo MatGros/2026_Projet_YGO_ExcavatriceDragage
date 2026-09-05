@@ -386,6 +386,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD1 (M1)</xhtml>
               </documentation>
             </variable>
+            <variable name="COD1_SpdValue">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute vitesse codeur COD1 (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
             <variable name="COD1_Alarms">
               <type>
                 <UINT />
@@ -416,6 +424,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD2 (M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_SpdValue">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute vitesse codeur COD2 (0x6031:01 en 0.1 RPM)</xhtml>
               </documentation>
             </variable>
             <variable name="COD2_Alarms">

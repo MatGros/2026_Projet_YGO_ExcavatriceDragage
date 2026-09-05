@@ -14,6 +14,7 @@ TYPE ST_fbEncoder_HwIn :
 STRUCT
     // === ENTRÉES BUS ETHERCAT (faits d'entrée, lecture seule) ===
     RawPosIn           : UDINT; // --> [HW] Position brute codeur
+    SpdValueIn         : DINT;  // --> [HW] Vitesse brute codeur (0x6031:01 en 0.1 RPM)
     AlarmsIn           : UINT;  // --> [HW] Alarmes brutes codeur
     WarningsIn         : UINT;  // --> [HW] Avertissements bruts codeur
     SlaveOperational   : BOOL;  // --> [HW] Esclave EtherCAT operationnel

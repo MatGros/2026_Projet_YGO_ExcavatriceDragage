@@ -7809,6 +7809,14 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD1 (M1)</xhtml>
               </documentation>
             </variable>
+            <variable name="COD1_SpdValue">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute vitesse codeur COD1 (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
             <variable name="COD1_Alarms">
               <type>
                 <UINT />
@@ -7839,6 +7847,14 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD2 (M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_SpdValue">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute vitesse codeur COD2 (0x6031:01 en 0.1 RPM)</xhtml>
               </documentation>
             </variable>
             <variable name="COD2_Alarms">
@@ -14879,6 +14895,14 @@ Identifiant numerique de l'action</xhtml>
 --&gt; [HW] Position brute codeur</xhtml>
               </documentation>
             </variable>
+            <variable name="SpdValueIn">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse brute codeur (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
             <variable name="AlarmsIn">
               <type>
                 <UINT />
@@ -15030,7 +15054,7 @@ Position cable (m, signee, + enroule)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE VITESSE CABLE ===
-Vitesse absolue sur fenetre glissante / filtree (m/s)</xhtml>
+Vitesse absolue câble (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SignedSpeed_Mps">
@@ -15038,23 +15062,7 @@ Vitesse absolue sur fenetre glissante / filtree (m/s)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee (m/s, + montee, - descente)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse absolue brute instantanee (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawSignedSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee brute instantanee (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee câble (m/s, + montee, - descente)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedValid">
@@ -25694,8 +25702,9 @@ instRel(
 instSpeed(
     Enable        := Enable,
     Reset         := Reset,
-    Position_M    := instSafety.CablePosMSafe,
-    PositionValid := NOT instRel.EncoderFault
+    SpdValueIn    := HwIn.SpdValueIn,
+    PositionValid := NOT instRel.EncoderFault,
+    CableM_PerRev := CableM_PerRev
 );
 {endregion}
 
@@ -25707,8 +25716,6 @@ Measurement.CablePosMSafe     := instSafety.CablePosMSafe;
 Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;
-Measurement.RawSpeed_Mps      := instSpeed.RawSpeed_Mps;
-Measurement.RawSignedSpeed_Mps:= instSpeed.RawSignedSpeed_Mps;
 Measurement.SpeedValid        := instSpeed.Valid;
 Measurement.HomingFault        := instHoming.Fault;
 Measurement.HomingLifecycle    := instHoming.Lifecycle;
@@ -27279,16 +27286,16 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Purge immediate de l'historique (front montant)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Purge immediate (front montant)</xhtml>
               </documentation>
             </variable>
-            <variable name="Position_M">
+            <variable name="SpdValueIn">
               <type>
-                <REAL />
+                <DINT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURE SURES EN ENTREE ===
---&gt; [HW]  Position cable sure en metres (FB_Encoder_Safety)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES EN ENTREE ===
+--&gt; [HW]  Mot de vitesse brut EtherCAT (0x6031:01 en 0.1 RPM)</xhtml>
               </documentation>
             </variable>
             <variable name="PositionValid">
@@ -27299,15 +27306,15 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Validite de la chaine codeur</xhtml>
               </documentation>
             </variable>
-            <variable name="FilterTimeConst">
+            <variable name="CableM_PerRev">
               <type>
-                <TIME />
+                <REAL />
               </type>
               <initialValue>
-                <simpleValue value="TIME#100MS" />
+                <simpleValue value="2" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Constante de temps du filtre PT1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Developpement cable par tour tambour (m/tour)</xhtml>
               </documentation>
             </variable>
           </inputVars>
@@ -27317,8 +27324,8 @@ END_IF;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VITESSE PRINCIPALE (FILTRÉE) ===
-&lt;-- [DIAG] Vitesse absolue filtree PT1 (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VITESSE CÂBLE QUALIFIÉE (m/s) ===
+&lt;-- [DIAG] Vitesse absolue directe (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SignedSpeed_Mps">
@@ -27326,7 +27333,7 @@ END_IF;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse signee filtree PT1 (+ montee, - descente) (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse signee directe (+ montee, - descente) (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="Valid">
@@ -27334,79 +27341,29 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Validite mesure (TRUE si codeur operationnel et premier cycle passe)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VITESSE BRUTE INSTANTANÉE (SCAN-PAR-SCAN, SANS FILTRE, NON BORNÉE) ===
-&lt;-- [DIAG] Vitesse absolue instantanee brute (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawSignedSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse signee instantanee brute (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Validite mesure (TRUE si codeur operationnel et autorise)</xhtml>
               </documentation>
             </variable>
           </outputVars>
           <localVars>
-            <variable name="instCycleTime">
-              <type>
-                <derived name="FB_CycleTime" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SOUS-INSTANCES ===
-* [INST] Mesure du dt reel par scan (tache 20ms)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="instFilter">
-              <type>
-                <derived name="FB_Filter" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Filtre PT1 pour la mesure lissée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="PrevPosition_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MEMOIRES &amp; DETECTEURS ===
-. [LOC] Position du scan precedent</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FirstScanDone">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Drapeau d'initialisation premier cycle</xhtml>
-              </documentation>
-            </variable>
             <variable name="ResetEdge">
               <type>
                 <derived name="R_TRIG" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Detecteur front montant Reset</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MEMOIRES &amp; DETECTEURS ===
+. [LOC] Detecteur front montant Reset</xhtml>
               </documentation>
             </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
+   ⚙️ FB_Encoder_SpeedMeasure — Mesure de vitesse câble directe codeur
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Calcul de la vitesse câble double mesure (Brute instantanée + Filtrée)
-   ⚙️ Différenciation : ΔPosition / dt réel issu de FB_CycleTime
-   🌊 Lissage : Filtre PT1 (FB_Filter) pour la sortie standard lissée
-   🛡️ Sans bornage : zéro clamping artificiel
+   🎯 Rôle : Conversion directe du mot de vitesse natif codeur EtherCAT (m/s)
+   ⚙️ Source CoE : Objet 0x6031:01 en 0.1 RPM (dixième de tour/min)
+   📐 Formule : V(m/s) = (SpdValue * 0.1 * CableM_PerRev) / 60.0
+   🛡️ Sans bornage : zéro clamping artificiel, suppression délai filtre PT1
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    =======================================================================</xhtml>
           </documentation>
@@ -27415,54 +27372,25 @@ END_IF;
           <ST>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">
 
-{region "§1 Gestion du temps &amp; Gate de neutralisation"}
+{region "§1 Gate de neutralisation &amp; Reset"}
 ResetEdge(CLK := Reset);
-instCycleTime(DefaultValueS := 0.020); // Tache PRG_02_Acquisition = 20ms
 
-// Purge immediate sur perte de confiance ou Reset
+// Purge immediate sur perte de confiance, desactivation ou Reset
 IF NOT Enable OR ResetEdge.Q OR NOT PositionValid THEN
-    Speed_Mps          := 0.0;
-    SignedSpeed_Mps    := 0.0;
-    RawSpeed_Mps       := 0.0;
-    RawSignedSpeed_Mps := 0.0;
-    Valid              := FALSE;
-    FirstScanDone      := FALSE;
-    PrevPosition_M     := Position_M;
+    Speed_Mps       := 0.0;
+    SignedSpeed_Mps := 0.0;
+    Valid           := FALSE;
     RETURN;
 END_IF;
 {endregion}
 
-{region "§2 Initialisation premier scan"}
-IF NOT FirstScanDone THEN
-    PrevPosition_M := Position_M;
-    FirstScanDone  := TRUE;
-    Valid          := FALSE;
-    Speed_Mps          := 0.0;
-    SignedSpeed_Mps    := 0.0;
-    RawSpeed_Mps       := 0.0;
-    RawSignedSpeed_Mps := 0.0;
-    RETURN;
-END_IF;
-{endregion}
-
-{region "§3 Calcul vitesse brute instantanee"}
-IF instCycleTime.CycleTimeS &gt; 0.0 THEN
-    RawSignedSpeed_Mps := (Position_M - PrevPosition_M) / instCycleTime.CycleTimeS;
-    RawSpeed_Mps       := ABS(RawSignedSpeed_Mps);
-    Valid              := TRUE;
-END_IF;
-PrevPosition_M := Position_M;
-{endregion}
-
-{region "§4 Filtrage PT1 pour sortie lissée"}
-instFilter(
-    ValueIn    := RawSignedSpeed_Mps,
-    TimeConst  := FilterTimeConst,
-    CycleTimeS := instCycleTime.CycleTimeS
-);
-
-SignedSpeed_Mps := instFilter.ValueOut;
+{region "§2 Conversion directe vitesse CoE (0.1 RPM -&gt; m/s)"}
+// Formule cinematique directe :
+// N_RPM = SpdValueIn * 0.1
+// V_mps = (N_RPM * CableM_PerRev) / 60.0 = (DINT_TO_REAL(SpdValueIn) * 0.1 * CableM_PerRev) / 60.0
+SignedSpeed_Mps := (DINT_TO_REAL(SpdValueIn) * 0.1 * CableM_PerRev) / 60.0;
 Speed_Mps       := ABS(SignedSpeed_Mps);
+Valid           := TRUE;
 {endregion}
 </xhtml>
           </ST>
@@ -36406,11 +36334,13 @@ Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
 Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
+Winch.COD1_SpdValue            := instSimEncoderM1.RawSpdOut;
 Winch.COD1_Alarms              := 0;
 Winch.COD1_Warnings            := 0;
 Winch.COD1_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING (bus OK)
 
 Winch.COD2_PosValue            := instSimEncoderM2.RawPosOut;
+Winch.COD2_SpdValue            := instSimEncoderM2.RawSpdOut;
 Winch.COD2_Alarms              := 0;
 Winch.COD2_Warnings            := 0;
 Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
@@ -36722,6 +36652,14 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Position brute simulée</xhtml>
               </documentation>
             </variable>
+            <variable name="RawSpdOut">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <inOutVars>
             <variable name="RawPos">
@@ -36927,6 +36865,17 @@ END_IF;
 
 {region "§4 Sortie"}
 RawPosOut := RawPos;
+// Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
+// SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
+IF (MovingDir &lt;&gt; 0) AND (CableM_PerRev &gt; 0.0) THEN
+    IF MovingDir = 1 THEN
+        RawSpdOut := REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
+    ELSE
+        RawSpdOut := -REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
+    END_IF;
+ELSE
+    RawSpdOut := 0;
+END_IF;
 {endregion}
 </xhtml>
           </ST>
@@ -47656,11 +47605,13 @@ HwReal.Winch.M1M2_TopPositionFree_DI  := M1M2_TopPositionFree_DI;
 HwReal.Winch.M2_TensionedCable_DI     := M2_TensionedCable_DI;
 
 HwReal.Winch.COD1_PosValue            := COD1_PosValue;
+HwReal.Winch.COD1_SpdValue            := COD1_SpdValue;
 HwReal.Winch.COD1_Alarms              := COD1_Alarms;
 HwReal.Winch.COD1_Warnings            := COD1_Warnings;
 HwReal.Winch.COD1_DeviceState         := COD1_CODEUR.GetDeviceState();
 
 HwReal.Winch.COD2_PosValue            := COD2_PosValue;
+HwReal.Winch.COD2_SpdValue            := COD2_SpdValue;
 HwReal.Winch.COD2_Alarms              := COD2_Alarms;
 HwReal.Winch.COD2_Warnings            := COD2_Warnings;
 HwReal.Winch.COD2_DeviceState         := COD2_CODEUR.GetDeviceState();
@@ -48012,6 +47963,7 @@ Data.MachineHoming.CmdWinchM2       := instCycleMachineHoming.CmdWinchM2;
 Data.MachineHoming.CmdBucketOpen    := instCycleMachineHoming.CmdBucketOpen;
 Data.MachineHoming.CmdBucketClose   := instCycleMachineHoming.CmdBucketClose;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
+HwInM1.SpdValueIn        := HwIn.Winch.COD1_SpdValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
 HwInM1.WarningsIn        := HwIn.Winch.COD1_Warnings;
 HwInM1.SlaveOperational  := instDiagEthercat.DeviceEncoderM1.Operational;
@@ -48066,6 +48018,7 @@ COD1_PresetValue    := instEncoderM1.HwOut.PresetValueOut;
 
 // Frontiere hardware remplie avant l'appel (le bus Hw est passe en entier).
 HwInM2.RawPosIn          := HwIn.Winch.COD2_PosValue;
+HwInM2.SpdValueIn        := HwIn.Winch.COD2_SpdValue;
 HwInM2.AlarmsIn          := HwIn.Winch.COD2_Alarms;
 HwInM2.WarningsIn        := HwIn.Winch.COD2_Warnings;
 HwInM2.SlaveOperational  := instDiagEthercat.DeviceEncoderM2.Operational;
