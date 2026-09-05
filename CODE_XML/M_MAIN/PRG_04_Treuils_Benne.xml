@@ -9397,7 +9397,7 @@ END_IF;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.02" />
+                <simpleValue value="0.1" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil vitesse mesurable (m/s)</xhtml>
@@ -9440,7 +9440,7 @@ END_IF;
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#500ms" />
+                <simpleValue value="TIME#1s0ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai confirmation sens oppose</xhtml>
@@ -10404,7 +10404,10 @@ IF NOT BypassGlobal THEN
     instCauses[13].Texte    := 'Escalade ecart synchronisation (Meca E)';
 
     // Cause 14 : Sens opposé (latched)
-    OppositeDirectionActive := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
+    // Convention de signe SignedSpeed_Mps confirmee machine reelle (MES 2026-09-05,
+    // DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md) : + montee (enroulement cable),
+    // - descente (deroulement cable).
+    OppositeDirectionActive := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
         AND ((ReqAscent AND (MeasuredSpeedSignedMps &lt; -MovementSpeedThresholdMps))
           OR (ReqDescend AND (MeasuredSpeedSignedMps &gt; MovementSpeedThresholdMps))));
     TonOppositeDirection(IN := OppositeDirectionActive, PT := OppositeDirectionTimeout);
