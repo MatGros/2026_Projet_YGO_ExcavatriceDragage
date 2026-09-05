@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:10:47.852417" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:10:47.852417">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T13:06:07.612470" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T13:06:07.612470">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1406,7 +1406,8 @@ GVL_PERSISTENT._MaintM2HomingRequired := instModes.Auth.HomingRequiredM2;
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     WinchBothMotionDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
     WinchBothMotionActive := PRG_02_Acquisition.Data.Joystick.DeadmanArmed
-                                     AND (instModes.Auth.JoystickWinchSelectArbitrated = 0);
+                             AND (instModes.Auth.JoystickWinchSelectArbitrated = 0)
+                             AND (instModes.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO);
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothAscent THEN
         WinchBothMotionDirection := 1;
@@ -1415,7 +1416,8 @@ ELSE
     ELSE
         WinchBothMotionDirection := 0;
     END_IF;
-    WinchBothMotionActive := (WinchBothMotionDirection &lt;&gt; 0);
+    WinchBothMotionActive := (WinchBothMotionDirection &lt;&gt; 0)
+                             AND (instModes.Auth.Mode &lt;&gt; E_Mode.SEMI_AUTO);
 END_IF;
 
 // Posture de départ du cycle SEMI_AUTO (condition AX1_INIT) : treuil porteur M1 ou M2 ayant

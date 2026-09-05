@@ -105,7 +105,8 @@ GVL_PERSISTENT._MaintM2HomingRequired := instModes.Auth.HomingRequiredM2;
 IF GVL_IHM.Modes.Cmd.TglJoystickMaster THEN
     WinchBothMotionDirection := PRG_02_Acquisition.Data.Joystick.AxisY.Direction;
     WinchBothMotionActive := PRG_02_Acquisition.Data.Joystick.DeadmanArmed
-                                     AND (instModes.Auth.JoystickWinchSelectArbitrated = 0);
+                             AND (instModes.Auth.JoystickWinchSelectArbitrated = 0)
+                             AND (instModes.Auth.Mode <> E_Mode.SEMI_AUTO);
 ELSE
     IF GVL_IHM.Commun.BtnWinchBothAscent THEN
         WinchBothMotionDirection := 1;
@@ -114,7 +115,8 @@ ELSE
     ELSE
         WinchBothMotionDirection := 0;
     END_IF;
-    WinchBothMotionActive := (WinchBothMotionDirection <> 0);
+    WinchBothMotionActive := (WinchBothMotionDirection <> 0)
+                             AND (instModes.Auth.Mode <> E_Mode.SEMI_AUTO);
 END_IF;
 
 // Posture de départ du cycle SEMI_AUTO (condition AX1_INIT) : treuil porteur M1 ou M2 ayant
