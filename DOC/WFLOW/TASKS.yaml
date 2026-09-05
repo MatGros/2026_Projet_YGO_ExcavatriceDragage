@@ -251,14 +251,14 @@ tasks:
   bloque_par: []
 - id: T015
   parent_id: ''
-  statut: ⏸️
+  statut: ✅
   criticite: C2
   domaine: TERRAIN
   agent: HUM
-  date: '2026-08-27T08:42:15'
+  date: '2026-09-05T08:44:00+02:00'
   titre: Validation câblage réel EmergencyStopOk_DI et réarmement
   contexte: ''
-  description: AF_Partie-01, PRG_02_Acquisition
+  description: '✅ Validé sur site/banc : câblage réel EmergencyStopOk_DI, chaîne AU et réarmement opérationnels (AF_Partie-01, PRG_02_Acquisition).'
   contrat: ''
   objectifs: []
   bloque_par: []
@@ -373,16 +373,18 @@ tasks:
   bloque_par: []
 - id: T092
   parent_id: ''
-  statut: ⏸️
+  statut: ⏳
   criticite: C4
   domaine: SÉCURITÉ
   agent: HUM
   titre: Qualification terrain persistance bypass RETAIN et homing à 0 m
-  contexte: ''
-  description: MES-002
-  objectifs: []
+  contexte: 'À valider avec le calage et la persistance de la benne (lié à T253).'
+  description: 'MES-002 / T253 — Qualification terrain de la rémanence NVRAM / RETAIN et du comportement homing à 0 m avec benne raccordée.'
+  objectifs:
+  - Valider la persistance NVRAM après redémarrage automate
+  - Valider le comportement du référencement 0 m conjointement à la benne
   contrat: ''
-  date: '2026-08-28T21:02:53'
+  date: '2026-09-05T08:44:00+02:00'
   bloque_par: []
 - id: T093
   parent_id: ''
@@ -521,23 +523,16 @@ tasks:
   bloque_par: []
 - id: T125
   parent_id: ''
-  statut: ⏸️
+  statut: ✅
   criticite: C4
   domaine: SÉCURITÉ
   agent: HUM
-  titre: Revue conception modes dragage (DiveSearch / ExtractionSequenc...
-  contexte: 'Intitulé complet : Revue conception modes dragage (DiveSearch / ExtractionSequence / DumpAtTremie) — standard
-    projet + fonctionnel après essais | Session 2026-08-18 : logique DumpAtTremie inline dans PRG_04 (violation « 1 FB = 1
-    responsabilité ») ; verrou translation à la trémie absent ; latch « une fois descendu → translation interdite » (P1/Maintenance)
-    absent ; DiveSearch/ExtractionSequence à revoir (standard + fonctionnel). Traitement en 2e temps.'
-  description: '✅ **Revue de conception livrée + corrigée après revue indépendante** (`DOC/WFLOW/AUDITS/REVUE_T125_MODES_DRAGAGE_v0.2.md`)
-    : 3 constats confirmés (DumpAtTremie inline PRG_04 L170-172/337/796-798, verrou translation absent→recoupe T108, latch
-    descente→translation absent = besoin neuf). 5 corrections intégrées (périmètre élargi, reformulation PRG pas FB, DescentLocked
-    ≠ base latch translation, ST_Modes* à préciser, 2 commits isolés). ⏳ **Implémentation en attente** (code safety-adjacent,
-    validation humaine).'
+  titre: Revue conception modes dragage (DiveSearch / ExtractionSequence) — [LEGACY / OBSOLÈTE]
+  contexte: 'Architecture legacy abandonnée : on ne fait plus les sous-GRAFCET DiveSearch / ExtractionSequence séparés. Les séquences sont intégrées dans le GRAFCET unifié FB_CycleSemiAuto / PRG_03.'
+  description: '✅ **Classé OBSOLÈTE / Nettoyé** : Les sous-blocs séparés DiveSearch/ExtractionSequence ne sont plus développés indépendamment. La logique est consolidée dans FB_CycleSemiAuto et le reliquat de nettoyage est suivi dans la dette technique globale.'
   objectifs: []
   contrat: ''
-  date: '2026-08-29T21:18:00'
+  date: '2026-09-05T08:44:00+02:00'
   bloque_par: []
 - id: T127
   parent_id: ''
