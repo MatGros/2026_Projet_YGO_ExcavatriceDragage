@@ -1,5 +1,9 @@
 Error compiling source files:
 
+FB_CycleSemiAuto.st:370:10: error: CASE selector must be an integer, bit, or enum type, got ANY_ELEMENTARY
+ 370 |     CASE LIMIT(0, CfgForceStepTarget, 20) OF
+     |          ^
+
 FB_Main_EndToEnd.st:361:18: error: Cannot assign E_AUTOCYCLESTEP to E_CYCLESTEP
  361 | CycleStep     := prg03.CycleStep;
      |                  ^

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T17:40:19.013054" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T17:40:19.013054">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T09:56:18.773342" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T09:56:18.773342">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1529,7 +1529,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 15 : Absence mouvement (latched)
     TonNoMovement(
-        IN := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
+        IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
               AND (ABS(MeasuredSpeedSignedMps) &lt; MovementSpeedThresholdMps)),
         PT := NoMovementTimeout
     );

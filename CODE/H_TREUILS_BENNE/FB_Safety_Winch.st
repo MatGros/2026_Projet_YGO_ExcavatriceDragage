@@ -408,7 +408,7 @@ IF NOT BypassGlobal THEN
 
     // Cause 15 : Absence mouvement (latched)
     TonNoMovement(
-        IN := NOT BypassProcess AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
+        IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
               AND (ABS(MeasuredSpeedSignedMps) < MovementSpeedThresholdMps)),
         PT := NoMovementTimeout
     );
