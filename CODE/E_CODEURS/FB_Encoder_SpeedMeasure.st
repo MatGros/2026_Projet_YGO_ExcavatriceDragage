@@ -1,10 +1,10 @@
 (* =======================================================================
-   ⚙️ FB_Encoder_SpeedMeasure — Mesure de vitesse câble horodatée
+   ⚙️ FB_Encoder_SpeedMeasure — Mesure de vitesse câble directe codeur
    ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Calcul de la vitesse câble double mesure (Brute instantanée + Filtrée)
-   ⚙️ Différenciation : ΔPosition / dt réel issu de FB_CycleTime
-   🌊 Lissage : Filtre PT1 (FB_Filter) pour la sortie standard lissée
-   🛡️ Sans bornage : zéro clamping artificiel
+   🎯 Rôle : Conversion directe du mot de vitesse natif codeur EtherCAT (m/s)
+   ⚙️ Source CoE : Objet 0x6031:01 en 0.1 RPM (dixième de tour/min)
+   📐 Formule : V(m/s) = (SpdValue * 0.1 * CableM_PerRev) / 60.0
+   🛡️ Sans bornage : zéro clamping artificiel, suppression délai filtre PT1
    📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md
    ======================================================================= *)
 
@@ -12,80 +12,43 @@ FUNCTION_BLOCK PUBLIC FB_Encoder_SpeedMeasure
 VAR_INPUT
     // === COMMANDES & AUTORISATIONS ===
     Enable              : BOOL;        // --> [CMD] Autorisation generale FB (TRUE=Autorise)
-    Reset               : BOOL;        // --> [CMD] Purge immediate de l'historique (front montant)
+    Reset               : BOOL;        // --> [CMD] Purge immediate (front montant)
 
-    // === MESURE SURES EN ENTREE ===
-    Position_M          : REAL;        // --> [HW]  Position cable sure en metres (FB_Encoder_Safety)
+    // === MESURES EN ENTREE ===
+    SpdValueIn          : DINT;        // --> [HW]  Mot de vitesse brut EtherCAT (0x6031:01 en 0.1 RPM)
     PositionValid       : BOOL;        // --> [SAFE] Validite de la chaine codeur
-    FilterTimeConst     : TIME := T#100MS; // --> [CFG] Constante de temps du filtre PT1
+    CableM_PerRev       : REAL := 2.0; // --> [CFG] Developpement cable par tour tambour (m/tour)
 END_VAR
 VAR_OUTPUT
-    // === VITESSE PRINCIPALE (FILTRÉE) ===
-    Speed_Mps           : REAL;        // <-- [DIAG] Vitesse absolue filtree PT1 (m/s)
-    SignedSpeed_Mps     : REAL;        // <-- [DIAG] Vitesse signee filtree PT1 (+ montee, - descente) (m/s)
-    Valid               : BOOL;        // <-- [STAT] Validite mesure (TRUE si codeur operationnel et premier cycle passe)
-
-    // === VITESSE BRUTE INSTANTANÉE (SCAN-PAR-SCAN, SANS FILTRE, NON BORNÉE) ===
-    RawSpeed_Mps        : REAL;        // <-- [DIAG] Vitesse absolue instantanee brute (m/s)
-    RawSignedSpeed_Mps  : REAL;        // <-- [DIAG] Vitesse signee instantanee brute (m/s)
+    // === VITESSE CÂBLE QUALIFIÉE (m/s) ===
+    Speed_Mps           : REAL;        // <-- [DIAG] Vitesse absolue directe (m/s)
+    SignedSpeed_Mps     : REAL;        // <-- [DIAG] Vitesse signee directe (+ montee, - descente) (m/s)
+    Valid               : BOOL;        // <-- [STAT] Validite mesure (TRUE si codeur operationnel et autorise)
 END_VAR
 VAR
-    // === SOUS-INSTANCES ===
-    instCycleTime       : FB_CycleTime; // * [INST] Mesure du dt reel par scan (tache 20ms)
-    instFilter          : FB_Filter;    // * [INST] Filtre PT1 pour la mesure lissée
-
     // === MEMOIRES & DETECTEURS ===
-    PrevPosition_M      : REAL;         // . [LOC] Position du scan precedent
-    FirstScanDone       : BOOL;         // . [LOC] Drapeau d'initialisation premier cycle
-    ResetEdge           : R_TRIG;       // . [LOC] Detecteur front montant Reset
+    ResetEdge           : R_TRIG;      // . [LOC] Detecteur front montant Reset
 END_VAR
 
-{region "§1 Gestion du temps & Gate de neutralisation"}
+{region "§1 Gate de neutralisation & Reset"}
 ResetEdge(CLK := Reset);
-instCycleTime(DefaultValueS := 0.020); // Tache PRG_02_Acquisition = 20ms
 
-// Purge immediate sur perte de confiance ou Reset
+// Purge immediate sur perte de confiance, desactivation ou Reset
 IF NOT Enable OR ResetEdge.Q OR NOT PositionValid THEN
-    Speed_Mps          := 0.0;
-    SignedSpeed_Mps    := 0.0;
-    RawSpeed_Mps       := 0.0;
-    RawSignedSpeed_Mps := 0.0;
-    Valid              := FALSE;
-    FirstScanDone      := FALSE;
-    PrevPosition_M     := Position_M;
+    Speed_Mps       := 0.0;
+    SignedSpeed_Mps := 0.0;
+    Valid           := FALSE;
     RETURN;
 END_IF;
 {endregion}
 
-{region "§2 Initialisation premier scan"}
-IF NOT FirstScanDone THEN
-    PrevPosition_M := Position_M;
-    FirstScanDone  := TRUE;
-    Valid          := FALSE;
-    Speed_Mps          := 0.0;
-    SignedSpeed_Mps    := 0.0;
-    RawSpeed_Mps       := 0.0;
-    RawSignedSpeed_Mps := 0.0;
-    RETURN;
-END_IF;
-{endregion}
-
-{region "§3 Calcul vitesse brute instantanee"}
-IF instCycleTime.CycleTimeS > 0.0 THEN
-    RawSignedSpeed_Mps := (Position_M - PrevPosition_M) / instCycleTime.CycleTimeS;
-    RawSpeed_Mps       := ABS(RawSignedSpeed_Mps);
-    Valid              := TRUE;
-END_IF;
-PrevPosition_M := Position_M;
-{endregion}
-
-{region "§4 Filtrage PT1 pour sortie lissée"}
-instFilter(
-    ValueIn    := RawSignedSpeed_Mps,
-    TimeConst  := FilterTimeConst,
-    CycleTimeS := instCycleTime.CycleTimeS
-);
-
-SignedSpeed_Mps := instFilter.ValueOut;
+{region "§2 Conversion directe vitesse CoE (0.1 RPM -> m/s)"}
+// Formule cinematique directe :
+// N_RPM = SpdValueIn * 0.1
+// V_mps = (N_RPM * CableM_PerRev) / 60.0 = (DINT_TO_REAL(SpdValueIn) * 0.1 * CableM_PerRev) / 60.0
+SignedSpeed_Mps := (DINT_TO_REAL(SpdValueIn) * 0.1 * CableM_PerRev) / 60.0;
 Speed_Mps       := ABS(SignedSpeed_Mps);
+Valid           := TRUE;
 {endregion}
+
+END_FUNCTION_BLOCK

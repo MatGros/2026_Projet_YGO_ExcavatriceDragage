@@ -191,6 +191,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD1 (M1)</xhtml>
               </documentation>
             </variable>
+            <variable name="COD1_SpdValue">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute vitesse codeur COD1 (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
             <variable name="COD1_Alarms">
               <type>
                 <UINT />
@@ -221,6 +229,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD2 (M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_SpdValue">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute vitesse codeur COD2 (0x6031:01 en 0.1 RPM)</xhtml>
               </documentation>
             </variable>
             <variable name="COD2_Alarms">
@@ -1955,7 +1971,7 @@ Position cable (m, signee, + enroule)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MESURES DE VITESSE CABLE ===
-Vitesse absolue sur fenetre glissante / filtree (m/s)</xhtml>
+Vitesse absolue câble (m/s)</xhtml>
               </documentation>
             </variable>
             <variable name="SignedSpeed_Mps">
@@ -1963,23 +1979,7 @@ Vitesse absolue sur fenetre glissante / filtree (m/s)</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee (m/s, + montee, - descente)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse absolue brute instantanee (m/s)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="RawSignedSpeed_Mps">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee brute instantanee (m/s)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse signee câble (m/s, + montee, - descente)</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedValid">

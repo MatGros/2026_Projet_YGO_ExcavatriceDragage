@@ -48,6 +48,7 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
     RawPosOut   : UDINT;   (* <-- [DIAG] Position brute simulée *)
+    RawSpdOut   : DINT;    (* <-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM) *)
 END_VAR
 VAR_IN_OUT
     RawPos      : UDINT;   (* <-> [BUS] Référence _SimEncoderRawPosM1/M2 (survit au reset froid) *)
@@ -145,4 +146,17 @@ END_IF;
 
 {region "§4 Sortie"}
 RawPosOut := RawPos;
+// Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
+// SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
+IF (MovingDir <> 0) AND (CableM_PerRev > 0.0) THEN
+    IF MovingDir = 1 THEN
+        RawSpdOut := REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
+    ELSE
+        RawSpdOut := -REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
+    END_IF;
+ELSE
+    RawSpdOut := 0;
+END_IF;
 {endregion}
+
+END_FUNCTION_BLOCK

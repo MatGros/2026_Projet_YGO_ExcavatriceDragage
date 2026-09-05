@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-30T20:43:53.749884" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-30T20:43:53.749884">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T07:09:23.820891" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T07:09:23.820891">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -33,6 +33,14 @@
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ENTRÉES BUS ETHERCAT (faits d'entrée, lecture seule) ===
 --&gt; [HW] Position brute codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpdValueIn">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Vitesse brute codeur (0x6031:01 en 0.1 RPM)</xhtml>
               </documentation>
             </variable>
             <variable name="AlarmsIn">

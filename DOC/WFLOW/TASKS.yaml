@@ -258,7 +258,8 @@ tasks:
   date: '2026-09-05T08:44:00+02:00'
   titre: Validation câblage réel EmergencyStopOk_DI et réarmement
   contexte: ''
-  description: '✅ Validé sur site/banc : câblage réel EmergencyStopOk_DI, chaîne AU et réarmement opérationnels (AF_Partie-01, PRG_02_Acquisition).'
+  description: '✅ Validé sur site/banc : câblage réel EmergencyStopOk_DI, chaîne AU et réarmement opérationnels (AF_Partie-01,
+    PRG_02_Acquisition).'
   contrat: ''
   objectifs: []
   bloque_par: []
@@ -378,8 +379,9 @@ tasks:
   domaine: SÉCURITÉ
   agent: HUM
   titre: Qualification terrain persistance bypass RETAIN et homing à 0 m
-  contexte: 'À valider avec le calage et la persistance de la benne (lié à T253).'
-  description: 'MES-002 / T253 — Qualification terrain de la rémanence NVRAM / RETAIN et du comportement homing à 0 m avec benne raccordée.'
+  contexte: À valider avec le calage et la persistance de la benne (lié à T253).
+  description: MES-002 / T253 — Qualification terrain de la rémanence NVRAM / RETAIN et du comportement homing à 0 m avec
+    benne raccordée.
   objectifs:
   - Valider la persistance NVRAM après redémarrage automate
   - Valider le comportement du référencement 0 m conjointement à la benne
@@ -528,8 +530,11 @@ tasks:
   domaine: SÉCURITÉ
   agent: HUM
   titre: Revue conception modes dragage (DiveSearch / ExtractionSequence) — [LEGACY / OBSOLÈTE]
-  contexte: 'Architecture legacy abandonnée : on ne fait plus les sous-GRAFCET DiveSearch / ExtractionSequence séparés. Les séquences sont intégrées dans le GRAFCET unifié FB_CycleSemiAuto / PRG_03.'
-  description: '✅ **Classé OBSOLÈTE / Nettoyé** : Les sous-blocs séparés DiveSearch/ExtractionSequence ne sont plus développés indépendamment. La logique est consolidée dans FB_CycleSemiAuto et le reliquat de nettoyage est suivi dans la dette technique globale.'
+  contexte: 'Architecture legacy abandonnée : on ne fait plus les sous-GRAFCET DiveSearch / ExtractionSequence séparés. Les
+    séquences sont intégrées dans le GRAFCET unifié FB_CycleSemiAuto / PRG_03.'
+  description: '✅ **Classé OBSOLÈTE / Nettoyé** : Les sous-blocs séparés DiveSearch/ExtractionSequence ne sont plus développés
+    indépendamment. La logique est consolidée dans FB_CycleSemiAuto et le reliquat de nettoyage est suivi dans la dette technique
+    globale.'
   objectifs: []
   contrat: ''
   date: '2026-09-05T08:44:00+02:00'
@@ -922,8 +927,11 @@ tasks:
   agent: HUM
   date: '2026-09-05T08:45:00+02:00'
   titre: 'Référencement / homing des codeurs : arbitrage vitesse/position sans homing — [TRAITÉ / VALIDÉ]'
-  contexte: 'Intitulé complet : Référencement / homing des codeurs : arbitrage vitesse/position sans homing (bridage hors homing, débridage capteur TOP haut, interlock grille/trémie)'
-  description: '✅ **Traitée & Validée** : Le GRAFCET de homing séquentiel HX0..HX6 a été refondu et validé (jalon `GRAFCET_HOMING_HX0-HX6_T146`), le bridage automatique Palier 1 hors homing est implémenté dans PRG_04 §5ter, le calcul dynamique M2 est corrigé, et la persistance codeur/benne est reprise dans T253.'
+  contexte: 'Intitulé complet : Référencement / homing des codeurs : arbitrage vitesse/position sans homing (bridage hors
+    homing, débridage capteur TOP haut, interlock grille/trémie)'
+  description: '✅ **Traitée & Validée** : Le GRAFCET de homing séquentiel HX0..HX6 a été refondu et validé (jalon `GRAFCET_HOMING_HX0-HX6_T146`),
+    le bridage automatique Palier 1 hors homing est implémenté dans PRG_04 §5ter, le calcul dynamique M2 est corrigé, et la
+    persistance codeur/benne est reprise dans T253.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T146.yaml
   objectifs:
   - 'Clos : interlock hauteur M3 exige Homed=TRUE strict (HomedAndReliable M1∧M2).'
@@ -1411,11 +1419,15 @@ tasks:
   agent: HUM
   date: '2026-09-05T08:46:00+02:00'
   titre: Permis d'armement joystick (ArmingPermit) — [Asymétrie Q2 traitée, reste gestion fine permis armement]
-  contexte: 'Asymétrie homme-mort treuils/translation (Q2) déjà arbitrée et mergée dans l''architecture 7 POU. Reste à finaliser la gestion fine et le câblage dynamique de ArmingPermit pour l''armement du joystick.'
-  description: '⏳ **Partiellement mergé & Requalifié** : L''alignement des arbitrages de mouvement contre DeadmanArmed dans PRG_04/PRG_05 est en place. Le point ouvert restant concerne la condition dynamique de `ArmingPermit` dans PRG_02_Acquisition (actuellement forcé/simplifié) pour éviter les armements hors conditions sûres.'
+  contexte: Asymétrie homme-mort treuils/translation (Q2) déjà arbitrée et mergée dans l'architecture 7 POU. Reste à finaliser
+    la gestion fine et le câblage dynamique de ArmingPermit pour l'armement du joystick.
+  description: '⏳ **Partiellement mergé & Requalifié** : L''alignement des arbitrages de mouvement contre DeadmanArmed dans
+    PRG_04/PRG_05 est en place. Le point ouvert restant concerne la condition dynamique de `ArmingPermit` dans PRG_02_Acquisition
+    (actuellement forcé/simplifié) pour éviter les armements hors conditions sûres.'
   objectifs:
   - 'Clos : Arbitrage et symétrie homme-mort sur l''ensemble des actionneurs (PRG_04/PRG_05).'
-  - 'Restant : Définir et raccorder le calcul dynamique de ArmingPermit (position neutre, absence de défaut bloquant, mode valide).'
+  - 'Restant : Définir et raccorder le calcul dynamique de ArmingPermit (position neutre, absence de défaut bloquant, mode
+    valide).'
   contrat: ''
   bloque_par: []
 - id: T158
@@ -1443,35 +1455,6 @@ tasks:
     une incohérence seule ne doit pas bloquer SEMI_AUTO/déclencher SafeStop'
   - 'Si câblage requis : contrat de tâche C4 rédigé avant implémentation (task_contract.yaml)'
   - Vérifier l'absence d'impact sur TC-P06-* et sur les tests non-régression existants avant tout changement
-  bloque_par: []
-- id: T159
-  parent_id: ''
-  statut: ⏸️
-  criticite: C2
-  domaine: DIAGNOSTIC
-  agent: —
-  date: '2026-08-26T00:00:00'
-  titre: Bug ErrorId DeviceEncoderM2 dans FB_Diag_Ethercat.st (bit4+5 au lieu de bit6)
-  contexte: Trouvé en revue indépendante (sous-agent expert automatisme) durant la mise en conformité AF_Partie-12_Fonction_Diagnostic_v1.3.md
-    §7. CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st positionne DeviceEncoderM2.ErrorId sur 16#0030 (bits 4+5, masque effacement
-    16#FFCF) au lieu de 16#0040 (bit6 seul, masque 16#FFBF) documenté/attendu.
-  description: 'N''affecte PAS les décisions safety (Error/Online/Operational, seuls champs consommés par FB_Safety_Winch,
-    restent corrects). Impact limité à la lecture directe du champ DeviceEncoderM2.ErrorId par un technicien/IHM/troubleshooting,
-    qui verrait un motif indiscernable d''un double défaut variateur+M1. La synthèse ErrorId globale par nibble (0x00F0/0x0F00/0xF000)
-    n''est pas affectée (basée sur le booléen Error, pas la valeur brute du bit). Correction proposée : bit6 = 16#0040, masque
-    effacement 16#FFBF. Couverture CI actuelle (test_fb_diag_ethercat.st) insuffisante pour détecter ce type de bug (aucune
-    assertion bit-level, voir AF12 TBD §9). Guard = TC-P12-020 (assertions bit-level ErrorId par device, catalogue AF12 §2)
-    — le cas M2 de ce TC générique sert de garde-fou permanent, PAS un TC dédié ''anti-régression M2'' distinct (challengé
-    par l''humain 2026-08-26 : un TC doit être un comportement stable et général, pas un test ponctuel calé sur un bug précis
-    ; le bug lui-même reste une tâche correctrice, ici).'
-  contrat: ''
-  objectifs:
-  - 'Décision humaine : corriger le bit dans FB_Diag_Ethercat.st (16#0030→16#0040, masque 16#FFCF→16#FFBF)'
-  - 'Écrire TC-P12-020 (test_fb_diag_ethercat.st) AVANT la correction : le cas M2 doit être rouge (16#0040 attendu, 16#0030
-    obtenu), preuve du bug'
-  - Corriger le code dans un commit séparé, TC-P12-020 doit passer au vert (M2 + les autres devices déjà couverts par le même
-    TC)
-  - Vérifier l'absence d'autre consommateur du bit brut DeviceEncoderM2.ErrorId avant correction (IHM, troubleshooting)
   bloque_par: []
 - id: T160
   parent_id: ''
@@ -1550,28 +1533,6 @@ tasks:
   - Mettre à jour la doc AF-06 §5 et la tâche T108
   - Aucun changement de valeur ni de comportement logique — G200 PASS + gates palier C PASS
   - Device.export déjà régénéré par l'humain (export CODESYS manuel), cohérent avec le câblage réel
-  bloque_par: []
-- id: T164
-  parent_id: ''
-  statut: ⏸️
-  criticite: C3
-  domaine: STANDARDS
-  agent: CC
-  titre: Robustesse d'interface — campagne post-refactor joystick
-  contexte: 'Intitulé complet : Généraliser au reste du projet les standards d''interface éprouvés sur FB_Joystick (2026-08-27)
-    et corriger la classe de bugs révélée (gate NOT Enable incomplet, causes de défaut fusionnées). Parent de 6 sous-tâches
-    séquencées 1∥2 → 3 → 4 → 5 → 6. Règle d''ordre : sécurité d''abord (T164-1/T164-2), figer la fondation (T164-3), construire
-    dessus (T164-4/T164-5), cosmétique en dernier (T164-6). Jamais migrer du code vers un contrat pas finalisé.'
-  description: 'Standards #1/#2/#4/#5 déjà livrés (commit 8b49f98a : NC-110, patterns Cfg/en-têtes/projections, gate G120).
-    E0 hotfix FB_Encoder + guard G127 livrés (commit 0b0a2785). Reste #3 (socle ST_Fault universel) comme clé de voûte, puis
-    mise en conformité encodeur, puis migration des 17 FB legacy ST_Status. Partage de travail possible : voir champ objectifs
-    de chaque sous-tâche (colonne agent = acteur pressenti).'
-  objectifs:
-  - Clôturer T164-1 à T164-6 dans l'ordre de séquence ; vérifier enfants ouverts avant clôture parent
-  - Chaque sous-tâche ≥ C2 a son contrat DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T164-x_*.yaml (check_task_contract PASS)
-  - Aucune migration de code vers un contrat non finalisé (T164-4/T164-5 bloqués par T164-3)
-  contrat: ''
-  date: '2026-08-28T10:20:27'
   bloque_par: []
 - id: T164-1
   parent_id: T164
@@ -4447,7 +4408,7 @@ tasks:
     sens n''est pas autorisé. Modèle : FB_Winch.st:163 (EffectiveSafeStop := SafeStop OR (Direction>0 AND NOT AscentPermit)
     OR (Direction<0 AND NOT DescendPermit)). Point d''insertion à déterminer (FB_TranslationCmdArbitrationM3 ou FB_Translation).
     Bits IHM déjà projetés (GVL_IHM.TranslationM3.Safety).'
-  contrat: ''
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T204.yaml
   objectifs:
   - Les permits directionnels M3 (TremiePermit/MaintenancePermit) bloquent réellement le mouvement vers un sens non autorisé
     (gate de commande), à l'unisson des treuils M1/M2
@@ -4457,7 +4418,6 @@ tasks:
     son comportement
   - Bits IHM directionnels M3 déjà projetés (GVL_IHM.TranslationM3.Safety) reflètent le blocage réel
   - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS + tests CI étendus'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T204.yaml
   bloque_par:
   - T184
 - id: T205
@@ -4553,16 +4513,17 @@ tasks:
   description: 'Design corrigé validé par 2 challenges experts (automatisme/sécurité + qualité/homing) : NE PAS réconcilier
     IsOpen/IsClosed depuis DeltaPosition_M (raisonnement circulaire = masque une vraie désynchro). Détecter la contradiction
     état<->position -> StateIncoherent, sortie dédiée BucketStateCoherent := NOT StateIncoherent, gate sur la COMMANDE (StartStop,
-    PAS SafeStop), geler plutôt que forcer ActiveOffsetM, re-qualification opérateur. Points bloquants doc à traiter AVANT code :
-    mapping ErrorId AF_Partie-10 FAUX, CoherenceLimitM 3 valeurs (viser 1.0, visa V2), boot RETAIN périmé (F08).'
+    PAS SafeStop), geler plutôt que forcer ActiveOffsetM, re-qualification opérateur. Points bloquants doc à traiter AVANT
+    code : mapping ErrorId AF_Partie-10 FAUX, CoherenceLimitM 3 valeurs (viser 1.0, visa V2), boot RETAIN périmé (F08).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T208.yaml
   objectifs:
-  - "Détecter la contradiction état benne <-> position physique -> StateIncoherent (ne JAMAIS réécrire IsOpen/IsClosed depuis DeltaPosition_M)"
-  - "Sortie dédiée BucketStateCoherent := NOT StateIncoherent, gate sur StartStop (PAS SafeStop), MecaE reste armé"
-  - "Gate sur HomedM1 AND HomedM2 + traiter le cas hors fenêtres + boot RETAIN périmé (F08)"
-  - "Gater M2_LimitShift et FB_Cycle X3/X6 sur BucketStateCoherent (risque mécanique butée haute M2 + cycle)"
-  - "Message IHM StateIncoherent + action re-confirmation → corriger AF_Partie-10 (mapping ErrorId, CoherenceLimitM) + AF_Partie-14"
-  - "Viser CoherenceLimitM=1.0 unique (visa V2) ; ne pas casser synchro/cycle benne/M2PositionCorrected"
+  - Détecter la contradiction état benne <-> position physique -> StateIncoherent (ne JAMAIS réécrire IsOpen/IsClosed depuis
+    DeltaPosition_M)
+  - Sortie dédiée BucketStateCoherent := NOT StateIncoherent, gate sur StartStop (PAS SafeStop), MecaE reste armé
+  - Gate sur HomedM1 AND HomedM2 + traiter le cas hors fenêtres + boot RETAIN périmé (F08)
+  - Gater M2_LimitShift et FB_Cycle X3/X6 sur BucketStateCoherent (risque mécanique butée haute M2 + cycle)
+  - Message IHM StateIncoherent + action re-confirmation → corriger AF_Partie-10 (mapping ErrorId, CoherenceLimitM) + AF_Partie-14
+  - Viser CoherenceLimitM=1.0 unique (visa V2) ; ne pas casser synchro/cycle benne/M2PositionCorrected
   - 'Auto-vérification : contrat PASS + bundle frais + G200 liaison PASS + gates palier C PASS'
   bloque_par: []
 - id: T209
@@ -4648,7 +4609,6 @@ tasks:
   - Vérifier la détection de fond Kobold (immersion + timeout) et le bridage Palier <= 4
   - Documenter les résultats dans une fiche de test terrain
   bloque_par: []
-
 - id: T212
   parent_id: ''
   statut: ⬜
@@ -4657,16 +4617,15 @@ tasks:
   agent: ''
   date: '2026-09-01T00:00:00+02:00'
   titre: Sécurité Kobold hors cycle — interlock anti-surchauffe (temps cumulé + repos)
-  contexte: 'Demande utilisateur (2026-09-01) : il ne faut pas pouvoir piloter le contacteur de commande
-    Kobold trop longtemps hors cycle — risque de détérioration matérielle / surchauffe du moteur Kobold.
-    Le Kobold doit être utilisé de façon épisodique et raisonnée. Imposer un repos entre chaque pilotage
-    et/ou un temps cumulé maximal pour éviter la surchauffe. Similaire à un interlock.'
-  description: 'Concevoir et implémenter une sécurité anti-surchauffe pour le pilotage du contacteur
-    Kobold HORS cycle (pilotage manuel/maintenance). Principe : interdire un pilotage prolongé du
-    contacteur Kobold, imposer un temps de repos entre deux pilotages, et/ou limiter le temps cumulé
-    d''activation sur une fenêtre glissante. À définir : seuils (durée max pilotage, temps de repos,
-    fenêtre cumulée), comportement (couper le contacteur + message IHM), et intégration dans le graphe
-    de commande Kobold. Ne pas dégrader le fonctionnement nominal en cycle (Dive/Extraction).'
+  contexte: 'Demande utilisateur (2026-09-01) : il ne faut pas pouvoir piloter le contacteur de commande Kobold trop longtemps
+    hors cycle — risque de détérioration matérielle / surchauffe du moteur Kobold. Le Kobold doit être utilisé de façon épisodique
+    et raisonnée. Imposer un repos entre chaque pilotage et/ou un temps cumulé maximal pour éviter la surchauffe. Similaire
+    à un interlock.'
+  description: 'Concevoir et implémenter une sécurité anti-surchauffe pour le pilotage du contacteur Kobold HORS cycle (pilotage
+    manuel/maintenance). Principe : interdire un pilotage prolongé du contacteur Kobold, imposer un temps de repos entre deux
+    pilotages, et/ou limiter le temps cumulé d''activation sur une fenêtre glissante. À définir : seuils (durée max pilotage,
+    temps de repos, fenêtre cumulée), comportement (couper le contacteur + message IHM), et intégration dans le graphe de
+    commande Kobold. Ne pas dégrader le fonctionnement nominal en cycle (Dive/Extraction).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T212.yaml
   objectifs:
   - Définir les seuils anti-surchauffe Kobold (durée max pilotage, temps de repos, fenêtre cumulée)
@@ -4675,7 +4634,6 @@ tasks:
   - Ne pas dégrader le fonctionnement nominal en cycle (Dive/Extraction)
   - Documenter dans l'AF (AF-04 / AF-10) et ajouter un garde-fou CI
   bloque_par: []
-
 - id: T213
   parent_id: ''
   statut: ⬜
@@ -4684,16 +4642,15 @@ tasks:
   agent: ''
   date: '2026-09-01T00:00:00+02:00'
   titre: Refactorer le troubleshooting — ajouter les variables de homing M2 (cible dynamique, offset benne)
-  contexte: 'Demande utilisateur (2026-09-01) : le snapshot troubleshooting ne contient pas les variables
-    détaillées du homing (MachineHomingMechanicalStopOk, BucketReferenceRequested, UseDynamicTarget,
-    DynamicHomingTargetM, M2Demand, etc.). Pour diagnostiquer le bug homing M2 benne fermée (M2 reste
-    à 8.5m au lieu de prendre la cible), il faut exposer ces variables dans GVL_Troubleshooting.'
-  description: 'Refactorer le troubleshooting pour exposer les variables de homing M2 dans
-    GVL_Troubleshooting (structure + câblage FB_TroubleshootingView) et la liste du script
-    troubleshooting_variables.txt. Variables à ajouter : MachineHomingMechanicalStopOk,
-    BucketReferenceRequested, UseDynamicTarget, DynamicHomingTargetM, M2Demand (HomeReq,
-    UseDynamicTarget, DynamicTarget_M), CfgTopHomingTarget_M, CfgOffsetClose_M, état FB_MachineHomingCycle.
-    Régénérer la liste (generate_variable_list_from_code.py) et valider avec l''humain avant compilation.'
+  contexte: 'Demande utilisateur (2026-09-01) : le snapshot troubleshooting ne contient pas les variables détaillées du homing
+    (MachineHomingMechanicalStopOk, BucketReferenceRequested, UseDynamicTarget, DynamicHomingTargetM, M2Demand, etc.). Pour
+    diagnostiquer le bug homing M2 benne fermée (M2 reste à 8.5m au lieu de prendre la cible), il faut exposer ces variables
+    dans GVL_Troubleshooting.'
+  description: 'Refactorer le troubleshooting pour exposer les variables de homing M2 dans GVL_Troubleshooting (structure
+    + câblage FB_TroubleshootingView) et la liste du script troubleshooting_variables.txt. Variables à ajouter : MachineHomingMechanicalStopOk,
+    BucketReferenceRequested, UseDynamicTarget, DynamicHomingTargetM, M2Demand (HomeReq, UseDynamicTarget, DynamicTarget_M),
+    CfgTopHomingTarget_M, CfgOffsetClose_M, état FB_MachineHomingCycle. Régénérer la liste (generate_variable_list_from_code.py)
+    et valider avec l''humain avant compilation.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T213.yaml
   objectifs:
   - Exposer les variables de homing M2 dans GVL_Troubleshooting (structure + câblage)
@@ -4709,26 +4666,22 @@ tasks:
   agent: DSH-02
   date: '2026-09-01T00:00:00'
   completed_at: '2026-09-01T00:00:00'
-  titre: 'Stimuli de simulation des boutons IHM M3 (testabilité pilotage IHM)'
-  contexte: 'Intitulé complet : Ajouter des stimuli de simulation des boutons IHM M3
-    (SimBtnTremie/SimBtnMaintenance) pour tester le pilotage IHM en simulation quand
-    JoyMaster est inactif.'
-  description: 'Diagnostic 2026-09-01 : l''arbitrage M3 (FB_TranslationCmdArbitrationM3)
-    utilise une sélection de source EXCLUSIVE pilotée par TglJoystickMaster. Quand
-    JoyMaster est inactif, l''arbitrage utilise les boutons IHM (IHM.BtnTremie/BtnMaintenance),
-    qui ne sont PAS simulés → impossible de tester le pilotage par boutons IHM en
-    simulation. Objectif : ajouter des stimuli de simulation (SimBtnTremie/SimBtnMaintenance
-    dans GVL_Simulation), câblés vers GVL_IHM.TranslationM3.Cmd.BtnTremie/BtnMaintenance
-    en mode simulation, actifs uniquement quand JoyMaster est inactif (éviter conflit
-    avec le joystick). Vérifier que GVL_IHM.TranslationM3.Cmd.BtnTremie n''est pas écrasé
-    par l''IHM réelle.'
+  titre: Stimuli de simulation des boutons IHM M3 (testabilité pilotage IHM)
+  contexte: 'Intitulé complet : Ajouter des stimuli de simulation des boutons IHM M3 (SimBtnTremie/SimBtnMaintenance) pour
+    tester le pilotage IHM en simulation quand JoyMaster est inactif.'
+  description: 'Diagnostic 2026-09-01 : l''arbitrage M3 (FB_TranslationCmdArbitrationM3) utilise une sélection de source EXCLUSIVE
+    pilotée par TglJoystickMaster. Quand JoyMaster est inactif, l''arbitrage utilise les boutons IHM (IHM.BtnTremie/BtnMaintenance),
+    qui ne sont PAS simulés → impossible de tester le pilotage par boutons IHM en simulation. Objectif : ajouter des stimuli
+    de simulation (SimBtnTremie/SimBtnMaintenance dans GVL_Simulation), câblés vers GVL_IHM.TranslationM3.Cmd.BtnTremie/BtnMaintenance
+    en mode simulation, actifs uniquement quand JoyMaster est inactif (éviter conflit avec le joystick). Vérifier que GVL_IHM.TranslationM3.Cmd.BtnTremie
+    n''est pas écrasé par l''IHM réelle.'
   contrat: ''
   objectifs:
-  - 'Ajouter SimBtnTremie/SimBtnMaintenance dans GVL_Simulation (stimuli de simulation)'
-  - 'Câbler les stimuli vers GVL_IHM.TranslationM3.Cmd.BtnTremie/BtnMaintenance en mode
-    simulation (actifs uniquement quand JoyMaster inactif)'
-  - 'Vérifier que GVL_IHM.TranslationM3.Cmd.BtnTremie n''est pas écrasé par l''IHM réelle'
-  - 'Permettre de tester le pilotage par boutons IHM M3 en simulation (JoyMaster inactif)'
+  - Ajouter SimBtnTremie/SimBtnMaintenance dans GVL_Simulation (stimuli de simulation)
+  - Câbler les stimuli vers GVL_IHM.TranslationM3.Cmd.BtnTremie/BtnMaintenance en mode simulation (actifs uniquement quand
+    JoyMaster inactif)
+  - Vérifier que GVL_IHM.TranslationM3.Cmd.BtnTremie n'est pas écrasé par l'IHM réelle
+  - Permettre de tester le pilotage par boutons IHM M3 en simulation (JoyMaster inactif)
   - 'Auto-vérification : bundle frais + G200 liaison PASS + gates palier C PASS'
   bloque_par: []
 - id: T215
@@ -4739,16 +4692,21 @@ tasks:
   agent: DSH (orchestrateur)
   date: '2026-09-01T00:00:00+02:00'
   completed_at: '2026-09-01T03:20:00+02:00'
-  titre: 'Refactor GVL_IHM.DredgingAssist en 3 sous-structures (CycleDiveSearch/CycleExtraction/CycleDumpAtTremie)'
-  contexte: 'Découper le bloc IHM mélangé GVL_IHM.DredgingAssist (Dive + Extraction + DumpAtTremie + Bypass) en 3 sous-structures homogènes Cmd/State/Cfg. Configs + toggles persistés (GVL_PERSISTENT). Refactor par étapes avec points de comparaison (baseline + diff de sortie nul). Option B validée par l''utilisateur.'
-  description: '✅ **Refactor terminé (2026-09-01)** : 12 types créés + ST_CycleAssistToggles, GVL_IHM déclare 3 membres, 4 structures source supprimées, persistance (4 persistants + 4 bridges), consommateurs PRG_03/04/07 recâblés (pur renommage), FB_TroubleshootingView interface 1→3 entrées, outillage (G330 + registry) mis à jour. G200 PASS (0 erreur), bundle frais, gates = baseline (5 échecs pré-existants, aucune nouvelle régression). Commit 9ba2fe63. Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T215_REFACTOR_GVL_IHM_DREDGING.yaml.'
+  titre: Refactor GVL_IHM.DredgingAssist en 3 sous-structures (CycleDiveSearch/CycleExtraction/CycleDumpAtTremie)
+  contexte: Découper le bloc IHM mélangé GVL_IHM.DredgingAssist (Dive + Extraction + DumpAtTremie + Bypass) en 3 sous-structures
+    homogènes Cmd/State/Cfg. Configs + toggles persistés (GVL_PERSISTENT). Refactor par étapes avec points de comparaison
+    (baseline + diff de sortie nul). Option B validée par l'utilisateur.
+  description: '✅ **Refactor terminé (2026-09-01)** : 12 types créés + ST_CycleAssistToggles, GVL_IHM déclare 3 membres, 4
+    structures source supprimées, persistance (4 persistants + 4 bridges), consommateurs PRG_03/04/07 recâblés (pur renommage),
+    FB_TroubleshootingView interface 1→3 entrées, outillage (G330 + registry) mis à jour. G200 PASS (0 erreur), bundle frais,
+    gates = baseline (5 échecs pré-existants, aucune nouvelle régression). Commit 9ba2fe63. Contrat : DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T215_REFACTOR_GVL_IHM_DREDGING.yaml.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T215_REFACTOR_GVL_IHM_DREDGING.yaml
   objectifs:
-  - 'Découper GVL_IHM.DredgingAssist en CycleDiveSearch/CycleExtraction/CycleDumpAtTremie (Cmd/State/Cfg)'
-  - 'Configs + toggles persistés (GVL_PERSISTENT), pas de perte du mode mémorisé au boot'
-  - 'Adapter interface FB_TroubleshootingView (1 struct → 3 entrées) + projection'
+  - Découper GVL_IHM.DredgingAssist en CycleDiveSearch/CycleExtraction/CycleDumpAtTremie (Cmd/State/Cfg)
+  - Configs + toggles persistés (GVL_PERSISTENT), pas de perte du mode mémorisé au boot
+  - Adapter interface FB_TroubleshootingView (1 struct → 3 entrées) + projection
   - 'Zéro changement de logique : diff de sortie nul à chaque étape'
-  - 'Mettre à jour l''outillage (G330, registry, snapshots) — tous les gates verts'
+  - Mettre à jour l'outillage (G330, registry, snapshots) — tous les gates verts
   bloque_par: []
 - id: T217
   parent_id: ''
@@ -4757,13 +4715,17 @@ tasks:
   domaine: SORTIES PRG_06 / STANDARDS
   agent: DSH-02
   date: '2026-09-01T00:00:00'
-  titre: "Mise en conformité PRG_06_Outputs §3bis — sorties variateur M3 ne doivent PAS être déclarées en VAR_OUTPUT homonyme d'un point matériel"
+  titre: Mise en conformité PRG_06_Outputs §3bis — sorties variateur M3 ne doivent PAS être déclarées en VAR_OUTPUT homonyme
+    d'un point matériel
   objectifs:
-  - "Bilan qualité complet PRG_06_Outputs (agent QC) : toutes violations §3bis (nom point matériel déclaré en VAR_OUTPUT/VAR local d'un PROGRAM, sauf PRG_02_Acquisition), M3_DriveControlWord / M3_DriveFreqCmdWord homonymes des globals mapping variateur M3"
-  - "Implémenter la correction conforme §3bis : PRG_06 écrit directement dans les globals mapping variateur M3 (M3_CommandWord / M3_SetpointFrequencyHz), sans déclaration locale homonyme; garder le nom non-collisionnant si besoin"
-  - "Zéro régression : sortie variateur M3 identique, mapping EtherCAT inchangé, G350 check_hw_name_collision PASS"
-  - "Revue large post-implémentation : ne rien oublier (chaîne AU, treuils M1/M2 même pattern, bus inter-PRG, tests)"
-  - "Auto-vérification : bundle frais + G200 liaison PASS + gates PASS + G350 PASS"
+  - 'Bilan qualité complet PRG_06_Outputs (agent QC) : toutes violations §3bis (nom point matériel déclaré en VAR_OUTPUT/VAR
+    local d''un PROGRAM, sauf PRG_02_Acquisition), M3_DriveControlWord / M3_DriveFreqCmdWord homonymes des globals mapping
+    variateur M3'
+  - 'Implémenter la correction conforme §3bis : PRG_06 écrit directement dans les globals mapping variateur M3 (M3_CommandWord
+    / M3_SetpointFrequencyHz), sans déclaration locale homonyme; garder le nom non-collisionnant si besoin'
+  - 'Zéro régression : sortie variateur M3 identique, mapping EtherCAT inchangé, G350 check_hw_name_collision PASS'
+  - 'Revue large post-implémentation : ne rien oublier (chaîne AU, treuils M1/M2 même pattern, bus inter-PRG, tests)'
+  - 'Auto-vérification : bundle frais + G200 liaison PASS + gates PASS + G350 PASS'
   bloque_par: []
 - id: T218
   parent_id: ''
@@ -4772,17 +4734,18 @@ tasks:
   domaine: MODES / SÉCURITÉ
   agent: ''
   date: '2026-09-01T00:00:00'
-  titre: "Résoudre le blocage de mode (déverrouiller la bascule quand le retour contacteur n'est pas câblé)"
-  contexte: >
-    L'opérateur est bloqué dans un mode quand le retour contacteur M1/M2_ContactorsReleased_DI
-    n'est pas câblé (=0) : ModeChangeAllowed reste 0, la bascule est refusée. Diagnostic IHM
-    fait (motif + 6 sous-conditions) mais cause non résolue. Décision de conception requise.
+  titre: Résoudre le blocage de mode (déverrouiller la bascule quand le retour contacteur n'est pas câblé)
+  contexte: 'L''opérateur est bloqué dans un mode quand le retour contacteur M1/M2_ContactorsReleased_DI n''est pas câblé
+    (=0) : ModeChangeAllowed reste 0, la bascule est refusée. Diagnostic IHM fait (motif + 6 sous-conditions) mais cause non
+    résolue. Décision de conception requise.
+
+    '
   objectifs:
-  - "Décision validée entre (A) retirer ModeChangeAllowed, (B) garder vitesse+frein seul, (C) câbler le retour contacteur"
-  - "Déverrouiller la bascule N1/N2/SEMI_AUTO sans jamais autoriser de mouvement sous AU"
-  - "Aucun redémarrage auto du cycle, interlocks physiques et permits M3 inchangés"
-  - "Diagnostic IHM conservé (ModeChangeBlockReason + 6 sous-conditions)"
-  - "Bundle frais + G200 PASS + gates PASS + CI FB_Modes PASS"
+  - Décision validée entre (A) retirer ModeChangeAllowed, (B) garder vitesse+frein seul, (C) câbler le retour contacteur
+  - Déverrouiller la bascule N1/N2/SEMI_AUTO sans jamais autoriser de mouvement sous AU
+  - Aucun redémarrage auto du cycle, interlocks physiques et permits M3 inchangés
+  - Diagnostic IHM conservé (ModeChangeBlockReason + 6 sous-conditions)
+  - Bundle frais + G200 PASS + gates PASS + CI FB_Modes PASS
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T218_BLOCAGE_MODE.yaml
   bloque_par: []
 - id: T219
@@ -4792,17 +4755,17 @@ tasks:
   domaine: IHM / DIAGNOSTIC
   agent: ''
   date: '2026-09-01T00:00:00'
-  titre: "Historique d'alarmes (buffer borné + horodatage), en complément du bandeau d'alarmes actives"
-  contexte: >
-    Le bandeau d'alarmes actives ne montre que l'état courant. Besoin d'un historique
-    (buffer FIFO borné, horodatage, acquittement) pour comprendre les incidents passés,
-    notamment la raison d'un blocage.
+  titre: Historique d'alarmes (buffer borné + horodatage), en complément du bandeau d'alarmes actives
+  contexte: 'Le bandeau d''alarmes actives ne montre que l''état courant. Besoin d''un historique (buffer FIFO borné, horodatage,
+    acquittement) pour comprendre les incidents passés, notamment la raison d''un blocage.
+
+    '
   objectifs:
-  - "Buffer borné (ex. 50) d'alarmes passées avec horodatage levée/retour/acquittement"
-  - "Coexiste sans écraser le bandeau d'alarmes actives"
-  - "Lecture par l'IHM (binding buffer)"
-  - "Note de design préalable : taille, source horodatage, interaction bandeau"
-  - "Bundle frais + G200 PASS + gates PASS"
+  - Buffer borné (ex. 50) d'alarmes passées avec horodatage levée/retour/acquittement
+  - Coexiste sans écraser le bandeau d'alarmes actives
+  - Lecture par l'IHM (binding buffer)
+  - 'Note de design préalable : taille, source horodatage, interaction bandeau'
+  - Bundle frais + G200 PASS + gates PASS
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T219_HISTORIQUE_ALARMES.yaml
   bloque_par: []
 - id: T220
@@ -4812,17 +4775,17 @@ tasks:
   domaine: IHM / BANDEAU
   agent: ''
   date: '2026-09-01T00:00:00'
-  titre: "Enrichir le bandeau IHM (maximum d'infos : défauts actifs, état AU, homing, blocage de mode)"
-  contexte: >
-    Donner à l'opérateur le maximum d'infos utiles au bandeau : défauts actifs (codeur,
-    synchro, benne, translation), état AU/urgence, état homing, motif du blocage de mode —
-    sans surcharger l'affichage.
+  titre: 'Enrichir le bandeau IHM (maximum d''infos : défauts actifs, état AU, homing, blocage de mode)'
+  contexte: 'Donner à l''opérateur le maximum d''infos utiles au bandeau : défauts actifs (codeur, synchro, benne, translation),
+    état AU/urgence, état homing, motif du blocage de mode — sans surcharger l''affichage.
+
+    '
   objectifs:
-  - "Afficher état AU/urgence (EmergencyChainClosed, PowerContactorEngaged, PowerCutOff)"
-  - "Afficher les défauts actifs (codeur, synchro, benne, translation) en texte court"
-  - "Conserver motif du blocage + 6 sous-conditions (déjà exposés)"
-  - "Chaque message rentre dans le champ (G406 PASS)"
-  - "Bundle frais + G200 PASS + gates PASS + compilation 0 avertissement"
+  - Afficher état AU/urgence (EmergencyChainClosed, PowerContactorEngaged, PowerCutOff)
+  - Afficher les défauts actifs (codeur, synchro, benne, translation) en texte court
+  - Conserver motif du blocage + 6 sous-conditions (déjà exposés)
+  - Chaque message rentre dans le champ (G406 PASS)
+  - Bundle frais + G200 PASS + gates PASS + compilation 0 avertissement
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T220_ENRICHIR_BANDEAU.yaml
   bloque_par: []
 - id: T222
@@ -4830,21 +4793,20 @@ tasks:
   statut: ⏳
   criticite: C4
   domaine: JOYSTICK / SÉCURITÉ MOUVEMENT
-  agent: 'CDX (exécution) — décisions A/C/D/B tranchées orchestrateur ; revues nommage + qualité obligatoires avant validation'
+  agent: CDX (exécution) — décisions A/C/D/B tranchées orchestrateur ; revues nommage + qualité obligatoires avant validation
   date: '2026-09-02T11:35:00+02:00'
   locked_at: '2026-09-02T12:05:00+02:00'
   titre: Désarmement joystick sur inversion inter-scan sans neutre observé
-  contexte: >
-    Retour terrain : à vitesse de manipulation élevée, les axes Hall peuvent
-    être lus directement dans le signe opposé au scan suivant sans qu'aucun
-    scan n'observe le centre. NeutralHoldTime ne détecte pas cette traversée.
-  description: >
-    Détecter toute transition qualifiée +1↔-1 de l'axe X ou Y entre deux scans
-    lorsque le geste est armé. Désarmer le geste dans le scan d'inversion,
-    forcer les deux commandes joystick à 0 %, interdire le réarmement tant que
-    X et Y n'ont pas été observés simultanément au neutre, puis exiger un nouveau
-    front homme-mort maintenu. ArmingPermit, SafeStop et PowerCutOff restent
-    hors de cette logique : le résultat est un arrêt normal par rampe.
+  contexte: 'Retour terrain : à vitesse de manipulation élevée, les axes Hall peuvent être lus directement dans le signe opposé
+    au scan suivant sans qu''aucun scan n''observe le centre. NeutralHoldTime ne détecte pas cette traversée.
+
+    '
+  description: 'Détecter toute transition qualifiée +1↔-1 de l''axe X ou Y entre deux scans lorsque le geste est armé. Désarmer
+    le geste dans le scan d''inversion, forcer les deux commandes joystick à 0 %, interdire le réarmement tant que X et Y
+    n''ont pas été observés simultanément au neutre, puis exiger un nouveau front homme-mort maintenu. ArmingPermit, SafeStop
+    et PowerCutOff restent hors de cette logique : le résultat est un arrêt normal par rampe.
+
+    '
   objectifs:
   - Détecter le saut +1↔-1 inter-scan sans échantillon neutre sur X ou Y
   - Désarmer DeadmanArmed et publier 0 % / StartStop FALSE / Direction 0 sur les deux axes au scan fautif
@@ -4863,15 +4825,15 @@ tasks:
   date: '2026-09-02T12:45:00+02:00'
   locked_at: '2026-09-02T12:45:00+02:00'
   titre: Liaison table paliers centrale vers configuration effective joystick
-  contexte: >
-    Diagnostic terrain : deflexion joystick Y a -96 % mais palier demande 1.
-    La table _WinchSpeedStepTable est pleine tandis que la table portee dans
-    _JoystickCfgPersist et recue par instJoystick est vide.
-  description: >
-    Deriver localement la configuration effective de l'instance joystick :
-    conserver les reglages joystick persistants et injecter uniquement la table
-    centrale persistante des paliers treuil. Aucun ecrivain supplementaire dans
-    GVL_PERSISTENT, aucune modification de FB_Joystick.
+  contexte: 'Diagnostic terrain : deflexion joystick Y a -96 % mais palier demande 1. La table _WinchSpeedStepTable est pleine
+    tandis que la table portee dans _JoystickCfgPersist et recue par instJoystick est vide.
+
+    '
+  description: 'Deriver localement la configuration effective de l''instance joystick : conserver les reglages joystick persistants
+    et injecter uniquement la table centrale persistante des paliers treuil. Aucun ecrivain supplementaire dans GVL_PERSISTENT,
+    aucune modification de FB_Joystick.
+
+    '
   objectifs:
   - InstJoystick recoit la table centrale des paliers
   - Aucun ecrasement cyclique de la persistance
@@ -4884,19 +4846,19 @@ tasks:
   statut: 🔎
   criticite: C4
   domaine: JOYSTICK / AUTORISATION MOUVEMENT
-  agent: 'Claude (exécution directe) — reprise=B · forme=X · scope AC2/AC3 = vues amont ; revues nommage + qualité en cours'
+  agent: Claude (exécution directe) — reprise=B · forme=X · scope AC2/AC3 = vues amont ; revues nommage + qualité en cours
   date: '2026-09-02T13:15:00+02:00'
   locked_at: '2026-09-02T16:20:00+02:00'
   titre: ArmingPermit cohérent avec disponibilité réelle des actionneurs
-  contexte: >
-    ArmingPermit peut actuellement rester TRUE alors qu'un interlock final,
-    un délai de reprise, un défaut mouvement ou un actionneur M3 indisponible
-    empêche le mouvement demandé. L'opérateur peut donc armer sans pouvoir agir.
-  description: >
-    Requalifier ArmingPermit comme permission d'armement cohérente avec
-    l'action sélectionnée, le sens demandé et la disponibilité aval réelle.
-    Séparer la possibilité d'armer, la disponibilité par axe/sens et le motif
-    de blocage, sans confondre pause normale, SafeStop et PowerCutOff.
+  contexte: 'ArmingPermit peut actuellement rester TRUE alors qu''un interlock final, un délai de reprise, un défaut mouvement
+    ou un actionneur M3 indisponible empêche le mouvement demandé. L''opérateur peut donc armer sans pouvoir agir.
+
+    '
+  description: 'Requalifier ArmingPermit comme permission d''armement cohérente avec l''action sélectionnée, le sens demandé
+    et la disponibilité aval réelle. Séparer la possibilité d''armer, la disponibilité par axe/sens et le motif de blocage,
+    sans confondre pause normale, SafeStop et PowerCutOff.
+
+    '
   objectifs:
   - Identifier toutes les conditions réelles de disponibilité M1, M2 et M3
   - Interdire l'armement trompeur lorsque l'action sélectionnée ne peut pas partir
@@ -4905,7 +4867,7 @@ tasks:
   - Publier axe, sens et raison pour l'IHM/troubleshooting
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T224_ARMINGPERMIT_ACTIONNEUR_PRET.yaml
   bloque_par:
-  - Arbitrage humain requis : politique au neutre et reprise consciente après pause
+  - Arbitrage humain requis: politique au neutre et reprise consciente après pause
 - id: T225
   parent_id: ''
   statut: ⬜
@@ -4914,22 +4876,19 @@ tasks:
   agent: ''
   date: '2026-09-02T13:45:00+02:00'
   titre: Concordance contacteurs M1/M2 graduee (SafeStop -> escalade PowerCutOff) en PRG_06
-  contexte: >
-    §2ter (PRG_06) met INSTANTANEMENT toutes les sorties treuil a FALSE des qu'un
-    ecart de vecteur M1/M2 est vu : aucune tolerance ms, pas de gradation, aucune
-    remontee decodee. FB_SyncContactor existe (debounce 500 ms -> SafeStop via
-    FB_WinchSync) mais sans escalade et tourne AVANT PRG_06 (ne voit pas les
-    vecteurs physiques finaux post §2ter/§2quater). Remontee actuelle par masque
-    hexa 16#0002 (interdit AF03 §4). Demande operateur 2026-09-02.
-  description: >
-    Etendre FB_SyncContactor avec une 2e sortie ContactorMismatchEscalated
-    (timeout nomme CST_SyncEscalationMs). Ajouter une instance dans PRG_06_Outputs
-    sur les vecteurs M1/M2 EFFECTIFS (post §2quater), en remplacement du §2ter
-    binaire : niveau 1 = SafeStop des 2 treuils, niveau 2 = PowerCutOff. Supprimer
-    tout masque hexa lie a ContactorMismatch (miroirs de causes nommes). Remonter
-    l'info decodee (niveau + contacteur fautif) vers GVL_Troubleshooting et le
-    bandeau IHM. Neutralisable par GVL_IHM.M1M2Sync.Bypass.Global (bypass groupe
-    synchro treuils existant, aucun nouveau bit).
+  contexte: '§2ter (PRG_06) met INSTANTANEMENT toutes les sorties treuil a FALSE des qu''un ecart de vecteur M1/M2 est vu
+    : aucune tolerance ms, pas de gradation, aucune remontee decodee. FB_SyncContactor existe (debounce 500 ms -> SafeStop
+    via FB_WinchSync) mais sans escalade et tourne AVANT PRG_06 (ne voit pas les vecteurs physiques finaux post §2ter/§2quater).
+    Remontee actuelle par masque hexa 16#0002 (interdit AF03 §4). Demande operateur 2026-09-02.
+
+    '
+  description: 'Etendre FB_SyncContactor avec une 2e sortie ContactorMismatchEscalated (timeout nomme CST_SyncEscalationMs).
+    Ajouter une instance dans PRG_06_Outputs sur les vecteurs M1/M2 EFFECTIFS (post §2quater), en remplacement du §2ter binaire
+    : niveau 1 = SafeStop des 2 treuils, niveau 2 = PowerCutOff. Supprimer tout masque hexa lie a ContactorMismatch (miroirs
+    de causes nommes). Remonter l''info decodee (niveau + contacteur fautif) vers GVL_Troubleshooting et le bandeau IHM. Neutralisable
+    par GVL_IHM.M1M2Sync.Bypass.Global (bypass groupe synchro treuils existant, aucun nouveau bit).
+
+    '
   objectifs:
   - FB_SyncContactor gagne l'escalade (2e sortie + seuil nomme), debounce 500 ms conserve
   - Instance PRG_06 sur les vecteurs physiques finaux, remplace le §2ter binaire
@@ -4939,42 +4898,40 @@ tasks:
   - Non-regression mode unitaire + bypass ; bundle + G200 + gates verts
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T225_SYNCCONTACTOR_ESCALADE_PRG06.yaml
   bloque_par:
-  - Arbitrage humain (design safety, lot MES-035) : chemin forcage SafeStop depuis PRG_06, cablage escalade -> PowerCutOff, forme du champ diagnostic
+  - Arbitrage humain (design safety, lot MES-035): chemin forcage SafeStop depuis PRG_06, cablage escalade -> PowerCutOff,
+      forme du champ diagnostic
 - id: T226
   parent_id: ''
   statut: ⬜
   criticite: C4
   domaine: MODES / REFERENCEMENT MACHINE / SEQUENCEUR SEMI_AUTO
-  agent: 'Claude (execution directe prevue) — phasage P0..P5, revues 3 agents + visa orchestrateur'
+  agent: Claude (execution directe prevue) — phasage P0..P5, revues 3 agents + visa orchestrateur
   date: '2026-09-02T17:30:00+02:00'
   titre: Refonte de la frontiere Referencement machine <-> SEMI_AUTO
-  contexte: >
-    Aujourd'hui SEMI_AUTO reste selectionnable sans machine referencee (le
-    re-homing est seulement publie a l'IHM et le cycle ne progresse pas), et
-    l'etape X1_HOMING de FB_Cycle realise elle-meme une recherche de capteur et
-    un referencement codeur. La frontiere entre le referencement machine (datum
-    M1/M2 + benne, du ressort de la maintenance) et le cycle de production est
-    floue. Idee operateur 2026-09-02 : durcir cette frontiere.
-  description: >
-    SEMI_AUTO devient homed-only : selection refusee et expulsion forcee vers
-    MAINT_N1 si NOT MachineHomed. Le referencement se fait par une sequence de
-    maintenance robuste et guidee au joystick : fermeture benne sans FDC dans une
-    fenetre bornee -> confirmation operateur = reference benne fermee -> montee
-    des deux treuils au joystick -> au front montant du capteur haut, reference
-    M1+M2 dans le meme scan et stop dur des treuils -> redemarrage possible en
-    descente seule sous le FDC logiciel haut. L'init SEMI_AUTO est reduite a une
-    mise en position haute + placement M3, sans referencement.
+  contexte: 'Aujourd''hui SEMI_AUTO reste selectionnable sans machine referencee (le re-homing est seulement publie a l''IHM
+    et le cycle ne progresse pas), et l''etape X1_HOMING de FB_Cycle realise elle-meme une recherche de capteur et un referencement
+    codeur. La frontiere entre le referencement machine (datum M1/M2 + benne, du ressort de la maintenance) et le cycle de
+    production est floue. Idee operateur 2026-09-02 : durcir cette frontiere.
+
+    '
+  description: 'SEMI_AUTO devient homed-only : selection refusee et expulsion forcee vers MAINT_N1 si NOT MachineHomed. Le
+    referencement se fait par une sequence de maintenance robuste et guidee au joystick : fermeture benne sans FDC dans une
+    fenetre bornee -> confirmation operateur = reference benne fermee -> montee des deux treuils au joystick -> au front montant
+    du capteur haut, reference M1+M2 dans le meme scan et stop dur des treuils -> redemarrage possible en descente seule sous
+    le FDC logiciel haut. L''init SEMI_AUTO est reduite a une mise en position haute + placement M3, sans referencement.
+
+    '
   objectifs:
   - Durcir la selection SEMI_AUTO sur MachineHomed et expulser vers MAINT_N1 en cas de perte
   - Sortir tout referencement codeur du cycle SEMI_AUTO
   - Sequence de referencement maintenance robuste, guidee, au joystick, avec textes par etape
   - Reference benne fermee sur confirmation operateur ; reference M1/M2 au front capteur haut, stop dur
-  - Init SEMI_AUTO simplifiee : position haute + M3, puis start boucle cycle
+  - Init SEMI_AUTO simplifiee: position haute + M3, puis start boucle cycle
   - Reprise consciente sur les 3 cas (arret capteur, perte datum, expulsion mode)
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T226_REFONTE_HOMING_SEMIAUTO.yaml
   bloque_par:
   - Phase P0 (etude & cadrage, aucun code) a valider par l'humain avant P1
-  - Sous-tache T227 (differee) : MAJ AF-04/05/09 + tests CI AC1..AC10
+  - Sous-tache T227 (differee): MAJ AF-04/05/09 + tests CI AC1..AC10
 - id: T173-C
   parent_id: T173
   statut: ✅
@@ -4983,23 +4940,23 @@ tasks:
   agent: Antigravity
   date: '2026-09-02T18:07:00+02:00'
   titre: Tests unitaires ST & non-régression réarmement AU (AF01 v1.4)
-  contexte: >
-    Validation par la preuve du réarmement AU sous cinématique et temporisations réelles
-    (500ms pré-armement, 1s test voies A/B, 500ms/1s rétablissement, 1s pulse, 2s confirmation,
-    garde 5s anti-chatter, 3 bypass MES orthogonaux).
-  description: >
-    Harnais de 12 tests unitaires ST FB_Safety_EmergencyManagement (12/12 PASS).
-    Élimination totale des sorties silencieuses et validation de la table de messages IHM.
+  contexte: 'Validation par la preuve du réarmement AU sous cinématique et temporisations réelles (500ms pré-armement, 1s
+    test voies A/B, 500ms/1s rétablissement, 1s pulse, 2s confirmation, garde 5s anti-chatter, 3 bypass MES orthogonaux).
+
+    '
+  description: 'Harnais de 12 tests unitaires ST FB_Safety_EmergencyManagement (12/12 PASS). Élimination totale des sorties
+    silencieuses et validation de la table de messages IHM.
+
+    '
   objectifs:
-  - Nominal : armement réussi en 1 essai (séquence complète 0->6->0, WasArmed=TRUE, Done=TRUE)
-  - Échec contacteur : PowerContactorEngaged reste FALSE après le pulse -> timeout 2s -> message explicite
-  - Coupure volontaire : BtnEmergencyCutOff pendant la séquence -> arrêt immédiat sans alarme
-  - 1er boot : preuve des préconditions au repos hors tension (Armable=TRUE)
-  - Table de vérité : 12 cas d'essais réels sans sortie silencieuse
-  - Non-régression : Bundle frais, liaison G200 0 erreur
+  - Nominal: armement réussi en 1 essai (séquence complète 0->6->0, WasArmed=TRUE, Done=TRUE)
+  - Échec contacteur: PowerContactorEngaged reste FALSE après le pulse -> timeout 2s -> message explicite
+  - Coupure volontaire: BtnEmergencyCutOff pendant la séquence -> arrêt immédiat sans alarme
+  - 1er boot: preuve des préconditions au repos hors tension (Armable=TRUE)
+  - Table de vérité: 12 cas d'essais réels sans sortie silencieuse
+  - Non-régression: Bundle frais, liaison G200 0 erreur
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T173-C_TESTS.yaml
   bloque_par: []
-
 - id: T229
   parent_id: ''
   statut: ⬜
@@ -5008,22 +4965,19 @@ tasks:
   agent: ''
   date: '2026-09-02T19:45:00+02:00'
   titre: FB_Cycle - une config treuil unique par etape (split X11, sequenceur au propre avant MES)
-  contexte: >
-    Le sequenceur SEMI_AUTO (FB_Cycle) et le homing machine ne sont PAS encore en
-    service. L'etape X11_OPEN_DUMP melange descente couplee M1+M2 et ouverture
-    benne differentielle dans le meme scan -> FB_WinchSync entierement coupe
-    (via instBucket.Lifecycle.Busy) -> perte de la surveillance d'ecart grossier
-    pendant une descente couplee reelle. Occasion de mettre le sequenceur au
-    propre avant mise en service.
-  description: >
-    Decouper X11 en sous-etapes a configuration treuil UNIQUE : arrivee tremie
-    (arret), ouverture benne (M2 pilote seul), repositionnement couple optionnel
-    (montee/descente synchro validee operateur), retour ouverture. Generaliser le
-    principe "1 config treuil par etape" a tout le cycle. FB_SyncDeviation reste
-    actif pendant les descentes reellement couplees ; seul FB_SyncContactor est
-    neutralise pendant l'ouverture/fermeture benne differentielle.
-    Scope FB_Cycle + E_CycleStep + PRG_03 uniquement — PRG_04/05/FB_Modes non
-    touches (ils restent consommateurs de WinchMxCmd / Auth).
+  contexte: 'Le sequenceur SEMI_AUTO (FB_Cycle) et le homing machine ne sont PAS encore en service. L''etape X11_OPEN_DUMP
+    melange descente couplee M1+M2 et ouverture benne differentielle dans le meme scan -> FB_WinchSync entierement coupe (via
+    instBucket.Lifecycle.Busy) -> perte de la surveillance d''ecart grossier pendant une descente couplee reelle. Occasion
+    de mettre le sequenceur au propre avant mise en service.
+
+    '
+  description: 'Decouper X11 en sous-etapes a configuration treuil UNIQUE : arrivee tremie (arret), ouverture benne (M2 pilote
+    seul), repositionnement couple optionnel (montee/descente synchro validee operateur), retour ouverture. Generaliser le
+    principe "1 config treuil par etape" a tout le cycle. FB_SyncDeviation reste actif pendant les descentes reellement couplees
+    ; seul FB_SyncContactor est neutralise pendant l''ouverture/fermeture benne differentielle. Scope FB_Cycle + E_CycleStep
+    + PRG_03 uniquement — PRG_04/05/FB_Modes non touches (ils restent consommateurs de WinchMxCmd / Auth).
+
+    '
   objectifs:
   - Split X11 en sous-etapes a config treuil unique
   - Table etape -> config treuil (M1 seul / M2 seul / couple) explicite pour X0..X13
@@ -5034,7 +4988,6 @@ tasks:
   bloque_par:
   - STUB rapide cree pendant MES - a completer (sous-etapes detaillees, chronogrammes, arbitrage bit IHM)
   - Lien a clarifier avec T226 (refonte homing <-> SEMI_AUTO)
-
 - id: T230
   parent_id: ''
   statut: ⬜
@@ -5043,19 +4996,18 @@ tasks:
   agent: ''
   date: '2026-09-03T00:00:00+02:00'
   titre: Protection thermique moteur / contacteur Kobold (temps maxi + repos impose + bypass)
-  contexte: >
-    Le moteur du capteur de fond Kobold chauffe et risque de griller. Le contacteur
-    est active dans le cycle a l'approche de l'eau et coupe peu apres detection du
-    fond, mais rien ne borne aujourd'hui la duree d'activation ni n'impose de repos.
-  description: >
-    Ajouter une garde thermique au point unique de commande du contacteur Kobold
-    (apres arbitrage cycle + assistant plongee) : temps maxi d'activation borne
-    (~60 s cfg IHM) -> coupure + defaut latche + arret du cycle avec defaut si en
-    plongee (X4) ; temps de repos impose (~15 s) apres une activation cumulee
-    (~30 s) avant reactivation ; tempos configurables IHM ; bypass dedie comme les
-    autres equipements (politique sous bypass a trancher - Q2). Conserve la coupure
-    immediate au front de detection de fond (AF-04 3bis H1) et l'interdiction
-    Palier 5 sous l'eau.
+  contexte: 'Le moteur du capteur de fond Kobold chauffe et risque de griller. Le contacteur est active dans le cycle a l''approche
+    de l''eau et coupe peu apres detection du fond, mais rien ne borne aujourd''hui la duree d''activation ni n''impose de
+    repos.
+
+    '
+  description: 'Ajouter une garde thermique au point unique de commande du contacteur Kobold (apres arbitrage cycle + assistant
+    plongee) : temps maxi d''activation borne (~60 s cfg IHM) -> coupure + defaut latche + arret du cycle avec defaut si en
+    plongee (X4) ; temps de repos impose (~15 s) apres une activation cumulee (~30 s) avant reactivation ; tempos configurables
+    IHM ; bypass dedie comme les autres equipements (politique sous bypass a trancher - Q2). Conserve la coupure immediate
+    au front de detection de fond (AF-04 3bis H1) et l''interdiction Palier 5 sous l''eau.
+
+    '
   objectifs:
   - Borne de duree d'activation contacteur Kobold (MaxOnTime) avec coupure + defaut
   - Defaut thermique en plongee -> STABILIZING, pas de redemarrage auto
@@ -5067,7 +5019,6 @@ tasks:
   bloque_par:
   - STUB rapide cree pendant MES - a completer (valeurs tempo, placement Q1, politique bypass Q2, remontee IHM Q4)
   - Lien avec T229 (FB_Cycle X4) et AF-04 3bis H1
-
 - id: T231
   parent_id: ''
   statut: ⬜
@@ -5076,15 +5027,18 @@ tasks:
   agent: ''
   date: '2026-09-03T01:25:00+02:00'
   titre: Assainissement compilation des harnais STruCpp et types résiduels (WINCH_INTEG, FB_Bucket, FB_TroubleshootingView)
-  contexte: >
-    La suite de tests automatiques CI (run_tests.py) relève 3 blocs/harnais non compilés
-    ou en échec de types STruCpp lors de la conversion C++ : WINCH_INTEG, FB_Bucket et FB_TroubleshootingView.
-    Le code de production CODE/ reste la source de vérité et ne doit pas être dégradé.
-  description: >
-    Tracer et appliquer les solutions d'alignement pour compiler les blocs résiduels :
-    1. FB_TroubleshootingView : GVL_Troubleshooting et GVL_IHM globaux à intégrer/mocker proprement dans le harnais sans dépendance circulaire.
-    2. FB_Bucket & FB_Winch : aligner les fichiers de tests test_fb_bucket.st et test_fb_winch.st sur les noms exacts d'interfaces ST (M2_RunRequest, ReqAscent/ReqDescend, RunRequest/StepTgt).
-    3. WINCH_INTEG : finaliser l'alignement des structures d'intégration multi-FB avec les types inter-PRG qualifiés.
+  contexte: 'La suite de tests automatiques CI (run_tests.py) relève 3 blocs/harnais non compilés ou en échec de types STruCpp
+    lors de la conversion C++ : WINCH_INTEG, FB_Bucket et FB_TroubleshootingView. Le code de production CODE/ reste la source
+    de vérité et ne doit pas être dégradé.
+
+    '
+  description: 'Tracer et appliquer les solutions d''alignement pour compiler les blocs résiduels : 1. FB_TroubleshootingView
+    : GVL_Troubleshooting et GVL_IHM globaux à intégrer/mocker proprement dans le harnais sans dépendance circulaire. 2. FB_Bucket
+    & FB_Winch : aligner les fichiers de tests test_fb_bucket.st et test_fb_winch.st sur les noms exacts d''interfaces ST
+    (M2_RunRequest, ReqAscent/ReqDescend, RunRequest/StepTgt). 3. WINCH_INTEG : finaliser l''alignement des structures d''intégration
+    multi-FB avec les types inter-PRG qualifiés.
+
+    '
   objectifs:
   - Intégrer les variables globales GVL_Troubleshooting / GVL_IHM dans l'environnement de compilation STruCpp pour FB_TroubleshootingView
   - Valider la compilation et l'exécution de FB_Bucket sous test_fb_bucket.st
@@ -5092,7 +5046,6 @@ tasks:
   - Maintenir 100% de conformité de index.html et des rapports CI
   contrat: ''
   bloque_par: []
-
 - id: T232
   parent_id: ''
   statut: ⏳
@@ -5101,26 +5054,22 @@ tasks:
   agent: AGY-01
   date: '2026-09-03T08:00:00+02:00'
   titre: Granularisation des tests unitaires et fiches AF pour Translation et Simulation (I_TRANSLATION & L_SIMULATION)
-  contexte: >
-    Actuellement, I_TRANSLATION et L_SIMULATION ne disposent que d'un test monolithique
-    (FB_Translation et FB_SimBench), masquant la visibilité unitaire des sous-briques.
-    L'objectif est d'aligner ces deux domaines sur le modèle granulaire de H_TREUILS_BENNE
-    en créant les fiches AF manquantes et les tests unitaires ciblés (2-3 TC clés par FB)
-    sans modifier une seule ligne du code de production CODE/.
-  description: >
-    1. Créer la fiche AF manquante DOC/AF/AF_Partie-11_Fonction_Translation/FB_Translation_PositionEstimator_v1.0.md.
-    2. Créer les tests unitaires ST dans RESULTS/I_TRANSLATION/tests/ :
-       - test_fb_safety_translation.st (TC-P11-SAF-001..003 : Enable, défauts Meca A/rotation/survitesse)
-       - test_fb_translation_positiondecoder.st (TC-P11-DEC-001..003 : décodage mots cames, cohérence)
-       - test_fb_translationoutputinterlock.st (TC-P11-INT-001..003 : permis directionnels, interlock sens)
-       - test_fb_translation_positionestimator.st (TC-P11-EST-001..003 : recalage et interpolation)
-    3. Créer les tests unitaires ST dans RESULTS/L_SIMULATION/tests/ :
-       - test_fb_sim_encoder.st (TC-P13-ENC-001..002 : dynamique vitesse et position simulée)
-       - test_fb_sim_joystick.st (TC-P13-JOY-001..002 : consigne simulée et filtrage)
-       - test_fb_sim_safety.st (TC-P13-SAF-001..002 : boucle AU et retours contacteurs)
-       - test_fb_sim_translation.st (TC-P13-TR-001..002 : modèle chariot M3)
-    4. Déclarer ces 8 nouveaux blocs dans TOOLS/TEST_AUTO_CI/registry.yaml.
-    5. Exécuter la suite complète pour intégration dans index.html.
+  contexte: 'Actuellement, I_TRANSLATION et L_SIMULATION ne disposent que d''un test monolithique (FB_Translation et FB_SimBench),
+    masquant la visibilité unitaire des sous-briques. L''objectif est d''aligner ces deux domaines sur le modèle granulaire
+    de H_TREUILS_BENNE en créant les fiches AF manquantes et les tests unitaires ciblés (2-3 TC clés par FB) sans modifier
+    une seule ligne du code de production CODE/.
+
+    '
+  description: "1. Créer la fiche AF manquante DOC/AF/AF_Partie-11_Fonction_Translation/FB_Translation_PositionEstimator_v1.0.md.\
+    \ 2. Créer les tests unitaires ST dans RESULTS/I_TRANSLATION/tests/ :\n   - test_fb_safety_translation.st (TC-P11-SAF-001..003\
+    \ : Enable, défauts Meca A/rotation/survitesse)\n   - test_fb_translation_positiondecoder.st (TC-P11-DEC-001..003 : décodage\
+    \ mots cames, cohérence)\n   - test_fb_translationoutputinterlock.st (TC-P11-INT-001..003 : permis directionnels, interlock\
+    \ sens)\n   - test_fb_translation_positionestimator.st (TC-P11-EST-001..003 : recalage et interpolation)\n3. Créer les\
+    \ tests unitaires ST dans RESULTS/L_SIMULATION/tests/ :\n   - test_fb_sim_encoder.st (TC-P13-ENC-001..002 : dynamique\
+    \ vitesse et position simulée)\n   - test_fb_sim_joystick.st (TC-P13-JOY-001..002 : consigne simulée et filtrage)\n  \
+    \ - test_fb_sim_safety.st (TC-P13-SAF-001..002 : boucle AU et retours contacteurs)\n   - test_fb_sim_translation.st (TC-P13-TR-001..002\
+    \ : modèle chariot M3)\n4. Déclarer ces 8 nouveaux blocs dans TOOLS/TEST_AUTO_CI/registry.yaml. 5. Exécuter la suite complète\
+    \ pour intégration dans index.html.\n"
   objectifs:
   - Rédaction des fiches AF manquantes
   - Écriture des 8 harnais de test unitaire STruCpp dédiés (2 à 3 TC ciblés par bloc)
@@ -5129,7 +5078,6 @@ tasks:
   - Zéro modification de CODE/
   contrat: ''
   bloque_par: []
-
 - id: T233
   parent_id: T226
   statut: ⏳
@@ -5138,16 +5086,16 @@ tasks:
   agent: CC-01
   date: '2026-09-03T09:30:00+02:00'
   titre: Implementation du GRAFCET de homing machine (FB_MachineHomingCycle HX0..HX6)
-  contexte: >
-    Realise la spec figee DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md
-    (partie 1). Transforme FB_MachineHomingCycle d'un guide passif en un cycle de
-    homing machine sequentiel qui coordonne montee capteur, reference axes M1/M2
-    au vol sur front descendant, mise en position benne fermee et commit atomique.
-    Concretise T226 D5/AC5/AC8/AC9.
-  description: >
-    P1 : types + interface FB (Cfg +timeouts, nouveaux VAR_INPUT/VAR_OUTPUT, squelette CASE).
-    P2 : corps GRAFCET complet (CASE HX0..HXF, sous-machine 3 appuis, SeenNeutral, guide S6) + rebuild tests StruCpp.
-    P3 : cablage PRG_02/PRG_03 (Cfg, WinchM1/M2Cmd -> PRG_04, M3Locked) + bundle + G200 + gates palier C + reviews.
+  contexte: 'Realise la spec figee DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md (partie 1). Transforme FB_MachineHomingCycle
+    d''un guide passif en un cycle de homing machine sequentiel qui coordonne montee capteur, reference axes M1/M2 au vol
+    sur front descendant, mise en position benne fermee et commit atomique. Concretise T226 D5/AC5/AC8/AC9.
+
+    '
+  description: 'P1 : types + interface FB (Cfg +timeouts, nouveaux VAR_INPUT/VAR_OUTPUT, squelette CASE). P2 : corps GRAFCET
+    complet (CASE HX0..HXF, sous-machine 3 appuis, SeenNeutral, guide S6) + rebuild tests StruCpp. P3 : cablage PRG_02/PRG_03
+    (Cfg, WinchM1/M2Cmd -> PRG_04, M3Locked) + bundle + G200 + gates palier C + reviews.
+
+    '
   objectifs:
   - GRAFCET HX0 (initiale pure) .. HX6 + HXF conforme a la spec gelee
   - Reference conjointe M1+M2 au vol sur F_TRIG(TopPositionActive)
@@ -5157,7 +5105,6 @@ tasks:
   - Suite test_fb_machinehomingcycle reconstruite sur le modele GRAFCET
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T233_IMPL_GRAFCET_HOMING_MACHINE.yaml
   bloque_par: []
-
 - id: T234
   parent_id: ''
   statut: ⏳
@@ -5166,20 +5113,22 @@ tasks:
   agent: CC-01
   date: '2026-09-03T08:10:00+02:00'
   titre: Mise a jour documentaire de la refonte du cycle SEMI_AUTO (ex-T232, renumerote)
-  contexte: >
-    Regroupe la dette documentaire des lots cycle codes pendant la MES 2026-09
-    (T229 + B1/B2/E, T226-AC1/AC2). Renumerote de T232 vers T234 suite a une
-    collision d'ID avec la tache AGY-01.
-  description: >
-    Aligner AF_Partie-04 / AF_Partie-05, les catalogues de tests, IHM_VARIABLES_MIGRATION.md
-    et VERSION_HISTORY.md sur le code du sequenceur SEMI_AUTO refondu. Scope DOC uniquement.
+  contexte: 'Regroupe la dette documentaire des lots cycle codes pendant la MES 2026-09 (T229 + B1/B2/E, T226-AC1/AC2). Renumerote
+    de T232 vers T234 suite a une collision d''ID avec la tache AGY-01.
+
+    '
+  description: 'Aligner AF_Partie-04 / AF_Partie-05, les catalogues de tests, IHM_VARIABLES_MIGRATION.md et VERSION_HISTORY.md
+    sur le code du sequenceur SEMI_AUTO refondu. Scope DOC uniquement.
+
+    '
   objectifs:
   - AF_Partie-04 decrit X1 sans referencement, split X11a/b/c, translation depart P1
   - AF_Partie-05 documente SEMI_AUTO homed-only + perte de datum
   - Catalogues TC et IHM_VARIABLES_MIGRATION.md a jour
   - Jalon VERSION_HISTORY.md
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T234_MAJ_DOC_REFONTE_CYCLE.yaml
-  bloque_par: [T233]
+  bloque_par:
+  - T233
 - id: T235
   parent_id: ''
   statut: ⬜
@@ -5188,21 +5137,19 @@ tasks:
   agent: ''
   date: '2026-09-03T09:00:00+02:00'
   titre: Refonte transaction de vérification preset homing (suppression latence 500 ms)
-  contexte: >
-    Demande utilisateur (2026-09-03) : retirer la temporisation de référencement
-    CST_PresetVerifyTime (500 ms) dans FB_Encoder_Homing.st. Analyse : ce n'est
-    PAS un simple retrait de constante — c'est la latence de sécurité
-    transactionnelle qui laisse le codeur appliquer physiquement le preset avant
-    la relecture de vérification (ReadbackOk). La retirer sans refonte risque de
-    valider Calib.Homed sur une position non encore appliquée (référence
-    erronée). Zone liée au bug homing M2 « benne fermée » (M2 reste à 8.5 m,
-    cf. T213).
-  description: >
-    Remplacer la latence fixe 500 ms (CST_PresetVerifyTime + TON PresetVerifyTimer)
-    par une logique de vérification déterministe (déclencheur événementiel :
-    retour PDO / état codeur), en conservant la garantie de non-validation d'un
-    preset non appliqué (ReadbackOk dans CST_HomingVerifyToleranceM avant
-    Calib.Homed := TRUE). Criticité C4 : fiabilité du référencement codeur.
+  contexte: 'Demande utilisateur (2026-09-03) : retirer la temporisation de référencement CST_PresetVerifyTime (500 ms) dans
+    FB_Encoder_Homing.st. Analyse : ce n''est PAS un simple retrait de constante — c''est la latence de sécurité transactionnelle
+    qui laisse le codeur appliquer physiquement le preset avant la relecture de vérification (ReadbackOk). La retirer sans
+    refonte risque de valider Calib.Homed sur une position non encore appliquée (référence erronée). Zone liée au bug homing
+    M2 « benne fermée » (M2 reste à 8.5 m, cf. T213).
+
+    '
+  description: 'Remplacer la latence fixe 500 ms (CST_PresetVerifyTime + TON PresetVerifyTimer) par une logique de vérification
+    déterministe (déclencheur événementiel : retour PDO / état codeur), en conservant la garantie de non-validation d''un
+    preset non appliqué (ReadbackOk dans CST_HomingVerifyToleranceM avant Calib.Homed := TRUE). Criticité C4 : fiabilité du
+    référencement codeur.
+
+    '
   objectifs:
   - Supprimer CST_PresetVerifyTime et PresetVerifyTimer de FB_Encoder_Homing.st
   - Déclencher la vérification preset par un événement déterministe, pas un timeout
@@ -5211,7 +5158,6 @@ tasks:
   - Documenter la nouvelle logique dans AF_Partie-09 v2.4
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T235_REFONTE_TRANSACTION_PRESET.yaml
   bloque_par: []
-
 - id: T237
   parent_id: ''
   statut: ⏳
@@ -5220,22 +5166,18 @@ tasks:
   agent: CC-01
   date: '2026-09-03T12:00:00+02:00'
   titre: FB_CycleSemiAuto - gel GRAFCET SEMI_AUTO + renommage FB_Cycle
-  contexte: >
-    Demande utilisateur (urgent, avant MES) : meme demarche que le homing machine
-    (T233) - figer le GRAFCET du sequenceur SEMI_AUTO sur papier (tableaux step /
-    actions / transitions), le faire valider, puis renommer FB_Cycle en
-    FB_CycleSemiAuto partout et appliquer les changements valides. Reprend le
-    perimetre contenu de T229 (split X11 deja livre en campagne).
-  description: >
-    P1 : GEL_GRAFCET_SEMIAUTO_20260903.md - etape initiale pure + steps X0..X13 +
-    STABILIZING + transitions + transverses, format tableaux comme le homing.
-    Validation humaine.
-    P2 : renommage FB_Cycle -> FB_CycleSemiAuto (fichier, POU, instance
-    instCycleSemiAuto, references FB_Modes / BannerFormatter / PRG_03/05/07,
-    registry, test_fb_cyclesemiauto.st, bundle XML).
-    P3 : ajout etape initiale pure a E_CycleStep + consommateurs + TC.
-    Scope : FB_Cycle + E_CycleStep + PRG_03 + types 3_CYCLE_ET_MODES + renommage
-    dans FB_Modes/PRG_05/PRG_07. PRG_04 / FB_MachineHomingCycle NON touches.
+  contexte: 'Demande utilisateur (urgent, avant MES) : meme demarche que le homing machine (T233) - figer le GRAFCET du sequenceur
+    SEMI_AUTO sur papier (tableaux step / actions / transitions), le faire valider, puis renommer FB_Cycle en FB_CycleSemiAuto
+    partout et appliquer les changements valides. Reprend le perimetre contenu de T229 (split X11 deja livre en campagne).
+
+    '
+  description: 'P1 : GEL_GRAFCET_SEMIAUTO_20260903.md - etape initiale pure + steps X0..X13 + STABILIZING + transitions +
+    transverses, format tableaux comme le homing. Validation humaine. P2 : renommage FB_Cycle -> FB_CycleSemiAuto (fichier,
+    POU, instance instCycleSemiAuto, references FB_Modes / BannerFormatter / PRG_03/05/07, registry, test_fb_cyclesemiauto.st,
+    bundle XML). P3 : ajout etape initiale pure a E_CycleStep + consommateurs + TC. Scope : FB_Cycle + E_CycleStep + PRG_03
+    + types 3_CYCLE_ET_MODES + renommage dans FB_Modes/PRG_05/PRG_07. PRG_04 / FB_MachineHomingCycle NON touches.
+
+    '
   objectifs:
   - GEL GRAFCET SEMI_AUTO valide (etape initiale pure, tableaux step/action/transition)
   - Renommage FB_Cycle -> FB_CycleSemiAuto complet et coherent (nom fichier = nom POU)
@@ -5252,72 +5194,56 @@ tasks:
   agent: ''
   date: '2026-09-03T17:00:00+02:00'
   titre: Retrait du sous-systeme assistants DiveSearch / ExtractionAssist / DumpAtTremie
-  contexte: >
-    Demande utilisateur (2026-09-03). Depuis T237, le diving (AX4..AX8 +
-    AX_DIVING_RETRY) et l'extraction (AX9..AX12) sont des steps de plein droit du
-    GRAFCET SEMI_AUTO (FB_CycleSemiAuto). Les FB assistants FB_DiveSearch /
-    FB_ExtractionAssist et le vidage tremie legacy (dump-at-tremie) deviennent
-    obsoletes. L'operateur retire les 3 slots cote IHM/SCADA ; cette tache retire
-    le sous-systeme cote PLC. Perimetre estime : ~175 references / 22 fichiers.
-  description: >
-    Auditer d'abord les consommateurs residuels (MAINT_N1/N2 : le dragage assiste
-    hors SEMI_AUTO utilise-t-il encore ces FB ?). Si confirme obsolete :
-    retirer les instances instDiveSearch / instExtractionAssist (PRG_03) et le
-    vidage tremie (PRG_04), les 3 ponts (FB_CfgPersistBridge_CycleDiveSearchCfg /
-    _CycleExtractionCfg / _CycleDumpAtTremieCfg), les 3 blocs persist
-    (_CycleDiveSearchCfgPersist / _CycleExtractionCfgPersist /
-    _CycleDumpAtTremieCfgPersist), les types 5_ASSISTANCE_DRAGAGE (12 fichiers
-    ST_CycleDiveSearch* / ST_CycleExtraction* / ST_CycleDumpAtTremie*), les slots
-    GVL_IHM.CycleDiveSearch / CycleExtraction / CycleDumpAtTremie, le cablage
-    FB_TroubleshootingView (M_AssistanceDragage), l'input DiveState de
-    FB_Hmi_BannerFormatter. Conserver E_DiveSearchState si reutilise comme brique
-    de detection immersion/fond appelee dans AX6/AX7 (a trancher).
-    Attention : DiveStartMin_M (_CycleDiveSearchCfgPersist) est partage avec
-    l'altimetrie de lancement Kobold du GRAFCET (AT4) - a migrer, pas a supprimer.
-  audit_2026_09_03: >
-    RESULTAT AUDIT (2026-09-03) : FB_DiveSearch et FB_ExtractionAssist sont
-    Enable UNIQUEMENT en MAINT_N1 / MAINT_N2 (PRG_03:178-192), gates par les
-    toggles IHM TglEnableDiveSearch / TglEnableExtractionSequence. Ils fournissent
-    l'ASSISTANCE DRAGAGE EN MODE MANUEL (arret auto Kobold sur fond, permis de
-    descente couplee, permis de remontee assistee, MinStepDown). Ils n'ont JAMAIS
-    fait partie de SEMI_AUTO -> T237 (GRAFCET 20 steps) ne les rend PAS obsoletes.
-    CycleDumpAtTremie = assist manuel ouverture benne a la tremie (legacy, MAINT).
-    -> Le retrait est une DECISION FONCTIONNELLE (abandon de l'assistance mode
-    manuel ?), pas un nettoyage mecanique. BLOQUE tant que l'humain ne confirme
-    pas l'abandon de l'assistance dragage manuelle.
-  decision_2026_09_03: >
-    DECISION HUMAINE (2026-09-03) : abandon confirme de l'assistance dragage en
-    mode manuel. Plus de sous-cycle en MAINT_N1/N2 : il reste homing machine,
-    SEMI_AUTO, et le pilotage manuel N1/N2 SANS assistant. -> retrait / archivage
-    de FB_DiveSearch, FB_ExtractionAssist, et du vidage tremie legacy.
-  plan_phases: >
-    P1 - GVL_IHM : retrait des 3 slots CycleDiveSearch / CycleExtraction /
-      CycleDumpAtTremie (+ ST_CycleAssistToggles si plus reference).
-    P2 - PRG_03 : retrait instDiveSearch / instExtractionAssist + bus
-      DiveSearchInputs / ExtractionAssistInputs + toute la branche ELSE
-      (non-SEMI_AUTO) de §4 ; SequenceState en mode assist -> valeurs neutres.
-      Retrait DumpAtTremie* / BypassKobold* / BottomPositionConfirmed.
-    P3 - PRG_04 : neutraliser les permis issus des assistants -
-      DescendPermitDiveBucketOpen -> TRUE (descente libre MAINT manuel) ;
-      ExtractionAssistActive -> FALSE (montee libre) ; MinStepDown -> 0.
-      ATTENTION surveillance Kobold "descente normale" (PRG_04:596-631) : ce
-      n'est PAS l'assistant, c'est un arret-auto Kobold hors FB - a CONSERVER,
-      migrer ses reglages ImmersionUpper_M/Lower_M hors _CycleDiveSearchCfgPersist.
-    P4 - PRG_07 : retrait des 3 ponts instCfgPersistBridgeCycleDiveSearch/
-      Extraction/DumpAtTremie + GVL_PERSISTENT (_Cycle*CfgPersist).
-    P5 - migration DiveStartMin_M (altimetrie lancement Kobold GRAFCET AT4) +
-      ImmersionUpper/Lower_M -> ST_CycleCfg ou ST_CommunCfg (a trancher).
-    P6 - FB_TroubleshootingView : retrait section M_AssistanceDragage.
-      FB_Hmi_BannerFormatter : retrait input DiveState + branche diving vestigiale.
-      ST_SequencePublicState : retrait champs Dive* / Extraction*.
-    P7 - archivage ARCHIVES/ des FB + 12 types + 3 ponts. Registry CI + tests.
-    Commit + gates + review entre chaque phase (P1..P7).
+  contexte: 'Demande utilisateur (2026-09-03). Depuis T237, le diving (AX4..AX8 + AX_DIVING_RETRY) et l''extraction (AX9..AX12)
+    sont des steps de plein droit du GRAFCET SEMI_AUTO (FB_CycleSemiAuto). Les FB assistants FB_DiveSearch / FB_ExtractionAssist
+    et le vidage tremie legacy (dump-at-tremie) deviennent obsoletes. L''operateur retire les 3 slots cote IHM/SCADA ; cette
+    tache retire le sous-systeme cote PLC. Perimetre estime : ~175 references / 22 fichiers.
+
+    '
+  description: 'Auditer d''abord les consommateurs residuels (MAINT_N1/N2 : le dragage assiste hors SEMI_AUTO utilise-t-il
+    encore ces FB ?). Si confirme obsolete : retirer les instances instDiveSearch / instExtractionAssist (PRG_03) et le vidage
+    tremie (PRG_04), les 3 ponts (FB_CfgPersistBridge_CycleDiveSearchCfg / _CycleExtractionCfg / _CycleDumpAtTremieCfg), les
+    3 blocs persist (_CycleDiveSearchCfgPersist / _CycleExtractionCfgPersist / _CycleDumpAtTremieCfgPersist), les types 5_ASSISTANCE_DRAGAGE
+    (12 fichiers ST_CycleDiveSearch* / ST_CycleExtraction* / ST_CycleDumpAtTremie*), les slots GVL_IHM.CycleDiveSearch / CycleExtraction
+    / CycleDumpAtTremie, le cablage FB_TroubleshootingView (M_AssistanceDragage), l''input DiveState de FB_Hmi_BannerFormatter.
+    Conserver E_DiveSearchState si reutilise comme brique de detection immersion/fond appelee dans AX6/AX7 (a trancher). Attention
+    : DiveStartMin_M (_CycleDiveSearchCfgPersist) est partage avec l''altimetrie de lancement Kobold du GRAFCET (AT4) - a
+    migrer, pas a supprimer.
+
+    '
+  audit_2026_09_03: 'RESULTAT AUDIT (2026-09-03) : FB_DiveSearch et FB_ExtractionAssist sont Enable UNIQUEMENT en MAINT_N1
+    / MAINT_N2 (PRG_03:178-192), gates par les toggles IHM TglEnableDiveSearch / TglEnableExtractionSequence. Ils fournissent
+    l''ASSISTANCE DRAGAGE EN MODE MANUEL (arret auto Kobold sur fond, permis de descente couplee, permis de remontee assistee,
+    MinStepDown). Ils n''ont JAMAIS fait partie de SEMI_AUTO -> T237 (GRAFCET 20 steps) ne les rend PAS obsoletes. CycleDumpAtTremie
+    = assist manuel ouverture benne a la tremie (legacy, MAINT). -> Le retrait est une DECISION FONCTIONNELLE (abandon de
+    l''assistance mode manuel ?), pas un nettoyage mecanique. BLOQUE tant que l''humain ne confirme pas l''abandon de l''assistance
+    dragage manuelle.
+
+    '
+  decision_2026_09_03: 'DECISION HUMAINE (2026-09-03) : abandon confirme de l''assistance dragage en mode manuel. Plus de
+    sous-cycle en MAINT_N1/N2 : il reste homing machine, SEMI_AUTO, et le pilotage manuel N1/N2 SANS assistant. -> retrait
+    / archivage de FB_DiveSearch, FB_ExtractionAssist, et du vidage tremie legacy.
+
+    '
+  plan_phases: "P1 - GVL_IHM : retrait des 3 slots CycleDiveSearch / CycleExtraction /\n  CycleDumpAtTremie (+ ST_CycleAssistToggles\
+    \ si plus reference).\nP2 - PRG_03 : retrait instDiveSearch / instExtractionAssist + bus\n  DiveSearchInputs / ExtractionAssistInputs\
+    \ + toute la branche ELSE\n  (non-SEMI_AUTO) de §4 ; SequenceState en mode assist -> valeurs neutres.\n  Retrait DumpAtTremie*\
+    \ / BypassKobold* / BottomPositionConfirmed.\nP3 - PRG_04 : neutraliser les permis issus des assistants -\n  DescendPermitDiveBucketOpen\
+    \ -> TRUE (descente libre MAINT manuel) ;\n  ExtractionAssistActive -> FALSE (montee libre) ; MinStepDown -> 0.\n  ATTENTION\
+    \ surveillance Kobold \"descente normale\" (PRG_04:596-631) : ce\n  n'est PAS l'assistant, c'est un arret-auto Kobold\
+    \ hors FB - a CONSERVER,\n  migrer ses reglages ImmersionUpper_M/Lower_M hors _CycleDiveSearchCfgPersist.\nP4 - PRG_07\
+    \ : retrait des 3 ponts instCfgPersistBridgeCycleDiveSearch/\n  Extraction/DumpAtTremie + GVL_PERSISTENT (_Cycle*CfgPersist).\n\
+    P5 - migration DiveStartMin_M (altimetrie lancement Kobold GRAFCET AT4) +\n  ImmersionUpper/Lower_M -> ST_CycleCfg ou\
+    \ ST_CommunCfg (a trancher).\nP6 - FB_TroubleshootingView : retrait section M_AssistanceDragage.\n  FB_Hmi_BannerFormatter\
+    \ : retrait input DiveState + branche diving vestigiale.\n  ST_SequencePublicState : retrait champs Dive* / Extraction*.\n\
+    P7 - archivage ARCHIVES/ des FB + 12 types + 3 ponts. Registry CI + tests. Commit + gates + review entre chaque phase\
+    \ (P1..P7).\n"
   objectifs:
   - '[FAIT] Audit : assistants = MAINT manuel, non remplaces par T237'
   - '[FAIT] Decision humaine : abandon assistance manuelle confirme'
-  - 'P1..P7 (voir plan_phases) - refactor C3, commit + gates entre phases'
+  - P1..P7 (voir plan_phases) - refactor C3, commit + gates entre phases
   - 'CONSERVER : arret-auto Kobold descente normale (PRG_04:596-631, hors FB)'
-  - 'Migrer DiveStartMin_M + ImmersionUpper/Lower_M hors _CycleDiveSearchCfgPersist'
+  - Migrer DiveStartMin_M + ImmersionUpper/Lower_M hors _CycleDiveSearchCfgPersist
   - Bundle regenere, G200 PASS, gates palier C baseline, tests CI verts, NON TESTE BANC
   contrat: ''
   bloque_par: []
@@ -5329,25 +5255,23 @@ tasks:
   agent: ''
   date: '2026-09-03T17:00:00+02:00'
   titre: Renommage FB_MachineHomingCycle -> FB_CycleMachineHoming (homogeneite Cycle*)
-  contexte: >
-    Demande utilisateur (2026-09-03). GVL_IHM.CycleMachineHoming a ete pose
-    (commit bdd18d16) pour l'homogeneite avec Cycle / CycleDiveSearch /
-    CycleExtraction. Le FB lui-meme reste FB_MachineHomingCycle -> a renommer pour
-    coherence complete.
-  description: >
-    git mv CODE/G_CYCLE/FB_MachineHomingCycle.st -> FB_CycleMachineHoming.st,
-    renommer le POU, l'instance instMachineHomingCycle (PRG_02), les references
-    (PRG_05, FB_Hmi_BannerFormatter, GEL_GRAFCET_HOMING_CYCLE), le registry CI,
-    test_fb_machinehomingcycle.st, le bundle XML. Types satellites
-    ST_fbMachineHomingCycle_* : renommer ou laisser (a trancher). Verifier
-    G310/G315 (nom fichier = nom POU).
+  contexte: 'Demande utilisateur (2026-09-03). GVL_IHM.CycleMachineHoming a ete pose (commit bdd18d16) pour l''homogeneite
+    avec Cycle / CycleDiveSearch / CycleExtraction. Le FB lui-meme reste FB_MachineHomingCycle -> a renommer pour coherence
+    complete.
+
+    '
+  description: 'git mv CODE/G_CYCLE/FB_MachineHomingCycle.st -> FB_CycleMachineHoming.st, renommer le POU, l''instance instMachineHomingCycle
+    (PRG_02), les references (PRG_05, FB_Hmi_BannerFormatter, GEL_GRAFCET_HOMING_CYCLE), le registry CI, test_fb_machinehomingcycle.st,
+    le bundle XML. Types satellites ST_fbMachineHomingCycle_* : renommer ou laisser (a trancher). Verifier G310/G315 (nom
+    fichier = nom POU).
+
+    '
   objectifs:
   - Renommage FB_MachineHomingCycle -> FB_CycleMachineHoming complet et coherent
   - Instance + references + registry + test + bundle a jour
   - Bundle regenere, G200 PASS, FB_CycleMachineHoming tests verts
   contrat: ''
   bloque_par: []
-
 - id: T240
   parent_id: ''
   statut: ⬜
@@ -5357,38 +5281,25 @@ tasks:
   date: '2026-09-03T18:45:00+02:00'
   updated_at: '2026-09-03T19:45:00+02:00'
   titre: Homing machine possible benne OUVERTE ou FERMEE (capteur top partage M1/M2)
-  contexte: >
-    Mise en service 2026-09-03. Constat banc (MES-045) : M1 et M2 partagent UN
-    SEUL capteur top (HwIn.Winch.M1M2_TopPositionFree_DI ; PRG_02
-    instEncoderM2.TopPositionSensor := NOT M1M2_TopPositionFree_DI). Le fix
-    0350e3d1 (HX3 : M2Demand.UseDynamicTarget := FALSE) preset M2 a
-    CfgTopSensorPos_M (8.5) quel que soit l'etat benne. Consequence si homing
-    lance BENNE FERMEE : M2 physiquement ~15 m sous M1, preset a 8.5 -> 15 m
-    d'incoherence injectee -> DriftGuard M2 (MecaA) + WinchSync (MecaE) ->
-    M2Status.HomedAndReliable=FALSE -> HX3 n'aboutit pas -> HXF_FAILED, et le
-    datum M2 reste corrompu de ~15 m (bordel en cascade : bucket ERROR
-    OffsetMax, FB_WinchSync desactive a la main, mesures faussees).
-    Demande utilisateur : le referencement doit marcher benne ouverte OU fermee,
-    puisque HX4 redemande justement de fermer la benne + valider sa position.
-    NOTE : remplace l'ancienne demande "fermer la benne a HX1" - incompatible,
-    la benne doit rester ouverte pendant HX2/HX3 SAUF si on rend le preset M2
-    offset-aware.
-  description: >
-    Spec GRAFCET homing (contrat obligatoire C2). Design propose :
-    1. HX1 : demander l'etat benne reel (ouverte / fermee) -> OffsetExpected
-       (0 ou OffsetCloseM).
-    2. HX3 : M2Demand.UseDynamicTarget := (OffsetExpected > 0) ;
-       M2Demand.DynamicTarget_M := M2.CfgTopSensorPos_M + OffsetExpected ->
-       M2 preseté a 8.5 (ouvert) ou ~23.5 (ferme).
-    3. Propager OffsetExpected vers instBucket.ActiveOffsetM pendant HX3 pour que
-       WinchSync / DriftGuard soient offset-aware (sinon SafeStop comme le
-       2026-09-02, cf. 0350e3d1).
-    4. RefWindowActive (FB_Safety_Winch) doit couvrir tout HX3 + reconvergence
-       M1/M2 : verifier que la fenetre M2 (InReferencingMode / PosStepDetected /
-       TonRefSettle 2 s) tient assez longtemps pour un preset de +15 m.
-    5. HX4/HX5 inchange : re-confirme + commit l'offset ferme.
-    Alternative minimale si trop risque : forcer benne ouverte pour HX2/HX3
-    (garde BucketIsOpen sur transition HX1->HX2) + prompt clair.
+  contexte: 'Mise en service 2026-09-03. Constat banc (MES-045) : M1 et M2 partagent UN SEUL capteur top (HwIn.Winch.M1M2_TopPositionFree_DI
+    ; PRG_02 instEncoderM2.TopPositionSensor := NOT M1M2_TopPositionFree_DI). Le fix 0350e3d1 (HX3 : M2Demand.UseDynamicTarget
+    := FALSE) preset M2 a CfgTopSensorPos_M (8.5) quel que soit l''etat benne. Consequence si homing lance BENNE FERMEE :
+    M2 physiquement ~15 m sous M1, preset a 8.5 -> 15 m d''incoherence injectee -> DriftGuard M2 (MecaA) + WinchSync (MecaE)
+    -> M2Status.HomedAndReliable=FALSE -> HX3 n''aboutit pas -> HXF_FAILED, et le datum M2 reste corrompu de ~15 m (bordel
+    en cascade : bucket ERROR OffsetMax, FB_WinchSync desactive a la main, mesures faussees). Demande utilisateur : le referencement
+    doit marcher benne ouverte OU fermee, puisque HX4 redemande justement de fermer la benne + valider sa position. NOTE :
+    remplace l''ancienne demande "fermer la benne a HX1" - incompatible, la benne doit rester ouverte pendant HX2/HX3 SAUF
+    si on rend le preset M2 offset-aware.
+
+    '
+  description: "Spec GRAFCET homing (contrat obligatoire C2). Design propose : 1. HX1 : demander l'etat benne reel (ouverte\
+    \ / fermee) -> OffsetExpected\n   (0 ou OffsetCloseM).\n2. HX3 : M2Demand.UseDynamicTarget := (OffsetExpected > 0) ;\n\
+    \   M2Demand.DynamicTarget_M := M2.CfgTopSensorPos_M + OffsetExpected ->\n   M2 preseté a 8.5 (ouvert) ou ~23.5 (ferme).\n\
+    3. Propager OffsetExpected vers instBucket.ActiveOffsetM pendant HX3 pour que\n   WinchSync / DriftGuard soient offset-aware\
+    \ (sinon SafeStop comme le\n   2026-09-02, cf. 0350e3d1).\n4. RefWindowActive (FB_Safety_Winch) doit couvrir tout HX3\
+    \ + reconvergence\n   M1/M2 : verifier que la fenetre M2 (InReferencingMode / PosStepDetected /\n   TonRefSettle 2 s)\
+    \ tient assez longtemps pour un preset de +15 m.\n5. HX4/HX5 inchange : re-confirme + commit l'offset ferme. Alternative\
+    \ minimale si trop risque : forcer benne ouverte pour HX2/HX3 (garde BucketIsOpen sur transition HX1->HX2) + prompt clair.\n"
   objectifs:
   - Homing machine aboutit benne ouverte ET benne fermee, sans datum M2 corrompu
   - Pas de MecaA / MecaE parasite pendant le preset M2 (RefWindow couvre HX3)
@@ -5396,7 +5307,6 @@ tasks:
   - FB_CycleMachineHoming tests verts, bundle regenere, G200 PASS
   contrat: ''
   bloque_par: []
-
 - id: T241
   parent_id: ''
   statut: ⏳
@@ -5405,58 +5315,38 @@ tasks:
   agent: ''
   date: '2026-09-03T19:40:00+02:00'
   titre: Fiabiliser etat benne + calcul ActiveOffsetM + defauts benne (mesure physique)
-  contexte: >
-    Mise en service 2026-09-03 (MES-045). Serie de defauts en cascade en
-    pilotage benne : etat memorise (IsOpen/IsClosed) fixe UNIQUEMENT par les
-    boutons ConfirmOpen/ClosePos (MAINT_N2) ou le succes d'un cycle -> quand
-    l'etat diverge de la realite mecanique, ActiveOffsetM (0 ou OffsetCloseM)
-    est applique a l'envers -> M2PositionCorrected faux de ~15 m -> FB_WinchSync
-    voit un ecart fantome -> MecaE -> synchro desactivee a la main. Plus :
-    OffsetMaxFault latche a 13 cm de M2 sous M1 (borne basse = CablePosM1 sec,
-    sans tolerance). L'ancienne version (CODE_BACKUP 20260822) avait un
-    classifieur d'etat continu sur la mesure, retire lors d'un refactor.
-    Tentative R3 (detection sur position en jog M2, commit 0defd32e) a introduit
-    un fly-through -> etat faux -> MecaE ; retiree (commit 8bd0b65f).
-  description: >
-    Implemente (NON COMMITE au 2026-09-03 19:40, en test banc) :
-    - FB_Bucket §4a : CLASSIFICATION CONTINUE de l'etat sur la mesure physique.
-      IsClosed si |Delta - OffsetCloseM| <= CoherenceLimitM pendant 1 s (TON),
-      IsOpen si |Delta - OffsetOpenM| <= CoherenceLimitM pendant 1 s ;
-      gate machine TOTALEMENT arretee + referencee + hors sequence
-      (NOT M1_Busy AND NOT M2_Busy AND NOT Lifecycle.Busy AND NOT SevereError)
-      -> aucun transitoire d'ecart, self-heal des que la machine est parkee,
-      dans tous les modes. Zone intermediaire -> dernier etat franc conserve.
-    - FB_Bucket §5 : ActiveOffsetM pilote par cet etat fiable (un seul offset,
-      pas de split display/sync : sync est OFF en WinchSel=2 ou le pas d'offset
-      se produit).
-    - FB_Bucket §5a : OffsetStateMismatchWarn (VAR_OUTPUT, publie IHM
-      ST_BucketHMIState) - warn non bloquant si |Delta - ActiveOffsetM| >
-      CoherenceLimitM pendant 2 s -> "reconfirmer position benne".
-    - FB_Bucket §1 : OffsetMaxFault borne basse = OffsetOpenM - CoherenceLimitM
-      (au lieu de CablePosM1 sec) + latch seulement si hors plage > 500 ms
-      (TON anti-pic). CfgFault : tolere OffsetOpenM legerement negatif (>= -2 m)
-      pour recalibration.
-    - PRG_04 : publication OffsetStateMismatchWarn.
-    Complement commit b6837198 (solution utilisateur) : §4a classification
-    INSTANTANEE (NearClosed/NearOpen/IsIntermediate/TooOpen/TooClosed) +
-    §5 SNAP IMMEDIAT de ActiveOffsetM sur la bande mesuree (M2 corrige ~ M1
-    des l'arret, avant le latch debounce 1 s). IsIntermediate (declare mais
-    jamais ecrit) restaure -> Benne_IsRoughlyClosed (PRG_04, tolerance galets).
+  contexte: 'Mise en service 2026-09-03 (MES-045). Serie de defauts en cascade en pilotage benne : etat memorise (IsOpen/IsClosed)
+    fixe UNIQUEMENT par les boutons ConfirmOpen/ClosePos (MAINT_N2) ou le succes d''un cycle -> quand l''etat diverge de la
+    realite mecanique, ActiveOffsetM (0 ou OffsetCloseM) est applique a l''envers -> M2PositionCorrected faux de ~15 m ->
+    FB_WinchSync voit un ecart fantome -> MecaE -> synchro desactivee a la main. Plus : OffsetMaxFault latche a 13 cm de M2
+    sous M1 (borne basse = CablePosM1 sec, sans tolerance). L''ancienne version (CODE_BACKUP 20260822) avait un classifieur
+    d''etat continu sur la mesure, retire lors d''un refactor. Tentative R3 (detection sur position en jog M2, commit 0defd32e)
+    a introduit un fly-through -> etat faux -> MecaE ; retiree (commit 8bd0b65f).
+
+    '
+  description: "Implemente (NON COMMITE au 2026-09-03 19:40, en test banc) : - FB_Bucket §4a : CLASSIFICATION CONTINUE de\
+    \ l'etat sur la mesure physique.\n  IsClosed si |Delta - OffsetCloseM| <= CoherenceLimitM pendant 1 s (TON),\n  IsOpen\
+    \ si |Delta - OffsetOpenM| <= CoherenceLimitM pendant 1 s ;\n  gate machine TOTALEMENT arretee + referencee + hors sequence\n\
+    \  (NOT M1_Busy AND NOT M2_Busy AND NOT Lifecycle.Busy AND NOT SevereError)\n  -> aucun transitoire d'ecart, self-heal\
+    \ des que la machine est parkee,\n  dans tous les modes. Zone intermediaire -> dernier etat franc conserve.\n- FB_Bucket\
+    \ §5 : ActiveOffsetM pilote par cet etat fiable (un seul offset,\n  pas de split display/sync : sync est OFF en WinchSel=2\
+    \ ou le pas d'offset\n  se produit).\n- FB_Bucket §5a : OffsetStateMismatchWarn (VAR_OUTPUT, publie IHM\n  ST_BucketHMIState)\
+    \ - warn non bloquant si |Delta - ActiveOffsetM| >\n  CoherenceLimitM pendant 2 s -> \"reconfirmer position benne\".\n\
+    - FB_Bucket §1 : OffsetMaxFault borne basse = OffsetOpenM - CoherenceLimitM\n  (au lieu de CablePosM1 sec) + latch seulement\
+    \ si hors plage > 500 ms\n  (TON anti-pic). CfgFault : tolere OffsetOpenM legerement negatif (>= -2 m)\n  pour recalibration.\n\
+    - PRG_04 : publication OffsetStateMismatchWarn. Complement commit b6837198 (solution utilisateur) : §4a classification\
+    \ INSTANTANEE (NearClosed/NearOpen/IsIntermediate/TooOpen/TooClosed) + §5 SNAP IMMEDIAT de ActiveOffsetM sur la bande\
+    \ mesuree (M2 corrige ~ M1 des l'arret, avant le latch debounce 1 s). IsIntermediate (declare mais jamais ecrit) restaure\
+    \ -> Benne_IsRoughlyClosed (PRG_04, tolerance galets).\n"
   reste_a_faire:
   - Test banc du classifieur continu (recalage auto etat a l'arret)
-  - >-
-    CALIBRATION ORDRE OBLIGATOIRE. Recalibrer OffsetCloseM (~13.95) et
-    OffsetOpenM (~ -0.13) aux vrais FDC AVANT tout. Sinon avec OffsetCloseM=15
-    et CoherenceLimitM=1.0 la bande fermee vaut 14 a 16 m, or Delta reel ~13.95
-    tombe HORS bande -> classe intermediaire, offset ne se recale pas.
-    Alternative, elargir CoherenceLimitM a 1.5 (tassement galets + allongement
-    charge).
-  - >-
-    Valider au banc un arret VOLONTAIRE a mi-course (Delta ~7.5 m). Doit rester
-    sur le dernier etat franc + HoldOffsetM (continuite geometrique voulue).
-  - >-
-    Reparer le test unitaire FB_Bucket (harness reference MotionDirection,
-    input supprime a un refactor anterieur) - ROUGE pre-existant.
+  - CALIBRATION ORDRE OBLIGATOIRE. Recalibrer OffsetCloseM (~13.95) et OffsetOpenM (~ -0.13) aux vrais FDC AVANT tout. Sinon
+    avec OffsetCloseM=15 et CoherenceLimitM=1.0 la bande fermee vaut 14 a 16 m, or Delta reel ~13.95 tombe HORS bande -> classe
+    intermediaire, offset ne se recale pas. Alternative, elargir CoherenceLimitM a 1.5 (tassement galets + allongement charge).
+  - Valider au banc un arret VOLONTAIRE a mi-course (Delta ~7.5 m). Doit rester sur le dernier etat franc + HoldOffsetM (continuite
+    geometrique voulue).
+  - Reparer le test unitaire FB_Bucket (harness reference MotionDirection, input supprime a un refactor anterieur) - ROUGE
+    pre-existant.
   - Widget IHM warn OffsetStateMismatchWarn
   objectifs:
   - Etat benne reflete la realite mecanique sans intervention MAINT_N2
@@ -5465,7 +5355,6 @@ tasks:
   - Alarme non bloquante en cas d'incoherence offset/mesure persistante
   contrat: ''
   bloque_par: []
-
 - id: T242
   parent_id: ''
   statut: ⬜
@@ -5474,27 +5363,24 @@ tasks:
   agent: ''
   date: '2026-09-04T08:00:00+02:00'
   titre: M3 translation - bits at position (tremie / P1 / zone maintenance) ne s activent pas
-  contexte: >
-    Mise en service 2026-09-03/04 (objectif seance 3). A l arrivee sur la
-    position tremie ou P1, et sans doute en zone maintenance, les bits
-    at position M3 ne s activent pas / ne se calculent pas. Bloque
-    l enchainement (verrous descente treuils lies a M3 a P1 / maintenance).
-  description: >
-    Diagnostic banc puis correction. Pistes : a) fenetre de tolerance position
-    trop serree vs precision decodage capteurs M3
-    (FB_Translation_PositionDecoder / PositionEstimator) ; b) logique de
-    detection de zone (maintenance) incorrecte ; c) position M3 pas mise a jour
-    (reference M3 non faite / decodage HS) ; d) seuils _TranslationCfgPersist
-    mal calibres. Action : snapshot position M3 + seuils, comparer ; elargir la
-    fenetre OU corriger la logique. Voir
-    INVENTAIRE_Defauts_Bloquants_MES_20260903 ligne M3-1 + MES-018.
+  contexte: 'Mise en service 2026-09-03/04 (objectif seance 3). A l arrivee sur la position tremie ou P1, et sans doute en
+    zone maintenance, les bits at position M3 ne s activent pas / ne se calculent pas. Bloque l enchainement (verrous descente
+    treuils lies a M3 a P1 / maintenance).
+
+    '
+  description: 'Diagnostic banc puis correction. Pistes : a) fenetre de tolerance position trop serree vs precision decodage
+    capteurs M3 (FB_Translation_PositionDecoder / PositionEstimator) ; b) logique de detection de zone (maintenance) incorrecte
+    ; c) position M3 pas mise a jour (reference M3 non faite / decodage HS) ; d) seuils _TranslationCfgPersist mal calibres.
+    Action : snapshot position M3 + seuils, comparer ; elargir la fenetre OU corriger la logique. Voir INVENTAIRE_Defauts_Bloquants_MES_20260903
+    ligne M3-1 + MES-018.
+
+    '
   objectifs:
   - Bits at position M3 s activent a l arrivee tremie / P1 / zone maintenance
   - Verrous descente treuils lies a M3 leves correctement a P1 / maintenance
   - Seuils / logique documentes dans l inventaire des defauts bloquants
   contrat: ''
   bloque_par: []
-
 - id: T243
   parent_id: ''
   statut: ⏳
@@ -5503,33 +5389,28 @@ tasks:
   agent: ''
   date: '2026-09-04T08:00:00+02:00'
   titre: Inventaire exhaustif des defauts bloquants MES - decisions seuil / faux positif / bypass granulaire
-  contexte: >
-    Seance 2026-09-03 : serie de defauts bloquants en cascade (MES-045) -
-    MecaA/MecaE parasites, OffsetMaxFault a 13 cm, bucket ERROR. Utilisateur a
-    du desactiver FB_WinchSync a la main. Objectif seance 2 (2026-09-04) :
-    inventaire EXHAUSTIF de chaque garde qui latche ou bloque le mouvement,
-    decision par cas : garder / elargir seuil / faux positif (controle au
-    mauvais moment -> re-fenetrer) / bypass granulaire le temps des essais avec
-    reactivation planifiee a moyen terme.
-  description: >
-    Piloter DOC/WFLOW/AUDITS/INVENTAIRE_Defauts_Bloquants_MES_20260903.md
-    (pre-rempli). Pour chaque ligne : symptome reel + snapshot, seuil/fenetre
-    actuels, verdict. Regles : JAMAIS de bypass code jetable -> bypass IHM
-    granulaires existants (matrice AF-05 section 4bis) ; tout bypass pose ->
-    ligne section 3 du doc avec date de reactivation ; re-fenetrage trivial et
-    sur -> patch direct + MES sinon sous-tache. Prioriser les defauts lies a la
-    mesure de position (dependent de T240/T241).
+  contexte: 'Seance 2026-09-03 : serie de defauts bloquants en cascade (MES-045) - MecaA/MecaE parasites, OffsetMaxFault a
+    13 cm, bucket ERROR. Utilisateur a du desactiver FB_WinchSync a la main. Objectif seance 2 (2026-09-04) : inventaire EXHAUSTIF
+    de chaque garde qui latche ou bloque le mouvement, decision par cas : garder / elargir seuil / faux positif (controle
+    au mauvais moment -> re-fenetrer) / bypass granulaire le temps des essais avec reactivation planifiee a moyen terme.
+
+    '
+  description: 'Piloter DOC/WFLOW/AUDITS/INVENTAIRE_Defauts_Bloquants_MES_20260903.md (pre-rempli). Pour chaque ligne : symptome
+    reel + snapshot, seuil/fenetre actuels, verdict. Regles : JAMAIS de bypass code jetable -> bypass IHM granulaires existants
+    (matrice AF-05 section 4bis) ; tout bypass pose -> ligne section 3 du doc avec date de reactivation ; re-fenetrage trivial
+    et sur -> patch direct + MES sinon sous-tache. Prioriser les defauts lies a la mesure de position (dependent de T240/T241).
+
+    '
   reste_a_faire:
   - Passe banc sur chaque ligne SW / BK / HM / M3 / PM du doc
   - Trancher chaque verdict + tracer bypass avec reactivation
   - Sous-taches pour les re-fenetrages non triviaux
   objectifs:
   - Inventaire complet renseigne avec preuve (snapshot/trace) par defaut
-  - Chaque defaut bloquant : verdict tranche + suite (patch / bypass+date / OK)
+  - Chaque defaut bloquant: verdict tranche + suite (patch / bypass+date / OK)
   - Zero bypass code jetable ; tout bypass essai a une date de reactivation
   contrat: ''
   bloque_par: []
-
 - id: T244
   parent_id: ''
   statut: ⬜
@@ -5538,30 +5419,25 @@ tasks:
   agent: ''
   date: '2026-09-04T08:00:00+02:00'
   titre: Test hors tension + reboot - ref codeurs persistantes + bits forces provisoires (usage partiel)
-  contexte: >
-    Objectif seance 6 (2026-09-04). Verifier qu apres coupure d alimentation et
-    reboot automate, les references codeurs M1/M2/benne et les reglages
-    persistants (GVL_PERSISTENT RETAIN) sont conserves. Definir un jeu de bits
-    forces PROVISOIRES documentes pour une utilisation PARTIELLE de la machine
-    (non entierement referencee) le temps de la mise en service.
-  description: >
-    1. Procedure test : relever tous les persistants critiques (datum M1/M2,
-    _BucketState, _WinchM1/M2CfgPersist, _CycleCfgPersist, offsets benne,
-    _CommunCfgPersist), couper alimentation, reboot, relever, comparer. Piege
-    PERSISTENT : un changement d initialiseur ne met pas a jour la valeur
-    retenue ; un champ neuf peut lire 0 sans Reinit. origine.
-    2. Inventaire des bits forces provisoires necessaires (HomedM1/M2 forces
-    pour jog benne partiel, bypass IHM granulaires) - chacun documente (raison,
-    portee, risque, retrait) dans l inventaire T243.
-    3. Regle : bit force cote code uniquement si [PROVISOIRE] + tache de
-    retrait ; privilegier bypass IHM.
+  contexte: 'Objectif seance 6 (2026-09-04). Verifier qu apres coupure d alimentation et reboot automate, les references codeurs
+    M1/M2/benne et les reglages persistants (GVL_PERSISTENT RETAIN) sont conserves. Definir un jeu de bits forces PROVISOIRES
+    documentes pour une utilisation PARTIELLE de la machine (non entierement referencee) le temps de la mise en service.
+
+    '
+  description: '1. Procedure test : relever tous les persistants critiques (datum M1/M2, _BucketState, _WinchM1/M2CfgPersist,
+    _CycleCfgPersist, offsets benne, _CommunCfgPersist), couper alimentation, reboot, relever, comparer. Piege PERSISTENT
+    : un changement d initialiseur ne met pas a jour la valeur retenue ; un champ neuf peut lire 0 sans Reinit. origine. 2.
+    Inventaire des bits forces provisoires necessaires (HomedM1/M2 forces pour jog benne partiel, bypass IHM granulaires)
+    - chacun documente (raison, portee, risque, retrait) dans l inventaire T243. 3. Regle : bit force cote code uniquement
+    si [PROVISOIRE] + tache de retrait ; privilegier bypass IHM.
+
+    '
   objectifs:
   - References codeurs + reglages persistants survivent a un reboot hors tension
   - Liste des bits forces provisoires pour usage partiel, chacun trace + risque
   - Aucun bit force code non marque [PROVISOIRE] / sans tache de retrait
   contrat: ''
   bloque_par: []
-
 - id: T245
   parent_id: ''
   statut: ⬜
@@ -5570,18 +5446,17 @@ tasks:
   agent: ''
   date: '2026-09-04T08:00:00+02:00'
   titre: Debug + execution banc du GRAFCET cycle SEMI_AUTO (20 steps, T237)
-  contexte: >
-    T237 (MES-041) : GRAFCET SEMI_AUTO refondu en 20 steps, 13/13 tests CI,
-    G200 PASS, revue agent - mais JAMAIS execute au banc. Objectif seance 4
-    (2026-09-04) : premiere execution reelle, debug pas a pas.
-  description: >
-    Executer le cycle SEMI_AUTO au banc, step par step (AX0 vers AX18),
-    snapshots / traces a chaque transition. Verifier : continuite joystick
-    (zero a-coup entre steps), sous-sequence diving AX4..AX8 + AX_DIVING_RETRY,
-    EXTRACTION AX9..AX12, DECHARGE AX13..AX18, rebouclage AX18 vers AX2.
-    Preconditions : machine referencee (T240/T241), retour contacteur Kobold
-    cable ou KoboldContactorFeedback = TRUE en dur assume, DiveStartMin_M regle
-    3-5 m. Consigner chaque anomalie en MES + inventaire defauts (T243).
+  contexte: 'T237 (MES-041) : GRAFCET SEMI_AUTO refondu en 20 steps, 13/13 tests CI, G200 PASS, revue agent - mais JAMAIS
+    execute au banc. Objectif seance 4 (2026-09-04) : premiere execution reelle, debug pas a pas.
+
+    '
+  description: 'Executer le cycle SEMI_AUTO au banc, step par step (AX0 vers AX18), snapshots / traces a chaque transition.
+    Verifier : continuite joystick (zero a-coup entre steps), sous-sequence diving AX4..AX8 + AX_DIVING_RETRY, EXTRACTION
+    AX9..AX12, DECHARGE AX13..AX18, rebouclage AX18 vers AX2. Preconditions : machine referencee (T240/T241), retour contacteur
+    Kobold cable ou KoboldContactorFeedback = TRUE en dur assume, DiveStartMin_M regle 3-5 m. Consigner chaque anomalie en
+    MES + inventaire defauts (T243).
+
+    '
   objectifs:
   - Cycle SEMI_AUTO parcourt AX0 vers AX18 vers AX2 au banc sans blocage non explique
   - Continuite joystick respectee (zero a-coup entre steps)
@@ -5590,7 +5465,6 @@ tasks:
   bloque_par:
   - T240
   - T241
-
 - id: T246
   parent_id: ''
   statut: ⬜
@@ -5599,31 +5473,27 @@ tasks:
   agent: ''
   date: '2026-09-04T00:30:00+02:00'
   titre: Garde de re-couplage M1/M2 - interdire le retour couple si ecart reel > tolerance
-  contexte: >
-    Suite au challenge du gate Meca E (commit a venir). Le controle d'ecart croise
-    M1/M2 (Meca E) est desormais inhibe en jog benne unitaire (M2-M1 varie de ~15 m
-    volontairement). Trou identifie par l'agent : si l'operateur eloigne M2 en jog
-    unitaire puis rebascule en couple (WinchSel 2 -> 0) sans avoir reconfirme l'etat
-    benne, Meca E se relatche INSTANTANEMENT a l'instant du re-couplage sur ~15 m
-    d'ecart -> SafeStop des 2 treuils puis PowerCutOff 3 s (PostRampTimeout) -> charge
-    potentiellement en l'air. Le gate deplace le probleme a la transition.
-  description: >
-    Ajouter un garde PROCESS (pas SafeStop / pas PowerCutOff) qui interdit
-    l'autorisation du pilotage couple (retour WinchSel=0 ou armement homme-mort
-    both) tant que ABS(CablePosM1 - CablePosM2 - ActiveOffsetM) > CriticalSyncToleranceM.
-    Message operateur explicite. Alternative / complement : imposer un
-    ConfirmClosePosition/ConfirmOpenPosition (mise a jour ActiveOffsetM) en sortie de
-    jog M2 avant re-autorisation du couple - point d'accroche : detection d'etat
-    passive sur jog M2 deja presente (classifieur FB_Bucket §4a). A minima : router
-    le re-latch Meca E post-transition WinchSel vers SafeStop seul (jamais escalade
-    PowerCutOff) pendant N secondes apres un changement de WinchSel.
+  contexte: 'Suite au challenge du gate Meca E (commit a venir). Le controle d''ecart croise M1/M2 (Meca E) est desormais
+    inhibe en jog benne unitaire (M2-M1 varie de ~15 m volontairement). Trou identifie par l''agent : si l''operateur eloigne
+    M2 en jog unitaire puis rebascule en couple (WinchSel 2 -> 0) sans avoir reconfirme l''etat benne, Meca E se relatche
+    INSTANTANEMENT a l''instant du re-couplage sur ~15 m d''ecart -> SafeStop des 2 treuils puis PowerCutOff 3 s (PostRampTimeout)
+    -> charge potentiellement en l''air. Le gate deplace le probleme a la transition.
+
+    '
+  description: 'Ajouter un garde PROCESS (pas SafeStop / pas PowerCutOff) qui interdit l''autorisation du pilotage couple
+    (retour WinchSel=0 ou armement homme-mort both) tant que ABS(CablePosM1 - CablePosM2 - ActiveOffsetM) > CriticalSyncToleranceM.
+    Message operateur explicite. Alternative / complement : imposer un ConfirmClosePosition/ConfirmOpenPosition (mise a jour
+    ActiveOffsetM) en sortie de jog M2 avant re-autorisation du couple - point d''accroche : detection d''etat passive sur
+    jog M2 deja presente (classifieur FB_Bucket §4a). A minima : router le re-latch Meca E post-transition WinchSel vers SafeStop
+    seul (jamais escalade PowerCutOff) pendant N secondes apres un changement de WinchSel.
+
+    '
   objectifs:
   - Pas de PowerCutOff sec au re-couplage apres une excursion unitaire
   - Retour en couple bloque (niveau process) tant que l'ecart reel M1/M2 depasse la tolerance
   - Message operateur clair ; recalage offset benne impose avant re-autorisation
   contrat: ''
   bloque_par: []
-
 - id: T249
   parent_id: ''
   statut: ⬜
@@ -5632,30 +5502,20 @@ tasks:
   agent: ''
   date: '2026-09-04T11:45:00+02:00'
   titre: Remontee statut position M3 (bannier/messages) + verrou descente treuil general
-  contexte: >-
-    MES 2026-09-04. (1) Aucune info M3 dans la banniere : l'operateur ne sait pas
-    entre quels capteurs se trouve le pont ni s'il est arrete a une position.
-    (2) Le verrou "descente M1/M2 interdite si M3 pas a P1/Maintenance"
-    (DumpAtTremieDescentLocked) n'etait actif que pendant l'assist vidage-tremie.
-    Passe en GENERAL en MAINT au commit T249-a (a tester banc). Le nom du champ
-    DumpAtTremieDescentLocked est desormais trompeur (a renommer).
-  description: >-
-    Lot 2 volets, meme domaine M3 :
-    A) INTERLOCK (fait, a valider banc) : PRG_03 - DumpAtTremieDescentLocked :=
-       NOT (M3_AtP1Stable OR M3_AtMaintenanceStable) AND NOT Bypass.LimitSwitch
-       AND NOT Bypass.Global, en MAINT_N1/N2. Reste a faire : bit IHM
-       TglAllowWinchMoveAtTremie (autorise montee+descente treuil quand M3 arrete
-       stable a la Tremie) ; decider regle MONTEE (libre partout ? ou meme regle) ;
-       renommer DumpAtTremieDescentLocked -> WinchVerticalMoveLockedByM3 (type +
-       consommateurs PRG_04:968) ; verifier branche SEMI_AUTO.
-    B) MESSAGE STATUT M3 (lecture seule, zero impact conduite) : table SensorsWord
-       -> texte (11111 a la Tremie / 01111 entre Tremie et PV / 00111 entre PV et
-       P2 / 00011 entre P2 et P1 / 00001 entre P1 et Maintenance / 00000 a la
-       Maintenance) ; suffixe mouvement (-> Tremie / -> Maintenance / arrete)
-       selon signe vitesse ; publie TranslationState.StatusText : STRING(80),
-       niveau INFO. Priorite banniere : M3 en mouvement OU sel. hors treuils ->
-       message M3 ; treuil M1/M2 en mouvement -> message treuil ; sinon dernier
-       pertinent.
+  contexte: 'MES 2026-09-04. (1) Aucune info M3 dans la banniere : l''operateur ne sait pas entre quels capteurs se trouve
+    le pont ni s''il est arrete a une position. (2) Le verrou "descente M1/M2 interdite si M3 pas a P1/Maintenance" (DumpAtTremieDescentLocked)
+    n''etait actif que pendant l''assist vidage-tremie. Passe en GENERAL en MAINT au commit T249-a (a tester banc). Le nom
+    du champ DumpAtTremieDescentLocked est desormais trompeur (a renommer).'
+  description: "Lot 2 volets, meme domaine M3 : A) INTERLOCK (fait, a valider banc) : PRG_03 - DumpAtTremieDescentLocked :=\n\
+    \   NOT (M3_AtP1Stable OR M3_AtMaintenanceStable) AND NOT Bypass.LimitSwitch\n   AND NOT Bypass.Global, en MAINT_N1/N2.\
+    \ Reste a faire : bit IHM\n   TglAllowWinchMoveAtTremie (autorise montee+descente treuil quand M3 arrete\n   stable a\
+    \ la Tremie) ; decider regle MONTEE (libre partout ? ou meme regle) ;\n   renommer DumpAtTremieDescentLocked -> WinchVerticalMoveLockedByM3\
+    \ (type +\n   consommateurs PRG_04:968) ; verifier branche SEMI_AUTO.\nB) MESSAGE STATUT M3 (lecture seule, zero impact\
+    \ conduite) : table SensorsWord\n   -> texte (11111 a la Tremie / 01111 entre Tremie et PV / 00111 entre PV et\n   P2\
+    \ / 00011 entre P2 et P1 / 00001 entre P1 et Maintenance / 00000 a la\n   Maintenance) ; suffixe mouvement (-> Tremie\
+    \ / -> Maintenance / arrete)\n   selon signe vitesse ; publie TranslationState.StatusText : STRING(80),\n   niveau INFO.\
+    \ Priorite banniere : M3 en mouvement OU sel. hors treuils ->\n   message M3 ; treuil M1/M2 en mouvement -> message treuil\
+    \ ; sinon dernier\n   pertinent."
   objectifs:
   - Descente M1/M2 interdite hors M3 arrete stable P1/Maintenance (bypass MES possible)
   - Bit IHM override Tremie fonctionnel ; regle montee tranchee et documentee
@@ -5664,67 +5524,48 @@ tasks:
   - Bascule banniere M3 <-> treuil selon contexte, niveau INFO (jamais alarme)
   contrat: ''
   bloque_par: []
-
 - id: T248
   parent_id: ''
   statut: ⏳
   criticite: C3
   domaine: BENNE / MODES / SEQUENCE COUPLEE
-  agent: 'CC'
+  agent: CC
   date: '2026-09-04T15:30:00+02:00'
   titre: Gestion bucket auto en MAINT couple (WinchSel=0) - ouverture/fermeture benne auto via le VRAI selecteur
-  contexte: >-
-    MES 2026-09-04. Mode "gestion bucket auto" actif par defaut (1 bouton IHM pour
-    desactiver : GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing). En MAINT
-    couple (JoystickWinchSelectRequest=0), si l'operateur pousse (descente) et benne
-    pas ouverte -> bascule auto WinchSel=2, ouvre benne, puis WinchSel=0 descente
-    couplee. Tire (montee) + pas fermee -> WinchSel=2 ferme, puis WinchSel=0 montee
-    couplee. Contrainte forte : passer par le VRAI selecteur arbitre
-    (JoystickWinchSelectArbitrated), pas un mecanisme parallele. Une fois le
-    mouvement couple lance, ne PLUS recorriger la benne meme si IsOpen/IsClosed est
-    perdu momentanement. La pause entre benne mode=2 et both mode=0 ne doit pas
-    desarmer le joystick.
-  description: >-
-    FB_Modes 4quater : BucketSeqSatisfied (phase latch), Auth.CoupledBucketPhaseLocked
-    (toute la fenetre T248 -> FB_BucketCmdArbitration n'arme jamais dive-open/ascent-
-    close -> pas de blip instBucket.Busy -> deadman preserve), Auth.WinchSelTransitionHold
-    (dwell fixe TonWinchSelSettle apres tout changement de JoystickWinchSelectArbitrated).
-    PRG_04:519 : si WinchSelTransitionHold -> zero des requetes logiques M1/M2.
-    FAIT : sequencement selecteur reel, phase-lock deadman, exemption programme
-    (DumpAtTremie/ExtractionAssist via ProgramBucketDriveActive), TOF MecaA/overspeed
-    non masque, dwell fixe (remplace la condition vitesse signee qui deadlockait).
-    REVERT 2026-09-04 (important) : la piste "OffsetOpenM 0.0 -> 2.25" ci-dessus etait
-    FAUSSE - confirme operateur sur machine reelle : OffsetOpenM=0.0 et OffsetCloseM=15.0
-    sont les vraies positions physiques, NE DOIVENT JAMAIS CHANGER. Remis a 0.0 (et
-    CoherenceLimitM a 1.0) commit abbd0aa2. Consequence de l'erreur : tout Confirm
-    Open/Close presse pendant la fenetre a 2.25 a injecte ~2.25 m d'erreur dans la
-    reference encodeur M2 (necessite un re-Confirm apres coup). La cause racine reelle
-    du NoMovement 16#8000 / IsOpen jamais TRUE observee initialement reste A IDENTIFIER
-    (ce n'etait PAS OffsetOpenM).
-    FAIT 2026-09-04 (reste valide, independant de l'erreur ci-dessus) : verrou atomicite
-    demarrage couple (PRG_04 ~1225/1315) - fige la commande finale du treuil PRET tant
-    que l'autre purge son dead-time D18 (fin de jog benne) -> contacteurs au meme scan,
-    plus de M1 seul 59 cm. Remplace le timer aveugle 2s. ActiveOffsetM toujours a pente
-    bornee (M2PositionCorrected sans pas au basculement) ; limites haute/basse M2
-    corrigees (comparaison sur position corrigee, pas brute) ; fenetre de grace
-    ReferencePresetActive (ActiveOffsetM suit immediatement un preset IHM, pas de faux
-    ecart SYNC/MecaE) ; affichage benne (DeltaPositionCorrected_M/M2PositionCorrected)
-    sans rampe visuelle (OffsetTargetM instantane, ActiveOffsetM pente bornee reserve a
-    la securite).
-    RESTE : identifier la vraie cause du NoMovement/IsOpen initial (hors OffsetOpenM) ;
-    reduire CST_T248TransitionSettle (2s -> valeur mini viable, plancher D18 ~900ms) ;
-    calibrer OpenAnticipationM/CloseAnticipationM sur la distance de coast reelle ;
-    TC CI atomicite couple + TC CI sequencement selecteur ; verifier continuite deadman
-    sur toute la fenetre.
+  contexte: 'MES 2026-09-04. Mode "gestion bucket auto" actif par defaut (1 bouton IHM pour desactiver : GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing).
+    En MAINT couple (JoystickWinchSelectRequest=0), si l''operateur pousse (descente) et benne pas ouverte -> bascule auto
+    WinchSel=2, ouvre benne, puis WinchSel=0 descente couplee. Tire (montee) + pas fermee -> WinchSel=2 ferme, puis WinchSel=0
+    montee couplee. Contrainte forte : passer par le VRAI selecteur arbitre (JoystickWinchSelectArbitrated), pas un mecanisme
+    parallele. Une fois le mouvement couple lance, ne PLUS recorriger la benne meme si IsOpen/IsClosed est perdu momentanement.
+    La pause entre benne mode=2 et both mode=0 ne doit pas desarmer le joystick.'
+  description: 'FB_Modes 4quater : BucketSeqSatisfied (phase latch), Auth.CoupledBucketPhaseLocked (toute la fenetre T248
+    -> FB_BucketCmdArbitration n''arme jamais dive-open/ascent- close -> pas de blip instBucket.Busy -> deadman preserve),
+    Auth.WinchSelTransitionHold (dwell fixe TonWinchSelSettle apres tout changement de JoystickWinchSelectArbitrated). PRG_04:519
+    : si WinchSelTransitionHold -> zero des requetes logiques M1/M2. FAIT : sequencement selecteur reel, phase-lock deadman,
+    exemption programme (DumpAtTremie/ExtractionAssist via ProgramBucketDriveActive), TOF MecaA/overspeed non masque, dwell
+    fixe (remplace la condition vitesse signee qui deadlockait). REVERT 2026-09-04 (important) : la piste "OffsetOpenM 0.0
+    -> 2.25" ci-dessus etait FAUSSE - confirme operateur sur machine reelle : OffsetOpenM=0.0 et OffsetCloseM=15.0 sont les
+    vraies positions physiques, NE DOIVENT JAMAIS CHANGER. Remis a 0.0 (et CoherenceLimitM a 1.0) commit abbd0aa2. Consequence
+    de l''erreur : tout Confirm Open/Close presse pendant la fenetre a 2.25 a injecte ~2.25 m d''erreur dans la reference
+    encodeur M2 (necessite un re-Confirm apres coup). La cause racine reelle du NoMovement 16#8000 / IsOpen jamais TRUE observee
+    initialement reste A IDENTIFIER (ce n''etait PAS OffsetOpenM). FAIT 2026-09-04 (reste valide, independant de l''erreur
+    ci-dessus) : verrou atomicite demarrage couple (PRG_04 ~1225/1315) - fige la commande finale du treuil PRET tant que l''autre
+    purge son dead-time D18 (fin de jog benne) -> contacteurs au meme scan, plus de M1 seul 59 cm. Remplace le timer aveugle
+    2s. ActiveOffsetM toujours a pente bornee (M2PositionCorrected sans pas au basculement) ; limites haute/basse M2 corrigees
+    (comparaison sur position corrigee, pas brute) ; fenetre de grace ReferencePresetActive (ActiveOffsetM suit immediatement
+    un preset IHM, pas de faux ecart SYNC/MecaE) ; affichage benne (DeltaPositionCorrected_M/M2PositionCorrected) sans rampe
+    visuelle (OffsetTargetM instantane, ActiveOffsetM pente bornee reserve a la securite). RESTE : identifier la vraie cause
+    du NoMovement/IsOpen initial (hors OffsetOpenM) ; reduire CST_T248TransitionSettle (2s -> valeur mini viable, plancher
+    D18 ~900ms) ; calibrer OpenAnticipationM/CloseAnticipationM sur la distance de coast reelle ; TC CI atomicite couple +
+    TC CI sequencement selecteur ; verifier continuite deadman sur toute la fenetre.'
   objectifs:
   - Pousser/tirer en MAINT couple ouvre/ferme la benne puis lance le mouvement couple, sans rearmement joystick
   - Aucun treuil ne part seul apres l'ouverture benne (ecart tambours ~0)
   - Une fois le couple lance, la benne n'est plus recorrigee
   - Mode desactivable par 1 bouton IHM ; actif par defaut
-  - TC CI : atomicite demarrage couple + sequencement selecteur reel
+  - TC CI: atomicite demarrage couple + sequencement selecteur reel
   contrat: ''
   bloque_par: []
-
 - id: T250
   parent_id: ''
   statut: ⬜
@@ -5733,56 +5574,34 @@ tasks:
   agent: ''
   date: '2026-09-04T17:30:00+02:00'
   titre: Rendre offset-aware tous les consommateurs de la position M2 (cycle, safety dure, legal, dive, HMI)
-  contexte: >-
-    MES 2026-09-04. Audit position par 3 agents (treuils/benne, M3, cycle/modes/safety).
-    Cause racine des petites modifications a repetition : seule la couche FB_Winch
-    (ralentissement) et FB_SyncDeviation / cross-check MecaE sont offset-aware. Le
-    cycle SEMI_AUTO, les coupures dures FB_Safety_Winch cote descente, le flag legal
-    global et FB_DiveSearch comparent CablePosM2 BRUTE a des seuils exprimes en
-    referentiel outil (= M1). Benne fermee -> biais ~OffsetCloseM (15 m) ; benne
-    ouverte -> ~OffsetOpenM (2.25 m). 1re passe (benne fermee sortie homing) OK,
-    passes suivantes en defaut latching. Repere corrige = CablePosM2 - ActiveOffsetM ;
-    DeltaPositionCorrected_M et BucketState.ActiveOffset_M deja publies par PRG_04.
-    Fixes deja poses hors T250 : M2_LimitShift, BottomLimitM2_Active += ActiveOffsetM
-    (FB_Winch), M3_AtWorkPositionStable + garde arret, limite legale -19 m, palier
-    descente 4.
-  description: >-
-    BLOCKERS.
-    B1 PRG_07:373-374 - LimitLegalReached global calcule sur M2 brute -> corriger le
-    terme M2 (- ActiveOffset_M) ou ne garder que M1. Reglementaire + coupe
-    DescendPermit M1+M2 trop tot.
-    B2 PRG_04:917 - CfgCableLimitDescentM (vers FB_Safety_Winch:305/536, coupure DURE
-    descente M2) fourni brut -> += instBucket.ActiveOffsetM (symetrique de
-    M2_LimitShift ligne 807). Sous-protection jusqu a 15 m aujourd hui.
-    B3 FB_CycleSemiAuto:318 - anti-telescopage ABS(M1raw-M2raw)>0.5 phases AX4..AX9
-    benne ouverte -> DeltaPositionCorrected_M.
-    B4 FB_CycleSemiAuto:333 + PRG_03:125-127 - fenetre haute treuils sur M2 brute ;
-    rebouclage AX18->AX2 benne ouverte -> treuils hors FdC haut latch sortie cycle
-    des la 2e passe. Corriger terme M2 (M2_raw - ActiveOffset_M) ; envisager fallback
-    OR TopPositionSensor (deja fait en AX_DIVING_RETRY:766).
-    B5 FB_CycleSemiAuto:310 + :854 - AX11 ABS(M1raw-M2raw)>0.25 -> latch instCauses[5],
-    sortie AX11 jamais franchie -> DeltaPositionCorrected_M (+ verifier collapse
-    ActiveOffsetM post-fermeture AX10, delai de grace eventuel).
-    MAJOR.
-    M1 PRG_03:130 CycleInitPositionOk sur jeton front M3_AtMaintenanceStable aveugle
-    au boot -> publier + consommer lecture statique zone Maintenance
-    (M3_AtMaintenanceStable OR mot 00000 OR 00001), gardee arret.
-    M2 PRG_05:179-183 M3_LimitSwitchMaintenanceStable liberable par rebond capteur
-    -> ne garder que ELSIF M3_ReqTremie_Active (latch direction-only, comme Tremie).
-    M3 FB_CycleSemiAuto:795 AX9 decollement fond teste sur M2 brute vs cible frame-M1
-    -> (M2_raw - ActiveOffsetM).
-    M4 FB_DiveSearch:196/228-241 fenetre immersion + DiveStartMin sur M2 brute
-    (PRG_03:166) -> alimenter M2Position_M corrige, ou evaluer sur M1 seul.
-    M5 FB_WinchStateProjection:250 fait public limite basse M2 non decale (asymetrie
-    vs :220) -> + M2_LimitShift. HMI/troubleshooting seulement.
-    M6 PRG_02:439 preset OPEN = M1 (Delta=0) au lieu de M1 + OffsetOpenM -> etat benne
-    publie juste apres confirmation classe TooOpen. A TRANCHER METIER.
-    MINOR. FB_CycleSemiAuto:637/852-853 seuils profondeur jambe M2 biaises ;
-    PRG_07:597-598 IHM affiche M2 brute non etiquetee -> exposer M2PositionCorrected
-    profondeur ; PRG_05:564-565 commentaire perime ; M3StatusText suffixe conflit.
-    GUARD. Gate mecanique TOOLS/AGENT_WORKFLOW/scripts/ interdisant toute comparaison
-    directe EncoderM2...CablePosM a un seuil dans CODE/G_CYCLE/ et FB_DiveSearch sans
-    soustraction d ActiveOffsetM.
+  contexte: 'MES 2026-09-04. Audit position par 3 agents (treuils/benne, M3, cycle/modes/safety). Cause racine des petites
+    modifications a repetition : seule la couche FB_Winch (ralentissement) et FB_SyncDeviation / cross-check MecaE sont offset-aware.
+    Le cycle SEMI_AUTO, les coupures dures FB_Safety_Winch cote descente, le flag legal global et FB_DiveSearch comparent
+    CablePosM2 BRUTE a des seuils exprimes en referentiel outil (= M1). Benne fermee -> biais ~OffsetCloseM (15 m) ; benne
+    ouverte -> ~OffsetOpenM (2.25 m). 1re passe (benne fermee sortie homing) OK, passes suivantes en defaut latching. Repere
+    corrige = CablePosM2 - ActiveOffsetM ; DeltaPositionCorrected_M et BucketState.ActiveOffset_M deja publies par PRG_04.
+    Fixes deja poses hors T250 : M2_LimitShift, BottomLimitM2_Active += ActiveOffsetM (FB_Winch), M3_AtWorkPositionStable
+    + garde arret, limite legale -19 m, palier descente 4.'
+  description: BLOCKERS. B1 PRG_07:373-374 - LimitLegalReached global calcule sur M2 brute -> corriger le terme M2 (- ActiveOffset_M)
+    ou ne garder que M1. Reglementaire + coupe DescendPermit M1+M2 trop tot. B2 PRG_04:917 - CfgCableLimitDescentM (vers FB_Safety_Winch:305/536,
+    coupure DURE descente M2) fourni brut -> += instBucket.ActiveOffsetM (symetrique de M2_LimitShift ligne 807). Sous-protection
+    jusqu a 15 m aujourd hui. B3 FB_CycleSemiAuto:318 - anti-telescopage ABS(M1raw-M2raw)>0.5 phases AX4..AX9 benne ouverte
+    -> DeltaPositionCorrected_M. B4 FB_CycleSemiAuto:333 + PRG_03:125-127 - fenetre haute treuils sur M2 brute ; rebouclage
+    AX18->AX2 benne ouverte -> treuils hors FdC haut latch sortie cycle des la 2e passe. Corriger terme M2 (M2_raw - ActiveOffset_M)
+    ; envisager fallback OR TopPositionSensor (deja fait en AX_DIVING_RETRY:766). B5 FB_CycleSemiAuto:310 + :854 - AX11 ABS(M1raw-M2raw)>0.25
+    -> latch instCauses[5], sortie AX11 jamais franchie -> DeltaPositionCorrected_M (+ verifier collapse ActiveOffsetM post-fermeture
+    AX10, delai de grace eventuel). MAJOR. M1 PRG_03:130 CycleInitPositionOk sur jeton front M3_AtMaintenanceStable aveugle
+    au boot -> publier + consommer lecture statique zone Maintenance (M3_AtMaintenanceStable OR mot 00000 OR 00001), gardee
+    arret. M2 PRG_05:179-183 M3_LimitSwitchMaintenanceStable liberable par rebond capteur -> ne garder que ELSIF M3_ReqTremie_Active
+    (latch direction-only, comme Tremie). M3 FB_CycleSemiAuto:795 AX9 decollement fond teste sur M2 brute vs cible frame-M1
+    -> (M2_raw - ActiveOffsetM). M4 FB_DiveSearch:196/228-241 fenetre immersion + DiveStartMin sur M2 brute (PRG_03:166) ->
+    alimenter M2Position_M corrige, ou evaluer sur M1 seul. M5 FB_WinchStateProjection:250 fait public limite basse M2 non
+    decale (asymetrie vs :220) -> + M2_LimitShift. HMI/troubleshooting seulement. M6 PRG_02:439 preset OPEN = M1 (Delta=0)
+    au lieu de M1 + OffsetOpenM -> etat benne publie juste apres confirmation classe TooOpen. A TRANCHER METIER. MINOR. FB_CycleSemiAuto:637/852-853
+    seuils profondeur jambe M2 biaises ; PRG_07:597-598 IHM affiche M2 brute non etiquetee -> exposer M2PositionCorrected
+    profondeur ; PRG_05:564-565 commentaire perime ; M3StatusText suffixe conflit. GUARD. Gate mecanique TOOLS/AGENT_WORKFLOW/scripts/
+    interdisant toute comparaison directe EncoderM2...CablePosM a un seuil dans CODE/G_CYCLE/ et FB_DiveSearch sans soustraction
+    d ActiveOffsetM.
   objectifs:
   - B1..B5 corriges - cycle SEMI_AUTO enchaine >= 3 passes benne ouverte sans defaut latching position
   - Coupure dure descente M2 (FB_Safety_Winch) au bon endroit benne fermee ET ouverte
@@ -5791,9 +5610,8 @@ tasks:
   - FB_DiveSearch fenetre immersion coherente benne ouverte
   - IHM profondeur affichee = referentiel outil, brut etiquete si conserve
   - Guard CI anti-regression en place ; TC CI par blocker
-  contrat: 'TASK_CONTRACT_T250_position_offset_aware.yaml (a rediger - C3)'
+  contrat: TASK_CONTRACT_T250_position_offset_aware.yaml (a rediger - C3)
   bloque_par: []
-
 - id: T251
   parent_id: ''
   statut: ⬜
@@ -5802,24 +5620,18 @@ tasks:
   agent: ''
   date: '2026-09-04T19:50:00+02:00'
   titre: Arret plus doux sur FdC haut (rampe deceleration au capteur haut)
-  contexte: >-
-    MES 2026-09-04. Note operateur : l'arret au fin de course haut (capteur
-    M1M2_TopPositionFree_DI / TopPositionSensor) est actuellement un arret sec, pas
-    de rampe de ralentissement dediee avant contact capteur. A investiguer : FB_Winch
-    zone de ralentissement (TopLimitM/BottomLimitM, deja utilisee pour la butee
-    logicielle) - voir si applicable/etendue au capteur physique, ou palier reduit
-    dans les derniers cm avant FdC haut.
-  description: >-
-    A cadrer : mesurer la distance/temps reel entre debut de ralentissement souhaite
-    et le capteur haut ; verifier si une zone de ralentissement existe deja pour le
-    capteur physique (distincte de la butee logicielle TopLimitM) ; sinon proposer
-    un palier reduit dans les X derniers cm avant FdC haut cote FB_Winch.
+  contexte: 'MES 2026-09-04. Note operateur : l''arret au fin de course haut (capteur M1M2_TopPositionFree_DI / TopPositionSensor)
+    est actuellement un arret sec, pas de rampe de ralentissement dediee avant contact capteur. A investiguer : FB_Winch zone
+    de ralentissement (TopLimitM/BottomLimitM, deja utilisee pour la butee logicielle) - voir si applicable/etendue au capteur
+    physique, ou palier reduit dans les derniers cm avant FdC haut.'
+  description: 'A cadrer : mesurer la distance/temps reel entre debut de ralentissement souhaite et le capteur haut ; verifier
+    si une zone de ralentissement existe deja pour le capteur physique (distincte de la butee logicielle TopLimitM) ; sinon
+    proposer un palier reduit dans les X derniers cm avant FdC haut cote FB_Winch.'
   objectifs:
   - Arret au FdC haut moins brutal (rampe/palier reduit avant contact capteur)
   - Ne pas degrader la protection FdC haut materiel (reste barriere dure independante)
   contrat: ''
   bloque_par: []
-
 - id: T252
   parent_id: ''
   statut: ⬜
@@ -5828,54 +5640,36 @@ tasks:
   agent: ''
   date: '2026-09-04T20:10:00+02:00'
   titre: Registre des points ouverts session MES 2026-09-04 (a traiter/verifier demain)
-  contexte: >-
-    Session MES longue 2026-09-04. Point general : validation operateur confirmee -
-    pilotage benne fonctionne en MAINT y compris benne en position haute et benne a
-    la Tremie (garde WinchSel=2 forcee + bouton override T249). Plusieurs points
-    restent ouverts, non resolus faute de trace/donnees suffisantes en session.
-  description: >-
-    A TRACER/DIAGNOSTIQUER (pas de donnees suffisantes aujourd'hui) :
-    1. A-coup a la fermeture benne au moment du passage en couple (transition
-       WinchSel 2->0) - cause non tranchee (transition logicielle WinchSelTransitionHold
-       vs mecanique). Grille de lecture donnee a l'operateur (WinchSelTransitionHold,
-       DirectionChangePending, MeasuredSpeed) - a appliquer sur prochaine trace ciblee.
-    2. [M2] ErrorID:16 absence mouvement en debut de montee, ressenti quasi-immediat
-       par l'operateur alors que le timer est 3s (NoMovementTimeout) - hypothese
-       sequence frein qui grignote le delai avant mouvement reel, OU treuil sous 0.02
-       m/s (MovementSpeedThresholdMps) plus longtemps que prevu sous charge. Trace
-       ciblee necessaire (MeasuredSpeedSignedMps, RelayFwd/Rev, BrakeCommandOpenConfirmed).
-
-    A VERIFIER (config live forcee aujourd'hui, a confirmer apres reload/persistance) :
-    3. GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M / CfgSyncCriticalTolerance_M - forcer
-       2.0/4.0 en live si pas deja fait ; confirmer apres reload complet.
-    4. OffsetOpenM=0.0 / CoherenceLimitM=1.0 / LimitLegal=-19 / WinchMaxStepDescent=4 -
-       confirmer que le reload complet a bien remis ces valeurs (RETAIN).
-    5. FB_Safety_Winch.UncommandedDriftToleranceM=5.0 (MecaA) - confirmer apres reload.
-    6. BrakeFeedbackTimeout M3=800ms / BrakeDelayMotorDecel M3=2s - confirmer apres reload,
-       tester un arret M3 dur (FdC) sans defaut sequence/frein.
-
-    DETTES TECHNIQUES / OUTILLAGE (non bloquant MES, a faire quand possible) :
-    7. OverspeedFaultLatched (M1/M2) non publie dans GVL_Troubleshooting - angle mort
-       de diagnostic identifie en cherchant un SafeStop sans cause visible.
-    8. Harnais de test casses (hors scope aujourd'hui, deja signales) : FB_Bucket
-       (MOTIONDIRECTION obsolete), FB_Sim_Translation (ACTUALPOSITIONM/DRIVECONTROLWORD
-       obsoletes), FB_Hmi_BannerFormatter (3 TC pre-existants rouges), FB_Safety_Winch
-       TC-P10-001 (injection derive en 1 scan absorbee par PosStepDetected/RefWindowActive
-       - design de test a revoir, pas la logique produit).
-    9. Renommage DumpAtTremieDescentLocked -> WinchVerticalMoveLockedByM3 (nom trompeur,
-       cosmetique, differe depuis T249).
-
-    BACKLOG DEJA TRACE (non refait ici, voir taches dediees) : T249 (reste : rename +
-    branche SEMI_AUTO), T250 (position M2 offset-aware, cycle SEMI_AUTO/DiveSearch/
-    LimitLegal - audit complet deja fait, pas encore implemente), T251 (arret doux FdC
-    haut M1/M2).
+  contexte: 'Session MES longue 2026-09-04. Point general : validation operateur confirmee - pilotage benne fonctionne en
+    MAINT y compris benne en position haute et benne a la Tremie (garde WinchSel=2 forcee + bouton override T249). Plusieurs
+    points restent ouverts, non resolus faute de trace/donnees suffisantes en session.'
+  description: "A TRACER/DIAGNOSTIQUER (pas de donnees suffisantes aujourd'hui) : 1. A-coup a la fermeture benne au moment\
+    \ du passage en couple (transition\n   WinchSel 2->0) - cause non tranchee (transition logicielle WinchSelTransitionHold\n\
+    \   vs mecanique). Grille de lecture donnee a l'operateur (WinchSelTransitionHold,\n   DirectionChangePending, MeasuredSpeed)\
+    \ - a appliquer sur prochaine trace ciblee.\n2. [M2] ErrorID:16 absence mouvement en debut de montee, ressenti quasi-immediat\n\
+    \   par l'operateur alors que le timer est 3s (NoMovementTimeout) - hypothese\n   sequence frein qui grignote le delai\
+    \ avant mouvement reel, OU treuil sous 0.02\n   m/s (MovementSpeedThresholdMps) plus longtemps que prevu sous charge.\
+    \ Trace\n   ciblee necessaire (MeasuredSpeedSignedMps, RelayFwd/Rev, BrakeCommandOpenConfirmed).\n\nA VERIFIER (config\
+    \ live forcee aujourd'hui, a confirmer apres reload/persistance) : 3. GVL_IHM.M1M2Sync.Cfg.CfgSyncTolerance_M / CfgSyncCriticalTolerance_M\
+    \ - forcer\n   2.0/4.0 en live si pas deja fait ; confirmer apres reload complet.\n4. OffsetOpenM=0.0 / CoherenceLimitM=1.0\
+    \ / LimitLegal=-19 / WinchMaxStepDescent=4 -\n   confirmer que le reload complet a bien remis ces valeurs (RETAIN).\n\
+    5. FB_Safety_Winch.UncommandedDriftToleranceM=5.0 (MecaA) - confirmer apres reload. 6. BrakeFeedbackTimeout M3=800ms /\
+    \ BrakeDelayMotorDecel M3=2s - confirmer apres reload,\n   tester un arret M3 dur (FdC) sans defaut sequence/frein.\n\n\
+    DETTES TECHNIQUES / OUTILLAGE (non bloquant MES, a faire quand possible) : 7. OverspeedFaultLatched (M1/M2) non publie\
+    \ dans GVL_Troubleshooting - angle mort\n   de diagnostic identifie en cherchant un SafeStop sans cause visible.\n8. Harnais\
+    \ de test casses (hors scope aujourd'hui, deja signales) : FB_Bucket\n   (MOTIONDIRECTION obsolete), FB_Sim_Translation\
+    \ (ACTUALPOSITIONM/DRIVECONTROLWORD\n   obsoletes), FB_Hmi_BannerFormatter (3 TC pre-existants rouges), FB_Safety_Winch\n\
+    \   TC-P10-001 (injection derive en 1 scan absorbee par PosStepDetected/RefWindowActive\n   - design de test a revoir,\
+    \ pas la logique produit).\n9. Renommage DumpAtTremieDescentLocked -> WinchVerticalMoveLockedByM3 (nom trompeur,\n   cosmetique,\
+    \ differe depuis T249).\n\nBACKLOG DEJA TRACE (non refait ici, voir taches dediees) : T249 (reste : rename + branche SEMI_AUTO),\
+    \ T250 (position M2 offset-aware, cycle SEMI_AUTO/DiveSearch/ LimitLegal - audit complet deja fait, pas encore implemente),\
+    \ T251 (arret doux FdC haut M1/M2)."
   objectifs:
   - Chaque point trace/diagnostique avec une vraie trace avant toute nouvelle modif
   - Config live confirmee persistante apres reload complet
   - Dette outillage (harnais casses) planifiee
   contrat: ''
   bloque_par: []
-
 - id: T253
   parent_id: ''
   statut: ⏳
@@ -5884,45 +5678,37 @@ tasks:
   agent: AGY-01
   date: '2026-09-05T08:11:00+02:00'
   titre: Calibration géométrie benne réelle et fiabilisation persistance NVRAM
-  contexte: >-
-    Constat terrain 2026-09-05 : au démarrage matin, après homing à 0m, la benne est
-    reconnue 'ouverte' au lieu de 'fermée' car Delta=M2-M1 (~0m) matche OffsetOpenM (0m)
-    au lieu de OffsetCloseM par défaut (15m). Nécessité de verrouiller la calibration
-    physique réelle et la rémanence NVRAM pour le SAT.
-  description: >-
-    1. Mesurer sur site l'écart Delta = M2 - M1 benne fermée.
-    2. Renseigner OffsetCloseM et CoherenceLimitM dans GVL_PERSISTENT / IHM.
-    3. Valider le pont FB_CfgPersistBridge_BucketCfg et la survie après reboot sans écrasement.
-    4. Valider le verrou BucketReferenced := TRUE sur confirmation explicite N2 ou homing conjoint.
+  contexte: 'Constat terrain 2026-09-05 : au démarrage matin, après homing à 0m, la benne est reconnue ''ouverte'' au lieu
+    de ''fermée'' car Delta=M2-M1 (~0m) matche OffsetOpenM (0m) au lieu de OffsetCloseM par défaut (15m). Nécessité de verrouiller
+    la calibration physique réelle et la rémanence NVRAM pour le SAT.'
+  description: 1. Mesurer sur site l'écart Delta = M2 - M1 benne fermée. 2. Renseigner OffsetCloseM et CoherenceLimitM dans
+    GVL_PERSISTENT / IHM. 3. Valider le pont FB_CfgPersistBridge_BucketCfg et la survie après reboot sans écrasement. 4. Valider
+    le verrou BucketReferenced := TRUE sur confirmation explicite N2 ou homing conjoint.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T253_CALIB_BENNE_PERSISTANTE.yaml
   objectifs:
   - Caler les seuils géométriques réels de la benne (OffsetOpenM, OffsetCloseM, CoherenceLimitM)
   - Garantir la reconnaissance déterministe IsClosed/IsOpen sans bascule intempestive au reboot
   - Assurer la conservation en NVRAM/RETAIN et la liaison G200 100% PASS
   bloque_par: []
-
 - id: T254
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: CODEURS_VITESSE
   agent: AGY-01
   date: '2026-09-05T09:05:00+02:00'
+  completed_at: '2026-09-05T09:18:00+02:00'
   titre: Conversion directe vitesse codeur EtherCAT (m/s) — suppression dérivation/filtre
-  contexte: >-
-    La vitesse câble actuelle est calculée par dérivation numérique (ΔP / Δt) avec un filtre PT1 100ms.
-    Le codeur EtherCAT délivre nativement le mot COD1_SpdValue / COD2_SpdValue (0x6031:01 en 0.1 RPM).
-    Sur tambour 2.0 m/tr, la formule exacte validée est : V(m/s) = (SpdValue * 0.1 * 2.0) / 60.0 = SpdValue / 300.0.
-  description: >-
-    1. Raccorder SpdValueIn dans ST_fbEncoder_HwIn et PRG_02_Acquisition.
-    2. Supprimer la dérivation numérique et le filtre PT1 dans FB_Encoder_SpeedMeasure au profit du calcul direct.
-    3. Unifier ST_fbEncoder_Measurement sur Speed_Mps / SignedSpeed_Mps (suppression RawSpeed_Mps obsolète).
-    4. Adapter FB_SimBench et vérifier l'ensemble des consommateurs de vitesse (FB_Safety_Winch, IHM, Troubleshooting).
+  contexte: 'La vitesse câble actuelle est calculée par dérivation numérique (ΔP / Δt) avec un filtre PT1 100ms. Le codeur
+    EtherCAT délivre nativement le mot COD1_SpdValue / COD2_SpdValue (0x6031:01 en 0.1 RPM). Sur tambour 2.0 m/tr, la formule
+    exacte validée est : V(m/s) = (SpdValue * 0.1 * 2.0) / 60.0 = SpdValue / 300.0.'
+  description: 1. Raccorder SpdValueIn dans ST_fbEncoder_HwIn et PRG_02_Acquisition. 2. Supprimer la dérivation numérique
+    et le filtre PT1 dans FB_Encoder_SpeedMeasure au profit du calcul direct. 3. Unifier ST_fbEncoder_Measurement sur Speed_Mps
+    / SignedSpeed_Mps (suppression RawSpeed_Mps obsolète). 4. Adapter FB_SimBench et vérifier l'ensemble des consommateurs
+    de vitesse (FB_Safety_Winch, IHM, Troubleshooting).
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T254_CONVERSION_DIRECTE_VITESSE_CODEUR.yaml
   objectifs:
   - Conversion directe native codeur V(m/s) = (SpdValue * 0.1 * CableM_PerRev) / 60.0
   - Suppression du déphasage/filtre PT1 sur la mesure de vitesse
   - Épuration des structures et validation G200 100% PASS
   bloque_par: []
-
-

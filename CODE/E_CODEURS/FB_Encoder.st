@@ -184,8 +184,9 @@ instRel(
 instSpeed(
     Enable        := Enable,
     Reset         := Reset,
-    Position_M    := instSafety.CablePosMSafe,
-    PositionValid := NOT instRel.EncoderFault
+    SpdValueIn    := HwIn.SpdValueIn,
+    PositionValid := NOT instRel.EncoderFault,
+    CableM_PerRev := CableM_PerRev
 );
 {endregion}
 
@@ -197,8 +198,6 @@ Measurement.CablePosMSafe     := instSafety.CablePosMSafe;
 Measurement.EncoderIncoherent := instSafety.EncoderIncoherent;
 Measurement.Speed_Mps         := instSpeed.Speed_Mps;
 Measurement.SignedSpeed_Mps   := instSpeed.SignedSpeed_Mps;
-Measurement.RawSpeed_Mps      := instSpeed.RawSpeed_Mps;
-Measurement.RawSignedSpeed_Mps:= instSpeed.RawSignedSpeed_Mps;
 Measurement.SpeedValid        := instSpeed.Valid;
 Measurement.HomingFault        := instHoming.Fault;
 Measurement.HomingLifecycle    := instHoming.Lifecycle;

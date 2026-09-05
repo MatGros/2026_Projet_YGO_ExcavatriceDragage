@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T23:17:59.913126" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T23:17:59.913126">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T07:10:14.043326" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T07:10:14.043326">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -386,6 +386,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD1 (M1)</xhtml>
               </documentation>
             </variable>
+            <variable name="COD1_SpdValue">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute vitesse codeur COD1 (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
             <variable name="COD1_Alarms">
               <type>
                 <UINT />
@@ -416,6 +424,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD2 (M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_SpdValue">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute vitesse codeur COD2 (0x6031:01 en 0.1 RPM)</xhtml>
               </documentation>
             </variable>
             <variable name="COD2_Alarms">
@@ -1318,11 +1334,13 @@ Winch.M1M2_TopPositionFree_DI  := NOT SimTopPositionActive;
 Winch.M2_TensionedCable_DI     := TRUE; // Câble tendu en simu
 
 Winch.COD1_PosValue            := instSimEncoderM1.RawPosOut;
+Winch.COD1_SpdValue            := instSimEncoderM1.RawSpdOut;
 Winch.COD1_Alarms              := 0;
 Winch.COD1_Warnings            := 0;
 Winch.COD1_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING (bus OK)
 
 Winch.COD2_PosValue            := instSimEncoderM2.RawPosOut;
+Winch.COD2_SpdValue            := instSimEncoderM2.RawSpdOut;
 Winch.COD2_Alarms              := 0;
 Winch.COD2_Warnings            := 0;
 Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
@@ -1634,6 +1652,14 @@ Vitesse simulée = interpolation linéaire du palier : palier 1 → MinSpeedMps,
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Position brute simulée</xhtml>
               </documentation>
             </variable>
+            <variable name="RawSpdOut">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Vitesse brute simulée (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <inOutVars>
             <variable name="RawPos">
@@ -1839,6 +1865,17 @@ END_IF;
 
 {region "§4 Sortie"}
 RawPosOut := RawPos;
+// Formule inverse vitesse brute EtherCAT CoE (0.1 RPM) :
+// SpdValue = (V_mps * 60.0) / (0.1 * CableM_PerRev) = V_mps * 300.0 (sur tambour 2m)
+IF (MovingDir &lt;&gt; 0) AND (CableM_PerRev &gt; 0.0) THEN
+    IF MovingDir = 1 THEN
+        RawSpdOut := REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
+    ELSE
+        RawSpdOut := -REAL_TO_DINT((SpeedMps * 60.0) / (0.1 * CableM_PerRev) * SpeedScaleFactor);
+    END_IF;
+ELSE
+    RawSpdOut := 0;
+END_IF;
 {endregion}
 </xhtml>
           </ST>
