@@ -1,0 +1,62 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TÂCHE : CONVERSION DIRECTE VITESSE CODEUR ETHERCAT (m/s)
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T254
+  criticality: C4
+  strategy: patch
+  objective: >
+    Remplacer le calcul de vitesse issu de la dérivation numérique (delta P / delta t) et du filtre PT1 (100ms)
+    par la conversion arithmétique directe du mot de vitesse natif EtherCAT (COD1_SpdValue / COD2_SpdValue).
+    Formule exacte validée : V(m/s) = (SpdValue * 0.1 * CableM_PerRev) / 60.0.
+    Unification des variables de sortie sur Speed_Mps et SignedSpeed_Mps uniques (suppression RawSpeed_Mps obsolète)
+    avec mise à jour du mapping PRG_02_Acquisition, GVL_IHM, Troubleshooting et Simulation.
+
+  acceptance:
+    - id: AC1
+      statement: "La vitesse calculée par FB_Encoder_SpeedMeasure utilise directement la valeur native SpdValueIn issue de HwIn et applique la formule sans filtre PT1 ni dérivation."
+      verified_by: "Lecture du code ST de FB_Encoder_SpeedMeasure.st et comparaison dynamique sur trace."
+    - id: AC2
+      statement: "La structure ST_fbEncoder_Measurement est épurée avec une seule mesure claire Speed_Mps et SignedSpeed_Mps (suppression de RawSpeed_Mps/RawSignedSpeed_Mps devenus sans objet)."
+      verified_by: "Contrôle des types ST_fbEncoder_Measurement.st et absence d'erreur de compilation."
+    - id: AC3
+      statement: "FB_SimBench et l'aiguillage PRG_02_Acquisition alimentent correctement SpdValueIn pour M1 et M2 en mode Réel et en mode Simulation."
+      verified_by: "Exécution du banc de test simulation et vérification du passage de variables dans PRG_02_Acquisition."
+    - id: AC4
+      statement: "Le bundle PLCopenXML est régénéré, G200 Linkage est 100% PASS (0 erreur) et aucun consommateur de vitesse (FB_Safety_Winch, GVL_IHM, Troubleshooting) n'est orphelin."
+      verified_by: "generate_codesys_bundle.py + G200_check_linkage.py --report."
+    - id: AC5
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU ; aucun suffixe de langage _CFC/_LD n'est ajouté et le suffixe reste identique au langage généré dans le bundle."
+      verified_by: "G310 structure + génération bundle PLCopenXML."
+
+  scope:
+    allowed:
+      - CODE/E_CODEURS/FB_Encoder_SpeedMeasure.st
+      - CODE/E_CODEURS/FB_Encoder.st
+      - CODE/E_CODEURS/_TYPES/ST_fbEncoder_HwIn.st
+      - CODE/E_CODEURS/_TYPES/ST_fbEncoder_Measurement.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "inherit"
+    - "omni/cx/gpt-5.6-terra"
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+
