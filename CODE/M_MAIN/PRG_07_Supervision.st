@@ -611,7 +611,7 @@ instHmiBannerFormatter(
     M3StatusText                := GVL_IHM.TranslationM3.State.M3StatusText,
     TranslationMotionErrorId    := GVL_IHM.TranslationM3.State.ErrorId,
     TranslationFinalInterlockErrorId := GVL_IHM.TranslationM3.State.FinalInterlockErrorId,
-    WinchDescentLockedByM3 := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked,
+    WinchDescentLockedByM3 := NOT PRG_03_Modes_Cycle.Data.SequenceState.WinchDescentAuth_M3,
     M3AtTremieStable := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,

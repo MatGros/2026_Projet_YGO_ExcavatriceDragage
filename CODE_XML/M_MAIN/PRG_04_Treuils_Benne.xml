@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:57:55.033387" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:57:55.033387">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:11:02.284980" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:11:02.284980">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6715,8 +6715,8 @@ ProcessAndSafetyPermitM2_Descend := ProcessPermitM2_Descend AND SafetyPermitM2_D
 // benne permis"). Sans cette exemption, EffectivePermitBucket_Open/Close (cable sur
 // EffectivePermitM2_Descend/Ascent, ligne ~1004) heritait du meme verrou par accident de
 // cablage -&gt; ouverture benne bloquee a la Tremie (REX MES 2026-09-04).
-// Décision et calcul centralisés dans PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked
-IF PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked THEN
+// Décision et calcul centralisés dans PRG_03_Modes_Cycle.Data.SequenceState.WinchDescentAuth_M3
+IF NOT PRG_03_Modes_Cycle.Data.SequenceState.WinchDescentAuth_M3 THEN
     ProcessAndSafetyPermitM1_Descend := FALSE;
     IF NOT (ManualBucketJogActive
             OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen

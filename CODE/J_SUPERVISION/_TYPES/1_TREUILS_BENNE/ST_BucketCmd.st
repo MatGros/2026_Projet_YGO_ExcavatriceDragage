@@ -14,5 +14,8 @@ STRUCT
     // FB_Bucket) ET plafonne la vitesse au palier 1, sans passer par instBucket (pas de mémorisation
     // CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sans limite dédiée.
     TglManualBucketLimits : BOOL := TRUE; // Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut
+    // Assistance "vidage à la trémie" (MAINT_N1/N2) : arme l'ouverture auto de la benne quand
+    // M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescentAuth_M3).
+    TglEnableDumpAtTremie : BOOL := FALSE;
 END_STRUCT
 END_TYPE

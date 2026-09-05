@@ -26,6 +26,6 @@ STRUCT
     CurrentCycleElapsed : TIME;             // Durée écoulée du cycle SEMI_AUTO en cours
     LastCycleDuration   : TIME;             // Durée du dernier cycle SEMI_AUTO achevé (figée à X13)
     BottomTouchConfirmed        : BOOL;                    // Contact fond Kobold confirmé (manuel + bypass)
-    DumpAtTremieDescentLocked   : BOOL;                    // Verrou descente treuil "vidage à la trémie" (PRG_04 §5)
+    WinchDescentAuth_M3         : BOOL;                    // Autorisation positive descente treuil selon position M3 (P1/Maintenance) — PRG_04 §5
 END_STRUCT
 END_TYPE

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-19T02:05:08.005487" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-19T02:05:08.005487">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:09:50.531455" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:09:50.531455">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -80,6 +80,18 @@ positions ouvert/fermé configurées (OffsetOpenM/OffsetCloseM relatif à M1, m�
 FB_Bucket) ET plafonne la vitesse au palier 1, sans passer par instBucket (pas de mémorisation
 CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sans limite dédiée.
 Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglEnableDumpAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance "vidage à la trémie" (MAINT_N1/N2) : arme l'ouverture auto de la benne quand
+M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescentAuth_M3).</xhtml>
               </documentation>
             </variable>
           </struct>

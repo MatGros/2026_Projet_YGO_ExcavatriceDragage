@@ -1724,6 +1724,18 @@ CloseReq/OpenReq, jogging libre borné). Défaut FALSE : pilotage unitaire M2 sa
 Défaut TRUE -- pilotage unitaire M2 borné + palier 1 par défaut</xhtml>
               </documentation>
             </variable>
+            <variable name="TglEnableDumpAtTremie">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Assistance "vidage à la trémie" (MAINT_N1/N2) : arme l'ouverture auto de la benne quand
+M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescentAuth_M3).</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -5268,133 +5280,6 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    🎮 ST_CycleCmd — Commandes IHM pour le cycle semi-automatique
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleDiveSearchCfg">
-        <baseType>
-          <struct>
-            <variable name="DiveStartMin_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Position mini M1/M2 avant plongée</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionUpper_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne haute fenêtre front immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="ImmersionLower_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="-0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Borne basse fenêtre front immersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>42ebb53a-45c2-5353-807e-c73f913cfb78</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_CycleDiveSearchCfg — Réglages persistants cycle plongée (DiveSearch)
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleDumpAtTremieCfg">
-        <baseType>
-          <struct>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>b2ec5a9c-7e18-56a8-be1d-202932b2b8c1</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_CycleDumpAtTremieCfg — Réglages persistants cycle vidage trémie (legacy)
-   ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_CycleExtractionCfg">
-        <baseType>
-          <struct>
-            <variable name="ExtractionControlDistance_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Remontée palier 1 avant accélération</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Initialized">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🚦 flag restauration boot</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>4c14feb8-ddba-5e35-a2e4-6711b9795a14</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
-   ⚙️ ST_CycleExtractionCfg — Réglages persistants cycle extraction
-   📄 Doc : DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md §3ter
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -10463,12 +10348,12 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact fond Kobold confirmé (manuel + bypass)</xhtml>
               </documentation>
             </variable>
-            <variable name="DumpAtTremieDescentLocked">
+            <variable name="WinchDescentAuth_M3">
               <type>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Verrou descente treuil "vidage à la trémie" (PRG_04 §5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation positive descente treuil selon position M3 (P1/Maintenance) — PRG_04 §5</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -45782,7 +45667,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
-    Data.SequenceState.DumpAtTremieDescentLocked     := FALSE;
+    Data.SequenceState.WinchDescentAuth_M3           := TRUE;
 
 ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2) THEN
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
@@ -45809,8 +45694,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.ReqProgram.ReqTranslation.ReqStart    := FALSE;
     Data.ReqProgram.ReqTranslation.PositionTgt := 0;
 
-    // Requêtes benne et assistants — DumpAtTremie retire (legacy, plus de commande IHM)
-    DumpAtTremieActive := FALSE;
+    // Requêtes benne et assistants — DumpAtTremie recode (toggle IHM independant du verrou descente)
+    DumpAtTremieActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglEnableDumpAtTremie;
     DumpAtTremieAssistActive := DumpAtTremieActive;
     DumpAtTremieBucketOpenArmed := DumpAtTremieAssistActive AND PRG_05_Translation.Data.M3_AtTremieStable;
 
@@ -45866,10 +45751,10 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // au boot PLC, pont deja pose a P1/Maintenance -&gt; descente autorisee sans devoir
     // franchir un capteur d'abord (M3_AtWorkPositionStable couvre M3_AtP1/Maint jetons
     // + lecture directe mot 00011 / 00000).
-    Data.SequenceState.DumpAtTremieDescentLocked     :=
-        NOT PRG_05_Translation.Data.M3_AtWorkPositionStable
-        AND NOT GVL_IHM.TranslationM3.Bypass.LimitSwitch
-        AND NOT GVL_IHM.TranslationM3.Bypass.Global;
+    Data.SequenceState.WinchDescentAuth_M3     :=
+        PRG_05_Translation.Data.M3_AtWorkPositionStable
+        OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
+        OR GVL_IHM.TranslationM3.Bypass.Global;
 
 ELSE
     // Neutralisation déterministe (DISABLE)
@@ -45918,7 +45803,7 @@ ELSE
     Data.SequenceState.CurrentCycleElapsed     := T#0s;
     Data.SequenceState.LastCycleDuration       := T#0s;
     Data.SequenceState.BottomTouchConfirmed       := FALSE;
-    Data.SequenceState.DumpAtTremieDescentLocked     := FALSE;
+    Data.SequenceState.WinchDescentAuth_M3           := TRUE;
 END_IF;
 
 {endregion}
@@ -47768,8 +47653,8 @@ ProcessAndSafetyPermitM2_Descend := ProcessPermitM2_Descend AND SafetyPermitM2_D
 // benne permis"). Sans cette exemption, EffectivePermitBucket_Open/Close (cable sur
 // EffectivePermitM2_Descend/Ascent, ligne ~1004) heritait du meme verrou par accident de
 // cablage -&gt; ouverture benne bloquee a la Tremie (REX MES 2026-09-04).
-// Décision et calcul centralisés dans PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked
-IF PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked THEN
+// Décision et calcul centralisés dans PRG_03_Modes_Cycle.Data.SequenceState.WinchDescentAuth_M3
+IF NOT PRG_03_Modes_Cycle.Data.SequenceState.WinchDescentAuth_M3 THEN
     ProcessAndSafetyPermitM1_Descend := FALSE;
     IF NOT (ManualBucketJogActive
             OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
@@ -51373,7 +51258,7 @@ instHmiBannerFormatter(
     M3StatusText                := GVL_IHM.TranslationM3.State.M3StatusText,
     TranslationMotionErrorId    := GVL_IHM.TranslationM3.State.ErrorId,
     TranslationFinalInterlockErrorId := GVL_IHM.TranslationM3.State.FinalInterlockErrorId,
-    WinchDescentLockedByM3 := PRG_03_Modes_Cycle.Data.SequenceState.DumpAtTremieDescentLocked,
+    WinchDescentLockedByM3 := NOT PRG_03_Modes_Cycle.Data.SequenceState.WinchDescentAuth_M3,
     M3AtTremieStable := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
@@ -52733,9 +52618,6 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
             </Folder>
             <Folder Name="5_ASSISTANCE_DRAGAGE">
               <Object Name="ST_CycleAssistToggles" ObjectId="b8d5367f-703e-50e4-b308-00377a6188b7" />
-              <Object Name="ST_CycleDiveSearchCfg" ObjectId="42ebb53a-45c2-5353-807e-c73f913cfb78" />
-              <Object Name="ST_CycleDumpAtTremieCfg" ObjectId="b2ec5a9c-7e18-56a8-be1d-202932b2b8c1" />
-              <Object Name="ST_CycleExtractionCfg" ObjectId="4c14feb8-ddba-5e35-a2e4-6711b9795a14" />
             </Folder>
           </Folder>
           <Object Name="FB_AntiFlickerText" ObjectId="c4ab4ebb-976e-5154-b2e7-972371a90d1b" />
