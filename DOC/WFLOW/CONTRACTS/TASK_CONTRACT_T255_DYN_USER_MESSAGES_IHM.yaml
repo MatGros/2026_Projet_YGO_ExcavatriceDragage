@@ -1,0 +1,76 @@
+﻿# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T255
+  criticality: C2
+  strategy: patch
+
+  objective: >
+    Journaliser, corriger et enrichir les retours d'essais de mise en service (MES) :
+    déblocage Exit/Abort en pause, assouplissement géométrie benne à l'initialisation AX1,
+    et dynamisation des messages opérateur et conditions IHM.
+
+  acceptance:
+    - id: AC1
+      statement: "Le bouton Exit / Abort (BtnAbort / AbortCycle) et le Reset réinitialisent immédiatement le séquenceur à AX0_REPOS, même lorsque le cycle est en pause (WaitingResume) ou hors mode SEMI_AUTO."
+      verified_by: "Test en ligne CODESYS : appui sur Exit/Abort pendant WaitingResume ramène à AX0_REPOS"
+    - id: AC2
+      statement: "La condition de départ cycle (CycleWinchesAtTopOk / AX1_INIT) valide M1 au capteur haut et s'appuie sur l'état qualifié de la benne (FB_Bucket.IsClosed ou IsOpen) sans imposer un range rigide ±0.4m sur M2."
+      verified_by: "Test départ cycle avec benne fermée/entre-ouverte et M1 au FDC haut"
+    - id: AC3
+      statement: "À l'étape AX1_INIT, le message IHM affiche dynamiquement la condition exacte manquante (Codeurs non référencés, Treuils hors FDC haut, Défaut actif, Chariot M3 en maintenance)."
+      verified_by: "Vérification affichage SpecialConditionText et OperatorActionText"
+    - id: AC4
+      statement: "La liaison mécanique G200 est 100% PASS (0 erreur) et le bundle PLCopenXML est regénéré à chaque étape."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report"
+    - id: AC5
+      statement: "Critère structurel (scope CODE/M_MAIN) : pour chaque fichier modifié, le nom de fichier est identique au nom de POU ; aucun suffixe de langage _CFC/_LD n'est ajouté et le suffixe reste identique au langage généré dans le bundle."
+      verified_by: "G310 structure + génération bundle PLCopenXML."
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T255_DYN_USER_MESSAGES_IHM.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/NAMING_CONVENTION.md
+
+  conservation:
+    must_survive:
+      - "Comportement sécuritaire et transitions nominales de l'automate de cycle"
+      - "Encapsulation stricte et producteur unique GVL_IHM (PRG_07)"
+    dropped_on_purpose:
+      - "Range rigide M2 en dur dans PRG_03"
+      - "Blocage bouton Exit pendant WaitingResume"
+
+  evidence_required:
+    - check_linkage
+    - bundle
+
+  models_allowed:
+    - "inherit"
+
+  alert_duty: >
+    Signaler immédiatement toute incohérence d'affichage ou ambiguïté d'arbitrage
+    entre les messages d'alarme, de condition spéciale et d'action opérateur.
+
+status: IN_PROGRESS
+
+execution:
+  executed_by: "Antigravity (AGY-01)"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: "Sous-tâches consignées dans TASKS.yaml : T255-A (Exit/Abort en pause), T255-B (Assouplissement géométrie benne AX1), T255-C (Messages dynamiques IHM)."
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
