@@ -1,0 +1,6 @@
+Error compiling source files:
+
+FB_Main_EndToEnd.st:361:18: error: Cannot assign E_AUTOCYCLESTEP to E_CYCLESTEP
+ 361 | CycleStep     := prg03.CycleStep;
+     |                  ^
+

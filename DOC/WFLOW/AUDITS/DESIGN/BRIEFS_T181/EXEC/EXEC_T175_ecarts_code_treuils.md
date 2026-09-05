@@ -21,7 +21,7 @@
 | # | Doc | Pour |
 |---|---|---|
 | 1 | `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T175.yaml` | AC2/AC3/AC4/AC5 |
-| 2 | `DOC/WFLOW/P3_TEST_AUDIT_PROPOSITIONS_v1.0.md` | source des écarts (vérifiés ligne à ligne) |
+| 2 | `DOC/WFLOW/AUDITS/P3_TEST_AUDIT_PROPOSITIONS_v1.0.md` | source des écarts (vérifiés ligne à ligne) |
 | 3 | `CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st` (l.32-33 `DeadTimeSameDir/OppositeDir`, §4bis l.165-205) | **temps mort directionnel** (AC2) |
 | 4 | `CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st` (l.29-30 `M1_Busy`/`M2_Busy` déclarés jamais lus) | **anti-traversée benne** (AC3, TC-P10-025) |
 | 5 | `CODE/M_MAIN/PRG_04_Treuils_Benne.st` (câblage `M1_Busy`/`M2_Busy` vers `FB_Bucket`) | flux anti-traversée |
