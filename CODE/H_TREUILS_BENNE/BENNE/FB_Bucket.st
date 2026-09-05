@@ -488,15 +488,6 @@ ELSE
                 CloseReq := FALSE;
                 Lifecycle.Busy := FALSE;
                 Lifecycle.Done := TRUE;
-            ELSIF LeftStartSinceArm AND (CablePosM2 <= M2StartPosM) THEN
-                M2_RunRequest := FALSE;
-                M2_ReqAscent := FALSE;
-                M2_ReqDescend := FALSE;
-                BucketState.IsOpen := WasOpenAtStart;
-                BucketState.IsClosed := WasClosedAtStart;
-                CloseReq := FALSE;
-                Lifecycle.Busy := FALSE;
-                Lifecycle.Done := TRUE;
             END_IF;
         END_IF;
 
@@ -510,15 +501,6 @@ ELSE
                 BucketState.IsClosed := FALSE;
                 BucketState.LastPosM2Open := CablePosM2;
                 BucketState.StateIncoherent := FALSE;
-                OpenReq := FALSE;
-                Lifecycle.Busy := FALSE;
-                Lifecycle.Done := TRUE;
-            ELSIF LeftStartSinceArm AND (CablePosM2 >= M2StartPosM) THEN
-                M2_RunRequest := FALSE;
-                M2_ReqAscent := FALSE;
-                M2_ReqDescend := FALSE;
-                BucketState.IsOpen := WasOpenAtStart;
-                BucketState.IsClosed := WasClosedAtStart;
                 OpenReq := FALSE;
                 Lifecycle.Busy := FALSE;
                 Lifecycle.Done := TRUE;
