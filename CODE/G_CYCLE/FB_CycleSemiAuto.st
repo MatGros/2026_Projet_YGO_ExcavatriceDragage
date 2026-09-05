@@ -323,19 +323,19 @@ instCauses[8].Active   := (((M1_SpeedStepApplied > CST_StepDive) OR (M2_SpeedSte
 instCauses[8].Latching := TRUE;
 instCauses[8].Texte    := 'Palier vitesse > 4 (palier 5) pendant la plongee - interdit';
 
-// Appel du socle de défaut
-instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
-Fault := instFault.Fault;
-ErrorEdge(CLK := Fault.Error);
-{endregion}
+// // Appel du socle de défaut
+// instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+// Fault := instFault.Fault;
+// ErrorEdge(CLK := Fault.Error);
+// {endregion}
 
-{region "§2 Gate securite & Bascule Mode"}
-// 🛑 1bis. ABANDON & RESET EXPLICITES (Priorité absolue, même hors mode ou en pause)
-IF AbortEdge.Q THEN
-    State := E_AutoCycleStep.AX0_REPOS;
-    WaitingResume := FALSE;
-    PausedState := E_AutoCycleStep.AX0_REPOS;
-END_IF;
+// {region "§2 Gate securite & Bascule Mode"}
+// // 🛑 1bis. ABANDON & RESET EXPLICITES (Priorité absolue, même hors mode ou en pause)
+// IF AbortEdge.Q THEN
+//     State := E_AutoCycleStep.AX0_REPOS;
+//     WaitingResume := FALSE;
+//     PausedState := E_AutoCycleStep.AX0_REPOS;
+// END_IF;
 
 // 🔧 1ter. FORCAGE DE STEP (Mise en service / dérogation)
 // Déverrouillé UNIQUEMENT si : case IHM mise en service (ou bouton forcer appuyé).
