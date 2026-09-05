@@ -105,6 +105,20 @@
   - La synchronisation dynamique en montée pleine vitesse est exceptionnelle (écart de 4 à 6 cm).
 - 📌 **Action différée** : Néant.
 
+### MES-049 — Blocage Cycle SEMI_AUTO pendant ouverture benne
+- 📅 **Date** : 2026-09-05 12:06 | 📍 **Lieu** : Machine / cycle SEMI_AUTO | 🏷️ **Preuve** : `TOOLS/PLC_CSV_SNAPSHOT/RESULTS/snapshot/Snapshot_Troubleshooting_20260905_120629.csv` (541/541 variables, 0 erreur)
+- 🎯 **Périmètre** : `PRG_03_Modes_Cycle` → `PRG_04_Treuils_Benne` → `FB_Bucket` → `FB_WinchCmdArbitrationM2` → `FB_WinchOutputInterlock`
+- 🚦 **Statut** : 🔴 **Bloquant** — la qualification des cycles SEMI_AUTO est suspendue.
+- 🔍 **Constat factuel** :
+  1. Machine en `SEMI_AUTO`, chaîne AU fermée, puissance engagée ; `SafeStopActiveAny=FALSE` et `PowerCutOffActiveAny=FALSE`.
+  2. Ouverture demandée par cycle : `CycleCmd_Open=TRUE`, `OpenReqActive=TRUE`, `BucketBusy=TRUE`; benne intermédiaire, `DeltaPosition_M=13.5839844 m`.
+  3. Couplage M1+M2 bloqué : `BothBlocked=TRUE`, motif `COUPLING_BLOCKED`.
+  4. M2 reçoit une demande amont descente (20 %, relais reverse, palier 1) mais `BrakeCmd=FALSE`; aucune erreur treuil, Safety ou interlock final publiée.
+  5. La maintenance est confirmée fonctionnelle. Le code relie les directions benne aux mêmes `WinchBothReqAscent/Descend` d'origine joystick : aucune différence de source de commande n'est retenue comme cause.
+- ❓ **Cause non déterminée** : le snapshot ne publie pas l'état interne de `FB_WinchOutputInterlock` (`State`, `Reason`, `RestartRequired`, `RestartInhibit`, `DeadTimePending`, délais). Le blocage final ne peut pas être attribué sans cette preuve.
+- 🛠️ **Action ouverte** : instrumenter ces états dans `GVL_Troubleshooting` + `FB_TroubleshootingView` et régénérer la liste snapshot, sous contrat C4 et validation humaine préalable. Aucun forçage PLC et aucune correction logique à l'aveugle.
+- 📄 **Fiche** : `DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_BenneOuverture_BlocageCouplage_20260905.md`.
+
 ---
 
 ## 4. ✅ Procédure de Clôture `Txx`

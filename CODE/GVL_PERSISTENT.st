@@ -124,28 +124,6 @@ VAR_GLOBAL PERSISTENT RETAIN
     // 🎯 CYCLE REFERENCEMENT MACHINE (homing) — reglage mise en service
     _CycleMachineHomingCfgPersist : ST_CycleMachineHomingCfg := (ForceStepTarget := 0); // 🌉 Pont FB_CfgPersistBridge_CycleMachineHomingCfg
 
-    // 🤿 CYCLE PLONGÉE (DiveSearch)
-    _CycleDiveSearchCfgPersist : ST_CycleDiveSearchCfg := (
-        DiveStartMin_M := 1.0,   // Partage : assistant FB_DiveSearch ET altimetrie lancement Kobold GRAFCET (AT4). GEL attend 3-5 m -> a regler sur l'IHM (borne plausible FB : 0,5..8,0 m)
-        ImmersionUpper_M := 0.5,
-        ImmersionLower_M := -0.5
-    ); // 🌉 Pont FB_CfgPersistBridge_CycleDiveSearchCfg
-
-    // ⛏️ CYCLE EXTRACTION
-    _CycleExtractionCfgPersist : ST_CycleExtractionCfg := (
-        ExtractionControlDistance_M := 2.0
-    ); // 🌉 Pont FB_CfgPersistBridge_CycleExtractionCfg
-
-    // 🚚 CYCLE VIDAGE TRÉMIE (legacy)
-    _CycleDumpAtTremieCfgPersist : ST_CycleDumpAtTremieCfg := (Initialized := FALSE); // 🌉 Pont FB_CfgPersistBridge_CycleDumpAtTremieCfg
-
-    // 🎛️ TOGGLES ASSISTANCE (mode mémorisé au boot)
-    _CycleAssistTogglesPersist : ST_CycleAssistToggles := (
-        TglEnableDiveSearch := FALSE,
-        TglEnableExtractionSequence := FALSE,
-        TglEnableDumpAtTremie := FALSE
-    ); // 🌉 Pont FB_CfgPersistBridge_CycleAssistToggles
-
     // 📏 RÉGLEMENTATION / LÉGAL
     _CommunCfgPersist : ST_CommunCfg := (
         LimitLegalDepthMinAllowed_M := -19.0,

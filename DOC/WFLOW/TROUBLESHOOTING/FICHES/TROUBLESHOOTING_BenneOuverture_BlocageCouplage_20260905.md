@@ -48,15 +48,16 @@ Cycle semi-auto demande OPEN = TRUE
 - **Fait utilisateur (2026-09-05)** : la maintenance fonctionne parfaitement; le symptôme est exclusivement en plein cycle SEMI_AUTO. L'hypothèse frein/câblage est donc écartée pour cette session.
 - **Important** : `O_MotionM2.Step2_ModeAuthorized=FALSE` est normal en SEMI_AUTO : cette checklist est explicitement définie pour MAINT_N1/N2. Elle ne prouve pas un blocage du cycle.
 - **Traçage code** : en SEMI_AUTO, `FB_WinchCmdArbitrationM2` autorise explicitement l'override benne même lorsque le couplage est bloqué. Le snapshot confirme son émission (`RelayRevActive=TRUE`, palier 1). `BothBlocked` décrit le BOTH M1+M2, pas l'ordre M2 propre à l'ouverture de benne.
-- **Cause racine confirmée par code + signature snapshot** : `FB_WinchOutputInterlock` maintient `RestartRequired=TRUE` après l'arrêt. Son `RestartDelay` n'accumule que sous `NOT MotorRequest`. En cycle, `OpenReq` conserve `MotorRequest=TRUE` avant que les 750 ms de pause ne soient écoulées : le timer est alors arrêté à jamais et la branche `ELSIF RestartRequired OR DeadTimePending` coupe les sorties finales. Signature correspondante : relais demandé amont (`RelayRevActive=TRUE`, palier 1), mais `BrakeCmd=FALSE`, sans erreur, SafeStop ni permis final refusé.
-- **Pourquoi MAINT fonctionne** : le relâchement naturel du joystick fournit la pause à zéro qui laisse le délai se purger; ce n'est pas le cas de la requête cycle continue.
-- **Défaut de diagnostic** : `GVL_Troubleshooting` publie le relais amont, pas l'état/raison finale de `FB_WinchOutputInterlock`; l'état `WAIT_RESTART_DELAY` n'est donc pas visible dans le snapshot.
+- **Fait vérifié dans le câblage** : `FB_Bucket.ReqAscent/ReqDescend` reçoit directement `WinchBothReqAscent/Descend`, eux-mêmes issus de `PRG_03.Data.WinchBothIntent` (intention joystick). Le cycle ne possède donc pas une demande autonome différente de la maintenance.
+- **Conclusion précédente retirée** : l'hypothèse « le délai de redémarrage ne compte jamais parce que le cycle maintient une demande autonome » n'est pas prouvée et ne doit pas guider une modification.
+- **Fait restant** : le snapshot montre une demande amont M2 (`RelayRevActive=TRUE`, palier 1), mais un frein final non commandé (`BrakeCmd=FALSE`) sans erreur, SafeStop ni permis final refusé. La barrière finale masque donc l'action ou la projection snapshot est incohérente; laquelle est indéterminable avec les variables publiées.
+- **Défaut de diagnostic** : `GVL_Troubleshooting` publie le relais amont, mais pas `FB_WinchOutputInterlock.State`, `Reason`, `RestartRequired`, `RestartInhibit`, `DeadTimePending` ni ses temps écoulés. La cause finale n'est pas lisible dans le snapshot actuel.
 - **Statut** : à valider par un snapshot frais pris après maintien de la demande d'ouverture.
 
 ## 8. 🛠️ Proposition
 
-- **Immédiat, sans code** : ne pas forcer le couplage. Une pause réelle à zéro d'au moins 750 ms avant le lancement cycle contourne le défaut, à valider uniquement en état sûr.
-- **Définitif (à planifier C4)** : faire progresser `RestartDelay` pendant l'attente d'une demande maintenue (et publier `FinalInterlockState`, `RestartRequired`, `RestartDelayElapsed` dans le snapshot), avec test de non-régression MAINT/SEMI_AUTO.
+- **Immédiat, sans code** : ne pas forcer le couplage; aucun contournement n'est recommandé tant que l'état final de l'interlock n'est pas lu.
+- **Définitif (à planifier C4)** : publier `FinalInterlockState`, `Reason`, `RestartRequired`, `RestartInhibit`, `DeadTimePending`, `RestartDelayElapsed` et `DeadTimeElapsed`, puis corriger uniquement la branche prouvée, avec test MAINT/SEMI_AUTO.
 - **Validation requise** : humaine; aucune modification code ou forçage PLC proposé.
 
 ## 10. 📝 Journal

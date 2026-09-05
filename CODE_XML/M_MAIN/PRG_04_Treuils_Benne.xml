@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:42:03.598257" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:42:03.598257">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:57:55.033387" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:57:55.033387">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6272,8 +6272,8 @@ IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
     ControlAscentStartM2PosM := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 END_IF;
 IF ExtractionControlActive THEN
-    IF (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - ControlAscentStartM1PosM) &gt;= _CycleExtractionCfgPersist.ExtractionControlDistance_M)
-       AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - ControlAscentStartM2PosM) &gt;= _CycleExtractionCfgPersist.ExtractionControlDistance_M) THEN
+    IF (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - ControlAscentStartM1PosM) &gt;= GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M)
+       AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - ControlAscentStartM2PosM) &gt;= GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M) THEN
         ExtractionControlActive := FALSE;         // Distance de contrôle parcourue : paliers normaux
     ELSIF NOT (WinchBothMotionActive AND WinchBothReqAscent) THEN
         ExtractionControlActive := FALSE;         // Ascending relâchée/interrompue : annule la phase
@@ -6399,10 +6399,10 @@ IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
    AND WinchBothReqDescend
    AND _BucketState.IsOpen
    AND KoboldAutoStopRiseEdge.Q THEN
-    IF (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &lt;= _CycleDiveSearchCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &gt;= _CycleDiveSearchCfgPersist.ImmersionLower_M)
-       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &lt;= _CycleDiveSearchCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &gt;= _CycleDiveSearchCfgPersist.ImmersionLower_M) THEN
+    IF (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &lt;= GVL_IHM.CycleSemiAuto.Cfg.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &gt;= GVL_IHM.CycleSemiAuto.Cfg.ImmersionLower_M)
+       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &lt;= GVL_IHM.CycleSemiAuto.Cfg.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &gt;= GVL_IHM.CycleSemiAuto.Cfg.ImmersionLower_M) THEN
         KoboldImmersionConfirmed := TRUE;
     END_IF;
 END_IF;

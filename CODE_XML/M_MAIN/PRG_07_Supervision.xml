@@ -292,6 +292,50 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=AX0 .. 20=AX_DIVING_RETRY), borné côté FB</xhtml>
               </documentation>
             </variable>
+            <variable name="DiveStartMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Altimétrie lancement Kobold (AT4, PRG_03)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionUpper_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Altimétrie Kobold haute confirmation immersion (AT4, PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionLower_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Altimétrie Kobold basse confirmation immersion (AT4, PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionControlDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance palier contrôle montée assistée (PRG_04)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />

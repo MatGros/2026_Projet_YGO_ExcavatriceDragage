@@ -5119,6 +5119,50 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step GRAFCET cible du forçage (0=AX0 .. 20=AX_DIVING_RETRY), borné côté FB</xhtml>
               </documentation>
             </variable>
+            <variable name="DiveStartMin_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Altimétrie lancement Kobold (AT4, PRG_03)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionUpper_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Altimétrie Kobold haute confirmation immersion (AT4, PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ImmersionLower_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-0.5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Altimétrie Kobold basse confirmation immersion (AT4, PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ExtractionControlDistance_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance palier contrôle montée assistée (PRG_04)</xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
@@ -45669,7 +45713,7 @@ instCycleSemiAuto(
     CfgForceStepTarget      := GVL_IHM.CycleSemiAuto.Cfg.ForceStepTarget,
     CfgForceStepApply       := GVL_IHM.CycleSemiAuto.Cmd.BtnForceStepApply,
     // Config diving / extraction (GEL 2026-09-03)
-    DiveStartMinM           := _CycleDiveSearchCfgPersist.DiveStartMin_M, // altimetrie lancement Kobold (AT4) — plus de Cfg IHM (assistant retire), lecture directe RETAIN
+    DiveStartMinM           := GVL_IHM.CycleSemiAuto.Cfg.DiveStartMin_M, // altimetrie lancement Kobold (AT4)
     CfgRaiseOffBottomM      := GVL_IHM.CycleSemiAuto.Cfg.RaiseOffBottom_M,   // GEL Q16 : decollement du fond AX8 (reglable IHM)
     CfgCtrlAscentMaxStep    := GVL_IHM.CycleSemiAuto.Cfg.CtrlAscentMaxStep,  // GEL Q16 : palier max montee controle AX11 [1..2]
     M1_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber, // palier applique (0..5) : garde palier&lt;&gt;4 en plongee (GT-dive-retry) + cause 8 (palier 5)
@@ -47281,8 +47325,8 @@ IF BucketBusyFallEdge.Q AND ControlAscentArmedForThisClose THEN
     ControlAscentStartM2PosM := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM;
 END_IF;
 IF ExtractionControlActive THEN
-    IF (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - ControlAscentStartM1PosM) &gt;= _CycleExtractionCfgPersist.ExtractionControlDistance_M)
-       AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - ControlAscentStartM2PosM) &gt;= _CycleExtractionCfgPersist.ExtractionControlDistance_M) THEN
+    IF (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - ControlAscentStartM1PosM) &gt;= GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M)
+       AND (ABS(PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - ControlAscentStartM2PosM) &gt;= GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M) THEN
         ExtractionControlActive := FALSE;         // Distance de contrôle parcourue : paliers normaux
     ELSIF NOT (WinchBothMotionActive AND WinchBothReqAscent) THEN
         ExtractionControlActive := FALSE;         // Ascending relâchée/interrompue : annule la phase
@@ -47408,10 +47452,10 @@ IF GVL_IHM.Commun.Cfg.TglEnableKoboldAutoStopDescent
    AND WinchBothReqDescend
    AND _BucketState.IsOpen
    AND KoboldAutoStopRiseEdge.Q THEN
-    IF (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &lt;= _CycleDiveSearchCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &gt;= _CycleDiveSearchCfgPersist.ImmersionLower_M)
-       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &lt;= _CycleDiveSearchCfgPersist.ImmersionUpper_M)
-       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &gt;= _CycleDiveSearchCfgPersist.ImmersionLower_M) THEN
+    IF (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &lt;= GVL_IHM.CycleSemiAuto.Cfg.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &gt;= GVL_IHM.CycleSemiAuto.Cfg.ImmersionLower_M)
+       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &lt;= GVL_IHM.CycleSemiAuto.Cfg.ImmersionUpper_M)
+       AND (PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM &gt;= GVL_IHM.CycleSemiAuto.Cfg.ImmersionLower_M) THEN
         KoboldImmersionConfirmed := TRUE;
     END_IF;
 END_IF;

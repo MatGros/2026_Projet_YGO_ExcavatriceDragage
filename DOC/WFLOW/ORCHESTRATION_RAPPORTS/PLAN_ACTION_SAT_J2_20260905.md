@@ -88,3 +88,17 @@ flowchart TD
 | **Étape 2** | Après-midi J-1 | Sortir de la matière en `MAINT_N1` + Vidage Trémie M3 | `AF-05`, `AF-10`, `AF-11` |
 | **Étape 3** | Matin J-2 | Valider 3 cycles complets Semi-Auto basique en dragage réel | `AF-04 v2.3` ($X_0..X_{13}$) |
 | **Étape 4** | Après-midi J-2 | PV de réception & validation SAT client | `REGISTRE_Suivi_MiseEnService.md` |
+
+---
+
+## 📌 Mise à jour terrain — matinée du 2026-09-05
+
+| Sujet | Fait vérifié | Statut / action SAT |
+|---|---|---|
+| Maintenance M1/M2 / benne | Les manœuvres complètes, ouverture haut et pleine vitesse sont tracées dans `MES-046` à `MES-048` : 0 défaut actif sur les essais consignés. | 🟢 Base maintenance validée. |
+| Cycle SEMI_AUTO | Snapshot `Snapshot_Troubleshooting_20260905_120629.csv` : 541/541 variables lues. Pendant l'ouverture benne : `CycleCmd_Open=TRUE`, `BucketBusy=TRUE`, benne intermédiaire (`Δ=13.584 m`), `BothBlocked=TRUE / COUPLING_BLOCKED`. Aucun AU, SafeStop ni PowerCutOff actif. | 🔴 Cycle bloqué ; **ne pas qualifier les 3 cycles SAT**. |
+| Chaîne commande M2 | La demande amont M2 est présente (`RelayRevActive=TRUE`, palier 1), mais `BrakeCmd=FALSE`. Le câblage confirme que la demande cycle provient de la même intention joystick que la maintenance ; aucune hypothèse de « demande cycle autonome » n'est retenue. | 🔴 Cause finale non visible dans la raquette actuelle. |
+| Diagnostic requis | `FinalInterlockState`, `Reason`, `RestartRequired`, `RestartInhibit`, `DeadTimePending`, `RestartDelayElapsed` et `DeadTimeElapsed` ne sont pas publiés dans le snapshot. | 🟠 Cadrer un correctif C4 uniquement après lecture de ces états ; aucun forçage PLC. |
+| Export PLCopenXML | Bundle régénéré après modification utilisateur : 264/264 objets, 0 erreur ; `CODE_XML/CODE_Bundle.xml` frais. | 🟢 Export disponible ; G200/gates restent à exécuter pour valider un lot code. |
+
+**Décision SAT immédiate** : poursuivre uniquement les essais MAINT déjà validés et le diagnostic lecture seule du SEMI_AUTO. La qualification cycle et toute correction logique restent suspendues jusqu'à cause finale instrumentée et validée humainement.
