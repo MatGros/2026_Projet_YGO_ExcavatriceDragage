@@ -61,7 +61,6 @@ VAR_INPUT
     // === REFERENCEMENT CODEURS ===
     HomedM1                 : BOOL;         // --> [HW] Codeur M1 reference
     HomedM2                 : BOOL;         // --> [HW] Codeur M2 reference
-    TopPositionSensor       : BOOL;         // --> [HW] Capteur position haute (referencement)
     HomingRequest           : BOOL;         // --> [CMD] Demande de referencement (front)
     InitPositionOk          : BOOL;         // --> [HW] Posture de depart OK (treuils/M3 dans la plage, calcul PRG_03) - condition AX1_INIT
     WinchesAtTopWindow      : BOOL;         // --> [HW] Treuils M1 ET M2 dans la fenetre FDC logiciel haut (calcul PRG_03) - surveille en AX2
@@ -70,6 +69,9 @@ VAR_INPUT
     CfgDrainTime           : TIME;         // --> [CFG] Duree d'egouttage AX13 configurable IHM (<= 0 -> defaut interne)
     SkipDrainRequest       : BOOL;         // --> [CMD] Bouton IHM : passer l'etape d'egouttage AX13 (front)
     RepositionRequest      : BOOL;         // --> [CMD] Option IHM (maintenue) : repositionnement couple M1+M2 pendant le vidage tremie (AX15B <-> AX15C)
+    CfgCommissioningEnable : BOOL;         // --> [CFG] Case IHM mise en service : deverrouille le forcage de step
+    CfgForceStepTarget     : INT;          // --> [CFG] Step cible du forcage (0=AX0 .. 20=AX_DIVING_RETRY), borne dans le FB
+    CfgForceStepApply      : BOOL;         // --> [CMD] Applique le forcage (front) — impulsion, le GRAFCET reprend ensuite
 
     // === CONFIG DIVING / EXTRACTION (GEL 2026-09-03) ===
     DiveStartMinM          : REAL;         // --> [CFG] Altimetrie de lancement Kobold (AT4 : AX4 -> AX5), reglable IHM (~3..5 m ; <= 0 -> defaut interne)
@@ -123,6 +125,7 @@ VAR
     AbortEdge               : R_TRIG;       // . [LOC] Detecteur front montant AbortCycle
     ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
     JoyDeflectedEdge        : R_TRIG;       // . [LOC] Front montant JoystickDeflected (relance AX18 sur geste franc, pas maintien)
+    ForceStepApplyEdge      : R_TRIG;       // . [LOC] Detecteur front montant CfgForceStepApply
 
     // === GATE CONTINU HOMME-MORT ===
     CycleMotionPermit       : BOOL; // . [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme) ; gate commun a toutes les commandes d'actionneur du sequenceur. Le sens du mouvement reste porte par ReqAscent/ReqDescend de chaque etape.
@@ -359,6 +362,42 @@ IF AbortEdge.Q THEN
     PausedState := E_AutoCycleStep.AX0_REPOS;
 END_IF;
 
+// 🔧 1ter. FORCAGE DE STEP (Mise en service / dérogation)
+// Déverrouillé UNIQUEMENT si : case IHM mise en service ET mode SEMI_AUTO (ou MAINT).
+// Impulsion sur front montant : réinitialise les commandes résiduelles et saute à l'étape cible.
+ForceStepApplyEdge(CLK := CfgForceStepApply);
+IF ForceStepApplyEdge.Q AND CfgCommissioningEnable THEN
+    CASE LIMIT(0, CfgForceStepTarget, 20) OF
+        0:  State := E_AutoCycleStep.AX0_REPOS;
+        1:  State := E_AutoCycleStep.AX1_INIT;
+        2:  State := E_AutoCycleStep.AX2_TRANSLATE_P1;
+        3:  State := E_AutoCycleStep.AX3_OPEN_BUCKET;
+        4:  State := E_AutoCycleStep.AX4_DESCEND_DIVING;
+        5:  State := E_AutoCycleStep.AX5_KOBOLD_INIT;
+        6:  State := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
+        7:  State := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
+        8:  State := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
+        9:  State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
+        10: State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+        11: State := E_AutoCycleStep.AX11_CTRL_ASCENT;
+        12: State := E_AutoCycleStep.AX12_LOADED_ASCENT;
+        13: State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
+        14: State := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
+        15: State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
+        16: State := E_AutoCycleStep.AX15B_DUMP_OPEN;
+        17: State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
+        18: State := E_AutoCycleStep.AX18_DONE_SYNC;
+        19: State := E_AutoCycleStep.AX_STAB;
+        20: State := E_AutoCycleStep.AX_DIVING_RETRY;
+    END_CASE;
+    WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+    WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+    TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
+    BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
+    WaitingResume := FALSE;
+    PausedState := State;
+END_IF;
+
 IF ResetEdge.Q THEN
     SavedState := E_AutoCycleStep.AX0_REPOS;
     BottomTouched := FALSE;
@@ -528,11 +567,9 @@ CASE State OF
         // AX1_INIT : verification des CONDITIONS INITIALES du cycle. AUCUN ordre de
         // mouvement, aucun referencement (datum M1/M2/benne = responsabilite exclusive
         // FB_CycleMachineHoming). Conditions : codeurs M1/M2 references, aucun defaut
-        // latche, treuil M1 au FDC haut (TopPositionSensor + InitPositionOk), et posture de depart
-        // OK (InitPositionOk : chariot M3 PAS a droite de P1 + treuil M1 dans la plage
-        // +/- 0,4 m autour du FDC haut + benne qualifiee IsClosed ou IsOpen ; positionnement fin P1 = AX2).
-        InitConditionsOk := HomedM1 AND HomedM2 AND NOT Fault.Latched
-                            AND TopPositionSensor AND InitPositionOk;
+        // latche, et posture de depart OK (InitPositionOk : chariot M3 PAS a droite de P1
+        // + treuil M1 au FDC logiciel haut + benne qualifiee IsClosed ou IsOpen ; positionnement fin P1 = AX2).
+        InitConditionsOk := HomedM1 AND HomedM2 AND NOT Fault.Latched AND InitPositionOk;
         IF InitConditionsOk THEN
             CycleStateStr := 'AX1 - Conditions initiales OK';
             ExpectedAxis := E_OperatorAxis.NONE;
@@ -547,7 +584,7 @@ CASE State OF
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'AX1 - Machine non referencee : referencer codeurs M1/M2.';
+            OperatorAction := 'AX1 - Machine non referencee : referencer codeurs M1/M2 et benne.';
         ELSIF Fault.Latched THEN
             CycleStateStr := 'AX1 - Defaut cycle present';
             ExpectedAxis := E_OperatorAxis.BUTTON;
@@ -555,27 +592,20 @@ CASE State OF
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
             OperatorAction := 'AX1 - Defaut cycle actif : acquitter avec Reset.';
-        ELSIF NOT TopPositionSensor THEN
-            CycleStateStr := 'AX1 - Treuil hors capteur FDC haut';
-            ExpectedAxis := E_OperatorAxis.BUTTON;
-            WaitingForOperator := TRUE;
-            WaitingForProcess := FALSE;
-            OperatorActionId := 16#0401;
-            OperatorAction := 'AX1 - Monter le treuil M1 sur le capteur haut.';
         ELSIF NOT InitPositionOk THEN
-            CycleStateStr := 'AX1 - Posture depart incorrecte (M3 ou position M1)';
+            CycleStateStr := 'AX1 - Posture depart incorrecte (M3, FDC haut M1 ou benne)';
             ExpectedAxis := E_OperatorAxis.BUTTON;
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'AX1 - Verifier position M1 (FDC haut +-0.4m) et chariot M3 hors maintenance.';
+            OperatorAction := 'AX1 - Amener treuil M1 au FDC logiciel haut et qualifier benne (ouverte/fermee).';
         ELSE
             CycleStateStr := 'AX1 - Conditions initiales non remplies';
             ExpectedAxis := E_OperatorAxis.BUTTON;
             WaitingForOperator := TRUE;
             WaitingForProcess := FALSE;
             OperatorActionId := 16#0401;
-            OperatorAction := 'AX1 - Amener le treuil M1 au FDC haut.';
+            OperatorAction := 'AX1 - Verifier les conditions de depart du cycle.';
         END_IF;
 
     E_AutoCycleStep.AX2_TRANSLATE_P1:
@@ -620,24 +650,27 @@ CASE State OF
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
-        ExpectedDirection := 0;
+        ExpectedDirection := -1; // Sens principal attendu : pousser pour ouvrir
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0403;
-        OperatorAction := 'AX3 - Joystick pousse : ouverture benne jusqu au FDC logiciel benne ouverte.';
+        OperatorAction := 'AX3 - Pousser le joystick pour ouvrir la benne (tirer pour refermer si besoin).';
 
         // X3 = etape benne seule : treuils explicitement neutralises (config treuil unique par etape).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
-        IF Benne_IsOpen THEN
-            State := E_AutoCycleStep.AX4_DESCEND_DIVING;
+        // Pilotage benne 2 sens : pousse (Y-) -> ouvre, tire (Y+) -> ferme
+        IF CycleMotionPermit THEN
+            BucketCmd.ReqOpen := TRUE; // Piloté via ReqDescend dans FB_Bucket
         ELSE
-            BucketCmd.ReqOpen := CycleMotionPermit;
-            IF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
-                BucketCmd.ReqOpen := FALSE;
-                State := E_AutoCycleStep.AX4_DESCEND_DIVING;
-            END_IF;
+            BucketCmd.ReqOpen := FALSE;
+        END_IF;
+
+        // Transition vers AX4 : benne ouverte atteinte et confirmée
+        IF Benne_IsOpen AND (Benne_Done OR NOT Benne_Busy) THEN
+            BucketCmd.ReqOpen := FALSE;
+            State := E_AutoCycleStep.AX4_DESCEND_DIVING;
         END_IF;
 
     (* ===================== DIVING (AX4..AX8 + AX_DIVING_RETRY) ===================== *)
@@ -796,7 +829,7 @@ CASE State OF
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
         // AT-retry : treuils revenus au FDC haut -> nouvelle tentative de plongee.
-        IF JoystickDeflected AND (WinchesAtTopWindow OR TopPositionSensor) THEN
+        IF JoystickDeflected AND WinchesAtTopWindow THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX4_DESCEND_DIVING;

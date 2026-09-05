@@ -120,13 +120,15 @@ ELSE
     WinchBothMotionActive := (WinchBothMotionDirection <> 0);
 END_IF;
 
-// Posture de départ du cycle SEMI_AUTO (condition AX1_INIT) : treuil porteur M1 dans la
-// plage de position haute (± CST_CycleInitWindowM autour de la limite haute configurée)
-// ET état mécanique benne qualifié (IsClosed ou IsOpen via FB_Bucket, sans forcer un range M2 rigide)
+// Posture de départ du cycle SEMI_AUTO (condition AX1_INIT) : treuil porteur M1 ou M2 ayant
+// atteint la limite haute logicielle (CableLimitAscent) OU dans la fenêtre haute (± CST_CycleInitWindowM)
+// ET état mécanique benne qualifié (IsClosed ou IsOpen via FB_Bucket, les sécurités gérant les écarts anormaux)
 // ET chariot M3 PAS à droite de P1 (côté maintenance interdit). Le positionnement fin
 // sur P1 est fait ensuite en AX2. Calculé ici — FB_CycleSemiAuto ne fait que consommer.
 CycleWinchesAtTopOk :=
-    (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - _CommunCfgPersist.CfgCableLimitAscent_M) <= CST_CycleInitWindowM)
+    (PRG_04_Treuils_Benne.Data.WinchM1Safety.CableLimitAscent
+     OR PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent
+     OR (ABS(PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM - _CommunCfgPersist.CfgCableLimitAscent_M) <= CST_CycleInitWindowM))
     AND (PRG_04_Treuils_Benne.Data.BucketState.MechState.IsClosed OR PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen);
 
 // Posture de départ complète (AX1_INIT) = treuils en haut ET chariot M3 PAS à droite de P1.
@@ -273,13 +275,15 @@ instCycleSemiAuto(
     Benne_IsRoughlyClosed   := PRG_04_Treuils_Benne.Data.Benne_IsRoughlyClosed,  // Tolérance matière 2m
     HomedM1                 := PRG_02_Acquisition.Data.EncoderM1.Homed,
     HomedM2                 := PRG_02_Acquisition.Data.EncoderM2.Homed,
-    TopPositionSensor       := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InitPositionOk          := CycleInitPositionOk,
     WinchesAtTopWindow      := CycleWinchesAtTopOk,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
     CfgDrainTime            := GVL_IHM.Cycle.Cfg.DrainTime,
     SkipDrainRequest        := GVL_IHM.Cycle.Cmd.BtnSkipDrain,
     RepositionRequest       := GVL_IHM.Cycle.Cmd.BtnReposition,
+    CfgCommissioningEnable  := GVL_IHM.Cycle.Cmd.TglCommissioning OR GVL_IHM.CycleSemiAuto.Cmd.TglCommissioning,
+    CfgForceStepTarget      := GVL_IHM.Cycle.Cfg.ForceStepTarget,
+    CfgForceStepApply       := GVL_IHM.Cycle.Cmd.BtnForceStepApply OR GVL_IHM.CycleSemiAuto.Cmd.BtnForceStepApply,
     // Config diving / extraction (GEL 2026-09-03)
     DiveStartMinM           := GVL_IHM.CycleDiveSearch.Cfg.DiveStartMin_M, // altimetrie lancement Kobold (AT4)
     CfgRaiseOffBottomM      := GVL_IHM.Cycle.Cfg.RaiseOffBottom_M,   // GEL Q16 : decollement du fond AX8 (reglable IHM)
