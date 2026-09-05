@@ -75,6 +75,8 @@ VAR_INPUT
     CycleDone                : BOOL;   (* --> [STAT] Séquenceur terminé *)
     CycleError               : BOOL;   (* --> [STAT] Séquenceur en erreur *)
     CycleErrorId             : WORD;   (* --> [DIAG] Code erreur séquenceur *)
+    CycleFaultLatched        : BOOL;   (* --> [STAT] Défaut latché séquenceur (bloque AX0->AX1, exige Reset) *)
+    CycleFaultLatchedId      : WORD;   (* --> [DIAG] Bitfield défaut latché figé *)
     CycleStep                : E_AutoCycleStep; (* --> [STAT] Étape courante *)
     CycleStepStr             : STRING(80);  (* --> [STAT] Libellé étape *)
     CycleStepAtError         : E_AutoCycleStep; (* --> [DIAG] Étape au défaut *)
@@ -663,6 +665,8 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx202_Busy                      := CycleAut
 GVL_Troubleshooting.G_CycleSemiAuto.Idx203_Done                      := CycleDone;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx204_Error                     := CycleError;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFaultLatched;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;

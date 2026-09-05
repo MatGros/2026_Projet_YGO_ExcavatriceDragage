@@ -22,8 +22,10 @@ STRUCT
     Idx201_Ready                     : BOOL; // 1 = Séquenceur prêt à démarrer
     Idx202_Busy                      : BOOL; // 1 = Cycle en cours d'exécution
     Idx203_Done                      : BOOL; // 1 = Cycle terminé avec succès
-    Idx204_Error                     : BOOL; // 1 = Défaut ou anomalie bloquante sur le cycle
+    Idx204_Error                     : BOOL; // 1 = Défaut vue LIVE (retombe seul avec la cause)
     Idx205_ErrorId                   : WORD; // Code d'erreur interne FB_Cycle
+    Idx217_FaultLatched              : BOOL; // 1 = Défaut vue LATCHÉE (bloque AX0->AX1 même si Idx204=0, exige Reset conscient)
+    Idx218_FaultLatchedId            : WORD; // Bitfield fige a l'apparition du defaut latche
     Idx206_Step                      : E_AutoCycleStep; // Étape courante (X0 à X13 + AX_STAB)
     Idx207_StepStr                   : STRING(80);  // Libellé explicite de l'étape
     Idx208_StepAtError               : E_AutoCycleStep; // Étape mémorisée lors du dernier défaut

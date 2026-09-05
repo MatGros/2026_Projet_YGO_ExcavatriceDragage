@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:44:45.745334" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:44:45.745334">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:31:30.145411" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:31:30.145411">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -7085,6 +7085,22 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code erreur séquenceur</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleFaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Défaut latché séquenceur (bloque AX0-&gt;AX1, exige Reset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleFaultLatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Bitfield défaut latché figé</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleStep">
               <type>
                 <derived name="E_AutoCycleStep" />
@@ -7871,6 +7887,8 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx202_Busy                      := CycleAut
 GVL_Troubleshooting.G_CycleSemiAuto.Idx203_Done                      := CycleDone;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx204_Error                     := CycleError;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFaultLatched;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;

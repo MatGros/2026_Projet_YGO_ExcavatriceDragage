@@ -3189,7 +3189,7 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut ou anomalie bloquante sur le cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut vue LIVE (retombe seul avec la cause)</xhtml>
               </documentation>
             </variable>
             <variable name="Idx205_ErrorId">
@@ -3198,6 +3198,22 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Code d'erreur interne FB_Cycle</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx217_FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = Défaut vue LATCHÉE (bloque AX0-&gt;AX1 même si Idx204=0, exige Reset conscient)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx218_FaultLatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield fige a l'apparition du defaut latche</xhtml>
               </documentation>
             </variable>
             <variable name="Idx206_Step">
@@ -38572,6 +38588,22 @@ PositionEstimatedM := LIMIT(PosTremieM - 0.5, PositionEstimatedM, PosMaintenance
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code erreur séquenceur</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleFaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Défaut latché séquenceur (bloque AX0-&gt;AX1, exige Reset)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleFaultLatchedId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Bitfield défaut latché figé</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleStep">
               <type>
                 <derived name="E_AutoCycleStep" />
@@ -39358,6 +39390,8 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx202_Busy                      := CycleAut
 GVL_Troubleshooting.G_CycleSemiAuto.Idx203_Done                      := CycleDone;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx204_Error                     := CycleError;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFaultLatched;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;
@@ -51376,6 +51410,8 @@ instTroubleshootingView(
     CycleDone            := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done,
     CycleError           := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error,
     CycleErrorId         := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
+    CycleFaultLatched    := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched,
+    CycleFaultLatchedId  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId,
     CycleStep            := PRG_03_Modes_Cycle.Data.SequenceState.Step,
     CycleStepStr         := PRG_03_Modes_Cycle.Data.SequenceState.StepStr,
     CycleStepAtError     := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
