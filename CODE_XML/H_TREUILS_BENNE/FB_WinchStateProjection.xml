@@ -4594,7 +4594,8 @@ IF NOT BypassGlobal THEN
     // s'appuie donc sur le codeur disponible + le delta de position confirme.
     TonNoMovement(
         IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND EncoderAvailable
-              AND MovementCommanded AND NOT InReferencingMode
+              AND MovementCommanded AND BrakeFeedback AND NOT FwdRevSpeedFeedbackOff
+              AND NOT InReferencingMode
               AND NOT PositionMovementDetected,
         PT := NoMovementTimeout
     );
