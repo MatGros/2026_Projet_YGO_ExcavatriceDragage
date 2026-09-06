@@ -134,7 +134,8 @@ VAR_GLOBAL PERSISTENT RETAIN
         WinchSlowdownDistanceTop_M := 0.5,
         WinchSlowdownDistanceBottom_M := 1.0,
         WinchSlowdownMaxStep := 1,
-        CfgCableLimitAscent_M := 7.0
+        CfgCableLimitAscent_M := 7.0,
+        TglEnableWinchDescentLock_M3 := TRUE
     ); // 🌉 Pont FB_CfgPersistBridge_CommunCfg
 
     // 🚦 SYSTÈME / IHM
