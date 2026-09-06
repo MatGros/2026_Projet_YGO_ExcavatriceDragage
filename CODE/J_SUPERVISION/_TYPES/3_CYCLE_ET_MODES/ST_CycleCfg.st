@@ -4,7 +4,7 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_CycleCfg :
 STRUCT
-    SetDepth_M         : REAL := -12.5; (* 📐 Profondeur de dragage cible (m, négative) *)
+    SetDepth_M         : REAL := -20.0; (* 📐 Profondeur de dragage cible (m, négative) *)
     DepthStopMode      : E_CycleDepthStopMode := E_CycleDepthStopMode.KOBOLD_OR_SETPOINT; (* 🧭 Source arrêt AX7 *)
     DrainTime          : TIME := T#5s;  (* ⏱️ Durée d'égouttage du godet en AX13 (configurable IHM) *)
     RaiseOffBottom_M   : REAL := 0.5;   (* 📐 Décollement du fond en AX8 : RaiseTarget = TouchPosition + ce champ (réglable essais, GEL Q16) *)
