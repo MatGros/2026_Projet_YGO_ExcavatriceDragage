@@ -27885,10 +27885,29 @@ ELSIF SafeStopActive THEN
         OperatorActionCandidate := '[SYNC] Discordance contacteurs M1/M2 - Acquitter SafeStop';
     ELSE
         OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
-    END_IF;
 ELSIF DirectionBlocked THEN
     IF CurrentDirection &lt; 0 THEN
-        OperatorActionCandidate := '[TREUIL] Descente interdite';
+        IF WinchDescentLockedByM3 THEN
+            // 🛡️ Descente verrouillée par position M3 (chariot pas à P1/Maintenance)
+            OperatorActionCandidate := '[TREUIL] Descente interdite - Chariot M3 pas a P1/Maintenance';
+        ELSIF LegalLimitReached THEN
+            // 🛡️ Descente bloquée par limite légale atteinte
+            OperatorActionCandidate := '[TREUIL] Descente interdite - Limite legale atteinte';
+        ELSIF WinchM1Safety.CableLimitDescent OR WinchM2Safety.CableLimitDescent THEN
+            // 🛡️ Descente bloquée par limite basse câble
+            OperatorActionCandidate := '[TREUIL] Descente interdite - Limite basse cable';
+        ELSIF WinchM1Safety.SlackCable OR WinchM2Safety.SlackCable THEN
+            // 🛡️ Descente bloquée par détection mou de câble
+            OperatorActionCandidate := '[TREUIL] Descente interdite - Mou de cable detecte';
+        ELSIF WinchM1Safety.DescendPermit AND NOT WinchM2Safety.DescendPermit THEN
+            // 🛡️ Descente bloquée spécifiquement par M2
+            OperatorActionCandidate := '[TREUIL] Descente interdite - Treuil M2 (benne)';
+        ELSIF WinchM2Safety.DescendPermit AND NOT WinchM1Safety.DescendPermit THEN
+            // 🛡️ Descente bloquée spécifiquement par M1
+            OperatorActionCandidate := '[TREUIL] Descente interdite - Treuil M1 (retenue)';
+        ELSE
+            OperatorActionCandidate := '[TREUIL] Descente interdite';
+        END_IF;
     ELSIF TopLimitReached THEN
         // 🛡️ Montée bloquée par butée logicielle haute (agrégat M1/M2) — cause exposée par le safety.
         OperatorActionCandidate := '[TREUIL] Montée interdite - limite haute';
