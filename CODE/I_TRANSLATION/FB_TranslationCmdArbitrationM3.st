@@ -35,6 +35,8 @@ VAR_OUTPUT
 END_VAR
 VAR
     FreqPct : REAL;  // . [LOC] Échelle fréquence (0..100 %)
+    CycleTargetDirectionOk : BOOL; // . [LOC] Axe X cohérent avec la cible SEMI_AUTO
+    CycleJoystickAxisOk    : BOOL; // . [LOC] Axe Y neutre avant translation SEMI_AUTO
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -61,7 +63,10 @@ ELSE
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         PositioningActive := TRUE;
         SelTarget := ReqTranslation.PositionTgt;
-        RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk;
+        CycleTargetDirectionOk := ((SelTarget = 1) AND Joystick.AxisX.DirectionPositive)
+                               OR ((SelTarget <> 1) AND Joystick.AxisX.DirectionNegative);
+        CycleJoystickAxisOk := CycleTargetDirectionOk AND Joystick.AxisY.AtNeutral;
+        RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk AND CycleJoystickAxisOk;
         IF RunRequest THEN
             SpeedPct := 100.0;
             IF SelTarget = 1 THEN
@@ -91,6 +96,8 @@ ELSE
         RunRequest := (ReqTremie OR ReqMaintenance)
                      AND (IHM.BypassGlobal OR NOT TglJoystickMaster OR TglJoystickMaster)
                      AND Joystick.DeadmanArmed
+                     // Interlock inter-axes : un ordre treuil Y bloque M3.
+                     AND (NOT TglJoystickMaster OR (Joystick.AxisY.Direction = 0))
                      AND Context.HeightInterlockOk;
 
         // Échelle fréquence : SetFreq_Hz (ou 100% si non renseignée), manche mis à l'échelle si joystick maître

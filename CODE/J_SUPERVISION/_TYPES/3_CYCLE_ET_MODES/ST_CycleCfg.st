@@ -13,7 +13,7 @@ STRUCT
     DiveStartMin_M     : REAL := 4.0;   (* 📐 Altimétrie lancement Kobold (AT4, PRG_03) *)
     ImmersionUpper_M   : REAL := 0.5;   (* 📐 Altimétrie Kobold haute confirmation immersion (AT4, PRG_04) *)
     ImmersionLower_M   : REAL := -0.5;  (* 📐 Altimétrie Kobold basse confirmation immersion (AT4, PRG_04) *)
-    ExtractionControlDistance_M : REAL := 0.0; (* 📐 0 = distance de contrôle interne par défaut *)
+    ExtractionControlDistance_M : REAL := 0.0; (* 📐 0 = bypass AX11, enchaînement direct AX10→AX12 *)
     Initialized        : BOOL := FALSE; (* 🚦 flag restauration boot *)
 END_STRUCT
 END_TYPE

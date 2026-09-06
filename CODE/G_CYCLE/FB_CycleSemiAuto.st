@@ -18,7 +18,8 @@ VAR_INPUT
     JoystickDeflected       : BOOL;         // --> [CMD] Manche deflecte (non centre)
     JoystickPush            : BOOL;         // --> [CMD] Intention Y descente qualifiee (axe Y pousse uniquement)
     JoystickPull            : BOOL;         // --> [CMD] Intention Y montee qualifiee (axe Y tire uniquement)
-    JoystickRight           : BOOL;         // --> [CMD] Intention X vers P1 qualifiee (axe X positif)
+    JoystickRight           : BOOL;         // --> [CMD] Intention X vers P1 qualifiee
+    JoystickLeft            : BOOL;         // --> [CMD] Intention X vers tremie qualifiee
     DeadmanArmed            : BOOL;         // --> [CMD] Appui homme-mort (fenetre 3 s)
     HeartbeatIhmOk          : BOOL;         // --> [SAFE] IHM<->PLC valide
 
@@ -146,7 +147,9 @@ VAR
     ForceStepApplyEdge      : R_TRIG;       // . [LOC] Detecteur front montant CfgForceStepApply
 
     // === GATE CONTINU HOMME-MORT ===
-    CycleMotionPermit       : BOOL; // . [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme) ; gate commun a toutes les commandes d'actionneur du sequenceur. Le sens du mouvement reste porte par ReqAscent/ReqDescend de chaque etape.
+    CycleMotionPermit       : BOOL; // . [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme)
+    TranslationP1Permit     : BOOL; // . [LOC] Translation vers P1 : axe X droit seul, axe Y au neutre
+    TranslationTremiePermit : BOOL; // . [LOC] Translation vers tremie : axe X gauche seul, axe Y au neutre
     WinchesAtDiveStep       : BOOL; // . [LOC] M1 ET M2 confirmes au palier 4 (mesure Kobold fiable seulement a vitesse stabilisee)
 
     // === COMPTEUR PRELEVEMENTS (garde de front) ===
@@ -639,6 +642,8 @@ Ready := Enable AND NOT Fault.Latched;
 // commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par JoystickDeflected.
 CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
+TranslationP1Permit := DeadmanArmed AND JoystickRight AND NOT JoystickPush AND NOT JoystickPull;
+TranslationTremiePermit := DeadmanArmed AND JoystickLeft AND NOT JoystickPush AND NOT JoystickPull;
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
 IF WaitingResume AND NOT StateExecutionInhibit THEN
@@ -821,7 +826,7 @@ CASE State OF
             WaitingForProcess := JoystickDeflected;
             OperatorActionId := 16#0402;
             OperatorAction := 'AX2 - Pousser le joystick vers la droite : arret automatique sur P1.';
-            TranslationCmd.ReqStart := CycleMotionPermit;
+            TranslationCmd.ReqStart := TranslationP1Permit;
         END_IF;
 
     E_AutoCycleStep.AX3_OPEN_BUCKET:
@@ -1137,9 +1142,15 @@ CASE State OF
             WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
             // Nouvelle reference de controle : position reelle au depart
             // d'AX11, apres extraction/fermeture, et non le contact fond.
+            // Une distance configuree a 0 desactive volontairement AX11 et
+            // enchaine directement AX12 sans demander de relacher le joystick.
             CtrlAscentStartM1 := M1_CablePosM;
             CtrlAscentStartM2 := M2_CablePosM;
-            State := E_AutoCycleStep.AX11_CTRL_ASCENT;
+            IF CfgCtrlAscentDistanceM <= 0.0 THEN
+                State := E_AutoCycleStep.AX12_LOADED_ASCENT;
+            ELSE
+                State := E_AutoCycleStep.AX11_CTRL_ASCENT;
+            END_IF;
         END_IF;
 
     E_AutoCycleStep.AX11_CTRL_ASCENT:
@@ -1240,7 +1251,7 @@ CASE State OF
         OperatorAction := 'AX14 - Maintenir la translation vers la tremie de dechargement.';
 
         TranslationCmd.PositionTgt := 1; // Trémie
-        TranslationCmd.ReqStart := CycleMotionPermit;
+        TranslationCmd.ReqStart := TranslationTremiePermit;
 
         IF Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;

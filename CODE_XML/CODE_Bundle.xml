@@ -5316,7 +5316,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = distance de contrôle interne par défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = bypass AX11, enchaînement direct AX10→AX12</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -20465,7 +20465,15 @@ FirstScanDone := TRUE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention X vers P1 qualifiee (axe X positif)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention X vers P1 qualifiee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickLeft">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention X vers tremie qualifiee</xhtml>
               </documentation>
             </variable>
             <variable name="DeadmanArmed">
@@ -21240,7 +21248,23 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== GATE CONTINU HOMME-MORT ===
-. [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme) ; gate commun a toutes les commandes d'actionneur du sequenceur. Le sens du mouvement reste porte par ReqAscent/ReqDescend de chaque etape.</xhtml>
+. [LOC] Permis de mouvement cycle = JoystickDeflected AND DeadmanArmed (manche deflechi + homme-mort arme)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationP1Permit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Translation vers P1 : axe X droit seul, axe Y au neutre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationTremiePermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Translation vers tremie : axe X gauche seul, axe Y au neutre</xhtml>
               </documentation>
             </variable>
             <variable name="WinchesAtDiveStep">
@@ -22328,6 +22352,8 @@ Ready := Enable AND NOT Fault.Latched;
 // commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par JoystickDeflected.
 CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
+TranslationP1Permit := DeadmanArmed AND JoystickRight AND NOT JoystickPush AND NOT JoystickPull;
+TranslationTremiePermit := DeadmanArmed AND JoystickLeft AND NOT JoystickPush AND NOT JoystickPull;
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
 IF WaitingResume AND NOT StateExecutionInhibit THEN
@@ -22510,7 +22536,7 @@ CASE State OF
             WaitingForProcess := JoystickDeflected;
             OperatorActionId := 16#0402;
             OperatorAction := 'AX2 - Pousser le joystick vers la droite : arret automatique sur P1.';
-            TranslationCmd.ReqStart := CycleMotionPermit;
+            TranslationCmd.ReqStart := TranslationP1Permit;
         END_IF;
 
     E_AutoCycleStep.AX3_OPEN_BUCKET:
@@ -22826,9 +22852,15 @@ CASE State OF
             WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
             // Nouvelle reference de controle : position reelle au depart
             // d'AX11, apres extraction/fermeture, et non le contact fond.
+            // Une distance configuree a 0 desactive volontairement AX11 et
+            // enchaine directement AX12 sans demander de relacher le joystick.
             CtrlAscentStartM1 := M1_CablePosM;
             CtrlAscentStartM2 := M2_CablePosM;
-            State := E_AutoCycleStep.AX11_CTRL_ASCENT;
+            IF CfgCtrlAscentDistanceM &lt;= 0.0 THEN
+                State := E_AutoCycleStep.AX12_LOADED_ASCENT;
+            ELSE
+                State := E_AutoCycleStep.AX11_CTRL_ASCENT;
+            END_IF;
         END_IF;
 
     E_AutoCycleStep.AX11_CTRL_ASCENT:
@@ -22929,7 +22961,7 @@ CASE State OF
         OperatorAction := 'AX14 - Maintenir la translation vers la tremie de dechargement.';
 
         TranslationCmd.PositionTgt := 1; // Trémie
-        TranslationCmd.ReqStart := CycleMotionPermit;
+        TranslationCmd.ReqStart := TranslationTremiePermit;
 
         IF Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
@@ -38060,6 +38092,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Échelle fréquence (0..100 %)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleTargetDirectionOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Axe X cohérent avec la cible SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleJoystickAxisOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Axe Y neutre avant translation SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -38105,7 +38153,10 @@ ELSE
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         PositioningActive := TRUE;
         SelTarget := ReqTranslation.PositionTgt;
-        RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk;
+        CycleTargetDirectionOk := ((SelTarget = 1) AND Joystick.AxisX.DirectionPositive)
+                               OR ((SelTarget &lt;&gt; 1) AND Joystick.AxisX.DirectionNegative);
+        CycleJoystickAxisOk := CycleTargetDirectionOk AND Joystick.AxisY.AtNeutral;
+        RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk AND CycleJoystickAxisOk;
         IF RunRequest THEN
             SpeedPct := 100.0;
             IF SelTarget = 1 THEN
@@ -38135,6 +38186,8 @@ ELSE
         RunRequest := (ReqTremie OR ReqMaintenance)
                      AND (IHM.BypassGlobal OR NOT TglJoystickMaster OR TglJoystickMaster)
                      AND Joystick.DeadmanArmed
+                     // Interlock inter-axes : un ordre treuil Y bloque M3.
+                     AND (NOT TglJoystickMaster OR (Joystick.AxisY.Direction = 0))
                      AND Context.HeightInterlockOk;
 
         // Échelle fréquence : SetFreq_Hz (ou 100% si non renseignée), manche mis à l'échelle si joystick maître
@@ -41435,7 +41488,8 @@ IF NOT Enable THEN
 ELSE
     // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
-        RunRequest := ReqWinch.RunRequest;
+        // Axe X translation prioritaire : aucun contacteur treuil pendant un jog X.
+        RunRequest := ReqWinch.RunRequest AND (Joystick.AxisX.Direction = 0);
         ReqAscent  := ReqWinch.ReqAscent;
         ReqDescend := ReqWinch.ReqDescend;
         StepTgt   := ReqWinch.StepTgt;
@@ -41499,6 +41553,9 @@ ELSE
                   AND NOT ((Context.SyncBlocksAscent   AND ReqAscent)
                         OR (Context.SyncBlocksDescent AND ReqDescend))
                   AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
+                  // Interlock inter-axes : le jog X translation est prioritaire;
+                  // aucun treuil joystick ne part avec X encore deflechi.
+                  AND (NOT TglJoystickMaster OR (Joystick.AxisX.Direction = 0))
                   AND BothDirectionAuthorized;
     END_IF;
 
@@ -41706,7 +41763,8 @@ ELSE
     IF Context.BucketBusy AND Context.BucketM2RunRequest
        AND ((Auth.JoystickWinchSelectArbitrated = 2)
             OR (Auth.Mode = E_Mode.SEMI_AUTO)) THEN
-        RunRequest := Context.BucketM2RunRequest;
+        // Axe X translation prioritaire : aucun contacteur treuil pendant un jog X.
+        RunRequest := Context.BucketM2RunRequest AND (Joystick.AxisX.Direction = 0);
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;
         IF ReqDescend THEN
@@ -41717,7 +41775,8 @@ ELSE
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN
-            RunRequest := ReqWinch.RunRequest;
+            // Axe X translation prioritaire : aucun contacteur treuil pendant un jog X.
+            RunRequest := ReqWinch.RunRequest AND (Joystick.AxisX.Direction = 0);
             ReqAscent  := ReqWinch.ReqAscent;
             ReqDescend := ReqWinch.ReqDescend;
             StepTgt   := ReqWinch.StepTgt;
@@ -41778,6 +41837,9 @@ ELSE
                       AND NOT ((Context.SyncBlocksAscent   AND ReqDescend)
                             OR (Context.SyncBlocksDescent AND ReqAscent))
                       AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
+                      // Interlock inter-axes : le jog X translation est prioritaire;
+                      // aucun treuil joystick ne part avec X encore deflechi.
+                      AND (NOT TglJoystickMaster OR (Joystick.AxisX.Direction = 0))
                       AND BothDirectionAuthorized;
         END_IF;
     END_IF;
@@ -46727,6 +46789,8 @@ instCycleSemiAuto(
     // Depuis la tremie vers P1, le sens physique droite correspond a ReqMaintenance,
     // donc a l'axe X negatif dans l'arbitrage M3.
     JoystickRight           := PRG_02_Acquisition.Data.Joystick.AxisX.DirectionNegative,
+    // Depuis P1 vers la tremie, l'axe X positif est la seule source autorisee.
+    JoystickLeft            := PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,

@@ -165,6 +165,8 @@ instCycleSemiAuto(
     // Depuis la tremie vers P1, le sens physique droite correspond a ReqMaintenance,
     // donc a l'axe X negatif dans l'arbitrage M3.
     JoystickRight           := PRG_02_Acquisition.Data.Joystick.AxisX.DirectionNegative,
+    // Depuis P1 vers la tremie, l'axe X positif est la seule source autorisee.
+    JoystickLeft            := PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
