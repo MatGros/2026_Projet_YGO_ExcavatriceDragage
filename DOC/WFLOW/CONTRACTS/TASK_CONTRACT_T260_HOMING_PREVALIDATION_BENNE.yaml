@@ -1,0 +1,139 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T260 : Step de pre-validation fermeture benne (cycle homing)
+# ═══════════════════════════════════════════════════════════════════════════
+# Etude / review / challenge : DOC/WFLOW/AUDITS/ETUDE_T260_STEP_PREVALIDATION_BENNE_HOMING.md
+# Validation contrat : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T260_HOMING_PREVALIDATION_BENNE.yaml
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T260_HOMING_PREVALIDATION_BENNE
+  criticality: C3            # sequenceur securite machine + touche la chaine permis benne PRG_04
+  strategy: patch
+
+  # ── 1. Objectif metier ──────────────────────────────────────────────────
+  objective: >
+    Ajouter au GRAFCET du cycle de homing machine (FB_CycleMachineHoming) une
+    etape DEDIEE de pre-verification benne, AVANT la montee couplee M1+M2 :
+    l'operateur ajuste la benne (ouverture/fermeture palier 1, SANS fin de
+    course logicielle car machine non referencee), puis CONFIRME "benne fermee"
+    par un geste explicite. Le cycle ne monte au capteur haut qu'apres cette
+    confirmation. But : garantir une reference machine prise benne fermee, avec
+    validation humaine (aucune detection auto fiable sans homing).
+
+  # ── 2. Criteres testables ───────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: >
+        Depuis HX0/HX1 en MAINT_N2, l'entree consciente du cycle (StartRequest OU
+        motif 3 appuis OU auto-armement) amene le GRAFCET a l'etape de
+        pre-verification benne (nouvelle etape OU sous-etat de HX1), AVANT HX2.
+      verified_by: "test_fb_cyclemachinehoming.st : SeqStep = <etape precheck>"
+    - id: AC2
+      statement: >
+        Dans l'etape de pre-verification, sous permis operateur maintenu
+        (homme-mort + joystick), la benne peut etre ouverte ET fermee palier 1,
+        SANS fin de course logicielle, treuils M1/M2 a l'arret (0 ordre treuil).
+      verified_by: "test_fb_cyclemachinehoming.st : CmdBucketOpen/Close suivent JoystickPush/Pull ; CmdWinchM1/M2.RunRequest = FALSE"
+    - id: AC3
+      statement: >
+        La transition pre-verification -> HX2 (ou HX2N si deja sur capteur) ne se
+        produit QUE sur le geste de validation explicite defini (button dedie OU
+        motif 3 appuis - a trancher §etude), joystick au neutre et treuils
+        mecaniquement arretes.
+      verified_by: "test_fb_cyclemachinehoming.st : pas de transition sans le geste ; transition avec le geste + JoystickNeutral + WinchesMechanicallyStopped"
+    - id: AC4
+      statement: >
+        Sortie de MAINT_N2 pendant la pre-verification -> retour HX0 sans defaut.
+        Erreur codeur / mouvement treuil hors phase -> HXF_FAILED (fail-safe).
+      verified_by: "test_fb_cyclemachinehoming.st : Mode<>MAINT_N2 -> HX0 ; AxisHomingError -> HXF"
+    - id: AC5
+      statement: >
+        NON-REGRESSION MAINT_N1 : le jog benne manuel WinchSel=2 en MAINT_N1
+        reste possible EXACTEMENT comme avant T260 (aucun blocage introduit par
+        une relaxation/gate liee au cycle homing).
+      verified_by: "revue diff PRG_04 : ManualBucketJogActive inchange en N1 ; test integ benne N1 (a creer ou observation site)"
+    - id: AC6
+      statement: >
+        NON-REGRESSION MAINT_N2 hors cycle homing : jog benne WinchSel=2 et
+        commandes benne IHM inchangees quand MachineHoming.Active = FALSE.
+      verified_by: "revue diff PRG_04 : les relaxations sont gardees par (SeqStep = <etape precheck>) OU un flag strictement egal, jamais par MachineHoming.Active large"
+    - id: AC7
+      statement: >
+        NON-REGRESSION cycle homing existant : HX2..HXF, HX4_BUCKET_ADJUST,
+        commit benne HX5, tempo, gardes de transition inchanges (hors insertion
+        de l'etape et sa transition amont).
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_CycleMachineHoming (tous PASS apres mise a jour des transitions HX1)"
+    - id: AC8
+      statement: >
+        Le forcage de step MES (§4bis) et le gate G494 connaissent la nouvelle
+        etape (valeur enum + cible force-step + liste de steps).
+      verified_by: "run_all_gates.py --palier C : G494 PASS ; force-step cible <n> -> etape precheck"
+
+  # ── 3. Perimetre ────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/G_CYCLE/_TYPES/E_MachineHomingTxState.st          # si nouvelle valeur enum retenue
+      - CODE/G_CYCLE/_TYPES/E_MachineHomingStep.st             # si nouveau libelle guide retenu
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st                    # relaxation permis benne STRICTEMENT gardee etape precheck
+      - CODE/M_MAIN/PRG_02_Acquisition.st                      # cablage input validation dediee (si button retenu)
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st                      # routage CmdBucket cycle (deja gate MachineHoming.Active)
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleMachineHomingCmd.st  # si button IHM dedie
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclemachinehoming.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G494_check_cycle_dive_handoff.py           # si liste de steps
+      - DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md           # F09.08 : documenter l'etape precheck
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st                       # cycle SEMI_AUTO : hors sujet (T258)
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st                # ne PAS masquer/delatcher les causes benne sans decision dediee
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st                # aucune modif interface safety winch
+      - "toute relaxation gardee par MachineHoming.Active large (>= HX1 ou >= HX2) : INTERDIT, garder par SeqStep = etape precheck"
+
+  # ── 4. Contrat de conservation ─────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "MAINT_N1 : jog benne WinchSel=2 fonctionnel (REX 2026-09-06 : gate NOT MachineHoming.Active l'a casse)"
+      - "MAINT_N2 hors homing : jog benne + commandes benne IHM inchangees"
+      - "Cycle homing HX2..HXF : montee couplee, homing au vol HX3, commit HX5, tempo, gardes fail-safe"
+      - "HX4_BUCKET_ADJUST post-homing (ajustement fin avant commit) conserve"
+      - "FDC haut MATERIEL (M1M2_TopPositionFree_DI) : barriere independante, jamais bypassee"
+      - "Reset jamais conditionne (std 9) ; pas de redemarrage auto apres defaut"
+    dropped_on_purpose:
+      - "(a decider) message HX1 'valider 3 appuis pour lancer' remplace par un texte oriente pre-verif benne"
+
+  # ── 5. Preuves attendues ───────────────────────────────────────────────
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "run_tests.py --fb FB_CycleMachineHoming : tous PASS"
+    - "diff PRG_04 relu : garde = SeqStep etape precheck, pas MachineHoming.Active"
+
+  # ── 6. Modeles autorises ───────────────────────────────────────────────
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  # ── 7. Devoir d'alerte ─────────────────────────────────────────────────
+  alert_duty: >
+    Toute relaxation de permis benne qui deborde l'etape de pre-verification
+    (fuite vers N1, vers HX2+, vers le jog normal) est un CAS D'ARRET : remonter
+    a l'orchestrateur, ne pas elargir. Le REX MAINT_N1 du 2026-09-06 (gate
+    ManualBucketJogActive) est la preuve que le perimetre de garde doit etre
+    l'etape exacte, jamais MachineHoming.Active.
+
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "-"
+  completed_at: "-"
+  status: PENDING
+  summary: "Non demarre. Etude/challenge a valider avant toute ecriture de code."
+  evidence_submitted: []
+
+validation:
+  validated_by: "-"
+  validated_at: "-"
+  verdict: PENDING
+  notes: >
+    A remplir par l'orchestrateur apres lecture du git diff reel.

@@ -43,7 +43,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         CfgRampAccelRate := 10.0,
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
-        CfgCableLimitDescent_M := -20.0
+        CfgCableLimitDescent_M := -50.0
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M1)
     _WinchM2CfgPersist : ST_WinchCfg := (
         CfgTopSensorPos_M := 8.5, // Capteur physique réel à 8.5m
@@ -51,7 +51,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         CfgRampAccelRate := 10.0,
         CfgRampDecelNormalRate := 150.0,
         CfgRampDecelFastRate := 400.0,
-        CfgCableLimitDescent_M := -20.0
+        CfgCableLimitDescent_M := -50.0
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M2)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
@@ -119,14 +119,14 @@ VAR_GLOBAL PERSISTENT RETAIN
     _JoystickCfgPersist : ST_fbJoystick_Cfg := (DeadbandRaw := 300); // reste des champs = defaults ST_fbJoystick_Cfg
 
     // 🔄 CYCLE (dragage semi-automatique)
-    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, DepthStopMode := E_CycleDepthStopMode.KOBOLD_OR_SETPOINT, RaiseOffBottom_M := 0.5, CtrlAscentMaxStep := 1); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
+    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -20.0, DepthStopMode := E_CycleDepthStopMode.KOBOLD_OR_SETPOINT, RaiseOffBottom_M := 0.5, CtrlAscentMaxStep := 1); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
 
     // 🎯 CYCLE REFERENCEMENT MACHINE (homing) — reglage mise en service
     _CycleMachineHomingCfgPersist : ST_CycleMachineHomingCfg := (ForceStepTarget := 0); // 🌉 Pont FB_CfgPersistBridge_CycleMachineHomingCfg
 
     // 📏 RÉGLEMENTATION / LÉGAL
     _CommunCfgPersist : ST_CommunCfg := (
-        LimitLegalDepthMinAllowed_M := -19.0,
+        LimitLegalDepthMinAllowed_M := -30.0,
         LimitLegalEnabled := TRUE,
         SelHomingApproachEnable := FALSE,
         WinchMaxStepDescent := 4,
@@ -134,7 +134,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         WinchSlowdownDistanceTop_M := 0.5,
         WinchSlowdownDistanceBottom_M := 1.0,
         WinchSlowdownMaxStep := 1,
-        CfgCableLimitAscent_M := 7.5
+        CfgCableLimitAscent_M := 7.0
     ); // 🌉 Pont FB_CfgPersistBridge_CommunCfg
 
     // 🚦 SYSTÈME / IHM

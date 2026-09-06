@@ -1806,7 +1806,7 @@ Cause de blocage prioritaire</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="-999" />
+                <simpleValue value="-30" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Blocage instantané à 0m : sans défaut explicite,
@@ -1895,7 +1895,7 @@ pas une vitesse continue.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="7.5" />
+                <simpleValue value="7" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
@@ -4822,7 +4822,7 @@ jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) �
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="-20" />
+                <simpleValue value="-50" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>

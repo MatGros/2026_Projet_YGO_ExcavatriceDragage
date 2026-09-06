@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.490077" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.490077">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:27:32.234617" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:27:32.234617">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -86,7 +86,7 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="-20" />
+                <simpleValue value="-50" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite basse physique de descente (m, négatif)</xhtml>
