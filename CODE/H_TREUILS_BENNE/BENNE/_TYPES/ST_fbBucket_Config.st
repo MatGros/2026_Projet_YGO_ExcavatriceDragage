@@ -12,7 +12,7 @@ STRUCT
     CloseAnticipationM : REAL := 1.2;                                 // Anticipation coupure commande fermeture (m) -- reglable IHM
     OpenAnticipationM  : REAL := 1.3;                                 // Anticipation coupure commande ouverture (m) -- reglable IHM
     JogSlowdownZoneM   : REAL := 1.0;                                 // Distance avant le point d'arret anticipe ou le jog unitaire M2 est force au palier 1 (m) -- reglable IHM
-    MaxStepUp          : INT := 4;                                    // Plafond palier benne en montée/fermeture (1..5) -- reglable IHM
+    MaxStepUp          : INT := 2;                                    // Plafond palier benne en montée/fermeture (1..5) -- reglable IHM
     MaxStepDown        : INT := 4;                                    // Plafond palier benne en descente/ouverture (1..5) -- reglable IHM
 END_STRUCT
 END_TYPE

@@ -12,7 +12,8 @@
    🪜 -B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
        pourcentage. En SEMI_AUTO, passthrough de ReqWinch.StepTgt ; en manuel,
        le joystick est le producteur UNIQUE du palier (passthrough de
-       Joystick.AxisY.StepTgt), boutons/both = palier 5, override benne = palier 1.
+       Joystick.AxisY.StepTgt), boutons/both = palier 5, override benne = palier
+       joystick borne par le plafond de configuration.
    ═══════════════════════════════════════════════════════════════ *)
 
 FUNCTION_BLOCK FB_WinchCmdArbitrationM2
@@ -38,6 +39,7 @@ VAR
     BenneBusyFallEdge : F_TRIG;  // . [LOC] Front descendant action benne (arrêt forcé)
     BothDirectionAuthorized : BOOL; // . [LOC] Atomicité Both : deux axes autorisés dans le même sens
     RequestConflict         : BOOL; // . [LOC] Double demande de sens refusée
+    BucketRequestedStep     : INT;  // . [LOC] Palier joystick benne avant plafond de configuration
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -67,10 +69,12 @@ ELSE
         RunRequest := Context.BucketM2RunRequest AND (Joystick.AxisX.Direction = 0);
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;
+        // Le plafond benne borne la consigne joystick ; il ne la remplace pas.
+        BucketRequestedStep := LIMIT(1, Joystick.AxisY.StepTgt, 5);
         IF ReqDescend THEN
-            StepTgt := Cfg.BucketOverrideStepDownTgt;
+            StepTgt := MIN(BucketRequestedStep, Cfg.BucketOverrideStepDownTgt);
         ELSE
-            StepTgt := Cfg.BucketOverrideStepUpTgt;
+            StepTgt := MIN(BucketRequestedStep, Cfg.BucketOverrideStepUpTgt);
         END_IF;
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
