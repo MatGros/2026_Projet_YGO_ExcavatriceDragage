@@ -632,7 +632,7 @@ TEST 'TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 6
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'Toujours AX4, pas de AX_STAB (StepMaxTimer non cumulatif)');
 END_TEST
 
-TEST 'TC-P04-026 : backstop anti-telescopage - ecart position M1/M2 > 0,5 m en phase couplee X4 -> AX_STAB'
+TEST 'TC-P04-026 : AX4 ne contient aucun seuil synchro local - PRG04 reste source unique'
     SampleCount := 0;
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE, StartCycle := TRUE,
@@ -663,7 +663,7 @@ TEST 'TC-P04-026 : backstop anti-telescopage - ecart position M1/M2 > 0,5 m en p
        SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, Translation_At_P1 := TRUE, Translation_Done := TRUE,
        Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -671,25 +671,27 @@ TEST 'TC-P04-026 : backstop anti-telescopage - ecart position M1/M2 > 0,5 m en p
        SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
-       M1_CablePosM := -10.0, M2_CablePosM := -10.0, Translation_At_P1 := TRUE, Translation_Done := TRUE,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0, Translation_At_P1 := TRUE, Translation_Done := TRUE,
        Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
     ADVANCE_TIME(300000000);
     FB(SampleCount := SampleCount);
     FB(SampleCount := SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'Etabli en X4');
-    // Ecart de position M1/M2 = 1,0 m > 0,5 m en phase couplee -> defaut anti-telescopage.
+    // AX4..AX7 ne lisent aucun seuil de delta. PRG04 convertit ses causes critiques
+    // (synchro confirmee, contacteurs ou Meca E) en WinchSyncError avant le cycle.
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE, StartCycle := FALSE,
        SelTarget := 3, LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE,
-       M1_CablePosM := -10.0, M2_CablePosM := -8.0, WinchSyncDeltaM := 2.0,
+       M1_CablePosM := 5.0, M2_CablePosM := 5.0,
+       WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_Done := TRUE,
        Benne_Done := TRUE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := SampleCount);
-    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX_STAB, 'Ecart couple excessif -> AX_STAB');
-    ASSERT_TRUE(FB.Fault.Error, 'Defaut anti-telescopage leve');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'AX4 reste pilote uniquement par WinchSyncError PRG04');
+    ASSERT_FALSE(FB.Fault.Error, 'Aucun seuil synchro local cycle');
 END_TEST
 
 TEST 'TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pas de redemarrage) (T192-A S1)'
@@ -1079,10 +1081,10 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest, 'X9 : treuil M1 arrete (egouttage)');
     ASSERT_FALSE(FB.WinchM2Cmd.RunRequest, 'X9 : treuil M2 arrete (egouttage)');
 
-    (* ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€šÃ‚Â±ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â Call 18 : ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©gouttage 5s ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X10 *)
+    (* Call 18 : egouttage 5s au joystick neutre -> AX14 sans geste cache *)
     ADVANCE_TIME(5000000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
-       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
+       DeadmanArmed := FALSE, JoystickDeflected := FALSE, JoystickPush := FALSE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,

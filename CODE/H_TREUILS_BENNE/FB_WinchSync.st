@@ -84,6 +84,11 @@ END_VAR
 // laisserait Fault.Latched cote PRG_04 (RAZ = Reset explicite seulement). La concordance
 // contacteurs "physique" reste couverte par instSyncContactorFinal (PRG_06), independant.
 IF NOT Enable THEN
+    // Executer aussi les sous-blocs avec leur gate ferme. Sans ces appels,
+    // WarnLatched de FB_SyncDeviation survivait a AX10/AX11 et reapparaissait
+    // a la reactivation avec un ecart redevenu normal (REX trace 2026-09-06).
+    instDeviation(Enable := FALSE, Reset := TRUE);
+    instContactor(Enable := FALSE, Reset := TRUE);
     Ready := FALSE;
     DeltaPosM := 0.0; SignedDeltaPosM := 0.0;
     SyncActive := FALSE;

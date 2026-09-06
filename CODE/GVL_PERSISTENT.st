@@ -72,7 +72,7 @@ VAR_GLOBAL PERSISTENT RETAIN
             // (méca dynamique évolutive). Le point d'arrêt jog unitaire M2 et
             // l'acceptation d'état ouvert/fermé sont à Offset ± Anticipation ;
             // palier 1 forcé dans les JogSlowdownZoneM derniers mètres.
-            CloseAnticipationM := 1.0,
+            CloseAnticipationM := 1.2,
             OpenAnticipationM  := 1.3,
             JogSlowdownZoneM   := 1.0
         ),

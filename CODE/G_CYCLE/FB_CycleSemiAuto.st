@@ -49,9 +49,9 @@ VAR_INPUT
     M2_BrakeApplied         : BOOL;         // --> [HW] Frein M2 mecaniquement serre
     SpeedMismatchThresholdMps : REAL;       // --> [CFG] Seuil ecart vitesse ; 0 = controle desactive
     SpeedMismatchTimeout    : TIME;         // --> [CFG] Duree de confirmation ; 0 = controle desactive
-    CableLimitM1AscentM     : REAL;         // --> [CFG] Limite haute d'exploitation M1
-    M1TopLimitReached        : BOOL;        // --> [SAFE] Limite haute effective M1
-    M2TopLimitReached        : BOOL;        // --> [SAFE] Limite haute effective M2
+    CableLimitM1AscentM     : REAL;         // --> [CFG] Limite haute d'exploitation M1 (compatibilite interface)
+    M1TopLimitReached       : BOOL;         // --> [SAFE] FDC haut logiciel effectif M1
+    M2TopLimitReached       : BOOL;         // --> [SAFE] FDC haut logiciel effectif M2
 
     // === FEEDBACKS TRANSLATION M3 ===
     Translation_At_P1           : BOOL;     // --> [HW] Capteur position P1 (arret travail)
@@ -1168,10 +1168,10 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
-        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q
-           AND ((M1_CablePosM >= CableLimitM1AscentM)
-             OR M1TopLimitReached
-             OR M2TopLimitReached) THEN
+        // Arrivee au FDC haut LOGICIEL = evenement procede, jamais une nouvelle
+        // action operateur. PRG04 est l'unique producteur du fait de limite
+        // (7,5 m nominal, geometrique pour M2) : G7 ne recalcule aucune cote.
+        IF M1TopLimitReached OR M2TopLimitReached THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
@@ -1195,7 +1195,11 @@ CASE State OF
 
         // Tempo d'egouttage armee/remise a zero en §1 (gate sur State = AX13, PT = DrainTimeEff).
         // Duree reglable IHM (CfgDrainTime) + bypass immediat (SkipDrainEdge).
-        IF JoystickDeflected AND (DrainingTimer.Q OR SkipDrainEdge.Q) THEN
+        // La fin d'egouttage est une transition procede autonome. AX14 porte
+        // ensuite l'attente operateur pour commander M3 vers la tremie.
+        // Important aussi apres forcage : aucun geste joystick cache ne doit
+        // maintenir AX13 une fois la temporisation terminee.
+        IF DrainingTimer.Q OR SkipDrainEdge.Q THEN
             State := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
         END_IF;
 

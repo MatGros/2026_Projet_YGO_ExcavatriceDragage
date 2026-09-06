@@ -403,9 +403,13 @@ SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND NOT ManualBucketJogActive
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose
-    // 🛡️ Pas de surveillance d'ecart M1/M2 aux etapes de contact fond et retente (AX8 + AX9)
+    // Pas de surveillance de synchronisme pendant les phases ou M1/M2 travaillent
+    // volontairement de facon dissymetrique : contact fond, retente et fermeture/controle.
+    // La surveillance est rearmee a partir de AX12 (montee en charge couplee).
     AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
     AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
+    AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX10_CLOSE_BUCKET)
+    AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX11_CTRL_ASCENT)
     AND instBucket.ActiveOffsetValid;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
