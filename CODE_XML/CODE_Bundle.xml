@@ -21992,7 +21992,8 @@ DepthStopBySetpoint := (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM)
                        AND (M2_CablePosM &lt;= SetDepthM);
 
 // Commande de niveau directement maitrisable depuis l'IHM : OFF retire l'inhibition au scan suivant.
-CycleChecksInhibited := CfgCycleChecksInhibit AND CfgCommissioningEnable AND (Mode = E_Mode.SEMI_AUTO);
+// Le toggle de commissioning ne conditionne pas l'application du réglage cycle.
+CycleChecksInhibited := CfgCycleChecksInhibit AND (Mode = E_Mode.SEMI_AUTO);
 
 // Table des causes de défaut
 instCauses[0].Active   := LimitLegalReached
@@ -22106,7 +22107,7 @@ IF ForceStepApplyEdge.Q AND NOT AbortEdge.Q THEN
     ForceStepPrepared := FALSE;
     ForceStepWaiting := FALSE;
     ForceStepCandidate := E_AutoCycleStep.AX0_REPOS;
-    IF CfgCommissioningEnable AND (Mode = E_Mode.SEMI_AUTO) AND NOT Fault.Latched
+    IF (Mode = E_Mode.SEMI_AUTO) AND NOT Fault.Latched
        AND NOT JoystickDeflected AND DiveStartStopped
        AND (CfgForceStepTarget &gt;= 0) AND (CfgForceStepTarget &lt;= 21)
        AND (CfgForceStepTarget &lt;&gt; 18) AND (CfgForceStepTarget &lt;&gt; 19) THEN
@@ -22246,14 +22247,6 @@ Ready := Enable AND NOT Fault.Latched;
 // commande de mouvement est gatée par ce permis à chaque scan (pas seulement au
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par JoystickDeflected.
 CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
-
-// Le retrait du mode commissioning annule une transaction non executee.
-IF NOT CfgCommissioningEnable AND ForceStepWaiting THEN
-    ForceStepPrepared := FALSE;
-    ForceStepWaiting := FALSE;
-    WaitingResume := FALSE;
-    PausedState := E_AutoCycleStep.AX0_REPOS;
-END_IF;
 
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
 IF WaitingResume AND NOT StateExecutionInhibit THEN
