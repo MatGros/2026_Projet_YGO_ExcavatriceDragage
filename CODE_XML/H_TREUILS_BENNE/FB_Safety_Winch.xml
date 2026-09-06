@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T08:29:46.473294" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T08:29:46.473294">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T08:52:21.017462" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T08:52:21.017462">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1581,7 +1581,8 @@ IF NOT BypassGlobal THEN
     // s'appuie donc sur le codeur disponible + le delta de position confirme.
     TonNoMovement(
         IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND EncoderAvailable
-              AND MovementCommanded AND NOT InReferencingMode
+              AND MovementCommanded AND BrakeFeedback AND NOT FwdRevSpeedFeedbackOff
+              AND NOT InReferencingMode
               AND NOT PositionMovementDetected,
         PT := NoMovementTimeout
     );
