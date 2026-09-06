@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T08:18:37.751780" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T08:18:37.751780">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T08:57:59.473909" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T08:57:59.473909">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1618,6 +1618,7 @@ instCycleSemiAuto(
     DiveStartMinM           := GVL_IHM.CycleSemiAuto.Cfg.DiveStartMin_M, // altimetrie lancement Kobold (AT4)
     CfgRaiseOffBottomM      := GVL_IHM.CycleSemiAuto.Cfg.RaiseOffBottom_M,   // GEL Q16 : decollement du fond AX8 (reglable IHM)
     CfgCtrlAscentMaxStep    := GVL_IHM.CycleSemiAuto.Cfg.CtrlAscentMaxStep,  // GEL Q16 : palier max montee controle AX11 [1..2]
+    CfgCtrlAscentDistanceM  := GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M, // Distance controle AX11 depuis AX10
     M1_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber, // palier applique (0..5) : garde palier&lt;&gt;4 en plongee (GT-dive-retry) + cause 8 (palier 5)
     M2_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
     SampleCount            := _CycleSampleCount
@@ -2366,6 +2367,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier max montee controle AX11, borne [1..2] (defaut 1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgCtrlAscentDistanceM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Distance controle AX11 depuis son depart (m)</xhtml>
               </documentation>
             </variable>
             <variable name="M1_SpeedStepApplied">
@@ -3133,6 +3142,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance minimale AX11 depuis le contact fond</xhtml>
               </documentation>
             </variable>
+            <variable name="CtrlAscentDistEffM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance AX11 valide et bornee</xhtml>
+              </documentation>
+            </variable>
             <variable name="CtrlAscentTimeout">
               <type>
                 <TIME />
@@ -3406,6 +3423,7 @@ ELSE
 END_IF;
 RaiseOffBottomEff := SEL(CfgRaiseOffBottomM &lt;= 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
+CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM &lt;= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
 // ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
 // .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration à l'achèvement (X13).
@@ -4278,8 +4296,8 @@ CASE State OF
 
         IF ExtractionStepDelayTimer.Q
            AND StabilizationTimer.Q
-           AND (M1_CablePosM &gt;= (CtrlAscentStartM1 + CtrlAscentDistM))
-           AND (M2_CablePosM &gt;= (CtrlAscentStartM2 + CtrlAscentDistM))
+           AND (M1_CablePosM &gt;= (CtrlAscentStartM1 + CtrlAscentDistEffM))
+           AND (M2_CablePosM &gt;= (CtrlAscentStartM2 + CtrlAscentDistEffM))
            AND NOT WinchSyncError THEN
             // La transition d'etat n'emet aucun mouvement : AX12 reste
             // conditionne a DeadmanArmed + JoystickPull dans ses commandes.

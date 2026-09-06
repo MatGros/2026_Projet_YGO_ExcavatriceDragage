@@ -87,6 +87,7 @@ VAR_INPUT
     DiveStartMinM          : REAL;         // --> [CFG] Altimetrie de lancement Kobold (AT4 : AX4 -> AX5), reglable IHM (~3..5 m ; <= 0 -> defaut interne)
     CfgRaiseOffBottomM     : REAL;         // --> [CFG] Decollement du fond en AX8 : RaiseTargetM = TouchPositionM + ce champ (reglable IHM ; <= 0 -> 0,5 m)
     CfgCtrlAscentMaxStep   : INT;          // --> [CFG] Palier max montee controle AX11, borne [1..2] (defaut 1)
+    CfgCtrlAscentDistanceM : REAL;         // --> [CFG] Distance controle AX11 depuis son depart (m)
     M1_SpeedStepApplied    : INT;          // --> [HW] Palier vitesse effectivement applique M1 (0 = inconnu ; garde palier <> 4 en diving)
     M2_SpeedStepApplied    : INT;          // --> [HW] Palier vitesse effectivement applique M2 (0 = inconnu)
 END_VAR
@@ -207,6 +208,7 @@ VAR
     // === CONSTANTES & CONFIGURATIONS INTERNES ===
     CtrlAscentToleranceM    : REAL := 0.25;     // . [LOC] Ancien seuil local conserve pour compatibilite IHM, non bloquant AX11
     CtrlAscentDistM         : REAL := 2.0;      // . [LOC] Distance minimale AX11 depuis le contact fond
+    CtrlAscentDistEffM      : REAL;              // . [LOC] Distance AX11 valide et bornee
     CtrlAscentTimeout       : TIME := T#1s;     // . [LOC] Pause de controle AX11 avant passage AX12
     DrainingTime            : TIME := T#5s;     // . [LOC] Temps d'egouttage par defaut
     StepMaxTimeout          : TIME := T#60s;    // . [LOC] Tempo max d'etape
@@ -272,6 +274,7 @@ ELSE
 END_IF;
 RaiseOffBottomEff := SEL(CfgRaiseOffBottomM <= 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
+CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM <= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
 // ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
 // .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration à l'achèvement (X13).
@@ -1144,8 +1147,8 @@ CASE State OF
 
         IF ExtractionStepDelayTimer.Q
            AND StabilizationTimer.Q
-           AND (M1_CablePosM >= (CtrlAscentStartM1 + CtrlAscentDistM))
-           AND (M2_CablePosM >= (CtrlAscentStartM2 + CtrlAscentDistM))
+           AND (M1_CablePosM >= (CtrlAscentStartM1 + CtrlAscentDistEffM))
+           AND (M2_CablePosM >= (CtrlAscentStartM2 + CtrlAscentDistEffM))
            AND NOT WinchSyncError THEN
             // La transition d'etat n'emet aucun mouvement : AX12 reste
             // conditionne a DeadmanArmed + JoystickPull dans ses commandes.

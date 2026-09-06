@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T08:48:55.476265" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T08:48:55.476265">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T08:57:50.219022" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T08:57:50.219022">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1161,6 +1161,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier max montee controle AX11, borne [1..2] (defaut 1)</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgCtrlAscentDistanceM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Distance controle AX11 depuis son depart (m)</xhtml>
+              </documentation>
+            </variable>
             <variable name="M1_SpeedStepApplied">
               <type>
                 <INT />
@@ -1926,6 +1934,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance minimale AX11 depuis le contact fond</xhtml>
               </documentation>
             </variable>
+            <variable name="CtrlAscentDistEffM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance AX11 valide et bornee</xhtml>
+              </documentation>
+            </variable>
             <variable name="CtrlAscentTimeout">
               <type>
                 <TIME />
@@ -2199,6 +2215,7 @@ ELSE
 END_IF;
 RaiseOffBottomEff := SEL(CfgRaiseOffBottomM &lt;= 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
+CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM &lt;= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
 // ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
 // .ET = durée écoulée du cycle en cours ; figée dans LastCycleDuration à l'achèvement (X13).
@@ -3071,8 +3088,8 @@ CASE State OF
 
         IF ExtractionStepDelayTimer.Q
            AND StabilizationTimer.Q
-           AND (M1_CablePosM &gt;= (CtrlAscentStartM1 + CtrlAscentDistM))
-           AND (M2_CablePosM &gt;= (CtrlAscentStartM2 + CtrlAscentDistM))
+           AND (M1_CablePosM &gt;= (CtrlAscentStartM1 + CtrlAscentDistEffM))
+           AND (M2_CablePosM &gt;= (CtrlAscentStartM2 + CtrlAscentDistEffM))
            AND NOT WinchSyncError THEN
             // La transition d'etat n'emet aucun mouvement : AX12 reste
             // conditionne a DeadmanArmed + JoystickPull dans ses commandes.
