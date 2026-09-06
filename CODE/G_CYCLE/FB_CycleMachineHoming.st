@@ -203,7 +203,8 @@ BucketPermit        := DeadmanArmed AND JoystickDeflected;
 // Fenetre de grace deceleration : armee des qu'on entre un step d'arret depuis une phase mouvement.
 // Fenetre de grace deceleration : armee sur tous les steps a l'arret (HX2N/HX3N +
 // HX4/HX5 ou les treuils doivent rester immobiles).
-SettleGraceTimer(IN := (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL)
+SettleGraceTimer(IN := (SeqStep = E_MachineHomingTxState.HX1B_BUCKET_PRECHECK)
+                       OR (SeqStep = E_MachineHomingTxState.HX2N_NEUTRAL)
                        OR (SeqStep = E_MachineHomingTxState.HX3N_PAUSE)
                        OR (SeqStep = E_MachineHomingTxState.HX4_BUCKET_ADJUST)
                        OR (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT), PT := CST_SettleGrace);
@@ -326,7 +327,7 @@ ForceStepApplyEdge(CLK := CfgForceStepApply);
 IF ForceStepApplyEdge.Q
    AND CfgCommissioningEnable
    AND (Mode = E_Mode.MAINT_N2) THEN
-    ForceStepClamped := LIMIT(0, CfgForceStepTarget, 9);
+    ForceStepClamped := LIMIT(0, CfgForceStepTarget, 10);
     CASE ForceStepClamped OF
         0: SeqStep := E_MachineHomingTxState.HX0_REPOS;
         1: SeqStep := E_MachineHomingTxState.HX1_CHOICE;
@@ -338,6 +339,7 @@ IF ForceStepApplyEdge.Q
         7: SeqStep := E_MachineHomingTxState.HX5_BUCKET_COMMIT;
         8: SeqStep := E_MachineHomingTxState.HX6_HOMED;
         9: SeqStep := E_MachineHomingTxState.HXF_FAILED;
+        10: SeqStep := E_MachineHomingTxState.HX1B_BUCKET_PRECHECK;
     END_CASE;
     HomeReqDone  := FALSE;
     SeenNeutral  := FALSE;
@@ -462,15 +464,38 @@ CASE SeqStep OF
         END_IF;
 
     E_MachineHomingTxState.HX1_CHOICE:
-        // Annonce + choix. Aucun ordre mouvement (garanti par la RAZ de tete de scan).
-        // Retour HX0 si le datum redevient valide (recuperation transitoire) ou si on
-        // quitte la maintenance. Le referencement (mouvement) exige MAINT_N2.
+        // Aiguillage transitoire. Aucun ordre mouvement (RAZ de tete de scan). Retour HX0
+        // si le datum redevient valide ou si on quitte la maintenance. En MAINT_N2 on passe
+        // DIRECTEMENT a HX1B (ajustement benne) : l'entree consciente du cycle a deja eu lieu
+        // en HX0 (StartRequest / motif 3 appuis / auto-armement). En N1 : rester ici et
+        // guider l'operateur vers N2.
         IF MachineHomed
            OR ((Mode <> E_Mode.MAINT_N1) AND (Mode <> E_Mode.MAINT_N2)) THEN
             SeqStep := E_MachineHomingTxState.HX0_REPOS;
-        ELSIF ExplicitValidationPulse AND (Mode = E_Mode.MAINT_N2) THEN
+        ELSIF (Mode = E_Mode.MAINT_N2) THEN
             CommitPublished := FALSE;   // datum invalide tant qu'il est refait (HT1b, deplace de HX0)
             CommitDone      := FALSE;
+            SeqStep         := E_MachineHomingTxState.HX1B_BUCKET_PRECHECK;
+        END_IF;
+        // HT1a (abandon) traite par la purge §4 sur front Reset.
+
+    E_MachineHomingTxState.HX1B_BUCKET_PRECHECK:
+        // Pre-verification benne AVANT la montee de referencement : l'operateur ajuste la
+        // benne (ouverture / fermeture palier 1, SANS FDC soft car machine non referencee)
+        // puis CONFIRME "benne fermee" par le motif 3 appuis (ExplicitValidationPulse),
+        // joystick au neutre, treuils arretes. Treuils a 0 (RAZ tete de scan). Aucun FDC
+        // logiciel : seul l'operateur valide.
+        IF BucketPermit AND JoystickPull THEN
+            CmdBucketClose := TRUE;
+        ELSIF BucketPermit AND JoystickPush THEN
+            CmdBucketOpen := TRUE;
+        END_IF;
+        IF (Mode <> E_Mode.MAINT_N2) THEN
+            SeqStep := E_MachineHomingTxState.HX0_REPOS;
+        ELSIF AxisHomingError OR MotionOutOfPhase THEN
+            MachineHomingFailed := TRUE;
+            SeqStep := E_MachineHomingTxState.HXF_FAILED;
+        ELSIF ExplicitValidationPulse AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
             IF NOT TopPositionSensor THEN
                 SeqStep := E_MachineHomingTxState.HX2_CLIMB;
             ELSE
@@ -478,7 +503,6 @@ CASE SeqStep OF
                 SeqStep     := E_MachineHomingTxState.HX2N_NEUTRAL;
             END_IF;
         END_IF;
-        // HT1a (abandon) traite par la purge §4 sur front Reset.
 
     E_MachineHomingTxState.HX2_CLIMB:
         // Montee couplee M1+M2 palier 1, uniquement sous permis maintenu (manche tire).
@@ -623,6 +647,9 @@ ELSIF MachineHomed AND NOT CycleRunning THEN
     //  reference absente / incomplete). Un defaut latche reste prioritaire (ci-dessus).
     MachineHomingStep := E_MachineHomingStep.VALID;
     MachineHomingInstruction := '';
+ELSIF (SeqStep = E_MachineHomingTxState.HX1B_BUCKET_PRECHECK) THEN
+    MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
+    MachineHomingInstruction := 'HX1B - Ajuster benne (SANS FDC, machine non referencee) puis valider 3 appuis JOY - montee treuils ensuite';
 ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
     MachineHomingInstruction := 'HX2 - RefHoming Tirer JOY palier 1 vers FDC haut';
@@ -646,12 +673,9 @@ ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) THEN
     IF Mode <> E_Mode.MAINT_N2 THEN
         MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
         MachineHomingInstruction := 'HX1 - RefHoming Passer en MAINT_N2 pour referencer';
-    ELSIF NOT TopPositionSensor THEN
-        MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
-        MachineHomingInstruction := 'HX1 - RefHoming Valider (3 appuis JOY) pour lancer';
     ELSE
         MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-        MachineHomingInstruction := 'HX1 - RefHoming Sur FDC haut - valider (3 appuis JOY)';
+        MachineHomingInstruction := 'HX1 - Valider (3 appuis JOY) -> ajustement benne (HX1B)';
     END_IF;
 ELSIF NOT M1Status.HomedAndReliable AND NOT M2Status.HomedAndReliable THEN
     MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;

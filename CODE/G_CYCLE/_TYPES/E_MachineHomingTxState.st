@@ -14,6 +14,9 @@ TYPE E_MachineHomingTxState :
     HX0_REPOS         := 0,   (* Etape initiale pure : aucune action, aucune affectation *)
     HX1_CHOICE        := 1,   (* Annonce + choix operateur : aucun mouvement *)
     HX2_CLIMB         := 2,   (* Chemin A : montee couplee M1+M2 palier 1 jusqu au capteur haut *)
+    HX1B_BUCKET_PRECHECK := 10, (* Pre-verification benne : fermeture benne SANS FDC (machine non referencee),
+                                  confirmation visuelle operateur. Valeur 10 (hors sequence) pour eviter la
+                                  renumerotation HX2..HXF. Ordre logique : HX1 -> HX1B -> HX2. *)
     HX2N_NEUTRAL      := 3,   (* Arret + inversion de sens (tire -> pousse) : mouvement nul obligatoire *)
     HX3_HOME_AXES     := 4,   (* Homing axes M1+M2 au vol sur front descendant capteur, puis descente couplee *)
     HX3N_PAUSE        := 5,   (* Arret avant benne : mouvement nul, retour joystick au neutre *)
