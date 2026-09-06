@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T07:09:56.879403" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T07:09:56.879403">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T07:31:45.766674" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T07:31:45.766674">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3377,6 +3377,7 @@ instJoystick(
     // 🔧 Producteur = PRG_04_Treuils_Benne (combiné interlock benne) via le bus Data.
     //    TRUE = armement autorisé (polarité positive NC-100).
     ArmingPermit              := PRG_04_Treuils_Benne.Data.ArmingPermit,
+    DirectInversionPermit     := GVL_IHM.CycleSemiAuto.State.Step = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED,
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
@@ -6206,6 +6207,14 @@ Ready := Enable AND NOT Fault.Latched;
 --&gt; [SAFE] Permission d'armement homme-mort ; FALSE = armement bloqué</xhtml>
               </documentation>
             </variable>
+            <variable name="DirectInversionPermit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, AX8 semi-auto uniquement</xhtml>
+              </documentation>
+            </variable>
             <variable name="BusCanOpenOP">
               <type>
                 <derived name="ST_Diag_Device" />
@@ -6745,7 +6754,7 @@ IF NeutralXYEdge.Q THEN
     InversionLockActive := FALSE;
 END_IF;
 
-IF FlipX OR FlipY THEN
+IF FlipX OR (FlipY AND NOT (DirectInversionPermit AND DeadmanArmed)) THEN
     InversionLockActive := TRUE;
     DeadmanArmed := FALSE;
     DeadmanArmPending := FALSE;

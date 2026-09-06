@@ -171,6 +171,7 @@ VAR
     SelectedWorkTarget      : INT;          // . [LOC] Cible de travail (fige a 3=P1 depuis C3.1) - conserve pour diag/futur
     InitConditionsOk        : BOOL;         // . [LOC] AX1_INIT : toutes les conditions initiales sont remplies
     StepMaxPrevState        : E_AutoCycleStep;  // . [LOC] Etape du scan precedent (rearmement StepMaxTimer au changement d'etape)
+    ExtractionDelayState    : E_AutoCycleStep := E_AutoCycleStep.AX0_REPOS;
 
     // === FRONTS / TEMPO DIVING ===
     KoboldRiseEdge          : R_TRIG;       // . [LOC] Front DI Kobold 0->1 (entree dans l'eau, AX6)
@@ -195,6 +196,7 @@ VAR
     StabilizationTimer      : TON;          // . [LOC] Temporisation maximale de remontee lente
     SpeedMismatchTimer      : TON;          // . [LOC] Confirmation temporelle ecart de vitesse
     StepMaxTimer            : TON;          // . [LOC] Tempo max d'etape
+    ExtractionStepDelayTimer : TON;
     StateExecutionInhibit   : BOOL;         // . [LOC] Interdit le CASE au scan de forçage
 
     // === CONSTANTES & CONFIGURATIONS INTERNES ===
@@ -225,6 +227,7 @@ VAR CONSTANT
     CST_DiveStartStopTimeout : TIME := T#5s; // Plafond anti-blocage ; timeout -> defaut latche, jamais depart
     CST_DiveStartSpeedThresholdMps : REAL := 0.02; // Vitesse quasi nulle, alignee FB_Modes
     CST_RaiseOffBottomDefaultM : REAL := 0.5;   // Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM <= 0
+    CST_ExtractionStepDelay    : TIME := T#500ms;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -295,6 +298,16 @@ SpeedMismatchConfirmed := SpeedMismatchTimer.Q;
 // Tempo max d'étape (R5) — DÉSACTIVÉE (pour éviter toute coupure/repli AX_STAB intempestif sur durée)
 StepMaxTimer(IN := FALSE, PT := StepMaxTimeout);
 StepMaxPrevState := State;
+ExtractionStepDelayTimer(
+    IN := ((State = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
+        OR (State = E_AutoCycleStep.AX10_CLOSE_BUCKET)
+        OR (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
+        OR (State = E_AutoCycleStep.AX12_LOADED_ASCENT))
+       AND (State = ExtractionDelayState),
+    PT := CST_ExtractionStepDelay);
+IF State <> ExtractionDelayState THEN
+    ExtractionDelayState := State;
+END_IF;
 
 // Egouttage AX13 : TON gaté sur l'étape (remis à 0 hors AX13). Remplace l'ancien IN:=TRUE câblé
 // qui pouvait laisser Q déjà vrai à l'entrée en AX13 (temps d'égouttage non respecté).
@@ -1056,7 +1069,7 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt := CST_StepSlow;
 
-        IF DeadmanArmed AND JoystickPull AND (M1_CablePosM >= RaiseTargetM1) AND (M2_CablePosM >= RaiseTargetM2) THEN
+        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q AND (M1_CablePosM >= RaiseTargetM1) AND (M2_CablePosM >= RaiseTargetM2) THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
@@ -1077,16 +1090,16 @@ CASE State OF
         // Etape benne seule : les DEUX treuils explicitement neutralises.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
-        BucketCmd.ReqClose := DeadmanArmed AND JoystickPull;
+        BucketCmd.ReqClose := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
 
-        IF DeadmanArmed AND JoystickPull AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
+        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.ReqClose := FALSE;
-            // C1e (GEL principe 4) : AX10 -> AX11 sans temps mort. M1+M2 lances le MEME
-            // scan que la sortie AX10_CLOSE_BUCKET (pas de creux RunRequest a la frontiere).
-            WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
+            // AX10 -> AX11 : la transition conserve la meme intention operateur;
+            // le timer inter-etape impose la pause de 500 ms avant mouvement.
+            WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
             WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
             WinchM1Cmd.StepTgt  := CtrlAscentMaxStepEff;
-            WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
+            WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
             WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
             WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
             State := E_AutoCycleStep.AX11_CTRL_ASCENT;
@@ -1105,14 +1118,14 @@ CASE State OF
         OperatorAction := 'AX11 - Maintenir la montee de controle : palier et synchronisme.';
 
         // Palier max reglable IHM, borne [1..2] (defaut 1 / P1 ; P2 possible au besoin).
-        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM1Cmd.StepTgt  := CtrlAscentMaxStepEff;
-        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
 
-        IF DeadmanArmed AND JoystickPull
+        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q
            AND (M1_CablePosM >= (TouchPositionM1 + CtrlAscentDistM))
            AND (M2_CablePosM >= (TouchPositionM2 + CtrlAscentDistM))
            AND (ABS(WinchSyncDeltaM) <= CtrlAscentToleranceM) THEN
@@ -1133,14 +1146,14 @@ CASE State OF
 
         // Benne bien fermee -> palier 4 ; benne mal fermee (a peu pres) -> palier 1.
         // Pas de ralentissement 1 m avant la position top (montee franche).
-        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM1Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
-        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
-        IF DeadmanArmed AND JoystickPull AND M1_CablePosM >= CableLimitM1AscentM THEN
+        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q AND M1_CablePosM >= CableLimitM1AscentM THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
