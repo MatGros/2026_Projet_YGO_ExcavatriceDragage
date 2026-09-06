@@ -673,7 +673,15 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 WinchM2.PositionM - ActiveOffset_M, affichage bargraphe</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📊 CablePosM2 - offset benne NOMINAL fige (Config.OffsetClose/OpenM selon l'etat franc) ; affichage bargraphe. Ne bouge que si le tambour M2 tourne.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2PositionCorrectedValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎭 M2PositionCorrected exploitable : benne referencee ET etat FRANC (ouvert OU ferme). FALSE en position intermediaire -&gt; l'IHM masque/grise le bargraphe.</xhtml>
               </documentation>
             </variable>
             <variable name="AutoBucketSeqActive">

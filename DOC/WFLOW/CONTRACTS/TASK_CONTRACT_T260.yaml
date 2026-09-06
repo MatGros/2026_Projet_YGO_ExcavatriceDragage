@@ -1,0 +1,69 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T260
+# Fix affichage M2PositionCorrected qui saute au basculement WinchSel 0->2 / fin de jog
+# Diagnostic : DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_WINCHSEL_M2_OFFSET_20260906.md
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T260
+  criticality: C2
+  strategy: patch
+  objective: >
+    L affichage operateur M2PositionCorrected (bargraphe benne) ne bouge que
+    lorsqu un tambour tourne : plus de saut de ~0.7 m au passage WinchSel 0->2
+    ou en fin de jog benne alors que M1/M2 sont immobiles, et aucune derive de
+    la valeur d une session a l autre.
+  acceptance:
+    - {id: AC1, statement: "Benne fermee referencee, passage WinchSel 0->2 en MAINT sans commande Y, tambours immobiles : M2PositionCorrected garde la meme valeur (delta nul).", verified_by: "Test sim : snapshot Snapshot_Troubleshooting avant/apres basculement, comparaison du champ M2PositionCorrected."}
+    - {id: AC2, statement: "En fin de jog benne unitaire M2, tambours a l arret, M2PositionCorrected garde la meme valeur (aucun recalage differe sur bande stable).", verified_by: "Test sim : observation M2PositionCorrected apres relache du joystick Y."}
+    - {id: AC3, statement: "M2PositionCorrected vaut CablePosM2 moins Config.OffsetCloseM quand la benne est fermee, moins Config.OffsetOpenM quand elle est ouverte, et garde sa derniere valeur en position intermediaire.", verified_by: "Revue code FB_Bucket.st §5 (DisplayOffsetM) + PRG_04_Treuils_Benne.st:1631."}
+    - {id: AC4, statement: "Position_M et BucketOpening_Pct affichent la mesure brute M2-M1 en temps reel, sans lissage ni offset fige.", verified_by: "Revue code FB_Bucket.st (BucketOpening_Pct) + PRG_07_Supervision (Position_M) : aucune ligne modifiee."}
+    - {id: AC5, statement: "Les fins de course logiciels M2 (BottomLimitM2_Active, M2_LimitShift), le cross-check MecaE et la surveillance de synchronisme lisent ActiveOffsetM inchange.", verified_by: "git diff : aucune ligne ActiveOffsetM ni FB_SyncDeviation/FB_WinchSync modifiee ; grep des consommateurs de ActiveOffsetM."}
+    - {id: AC6, statement: "Patch editorial sur le POU PRG_04_Treuils_Benne : le nom de fichier reste egal au nom de POU et le suffixe reste identique au langage genere dans le bundle, sans renommage ni reclassement", verified_by: "git diff --stat : seules des lignes internes du POU changent, aucun fichier CODE/M_MAIN cree, supprime ou renomme"}
+    - {id: AC7, statement: "BucketState.M2PositionCorrectedValid vaut TRUE quand la benne est referencee ET en etat franc (IsClosed XOR IsOpen), FALSE en position intermediaire, pour que l IHM masque ou grise le bargraphe M2PositionCorrected.", verified_by: "Revue code PRG_04_Treuils_Benne.st (publication BucketState) + test sim : benne mi-course -> M2PositionCorrectedValid = FALSE."}
+  scope:
+    allowed: [CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st, CODE/M_MAIN/PRG_04_Treuils_Benne.st, CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_BucketHMIState.st, CODE_XML/, DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_WINCHSEL_M2_OFFSET_20260906.md]
+    forbidden: [PRJ_CODESYS/PROJ_Full_ImportExport/Device.export, CODE/H_TREUILS_BENNE/FB_SyncDeviation.st, CODE/H_TREUILS_BENNE/FB_WinchSync.st, CODE/H_TREUILS_BENNE/BENNE/_TYPES/ST_fbBucket_State.st, CODE/GVL_PERSISTENT.st]
+  conservation:
+    must_survive:
+      - "ActiveOffsetM a pente bornee (<0.5 m/scan) : consomme par FdC bas/haut M2, MecaE, SYNC."
+      - "DeltaPositionCorrected_M garde son sens ~0=synchro en manoeuvre (reste sur OffsetTargetM)."
+      - "Gel affichage homing PRG_07 (M2PosDisplayFrozen, AF-09 §13) fonctionnel."
+      - "OffsetTargetM reste calcule (convergence ActiveOffsetSettled + DeltaPositionCorrected_M)."
+    dropped_on_purpose:
+      - "M2PositionCorrected ne suit plus l ecart mesure live pendant Busy/jog."
+      - "Un pas de recalage subsiste au franchissement FRANC ouvert<->ferme (tambour M2 a tourne) - accepte."
+      - "Approche 'capture de l offset au referencement' ecartee (derive inter-session par variabilite inertie/coast)."
+  evidence_required: [bundle_xml, g200_linkage, gates_palier_c]
+  alert_duty: >
+    Tout consommateur non identifie de M2PositionCorrected ou OffsetTargetM
+    (bargraphe IHM, diagnostic) est signale immediatement, pas a la fin.
+
+status: COMPLETED
+
+execution:
+  executed_by: "claude-sonnet-5 (Claude Code)"
+  completed_at: "2026-09-07T01:05:26+02:00"
+  status: COMPLETED
+  summary: >
+    FB_Bucket.st : VAR_OUTPUT DisplayOffsetM ajoute, init Config.OffsetCloseM
+    (gate §2 + FirstCycle §3), calcul §5 (Config.OffsetCloseM/OffsetOpenM selon
+    IsClosed/IsOpen, gele en intermediaire). PRG_04_Treuils_Benne.st:1631 :
+    M2PositionCorrected repointe de OffsetTargetM vers instBucket.DisplayOffsetM ;
+    ajout BucketState.M2PositionCorrectedValid (BucketReferenced AND IsClosed XOR
+    IsOpen). ST_BucketHMIState.st : champ M2PositionCorrectedValid + maj commentaire
+    M2PositionCorrected. DeltaPositionCorrected_M inchange. Aucun chemin securite
+    touche. Commentaire REX retire de FB_Bucket au passage.
+    TEST SIM UTILISATEUR OK (AC1/AC2 : plus de saut, % benne OK) ; NON COMMITE.
+  evidence_submitted:
+    - "generate_codesys_bundle.py : PASS (bundle fresh)"
+    - "G200_check_linkage.py --report : PASS (0 erreur, 1784 instances)"
+    - "run_all_gates.py --palier C : 4 gates FAIL preexistants hors perimetre (G340, G406, G430 PRG_05 T249, G483 T181) ; baseline identique"
+    - "test simulation utilisateur : basculement WinchSel 0->2 sans saut, BucketOpening_Pct OK"
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    En attente du test simulation utilisateur (AC1/AC2) puis visa orchestrateur avant commit.
