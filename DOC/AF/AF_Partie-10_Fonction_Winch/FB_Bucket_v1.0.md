@@ -4,7 +4,7 @@
 > Rôle de **ce** document : ouverture/fermeture benne par désynchronisation M1/M2, protection
 > glissement, assistants maintenance — et **catalogue unique** des `TC-P10-023` à `TC-P10-034`.
 > **Sous-fonction du domaine Treuils** (AF10) — aucune I/O ni programme propre.
-> Source code : `CODE/TREUILS/BENNE/*.st`, `CODE/G_CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st`.
+> Source code : `CODE/H_TREUILS_BENNE/BENNE/*.st` (assistants `FB_DiveSearch`/`FB_ExtractionSequence` retires — T258, cf. AF-04 v2.3).
 > Instance unique `instBucket` dans `PRG_04_Treuils_Benne` — fiche FB du domaine Treuils.
 
 ## 🧭 Sommaire
@@ -375,4 +375,4 @@ programme/Safety propre (contrairement à Translation qui a son propre programme
 | AF09 | Encodeurs — position/Homed consommés |
 | AF04 | Cycle SEMI_AUTO — séquence dragage |
 | AF05 | Modes — MAINT_N1/N2 requis pour assistants |
-| Code | `CODE/TREUILS/BENNE/*.st`, `CODE/G_CYCLE/FB_DiveSearch.st`, `FB_ExtractionSequence.st` |
+| Code | `CODE/H_TREUILS_BENNE/BENNE/*.st` (assistants `FB_DiveSearch`/`FB_ExtractionSequence` retires — T258, cf. AF-04 v2.3) |

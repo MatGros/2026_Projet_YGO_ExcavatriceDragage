@@ -106,6 +106,7 @@ VAR
     ClimbTimer                  : TON;                                      // . [LOC] Garde HX2 (montee au capteur)
     HomeAxesTimer               : TON;                                      // . [LOC] Garde HX3 (descente jusqu'au front descendant)
     SettleGraceTimer            : TON;                                      // . [LOC] Fenetre de grace decelaration a l'entree d'un step d'arret
+    PauseSettleTimer            : TON;                                      // . [LOC] Palier de stabilisation HX3N (arret confirme >= 2 s avant benne)
     AutoArmTimer                : TON;                                      // . [LOC] Debounce de l'auto-armement HX0->HX1 (anti-flapping MachineHomed)
     FirstScanDone               : BOOL;                                     // . [LOC] Garde 1er scan : statuts codeurs pas encore stables au boot
 
@@ -158,6 +159,7 @@ VAR CONSTANT
 
     // === DIVERS ===
     CST_SettleGrace : TIME := T#3s;          // Grace deceleration a l'entree d'un step d'arret
+    CST_PauseSettle : TIME := T#2s;          // Palier de stabilisation HX3N -> HX4 (arret confirme avant benne)
     CST_StepSlow    : INT  := 1;             // Palier de vitesse lent (montee / descente couplee homing)
 END_VAR
 
@@ -422,6 +424,12 @@ ClimbTimer(IN := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) AND (Cfg.CfgTimeou
            PT := Cfg.CfgTimeoutClimb);
 HomeAxesTimer(IN := (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) AND (Cfg.CfgTimeoutHomeAxes > T#0s),
               PT := Cfg.CfgTimeoutHomeAxes);
+// HX3N -> HX4 : palier de stabilisation. Treuils arretes ET joystick revenu au neutre
+// maintenus CST_PauseSettle (2 s) avant d'autoriser la manoeuvre benne (arret mecanique
+// franc confirme, pas un simple front "Done").
+PauseSettleTimer(IN := (SeqStep = E_MachineHomingTxState.HX3N_PAUSE)
+                       AND WinchesMechanicallyStopped AND SeenNeutral,
+                 PT := CST_PauseSettle);
 {endregion}
 
 {region "§8 GRAFCET de referencement machine (CASE SeqStep)"}
@@ -528,7 +536,7 @@ CASE SeqStep OF
         IF TransactionAbort THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF WinchesMechanicallyStopped AND SeenNeutral THEN
+        ELSIF WinchesMechanicallyStopped AND SeenNeutral AND PauseSettleTimer.Q THEN
             SeqStep := E_MachineHomingTxState.HX4_BUCKET_ADJUST;
         END_IF;
 
