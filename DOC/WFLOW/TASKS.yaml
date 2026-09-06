@@ -5926,3 +5926,22 @@ tasks:
   - T258-B
   - T258-C
   - T258-D
+
+- id: T259
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: MAINTENANCE_N2_IHM
+  agent: Antigravity
+  date: '2026-09-07T00:56:00+02:00'
+  titre: Shunt forçage direct sorties hardware en MAINT_N2 sous mot de passe IHM
+  contexte: 'Besoins de décoinçage d urgence et test unitaire des contacteurs/freins en maintenance experte sans dépendre des FBs amont ni du joystick CAN.'
+  description: 'Ajout des commandes IHM dédiées dans GVL_IHM.MaintenanceN2 et shunt direct dans PRG_06_Outputs (M1/M2/Both Montée/Descente Palier 1, Freins M1/M2/M3 seuls) sous condition Auth.Mode = MAINT_N2 et mot de passe N2 actif.'
+  objectifs:
+  - Commandes IHM dédiées dans GVL_IHM protégées par mot de passe N2
+  - Shunt direct dans PRG_06_Outputs indépendant des FBs amont
+  - Exclusion mutuelle stricte Montée/Descente (anti-court-circuit 400V)
+  - Maintien du FDC haut physique ultime et de la coupure AU
+  - Rebouclage propre dans Data.* vers le banc de simulation FB_SimBench
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T259.yaml
+  bloque_par: []
