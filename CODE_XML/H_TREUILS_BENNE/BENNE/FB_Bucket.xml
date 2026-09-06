@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T12:42:27.725454" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T12:42:27.725454">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T12:03:44.664020" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T12:03:44.664020">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1171,10 +1171,13 @@
                 <BOOL />
               </type>
             </variable>
-            <variable name="HomingFaultLatched">
+            <variable name="HomingUnreferenced">
               <type>
                 <BOOL />
               </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Miroir live : M1 ou M2 non référencé (cause 4, non latchée)</xhtml>
+              </documentation>
             </variable>
             <variable name="instFault">
               <type>
@@ -1269,7 +1272,6 @@ IF ResetEdge.Q OR BypassGlobal THEN
     OffsetMaxFaultLatched := FALSE;
     TimeoutFaultLatched   := FALSE;
     M1SlipFaultLatched    := FALSE;
-    HomingFaultLatched    := FALSE;
 END_IF;
 
 IF NOT BypassGlobal THEN
@@ -1298,11 +1300,17 @@ IF NOT BypassGlobal THEN
     OffsetMaxViolNow := (CablePosM2 &gt; (CablePosM1 + MaxAllowedOffset))
                      OR (CablePosM2 &lt; (CablePosM1 + MinAllowedOffset));
     // Anti-pic : ne latche que si l'ecart reste hors plage &gt; 500 ms (bruit codeur / glitch).
-    TonOffsetMaxViol(IN := OffsetMaxViolNow, PT := T#500ms);
+    // Gate homing machine : pendant MachineHomingActive les positions M1/M2 brutes multitour
+    // ont un ecart geometrique quelconque (codeurs non references, AF-09 §5) -&gt; la coherence
+    // geometrique benne n'a pas de sens et ne doit pas latcher. Latch de-arme pendant le cycle.
+    TonOffsetMaxViol(IN := OffsetMaxViolNow AND NOT MachineHomingActive, PT := T#500ms);
     IF TonOffsetMaxViol.Q THEN
         OffsetMaxFaultLatched := TRUE;
     END_IF;
-    instCauses[1].Active   := OffsetMaxFaultLatched;
+    IF MachineHomingActive THEN
+        OffsetMaxFaultLatched := FALSE;
+    END_IF;
+    instCauses[1].Active   := OffsetMaxFaultLatched AND NOT MachineHomingActive;
     instCauses[1].Latching := TRUE;
     instCauses[1].Texte    := 'Depassement ecart maximum autorise benne';
 
@@ -1324,12 +1332,18 @@ IF NOT BypassGlobal THEN
     instCauses[3].Latching := TRUE;
     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
 
-    // Cause 4 : Non référencé
-    IF NOT HomedM1 OR NOT HomedM2 THEN
-        HomingFaultLatched := TRUE;
-    END_IF;
-    instCauses[4].Active   := HomingFaultLatched;
-    instCauses[4].Latching := TRUE;
+    // Cause 4 : Non référencé — vue LIVE (non latchée), masquée pendant le homing machine.
+    // "Codeurs non référencés" est un ÉTAT, pas un événement transitoire : latché, il
+    // s'armait dès le premier scan sous puissance (codeurs jamais référencés en début de
+    // session) et restait bloqué jusqu'à un Reset -&gt; FB_Bucket en défaut latché permanent
+    // -&gt; EffectivePermitBucket_* = FALSE en permanence. En vue LIVE, la cause suit
+    // HomedM1/M2 et s'efface seule au référencement (FB_FaultCore : Latching=FALSE = la
+    // cause reste visible tant qu'active, sans acquittement). Pendant MachineHomingActive
+    // les codeurs sont volontairement non référencés (objet même du cycle, AF-09 §5) : la
+    // cause est masquée pour ne pas bloquer la participation du treuil benne au homing.
+    HomingUnreferenced     := (NOT HomedM1 OR NOT HomedM2);
+    instCauses[4].Active   := HomingUnreferenced AND NOT MachineHomingActive;
+    instCauses[4].Latching := FALSE;
     instCauses[4].Texte    := 'Codeurs treuils non references pour sequence benne';
 ELSE
     TonTimeout(IN := FALSE);

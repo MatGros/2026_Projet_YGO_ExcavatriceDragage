@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T05:43:28.988168" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T05:43:28.988168">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T12:04:33.860496" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T12:04:33.860496">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1153,6 +1153,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fenetre de grace decelaration a l'entree d'un step d'arret</xhtml>
               </documentation>
             </variable>
+            <variable name="PauseSettleTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier de stabilisation HX3N (arret confirme &gt;= 2 s avant benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="AutoArmTimer">
               <type>
                 <derived name="TON" />
@@ -1519,6 +1527,17 @@ Debounce anti-flapping de l'auto-armement HX0-&gt;HX1</xhtml>
 Grace deceleration a l'entree d'un step d'arret</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_PauseSettle">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier de stabilisation HX3N -&gt; HX4 (arret confirme avant benne)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_StepSlow">
               <type>
                 <INT />
@@ -1812,6 +1831,12 @@ ClimbTimer(IN := (SeqStep = E_MachineHomingTxState.HX2_CLIMB) AND (Cfg.CfgTimeou
            PT := Cfg.CfgTimeoutClimb);
 HomeAxesTimer(IN := (SeqStep = E_MachineHomingTxState.HX3_HOME_AXES) AND (Cfg.CfgTimeoutHomeAxes &gt; T#0s),
               PT := Cfg.CfgTimeoutHomeAxes);
+// HX3N -&gt; HX4 : palier de stabilisation. Treuils arretes ET joystick revenu au neutre
+// maintenus CST_PauseSettle (2 s) avant d'autoriser la manoeuvre benne (arret mecanique
+// franc confirme, pas un simple front "Done").
+PauseSettleTimer(IN := (SeqStep = E_MachineHomingTxState.HX3N_PAUSE)
+                       AND WinchesMechanicallyStopped AND SeenNeutral,
+                 PT := CST_PauseSettle);
 {endregion}
 
 {region "§8 GRAFCET de referencement machine (CASE SeqStep)"}
@@ -1918,7 +1943,7 @@ CASE SeqStep OF
         IF TransactionAbort THEN
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HXF_FAILED;
-        ELSIF WinchesMechanicallyStopped AND SeenNeutral THEN
+        ELSIF WinchesMechanicallyStopped AND SeenNeutral AND PauseSettleTimer.Q THEN
             SeqStep := E_MachineHomingTxState.HX4_BUCKET_ADJUST;
         END_IF;
 

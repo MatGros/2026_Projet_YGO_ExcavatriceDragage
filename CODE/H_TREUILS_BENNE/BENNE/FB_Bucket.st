@@ -127,7 +127,7 @@ VAR
     OffsetMaxFaultLatched           : BOOL;
     TimeoutFaultLatched             : BOOL;
     M1SlipFaultLatched              : BOOL;
-    HomingFaultLatched              : BOOL;
+    HomingUnreferenced              : BOOL;   // . [LOC] Miroir live : M1 ou M2 non référencé (cause 4, non latchée)
 
     // Socle défaut
     instFault                       : FB_FaultCore;                   // * [INST] Socle défaut transverse
@@ -151,7 +151,6 @@ IF ResetEdge.Q OR BypassGlobal THEN
     OffsetMaxFaultLatched := FALSE;
     TimeoutFaultLatched   := FALSE;
     M1SlipFaultLatched    := FALSE;
-    HomingFaultLatched    := FALSE;
 END_IF;
 
 IF NOT BypassGlobal THEN
@@ -180,11 +179,17 @@ IF NOT BypassGlobal THEN
     OffsetMaxViolNow := (CablePosM2 > (CablePosM1 + MaxAllowedOffset))
                      OR (CablePosM2 < (CablePosM1 + MinAllowedOffset));
     // Anti-pic : ne latche que si l'ecart reste hors plage > 500 ms (bruit codeur / glitch).
-    TonOffsetMaxViol(IN := OffsetMaxViolNow, PT := T#500ms);
+    // Gate homing machine : pendant MachineHomingActive les positions M1/M2 brutes multitour
+    // ont un ecart geometrique quelconque (codeurs non references, AF-09 §5) -> la coherence
+    // geometrique benne n'a pas de sens et ne doit pas latcher. Latch de-arme pendant le cycle.
+    TonOffsetMaxViol(IN := OffsetMaxViolNow AND NOT MachineHomingActive, PT := T#500ms);
     IF TonOffsetMaxViol.Q THEN
         OffsetMaxFaultLatched := TRUE;
     END_IF;
-    instCauses[1].Active   := OffsetMaxFaultLatched;
+    IF MachineHomingActive THEN
+        OffsetMaxFaultLatched := FALSE;
+    END_IF;
+    instCauses[1].Active   := OffsetMaxFaultLatched AND NOT MachineHomingActive;
     instCauses[1].Latching := TRUE;
     instCauses[1].Texte    := 'Depassement ecart maximum autorise benne';
 
@@ -206,12 +211,18 @@ IF NOT BypassGlobal THEN
     instCauses[3].Latching := TRUE;
     instCauses[3].Texte    := 'Glissement treuil M1 pendant manoeuvre benne';
 
-    // Cause 4 : Non référencé
-    IF NOT HomedM1 OR NOT HomedM2 THEN
-        HomingFaultLatched := TRUE;
-    END_IF;
-    instCauses[4].Active   := HomingFaultLatched;
-    instCauses[4].Latching := TRUE;
+    // Cause 4 : Non référencé — vue LIVE (non latchée), masquée pendant le homing machine.
+    // "Codeurs non référencés" est un ÉTAT, pas un événement transitoire : latché, il
+    // s'armait dès le premier scan sous puissance (codeurs jamais référencés en début de
+    // session) et restait bloqué jusqu'à un Reset -> FB_Bucket en défaut latché permanent
+    // -> EffectivePermitBucket_* = FALSE en permanence. En vue LIVE, la cause suit
+    // HomedM1/M2 et s'efface seule au référencement (FB_FaultCore : Latching=FALSE = la
+    // cause reste visible tant qu'active, sans acquittement). Pendant MachineHomingActive
+    // les codeurs sont volontairement non référencés (objet même du cycle, AF-09 §5) : la
+    // cause est masquée pour ne pas bloquer la participation du treuil benne au homing.
+    HomingUnreferenced     := (NOT HomedM1 OR NOT HomedM2);
+    instCauses[4].Active   := HomingUnreferenced AND NOT MachineHomingActive;
+    instCauses[4].Latching := FALSE;
     instCauses[4].Texte    := 'Codeurs treuils non references pour sequence benne';
 ELSE
     TonTimeout(IN := FALSE);

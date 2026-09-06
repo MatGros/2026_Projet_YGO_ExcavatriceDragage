@@ -236,6 +236,9 @@ VAR
     // Le FDC haut CAPTEUR (TopPositionSensor ≈ 8,5 m) n'est JAMAIS ouvert par cet override.
     OverrideTopSoftwareN1M1 : BOOL;
     OverrideTopSoftwareN1M2 : BOOL;
+    MachineHomingActive : BOOL; // . [LOC] Cycle homing conjoint effectivement engage
+    HomingBothAscentRequested : BOOL; // . [LOC] HX2 : M1/M2 demandent ensemble la montee
+    HomingClimbTopLimitOverride : BOOL; // . [LOC] HX2 N2 : releve la limite soft jusqu'au capteur haut, jamais le FDC physique
 
     // Limite haute logicielle active (m) : 7,5 m nominal ➔ 8,5 m (capteur homing haut) sous override.
     TopLimitM1_M : REAL;
@@ -800,6 +803,19 @@ OverrideTopSoftwareN1M2 := MaintN1
                            AND NOT PRG_02_Acquisition.Data.EncoderM2.HomingSuspect
                            AND GVL_IHM.M2TreuilBenne.Cmd.BtnOverrideTopSoftware;
 
+// Homing conjoint : des codeurs non references ne portent pas une cote exploitable.
+// Pendant HX2 seulement, le cycle doit donc atteindre le capteur haut afin de recreer
+// le datum. Le critere est l'ordre both de montee effectivement emis par le GRAFCET,
+// pas un bypass IHM ; le FDC haut physique reste traite par FB_Safety_Winch.
+MachineHomingActive := PRG_02_Acquisition.Data.MachineHoming.Active;
+HomingBothAscentRequested := PRG_02_Acquisition.Data.MachineHoming.CmdWinchM1.RunRequest
+                             AND PRG_02_Acquisition.Data.MachineHoming.CmdWinchM1.ReqAscent
+                             AND PRG_02_Acquisition.Data.MachineHoming.CmdWinchM2.RunRequest
+                             AND PRG_02_Acquisition.Data.MachineHoming.CmdWinchM2.ReqAscent;
+HomingClimbTopLimitOverride := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                               AND MachineHomingActive
+                               AND HomingBothAscentRequested;
+
 // --- Bypass EFFECTIFS de la famille position (individuel OR commun, SANS gate de mode — dérogation MES 2026) ---
 BypassM1TopLimitSwitchEff   := (GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch   OR GVL_IHM.Commun.Bypass.TopLimitSwitch);
 BypassM1TopLimitSoftwareEff := (GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSoftware OR GVL_IHM.Commun.Bypass.TopLimitSoftware);
@@ -818,10 +834,10 @@ BypassM2MecaDEff            := GVL_IHM.M2TreuilBenne.Bypass.MecaD;
 // deux cas : l'override ne modifie que l'assiette de référence, pas la géométrie M1/M2.
 // Le seuil haut nominal est un arrêt immédiat (distance de ralentissement = 0 m).
 // En override/bypass MAINT, seul le FDC haut matériel définit la borne : il reste non-bypassable.
-TopLimitM1_M := SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff,
+TopLimitM1_M := SEL(OverrideTopSoftwareN1M1 OR BypassM1TopLimitSoftwareEff OR HomingClimbTopLimitOverride,
                     _CommunCfgPersist.CfgCableLimitAscent_M,
                     _WinchM1CfgPersist.CfgTopSensorPos_M);
-TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
+TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff OR HomingClimbTopLimitOverride,
                     _CommunCfgPersist.CfgCableLimitAscent_M + M2_LimitShift,
                     _WinchM2CfgPersist.CfgTopSensorPos_M + M2_LimitShift);
 // EXEMPTION jog benne seule (WinchSel=2) : la formule ci-dessus, une fois M2_LimitShift
@@ -877,7 +893,14 @@ instSafetyWinchM1(
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    InReferencingMode      := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy,
+    // Fenetre de referencement = transaction SDO preset (HomingLifecycle.Busy, ~1 scan en HX3)
+    // OU cycle de homing machine engage (MachineHoming.Active = HX2..HX6). Pendant l'approche du
+    // capteur haut (HX2) et la descente couplee (HX3) la position codeur n'est pas encore fiable
+    // (AF-09 §5) : les butees logicielles de position et les gardes derive doivent etre
+    // neutralisees, sinon la montee de referencement est impossible (position brute multitour
+    // ~4100 m > butee 7,5 m -> AscentPermit bloque). Le FDC haut MATERIEL reste actif.
+    InReferencingMode      := PRG_02_Acquisition.Data.MachineHoming.Active
+                              OR PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
@@ -945,7 +968,11 @@ instSafetyWinchM2(
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    InReferencingMode      := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy,
+    // Meme regle que M1 : fenetre de referencement elargie au cycle de homing machine
+    // (MachineHoming.Active) en plus de la transaction SDO (HomingLifecycle.Busy). Position
+    // codeur non fiable tant que non reference (AF-09 §5) -> butees logicielles neutralisees.
+    InReferencingMode      := PRG_02_Acquisition.Data.MachineHoming.Active
+                              OR PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
@@ -1043,6 +1070,17 @@ EffectivePermitM2_Descend := ProcessAndSafetyPermitM2_Descend AND NOT SafeStopM2
 EffectivePermitM1_Ascent  := ProcessAndSafetyPermitM1_Ascent  AND NOT SafeStopM1_Active AND (NOT CoupledBoth OR ProcessAndSafetyPermitM2_Ascent);
 EffectivePermitM2_Ascent  := ProcessAndSafetyPermitM2_Ascent  AND NOT SafeStopM2_Active AND (NOT CoupledBoth OR ProcessAndSafetyPermitM1_Ascent);
 
+// 🔧 Homing machine (MachineHoming.Active = HX2..HX6) : la benne M2 doit pouvoir monter
+// COUPLEE a M1 pour atteindre le capteur haut de referencement. Tant que les codeurs ne
+// sont pas references, les permis M2 derives de la position/geometrie benne sont non
+// fiables (AF-09 §5) -> M2 suit STRICTEMENT M1 pendant le cycle. Le FDC haut MATERIEL
+// (commun M1M2, FB_Safety_Winch §3 sur cause capteur) reste la vraie butee, et le GRAFCET
+// bascule HX2->HX2N sur TopPositionSensor. Aucun mouvement hors permis maintenu (homme-mort
+// + joystick) : le cycle FB_CycleMachineHoming ne commande la montee que sous ClimbPermit.
+IF PRG_02_Acquisition.Data.MachineHoming.Active THEN
+    EffectivePermitM2_Ascent := EffectivePermitM1_Ascent;
+END_IF;
+
 // Permis canoniques benne : ouverture = M2 vers le bas, fermeture = M2 vers le haut.
 // Les fins de course benne restent des faits fonctionnels distincts des limites treuil.
 EffectivePermitBucket_Open := EffectivePermitM2_Descend
@@ -1062,6 +1100,13 @@ M2AscentPermitApplied := EffectivePermitM2_Ascent
     AND (NOT instBucket.M2_RunRequest OR EffectivePermitBucket_Close);
 M2DescendPermitApplied := EffectivePermitM2_Descend
     AND (NOT instBucket.M2_RunRequest OR EffectivePermitBucket_Open);
+
+// 🔧 Homing machine : la defense en profondeur benne (permis EffectivePermitBucket_Close,
+// conditionne a EncoderM1/M2.Homed) est non pertinente tant que les codeurs ne sont pas
+// references. M2 monte couple a M1 (memes conditions), sans passer par le permis benne.
+IF PRG_02_Acquisition.Data.MachineHoming.Active THEN
+    M2AscentPermitApplied := EffectivePermitM2_Ascent;
+END_IF;
 
 // 🔗 Agrégats Both : permis communs consommés par la commande both.
 // = AND des 4 permits effectifs. Chaque axe garde sa vérité propre

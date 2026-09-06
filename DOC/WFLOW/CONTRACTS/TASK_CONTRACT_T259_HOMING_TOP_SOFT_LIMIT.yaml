@@ -1,0 +1,54 @@
+contract:
+  task_id: T259_HOMING_TOP_SOFT_LIMIT
+  criticality: C3
+  strategy: patch
+  objective: >
+    Permettre au homing conjoint MAINT_N2 de monter au capteur haut physique
+    lorsque les codeurs non references affichent une position hors limite logicielle nominale.
+  acceptance:
+    - id: AC1
+      statement: "En HX2, une demande conjointe de montee homing releve les limites logicielles M1/M2 a leurs cotes capteur configurees."
+      verified_by: "Revue Req -> Tgt -> Cmd -> Act et test integration treuil."
+    - id: AC2
+      statement: "Hors HX2 homing, les limites nominales et les comportements MAINT_N1/N2 existants sont inchanges."
+      verified_by: "Test integration et revue differentielle."
+    - id: AC3
+      statement: "Le FDC haut physique, SafeStop, PowerCutOff et les interlocks finaux ne sont jamais bypasses."
+      verified_by: "Revue du cablage FB_Safety_Winch et G200."
+    - id: AC4
+      statement: "Au front descendant du capteur haut dans HX3, M1Demand.HomeReq et M2Demand.HomeReq restent emis un seul scan."
+      verified_by: "Test FB_CycleMachineHoming existant."
+    - id: AC5
+      statement: "Le G7 est inactif hors SEMI_AUTO et ne peut pas creer de defaut pendant le homing N2."
+      verified_by: "Revue de l'appel PRG_03 Enable := Mode = SEMI_AUTO."
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE_XML
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T259_HOMING_TOP_SOFT_LIMIT.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+  conservation:
+    must_survive:
+      - "FDC haut physique non bypassable."
+      - "SafeStop, PowerCutOff, interlocks finaux et Reset sur front."
+      - "Limite logicielle nominale 7.5 m hors montee homing HX2."
+      - "MAINT_N1 et MAINT_N2 hors homing bit a bit inchanges."
+    dropped_on_purpose: []
+  evidence_required: [tests_strucpp, check_linkage, bundle]
+  alert_duty: "Toute extension du bypass au FDC physique ou hors HX2 bloque la livraison."
+status: IN_PROGRESS
+execution:
+  executed_by: Codex
+  completed_at: ''
+  status: IN_PROGRESS
+  summary: ''
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ''
+  validated_at: ''
+  notes: ''
