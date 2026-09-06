@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.419168" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.419168">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:56:03.691930" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:56:03.691930">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1723,7 +1723,7 @@ AscentPermit := NOT (
     // TopLimitM porte la relaxation 7,5-&gt;8,5 m en override N1 / bypass N2 : la butee
     // logicielle reste active a la valeur relevee. Bypasser le logiciel releve la butee,
     // il ne la supprime pas ; le FDC haut materiel reste une barriere independante.
-    OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM))
+    OR (Homed AND NOT HomingSuspect AND NOT InReferencingMode AND (CablePosM &gt;= TopLimitM) AND NOT (BypassGlobal OR BypassTopLimitSoftware))
 );
 
 PowerCutOff := CausesPowerCutOffActive;

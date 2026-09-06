@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:33:27.397741" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:33:27.397741">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:57:41.246118" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:57:41.246118">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2679,6 +2679,7 @@ ELSIF SafeStopActive THEN
         OperatorActionCandidate := '[SYNC] Discordance contacteurs M1/M2 - Acquitter SafeStop';
     ELSE
         OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
+    END_IF;
 ELSIF DirectionBlocked THEN
     IF CurrentDirection &lt; 0 THEN
         IF WinchDescentLockedByM3 THEN
