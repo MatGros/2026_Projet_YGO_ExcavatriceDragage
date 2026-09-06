@@ -492,6 +492,7 @@ ELSIF SafeStopActive THEN
         OperatorActionCandidate := '[SYNC] Discordance contacteurs M1/M2 - Acquitter SafeStop';
     ELSE
         OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
+    END_IF;
 ELSIF DirectionBlocked THEN
     IF CurrentDirection < 0 THEN
         IF WinchDescentLockedByM3 THEN
