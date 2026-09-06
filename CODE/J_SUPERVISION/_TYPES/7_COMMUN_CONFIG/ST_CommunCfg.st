@@ -27,6 +27,9 @@ STRUCT
     // (2 treuils sans condition). OFF = jamais gouverné par instBucket.Busy hors
     // action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.
     TglEnableCoupledBucketSequencing : BOOL := TRUE;
+    // 🔒 Verrouillage descente treuil M1/M2 en mode MAINT si le pont M3 n'est pas à P1/Maintenance :
+    // Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils partout).
+    TglEnableWinchDescentLock_M3 : BOOL := TRUE;
     Initialized                 : BOOL := FALSE; (* 🚦 flag restauration boot *)
 END_STRUCT
 END_TYPE

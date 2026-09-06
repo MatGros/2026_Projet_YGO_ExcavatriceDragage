@@ -1237,6 +1237,18 @@ Défaut TRUE (activé) ; 1 bouton IHM pour désactiver -&gt; comportement brut
 action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
               </documentation>
             </variable>
+            <variable name="TglEnableWinchDescentLock_M3">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Verrouillage descente treuil M1/M2 en mode MAINT si le pont M3 n'est pas à P1/Maintenance :
+Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils partout).</xhtml>
+              </documentation>
+            </variable>
             <variable name="Initialized">
               <type>
                 <BOOL />
