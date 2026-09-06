@@ -162,7 +162,9 @@ instCycleSemiAuto(
     JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
-    JoystickRight           := PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive,
+    // Depuis la tremie vers P1, le sens physique droite correspond a ReqMaintenance,
+    // donc a l'axe X negatif dans l'arbitrage M3.
+    JoystickRight           := PRG_02_Acquisition.Data.Joystick.AxisX.DirectionNegative,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
@@ -188,6 +190,8 @@ instCycleSemiAuto(
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
+    M1TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM1Safety.CableLimitAscent,
+    M2TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent,
     Translation_At_P1       := PRG_05_Translation.Data.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.Data.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.Data.M3_AtMaintenanceStable,

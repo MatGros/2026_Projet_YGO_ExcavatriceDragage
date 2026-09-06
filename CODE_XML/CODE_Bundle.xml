@@ -20626,6 +20626,22 @@ FirstScanDone := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite haute d'exploitation M1</xhtml>
               </documentation>
             </variable>
+            <variable name="M1TopLimitReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite haute effective M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2TopLimitReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite haute effective M2</xhtml>
+              </documentation>
+            </variable>
             <variable name="Translation_At_P1">
               <type>
                 <BOOL />
@@ -21557,18 +21573,6 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Interdit le CASE au scan de forçage</xhtml>
               </documentation>
             </variable>
-            <variable name="CtrlAscentDistM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSTANTES &amp; CONFIGURATIONS INTERNES ===
-. [LOC] Distance de remontee lente de controle</xhtml>
-              </documentation>
-            </variable>
             <variable name="CtrlAscentToleranceM">
               <type>
                 <REAL />
@@ -21577,7 +21581,19 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <simpleValue value="0.25" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart maximal admis entre codeurs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSTANTES &amp; CONFIGURATIONS INTERNES ===
+. [LOC] Ancien seuil local conserve pour compatibilite IHM, non bloquant AX11</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlAscentDistM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance minimale AX11 depuis le contact fond</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentTimeout">
@@ -21585,10 +21601,10 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#30s0ms" />
+                <simpleValue value="TIME#1s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps max pour zone de stabilisation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pause de controle AX11 avant passage AX12</xhtml>
               </documentation>
             </variable>
             <variable name="DrainingTime">
@@ -21863,8 +21879,14 @@ CurrentCycleElapsed := CycleRunTimer.ET;
 DrainTimeEff := SEL(CfgDrainTime &lt;= T#0s, CfgDrainTime, DrainingTime);
 
 // ⏱️ Surveillance indépendante de la remontée lente de controle
-// AX11_CTRL_ASCENT -&gt; AX12_LOADED_ASCENT : TON de stabilisation palier lent (DÉSACTIVÉ).
-StabilizationTimer(IN := FALSE, PT := CtrlAscentTimeout);
+// AX11_CTRL_ASCENT -&gt; AX12_LOADED_ASCENT : pause de controle courte.
+// Le synchronisme est surveille par FB_WinchSync ; aucune comparaison de
+// positions memorisees au fond ne doit bloquer le passage lorsque les mesures
+// courantes sont valides.
+StabilizationTimer(
+    IN := (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
+          AND ExtractionStepDelayTimer.Q,
+    PT := CtrlAscentTimeout);
 
 // AX5 : le contacteur alimente le capteur ; aucun retour auxiliaire n existe.
 KoboldInitTimer(IN := (State = E_AutoCycleStep.AX5_KOBOLD_INIT) AND DeadmanArmed AND JoystickPush,
@@ -21964,7 +21986,9 @@ instCauses[4].Active   := StepMaxTimer.Q AND (State &lt;&gt; E_AutoCycleStep.AX_
 instCauses[4].Latching := TRUE;
 instCauses[4].Texte    := 'Depassement tempo maximale d etape (blocage mouvement)';
 
-instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(WinchSyncDeltaM) &gt; CtrlAscentToleranceM))
+// Le timer AX11 est une temporisation de passage, pas une cause de défaut.
+// Le défaut éventuel reste exclusivement celui de l'écart vitesse confirmé.
+instCauses[5].Active   := SpeedMismatchConfirmed
                           AND (State = E_AutoCycleStep.AX11_CTRL_ASCENT);
 instCauses[5].Latching := TRUE;
 instCauses[5].Texte    := 'Defaut de stabilisation / tolerance ecart codeurs en remontee controle';
@@ -22711,10 +22735,13 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
 
-        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q
+        IF ExtractionStepDelayTimer.Q
+           AND StabilizationTimer.Q
            AND (M1_CablePosM &gt;= (TouchPositionM1 + CtrlAscentDistM))
            AND (M2_CablePosM &gt;= (TouchPositionM2 + CtrlAscentDistM))
-           AND (ABS(WinchSyncDeltaM) &lt;= CtrlAscentToleranceM) THEN
+           AND NOT WinchSyncError THEN
+            // La transition d'etat n'emet aucun mouvement : AX12 reste
+            // conditionne a DeadmanArmed + JoystickPull dans ses commandes.
             State := E_AutoCycleStep.AX12_LOADED_ASCENT;
         END_IF;
 
@@ -22739,7 +22766,10 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
-        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
+        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q
+           AND ((M1_CablePosM &gt;= CableLimitM1AscentM)
+             OR M1TopLimitReached
+             OR M2TopLimitReached) THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
@@ -32901,6 +32931,30 @@ MaintenanceLimitClear := NOT LimitSwitchMaintenance;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition active sens oppose</xhtml>
               </documentation>
             </variable>
+            <variable name="PositionMovementDetected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mouvement confirme par variation de position codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MovementCommandedPrev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat precedent de commande mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NoMovementReferencePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position au debut de la commande</xhtml>
+              </documentation>
+            </variable>
             <variable name="FirstScanDone">
               <type>
                 <BOOL />
@@ -33167,6 +33221,17 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur) — la course reelle d'un treuil par scan 10ms reste sous ~0.01 m</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_NoMovementPositionDeltaM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mouvement codeur minimal confirme pendant la surveillance absence mouvement</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -33237,6 +33302,16 @@ IF NOT BypassGlobal THEN
     // le treuil ne passe pas en mode securite degrade, le homing exige l'arret confirme des treuils).
     PosStepDetected := (ABS(CablePosM - CablePosMPrev) &gt; CST_RefPosStepM)
                     OR (ABS(ExpectedOtherWinchPosM - ExpectedOtherWinchPosMPrev) &gt; CST_RefPosStepM);
+
+    // La vitesse derivee peut rester sous le seuil pendant une montee lente
+    // alors que le codeur confirme bien le mouvement. Memoriser le point de
+    // depart de chaque commande permet de distinguer ce cas d'un treuil bloque.
+    IF MovementCommanded AND NOT MovementCommandedPrev THEN
+        NoMovementReferencePosM := CablePosM;
+    END_IF;
+    MovementCommandedPrev    := MovementCommanded;
+    PositionMovementDetected := MovementCommanded
+        AND (ABS(CablePosM - NoMovementReferencePosM) &gt;= CST_NoMovementPositionDeltaM);
     CablePosMPrev := CablePosM;
     ExpectedOtherWinchPosMPrev := ExpectedOtherWinchPosM;
     // NOT CrossCheckEnable : homing machine, manipulation benne, pilotage unitaire -&gt;
@@ -33421,10 +33496,14 @@ IF NOT BypassGlobal THEN
     instCauses[14].Latching := TRUE;
     instCauses[14].Texte    := 'Sens reel oppose a la commande treuil';
 
-    // Cause 15 : Absence mouvement (latched)
+    // Cause 15 : Absence mouvement (latched).
+    // La vitesse derivee n'est pas la source de verite : en montee lente elle
+    // peut rester nulle alors que la position codeur progresse. La surveillance
+    // s'appuie donc sur le codeur disponible + le delta de position confirme.
     TonNoMovement(
-        IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
-              AND (ABS(MeasuredSpeedSignedMps) &lt; MovementSpeedThresholdMps)),
+        IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND EncoderAvailable
+              AND MovementCommanded AND NOT InReferencingMode
+              AND NOT PositionMovementDetected,
         PT := NoMovementTimeout
     );
     IF TonNoMovement.Q THEN NoMovementFaultLatched := TRUE; END_IF;
@@ -46476,7 +46555,9 @@ instCycleSemiAuto(
     JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
-    JoystickRight           := PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive,
+    // Depuis la tremie vers P1, le sens physique droite correspond a ReqMaintenance,
+    // donc a l'axe X negatif dans l'arbitrage M3.
+    JoystickRight           := PRG_02_Acquisition.Data.Joystick.AxisX.DirectionNegative,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
@@ -46502,6 +46583,8 @@ instCycleSemiAuto(
     SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
     SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
+    M1TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM1Safety.CableLimitAscent,
+    M2TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent,
     Translation_At_P1       := PRG_05_Translation.Data.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.Data.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.Data.M3_AtMaintenanceStable,

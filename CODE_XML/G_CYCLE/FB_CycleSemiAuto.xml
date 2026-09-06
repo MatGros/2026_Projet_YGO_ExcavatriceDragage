@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T08:10:38.239465" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T08:10:38.239465">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T08:39:38.941118" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T08:39:38.941118">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -940,6 +940,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite haute d'exploitation M1</xhtml>
               </documentation>
             </variable>
+            <variable name="M1TopLimitReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite haute effective M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2TopLimitReached">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite haute effective M2</xhtml>
+              </documentation>
+            </variable>
             <variable name="Translation_At_P1">
               <type>
                 <BOOL />
@@ -1871,18 +1887,6 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Interdit le CASE au scan de forçage</xhtml>
               </documentation>
             </variable>
-            <variable name="CtrlAscentDistM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSTANTES &amp; CONFIGURATIONS INTERNES ===
-. [LOC] Distance de remontee lente de controle</xhtml>
-              </documentation>
-            </variable>
             <variable name="CtrlAscentToleranceM">
               <type>
                 <REAL />
@@ -1891,7 +1895,19 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <simpleValue value="0.25" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Ecart maximal admis entre codeurs</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSTANTES &amp; CONFIGURATIONS INTERNES ===
+. [LOC] Ancien seuil local conserve pour compatibilite IHM, non bloquant AX11</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlAscentDistM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance minimale AX11 depuis le contact fond</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentTimeout">
@@ -1899,10 +1915,10 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#30s0ms" />
+                <simpleValue value="TIME#1s0ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps max pour zone de stabilisation</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Pause de controle AX11 avant passage AX12</xhtml>
               </documentation>
             </variable>
             <variable name="DrainingTime">
@@ -2177,8 +2193,14 @@ CurrentCycleElapsed := CycleRunTimer.ET;
 DrainTimeEff := SEL(CfgDrainTime &lt;= T#0s, CfgDrainTime, DrainingTime);
 
 // ⏱️ Surveillance indépendante de la remontée lente de controle
-// AX11_CTRL_ASCENT -&gt; AX12_LOADED_ASCENT : TON de stabilisation palier lent (DÉSACTIVÉ).
-StabilizationTimer(IN := FALSE, PT := CtrlAscentTimeout);
+// AX11_CTRL_ASCENT -&gt; AX12_LOADED_ASCENT : pause de controle courte.
+// Le synchronisme est surveille par FB_WinchSync ; aucune comparaison de
+// positions memorisees au fond ne doit bloquer le passage lorsque les mesures
+// courantes sont valides.
+StabilizationTimer(
+    IN := (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
+          AND ExtractionStepDelayTimer.Q,
+    PT := CtrlAscentTimeout);
 
 // AX5 : le contacteur alimente le capteur ; aucun retour auxiliaire n existe.
 KoboldInitTimer(IN := (State = E_AutoCycleStep.AX5_KOBOLD_INIT) AND DeadmanArmed AND JoystickPush,
@@ -2278,7 +2300,9 @@ instCauses[4].Active   := StepMaxTimer.Q AND (State &lt;&gt; E_AutoCycleStep.AX_
 instCauses[4].Latching := TRUE;
 instCauses[4].Texte    := 'Depassement tempo maximale d etape (blocage mouvement)';
 
-instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(WinchSyncDeltaM) &gt; CtrlAscentToleranceM))
+// Le timer AX11 est une temporisation de passage, pas une cause de défaut.
+// Le défaut éventuel reste exclusivement celui de l'écart vitesse confirmé.
+instCauses[5].Active   := SpeedMismatchConfirmed
                           AND (State = E_AutoCycleStep.AX11_CTRL_ASCENT);
 instCauses[5].Latching := TRUE;
 instCauses[5].Texte    := 'Defaut de stabilisation / tolerance ecart codeurs en remontee controle';
@@ -3025,10 +3049,13 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
 
-        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q
+        IF ExtractionStepDelayTimer.Q
+           AND StabilizationTimer.Q
            AND (M1_CablePosM &gt;= (TouchPositionM1 + CtrlAscentDistM))
            AND (M2_CablePosM &gt;= (TouchPositionM2 + CtrlAscentDistM))
-           AND (ABS(WinchSyncDeltaM) &lt;= CtrlAscentToleranceM) THEN
+           AND NOT WinchSyncError THEN
+            // La transition d'etat n'emet aucun mouvement : AX12 reste
+            // conditionne a DeadmanArmed + JoystickPull dans ses commandes.
             State := E_AutoCycleStep.AX12_LOADED_ASCENT;
         END_IF;
 
@@ -3053,7 +3080,10 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
-        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
+        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q
+           AND ((M1_CablePosM &gt;= CableLimitM1AscentM)
+             OR M1TopLimitReached
+             OR M2TopLimitReached) THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX13_DRAIN_PAUSE;

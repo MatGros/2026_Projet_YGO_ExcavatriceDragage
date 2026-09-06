@@ -50,6 +50,8 @@ VAR_INPUT
     SpeedMismatchThresholdMps : REAL;       // --> [CFG] Seuil ecart vitesse ; 0 = controle desactive
     SpeedMismatchTimeout    : TIME;         // --> [CFG] Duree de confirmation ; 0 = controle desactive
     CableLimitM1AscentM     : REAL;         // --> [CFG] Limite haute d'exploitation M1
+    M1TopLimitReached        : BOOL;        // --> [SAFE] Limite haute effective M1
+    M2TopLimitReached        : BOOL;        // --> [SAFE] Limite haute effective M2
 
     // === FEEDBACKS TRANSLATION M3 ===
     Translation_At_P1           : BOOL;     // --> [HW] Capteur position P1 (arret travail)
@@ -201,9 +203,9 @@ VAR
     StateExecutionInhibit   : BOOL;         // . [LOC] Interdit le CASE au scan de forçage
 
     // === CONSTANTES & CONFIGURATIONS INTERNES ===
-    CtrlAscentDistM         : REAL := 2.0;      // . [LOC] Distance de remontee lente de controle
-    CtrlAscentToleranceM    : REAL := 0.25;     // . [LOC] Ecart maximal admis entre codeurs
-    CtrlAscentTimeout       : TIME := T#30s;    // . [LOC] Temps max pour zone de stabilisation
+    CtrlAscentToleranceM    : REAL := 0.25;     // . [LOC] Ancien seuil local conserve pour compatibilite IHM, non bloquant AX11
+    CtrlAscentDistM         : REAL := 2.0;      // . [LOC] Distance minimale AX11 depuis le contact fond
+    CtrlAscentTimeout       : TIME := T#1s;     // . [LOC] Pause de controle AX11 avant passage AX12
     DrainingTime            : TIME := T#5s;     // . [LOC] Temps d'egouttage par defaut
     StepMaxTimeout          : TIME := T#60s;    // . [LOC] Tempo max d'etape
     DiveStartStopTimer      : TON;              // . [LOC] Confirmation arret mecanique avant depart couple
@@ -278,8 +280,14 @@ CurrentCycleElapsed := CycleRunTimer.ET;
 DrainTimeEff := SEL(CfgDrainTime <= T#0s, CfgDrainTime, DrainingTime);
 
 // ⏱️ Surveillance indépendante de la remontée lente de controle
-// AX11_CTRL_ASCENT -> AX12_LOADED_ASCENT : TON de stabilisation palier lent (DÉSACTIVÉ).
-StabilizationTimer(IN := FALSE, PT := CtrlAscentTimeout);
+// AX11_CTRL_ASCENT -> AX12_LOADED_ASCENT : pause de controle courte.
+// Le synchronisme est surveille par FB_WinchSync ; aucune comparaison de
+// positions memorisees au fond ne doit bloquer le passage lorsque les mesures
+// courantes sont valides.
+StabilizationTimer(
+    IN := (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
+          AND ExtractionStepDelayTimer.Q,
+    PT := CtrlAscentTimeout);
 
 // AX5 : le contacteur alimente le capteur ; aucun retour auxiliaire n existe.
 KoboldInitTimer(IN := (State = E_AutoCycleStep.AX5_KOBOLD_INIT) AND DeadmanArmed AND JoystickPush,
@@ -379,7 +387,9 @@ instCauses[4].Active   := StepMaxTimer.Q AND (State <> E_AutoCycleStep.AX_STAB) 
 instCauses[4].Latching := TRUE;
 instCauses[4].Texte    := 'Depassement tempo maximale d etape (blocage mouvement)';
 
-instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(WinchSyncDeltaM) > CtrlAscentToleranceM))
+// Le timer AX11 est une temporisation de passage, pas une cause de défaut.
+// Le défaut éventuel reste exclusivement celui de l'écart vitesse confirmé.
+instCauses[5].Active   := SpeedMismatchConfirmed
                           AND (State = E_AutoCycleStep.AX11_CTRL_ASCENT);
 instCauses[5].Latching := TRUE;
 instCauses[5].Texte    := 'Defaut de stabilisation / tolerance ecart codeurs en remontee controle';
@@ -1126,10 +1136,13 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
 
-        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q
+        IF ExtractionStepDelayTimer.Q
+           AND StabilizationTimer.Q
            AND (M1_CablePosM >= (TouchPositionM1 + CtrlAscentDistM))
            AND (M2_CablePosM >= (TouchPositionM2 + CtrlAscentDistM))
-           AND (ABS(WinchSyncDeltaM) <= CtrlAscentToleranceM) THEN
+           AND NOT WinchSyncError THEN
+            // La transition d'etat n'emet aucun mouvement : AX12 reste
+            // conditionne a DeadmanArmed + JoystickPull dans ses commandes.
             State := E_AutoCycleStep.AX12_LOADED_ASCENT;
         END_IF;
 
@@ -1154,7 +1167,10 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
-        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q AND M1_CablePosM >= CableLimitM1AscentM THEN
+        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q
+           AND ((M1_CablePosM >= CableLimitM1AscentM)
+             OR M1TopLimitReached
+             OR M2TopLimitReached) THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
