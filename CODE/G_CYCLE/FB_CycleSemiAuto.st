@@ -299,8 +299,8 @@ StabilizationTimer(
 // Arrêt M3 confirmé avant de quitter AX14 : le FDC seul ne suffit pas si le
 // variateur est encore en décélération. L'homme-mort peut rester armé pour AX15B.
 TranslationStopTimer(
-    IN := (State = E_AutoCycleStep.AX14_TRANSLATE_DUMP)
-          AND Translation_At_Tremie
+    IN := (((State = E_AutoCycleStep.AX2_TRANSLATE_P1) AND Translation_At_P1)
+           OR ((State = E_AutoCycleStep.AX14_TRANSLATE_DUMP) AND Translation_At_Tremie))
           AND NOT Translation_Busy,
     PT := CST_TranslationStopConfirmTime);
 
@@ -798,7 +798,10 @@ CASE State OF
             OperatorActionId := 16#0402;
             OperatorAction := 'AX2 - Position P1 atteinte.';
             TranslationCmd.ReqStart := FALSE;
-            State := E_AutoCycleStep.AX3_OPEN_BUCKET;
+            TranslationCmd.PositionTgt := 0;
+            IF TranslationStopTimer.Q THEN
+                State := E_AutoCycleStep.AX3_OPEN_BUCKET;
+            END_IF;
         ELSE
             // Entre tremie et P1 : l'operateur pousse le joystick VERS LA DROITE (axe
             // Tremie--P2--P1--Maintenance : P1 est a droite de la tremie). Maintien requis ;
