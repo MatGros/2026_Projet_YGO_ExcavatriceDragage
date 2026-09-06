@@ -54,7 +54,8 @@ IF NOT Enable THEN
 ELSE
     // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
-        RunRequest := ReqWinch.RunRequest;
+        // Axe X translation prioritaire : aucun contacteur treuil pendant un jog X.
+        RunRequest := ReqWinch.RunRequest AND (Joystick.AxisX.Direction = 0);
         ReqAscent  := ReqWinch.ReqAscent;
         ReqDescend := ReqWinch.ReqDescend;
         StepTgt   := ReqWinch.StepTgt;
@@ -118,6 +119,9 @@ ELSE
                   AND NOT ((Context.SyncBlocksAscent   AND ReqAscent)
                         OR (Context.SyncBlocksDescent AND ReqDescend))
                   AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
+                  // Interlock inter-axes : le jog X translation est prioritaire;
+                  // aucun treuil joystick ne part avec X encore deflechi.
+                  AND (NOT TglJoystickMaster OR (Joystick.AxisX.Direction = 0))
                   AND BothDirectionAuthorized;
     END_IF;
 

@@ -4573,6 +4573,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Échelle fréquence (0..100 %)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleTargetDirectionOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Axe X cohérent avec la cible SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleJoystickAxisOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Axe Y neutre avant translation SEMI_AUTO</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -4618,7 +4634,10 @@ ELSE
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         PositioningActive := TRUE;
         SelTarget := ReqTranslation.PositionTgt;
-        RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk;
+        CycleTargetDirectionOk := ((SelTarget = 1) AND Joystick.AxisX.DirectionPositive)
+                               OR ((SelTarget &lt;&gt; 1) AND Joystick.AxisX.DirectionNegative);
+        CycleJoystickAxisOk := CycleTargetDirectionOk AND Joystick.AxisY.AtNeutral;
+        RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk AND CycleJoystickAxisOk;
         IF RunRequest THEN
             SpeedPct := 100.0;
             IF SelTarget = 1 THEN
@@ -4648,6 +4667,8 @@ ELSE
         RunRequest := (ReqTremie OR ReqMaintenance)
                      AND (IHM.BypassGlobal OR NOT TglJoystickMaster OR TglJoystickMaster)
                      AND Joystick.DeadmanArmed
+                     // Interlock inter-axes : un ordre treuil Y bloque M3.
+                     AND (NOT TglJoystickMaster OR (Joystick.AxisY.Direction = 0))
                      AND Context.HeightInterlockOk;
 
         // Échelle fréquence : SetFreq_Hz (ou 100% si non renseignée), manche mis à l'échelle si joystick maître

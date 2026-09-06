@@ -63,7 +63,8 @@ ELSE
     IF Context.BucketBusy AND Context.BucketM2RunRequest
        AND ((Auth.JoystickWinchSelectArbitrated = 2)
             OR (Auth.Mode = E_Mode.SEMI_AUTO)) THEN
-        RunRequest := Context.BucketM2RunRequest;
+        // Axe X translation prioritaire : aucun contacteur treuil pendant un jog X.
+        RunRequest := Context.BucketM2RunRequest AND (Joystick.AxisX.Direction = 0);
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;
         IF ReqDescend THEN
@@ -74,7 +75,8 @@ ELSE
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN
-            RunRequest := ReqWinch.RunRequest;
+            // Axe X translation prioritaire : aucun contacteur treuil pendant un jog X.
+            RunRequest := ReqWinch.RunRequest AND (Joystick.AxisX.Direction = 0);
             ReqAscent  := ReqWinch.ReqAscent;
             ReqDescend := ReqWinch.ReqDescend;
             StepTgt   := ReqWinch.StepTgt;
@@ -135,6 +137,9 @@ ELSE
                       AND NOT ((Context.SyncBlocksAscent   AND ReqDescend)
                             OR (Context.SyncBlocksDescent AND ReqAscent))
                       AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
+                      // Interlock inter-axes : le jog X translation est prioritaire;
+                      // aucun treuil joystick ne part avec X encore deflechi.
+                      AND (NOT TglJoystickMaster OR (Joystick.AxisX.Direction = 0))
                       AND BothDirectionAuthorized;
         END_IF;
     END_IF;

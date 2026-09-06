@@ -167,7 +167,7 @@
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = distance de contrôle interne par défaut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = bypass AX11, enchaînement direct AX10→AX12</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">

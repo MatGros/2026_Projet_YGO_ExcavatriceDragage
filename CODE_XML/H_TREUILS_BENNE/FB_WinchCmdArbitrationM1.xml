@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.423643" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.423643">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T17:32:32.855323" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T17:32:32.855323">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1036,7 +1036,8 @@ IF NOT Enable THEN
 ELSE
     // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
-        RunRequest := ReqWinch.RunRequest;
+        // Axe X translation prioritaire : aucun contacteur treuil pendant un jog X.
+        RunRequest := ReqWinch.RunRequest AND (Joystick.AxisX.Direction = 0);
         ReqAscent  := ReqWinch.ReqAscent;
         ReqDescend := ReqWinch.ReqDescend;
         StepTgt   := ReqWinch.StepTgt;
@@ -1100,6 +1101,9 @@ ELSE
                   AND NOT ((Context.SyncBlocksAscent   AND ReqAscent)
                         OR (Context.SyncBlocksDescent AND ReqDescend))
                   AND (NOT TglJoystickMaster OR Joystick.DeadmanArmed)
+                  // Interlock inter-axes : le jog X translation est prioritaire;
+                  // aucun treuil joystick ne part avec X encore deflechi.
+                  AND (NOT TglJoystickMaster OR (Joystick.AxisX.Direction = 0))
                   AND BothDirectionAuthorized;
     END_IF;
 
