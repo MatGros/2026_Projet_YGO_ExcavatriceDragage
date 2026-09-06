@@ -179,7 +179,7 @@
               <EnumValue>
                 <Name>AX9_RAISE_OFF_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Retente les cables (palier 1), decollement du fond ; selecteur couplage BOTH/M1/M2 accessible</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee synchronisee : retendre les cables ; selecteur couplage BOTH/M1/M2 accessible</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -5213,7 +5213,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <derived name="E_CycleDepthStopMode" />
               </type>
               <initialValue>
-                <simpleValue value="E_CycleDepthStopMode.KOBOLD_ONLY" />
+                <simpleValue value="E_CycleDepthStopMode.KOBOLD_OR_SETPOINT" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
@@ -20415,6 +20415,14 @@ FirstScanDone := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention Y montee qualifiee (axe Y tire uniquement)</xhtml>
               </documentation>
             </variable>
+            <variable name="JoystickRight">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention X vers P1 qualifiee (axe X positif)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DeadmanArmed">
               <type>
                 <BOOL />
@@ -21789,7 +21797,7 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#500ms" />
+                <simpleValue value="TIME#1s0ms" />
               </initialValue>
             </variable>
           </localVars>
@@ -21843,7 +21851,7 @@ IF (DiveStartMinM &gt;= 0.5) AND (DiveStartMinM &lt;= 8.0) THEN
 ELSE
     DiveStartMinEff := 4.0;
 END_IF;
-RaiseOffBottomEff := SEL(CfgRaiseOffBottomM &gt; 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
+RaiseOffBottomEff := SEL(CfgRaiseOffBottomM &lt;= 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 
 // ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
@@ -22628,7 +22636,7 @@ CASE State OF
 
     E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM:
         CycleStep := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
-        CycleStateStr := 'AX9 - Retente les cables (palier 1), decollement du fond';
+        CycleStateStr := 'AX9 - Montee synchronisee : retendre les cables';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -22636,7 +22644,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0409;
-        OperatorAction := 'AX9 - Maintenir la montee palier 1 : retente des cables, decollement du fond.';
+        OperatorAction := 'AX9 - Maintenir la montee synchronisee : retendre les cables.';
 
         // Palier 1 (doux). Selecteur couplage BOTH/M1/M2 = garde cote PRG_04 (GEL Q15),
         // le sequenceur commande toujours les deux treuils symetriquement.
@@ -22685,7 +22693,7 @@ CASE State OF
 
     E_AutoCycleStep.AX11_CTRL_ASCENT:
         CycleStep := E_AutoCycleStep.AX11_CTRL_ASCENT;
-        CycleStateStr := 'AX11 - Remontee lente de controle';
+        CycleStateStr := 'AX11 - Montee controlee : surveillance visuelle M1/M2';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -22693,7 +22701,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX11 - Maintenir la montee de controle : palier et synchronisme.';
+        OperatorAction := 'AX11 - Maintenir la montee : surveiller visuellement M1/M2 (securites actives).';
 
         // Palier max reglable IHM, borne [1..2] (defaut 1 / P1 ; P2 possible au besoin).
         WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
@@ -22796,7 +22804,7 @@ CASE State OF
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
         // Geste operateur (manche defleci) -&gt; phase d'ouverture benne.
-        IF JoystickDeflected THEN
+        IF DeadmanArmed AND JoystickPush THEN
             State := E_AutoCycleStep.AX15B_DUMP_OPEN;
         END_IF;
 
@@ -22807,8 +22815,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+        WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#040B;
         OperatorAction := 'AX15b - Maintenir : ouverture complete de la benne, vidage a la tremie.';
 
@@ -22818,14 +22826,14 @@ CASE State OF
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
-        BucketCmd.ReqOpen := CycleMotionPermit;
+        BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
         // Option operateur (bit IHM) : descendre la benne dans la gueule de tremie
         // pour aider la vidange -&gt; repositionnement couple M1+M2 (AX15C). Prioritaire
         // sur la fin de vidage.
         IF RepositionRequest THEN
             State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
-        ELSIF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
+        ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
             State := E_AutoCycleStep.AX18_DONE_SYNC;
         END_IF;
@@ -22871,8 +22879,8 @@ CASE State OF
         Lifecycle.Busy := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
         ExpectedDirection := 1;
-        WaitingForOperator := TRUE;
-        WaitingForProcess := FALSE;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickRight);
+        WaitingForProcess := DeadmanArmed AND JoystickRight;
         OperatorActionId := 16#040D;
         OperatorAction := 'AX18 - Cycle termine. Aller en P1 (joystick vers la droite) pour recommencer.';
 
@@ -22887,7 +22895,7 @@ CASE State OF
         // referencee, la passe suivante enchaine sur la translation P1 (pas de retour AX0).
         // Relance sur StartCycle OU FRONT joystick (geste franc) - pas sur simple maintien,
         // pour que AX18 (Lifecycle.Done + msg) soit reellement observable / tracable.
-        IF StartEdge.Q OR JoyDeflectedEdge.Q THEN
+        IF StartEdge.Q OR (DeadmanArmed AND JoystickRight) THEN
             SampleCountDone := FALSE;
             Lifecycle.Done := FALSE;
             State := E_AutoCycleStep.AX2_TRANSLATE_P1;
@@ -27572,7 +27580,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX7_SEARCH_BOTTOM: Banner.SequenceProgressText := 'Cycle: RECHERCHE FOND';
             E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
             E_AutoCycleStep.AX_DIVING_RETRY: Banner.SequenceProgressText := 'Cycle: REPRISE PLONGÉE';
-            E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: Banner.SequenceProgressText := 'Cycle: RETENTE CÂBLES';
+            E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: Banner.SequenceProgressText := 'Cycle: MONTEE SYNCHRONISEE - RETENDRE CABLES';
             E_AutoCycleStep.AX10_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
             E_AutoCycleStep.AX11_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: MONTÉE CONTRÔLE';
             E_AutoCycleStep.AX12_LOADED_ASCENT: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
@@ -27847,7 +27855,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
         E_AutoCycleStep.AX_DIVING_RETRY:
             OperatorActionCandidate := '[JOY] Reprise plongee : remonter au FDC haut';
         E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM:
-            OperatorActionCandidate := '[JOY] Tirer montee (P1) : retente et decollage';
+            OperatorActionCandidate := '[JOY] Tirer : montee synchronisee et retendre les cables';
         E_AutoCycleStep.AX10_CLOSE_BUCKET:
             OperatorActionCandidate := '[JOY] Tirer montee : fermeture de la benne';
         E_AutoCycleStep.AX11_CTRL_ASCENT:
@@ -27877,7 +27885,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_AutoCycleStep.AX7_SEARCH_BOTTOM: StepAtErrorStr := 'AX7 (recherche fond)';
                 E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: StepAtErrorStr := 'AX8 (fond confirme)';
                 E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'AX_DIVING_RETRY (reprise plongee)';
-                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (retente cables)';
+                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (montee synchronisee - retendre cables)';
                 E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10 (fermeture benne)';
                 E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11 (remontee controle)';
                 E_AutoCycleStep.AX12_LOADED_ASCENT: StepAtErrorStr := 'AX12 (remontee chargee)';
@@ -45956,7 +45964,7 @@ instJoystick(
     // 🔧 Producteur = PRG_04_Treuils_Benne (combiné interlock benne) via le bus Data.
     //    TRUE = armement autorisé (polarité positive NC-100).
     ArmingPermit              := PRG_04_Treuils_Benne.Data.ArmingPermit,
-    DirectInversionPermit     := GVL_IHM.CycleSemiAuto.State.Step = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED,
+    DirectInversionPermit     := GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED,
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
@@ -46468,6 +46476,7 @@ instCycleSemiAuto(
     JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
+    JoystickRight           := PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
