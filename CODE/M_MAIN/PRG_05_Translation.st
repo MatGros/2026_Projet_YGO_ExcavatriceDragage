@@ -44,6 +44,7 @@ VAR
     M3_SpeedCmd_Active      : REAL;
     M3_PositioningActive    : BOOL;
     M3_PositionSensorTarget : BOOL;
+    M3_CycleTranslationStepAuthorized : BOOL; // [SAFE] En SEMI_AUTO, M3 autorise uniquement en AX2/AX14
     SimBtnIHM_Active        : BOOL; // . [LOC] Stimuli boutons IHM M3 actifs (simulation ET JoyMaster inactif)
 
     SelTarget       : INT;
@@ -268,6 +269,22 @@ M3_ReqTremie_Active := instArbM3.ReqTremie;
 M3_ReqMaintenance_Active := instArbM3.ReqMaintenance;
 M3_CommandConflict := instArbM3.CommandConflict;
 M3_SpeedCmd_Active := instArbM3.SpeedPct;
+
+// Verrou independant du G7 et de l'arbitrage joystick : en SEMI_AUTO, aucune
+// commande M3 ne doit survivre hors des deux etapes explicitement dediees a la
+// translation. Ce veto couvre notamment AX3/AX10/AX15 (manoeuvres benne), meme
+// si une demande ReqTranslation ou un etat interne restait accidentellement actif.
+M3_CycleTranslationStepAuthorized :=
+    (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX2_TRANSLATE_P1)
+    OR (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX14_TRANSLATE_DUMP);
+
+IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+   AND NOT M3_CycleTranslationStepAuthorized THEN
+    M3_RunRequest_Active := FALSE;
+    M3_ReqTremie_Active := FALSE;
+    M3_ReqMaintenance_Active := FALSE;
+    M3_SpeedCmd_Active := 0.0;
+END_IF;
 
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
 // de commande variateur en sortie — les bits ReqTremie/ReqMaintenance restent le sens sémantique réel.
@@ -523,6 +540,19 @@ TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeR
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
+TranslationFinalInterlockRequest.ReqTremieSemantic := M3_ReqTremie_Active;
+
+// Derniere barriere avant PRG_06 : neutralisation immediate du variateur ET du
+// frein M3 hors AX2/AX14 en SEMI_AUTO. Elle reste volontairement redondante avec
+// le veto amont pour qu'une rampe ou un sens memorise dans FB_Translation ne
+// puisse alimenter M3 pendant une etape benne.
+IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+   AND NOT M3_CycleTranslationStepAuthorized THEN
+    TranslationFinalInterlockRequest.BrakeReleaseRequest := FALSE;
+    TranslationFinalInterlockRequest.RequestedDriveControlWord := 0;
+    TranslationFinalInterlockRequest.RequestedDriveFreqHz := 0.0;
+    TranslationFinalInterlockRequest.ReqTremieSemantic := FALSE;
+END_IF;
 
 {endregion}
 

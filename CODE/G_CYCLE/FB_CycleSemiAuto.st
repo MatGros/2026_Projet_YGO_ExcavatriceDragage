@@ -265,8 +265,9 @@ DiveStartStopped := M1_SpeedValid AND M2_SpeedValid
                     AND (ABS(M2_MeasuredSpeedMps) < CST_DiveStartSpeedThresholdMps);
 DiveStartStopTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START) AND DiveStartStopped,
                    PT := CST_DiveStartStopConfirmTime);
-DiveStartTimeoutTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START),
-                      PT := CST_DiveStartStopTimeout);
+// AX3_WAIT_DIVE_START est une attente de condition mecanique, sans sanction
+// temporelle : l'arret confirme reste obligatoire pour passer en AX4.
+DiveStartTimeoutTimer(IN := FALSE, PT := CST_DiveStartStopTimeout);
 
 // Config diving/extraction bornee (repli defaut interne si non reglee / valeur implausible).
 // DiveStartMinM = altimetrie de lancement Kobold dans le referentiel M1_CablePosM
@@ -456,10 +457,9 @@ instCauses[9].Active   := PalierNot4Timer.Q AND NOT CycleChecksInhibited
 instCauses[9].Latching := TRUE;
 instCauses[9].Texte    := 'Palier 4 non confirme sur M1 et/ou M2 pendant la recherche Kobold';
 
-instCauses[10].Active   := DiveStartTimeoutTimer.Q
-                           AND (State = E_AutoCycleStep.AX3_WAIT_DIVE_START);
+instCauses[10].Active   := FALSE;
 instCauses[10].Latching := TRUE;
-instCauses[10].Texte    := 'Arret mecanique M1/M2 non confirme avant plongee';
+instCauses[10].Texte    := 'Reserve - attente arret mecanique AX3 sans defaut temporel';
 
 instCauses[11].Active   := (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM)
                            AND (DepthStopMode <> E_CycleDepthStopMode.KOBOLD_ONLY)
