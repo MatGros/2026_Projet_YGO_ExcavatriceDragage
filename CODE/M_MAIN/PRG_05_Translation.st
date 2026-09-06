@@ -675,7 +675,9 @@ TranslationState.AxisBlockReason := TranslationTrace.BlockReason;
 Data.TranslationFinalInterlockRequest := TranslationFinalInterlockRequest;
 Data.TranslationState                 := TranslationState;
 Data.TranslationSafety                := TranslationSafety;
-Data.TranslationBusy                  := (ABS(instTranslationM3.RequestedDriveFreqHz) > 0.1);
+// Arret confirme sur retour reel variateur : la consigne peut deja etre nulle
+// pendant la deceleration, elle ne prouve donc pas l'arret physique de M3.
+Data.TranslationBusy                  := (ABS(UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0) > 0.5);
 Data.TranslationDone                  := instTranslationM3.TargetReached;
 Data.M3_AtTremieStable                := M3_AtTremieStable;
 Data.M3_AtP1Stable                    := M3_AtP1Stable;
