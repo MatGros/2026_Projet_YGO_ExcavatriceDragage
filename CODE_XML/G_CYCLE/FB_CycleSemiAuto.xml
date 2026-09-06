@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T15:32:13.675922" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T15:32:13.675922">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T15:46:24.887680" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T15:46:24.887680">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1882,6 +1882,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temporisation maximale de remontee lente</xhtml>
               </documentation>
             </variable>
+            <variable name="TranslationStopTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation arret M3 sur FDC avant etape benne</xhtml>
+              </documentation>
+            </variable>
             <variable name="SpeedMismatchTimer">
               <type>
                 <derived name="TON" />
@@ -2041,6 +2049,17 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation arret apres contact fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_TranslationStopConfirmTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#300ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation arret M3 sur FDC trémie</xhtml>
               </documentation>
             </variable>
             <variable name="instFault">
@@ -2234,6 +2253,14 @@ StabilizationTimer(
     IN := (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
           AND ExtractionStepDelayTimer.Q,
     PT := CtrlAscentTimeout);
+
+// Arrêt M3 confirmé avant de quitter AX14 : le FDC seul ne suffit pas si le
+// variateur est encore en décélération. L'homme-mort peut rester armé pour AX15B.
+TranslationStopTimer(
+    IN := (((State = E_AutoCycleStep.AX2_TRANSLATE_P1) AND Translation_At_P1)
+           OR ((State = E_AutoCycleStep.AX14_TRANSLATE_DUMP) AND Translation_At_Tremie))
+          AND NOT Translation_Busy,
+    PT := CST_TranslationStopConfirmTime);
 
 // AX5 : le contacteur alimente le capteur ; aucun retour auxiliaire n existe.
 KoboldInitTimer(IN := (State = E_AutoCycleStep.AX5_KOBOLD_INIT) AND DeadmanArmed AND JoystickPush,
@@ -2729,7 +2756,10 @@ CASE State OF
             OperatorActionId := 16#0402;
             OperatorAction := 'AX2 - Position P1 atteinte.';
             TranslationCmd.ReqStart := FALSE;
-            State := E_AutoCycleStep.AX3_OPEN_BUCKET;
+            TranslationCmd.PositionTgt := 0;
+            IF TranslationStopTimer.Q THEN
+                State := E_AutoCycleStep.AX3_OPEN_BUCKET;
+            END_IF;
         ELSE
             // Entre tremie et P1 : l'operateur pousse le joystick VERS LA DROITE (axe
             // Tremie--P2--P1--Maintenance : P1 est a droite de la tremie). Maintien requis ;
@@ -2757,6 +2787,8 @@ CASE State OF
         // X3 = etape benne seule : treuils explicitement neutralises (config treuil unique par etape).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
 
         // Pilotage benne 2 sens : pousse (Y-) -&gt; ouvre, tire (Y+) -&gt; ferme
         IF DeadmanArmed AND JoystickPush THEN
@@ -3160,7 +3192,10 @@ CASE State OF
 
         IF JoystickDeflected AND Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
-            State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
+            TranslationCmd.PositionTgt := 0;
+            IF TranslationStopTimer.Q THEN
+                State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
+            END_IF;
         END_IF;
 
     E_AutoCycleStep.AX15A_DUMP_ARRIVE:
@@ -3178,6 +3213,8 @@ CASE State OF
         // Config treuil UNIQUE : arret des deux treuils (aucune descente couplee ici).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
 
         // Geste operateur (manche defleci) -&gt; phase d'ouverture benne.
         IF DeadmanArmed AND JoystickPush THEN
@@ -3201,6 +3238,8 @@ CASE State OF
         // d'ecart M1/M2 volontaire ni de faux SafeStop concordance contacteurs).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
 
         BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
@@ -3234,6 +3273,8 @@ CASE State OF
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
         WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.StepTgt := CST_StepSlow;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
 
         // La benne reste ouverte pendant le repositionnement (on finit l'ouverture si besoin).
         BucketCmd.ReqOpen := CycleMotionPermit AND NOT Benne_IsOpen;
