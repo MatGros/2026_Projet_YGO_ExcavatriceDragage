@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T16:06:15.010383" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T16:06:15.010383">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T08:29:46.473294" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T08:29:46.473294">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1010,6 +1010,30 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition active sens oppose</xhtml>
               </documentation>
             </variable>
+            <variable name="PositionMovementDetected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mouvement confirme par variation de position codeur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MovementCommandedPrev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat precedent de commande mouvement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="NoMovementReferencePosM">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position au debut de la commande</xhtml>
+              </documentation>
+            </variable>
             <variable name="FirstScanDone">
               <type>
                 <BOOL />
@@ -1276,6 +1300,17 @@ Interlocks §3 : toujours sur la cause brute, jamais sur la vue Latched (AF03 §
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur) — la course reelle d'un treuil par scan 10ms reste sous ~0.01 m</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_NoMovementPositionDeltaM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.02" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mouvement codeur minimal confirme pendant la surveillance absence mouvement</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -1346,6 +1381,16 @@ IF NOT BypassGlobal THEN
     // le treuil ne passe pas en mode securite degrade, le homing exige l'arret confirme des treuils).
     PosStepDetected := (ABS(CablePosM - CablePosMPrev) &gt; CST_RefPosStepM)
                     OR (ABS(ExpectedOtherWinchPosM - ExpectedOtherWinchPosMPrev) &gt; CST_RefPosStepM);
+
+    // La vitesse derivee peut rester sous le seuil pendant une montee lente
+    // alors que le codeur confirme bien le mouvement. Memoriser le point de
+    // depart de chaque commande permet de distinguer ce cas d'un treuil bloque.
+    IF MovementCommanded AND NOT MovementCommandedPrev THEN
+        NoMovementReferencePosM := CablePosM;
+    END_IF;
+    MovementCommandedPrev    := MovementCommanded;
+    PositionMovementDetected := MovementCommanded
+        AND (ABS(CablePosM - NoMovementReferencePosM) &gt;= CST_NoMovementPositionDeltaM);
     CablePosMPrev := CablePosM;
     ExpectedOtherWinchPosMPrev := ExpectedOtherWinchPosM;
     // NOT CrossCheckEnable : homing machine, manipulation benne, pilotage unitaire -&gt;
@@ -1530,10 +1575,14 @@ IF NOT BypassGlobal THEN
     instCauses[14].Latching := TRUE;
     instCauses[14].Texte    := 'Sens reel oppose a la commande treuil';
 
-    // Cause 15 : Absence mouvement (latched)
+    // Cause 15 : Absence mouvement (latched).
+    // La vitesse derivee n'est pas la source de verite : en montee lente elle
+    // peut rester nulle alors que la position codeur progresse. La surveillance
+    // s'appuie donc sur le codeur disponible + le delta de position confirme.
     TonNoMovement(
-        IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
-              AND (ABS(MeasuredSpeedSignedMps) &lt; MovementSpeedThresholdMps)),
+        IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND EncoderAvailable
+              AND MovementCommanded AND NOT InReferencingMode
+              AND NOT PositionMovementDetected,
         PT := NoMovementTimeout
     );
     IF TonNoMovement.Q THEN NoMovementFaultLatched := TRUE; END_IF;

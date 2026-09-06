@@ -123,6 +123,9 @@ VAR
     UncommandedActiveB              : BOOL;                           // . [LOC] Condition active Meca B
     UncommandedActiveD              : BOOL;                           // . [LOC] Condition active Meca D
     OppositeDirectionActive         : BOOL;                           // . [LOC] Condition active sens oppose
+    PositionMovementDetected        : BOOL;                           // . [LOC] Mouvement confirme par variation de position codeur
+    MovementCommandedPrev           : BOOL;                           // . [LOC] Etat precedent de commande mouvement
+    NoMovementReferencePosM         : REAL;                           // . [LOC] Position au debut de la commande
     FirstScanDone                   : BOOL;                           // . [LOC] Initialisation premier scan
 
     // === MIROIRS LISIBLES DES CAUSES (bits ErrorId, source instCauses[i].Active) ===
@@ -168,6 +171,7 @@ VAR
 END_VAR
 VAR CONSTANT
     CST_RefPosStepM                 : REAL := 0.5;                    // Saut de position (m/scan) au-dela duquel la variation n'est pas physique (preset codeur) — la course reelle d'un treuil par scan 10ms reste sous ~0.01 m
+    CST_NoMovementPositionDeltaM    : REAL := 0.02;                   // Mouvement codeur minimal confirme pendant la surveillance absence mouvement
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -225,6 +229,16 @@ IF NOT BypassGlobal THEN
     // le treuil ne passe pas en mode securite degrade, le homing exige l'arret confirme des treuils).
     PosStepDetected := (ABS(CablePosM - CablePosMPrev) > CST_RefPosStepM)
                     OR (ABS(ExpectedOtherWinchPosM - ExpectedOtherWinchPosMPrev) > CST_RefPosStepM);
+
+    // La vitesse derivee peut rester sous le seuil pendant une montee lente
+    // alors que le codeur confirme bien le mouvement. Memoriser le point de
+    // depart de chaque commande permet de distinguer ce cas d'un treuil bloque.
+    IF MovementCommanded AND NOT MovementCommandedPrev THEN
+        NoMovementReferencePosM := CablePosM;
+    END_IF;
+    MovementCommandedPrev    := MovementCommanded;
+    PositionMovementDetected := MovementCommanded
+        AND (ABS(CablePosM - NoMovementReferencePosM) >= CST_NoMovementPositionDeltaM);
     CablePosMPrev := CablePosM;
     ExpectedOtherWinchPosMPrev := ExpectedOtherWinchPosM;
     // NOT CrossCheckEnable : homing machine, manipulation benne, pilotage unitaire ->
@@ -409,10 +423,14 @@ IF NOT BypassGlobal THEN
     instCauses[14].Latching := TRUE;
     instCauses[14].Texte    := 'Sens reel oppose a la commande treuil';
 
-    // Cause 15 : Absence mouvement (latched)
+    // Cause 15 : Absence mouvement (latched).
+    // La vitesse derivee n'est pas la source de verite : en montee lente elle
+    // peut rester nulle alors que la position codeur progresse. La surveillance
+    // s'appuie donc sur le codeur disponible + le delta de position confirme.
     TonNoMovement(
-        IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND MeasuredSpeedValid AND (MovementCommanded AND NOT InReferencingMode
-              AND (ABS(MeasuredSpeedSignedMps) < MovementSpeedThresholdMps)),
+        IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND EncoderAvailable
+              AND MovementCommanded AND NOT InReferencingMode
+              AND NOT PositionMovementDetected,
         PT := NoMovementTimeout
     );
     IF TonNoMovement.Q THEN NoMovementFaultLatched := TRUE; END_IF;
