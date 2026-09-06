@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T07:46:01.409753" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T07:46:01.409753">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T09:17:34.345975" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T09:17:34.345975">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2495,7 +2495,7 @@ IF ModeChangePendingBlocked AND ModeChangeBlockReason &lt;&gt; '' THEN
     // Bascule de mode refusée : motif prioritaire (info opérateur, ex. "Chgt mode refuse : contacteur M1").
     SpecialConditionCandidate := ModeChangeBlockReason;
 ELSIF CycleChecksInhibited THEN
-    SpecialConditionCandidate := 'ESSAI CYCLE: CONTROLES PROCEDE INHIBES - PROTECTIONS MACHINE ACTIVES';
+    SpecialConditionCandidate := 'ESSAI CYCLE : CONTROLES INHIBES';
 ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN

@@ -22765,13 +22765,12 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
 
-        IF ExtractionStepDelayTimer.Q
-           AND StabilizationTimer.Q
-           AND (M1_CablePosM &gt;= (CtrlAscentStartM1 + CtrlAscentDistEffM))
+        IF (M1_CablePosM &gt;= (CtrlAscentStartM1 + CtrlAscentDistEffM))
            AND (M2_CablePosM &gt;= (CtrlAscentStartM2 + CtrlAscentDistEffM))
            AND NOT WinchSyncError THEN
-            // La transition d'etat n'emet aucun mouvement : AX12 reste
-            // conditionne a DeadmanArmed + JoystickPull dans ses commandes.
+            // Transition strictement sur la distance CFG (2 m par defaut)
+            // et le synchronisme FB_WinchSync. Les commandes AX12 restent
+            // protegees par homme-mort + joystick.
             State := E_AutoCycleStep.AX12_LOADED_ASCENT;
         END_IF;
 
@@ -27686,7 +27685,7 @@ IF ModeChangePendingBlocked AND ModeChangeBlockReason &lt;&gt; '' THEN
     // Bascule de mode refusée : motif prioritaire (info opérateur, ex. "Chgt mode refuse : contacteur M1").
     SpecialConditionCandidate := ModeChangeBlockReason;
 ELSIF CycleChecksInhibited THEN
-    SpecialConditionCandidate := 'ESSAI CYCLE: CONTROLES PROCEDE INHIBES - PROTECTIONS MACHINE ACTIVES';
+    SpecialConditionCandidate := 'ESSAI CYCLE : CONTROLES INHIBES';
 ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN
@@ -28486,7 +28485,7 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, AX8 semi-auto uniquement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, extraction semi-auto AX8..AX12</xhtml>
               </documentation>
             </variable>
             <variable name="BusCanOpenOP">
@@ -46074,7 +46073,15 @@ instJoystick(
     // 🔧 Producteur = PRG_04_Treuils_Benne (combiné interlock benne) via le bus Data.
     //    TRUE = armement autorisé (polarité positive NC-100).
     ArmingPermit              := PRG_04_Treuils_Benne.Data.ArmingPermit,
-    DirectInversionPermit     := GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED,
+    // Autorise l'inversion directe du joystick pendant toute l'extraction.
+    // Le deadman reste obligatoire ; seule la remise au neutre est supprimee
+    // aux transitions AX8 -&gt; AX12 pour conserver la commande maintenue.
+    DirectInversionPermit     :=
+        (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT),
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,

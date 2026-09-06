@@ -385,7 +385,15 @@ instJoystick(
     // 🔧 Producteur = PRG_04_Treuils_Benne (combiné interlock benne) via le bus Data.
     //    TRUE = armement autorisé (polarité positive NC-100).
     ArmingPermit              := PRG_04_Treuils_Benne.Data.ArmingPermit,
-    DirectInversionPermit     := GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED,
+    // Autorise l'inversion directe du joystick pendant toute l'extraction.
+    // Le deadman reste obligatoire ; seule la remise au neutre est supprimee
+    // aux transitions AX8 -> AX12 pour conserver la commande maintenue.
+    DirectInversionPermit     :=
+        (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT),
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
