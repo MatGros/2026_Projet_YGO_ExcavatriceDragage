@@ -19,8 +19,9 @@ VAR_INPUT
     // 🔄 Cycle & sous-cycles
     CycleStep            : E_AutoCycleStep;   // --> [HW] Étape cycle
     CycleStateStr        : STRING(80);   // --> [HW] Libellé détaillé de l'étape cycle (FB_CycleSemiAuto.CycleStateStr)
-    CycleErrorId         : WORD;   // --> [DIAG] Code défaut cycle (FB_CycleSemiAuto.ErrorId) — notifié à AX_STAB
+    CycleErrorId         : WORD;   // --> [DIAG] Code défaut cycle actif/latche (jamais 0 en AX_STAB)
     CycleStepAtError     : E_AutoCycleStep;   // --> [DIAG] Dernière étape avant le défaut (FB_CycleSemiAuto.CycleStepAtError)
+    CycleChecksInhibited : BOOL;   // --> [TST] Mode essai cycle : controles procede inhibes
     MachineHomingStep        : INT;   // --> [HW] Étape guide homing machine (E_MachineHomingStep : 0..70, 60 = valide)
     MachineHomingInstruction : STRING(120);   // --> [HW] Consigne opérateur en clair produite par FB_CycleMachineHoming
 
@@ -94,6 +95,7 @@ VAR
     SpecialConditionCandidate : STRING(120);   // . [LOC] Texte condition spéciale
     OperatorActionCandidate   : STRING(120);   // . [LOC] Texte action opérateur
     StepAtErrorStr            : STRING(40);   // . [LOC] Libellé de l'étape d'origine du défaut
+    CycleFaultCauseStr        : STRING(120);  // . [LOC] Cause cycle décodée pour acquittement terrain
     AntiFlickSpecial     : FB_AntiFlickerText; // * [INST] §3 Condition spéciale (warning → maintenu)
     AntiFlickOperator    : FB_AntiFlickerText; // * [INST] §4 Action opérateur (critique → direct, warning → maintenu)
     LastAbortEdge        : F_TRIG; // . [LOC] Front descendant ArmingSeqStep (abandon de sequence AU)
@@ -305,6 +307,8 @@ AnyBypassActive := BypassGlobalActive
 IF ModeChangePendingBlocked AND ModeChangeBlockReason <> '' THEN
     // Bascule de mode refusée : motif prioritaire (info opérateur, ex. "Chgt mode refuse : contacteur M1").
     SpecialConditionCandidate := ModeChangeBlockReason;
+ELSIF CycleChecksInhibited THEN
+    SpecialConditionCandidate := 'ESSAI CYCLE: CONTROLES PROCEDE INHIBES - PROTECTIONS MACHINE ACTIVES';
 ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN
@@ -577,9 +581,36 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 ELSE
                     StepAtErrorStr := '?';
             END_CASE;
-            // Message compact : ID défaut (ErrorId) + étape d'origine + acquitter.
-            // Le détail de la cause est consultable dans le dépannage (GVL_Troubleshooting).
-            OperatorActionCandidate := CONCAT('[PUPITRE] Defaut #', CONCAT(WORD_TO_STRING(CycleErrorId), CONCAT(' (etape ', CONCAT(StepAtErrorStr, ') - acquitter'))));
+            // Décodage priorisé : l'opérateur voit la grandeur fautive, pas un masque.
+            // Bits cycle : 0 limite, 1 synchro, 2 vitesse, 3 IHM, 4 tempo,
+            // 5 stabilisation, 6 position, 7 FDC haut, 8/9 paliers, 10 arrêt.
+            IF (CycleErrorId AND 16#0001) <> 0 THEN
+                CycleFaultCauseStr := 'limite legale de profondeur atteinte';
+            ELSIF (CycleErrorId AND 16#0002) <> 0 THEN
+                CycleFaultCauseStr := 'synchronisme M1/M2 bloquant';
+            ELSIF (CycleErrorId AND 16#0004) <> 0 THEN
+                CycleFaultCauseStr := 'ecart vitesse M1/M2 confirme';
+            ELSIF (CycleErrorId AND 16#0008) <> 0 THEN
+                CycleFaultCauseStr := 'communication IHM perdue';
+            ELSIF (CycleErrorId AND 16#0010) <> 0 THEN
+                CycleFaultCauseStr := 'tempo maximale etape depassee';
+            ELSIF (CycleErrorId AND 16#0020) <> 0 THEN
+                CycleFaultCauseStr := 'stabilisation remontee hors tolerance';
+            ELSIF (CycleErrorId AND 16#0040) <> 0 THEN
+                CycleFaultCauseStr := 'ecart position M1/M2 > 1,5 m (anti-telescopage)';
+            ELSIF (CycleErrorId AND 16#0080) <> 0 THEN
+                CycleFaultCauseStr := 'M1/M2 hors FDC haut pendant translation P1';
+            ELSIF (CycleErrorId AND 16#0100) <> 0 THEN
+                CycleFaultCauseStr := 'palier 5 interdit sur M1 ou M2 pendant plongee';
+            ELSIF (CycleErrorId AND 16#0200) <> 0 THEN
+                CycleFaultCauseStr := 'palier 4 non confirme sur M1 ou M2 en recherche Kobold';
+            ELSIF (CycleErrorId AND 16#0400) <> 0 THEN
+                CycleFaultCauseStr := 'arret mecanique M1/M2 non confirme avant plongee';
+            ELSE
+                CycleFaultCauseStr := CONCAT('cause cycle inconnue #', WORD_TO_STRING(CycleErrorId));
+            END_IF;
+            OperatorActionCandidate := CONCAT('[CYCLE] ', CONCAT(CycleFaultCauseStr,
+                                         CONCAT(' (', CONCAT(StepAtErrorStr, ') - cause disparue puis acquitter'))));
         ELSE
             OperatorActionCandidate := '[CYCLE] Cycle en cours...';
     END_CASE;

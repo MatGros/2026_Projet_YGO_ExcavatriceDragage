@@ -6,8 +6,8 @@ STRUCT
     Ready                  : BOOL;        (* 🟢 Séquenceur prêt *)
     Busy                   : BOOL;        (* ⚙️ Cycle en cours *)
     Done                   : BOOL;        (* ✅ Cycle terminé *)
-    Error                  : BOOL;        (* Défaut cycle *)
-    ErrorId                : WORD;        (* ❌ Code défaut cycle *)
+    Error                  : BOOL;        (* Défaut cycle actif ou mémorisé, à acquitter *)
+    ErrorId                : WORD;        (* ❌ Code affiché : actif, ou latched après repli AX_STAB *)
     CycleStep              : E_AutoCycleStep; (* 🔄 Étape courante du Grafcet *)
     CycleStateStr          : STRING(80);  (* 📝 Libellé texte de l'étape courante *)
     SelTarget              : INT;         (* 🎯 Miroir lecture seule de GVL_IHM.TranslationM3.Cmd.SelTarget *)
@@ -28,5 +28,11 @@ STRUCT
     SampleCount            : INT;         (* Compteur de prélèvements (RETAIN, Q3bis) *)
     CurrentCycleElapsed    : TIME;        (* ⏱️ Durée écoulée du cycle en cours *)
     LastCycleDuration      : TIME;        (* ⏱️ Durée du dernier cycle achevé (figée à X13) *)
+    CycleChecksInhibited   : BOOL;        (* 🧪 Contrôles procédé cycle inhibés, protections machine actives *)
+    IgnoredCycleCheckId    : WORD;        (* 🔎 Contrôles procédé actifs mais ignorés *)
+    ForceStepPrepared      : BOOL;        (* 🔧 Step préparé, commandes neutres *)
+    ForceStepAccepted      : BOOL;        (* ✅ Impulsion préparation acceptée *)
+    ForceStepRejected      : BOOL;        (* ❌ Impulsion préparation refusée *)
+    ForceStepResult        : STRING(120); (* 📝 Motif accepté/refusé *)
 END_STRUCT
 END_TYPE

@@ -415,3 +415,16 @@ TEST 'TC-P07-030 Abandon AU 16#0010 decode en cause explicite M3 MecaA (Bug A+B)
               'cause 16#0010 decodee en M3 MecaA (Bug A+B)');
 END_TEST
 
+TEST 'TC-P07-031 AX_STAB affiche le bit defaut latche, jamais #0'
+    FB_Banner(Enable := TRUE, CurrentMode := E_Mode.SEMI_AUTO,
+              EmergencyChainClosed := TRUE, PowerContactorEngaged := TRUE,
+              CycleStep := E_AutoCycleStep.AX_STAB,
+              CycleStepAtError := E_AutoCycleStep.AX7_SEARCH_BOTTOM,
+              CycleErrorId := 16#0200,
+              WinchM1Safety := WinchM1Safety, WinchM2Safety := WinchM2Safety,
+              Network := NetDiag);
+    ASSERT_EQ(FB_Banner.Banner.OperatorActionText,
+              '[CYCLE] palier 4 non confirme sur M1 ou M2 en recherche Kobold (AX7 (recherche fond)) - cause disparue puis acquitter',
+              'AX_STAB decode le code cause latche');
+END_TEST
+

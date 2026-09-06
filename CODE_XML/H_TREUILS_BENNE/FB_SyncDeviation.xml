@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-08-26T16:40:01.158068" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-08-26T16:40:01.158068">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T06:58:50.145231" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T06:58:50.145231">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -90,7 +90,7 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.1" />
+                <simpleValue value="3" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET CONFIGURATION ===
@@ -102,7 +102,7 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.5" />
+                <simpleValue value="6" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil 2 (Fault) — ecart critique (m)</xhtml>

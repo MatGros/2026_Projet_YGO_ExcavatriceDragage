@@ -26,6 +26,10 @@ STRUCT
     Idx205_ErrorId                   : WORD; // Code d'erreur interne FB_Cycle
     Idx217_FaultLatched              : BOOL; // 1 = Défaut vue LATCHÉE (bloque AX0->AX1 même si Idx204=0, exige Reset conscient)
     Idx218_FaultLatchedId            : WORD; // Bitfield fige a l'apparition du defaut latche
+    Idx219_CycleChecksInhibited       : BOOL; // 1 = controles procede inhibes, protections actives
+    Idx220_IgnoredCycleCheckId        : WORD; // Causes procede actives mais ignorees
+    Idx221_ForceStepPrepared          : BOOL; // 1 = cible preparee, commandes neutres
+    Idx222_ForceStepResult            : STRING(120); // Motif accepte/refuse du forçage
     Idx206_Step                      : E_AutoCycleStep; // Étape courante (X0 à X13 + AX_STAB)
     Idx207_StepStr                   : STRING(80);  // Libellé explicite de l'étape
     Idx208_StepAtError               : E_AutoCycleStep; // Étape mémorisée lors du dernier défaut

@@ -1,0 +1,21 @@
+contract:
+  task_id: T258-D
+  criticality: C3
+  strategy: patch
+  objective: Fournir un mode essai visible et un forçage de step transactionnel sans affaiblir les protections machine.
+  acceptance:
+    - {id: AC1, statement: L inhibition est non persistante et effective seulement avec commissioning et SEMI_AUTO., verified_by: Tests reboot logique, sortie mode, Abort et fin cycle.}
+    - {id: AC2, statement: Seuls les controles procedes listes sont ignorables; toutes protections restent bloquantes., verified_by: Matrice cause par cause ON et OFF.}
+    - {id: AC3, statement: Tout controle ignore reste publie avec ID, step et avertissement ambre permanent., verified_by: Tests et revue des publications IHM/Troubleshooting.}
+    - {id: AC4, statement: Preparer un step ne produit aucune demande au scan courant ni avant un nouveau front de reprise., verified_by: Tests apply maintenu, joystick deja pousse, Start neuf et priorites Abort/Fault.}
+    - {id: AC5, statement: Les cibles invalides ou contextuelles sans registres valides sont refusees avec un motif., verified_by: Tests de la whitelist et de AX3_WAIT_DIVE_START; AX_STAB non selectionnable.}
+    - {id: AC6, statement: Le nom du fichier est identique au nom du POU et le suffixe correspond au langage du bundle., verified_by: Revue bundle et gates structurels.}
+  scope:
+    allowed: [CODE/G_CYCLE/FB_CycleSemiAuto.st, CODE/M_MAIN/PRG_03_Modes_Cycle.st, CODE/J_SUPERVISION/, TOOLS/TEST_AUTO_CI/, TOOLS/AGENT_WORKFLOW/scripts/]
+    forbidden: [PRJ_CODESYS/PROJ_Full_ImportExport/Device.export, CODE/M_MAIN/PRG_04_Treuils_Benne.st]
+  conservation: {must_survive: [Reset sur front, aucun redemarrage automatique, protections machine toujours actives], dropped_on_purpose: [Forçage direct meme scan]}
+  evidence_required: [tests_strucpp, check_linkage, revue_ihm]
+  alert_duty: Le toggle d inhibition ne doit jamais acquitter un defaut deja latche ni changer l etape.
+status: PENDING
+execution: {executed_by: Codex, completed_at: '', status: PENDING, summary: '', evidence_submitted: []}
+validation: {status: PENDING, validated_by: '', validated_at: '', notes: ''}

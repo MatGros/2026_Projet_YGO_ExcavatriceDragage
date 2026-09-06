@@ -161,16 +161,15 @@ instCycleSemiAuto(
     Mode                    := instModes.Auth.Mode,
     JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
+    JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
     AbortCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnAbort,
     SelTarget               := GVL_IHM.TranslationM3.Cmd.SelTarget,
     SetDepthM               := GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M,
-    SetOffsetM              := GVL_IHM.CycleSemiAuto.Cfg.SetOffset_M,
-    KoboldContactFond       := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
+    DepthStopMode           := GVL_IHM.CycleSemiAuto.Cfg.DepthStopMode,
     KoboldImmersed          := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI, // DI brut Kobold (fronts AX6/AX7) - convention a confirmer au banc
-    KoboldContactorFeedback := TRUE, // TODO banc : cabler le retour contacteur Kobold reel ; TRUE = init reputee OK (verif AX5 dormante)
     LimitLegalReached       := GVL_IHM.Commun.LimitLegalReached,
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
     WinchSyncError          := PRG_04_Treuils_Benne.Data.WinchSyncError,
@@ -207,6 +206,7 @@ instCycleSemiAuto(
     SkipDrainRequest        := GVL_IHM.CycleSemiAuto.Cmd.BtnSkipDrain,
     RepositionRequest       := GVL_IHM.CycleSemiAuto.Cmd.BtnReposition,
     CfgCommissioningEnable  := GVL_IHM.CycleSemiAuto.Cmd.TglCommissioning,
+    CfgCycleChecksInhibit   := GVL_IHM.CycleSemiAuto.Cmd.TglCycleChecksInhibit,
     CfgForceStepTarget      := GVL_IHM.CycleSemiAuto.Cfg.ForceStepTarget,
     CfgForceStepApply       := GVL_IHM.CycleSemiAuto.Cmd.BtnForceStepApply,
     // Config diving / extraction (GEL 2026-09-03)
@@ -292,7 +292,13 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
     Data.SequenceState.CurrentCycleElapsed    := instCycleSemiAuto.CurrentCycleElapsed;
     Data.SequenceState.LastCycleDuration      := instCycleSemiAuto.LastCycleDuration;
-    Data.SequenceState.BottomTouchConfirmed   := FALSE;
+    Data.SequenceState.CycleChecksInhibited   := instCycleSemiAuto.CycleChecksInhibited;
+    Data.SequenceState.IgnoredCycleCheckId    := instCycleSemiAuto.IgnoredCycleCheckId;
+    Data.SequenceState.ForceStepPrepared      := instCycleSemiAuto.ForceStepPrepared;
+    Data.SequenceState.ForceStepAccepted      := instCycleSemiAuto.ForceStepAccepted;
+    Data.SequenceState.ForceStepRejected      := instCycleSemiAuto.ForceStepRejected;
+    Data.SequenceState.ForceStepResult        := instCycleSemiAuto.ForceStepResult;
+    Data.SequenceState.BottomTouchConfirmed   := instCycleSemiAuto.BottomTouched;
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
@@ -371,6 +377,12 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
     Data.SequenceState.CurrentCycleElapsed    := T#0s;
     Data.SequenceState.LastCycleDuration      := T#0s;
+    Data.SequenceState.CycleChecksInhibited   := FALSE;
+    Data.SequenceState.IgnoredCycleCheckId    := 0;
+    Data.SequenceState.ForceStepPrepared      := FALSE;
+    Data.SequenceState.ForceStepAccepted      := FALSE;
+    Data.SequenceState.ForceStepRejected      := FALSE;
+    Data.SequenceState.ForceStepResult        := '';
     Data.SequenceState.BottomTouchConfirmed       := BottomPositionConfirmed;
     // Verrou descente treuil = GENERAL en MAINT (plus seulement pendant l'assist vidage) :
     // descente M1/M2 interdite tant que le pont M3 n'est pas ARRETE STABLE a P1 (travail)
@@ -431,6 +443,12 @@ ELSE
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
     Data.SequenceState.CurrentCycleElapsed     := T#0s;
     Data.SequenceState.LastCycleDuration       := T#0s;
+    Data.SequenceState.CycleChecksInhibited    := FALSE;
+    Data.SequenceState.IgnoredCycleCheckId     := 0;
+    Data.SequenceState.ForceStepPrepared       := FALSE;
+    Data.SequenceState.ForceStepAccepted       := FALSE;
+    Data.SequenceState.ForceStepRejected       := FALSE;
+    Data.SequenceState.ForceStepResult         := '';
     Data.SequenceState.BottomTouchConfirmed       := FALSE;
     Data.SequenceState.WinchDescentAuth_M3           := TRUE;
 END_IF;

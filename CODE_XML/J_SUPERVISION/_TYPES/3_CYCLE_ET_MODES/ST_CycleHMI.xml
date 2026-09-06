@@ -71,15 +71,15 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Profondeur de dragage cible (m, négative)</xhtml>
               </documentation>
             </variable>
-            <variable name="SetOffset_M">
+            <variable name="DepthStopMode">
               <type>
-                <REAL />
+                <derived name="E_CycleDepthStopMode" />
               </type>
               <initialValue>
-                <simpleValue value="1.5" />
+                <simpleValue value="E_CycleDepthStopMode.KOBOLD_ONLY" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décalage cible de fermeture de la benne (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTime">
@@ -191,7 +191,7 @@
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_CycleCfg — Configuration du cycle semi-automatique
-   SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
+   SetDepth_M et DepthStopMode protégés par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -257,6 +257,17 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Case mise en service : déverrouille le forçage de step (front/impulsion). NON persisté.</xhtml>
               </documentation>
             </variable>
+            <variable name="TglCycleChecksInhibit">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Mode essai : inhibe uniquement les controles procede autorises. NON persiste.</xhtml>
+              </documentation>
+            </variable>
             <variable name="BtnForceStepApply">
               <type>
                 <BOOL />
@@ -310,7 +321,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut cycle actif ou mémorisé, à acquitter</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -318,7 +329,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code défaut cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code affiché : actif, ou latched après repli AX_STAB</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStep">
@@ -481,6 +492,54 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée du dernier cycle achevé (figée à X13)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleChecksInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Contrôles procédé cycle inhibés, protections machine actives</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IgnoredCycleCheckId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔎 Contrôles procédé actifs mais ignorés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepPrepared">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step préparé, commandes neutres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepAccepted">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Impulsion préparation acceptée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepRejected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Impulsion préparation refusée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepResult">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📝 Motif accepté/refusé</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -493,6 +552,50 @@
    🚦 ST_CycleState — États et diagnostics IHM du cycle semi-automatique
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="E_CycleDepthStopMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="KOBOLD_ONLY" value="0" />
+              <value name="SETPOINT_ONLY" value="1" />
+              <value name="KOBOLD_OR_SETPOINT" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>KOBOLD_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Comportement historique : fond valide par DI Kobold</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SETPOINT_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret sur consigne de profondeur valide</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>KOBOLD_OR_SETPOINT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Premier evenement valide des deux</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a4e533cc-1a07-5fca-8da6-b652a120d4dd</ObjectId>
+          </data>
+        </addData>
       </dataType>
       <dataType name="E_AutoCycleStep">
         <baseType>
@@ -691,6 +794,7 @@
               <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
               <Object Name="ST_CycleCmd" ObjectId="dac4a7a5-fa3d-5326-bf1a-3202f2fbdc28" />
               <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
+              <Object Name="E_CycleDepthStopMode" ObjectId="a4e533cc-1a07-5fca-8da6-b652a120d4dd" />
             </Folder>
           </Folder>
         </Folder>

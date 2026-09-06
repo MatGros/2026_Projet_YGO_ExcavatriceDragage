@@ -55,7 +55,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     ); // 🌉 Pont FB_CfgPersistBridge_WinchCfg (M2)
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
-    _SyncCfgPersist : ST_SyncCfg := (CfgSyncTolerance_M := 2.0, CfgSyncCriticalTolerance_M := 4.0); // 🌉 Pont FB_CfgPersistBridge_SyncCfg — MES 2026-09-04 : Warn 0.8->2.0m, Fault 2.0(defaut type)->4.0m (confirme operateur)
+    _SyncCfgPersist : ST_SyncCfg := (CfgSyncTolerance_M := 3.0, CfgSyncCriticalTolerance_M := 6.0); // 🌉 Pont FB_CfgPersistBridge_SyncCfg — seuils projet Warn 3.0m / Fault 6.0m
     _WinchCriticalSyncTolerance_M : REAL := 2.5; // Méca E : écart critique (Zone 3: SafeStop dès 2.5m)
     _SyncSoftStopEnable : BOOL := FALSE; // Rattrapage directionnel (Défaut: OFF)
 
@@ -119,7 +119,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _JoystickCfgPersist : ST_fbJoystick_Cfg := (DeadbandRaw := 300); // reste des champs = defaults ST_fbJoystick_Cfg
 
     // 🔄 CYCLE (dragage semi-automatique)
-    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, SetOffset_M := 1.5, RaiseOffBottom_M := 0.5, CtrlAscentMaxStep := 1); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
+    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -12.5, DepthStopMode := E_CycleDepthStopMode.KOBOLD_ONLY, RaiseOffBottom_M := 0.5, CtrlAscentMaxStep := 1); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
 
     // 🎯 CYCLE REFERENCEMENT MACHINE (homing) — reglage mise en service
     _CycleMachineHomingCfgPersist : ST_CycleMachineHomingCfg := (ForceStepTarget := 0); // 🌉 Pont FB_CfgPersistBridge_CycleMachineHomingCfg

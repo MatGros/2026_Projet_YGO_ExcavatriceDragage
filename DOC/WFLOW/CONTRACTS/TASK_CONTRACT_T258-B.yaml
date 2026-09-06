@@ -1,0 +1,20 @@
+contract:
+  task_id: T258-B
+  criticality: C3
+  strategy: patch
+  objective: Fiabiliser la plongee Kobold AX4 a AX8 avec direction Y- stricte et arret mecanique confirme.
+  acceptance:
+    - {id: AC1, statement: AX4 a AX7 ne commandent la descente qu avec DeadmanArmed et JoystickPush Y-., verified_by: Tests de toutes directions joystick et perte homme-mort meme scan.}
+    - {id: AC2, statement: AX5 alimente le capteur pendant un delai d etablissement sans faux retour auxiliaire., verified_by: Test scan-par-scan ordre Kobold et absence de transition sur feedback fictif.}
+    - {id: AC3, statement: Le fond est valide uniquement apres DI haute stable puis transition haute vers basse qualifiee., verified_by: Tests nominal 0-1-0, DI basse initiale et rebonds.}
+    - {id: AC4, statement: AX8 neutralise M1 M2 et Kobold puis attend vitesses valides basses, contacteurs relaches et freins serres., verified_by: Tests retirant successivement chacun des six faits d arret.}
+    - {id: AC5, statement: Le nom du fichier est identique au nom du POU et le suffixe correspond au langage du bundle., verified_by: Revue bundle et gates structurels.}
+  scope:
+    allowed: [CODE/G_CYCLE/FB_CycleSemiAuto.st, CODE/M_MAIN/PRG_03_Modes_Cycle.st, TOOLS/TEST_AUTO_CI/, TOOLS/AGENT_WORKFLOW/scripts/]
+    forbidden: [PRJ_CODESYS/PROJ_Full_ImportExport/Device.export, CODE/M_MAIN/PRG_04_Treuils_Benne.st]
+  conservation: {must_survive: [Palier 5 interdit, limite legale, synchro, handoff AX3 sans relachement joystick], dropped_on_purpose: [KoboldContactorFeedback fictif]}
+  evidence_required: [tests_strucpp, check_linkage]
+  alert_duty: La polarite DI 0 hors eau vers 1 immergee vers 0 fond doit etre confirmee au SAT.
+status: PENDING
+execution: {executed_by: Codex, completed_at: '', status: PENDING, summary: '', evidence_submitted: []}
+validation: {status: PENDING, validated_by: '', validated_at: '', notes: ''}

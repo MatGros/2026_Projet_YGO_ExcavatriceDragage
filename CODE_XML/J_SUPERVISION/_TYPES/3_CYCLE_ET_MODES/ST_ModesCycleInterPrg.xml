@@ -539,6 +539,54 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée du dernier cycle SEMI_AUTO achevé (figée à X13)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleChecksInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode essai : controles procede inhibes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IgnoredCycleCheckId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Causes procede actives mais ignorees</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepPrepared">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible forcee preparee, commandes neutres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepAccepted">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion preparation acceptee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepRejected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion preparation refusee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepResult">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif accepte/refuse</xhtml>
+              </documentation>
+            </variable>
             <variable name="BottomTouchConfirmed">
               <type>
                 <BOOL />

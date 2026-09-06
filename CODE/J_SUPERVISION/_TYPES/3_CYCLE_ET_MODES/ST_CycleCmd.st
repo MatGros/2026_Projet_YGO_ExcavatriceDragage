@@ -10,6 +10,7 @@ STRUCT
     BtnSkipDrain      : BOOL; (* ⏭️ Passer l'étape d'égouttage X9 (front) *)
     BtnReposition     : BOOL; (* ⬇️ Option maintenue : repositionnement couplé M1+M2 pendant le vidage trémie (X11b <-> X11c) *)
     TglCommissioning  : BOOL := FALSE; (* 🔧 Case mise en service : déverrouille le forçage de step (front/impulsion). NON persisté. *)
+    TglCycleChecksInhibit : BOOL := FALSE; (* 🧪 Mode essai : inhibe uniquement les controles procede autorises. NON persiste. *)
     BtnForceStepApply : BOOL; (* 🔧 Applique le forçage de step (front) — impulsion ; cible = ST_CycleCfg.ForceStepTarget *)
 END_STRUCT
 END_TYPE

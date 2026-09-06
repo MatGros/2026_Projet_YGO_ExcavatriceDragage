@@ -543,8 +543,14 @@ GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputMo
 GVL_IHM.CycleSemiAuto.State.Ready                  := PRG_03_Modes_Cycle.Data.SequenceState.Ready;
 GVL_IHM.CycleSemiAuto.State.Busy                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy;
 GVL_IHM.CycleSemiAuto.State.Done                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done;
-GVL_IHM.CycleSemiAuto.State.Error                  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error;
-GVL_IHM.CycleSemiAuto.State.ErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId;
+// En AX_STAB les causes contextuelles (ex. AX7) ne sont plus actives : la vue live
+// ErrorId retombe alors à 0. L'IHM doit conserver le bit latche afin de permettre
+// un acquittement fonde sur la vraie cause, jamais sur un ambigu "Defaut #0".
+GVL_IHM.CycleSemiAuto.State.Error                  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error
+                                                       OR PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched;
+GVL_IHM.CycleSemiAuto.State.ErrorId                := SEL(PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched,
+                                                           PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
+                                                           PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId);
 GVL_IHM.CycleSemiAuto.State.CycleStep              := PRG_03_Modes_Cycle.Data.SequenceState.Step;
 GVL_IHM.CycleSemiAuto.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.SequenceState.StepStr;
 GVL_IHM.CycleSemiAuto.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
@@ -552,7 +558,7 @@ GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.TranslationM3.Cmd.SelTarget;
-GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;
+GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
 GVL_IHM.CycleSemiAuto.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 GVL_IHM.CycleSemiAuto.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
 GVL_IHM.CycleSemiAuto.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
@@ -561,6 +567,12 @@ GVL_IHM.CycleSemiAuto.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.Data.
 GVL_IHM.CycleSemiAuto.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
 GVL_IHM.CycleSemiAuto.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
 GVL_IHM.CycleSemiAuto.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
+GVL_IHM.CycleSemiAuto.State.CycleChecksInhibited   := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited;
+GVL_IHM.CycleSemiAuto.State.IgnoredCycleCheckId    := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId;
+GVL_IHM.CycleSemiAuto.State.ForceStepPrepared      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared;
+GVL_IHM.CycleSemiAuto.State.ForceStepAccepted      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepAccepted;
+GVL_IHM.CycleSemiAuto.State.ForceStepRejected      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepRejected;
+GVL_IHM.CycleSemiAuto.State.ForceStepResult        := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult;
 // Position cycle : meme gel affichage que M1TreuilRetenue/M2TreuilBenne pendant le preset codeur.
 GVL_IHM.CycleSemiAuto.State.M1Position_M           := SEL(M1PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM, M1PosHmiHeld_M);
 GVL_IHM.CycleSemiAuto.State.M2Position_M           := SEL(M2PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM, M2PosHmiHeld_M);
@@ -578,8 +590,9 @@ instHmiBannerFormatter(
     WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     CycleStep             := GVL_IHM.CycleSemiAuto.State.CycleStep,
     CycleStateStr         := GVL_IHM.CycleSemiAuto.State.CycleStateStr,
-    CycleErrorId          := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
+    CycleErrorId          := GVL_IHM.CycleSemiAuto.State.ErrorId,
     CycleStepAtError      := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
+    CycleChecksInhibited  := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
@@ -732,6 +745,10 @@ instTroubleshootingView(
     CycleErrorId         := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
     CycleFaultLatched    := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched,
     CycleFaultLatchedId  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId,
+    CycleChecksInhibited := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
+    CycleIgnoredCheckId  := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId,
+    CycleForceStepPrepared := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared,
+    CycleForceStepResult := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult,
     CycleStep            := PRG_03_Modes_Cycle.Data.SequenceState.Step,
     CycleStepStr         := PRG_03_Modes_Cycle.Data.SequenceState.StepStr,
     CycleStepAtError     := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
@@ -747,7 +764,7 @@ instTroubleshootingView(
     CycleKoboldBottomTouch := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     CycleSpeedMismatchActive := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive,
     CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
-    CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Fault.Error,
+    CycleWinchSyncError  := PRG_04_Treuils_Benne.Data.WinchSyncError,
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     HomedM1              := PRG_02_Acquisition.Data.EncoderM1.Homed,

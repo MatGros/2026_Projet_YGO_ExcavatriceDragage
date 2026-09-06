@@ -4,6 +4,8 @@
 > 🆕 v2.3 (2026-08-28) : Intégration du cycle Kobold 4 temps à la volée, bridage strict Palier $\le$ 4, enchaînement fluide d'extraction sous maintien continu joystick, gestion des bascules de mode sans perte d'étape et raccordement diagnostic Troubleshooting (`ST_ChainCycleSemiAuto`).
 >
 > 🔒 Addendum T257 (2026-09-05) : handoff `AX3_OPEN_BUCKET` → `AX3_WAIT_DIVE_START` → `AX4_DESCEND_DIVING` sous maintien joystick, avec arrêt mécanique confirmé et publication atomique M1/M2 exclusivement en `SEMI_AUTO`.
+>
+> 🔒 Addendum T258 (2026-09-06) : `FB_CycleSemiAuto` est la source unique ; les anciens `FB_DiveSearch`, `FB_ExtractionAssist` et `FB_Cycle` sont retirés. La DI Kobold est qualifiée `0→1→0` (hors eau → immersion → fond), AX8 mémorise M1/M2 séparément après arrêt stable, AX9..AX12 exigent Y+, et l'IHM expose `TglCycleChecksInhibit` (commissioning + SEMI_AUTO, niveau, causes procédé 4/9 seulement). Le forçage est transactionnel : candidate validée, Apply sans action, Start neutre, geste séparé ; Reset, Abort, retrait commissioning et rejet annulent la transaction sans annuler une pause de mode.
 
 ## 🎯 Rôle et périmètre
 
@@ -307,7 +309,8 @@ END_TYPE
 
 | Mécanisme | Portée | Seuils réels |
 |---|---|---|
-| Écart de position continu (`FB_SyncDeviation`/`FB_WinchSync`) | Tout mouvement M1/M2 synchronisé | `CfgSyncToleranceM=0.10m` (Warn) / `CfgSyncCriticalToleranceM=0.50m` (Fault) |
+| Écart de position continu (`FB_SyncDeviation`/`FB_WinchSync`) | Tout mouvement M1/M2 synchronisé | `2.0m` warning (information/bridage) ; `4.0m` défaut synchro confirmé après 800 ms. Le cycle ne consomme pas le warning. |
+| Protection synchronisme machine (`FB_Safety_Winch`, Méca E) | Treuils couplés hors manoeuvre benne/homing | `2.5m` : SafeStop. PRG04 publie cette cause au cycle ; aucun seuil local redondant dans `FB_CycleSemiAuto`. |
 | Contrôle de remontée lente (`FB_Cycle`, **X7_CTRL_ASCENT uniquement**) | Étape X7 seulement | `CtrlAscentToleranceM=0.25m` sur `CtrlAscentDistM=2.0m` ; `CtrlAscentTimeout=T#30s` |
 | Écart de vitesse (`FB_Cycle`, X7 uniquement) | Étape X7 seulement | `SpeedMismatchThresholdMps` |
 

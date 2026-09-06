@@ -53,8 +53,6 @@ instHmiBannerFormatter(
     CycleStateStr         := 'X0_PREPARATION',
     CycleErrorId          := 16#0000,
     CycleStepAtError      := E_AutoCycleStep.AX0_REPOS,
-    DiveState             := E_DiveSearchState.WAIT_PRECONDITIONS,
-    ExtractionState       := E_ExtractionAssistState.WAIT_BOTTOM_CONFIRMATION,
     MachineHomingStep     := 0,
     MachineHomingInstruction := '',
 

@@ -77,6 +77,10 @@ VAR_INPUT
     CycleErrorId             : WORD;   (* --> [DIAG] Code erreur séquenceur *)
     CycleFaultLatched        : BOOL;   (* --> [STAT] Défaut latché séquenceur (bloque AX0->AX1, exige Reset) *)
     CycleFaultLatchedId      : WORD;   (* --> [DIAG] Bitfield défaut latché figé *)
+    CycleChecksInhibited     : BOOL;   (* --> [TST] Contrôles procédé inhibés *)
+    CycleIgnoredCheckId      : WORD;   (* --> [DIAG] Contrôles procédé ignorés *)
+    CycleForceStepPrepared   : BOOL;   (* --> [STAT] Step préparé, commandes neutres *)
+    CycleForceStepResult     : STRING(120); (* --> [DIAG] Motif forçage *)
     CycleStep                : E_AutoCycleStep; (* --> [STAT] Étape courante *)
     CycleStepStr             : STRING(80);  (* --> [STAT] Libellé étape *)
     CycleStepAtError         : E_AutoCycleStep; (* --> [DIAG] Étape au défaut *)
@@ -675,6 +679,10 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx204_Error                     := CycleErr
 GVL_Troubleshooting.G_CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFaultLatched;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx219_CycleChecksInhibited       := CycleChecksInhibited;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx220_IgnoredCycleCheckId        := CycleIgnoredCheckId;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx221_ForceStepPrepared          := CycleForceStepPrepared;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx222_ForceStepResult            := CycleForceStepResult;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;

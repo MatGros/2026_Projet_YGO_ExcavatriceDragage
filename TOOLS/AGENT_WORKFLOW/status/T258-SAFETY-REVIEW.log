@@ -1,0 +1,8 @@
+07:17:21 [Codex-review] debut -> en_cours Revue read-only diff T258, liaison puis safety
+07:19:33 [Codex-review] fin -> termine Verdict BLOCK: AX9 sens oppose, forcage rejet conserve cible armee, Apply+Start meme scan, etats IHM stale hors semi-auto, Kobold interface incoherente, CI insuffisante
+07:32:10 [Codex-review] correction -> en_cours Contre-revue fixes BLOCK et tests dynamiques
+07:33:01 [Codex-review] correction -> fail BLOCK restant: transaction force rejet/reset/commissioning; autres corrections confirmees
+07:35:21 [Codex-review] atomique -> en_cours Revue transaction ForceStepWaiting et TC029-033
+07:35:50 [Codex-review] atomique -> fail BLOCK: Apply refusee annule pause mode et contourne reprise consciente
+08:19:48 [Codex-review] final -> en_cours Relecture finale force/pause/tests/mapping MAINT
+08:20:11 [Codex-review] final -> termine PASS ciblé: transaction et pause mode sûres, mappings neutralisés, tests couvrants

@@ -1,0 +1,19 @@
+contract:
+  task_id: T258-A
+  criticality: C3
+  strategy: patch
+  objective: Construire une preuve executable fidele du cycle et des frontieres PRG03/PRG04 avant validation SAT.
+  acceptance:
+    - {id: AC1, statement: Le harness FB_CycleSemiAuto expose toutes les entrees AX4 a AX12, commissioning et forçage., verified_by: Compilation STruC++ et tests Given/When/Then dedies.}
+    - {id: AC2, statement: La barriere atomique reelle SEMI_AUTO est exercee avec readiness ou defaut asymetrique., verified_by: Tests imposant sorties M1 et M2 a zero le meme scan.}
+    - {id: AC3, statement: Les chemins MAINT_N1 et MAINT_N2 restent identiques pour tous les vecteurs de test., verified_by: Snapshots bit a bit des demandes et sorties.}
+    - {id: AC4, statement: Les gardes statiques refusent pseudo-feedback Kobold, ecart brut AX11 et barriere PRG04 non bornee SEMI_AUTO., verified_by: Tests integration des scripts de gate.}
+  scope:
+    allowed: [TOOLS/TEST_AUTO_CI/, TOOLS/AGENT_WORKFLOW/scripts/, TOOLS/tests/integration/]
+    forbidden: [PRJ_CODESYS/PROJ_Full_ImportExport/Device.export, CODE/]
+  conservation: {must_survive: [Tests existants], dropped_on_purpose: []}
+  evidence_required: [tests_strucpp, tests_gardes]
+  alert_duty: Ne jamais annoncer une preuve physique a partir de la seule simulation CI.
+status: IN_PROGRESS
+execution: {executed_by: Codex, completed_at: '', status: PENDING, summary: '', evidence_submitted: []}
+validation: {status: PENDING, validated_by: '', validated_at: '', notes: ''}

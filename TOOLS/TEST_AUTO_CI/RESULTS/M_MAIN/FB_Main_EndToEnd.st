@@ -71,7 +71,6 @@ VAR_INPUT
     CoupledIntentActive     : BOOL := FALSE;
     CoupledIntentDirection  : INT := 0;
     SeqBottomTouchConfirmed : BOOL := FALSE;
-    SeqDumpAtTremieDescentLocked : BOOL := FALSE;
 
     // === ⚙️ Configuration Treuils/Sync/Benne (0/0.0 = à fournir par la suite de test) ===
     SpeedTable              : ST_SpeedStepTable;
@@ -149,8 +148,8 @@ VAR_OUTPUT
 
     // === 🔄 Observation Séquenceur Cycle (miroir FB_TestHarness_PRG_03) ===
     // Sorties de DIAG uniquement (aucun impact sur la chaîne) : exposent l'état du
-    // séquenceur FB_Cycle pour les scénarios e2e homme-mort / timeout (T169-A S3/S4).
-    CycleStep               : E_CycleStep;
+    // séquenceur FB_CycleSemiAuto pour les scénarios e2e homme-mort / timeout (T169-A S3/S4).
+    CycleStep               : E_AutoCycleStep;
     CycleBusy               : BOOL;
     CycleError              : BOOL;
     CycleStateStr           : STRING(80);
@@ -368,7 +367,6 @@ reqProgramLocal.ReqWinchM1 := SeqReqWinchM1;
 reqProgramLocal.ReqWinchM2 := SeqReqWinchM2;
 reqProgramLocal.ReqBucket := SeqReqBucket;
 seqStateLocal.BottomTouchConfirmed := SeqBottomTouchConfirmed;
-seqStateLocal.DumpAtTremieDescentLocked := SeqDumpAtTremieDescentLocked;
 bucketPersistLocal.OffsetOpenM := BucketOffsetOpenM;
 bucketPersistLocal.OffsetCloseM := BucketOffsetCloseM;
 bucketPersistLocal.CoherenceLimitM := BucketCoherenceLimitM;

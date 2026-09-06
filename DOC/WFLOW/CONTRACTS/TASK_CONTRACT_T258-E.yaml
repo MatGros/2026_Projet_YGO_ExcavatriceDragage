@@ -1,0 +1,20 @@
+contract:
+  task_id: T258-E
+  criticality: C3
+  strategy: patch
+  objective: Qualifier le lot complet, aligner les AF et livrer un bundle frais avec un protocole SAT exploitable.
+  acceptance:
+    - {id: AC1, statement: Les AF actives decrivent exactement directions, Kobold, extraction, inhibition et forçage livres., verified_by: Revue code vers AF et G340.}
+    - {id: AC2, statement: Les tests FB cycle, PRG03, PRG04 et WINCH_INTEG passent., verified_by: Rapports TEST_AUTO_CI.}
+    - {id: AC3, statement: Le bundle est frais et G200 ne remonte aucune erreur de liaison., verified_by: generate_codesys_bundle puis G200_check_linkage --report.}
+    - {id: AC4, statement: Palier C puis suite complete des 21 gates passent., verified_by: run_all_gates --palier C puis run_all_gates.}
+    - {id: AC5, statement: Le plan SAT distingue preuves CI et controles physiques restant a realiser., verified_by: Checklist polarite DI, freins, inertie, sorties, RETAIN et traces CODESYS.}
+  scope:
+    allowed: [DOC/AF/, DOC/WFLOW/, CODE_XML/, TOOLS/TEST_AUTO_CI/RESULTS/]
+    forbidden: [PRJ_CODESYS/PROJ_Full_ImportExport/Device.export]
+  conservation: {must_survive: [Historique MES, changements utilisateur hors scope], dropped_on_purpose: []}
+  evidence_required: [check_linkage, run_all_gates, bundle, tests_strucpp, sat_plan]
+  alert_duty: Un gate rouge, bundle perime ou liaison rouge interdit le bandeau final de conformite.
+status: PENDING
+execution: {executed_by: Codex, completed_at: '', status: PENDING, summary: '', evidence_submitted: []}
+validation: {status: PENDING, validated_by: '', validated_at: '', notes: ''}
