@@ -12,15 +12,18 @@ CYCLE = (ROOT / "CODE/G_CYCLE/FB_CycleSemiAuto.st").read_text(encoding="utf-8-si
 PRG03 = (ROOT / "CODE/M_MAIN/PRG_03_Modes_Cycle.st").read_text(encoding="utf-8-sig")
 PRG04 = (ROOT / "CODE/M_MAIN/PRG_04_Treuils_Benne.st").read_text(encoding="utf-8-sig")
 PRG07 = (ROOT / "CODE/M_MAIN/PRG_07_Supervision.st").read_text(encoding="utf-8-sig")
+WINCH_SYNC = (ROOT / "CODE/H_TREUILS_BENNE/FB_WinchSync.st").read_text(encoding="utf-8-sig")
 
 required_cycle = {
     "intention montee qualifiee": "JoystickPull",
     "cible fond M1": "TouchPositionM1",
     "cible fond M2": "TouchPositionM2",
-    "synchro compensee AX11": "ABS(WinchSyncDeltaM) <= CtrlAscentToleranceM",
+    "distance AX11 M1": "M1_CablePosM >= (CtrlAscentStartM1 + CtrlAscentDistEffM)",
+    "distance AX11 M2": "M2_CablePosM >= (CtrlAscentStartM2 + CtrlAscentDistEffM)",
     "arret mecanique AX8": "BottomTouchStabTimer.Q AND DiveStartStopped",
     "mode essai visible": "CycleChecksInhibited",
-    "mode essai commande de niveau": "CycleChecksInhibited := CfgCycleChecksInhibit AND CfgCommissioningEnable",
+    "mode essai borne semi-auto": "CycleChecksInhibited := CfgCycleChecksInhibit AND (Mode = E_Mode.SEMI_AUTO)",
+    "fin egouttage autonome": "IF DrainingTimer.Q OR SkipDrainEdge.Q THEN",
     "forcage prepare": "ForceStepPrepared",
     "cible candidate non publiee": "ForceStepCandidate",
     "etape attente 21 explicite": "21: ForceStepCandidate := E_AutoCycleStep.AX3_WAIT_DIVE_START",
@@ -36,6 +39,7 @@ for forbidden, label in (
     ("KoboldContactorFeedback", "pseudo-feedback contacteur Kobold"),
     ("ABS(M1_CablePosM - M2_CablePosM) <= CtrlAscentToleranceM", "ecart brut AX11"),
     ("CST_CoupledPosBacklashM", "seuil synchro local cycle duplique"),
+    ("IF JoystickDeflected AND (DrainingTimer.Q OR SkipDrainEdge.Q) THEN", "geste joystick cache encore requis pour quitter AX13"),
 ):
     if forbidden in CYCLE or forbidden in PRG03:
         errors.append(label)
@@ -48,6 +52,22 @@ for token, label in (
     ("OR WinchM2Safety.ErrorMecaE", "Meca E M2 absente du signal cycle"),
 ):
     if token not in PRG04:
+        errors.append(label)
+
+# REX terrain 2026-09-06 : AX10/AX11 sont volontairement dissymetriques.
+# Le gate doit couper la synchro a la source et FB_WinchSync doit executer ses
+# sous-blocs desactives pour purger WarnLatched avant le rearmement en AX12.
+for token, label in (
+    ("AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX10_CLOSE_BUCKET)", "surveillance synchro encore active en AX10"),
+    ("AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX11_CTRL_ASCENT)", "surveillance synchro encore active en AX11"),
+):
+    if token not in PRG04:
+        errors.append(label)
+for token, label in (
+    ("instDeviation(Enable := FALSE, Reset := TRUE);", "sous-bloc deviation non purge gate ferme"),
+    ("instContactor(Enable := FALSE, Reset := TRUE);", "sous-bloc contacteurs non purge gate ferme"),
+):
+    if token not in WINCH_SYNC:
         errors.append(label)
 if "JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive" not in PRG03:
     errors.append("liaison JoystickPull PRG02 vers cycle")

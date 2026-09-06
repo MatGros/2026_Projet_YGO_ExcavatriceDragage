@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T16:30:19.117345" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T16:30:19.117345">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T11:39:10.729724" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T11:39:10.729724">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -55,7 +55,7 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="1.2" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m) -- reglable IHM</xhtml>

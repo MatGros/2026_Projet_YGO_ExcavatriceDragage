@@ -135,7 +135,7 @@ TEST 'TC-P04-032 T258 : Reset simultane annule le forçage'
     ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'AX4 non charge apres Reset+Apply');
 END_TEST
 
-TEST 'TC-P04-033 T258 : Retrait commissioning annule le forçage'
+TEST 'TC-P04-033 T258 : Forcage semi-auto independant du bit commissioning'
     FB(Enable := TRUE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        HeartbeatIhmOk := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE,
        M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE,
@@ -145,9 +145,9 @@ TEST 'TC-P04-033 T258 : Retrait commissioning annule le forçage'
     FB(CfgForceStepApply := TRUE, SampleCount := SampleCount);
     ASSERT_TRUE(FB.ForceStepPrepared, 'Preparation initiale acceptee');
     FB(CfgForceStepApply := FALSE, CfgCommissioningEnable := FALSE, SampleCount := SampleCount);
-    ASSERT_FALSE(FB.ForceStepPrepared, 'Retrait commissioning annule la preparation');
+    ASSERT_TRUE(FB.ForceStepPrepared, 'Retrait commissioning ne bloque pas la preparation semi-auto');
     FB(StartCycle := TRUE, SampleCount := SampleCount);
-    ASSERT_FALSE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'AX4 non charge hors commissioning');
+    ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX4_DESCEND_DIVING, 'AX4 charge en semi-auto hors commissioning');
 END_TEST
 
 TEST 'TC-P04-001 : Relachement manche (JoystickDeflected=FALSE) stoppe les commandes sans perdre l etape'
@@ -285,7 +285,7 @@ TEST 'TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutra
     (* Call 1 : front StartCycle -> X0->X1 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := TRUE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := TRUE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -298,7 +298,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* Call 2 : observe X1, deja home -> X2 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -311,7 +311,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* Call 3 : observe X2, cible P1 atteinte -> X3 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -324,7 +324,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* Call 4 : observe X3, benne ouverte -> X4 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -337,7 +337,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* Call 5 : observe AX4_DESCEND_DIVING, plongee sans contact fond *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -358,7 +358,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* Call 6 : relache homme-mort / manche au centre pendant la plongee -> neutralisation, etape maintenue *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := FALSE, JoystickDeflected := FALSE, JoystickPush := FALSE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -378,7 +378,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     ADVANCE_TIME(5000000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := FALSE, JoystickDeflected := FALSE, JoystickPush := FALSE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -413,7 +413,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* Call 8 : nouveau geste apres Start -> reprise a X4 SANS repartir de X0 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -433,7 +433,7 @@ TEST 'TC-P04-021 : Fond jamais atteint -> maintien AX4 car tempo max etape desac
     (* Call 1 : front StartCycle -> X0->X1 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := TRUE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := TRUE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -446,7 +446,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* Call 2 : observe X1, deja home -> X2 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -459,7 +459,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* Call 3 : observe X2, cible P1 atteinte -> X3 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -472,7 +472,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* Call 4 : observe X3, benne ouverte -> X4 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -485,7 +485,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* Call 5 : observe AX4_DESCEND_DIVING, plongee sans contact fond (Kobold = FALSE) *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -505,7 +505,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        l'ADVANCE_TIME qui suit ne serait pas compte (IN passe FALSE->TRUE au scan d'avance). *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -520,7 +520,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     ADVANCE_TIME(61000000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0, DiveStartMinM := 4.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -806,7 +806,7 @@ TEST 'TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et 
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â¡ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 1 : StartCycle ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X1 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := TRUE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := TRUE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -820,7 +820,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 2 : X1 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, dÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©jÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â  homÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X2 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -835,7 +835,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 3 : X2 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, translation active *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -851,7 +851,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¯ Call 4 : P1 atteinte ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X3 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -865,7 +865,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 5 : X3 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, ouverture benne *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -881,7 +881,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã¢â‚¬â„¢Ãƒâ€¦Ã‚Â  Call 6 : benne ouverte ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X4 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -895,7 +895,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 7 : AX4 observe, plongee palier 4 (au-dessus de l'altimetrie de lancement) *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -958,10 +958,13 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     ASSERT_TRUE(FB.WinchM1Cmd.RunRequest AND FB.WinchM2Cmd.RunRequest, 'AX9 : remontee M1+M2 commandee');
     ASSERT_TRUE(FB.WinchM1Cmd.StepTgt = 1, 'AX9 : palier 1');
 
+    (* Laisser expirer la pause inter-etapes AX9 avant d'atteindre la cible. *)
+    ADVANCE_TIME(1100000000);
+
     (* ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â Call 10 : hauteur fermeture ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X6 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -975,7 +978,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 11 : X6 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, fermeture benne *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -986,12 +989,15 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Benne_Busy := FALSE, Benne_Done := FALSE, Benne_IsOpen := TRUE, Benne_IsClosed := FALSE, Benne_IsRoughlyClosed := FALSE,
        SampleCount := FB.SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET, 'X6 observe : fermeture benne');
-    ASSERT_TRUE(FB.BucketCmd.ReqClose, 'X6 : fermeture benne commandee');
+    ASSERT_FALSE(FB.BucketCmd.ReqClose, 'X6 : pause inter-etape avant fermeture benne');
+    // Premier scan stable AX10 : arme le TON apres mise a jour de ExtractionDelayState.
+    FB();
+    ADVANCE_TIME(1100000000);
 
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¯ Call 12 : benne fermÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©e ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X7 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
-       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := FALSE, JoystickPull := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1004,8 +1010,8 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
 
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 13 : X7 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, remontÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©e contrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â´le *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
-       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := FALSE, JoystickPull := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1016,17 +1022,20 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
        SampleCount := FB.SampleCount);
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT, 'X7 observe : remontee controle');
-    ASSERT_TRUE(FB.WinchM1Cmd.RunRequest, 'X7 : remontee lente M1 commandee');
-    ASSERT_TRUE(FB.WinchM2Cmd.RunRequest, 'X7 : remontee lente M2 commandee');
+    ASSERT_FALSE(FB.WinchM1Cmd.RunRequest, 'X7 : pause inter-etape M1 avant remontee controlee');
+    ASSERT_FALSE(FB.WinchM2Cmd.RunRequest, 'X7 : pause inter-etape M2 avant remontee controlee');
+    // Premier scan stable AX11 puis ecoulement de la temporisation de debug.
+    FB();
+    ADVANCE_TIME(1100000000);
 
     (* ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â Call 14 : palier contrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â´le ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X8 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
-       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := FALSE, JoystickPull := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -7.5, M2_CablePosM := -7.5, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := -7.0, M2_CablePosM := -7.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
 WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -1035,12 +1044,12 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
 
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 15 : X8 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, remontÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©e charge *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
-       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := FALSE, JoystickPull := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
-       M1_CablePosM := -7.5, M2_CablePosM := -7.5, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
+       M1_CablePosM := -7.0, M2_CablePosM := -7.0, M1_MeasuredSpeedMps := 0.0, M2_MeasuredSpeedMps := 0.0,
 WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_At_P1 := TRUE, Translation_At_Tremie := FALSE, Translation_At_Maintenance := FALSE,
        Translation_Busy := FALSE, Translation_Done := TRUE,
@@ -1053,7 +1062,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â Call 16 : limite haute ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X9 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1067,7 +1076,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 17 : X9 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©gouttage *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1081,11 +1090,11 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest, 'X9 : treuil M1 arrete (egouttage)');
     ASSERT_FALSE(FB.WinchM2Cmd.RunRequest, 'X9 : treuil M2 arrete (egouttage)');
 
-    (* ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€šÃ‚Â±ÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â Call 18 : ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©gouttage 5s ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X10 *)
+    (* Call 18 : egouttage 5s au joystick neutre -> AX14 sans geste cache *)
     ADVANCE_TIME(5000000000);
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
-       DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       DeadmanArmed := FALSE, JoystickDeflected := FALSE, JoystickPush := FALSE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1099,7 +1108,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 19 : X10 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, translation trÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©mie *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1115,7 +1124,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â¡Ãƒâ€¦Ã‚Â¡ Call 20 : trÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©mie atteinte ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X11 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1129,7 +1138,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 20b : X11a observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© (arrivÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©e trÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©mie, treuils arrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂªtÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©s) -> X11b sur geste joystick *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1146,7 +1155,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 21 : X11b observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, ouverture vidange *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1207,7 +1216,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Call 22 : benne ouverte ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X13 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1221,7 +1230,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Call 23 : X13 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, Done + SampleCount+1 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1239,7 +1248,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Call 24 : X13 2e scan, garde anti-double *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1254,7 +1263,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾ Call 25 : StartCycle ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ X0 (rebouclage) *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := TRUE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := TRUE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,
@@ -1269,7 +1278,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾ Call 26 : rebouclage effectif -> AX2_TRANSLATE_P1 (GEL Q14 : pas de retour AX0) *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := TRUE, JoystickDeflected := TRUE, JoystickPush := TRUE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
-       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0, SetOffsetM := 0.0,
+       StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
        LimitLegalDepthM := -10.5, CableLimitM1AscentM := 7.0,
        SpeedMismatchThresholdMps := 0.0, SpeedMismatchTimeout := T#0ms,
        HomedM1 := TRUE, HomedM2 := TRUE, InitPositionOk := TRUE, WinchesAtTopWindow := TRUE, HomingRequest := FALSE,

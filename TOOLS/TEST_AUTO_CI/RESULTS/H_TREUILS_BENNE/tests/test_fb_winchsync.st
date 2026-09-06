@@ -63,6 +63,29 @@ TEST 'TC-P10-014 Ecart M1/M2 > seuil Warn (0.8m) : SyncWarn instantane + latch, 
     ASSERT_FALSE(fb.SyncWarn, 'Reset -> SyncWarn leve');
 END_TEST
 
+TEST 'T258-REX-20260906 Gate ferme purge le warning deviation avant reactivation'
+    (* Reproduit la trace terrain : un ecart avertissement est memorise avant
+       une phase dissymetrique, puis le gate est coupe et reactive avec 0.088 m. *)
+    fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO, SyncEnable := TRUE,
+       CablePosM1 := -3.210, CablePosM2 := 0.0,
+       HomedAndReliableM1 := TRUE, HomedAndReliableM2 := TRUE,
+       CfgSyncToleranceM := 3.0, CfgSyncCriticalToleranceM := 6.0, ActiveOffsetM := 0.0);
+    ASSERT_TRUE(fb.SyncDeviationWarn, 'Ecart 3.210m > seuil 3m : warning memorise');
+
+    ADVANCE_TIME(10000000);
+    fb(Enable := FALSE, Reset := FALSE);
+    ASSERT_FALSE(fb.Fault.Error, 'Gate ferme : aucun defaut publie');
+
+    ADVANCE_TIME(10000000);
+    fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.SEMI_AUTO, SyncEnable := TRUE,
+       CablePosM1 := 0.088, CablePosM2 := 0.0,
+       HomedAndReliableM1 := TRUE, HomedAndReliableM2 := TRUE,
+       CfgSyncToleranceM := 3.0, CfgSyncCriticalToleranceM := 6.0, ActiveOffsetM := 0.0);
+    ASSERT_FALSE(fb.SyncDeviationWarn, 'Reactivation sous seuil : aucun warning residuel');
+    ASSERT_FALSE(fb.Fault.Error, 'Reactivation sous seuil : Error reste FALSE');
+    ASSERT_EQ(fb.Fault.ErrorId, 0, 'Reactivation sous seuil : ErrorId remis a zero');
+END_TEST
+
 TEST 'TC-P10-014bis Ecart > seuil Fault (0.50m) : SyncDeviationFault filtre 800ms'
     (* Scan 1 : regime nominal *)
     fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, SyncEnable := TRUE,

@@ -13686,7 +13686,7 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="1.2" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m) -- reglable IHM</xhtml>
@@ -20623,7 +20623,7 @@ FirstScanDone := TRUE;
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite haute d'exploitation M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite haute d'exploitation M1 (compatibilite interface)</xhtml>
               </documentation>
             </variable>
             <variable name="M1TopLimitReached">
@@ -20631,7 +20631,7 @@ FirstScanDone := TRUE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite haute effective M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] FDC haut logiciel effectif M1</xhtml>
               </documentation>
             </variable>
             <variable name="M2TopLimitReached">
@@ -20639,7 +20639,7 @@ FirstScanDone := TRUE;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite haute effective M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] FDC haut logiciel effectif M2</xhtml>
               </documentation>
             </variable>
             <variable name="Translation_At_P1">
@@ -22795,10 +22795,10 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
-        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q
-           AND ((M1_CablePosM &gt;= CableLimitM1AscentM)
-             OR M1TopLimitReached
-             OR M2TopLimitReached) THEN
+        // Arrivee au FDC haut LOGICIEL = evenement procede, jamais une nouvelle
+        // action operateur. PRG04 est l'unique producteur du fait de limite
+        // (7,5 m nominal, geometrique pour M2) : G7 ne recalcule aucune cote.
+        IF M1TopLimitReached OR M2TopLimitReached THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
@@ -22822,7 +22822,11 @@ CASE State OF
 
         // Tempo d'egouttage armee/remise a zero en §1 (gate sur State = AX13, PT = DrainTimeEff).
         // Duree reglable IHM (CfgDrainTime) + bypass immediat (SkipDrainEdge).
-        IF JoystickDeflected AND (DrainingTimer.Q OR SkipDrainEdge.Q) THEN
+        // La fin d'egouttage est une transition procede autonome. AX14 porte
+        // ensuite l'attente operateur pour commander M3 vers la tremie.
+        // Important aussi apres forcage : aucun geste joystick cache ne doit
+        // maintenir AX13 une fois la temporisation terminee.
+        IF DrainingTimer.Q OR SkipDrainEdge.Q THEN
             State := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
         END_IF;
 
@@ -44902,6 +44906,11 @@ END_IF;
 // laisserait Fault.Latched cote PRG_04 (RAZ = Reset explicite seulement). La concordance
 // contacteurs "physique" reste couverte par instSyncContactorFinal (PRG_06), independant.
 IF NOT Enable THEN
+    // Executer aussi les sous-blocs avec leur gate ferme. Sans ces appels,
+    // WarnLatched de FB_SyncDeviation survivait a AX10/AX11 et reapparaissait
+    // a la reactivation avec un ecart redevenu normal (REX trace 2026-09-06).
+    instDeviation(Enable := FALSE, Reset := TRUE);
+    instContactor(Enable := FALSE, Reset := TRUE);
     Ready := FALSE;
     DeltaPosM := 0.0; SignedDeltaPosM := 0.0;
     SyncActive := FALSE;
@@ -48156,9 +48165,13 @@ SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND NOT ManualBucketJogActive
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose
-    // 🛡️ Pas de surveillance d'ecart M1/M2 aux etapes de contact fond et retente (AX8 + AX9)
+    // Pas de surveillance de synchronisme pendant les phases ou M1/M2 travaillent
+    // volontairement de facon dissymetrique : contact fond, retente et fermeture/controle.
+    // La surveillance est rearmee a partir de AX12 (montee en charge couplee).
     AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
     AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
+    AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX10_CLOSE_BUCKET)
+    AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX11_CTRL_ASCENT)
     AND instBucket.ActiveOffsetValid;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),

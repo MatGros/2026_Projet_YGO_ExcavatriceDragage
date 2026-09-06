@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T09:02:44.076316" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T09:02:44.076316">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T11:35:58.667319" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T11:35:58.667319">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -937,7 +937,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite haute d'exploitation M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Limite haute d'exploitation M1 (compatibilite interface)</xhtml>
               </documentation>
             </variable>
             <variable name="M1TopLimitReached">
@@ -945,7 +945,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite haute effective M1</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] FDC haut logiciel effectif M1</xhtml>
               </documentation>
             </variable>
             <variable name="M2TopLimitReached">
@@ -953,7 +953,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Limite haute effective M2</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] FDC haut logiciel effectif M2</xhtml>
               </documentation>
             </variable>
             <variable name="Translation_At_P1">
@@ -3109,10 +3109,10 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
-        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q
-           AND ((M1_CablePosM &gt;= CableLimitM1AscentM)
-             OR M1TopLimitReached
-             OR M2TopLimitReached) THEN
+        // Arrivee au FDC haut LOGICIEL = evenement procede, jamais une nouvelle
+        // action operateur. PRG04 est l'unique producteur du fait de limite
+        // (7,5 m nominal, geometrique pour M2) : G7 ne recalcule aucune cote.
+        IF M1TopLimitReached OR M2TopLimitReached THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
@@ -3136,7 +3136,11 @@ CASE State OF
 
         // Tempo d'egouttage armee/remise a zero en §1 (gate sur State = AX13, PT = DrainTimeEff).
         // Duree reglable IHM (CfgDrainTime) + bypass immediat (SkipDrainEdge).
-        IF JoystickDeflected AND (DrainingTimer.Q OR SkipDrainEdge.Q) THEN
+        // La fin d'egouttage est une transition procede autonome. AX14 porte
+        // ensuite l'attente operateur pour commander M3 vers la tremie.
+        // Important aussi apres forcage : aucun geste joystick cache ne doit
+        // maintenir AX13 une fois la temporisation terminee.
+        IF DrainingTimer.Q OR SkipDrainEdge.Q THEN
             State := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
         END_IF;
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-04T04:51:50.553209" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-04T04:51:50.553209">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T09:24:07.324538" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T09:24:07.324538">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -632,6 +632,11 @@
 // laisserait Fault.Latched cote PRG_04 (RAZ = Reset explicite seulement). La concordance
 // contacteurs "physique" reste couverte par instSyncContactorFinal (PRG_06), independant.
 IF NOT Enable THEN
+    // Executer aussi les sous-blocs avec leur gate ferme. Sans ces appels,
+    // WarnLatched de FB_SyncDeviation survivait a AX10/AX11 et reapparaissait
+    // a la reactivation avec un ecart redevenu normal (REX trace 2026-09-06).
+    instDeviation(Enable := FALSE, Reset := TRUE);
+    instContactor(Enable := FALSE, Reset := TRUE);
     Ready := FALSE;
     DeltaPosM := 0.0; SignedDeltaPosM := 0.0;
     SyncActive := FALSE;

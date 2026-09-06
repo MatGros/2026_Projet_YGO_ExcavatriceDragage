@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T07:03:15.331918" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T07:03:15.331918">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T09:24:07.323518" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T09:24:07.323518">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2733,7 +2733,7 @@ TRUE = relais sens + C1..C4 tous retombés (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="1.2" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Anticipation coupure commande fermeture (m) -- reglable IHM</xhtml>
@@ -6158,9 +6158,13 @@ SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND NOT ManualBucketJogActive
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose
-    // 🛡️ Pas de surveillance d'ecart M1/M2 aux etapes de contact fond et retente (AX8 + AX9)
+    // Pas de surveillance de synchronisme pendant les phases ou M1/M2 travaillent
+    // volontairement de facon dissymetrique : contact fond, retente et fermeture/controle.
+    // La surveillance est rearmee a partir de AX12 (montee en charge couplee).
     AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
     AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
+    AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX10_CLOSE_BUCKET)
+    AND NOT (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX11_CTRL_ASCENT)
     AND instBucket.ActiveOffsetValid;
 
 // En mode récupération (SyncEnable=FALSE), si un mou de câble est détecté (bit3 ErrorId),
@@ -13671,6 +13675,11 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
 // laisserait Fault.Latched cote PRG_04 (RAZ = Reset explicite seulement). La concordance
 // contacteurs "physique" reste couverte par instSyncContactorFinal (PRG_06), independant.
 IF NOT Enable THEN
+    // Executer aussi les sous-blocs avec leur gate ferme. Sans ces appels,
+    // WarnLatched de FB_SyncDeviation survivait a AX10/AX11 et reapparaissait
+    // a la reactivation avec un ecart redevenu normal (REX trace 2026-09-06).
+    instDeviation(Enable := FALSE, Reset := TRUE);
+    instContactor(Enable := FALSE, Reset := TRUE);
     Ready := FALSE;
     DeltaPosM := 0.0; SignedDeltaPosM := 0.0;
     SyncActive := FALSE;
