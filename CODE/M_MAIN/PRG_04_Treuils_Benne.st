@@ -1626,9 +1626,16 @@ BucketState.M2ReqDescend := instBucket.M2_ReqDescend;
 BucketState.M2BucketJogLimit := instBucket.M2_BucketJogLimit;
 BucketState.ManualBucketLimitsActive := ManualBucketLimitsActive;
 BucketState.OffsetStateMismatchWarn := instBucket.OffsetStateMismatchWarn;
-// Affichage operateur : cible instantanee (OffsetTargetM), pas la pente de securite
-// (ActiveOffsetM). Rampe visuelle inutile ici, meme raison que DeltaPositionCorrected_M.
-BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.OffsetTargetM;
+// Affichage operateur (bargraphe) : offset NOMINAL fige (DisplayOffsetM = Config.OffsetCloseM/
+// OffsetOpenM selon l'etat franc). Ne bouge que si le tambour M2 tourne -> pas de saut au
+// basculement de mode ni en fin de jog a l'arret, pas de derive inter-session. Ni OffsetTargetM
+// (ecart live) ni ActiveOffsetM (pente de securite).
+BucketState.M2PositionCorrected := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM - instBucket.DisplayOffsetM;
+// Exploitable seulement en etat FRANC (ouvert XOR ferme) et benne referencee : en position
+// intermediaire DisplayOffsetM est gele sur le dernier etat franc -> valeur non representative,
+// l'IHM masque/grise le bargraphe.
+BucketState.M2PositionCorrectedValid := _BucketState.BucketReferenced
+    AND (_BucketState.IsClosed XOR _BucketState.IsOpen);
 BucketState.Ready := instBucket.Ready;
 BucketState.Busy := instBucket.Lifecycle.Busy;
 BucketState.Done := instBucket.Lifecycle.Done;
