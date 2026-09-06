@@ -4797,7 +4797,7 @@ pas une vitesse continue.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="7" />
+                <simpleValue value="7.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
@@ -5247,10 +5247,10 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.5" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décollement du fond en AX8 : RaiseTarget = TouchPosition + ce champ (réglable essais, GEL Q16)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = compensation interne par défaut pour le décollement AX8</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentMaxStep">
@@ -5313,10 +5313,10 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance palier contrôle montée assistée (PRG_04)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = distance de contrôle interne par défaut</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -13726,6 +13726,28 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant le point d'arret anticipe ou le jog unitaire M2 est force au palier 1 (m) -- reglable IHM</xhtml>
               </documentation>
             </variable>
+            <variable name="MaxStepUp">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en montée/fermeture (1..5) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en descente/ouverture (1..5) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -14858,7 +14880,7 @@ fournie par la configuration persistante de l'appelant.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier boutons/both (100 % → palier max)</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketOverrideStepTgt">
+            <variable name="BucketOverrideStepUpTgt">
               <type>
                 <INT />
               </type>
@@ -14866,7 +14888,18 @@ fournie par la configuration persistante de l'appelant.
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier override benne (vitesse lente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond benne montée/fermeture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketOverrideStepDownTgt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond benne descente/ouverture</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -14882,7 +14915,7 @@ fournie par la configuration persistante de l'appelant.
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Config statique de FB_WinchCmdArbitrationM1/M2.
        Structure UNIQUE partagée : M1 consomme BtnStepTgt (boutons/both),
-       M2 consomme BtnStepTgt (boutons/both) + BucketOverrideStepTgt (chemin benne).
+       M2 consomme BtnStepTgt (boutons/both) + plafonds benne par sens.
    📤 Producteur : PRG_04_Treuils_Benne (câblage).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Remplace les paliers codés en dur (StepTgt := 5 / StepTgt := 1) par des constantes nommées.
@@ -22040,7 +22073,17 @@ instCauses[0].Active   := LimitLegalReached
 instCauses[0].Latching := TRUE;
 instCauses[0].Texte    := 'Limite legale de profondeur atteinte pendant descente';
 
-instCauses[1].Active   := WinchSyncError AND (State &lt;&gt; E_AutoCycleStep.AX0_REPOS) AND (State &lt;&gt; E_AutoCycleStep.AX_STAB);
+// PRG_04 purge FB_WinchSync pendant AX8..AX11, mais PRG_03 peut encore lire
+// le diagnostic du scan precedent a l'entree AX8. Ces phases sont volontairement
+// dissymetriques (contact fond, retente, fermeture, controle) : aucun vieux bit
+// de synchronisme ne doit provoquer un repli AX_STAB avant la purge.
+instCauses[1].Active   := WinchSyncError
+                          AND (State &lt;&gt; E_AutoCycleStep.AX0_REPOS)
+                          AND (State &lt;&gt; E_AutoCycleStep.AX_STAB)
+                          AND (State &lt;&gt; E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
+                          AND (State &lt;&gt; E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
+                          AND (State &lt;&gt; E_AutoCycleStep.AX10_CLOSE_BUCKET)
+                          AND (State &lt;&gt; E_AutoCycleStep.AX11_CTRL_ASCENT);
 instCauses[1].Latching := TRUE;
 instCauses[1].Texte    := 'Desynchronisme treuils M1/M2 bloquant';
 
@@ -22449,13 +22492,13 @@ CASE State OF
 
         IF Translation_At_P1 THEN
             ExpectedDirection := 0;
-            WaitingForOperator := FALSE;
-            WaitingForProcess := TRUE;
+            WaitingForOperator := JoystickDeflected;
+            WaitingForProcess := NOT JoystickDeflected;
             OperatorActionId := 16#0402;
-            OperatorAction := 'AX2 - Position P1 atteinte.';
+            OperatorAction := 'AX2 - P1 atteint : relacher le joystick au neutre avant ouverture benne.';
             TranslationCmd.ReqStart := FALSE;
             TranslationCmd.PositionTgt := 0;
-            IF TranslationStopTimer.Q THEN
+            IF TranslationStopTimer.Q AND NOT JoystickDeflected THEN
                 State := E_AutoCycleStep.AX3_OPEN_BUCKET;
             END_IF;
         ELSE
@@ -22888,10 +22931,13 @@ CASE State OF
         TranslationCmd.PositionTgt := 1; // Trémie
         TranslationCmd.ReqStart := CycleMotionPermit;
 
-        IF JoystickDeflected AND Translation_At_Tremie THEN
+        IF Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
             TranslationCmd.PositionTgt := 0;
-            IF TranslationStopTimer.Q THEN
+            WaitingForOperator := JoystickDeflected;
+            WaitingForProcess := NOT JoystickDeflected;
+            OperatorAction := 'AX14 - Tremie atteinte : relacher le joystick au neutre avant ouverture benne.';
+            IF TranslationStopTimer.Q AND NOT JoystickDeflected THEN
                 State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
             END_IF;
         END_IF;
@@ -41663,7 +41709,11 @@ ELSE
         RunRequest := Context.BucketM2RunRequest;
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;
-        StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
+        IF ReqDescend THEN
+            StepTgt := Cfg.BucketOverrideStepDownTgt;
+        ELSE
+            StepTgt := Cfg.BucketOverrideStepUpTgt;
+        END_IF;
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN
@@ -48212,7 +48262,10 @@ instBucket(
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
 WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
-BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
+BucketNotClosedAscentCapStep1 := NOT ManualBucketJogActive
+    AND (M1LogicReqAscent OR M2LogicReqAscent)
+    AND NOT instBucket.Lifecycle.Busy
+    AND NOT _BucketState.IsClosed;
 
 // === GATE CANONIQUE SURVEILLANCE ECART M1/M2 ===============================================
 // REGLE MES : aucun defaut/alarme d'ecart M1/M2 (synchro process, MecaE croise, concordance
@@ -48319,7 +48372,8 @@ ArbContext.BothBlock         := BothBlocked;
 
 ArbM1Cfg.BtnStepTgt := 5;
 ArbM2Cfg.BtnStepTgt := 5;
-ArbM2Cfg.BucketOverrideStepTgt := 1;
+ArbM2Cfg.BucketOverrideStepUpTgt   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
+ArbM2Cfg.BucketOverrideStepDownTgt := LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5);
 
 // ── Arbitrage M1 (FB_WinchCmdArbitrationM1) ──
 instArbM1(
@@ -49035,8 +49089,8 @@ M2MaxStepUp   := CommonMaxStepAscent;
 M2MaxStepDown := CommonMaxStepDescent;
 // Auto-séquencement benne (FB_Bucket) : palier 1 sur toute la manœuvre.
 IF instBucket.M2_BucketJogLimit THEN
-    M2MaxStepUp   := 1;
-    M2MaxStepDown := 1;
+    M2MaxStepUp   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
+    M2MaxStepDown := LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5);
 END_IF;
 // Jog unitaire M2 : palier libre en course, palier 1 uniquement dans la zone de
 // ralentissement (JogSlowdownZoneM avant le point d'arrêt anticipé — cf. §5). Montée M2
@@ -49047,6 +49101,8 @@ IF ManualBucketJogActive THEN
         M2MaxStepUp   := 1;
         M2MaxStepDown := 1;
     ELSE
+        M2MaxStepUp   := MIN(M2MaxStepUp, LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5));
+        M2MaxStepDown := MIN(M2MaxStepDown, LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5));
         IF M2JogApproachClose THEN
             M2MaxStepUp := 1;
         END_IF;

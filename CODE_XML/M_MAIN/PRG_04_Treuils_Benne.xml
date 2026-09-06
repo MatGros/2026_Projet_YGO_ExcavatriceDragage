@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:24:18.751471" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:24:18.751471">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T17:03:18.532239" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T17:03:18.532239">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1876,7 +1876,7 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier boutons/both (100 % → palier max)</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketOverrideStepTgt">
+            <variable name="BucketOverrideStepUpTgt">
               <type>
                 <INT />
               </type>
@@ -1884,7 +1884,18 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier override benne (vitesse lente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond benne montée/fermeture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketOverrideStepDownTgt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond benne descente/ouverture</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -1900,7 +1911,7 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Config statique de FB_WinchCmdArbitrationM1/M2.
        Structure UNIQUE partagée : M1 consomme BtnStepTgt (boutons/both),
-       M2 consomme BtnStepTgt (boutons/both) + BucketOverrideStepTgt (chemin benne).
+       M2 consomme BtnStepTgt (boutons/both) + plafonds benne par sens.
    📤 Producteur : PRG_04_Treuils_Benne (câblage).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Remplace les paliers codés en dur (StepTgt := 5 / StepTgt := 1) par des constantes nommées.
@@ -2759,6 +2770,28 @@ TRUE = relais sens + C1..C4 tous retombés (ex-FwdRevSpeedFeedbackOff)</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant le point d'arret anticipe ou le jog unitaire M2 est force au palier 1 (m) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepUp">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en montée/fermeture (1..5) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en descente/ouverture (1..5) -- reglable IHM</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -6130,7 +6163,10 @@ instBucket(
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
 WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
-BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
+BucketNotClosedAscentCapStep1 := NOT ManualBucketJogActive
+    AND (M1LogicReqAscent OR M2LogicReqAscent)
+    AND NOT instBucket.Lifecycle.Busy
+    AND NOT _BucketState.IsClosed;
 
 // === GATE CANONIQUE SURVEILLANCE ECART M1/M2 ===============================================
 // REGLE MES : aucun defaut/alarme d'ecart M1/M2 (synchro process, MecaE croise, concordance
@@ -6237,7 +6273,8 @@ ArbContext.BothBlock         := BothBlocked;
 
 ArbM1Cfg.BtnStepTgt := 5;
 ArbM2Cfg.BtnStepTgt := 5;
-ArbM2Cfg.BucketOverrideStepTgt := 1;
+ArbM2Cfg.BucketOverrideStepUpTgt   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
+ArbM2Cfg.BucketOverrideStepDownTgt := LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5);
 
 // ── Arbitrage M1 (FB_WinchCmdArbitrationM1) ──
 instArbM1(
@@ -6953,8 +6990,8 @@ M2MaxStepUp   := CommonMaxStepAscent;
 M2MaxStepDown := CommonMaxStepDescent;
 // Auto-séquencement benne (FB_Bucket) : palier 1 sur toute la manœuvre.
 IF instBucket.M2_BucketJogLimit THEN
-    M2MaxStepUp   := 1;
-    M2MaxStepDown := 1;
+    M2MaxStepUp   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
+    M2MaxStepDown := LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5);
 END_IF;
 // Jog unitaire M2 : palier libre en course, palier 1 uniquement dans la zone de
 // ralentissement (JogSlowdownZoneM avant le point d'arrêt anticipé — cf. §5). Montée M2
@@ -6965,6 +7002,8 @@ IF ManualBucketJogActive THEN
         M2MaxStepUp   := 1;
         M2MaxStepDown := 1;
     ELSE
+        M2MaxStepUp   := MIN(M2MaxStepUp, LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5));
+        M2MaxStepDown := MIN(M2MaxStepDown, LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5));
         IF M2JogApproachClose THEN
             M2MaxStepUp := 1;
         END_IF;
@@ -11862,7 +11901,11 @@ ELSE
         RunRequest := Context.BucketM2RunRequest;
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;
-        StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
+        IF ReqDescend THEN
+            StepTgt := Cfg.BucketOverrideStepDownTgt;
+        ELSE
+            StepTgt := Cfg.BucketOverrideStepUpTgt;
+        END_IF;
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN

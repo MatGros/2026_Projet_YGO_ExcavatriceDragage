@@ -74,7 +74,9 @@ VAR_GLOBAL PERSISTENT RETAIN
             // palier 1 forcé dans les JogSlowdownZoneM derniers mètres.
             CloseAnticipationM := 1.2,
             OpenAnticipationM  := 1.3,
-            JogSlowdownZoneM   := 1.0
+            JogSlowdownZoneM   := 1.0,
+            MaxStepUp          := 4,
+            MaxStepDown        := 4
         ),
         CfgTimeoutDuration := T#60s
     ); // 🌉 Pont FB_CfgPersistBridge_BucketCfg
@@ -119,7 +121,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _JoystickCfgPersist : ST_fbJoystick_Cfg := (DeadbandRaw := 300); // reste des champs = defaults ST_fbJoystick_Cfg
 
     // 🔄 CYCLE (dragage semi-automatique)
-    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -20.0, DepthStopMode := E_CycleDepthStopMode.KOBOLD_OR_SETPOINT, RaiseOffBottom_M := 0.5, CtrlAscentMaxStep := 1); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
+    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -20.0, DepthStopMode := E_CycleDepthStopMode.KOBOLD_OR_SETPOINT, RaiseOffBottom_M := 0.0, ExtractionControlDistance_M := 0.0, CtrlAscentMaxStep := 1); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
 
     // 🎯 CYCLE REFERENCEMENT MACHINE (homing) — reglage mise en service
     _CycleMachineHomingCfgPersist : ST_CycleMachineHomingCfg := (ForceStepTarget := 0); // 🌉 Pont FB_CfgPersistBridge_CycleMachineHomingCfg
@@ -134,7 +136,7 @@ VAR_GLOBAL PERSISTENT RETAIN
         WinchSlowdownDistanceTop_M := 0.5,
         WinchSlowdownDistanceBottom_M := 1.0,
         WinchSlowdownMaxStep := 1,
-        CfgCableLimitAscent_M := 7.0,
+        CfgCableLimitAscent_M := 7.5,
         TglEnableWinchDescentLock_M3 := TRUE
     ); // 🌉 Pont FB_CfgPersistBridge_CommunCfg
 

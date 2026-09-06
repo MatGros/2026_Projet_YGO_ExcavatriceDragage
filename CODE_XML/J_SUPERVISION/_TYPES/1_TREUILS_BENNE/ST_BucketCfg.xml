@@ -129,6 +129,28 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant le point d'arret anticipe ou le jog unitaire M2 est force au palier 1 (m) -- reglable IHM</xhtml>
               </documentation>
             </variable>
+            <variable name="MaxStepUp">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en montée/fermeture (1..5) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en descente/ouverture (1..5) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

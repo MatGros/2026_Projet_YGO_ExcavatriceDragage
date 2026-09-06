@@ -375,7 +375,10 @@ instBucket(
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
 WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
-BucketNotClosedAscentCapStep1 := (M1LogicReqAscent OR M2LogicReqAscent) AND NOT instBucket.Lifecycle.Busy AND NOT _BucketState.IsClosed;
+BucketNotClosedAscentCapStep1 := NOT ManualBucketJogActive
+    AND (M1LogicReqAscent OR M2LogicReqAscent)
+    AND NOT instBucket.Lifecycle.Busy
+    AND NOT _BucketState.IsClosed;
 
 // === GATE CANONIQUE SURVEILLANCE ECART M1/M2 ===============================================
 // REGLE MES : aucun defaut/alarme d'ecart M1/M2 (synchro process, MecaE croise, concordance
@@ -482,7 +485,8 @@ ArbContext.BothBlock         := BothBlocked;
 
 ArbM1Cfg.BtnStepTgt := 5;
 ArbM2Cfg.BtnStepTgt := 5;
-ArbM2Cfg.BucketOverrideStepTgt := 1;
+ArbM2Cfg.BucketOverrideStepUpTgt   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
+ArbM2Cfg.BucketOverrideStepDownTgt := LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5);
 
 // ── Arbitrage M1 (FB_WinchCmdArbitrationM1) ──
 instArbM1(
@@ -1198,8 +1202,8 @@ M2MaxStepUp   := CommonMaxStepAscent;
 M2MaxStepDown := CommonMaxStepDescent;
 // Auto-séquencement benne (FB_Bucket) : palier 1 sur toute la manœuvre.
 IF instBucket.M2_BucketJogLimit THEN
-    M2MaxStepUp   := 1;
-    M2MaxStepDown := 1;
+    M2MaxStepUp   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
+    M2MaxStepDown := LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5);
 END_IF;
 // Jog unitaire M2 : palier libre en course, palier 1 uniquement dans la zone de
 // ralentissement (JogSlowdownZoneM avant le point d'arrêt anticipé — cf. §5). Montée M2
@@ -1210,6 +1214,8 @@ IF ManualBucketJogActive THEN
         M2MaxStepUp   := 1;
         M2MaxStepDown := 1;
     ELSE
+        M2MaxStepUp   := MIN(M2MaxStepUp, LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5));
+        M2MaxStepDown := MIN(M2MaxStepDown, LIMIT(1, _BucketCfgPersist.Config.MaxStepDown, 5));
         IF M2JogApproachClose THEN
             M2MaxStepUp := 1;
         END_IF;

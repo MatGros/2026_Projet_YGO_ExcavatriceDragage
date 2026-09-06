@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.424653" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.424653">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T17:00:26.723588" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T17:00:26.723588">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -410,7 +410,7 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier boutons/both (100 % → palier max)</xhtml>
               </documentation>
             </variable>
-            <variable name="BucketOverrideStepTgt">
+            <variable name="BucketOverrideStepUpTgt">
               <type>
                 <INT />
               </type>
@@ -418,7 +418,18 @@ M1 : contacteurs retombés</xhtml>
                 <simpleValue value="1" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Palier override benne (vitesse lente)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond benne montée/fermeture</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketOverrideStepDownTgt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Plafond benne descente/ouverture</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -434,7 +445,7 @@ M1 : contacteurs retombés</xhtml>
    ───────────────────────────────────────────────────────────────
    🎯 Rôle : Config statique de FB_WinchCmdArbitrationM1/M2.
        Structure UNIQUE partagée : M1 consomme BtnStepTgt (boutons/both),
-       M2 consomme BtnStepTgt (boutons/both) + BucketOverrideStepTgt (chemin benne).
+       M2 consomme BtnStepTgt (boutons/both) + plafonds benne par sens.
    📤 Producteur : PRG_04_Treuils_Benne (câblage).
    📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    🔌 Remplace les paliers codés en dur (StepTgt := 5 / StepTgt := 1) par des constantes nommées.
@@ -1037,7 +1048,11 @@ ELSE
         RunRequest := Context.BucketM2RunRequest;
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;
-        StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
+        IF ReqDescend THEN
+            StepTgt := Cfg.BucketOverrideStepDownTgt;
+        ELSE
+            StepTgt := Cfg.BucketOverrideStepUpTgt;
+        END_IF;
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN

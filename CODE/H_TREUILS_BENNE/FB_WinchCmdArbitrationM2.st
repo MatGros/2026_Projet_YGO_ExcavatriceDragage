@@ -66,7 +66,11 @@ ELSE
         RunRequest := Context.BucketM2RunRequest;
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;
-        StepTgt   := Cfg.BucketOverrideStepTgt;   // override benne = vitesse lente (palier configurable)
+        IF ReqDescend THEN
+            StepTgt := Cfg.BucketOverrideStepDownTgt;
+        ELSE
+            StepTgt := Cfg.BucketOverrideStepUpTgt;
+        END_IF;
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
         IF Auth.Mode = E_Mode.SEMI_AUTO THEN
