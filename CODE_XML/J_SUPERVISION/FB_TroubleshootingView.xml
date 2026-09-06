@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T12:12:25.610205" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T12:12:25.610205">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T22:13:19.442092" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T22:13:19.442092">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3180,10 +3180,10 @@ fournie par la configuration persistante de l'appelant.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.8" />
+                <simpleValue value="3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 0.8m</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 3.0m</xhtml>
               </documentation>
             </variable>
             <variable name="CfgSyncCriticalTolerance_M">
@@ -3191,7 +3191,7 @@ fournie par la configuration persistante de l'appelant.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="6" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Seuil 2 critique (m) — blocage synchro ; doit être &gt; CfgSyncTolerance_M</xhtml>
@@ -7132,6 +7132,38 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Bitfield défaut latché figé</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleChecksInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Contrôles procédé inhibés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleIgnoredCheckId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Contrôles procédé ignorés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleForceStepPrepared">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Step préparé, commandes neutres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleForceStepResult">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Motif forçage</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleStep">
               <type>
                 <derived name="E_AutoCycleStep" />
@@ -7928,6 +7960,10 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx204_Error                     := CycleErr
 GVL_Troubleshooting.G_CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFaultLatched;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx219_CycleChecksInhibited       := CycleChecksInhibited;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx220_IgnoredCycleCheckId        := CycleIgnoredCheckId;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx221_ForceStepPrepared          := CycleForceStepPrepared;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx222_ForceStepResult            := CycleForceStepResult;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;

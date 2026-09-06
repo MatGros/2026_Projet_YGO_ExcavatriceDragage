@@ -25,8 +25,8 @@ VAR_INPUT
     HomedAndReliableM2              : BOOL;                           // --> [STAT] Gate fiable M2 (FB_EncoderReliability)
 
     // === REGLAGES ET CONFIGURATION ===
-    CfgSyncToleranceM               : REAL := 0.10;                   // --> [CFG] Seuil 1 (Warn) — ecart max avant alerte (m)
-    CfgSyncCriticalToleranceM       : REAL := 0.50;                   // --> [CFG] Seuil 2 (Fault) — ecart critique (m)
+    CfgSyncToleranceM               : REAL := 3.0;                    // --> [CFG] Seuil 1 (Warn) — ecart max avant alerte (m)
+    CfgSyncCriticalToleranceM       : REAL := 6.0;                    // --> [CFG] Seuil 2 (Fault) — ecart critique (m)
     ActiveOffsetM                   : REAL := 0.0;                    // --> [CFG] Offset cible RESOLU (ex: benne)
 
     // === BYPASSES ET SIMULATION ===

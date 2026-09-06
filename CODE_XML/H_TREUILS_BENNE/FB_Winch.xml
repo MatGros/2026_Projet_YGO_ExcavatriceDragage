@@ -206,7 +206,7 @@ Table de seuils des paliers de vitesse</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== INTERLOCK CHANGEMENT DE SENS ===
-Delai interlock changement de sens montee (DeadTimeOppositeDir 700ms + 100ms)</xhtml>
+Delai interlock inversion vers montee</xhtml>
               </documentation>
             </variable>
             <variable name="DirectionInterlockDelayDescent">
@@ -214,10 +214,10 @@ Delai interlock changement de sens montee (DeadTimeOppositeDir 700ms + 100ms)</x
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#800ms" />
+                <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock changement de sens descente (DeadTimeOppositeDir 700ms + 100ms)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Delai interlock inversion vers descente</xhtml>
               </documentation>
             </variable>
             <variable name="StepRampDelay">
@@ -225,7 +225,7 @@ Delai interlock changement de sens montee (DeadTimeOppositeDir 700ms + 100ms)</x
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#900ms" />
+                <simpleValue value="TIME#700ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CADENCE DE RAMPE PALIER ===
@@ -237,7 +237,7 @@ Delai interlock changement de sens montee (DeadTimeOppositeDir 700ms + 100ms)</x
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#900ms" />
+                <simpleValue value="TIME#700ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">[08a] Cadence palier montee (D10, dedie)</xhtml>

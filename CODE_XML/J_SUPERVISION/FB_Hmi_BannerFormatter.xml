@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T13:16:06.290591" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T13:16:06.290591">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T06:34:27.461154" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T06:34:27.461154">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1392,7 +1392,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut cycle (FB_CycleSemiAuto.ErrorId) — notifié à AX_STAB</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut cycle actif/latche (jamais 0 en AX_STAB)</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStepAtError">
@@ -1401,6 +1401,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Dernière étape avant le défaut (FB_CycleSemiAuto.CycleStepAtError)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleChecksInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Mode essai cycle : controles procede inhibes</xhtml>
               </documentation>
             </variable>
             <variable name="MachineHomingStep">
@@ -1915,6 +1923,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Libellé de l'étape d'origine du défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleFaultCauseStr">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cause cycle décodée pour acquittement terrain</xhtml>
               </documentation>
             </variable>
             <variable name="AntiFlickSpecial">
@@ -2478,6 +2494,8 @@ AnyBypassActive := BypassGlobalActive
 IF ModeChangePendingBlocked AND ModeChangeBlockReason &lt;&gt; '' THEN
     // Bascule de mode refusée : motif prioritaire (info opérateur, ex. "Chgt mode refuse : contacteur M1").
     SpecialConditionCandidate := ModeChangeBlockReason;
+ELSIF CycleChecksInhibited THEN
+    SpecialConditionCandidate := 'ESSAI CYCLE: CONTROLES PROCEDE INHIBES - PROTECTIONS MACHINE ACTIVES';
 ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN
@@ -2750,9 +2768,36 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 ELSE
                     StepAtErrorStr := '?';
             END_CASE;
-            // Message compact : ID défaut (ErrorId) + étape d'origine + acquitter.
-            // Le détail de la cause est consultable dans le dépannage (GVL_Troubleshooting).
-            OperatorActionCandidate := CONCAT('[PUPITRE] Defaut #', CONCAT(WORD_TO_STRING(CycleErrorId), CONCAT(' (etape ', CONCAT(StepAtErrorStr, ') - acquitter'))));
+            // Décodage priorisé : l'opérateur voit la grandeur fautive, pas un masque.
+            // Bits cycle : 0 limite, 1 synchro, 2 vitesse, 3 IHM, 4 tempo,
+            // 5 stabilisation, 6 position, 7 FDC haut, 8/9 paliers, 10 arrêt.
+            IF (CycleErrorId AND 16#0001) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'limite legale de profondeur atteinte';
+            ELSIF (CycleErrorId AND 16#0002) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'synchronisme M1/M2 bloquant';
+            ELSIF (CycleErrorId AND 16#0004) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'ecart vitesse M1/M2 confirme';
+            ELSIF (CycleErrorId AND 16#0008) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'communication IHM perdue';
+            ELSIF (CycleErrorId AND 16#0010) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'tempo maximale etape depassee';
+            ELSIF (CycleErrorId AND 16#0020) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'stabilisation remontee hors tolerance';
+            ELSIF (CycleErrorId AND 16#0040) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'ecart position M1/M2 &gt; 1,5 m (anti-telescopage)';
+            ELSIF (CycleErrorId AND 16#0080) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'M1/M2 hors FDC haut pendant translation P1';
+            ELSIF (CycleErrorId AND 16#0100) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'palier 5 interdit sur M1 ou M2 pendant plongee';
+            ELSIF (CycleErrorId AND 16#0200) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'palier 4 non confirme sur M1 ou M2 en recherche Kobold';
+            ELSIF (CycleErrorId AND 16#0400) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'arret mecanique M1/M2 non confirme avant plongee';
+            ELSE
+                CycleFaultCauseStr := CONCAT('cause cycle inconnue #', WORD_TO_STRING(CycleErrorId));
+            END_IF;
+            OperatorActionCandidate := CONCAT('[CYCLE] ', CONCAT(CycleFaultCauseStr,
+                                         CONCAT(' (', CONCAT(StepAtErrorStr, ') - cause disparue puis acquitter'))));
         ELSE
             OperatorActionCandidate := '[CYCLE] Cycle en cours...';
     END_CASE;

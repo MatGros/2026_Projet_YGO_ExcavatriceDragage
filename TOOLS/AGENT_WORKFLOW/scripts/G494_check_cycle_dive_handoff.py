@@ -16,7 +16,7 @@ REQUIRED = {
     "contacteurs retombes": "M1_ContactorsReleased AND M2_ContactorsReleased",
     "freins appliques": "M1_BrakeApplied AND M2_BrakeApplied",
     "timeout latche": "instCauses[10].Latching := TRUE",
-    "Kobold directionnel": "IF DeadmanArmed AND JoystickPush AND KoboldContactorFeedback THEN",
+    "Kobold directionnel": "IF DeadmanArmed AND JoystickPush AND KoboldInitTimer.Q THEN",
 }
 errors = [name for name, token in REQUIRED.items() if token not in CYCLE]
 if "Data.WinchBothIntent.Active     := WinchBothMotionActive;" not in PRG03:
@@ -28,4 +28,4 @@ if "NOT WinchBothFinalRequestsCoherent" not in PRG04:
 if errors:
     print("G494 FAIL: " + ", ".join(errors))
     sys.exit(1)
-print("G494 PASS - handoff AX3/AX4 qualifie, atomique et neutre MAINT_N1/N2")
+print("G494 PASS - invariants statiques handoff AX3/AX4 et barriere bornee SEMI_AUTO presents")

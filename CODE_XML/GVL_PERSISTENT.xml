@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T10:50:16.631843" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T10:50:16.631843">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T06:58:50.876860" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T06:58:50.876860">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -237,15 +237,15 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Profondeur de dragage cible (m, négative)</xhtml>
               </documentation>
             </variable>
-            <variable name="SetOffset_M">
+            <variable name="DepthStopMode">
               <type>
-                <REAL />
+                <derived name="E_CycleDepthStopMode" />
               </type>
               <initialValue>
-                <simpleValue value="1.5" />
+                <simpleValue value="E_CycleDepthStopMode.KOBOLD_ONLY" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décalage cible de fermeture de la benne (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTime">
@@ -357,7 +357,7 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_CycleCfg — Configuration du cycle semi-automatique
-   SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
+   SetDepth_M et DepthStopMode protégés par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -675,10 +675,10 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.8" />
+                <simpleValue value="3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 0.8m</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 3.0m</xhtml>
               </documentation>
             </variable>
             <variable name="CfgSyncCriticalTolerance_M">
@@ -686,7 +686,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="6" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Seuil 2 critique (m) — blocage synchro ; doit être &gt; CfgSyncTolerance_M</xhtml>
@@ -1552,6 +1552,50 @@ palier : 1..5</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="E_CycleDepthStopMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="KOBOLD_ONLY" value="0" />
+              <value name="SETPOINT_ONLY" value="1" />
+              <value name="KOBOLD_OR_SETPOINT" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>KOBOLD_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Comportement historique : fond valide par DI Kobold</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SETPOINT_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret sur consigne de profondeur valide</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>KOBOLD_OR_SETPOINT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Premier evenement valide des deux</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a4e533cc-1a07-5fca-8da6-b652a120d4dd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
       <dataType name="E_PresetConfirmMode">
         <baseType>
           <enum>
@@ -1662,6 +1706,7 @@ palier : 1..5</xhtml>
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
               <Object Name="ST_CycleMachineHomingCfg" ObjectId="892dec72-1fe2-5fad-a62f-d1ead6f61579" />
+              <Object Name="E_CycleDepthStopMode" ObjectId="a4e533cc-1a07-5fca-8da6-b652a120d4dd" />
             </Folder>
             <Folder Name="2_TRANSLATION">
               <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />

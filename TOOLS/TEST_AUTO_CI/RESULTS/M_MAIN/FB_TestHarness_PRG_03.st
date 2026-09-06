@@ -94,7 +94,6 @@ instCycleSemiAuto(
     SelTarget               := 1,
     SetDepthM               := -12.0,
     SetOffsetM              := 1.5,
-    KoboldContactFond       := FALSE,
     LimitLegalReached       := FALSE,
     LimitLegalDepthM        := -15.0,
     WinchSyncError          := FALSE,
@@ -118,7 +117,6 @@ instCycleSemiAuto(
     Benne_IsRoughlyClosed   := Benne_IsRoughlyClosed,
     HomedM1                 := HomedM1,
     HomedM2                 := HomedM2,
-    TopPositionSensor       := FALSE,
     HomingRequest           := FALSE,
     SampleCount             := countMem
 );

@@ -25,6 +25,12 @@ STRUCT
     SpeedMismatchConfirmed : BOOL;          // Écart vitesse confirmé pendant timeout
     CurrentCycleElapsed : TIME;             // Durée écoulée du cycle SEMI_AUTO en cours
     LastCycleDuration   : TIME;             // Durée du dernier cycle SEMI_AUTO achevé (figée à X13)
+    CycleChecksInhibited: BOOL;             // Mode essai : controles procede inhibes
+    IgnoredCycleCheckId : WORD;             // Causes procede actives mais ignorees
+    ForceStepPrepared   : BOOL;             // Cible forcee preparee, commandes neutres
+    ForceStepAccepted   : BOOL;             // Impulsion preparation acceptee
+    ForceStepRejected   : BOOL;             // Impulsion preparation refusee
+    ForceStepResult     : STRING(120);      // Motif accepte/refuse
     BottomTouchConfirmed        : BOOL;                    // Contact fond Kobold confirmé (manuel + bypass)
     WinchDescentAuth_M3         : BOOL;                    // Autorisation positive descente treuil selon position M3 (P1/Maintenance) — PRG_04 §5
 END_STRUCT

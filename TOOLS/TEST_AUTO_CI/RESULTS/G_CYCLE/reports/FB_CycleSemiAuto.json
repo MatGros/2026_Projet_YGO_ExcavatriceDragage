@@ -7,6 +7,34 @@
       "passed": true
     },
     {
+      "name": "TC-P04-027 T258 : For\u00c3\u00a7age prepare sans action et reprise sur Start au neutre",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-028 T258 : For\u00c3\u00a7age AX_STAB refuse et reste neutre",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-029 T258 : Inhibition ne masque pas le desynchronisme",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-030 T258 : Un for\u00e7age refuse invalide une preparation precedente",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-031 T258 : Apply et Start simultanes restent en preparation neutre",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-032 T258 : Reset simultane annule le for\u00e7age",
+      "passed": true
+    },
+    {
+      "name": "TC-P04-033 T258 : Retrait commissioning annule le for\u00e7age",
+      "passed": true
+    },
+    {
       "name": "TC-P04-001 : Relachement manche (JoystickDeflected=FALSE) stoppe les commandes sans perdre l etape",
       "passed": true
     },
@@ -56,8 +84,8 @@
     }
   ],
   "summary": {
-    "total": 13,
-    "passed": 13,
+    "total": 20,
+    "passed": 20,
     "failed": 0
   }
 }

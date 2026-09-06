@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T17:57:47.151749" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T17:57:47.151749">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T06:53:56.684303" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T06:53:56.684303">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -267,6 +267,50 @@ un interlock qu'on ne voit pas est un interlock qu'on contourne.
           </data>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>6e89b113-d6f1-5719-b130-7af999a1c7fd</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+      <dataType name="E_CycleDepthStopMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="KOBOLD_ONLY" value="0" />
+              <value name="SETPOINT_ONLY" value="1" />
+              <value name="KOBOLD_OR_SETPOINT" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>KOBOLD_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Comportement historique : fond valide par DI Kobold</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SETPOINT_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret sur consigne de profondeur valide</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>KOBOLD_OR_SETPOINT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Premier evenement valide des deux</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a4e533cc-1a07-5fca-8da6-b652a120d4dd</ObjectId>
           </data>
         </addData>
       </dataType>
@@ -1071,6 +1115,54 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée du dernier cycle SEMI_AUTO achevé (figée à X13)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleChecksInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mode essai : controles procede inhibes</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IgnoredCycleCheckId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Causes procede actives mais ignorees</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepPrepared">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible forcee preparee, commandes neutres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepAccepted">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion preparation acceptee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepRejected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Impulsion preparation refusee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepResult">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif accepte/refuse</xhtml>
+              </documentation>
+            </variable>
             <variable name="BottomTouchConfirmed">
               <type>
                 <BOOL />
@@ -1469,16 +1561,15 @@ instCycleSemiAuto(
     Mode                    := instModes.Auth.Mode,
     JoystickDeflected       := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
+    JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     DeadmanArmed            := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
     AbortCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnAbort,
     SelTarget               := GVL_IHM.TranslationM3.Cmd.SelTarget,
     SetDepthM               := GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M,
-    SetOffsetM              := GVL_IHM.CycleSemiAuto.Cfg.SetOffset_M,
-    KoboldContactFond       := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
+    DepthStopMode           := GVL_IHM.CycleSemiAuto.Cfg.DepthStopMode,
     KoboldImmersed          := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI, // DI brut Kobold (fronts AX6/AX7) - convention a confirmer au banc
-    KoboldContactorFeedback := TRUE, // TODO banc : cabler le retour contacteur Kobold reel ; TRUE = init reputee OK (verif AX5 dormante)
     LimitLegalReached       := GVL_IHM.Commun.LimitLegalReached,
     LimitLegalDepthM        := _CommunCfgPersist.LimitLegalDepthMinAllowed_M,
     WinchSyncError          := PRG_04_Treuils_Benne.Data.WinchSyncError,
@@ -1515,6 +1606,7 @@ instCycleSemiAuto(
     SkipDrainRequest        := GVL_IHM.CycleSemiAuto.Cmd.BtnSkipDrain,
     RepositionRequest       := GVL_IHM.CycleSemiAuto.Cmd.BtnReposition,
     CfgCommissioningEnable  := GVL_IHM.CycleSemiAuto.Cmd.TglCommissioning,
+    CfgCycleChecksInhibit   := GVL_IHM.CycleSemiAuto.Cmd.TglCycleChecksInhibit,
     CfgForceStepTarget      := GVL_IHM.CycleSemiAuto.Cfg.ForceStepTarget,
     CfgForceStepApply       := GVL_IHM.CycleSemiAuto.Cmd.BtnForceStepApply,
     // Config diving / extraction (GEL 2026-09-03)
@@ -1600,7 +1692,13 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
     Data.SequenceState.CurrentCycleElapsed    := instCycleSemiAuto.CurrentCycleElapsed;
     Data.SequenceState.LastCycleDuration      := instCycleSemiAuto.LastCycleDuration;
-    Data.SequenceState.BottomTouchConfirmed   := FALSE;
+    Data.SequenceState.CycleChecksInhibited   := instCycleSemiAuto.CycleChecksInhibited;
+    Data.SequenceState.IgnoredCycleCheckId    := instCycleSemiAuto.IgnoredCycleCheckId;
+    Data.SequenceState.ForceStepPrepared      := instCycleSemiAuto.ForceStepPrepared;
+    Data.SequenceState.ForceStepAccepted      := instCycleSemiAuto.ForceStepAccepted;
+    Data.SequenceState.ForceStepRejected      := instCycleSemiAuto.ForceStepRejected;
+    Data.SequenceState.ForceStepResult        := instCycleSemiAuto.ForceStepResult;
+    Data.SequenceState.BottomTouchConfirmed   := instCycleSemiAuto.BottomTouched;
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
@@ -1679,6 +1777,12 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
     Data.SequenceState.CurrentCycleElapsed    := T#0s;
     Data.SequenceState.LastCycleDuration      := T#0s;
+    Data.SequenceState.CycleChecksInhibited   := FALSE;
+    Data.SequenceState.IgnoredCycleCheckId    := 0;
+    Data.SequenceState.ForceStepPrepared      := FALSE;
+    Data.SequenceState.ForceStepAccepted      := FALSE;
+    Data.SequenceState.ForceStepRejected      := FALSE;
+    Data.SequenceState.ForceStepResult        := '';
     Data.SequenceState.BottomTouchConfirmed       := BottomPositionConfirmed;
     // Verrou descente treuil = GENERAL en MAINT (plus seulement pendant l'assist vidage) :
     // descente M1/M2 interdite tant que le pont M3 n'est pas ARRETE STABLE a P1 (travail)
@@ -1739,6 +1843,12 @@ ELSE
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
     Data.SequenceState.CurrentCycleElapsed     := T#0s;
     Data.SequenceState.LastCycleDuration       := T#0s;
+    Data.SequenceState.CycleChecksInhibited    := FALSE;
+    Data.SequenceState.IgnoredCycleCheckId     := 0;
+    Data.SequenceState.ForceStepPrepared       := FALSE;
+    Data.SequenceState.ForceStepAccepted       := FALSE;
+    Data.SequenceState.ForceStepRejected       := FALSE;
+    Data.SequenceState.ForceStepResult         := '';
     Data.SequenceState.BottomTouchConfirmed       := FALSE;
     Data.SequenceState.WinchDescentAuth_M3           := TRUE;
 END_IF;
@@ -1813,6 +1923,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention Y descente qualifiee (axe Y pousse uniquement)</xhtml>
               </documentation>
             </variable>
+            <variable name="JoystickPull">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention Y montee qualifiee (axe Y tire uniquement)</xhtml>
+              </documentation>
+            </variable>
             <variable name="DeadmanArmed">
               <type>
                 <BOOL />
@@ -1863,21 +1981,12 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Profondeur de consigne (negative)</xhtml>
               </documentation>
             </variable>
-            <variable name="SetOffsetM">
+            <variable name="DepthStopMode">
               <type>
-                <REAL />
+                <derived name="E_CycleDepthStopMode" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Ecart de fermeture benne cible</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldContactFond">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FEEDBACKS CAPTEURS &amp; MATERIEL ===
---&gt; [HW] Retour dedie Kobold : TRUE = contact fond (front descendant DI)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Source d'arret AX7</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldImmersed">
@@ -1885,15 +1994,8 @@ END_IF;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Etat brut DI Kobold : TRUE = sonde dans l'eau (fronts AX6/AX7)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldContactorFeedback">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Retour contacteur Kobold enclenche (verif init AX5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== FEEDBACKS CAPTEURS &amp; MATERIEL ===
+--&gt; [HW] Etat brut DI Kobold : TRUE = sonde dans l'eau (fronts AX6/AX7)</xhtml>
               </documentation>
             </variable>
             <variable name="LimitLegalReached">
@@ -2188,6 +2290,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Case IHM mise en service : deverrouille le forcage de step</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgCycleChecksInhibit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Activation controles procede inhibes en mise en service</xhtml>
+              </documentation>
+            </variable>
             <variable name="CfgForceStepTarget">
               <type>
                 <INT />
@@ -2302,6 +2412,62 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fond touche (latch AX8, efface a AX0 / AX_STAB / Reset) - variable d'info GEL AX8</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomStopSource">
+              <type>
+                <string length="24" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Source arret fond : KOBOLD ou CONSIGNE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleChecksInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Controles procede inhibes ; protections machine actives</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IgnoredCycleCheckId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Causes procede actives mais ignorees</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepPrepared">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Cible validee, demandes maintenues neutres avant reprise</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepAccepted">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Impulsion preparation acceptee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepRejected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Impulsion preparation refusee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepResult">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Motif accepte/refuse</xhtml>
               </documentation>
             </variable>
             <variable name="WinchM1Cmd">
@@ -2570,6 +2736,17 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etape en pause lors de la bascule hors auto</xhtml>
               </documentation>
             </variable>
+            <variable name="ForceStepCandidate">
+              <type>
+                <derived name="E_AutoCycleStep" />
+              </type>
+              <initialValue>
+                <simpleValue value="E_AutoCycleStep.AX0_REPOS" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible locale non publiee avant validation complete</xhtml>
+              </documentation>
+            </variable>
             <variable name="WaitingResume">
               <type>
                 <BOOL />
@@ -2581,7 +2758,18 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] En attente de validation consciente pour reprendre</xhtml>
               </documentation>
             </variable>
-            <variable name="TouchPositionM">
+            <variable name="ForceStepWaiting">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distingue attente forçage et reprise apres changement de mode</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TouchPositionM1">
               <type>
                 <REAL />
               </type>
@@ -2590,12 +2778,84 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
 . [LOC] Position M1 memorisee lors du contact fond</xhtml>
               </documentation>
             </variable>
-            <variable name="RaiseTargetM">
+            <variable name="TouchPositionM2">
               <type>
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Profondeur de remontee memorisee</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 memorisee lors du contact fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StopPositionM1">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M1 apres arret mecanique stabilise AX8</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StopPositionM2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 apres arret mecanique stabilise AX8</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RaiseTargetM1">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible M1 de decollement du fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RaiseTargetM2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible M2 de decollement du fond</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomContextValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Positions fond M1/M2 qualifiees</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StopPositionCaptured">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position stabilisee capturee une seule fois en AX8</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DepthSetpointValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne valide et au-dessus de la limite legale</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DepthSetpointReachedNow">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Les deux treuils ont atteint la consigne hors AX7</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DepthStopBySetpoint">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Les deux treuils ont atteint la consigne AX7</xhtml>
               </documentation>
             </variable>
             <variable name="SelectedWorkTarget">
@@ -2677,6 +2937,22 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation palier bloque &lt; 4 en plongee (tolere la rampe 1-&gt;4)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldBottomTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation DI Kobold basse apres immersion</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldImmersionQualified">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] DI haute stable observee sous alimentation</xhtml>
               </documentation>
             </variable>
             <variable name="DivingRetryTrig">
@@ -2768,6 +3044,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Tempo max d'etape</xhtml>
               </documentation>
             </variable>
+            <variable name="StateExecutionInhibit">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Interdit le CASE au scan de forçage</xhtml>
+              </documentation>
+            </variable>
             <variable name="CtrlAscentDistM">
               <type>
                 <REAL />
@@ -2857,6 +3141,28 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation feedback Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_KoboldPowerUpTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etablissement alimentation capteur Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_KoboldBottomConfirmTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#100ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Anti-rebond contact fond</xhtml>
               </documentation>
             </variable>
             <variable name="CST_BottomTouchStabTime">
@@ -2981,19 +3287,6 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM &lt;= 0</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_CoupledPosBacklashM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Backstop anti-telescopage : ecart de position M1/M2 max tolere pendant les phases
-reellement couplees hors X7. Porte a 1,50 m pour absorber la dynamique benne ouverte
-en plongee rapide palier 4 sans decrochage intempestif vers AX_STAB.</xhtml>
-              </documentation>
-            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -3022,6 +3315,9 @@ SkipDrainEdge(CLK := SkipDrainRequest);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
 JoyDeflectedEdge(CLK := JoystickDeflected);
+StateExecutionInhibit := FALSE;
+ForceStepAccepted := FALSE;
+ForceStepRejected := FALSE;
 
 DiveStartStopped := M1_SpeedValid AND M2_SpeedValid
                     AND M1_ContactorsReleased AND M2_ContactorsReleased
@@ -3057,8 +3353,9 @@ DrainTimeEff := SEL(CfgDrainTime &lt;= T#0s, CfgDrainTime, DrainingTime);
 // AX11_CTRL_ASCENT -&gt; AX12_LOADED_ASCENT : TON de stabilisation palier lent (DÉSACTIVÉ).
 StabilizationTimer(IN := FALSE, PT := CtrlAscentTimeout);
 
-// ⏱️ AX5_KOBOLD_INIT : fenetre de confirmation du retour contacteur Kobold (DÉSACTIVÉ).
-KoboldInitTimer(IN := FALSE, PT := CST_KoboldInitTimeout);
+// AX5 : le contacteur alimente le capteur ; aucun retour auxiliaire n existe.
+KoboldInitTimer(IN := (State = E_AutoCycleStep.AX5_KOBOLD_INIT) AND DeadmanArmed AND JoystickPush,
+                PT := CST_KoboldPowerUpTime);
 
 // 📏 Comparaison vitesse réelle M1/M2
 SpeedMismatchMps := ABS(M1_MeasuredSpeedMps - M2_MeasuredSpeedMps);
@@ -3083,7 +3380,8 @@ DrainingTimer(IN := (State = E_AutoCycleStep.AX13_DRAIN_PAUSE), PT := DrainTimeE
 KoboldStabTimer(IN := (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) AND DeadmanArmed AND JoystickPush AND KoboldImmersed, PT := CST_KoboldStabTime);
 
 // ⏱️ Stabilisation à l'arrêt fond touché (2s en AX8 freins serrés avant montée AX9)
-BottomTouchStabTimer(IN := (State = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED), PT := CST_BottomTouchStabTime);
+BottomTouchStabTimer(IN := (State = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED) AND DiveStartStopped,
+                     PT := CST_BottomTouchStabTime);
 
 // GT-dive-retry (GEL Q11) : en AX5/AX6/AX7, erreur sequence Kobold / joystick relache / palier &lt; 4
 RetryJoyReleaseTimer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
@@ -3091,9 +3389,32 @@ RetryJoyReleaseTimer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                              OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                             AND NOT (DeadmanArmed AND JoystickPush),
                      PT := T#200ms);
-// Palier bloque SOUS 4 pendant la plongee (DÉSACTIVÉ en reprise auto)
-PalierNot4Timer(IN := FALSE, PT := T#5s);
+WinchesAtDiveStep := (M1_SpeedStepApplied = CST_StepDive) AND (M2_SpeedStepApplied = CST_StepDive);
+PalierNot4Timer(IN := ((State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
+                         AND DeadmanArmed AND JoystickPush AND NOT WinchesAtDiveStep,
+                    PT := T#2s);
 DivingRetryTrig := FALSE;
+KoboldBottomTimer(IN := (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM)
+                         AND KoboldImmersionQualified AND NOT KoboldImmersed,
+                   PT := CST_KoboldBottomConfirmTime);
+
+// Consigne profondeur : profondeur negative, et jamais au-dela de la limite legale.
+DepthSetpointValid := (SetDepthM &lt; 0.0)
+                      AND ((LimitLegalDepthM &gt;= -0.01) OR (SetDepthM &gt;= LimitLegalDepthM));
+DepthSetpointReachedNow := ((DepthStopMode = E_CycleDepthStopMode.SETPOINT_ONLY)
+                            OR (DepthStopMode = E_CycleDepthStopMode.KOBOLD_OR_SETPOINT))
+                           AND DepthSetpointValid
+                           AND (M1_CablePosM &lt;= SetDepthM)
+                           AND (M2_CablePosM &lt;= SetDepthM);
+DepthStopBySetpoint := (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM)
+                       AND ((DepthStopMode = E_CycleDepthStopMode.SETPOINT_ONLY)
+                            OR (DepthStopMode = E_CycleDepthStopMode.KOBOLD_OR_SETPOINT))
+                       AND DepthSetpointValid
+                       AND (M1_CablePosM &lt;= SetDepthM)
+                       AND (M2_CablePosM &lt;= SetDepthM);
+
+// Commande de niveau directement maitrisable depuis l'IHM : OFF retire l'inhibition au scan suivant.
+CycleChecksInhibited := CfgCycleChecksInhibit AND CfgCommissioningEnable AND (Mode = E_Mode.SEMI_AUTO);
 
 // Table des causes de défaut
 instCauses[0].Active   := LimitLegalReached
@@ -3116,30 +3437,21 @@ instCauses[3].Active   := NOT HeartbeatIhmOk AND (State &lt;&gt; E_AutoCycleStep
 instCauses[3].Latching := TRUE;
 instCauses[3].Texte    := 'Perte communication IHM pendant cycle';
 
-instCauses[4].Active   := StepMaxTimer.Q AND (State &lt;&gt; E_AutoCycleStep.AX_STAB);
+instCauses[4].Active   := StepMaxTimer.Q AND (State &lt;&gt; E_AutoCycleStep.AX_STAB) AND NOT CycleChecksInhibited;
 instCauses[4].Latching := TRUE;
 instCauses[4].Texte    := 'Depassement tempo maximale d etape (blocage mouvement)';
 
-instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(M1_CablePosM - M2_CablePosM) &gt; CtrlAscentToleranceM))
+instCauses[5].Active   := (StabilizationTimer.Q OR (ABS(WinchSyncDeltaM) &gt; CtrlAscentToleranceM))
                           AND (State = E_AutoCycleStep.AX11_CTRL_ASCENT);
 instCauses[5].Latching := TRUE;
 instCauses[5].Texte    := 'Defaut de stabilisation / tolerance ecart codeurs en remontee controle';
 
-// Backstop anti-telescopage : ecart de position M1/M2 excessif pendant une phase
-// reellement couplee (prend en compte l'offset benne active via WinchSyncDeltaM).
-// AX11 a deja son propre controle (instCauses[5]). Seuil grossier (0,50 m) : filet local
-// si FB_SyncDeviation (PRG_04) ne coupe pas.
-instCauses[6].Active   := (ABS(WinchSyncDeltaM) &gt; CST_CoupledPosBacklashM)
-                          AND JoystickDeflected
-                          AND ((State = E_AutoCycleStep.AX4_DESCEND_DIVING)
-                            OR (State = E_AutoCycleStep.AX5_KOBOLD_INIT)
-                            OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
-                            OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM)
-                            OR (State = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
-                            OR (State = E_AutoCycleStep.AX12_LOADED_ASCENT)
-                            OR (State = E_AutoCycleStep.AX15C_DUMP_REPOSITION));
+// La decision de synchronisme est produite une seule fois dans PRG_04 : FB_WinchSync
+// (defaut critique/confirme ou contacteurs) et FB_Safety_Winch (Meca E). Le cycle
+// consomme WinchSyncError (cause 1) ; aucun seuil local ne doit contredire ces reglages.
+instCauses[6].Active   := FALSE;
 instCauses[6].Latching := TRUE;
-instCauses[6].Texte    := 'Ecart de position M1/M2 excessif en phase couplee (anti-telescopage)';
+instCauses[6].Texte    := 'Reserve - synchronisme arbitre exclusivement par PRG_04';
 
 // AX2 : pendant la translation vers P1 les treuils M1/M2 doivent RESTER au FDC
 // logiciel haut (WinchesAtTopWindow, calcul PRG_03). S'ils quittent la fenetre
@@ -3162,8 +3474,7 @@ instCauses[8].Texte    := 'Palier vitesse &gt; 4 (palier 5) pendant la plongee -
 // GEL cause 9 : mesure Kobold fiable seulement a vitesse de descente stabilisee
 // palier 4 sur LES DEUX treuils. Recherche immersion/fond (AX6/AX7) avec un des
 // deux hors palier 4 -&gt; defaut latche (pas un blocage silencieux de transition).
-WinchesAtDiveStep := (M1_SpeedStepApplied = CST_StepDive) AND (M2_SpeedStepApplied = CST_StepDive);
-instCauses[9].Active   := NOT WinchesAtDiveStep
+instCauses[9].Active   := PalierNot4Timer.Q AND NOT CycleChecksInhibited
                           AND ((State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
                             OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM));
 instCauses[9].Latching := TRUE;
@@ -3173,6 +3484,16 @@ instCauses[10].Active   := DiveStartTimeoutTimer.Q
                            AND (State = E_AutoCycleStep.AX3_WAIT_DIVE_START);
 instCauses[10].Latching := TRUE;
 instCauses[10].Texte    := 'Arret mecanique M1/M2 non confirme avant plongee';
+
+instCauses[11].Active   := (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM)
+                           AND (DepthStopMode &lt;&gt; E_CycleDepthStopMode.KOBOLD_ONLY)
+                           AND NOT DepthSetpointValid;
+instCauses[11].Latching := TRUE;
+instCauses[11].Texte    := 'Consigne profondeur invalide ou sous la limite legale';
+
+IgnoredCycleCheckId := 0;
+IF CycleChecksInhibited AND StepMaxTimer.Q THEN IgnoredCycleCheckId := IgnoredCycleCheckId OR 16#0010; END_IF;
+IF CycleChecksInhibited AND PalierNot4Timer.Q THEN IgnoredCycleCheckId := IgnoredCycleCheckId OR 16#0200; END_IF;
 
 // Appel du socle de defaut
 instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
@@ -3186,57 +3507,90 @@ IF AbortEdge.Q THEN
     State := E_AutoCycleStep.AX0_REPOS;
     WaitingResume := FALSE;
     PausedState := E_AutoCycleStep.AX0_REPOS;
+    ForceStepPrepared := FALSE;
+    ForceStepWaiting := FALSE;
 END_IF;
 
 // 🔧 1ter. FORCAGE DE STEP (Mise en service / dérogation)
-// Déverrouillé UNIQUEMENT si : case IHM mise en service (ou bouton forcer appuyé).
-// Impulsion sur front montant : réinitialise les commandes résiduelles et saute à l'étape cible.
+// Preparation transactionnelle : machine arretee, joystick neutre, aucune action le meme scan.
 ForceStepApplyEdge(CLK := CfgForceStepApply);
-IF ForceStepApplyEdge.Q AND CfgCommissioningEnable THEN
-    IF (CfgForceStepTarget &gt;= 0) AND (CfgForceStepTarget &lt;= 20) THEN
-        CASE CfgForceStepTarget OF
-            0:  State := E_AutoCycleStep.AX0_REPOS;
-            1:  State := E_AutoCycleStep.AX1_INIT;
-            2:  State := E_AutoCycleStep.AX2_TRANSLATE_P1;
-            3:  State := E_AutoCycleStep.AX3_OPEN_BUCKET;
-            4:  State := E_AutoCycleStep.AX4_DESCEND_DIVING;
-            5:  State := E_AutoCycleStep.AX5_KOBOLD_INIT;
-            6:  State := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
-            7:  State := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
-            8:  State := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
-            9:  State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
-            10: State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
-            11: State := E_AutoCycleStep.AX11_CTRL_ASCENT;
-            12: State := E_AutoCycleStep.AX12_LOADED_ASCENT;
-            13: State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
-            14: State := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
-            15: State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
-            16: State := E_AutoCycleStep.AX15B_DUMP_OPEN;
-            17: State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
-            18: State := E_AutoCycleStep.AX18_DONE_SYNC;
-            19: State := E_AutoCycleStep.AX_STAB;
-            20: State := E_AutoCycleStep.AX_DIVING_RETRY;
-        END_CASE;
+IF ForceStepApplyEdge.Q AND NOT AbortEdge.Q THEN
+    // Toute nouvelle transaction invalide d'abord la preparation precedente.
+    // Une demande refusee ne doit jamais laisser une cible ancienne executable.
+    IF ForceStepWaiting THEN
+        // Remplace uniquement une transaction de forçage precedente.
+        // Une attente issue d'un changement de mode reste intacte si la nouvelle cible est refusee.
+        WaitingResume := FALSE;
+        PausedState := E_AutoCycleStep.AX0_REPOS;
     END_IF;
-    CycleStep := State;
+    ForceStepPrepared := FALSE;
+    ForceStepWaiting := FALSE;
+    ForceStepCandidate := E_AutoCycleStep.AX0_REPOS;
+    IF CfgCommissioningEnable AND (Mode = E_Mode.SEMI_AUTO) AND NOT Fault.Latched
+       AND NOT JoystickDeflected AND DiveStartStopped
+       AND (CfgForceStepTarget &gt;= 0) AND (CfgForceStepTarget &lt;= 21)
+       AND (CfgForceStepTarget &lt;&gt; 18) AND (CfgForceStepTarget &lt;&gt; 19) THEN
+        CASE CfgForceStepTarget OF
+            0:  ForceStepCandidate := E_AutoCycleStep.AX0_REPOS;
+            1:  ForceStepCandidate := E_AutoCycleStep.AX1_INIT;
+            2:  ForceStepCandidate := E_AutoCycleStep.AX2_TRANSLATE_P1;
+            3:  ForceStepCandidate := E_AutoCycleStep.AX3_OPEN_BUCKET;
+            4:  ForceStepCandidate := E_AutoCycleStep.AX4_DESCEND_DIVING;
+            5:  ForceStepCandidate := E_AutoCycleStep.AX5_KOBOLD_INIT;
+            6:  ForceStepCandidate := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
+            7:  ForceStepCandidate := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
+            8:  ForceStepCandidate := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
+            9:  ForceStepCandidate := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
+            10: ForceStepCandidate := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+            11: ForceStepCandidate := E_AutoCycleStep.AX11_CTRL_ASCENT;
+            12: ForceStepCandidate := E_AutoCycleStep.AX12_LOADED_ASCENT;
+            13: ForceStepCandidate := E_AutoCycleStep.AX13_DRAIN_PAUSE;
+            14: ForceStepCandidate := E_AutoCycleStep.AX14_TRANSLATE_DUMP;
+            15: ForceStepCandidate := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
+            16: ForceStepCandidate := E_AutoCycleStep.AX15B_DUMP_OPEN;
+            17: ForceStepCandidate := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
+            18: ForceStepCandidate := E_AutoCycleStep.AX18_DONE_SYNC;
+            20: ForceStepCandidate := E_AutoCycleStep.AX_DIVING_RETRY;
+            21: ForceStepCandidate := E_AutoCycleStep.AX3_WAIT_DIVE_START;
+        END_CASE;
+        IF (CfgForceStepTarget = 7) AND NOT KoboldImmersionQualified THEN
+            ForceStepRejected := TRUE;
+            ForceStepResult := 'Forçage refuse : immersion Kobold non qualifiee.';
+        ELSIF ((CfgForceStepTarget &gt;= 8) AND (CfgForceStepTarget &lt;= 12)) AND NOT BottomContextValid THEN
+            ForceStepRejected := TRUE;
+            ForceStepResult := 'Forçage refuse : contexte immersion/fond non qualifie.';
+        ELSE
+            PausedState := ForceStepCandidate;
+            ForceStepPrepared := TRUE;
+            ForceStepWaiting := TRUE;
+            ForceStepAccepted := TRUE;
+            WaitingResume := TRUE;
+            ForceStepResult := 'Step prepare : appuyer Start au joystick neutre.';
+        END_IF;
+    ELSE
+        ForceStepRejected := TRUE;
+        ForceStepResult := 'Forçage refuse : conditions, cible ou arret non valides.';
+    END_IF;
+    StateExecutionInhibit := TRUE;
     WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
     WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
     TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
     BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE; BucketCmd.ReqKoboldMeasureEnable := FALSE;
-    WaitingResume := FALSE;
-    PausedState := State;
-    IF State = E_AutoCycleStep.AX0_REPOS THEN
-        Lifecycle.Busy := FALSE;
-        Lifecycle.Done := FALSE;
-    ELSE
-        Lifecycle.Busy := TRUE;
-        Lifecycle.Done := FALSE;
-    END_IF;
 END_IF;
 
 IF ResetEdge.Q THEN
+    IF ForceStepWaiting THEN
+        WaitingResume := FALSE;
+    END_IF;
+    ForceStepPrepared := FALSE;
+    ForceStepWaiting := FALSE;
+    PausedState := E_AutoCycleStep.AX0_REPOS;
     SavedState := E_AutoCycleStep.AX0_REPOS;
     BottomTouched := FALSE;
+    BottomStopSource := '';
+    BottomContextValid := FALSE;
+    StopPositionCaptured := FALSE;
+    KoboldImmersionQualified := FALSE;
     IF State = E_AutoCycleStep.AX_STAB THEN
         State := E_AutoCycleStep.AX0_REPOS;
     END_IF;
@@ -3247,6 +3601,11 @@ END_IF;
 // ne tourne JAMAIS sans puissance (PowerContactorEngaged) ni avec un codeur défaillant
 // (EncoderFaultPresent) — les données de position invalides rendraient le Grafcet erroné.
 IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
+    IF ForceStepWaiting THEN
+        WaitingResume := FALSE;
+    END_IF;
+    ForceStepPrepared := FALSE;
+    ForceStepWaiting := FALSE;
     WinchM1Cmd.RunRequest     := FALSE;
     WinchM1Cmd.ReqAscent      := FALSE;
     WinchM1Cmd.ReqDescend     := FALSE;
@@ -3308,14 +3667,29 @@ Ready := Enable AND NOT Fault.Latched;
 // démarrage). Le séquenceur (transitions X0→X13) reste piloté par JoystickDeflected.
 CycleMotionPermit := JoystickDeflected AND DeadmanArmed;
 
+// Le retrait du mode commissioning annule une transaction non executee.
+IF NOT CfgCommissioningEnable AND ForceStepWaiting THEN
+    ForceStepPrepared := FALSE;
+    ForceStepWaiting := FALSE;
+    WaitingResume := FALSE;
+    PausedState := E_AutoCycleStep.AX0_REPOS;
+END_IF;
+
 // Au retour en Semi-Auto, si une étape était en cours, on exige une reprise consciente
-IF WaitingResume THEN
+IF WaitingResume AND NOT StateExecutionInhibit THEN
     // 🔒 Sécurité anti-redémarrage automatique (AF-04 §4.1) : reprise sur StartCycle OU Homme-Mort
     IF AbortEdge.Q THEN
         State := E_AutoCycleStep.AX0_REPOS;
         WaitingResume := FALSE;
         PausedState := E_AutoCycleStep.AX0_REPOS;
-    ELSIF StartEdge.Q OR DeadmanArmedEdge.Q THEN
+    ELSIF ForceStepPrepared AND StartEdge.Q AND NOT JoystickDeflected THEN
+        State := PausedState;
+        WaitingResume := FALSE;
+        ForceStepPrepared := FALSE;
+        ForceStepWaiting := FALSE;
+        StateExecutionInhibit := TRUE;
+        ForceStepResult := 'Step charge : nouveau geste joystick requis.';
+    ELSIF (NOT ForceStepPrepared) AND (StartEdge.Q OR DeadmanArmedEdge.Q) THEN
         State := PausedState;   // reprise consciente : restaure l'étape mémorisée
         WaitingResume := FALSE;
     ELSE
@@ -3364,12 +3738,15 @@ BucketCmd.MinStepDown := 0;
 // 🔁 2. LOGIQUE DU SÉQUENCEUR (Machine d'état) — CASE sur enum unique (R1)
 // Pendant une reprise consciente (WaitingResume), le séquenceur est gelé :
 // l'étape mémorisée ne s'exécute pas tant que StartCycle n'a pas été appuyé.
-IF NOT WaitingResume THEN
+IF NOT WaitingResume AND NOT StateExecutionInhibit THEN
 CASE State OF
 
     E_AutoCycleStep.AX0_REPOS:
         CycleStep := E_AutoCycleStep.AX0_REPOS;
         CycleStateStr := 'AX0 - Verification coherence systeme';
+        BottomContextValid := FALSE;
+        StopPositionCaptured := FALSE;
+        KoboldImmersionQualified := FALSE;
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         TranslationCmd.ReqStart := FALSE; TranslationCmd.PositionTgt := 0;
@@ -3384,6 +3761,7 @@ CASE State OF
         OperatorAction := 'AX0 - Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
         SampleCountDone := FALSE;   // F2: réarmement du front de comptage à chaque entrée en X0
         BottomTouched   := FALSE;   // info fond touche effacee au repos
+        BottomStopSource := '';
 
         // Transition si système sain et réarmé (front reset ou démarrage).
         // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
@@ -3582,13 +3960,14 @@ CASE State OF
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
         WinchM2Cmd.StepTgt  := CST_StepDive;
-        BucketCmd.ReqKoboldMeasureEnable := DeadmanArmed AND JoystickPush;
+        BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode &lt;&gt; E_CycleDepthStopMode.SETPOINT_ONLY)
+                                             AND DeadmanArmed AND JoystickPush;
 
-        // AT5 : retour contacteur Kobold coherent -&gt; recherche immersion.
+        // AT5 : alimentation capteur etablie -&gt; recherche immersion.
         // Palier 4 M1/M2 non atteint = cause de defaut (instCauses[9]), pas un blocage
         // silencieux de la transition.
         // (echec init / joystick relache / palier &lt;&gt; 4 -&gt; AX_DIVING_RETRY via GT-dive-retry §1)
-        IF DeadmanArmed AND JoystickPush AND KoboldContactorFeedback THEN
+        IF DeadmanArmed AND JoystickPush AND KoboldInitTimer.Q THEN
             State := E_AutoCycleStep.AX6_SEARCH_IMMERSION;
         END_IF;
 
@@ -3610,16 +3989,22 @@ CASE State OF
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
         WinchM2Cmd.StepTgt  := CST_StepDive;
-        BucketCmd.ReqKoboldMeasureEnable := DeadmanArmed AND JoystickPush;
+        BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode &lt;&gt; E_CycleDepthStopMode.SETPOINT_ONLY)
+                                             AND DeadmanArmed AND JoystickPush;
 
         // AT6 : signal Kobold sous tension confirme haut (DI=1) pendant 500ms -&gt; recherche du fond.
-        IF DeadmanArmed AND JoystickPush AND KoboldStabTimer.Q THEN
+        IF DeadmanArmed AND JoystickPush
+           AND (KoboldStabTimer.Q OR ((DepthStopMode &lt;&gt; E_CycleDepthStopMode.KOBOLD_ONLY)
+                                     AND DepthSetpointReachedNow)) THEN
+            IF KoboldStabTimer.Q THEN
+                KoboldImmersionQualified := TRUE;
+            END_IF;
             State := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
         END_IF;
 
     E_AutoCycleStep.AX7_SEARCH_BOTTOM:
         CycleStep := E_AutoCycleStep.AX7_SEARCH_BOTTOM;
-        CycleStateStr := 'AX7 - Recherche du fond (front descendant DI Kobold 1-&gt;0)';
+        CycleStateStr := 'AX7 - Recherche du fond (Kobold ou consigne)';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -3635,23 +4020,32 @@ CASE State OF
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
         WinchM2Cmd.StepTgt  := CST_StepDive;
-        BucketCmd.ReqKoboldMeasureEnable := DeadmanArmed AND JoystickPush;
+        BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode &lt;&gt; E_CycleDepthStopMode.SETPOINT_ONLY)
+                                             AND DeadmanArmed AND JoystickPush;
 
-        // AT7 : coupure signal Kobold (front descendant 1-&gt;0 ou DI=0) = fond touche.
-        IF DeadmanArmed AND JoystickPush AND (KoboldFallEdge.Q OR NOT KoboldImmersed) THEN
-            TouchPositionM := M1_CablePosM;
+        // AT7 : DI basse stable apres immersion haute qualifiee = fond touche.
+        IF DeadmanArmed AND JoystickPush
+           AND ((DepthStopMode = E_CycleDepthStopMode.KOBOLD_ONLY
+                 AND KoboldImmersionQualified AND KoboldBottomTimer.Q)
+             OR (DepthStopMode = E_CycleDepthStopMode.SETPOINT_ONLY AND DepthStopBySetpoint)
+             OR (DepthStopMode = E_CycleDepthStopMode.KOBOLD_OR_SETPOINT
+                 AND ((KoboldImmersionQualified AND KoboldBottomTimer.Q) OR DepthStopBySetpoint))) THEN
+            TouchPositionM1 := M1_CablePosM;
+            TouchPositionM2 := M2_CablePosM;
             BottomTouched  := TRUE;   // variable d'info latchee (GEL AX8) - effacee a AX0 / AX_STAB / Reset
-            IF LimitLegalDepthM &lt; -0.01 THEN
-                RaiseTargetM := MAX(TouchPositionM + RaiseOffBottomEff, LimitLegalDepthM + RaiseOffBottomEff);
+            IF DepthStopBySetpoint AND NOT KoboldBottomTimer.Q THEN
+                BottomStopSource := 'CONSIGNE PROFONDEUR';
             ELSE
-                RaiseTargetM := TouchPositionM + RaiseOffBottomEff;
+                BottomStopSource := 'KOBOLD';
             END_IF;
+            BottomContextValid := TRUE;
+            StopPositionCaptured := FALSE;
             State := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
         END_IF;
 
     E_AutoCycleStep.AX8_BOTTOM_CONFIRMED:
         CycleStep := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
-        CycleStateStr := 'AX8 - Fond confirme : arret treuils et stabilisation (2s)';
+        CycleStateStr := CONCAT('AX8 - Fond confirme par ', BottomStopSource);
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.NONE;
@@ -3659,7 +4053,23 @@ CASE State OF
         WaitingForOperator := FALSE;
         WaitingForProcess := TRUE;
         OperatorActionId := 16#0408;
-        OperatorAction := 'AX8 - Fond touche : stabilisation et arret des treuils.';
+        OperatorAction := CONCAT('AX8 - Fond confirme par ', BottomStopSource);
+
+        // L'inertie peut encore derouler les cables apres le front fond. La position
+        // de reference pour AX9 est donc la position MECANIQUEMENT STABILISEE,
+        // commune aux chemins Kobold et consigne, et non la position du front.
+        IF DiveStartStopped AND NOT StopPositionCaptured THEN
+            StopPositionM1 := M1_CablePosM;
+            StopPositionM2 := M2_CablePosM;
+            IF LimitLegalDepthM &lt; -0.01 THEN
+                RaiseTargetM1 := MAX(StopPositionM1 + RaiseOffBottomEff, LimitLegalDepthM + RaiseOffBottomEff);
+                RaiseTargetM2 := MAX(StopPositionM2 + RaiseOffBottomEff, LimitLegalDepthM + RaiseOffBottomEff);
+            ELSE
+                RaiseTargetM1 := StopPositionM1 + RaiseOffBottomEff;
+                RaiseTargetM2 := StopPositionM2 + RaiseOffBottomEff;
+            END_IF;
+            StopPositionCaptured := TRUE;
+        END_IF;
 
         // Coupure INSTANTANEE de toutes les commandes treuils + Kobold coupe.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
@@ -3667,7 +4077,7 @@ CASE State OF
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
         // Transition vers AX9 apres 2 secondes de stabilisation a l arret (freins serres)
-        IF BottomTouchStabTimer.Q THEN
+        IF BottomTouchStabTimer.Q AND DiveStartStopped AND StopPositionCaptured THEN
             State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
         END_IF;
 
@@ -3684,10 +4094,10 @@ CASE State OF
         OperatorAction := 'AX_DIVING_RETRY - Reprise plongee : monter jusqu au FDC haut, puis relancer.';
 
         // Remontee assistee palier lent, Kobold coupe.
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM1Cmd.StepTgt  := CST_StepSlow;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := CST_StepSlow;
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
@@ -3715,14 +4125,14 @@ CASE State OF
 
         // Palier 1 (doux). Selecteur couplage BOTH/M1/M2 = garde cote PRG_04 (GEL Q15),
         // le sequenceur commande toujours les deux treuils symetriquement.
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM1Cmd.StepTgt := CST_StepSlow;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt := CST_StepSlow;
 
-        IF JoystickDeflected AND (M1_CablePosM &gt;= RaiseTargetM) AND (M2_CablePosM &gt;= RaiseTargetM) THEN
+        IF DeadmanArmed AND JoystickPull AND (M1_CablePosM &gt;= RaiseTargetM1) AND (M2_CablePosM &gt;= RaiseTargetM2) THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
@@ -3743,16 +4153,16 @@ CASE State OF
         // Etape benne seule : les DEUX treuils explicitement neutralises.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
-        BucketCmd.ReqClose := CycleMotionPermit;
+        BucketCmd.ReqClose := DeadmanArmed AND JoystickPull;
 
-        IF JoystickDeflected AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
+        IF DeadmanArmed AND JoystickPull AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.ReqClose := FALSE;
             // C1e (GEL principe 4) : AX10 -&gt; AX11 sans temps mort. M1+M2 lances le MEME
             // scan que la sortie AX10_CLOSE_BUCKET (pas de creux RunRequest a la frontiere).
-            WinchM1Cmd.RunRequest := CycleMotionPermit;
+            WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
             WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
             WinchM1Cmd.StepTgt  := CtrlAscentMaxStepEff;
-            WinchM2Cmd.RunRequest := CycleMotionPermit;
+            WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
             WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
             WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
             State := E_AutoCycleStep.AX11_CTRL_ASCENT;
@@ -3771,17 +4181,17 @@ CASE State OF
         OperatorAction := 'AX11 - Maintenir la montee de controle : palier et synchronisme.';
 
         // Palier max reglable IHM, borne [1..2] (defaut 1 / P1 ; P2 possible au besoin).
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM1Cmd.StepTgt  := CtrlAscentMaxStepEff;
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
 
-        IF JoystickDeflected
-           AND (M1_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
-           AND (M2_CablePosM &gt;= (TouchPositionM + CtrlAscentDistM))
-           AND (ABS(M1_CablePosM - M2_CablePosM) &lt;= CtrlAscentToleranceM) THEN
+        IF DeadmanArmed AND JoystickPull
+           AND (M1_CablePosM &gt;= (TouchPositionM1 + CtrlAscentDistM))
+           AND (M2_CablePosM &gt;= (TouchPositionM2 + CtrlAscentDistM))
+           AND (ABS(WinchSyncDeltaM) &lt;= CtrlAscentToleranceM) THEN
             State := E_AutoCycleStep.AX12_LOADED_ASCENT;
         END_IF;
 
@@ -3799,14 +4209,14 @@ CASE State OF
 
         // Benne bien fermee -&gt; palier 4 ; benne mal fermee (a peu pres) -&gt; palier 1.
         // Pas de ralentissement 1 m avant la position top (montee franche).
-        WinchM1Cmd.RunRequest := CycleMotionPermit;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM1Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
-        WinchM2Cmd.RunRequest := CycleMotionPermit;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
-        IF JoystickDeflected AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
+        IF DeadmanArmed AND JoystickPull AND M1_CablePosM &gt;= CableLimitM1AscentM THEN
             WinchM1Cmd.RunRequest := FALSE;
             WinchM2Cmd.RunRequest := FALSE;
             State := E_AutoCycleStep.AX13_DRAIN_PAUSE;
@@ -5057,6 +5467,7 @@ Fault.Latched := (Fault.LatchedId &lt;&gt; 0);
           <Folder Name="_TYPES">
             <Folder Name="3_CYCLE_ET_MODES">
               <Object Name="ST_ModesCycleInterPrg" ObjectId="c66e2ea9-61f6-5705-86e7-b9f19e28d4f1" />
+              <Object Name="E_CycleDepthStopMode" ObjectId="a4e533cc-1a07-5fca-8da6-b652a120d4dd" />
               <Object Name="ST_ProgramBucketRequest" ObjectId="5a4cda1a-b4fc-5fb6-88f8-2a4ff29ce2ca" />
               <Object Name="ST_ProgramTranslationRequest" ObjectId="478a938b-bb21-5d74-8556-79842696e566" />
               <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T12:12:25.615330" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T12:12:25.615330">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T06:35:53.068840" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T06:35:53.068840">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -237,15 +237,15 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Profondeur de dragage cible (m, négative)</xhtml>
               </documentation>
             </variable>
-            <variable name="SetOffset_M">
+            <variable name="DepthStopMode">
               <type>
-                <REAL />
+                <derived name="E_CycleDepthStopMode" />
               </type>
               <initialValue>
-                <simpleValue value="1.5" />
+                <simpleValue value="E_CycleDepthStopMode.KOBOLD_ONLY" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décalage cible de fermeture de la benne (m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
               </documentation>
             </variable>
             <variable name="DrainTime">
@@ -357,7 +357,7 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
         <documentation>
           <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
    ST_CycleCfg — Configuration du cycle semi-automatique
-   SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
+   SetDepth_M et DepthStopMode protégés par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
@@ -411,10 +411,10 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.8" />
+                <simpleValue value="3" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 0.8m</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Tolérance max d'écart (m) — Dégradation Palier 1 dès 3.0m</xhtml>
               </documentation>
             </variable>
             <variable name="CfgSyncCriticalTolerance_M">
@@ -422,7 +422,7 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="6" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔴 Seuil 2 critique (m) — blocage synchro ; doit être &gt; CfgSyncTolerance_M</xhtml>
@@ -3323,6 +3323,50 @@ Cause de blocage prioritaire</xhtml>
    📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
    =======================================================================</xhtml>
         </documentation>
+      </dataType>
+      <dataType name="E_CycleDepthStopMode">
+        <baseType>
+          <enum>
+            <values>
+              <value name="KOBOLD_ONLY" value="0" />
+              <value name="SETPOINT_ONLY" value="1" />
+              <value name="KOBOLD_OR_SETPOINT" value="2" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>KOBOLD_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Comportement historique : fond valide par DI Kobold</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SETPOINT_ONLY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Arret sur consigne de profondeur valide</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>KOBOLD_OR_SETPOINT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Premier evenement valide des deux</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a4e533cc-1a07-5fca-8da6-b652a120d4dd</ObjectId>
+          </data>
+        </addData>
       </dataType>
       <dataType name="E_PresetConfirmMode">
         <baseType>
@@ -8231,8 +8275,14 @@ GVL_IHM.Network.InputModules.Fault            := PRG_02_Acquisition.Data.InputMo
 GVL_IHM.CycleSemiAuto.State.Ready                  := PRG_03_Modes_Cycle.Data.SequenceState.Ready;
 GVL_IHM.CycleSemiAuto.State.Busy                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy;
 GVL_IHM.CycleSemiAuto.State.Done                   := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Done;
-GVL_IHM.CycleSemiAuto.State.Error                  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error;
-GVL_IHM.CycleSemiAuto.State.ErrorId                := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId;
+// En AX_STAB les causes contextuelles (ex. AX7) ne sont plus actives : la vue live
+// ErrorId retombe alors à 0. L'IHM doit conserver le bit latche afin de permettre
+// un acquittement fonde sur la vraie cause, jamais sur un ambigu "Defaut #0".
+GVL_IHM.CycleSemiAuto.State.Error                  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Error
+                                                       OR PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched;
+GVL_IHM.CycleSemiAuto.State.ErrorId                := SEL(PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched,
+                                                           PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
+                                                           PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId);
 GVL_IHM.CycleSemiAuto.State.CycleStep              := PRG_03_Modes_Cycle.Data.SequenceState.Step;
 GVL_IHM.CycleSemiAuto.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.SequenceState.StepStr;
 GVL_IHM.CycleSemiAuto.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
@@ -8240,7 +8290,7 @@ GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.TranslationM3.Cmd.SelTarget;
-GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI;
+GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
 GVL_IHM.CycleSemiAuto.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 GVL_IHM.CycleSemiAuto.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
 GVL_IHM.CycleSemiAuto.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
@@ -8249,6 +8299,12 @@ GVL_IHM.CycleSemiAuto.State.WinchSyncDelta_M       := PRG_04_Treuils_Benne.Data.
 GVL_IHM.CycleSemiAuto.State.SpeedMismatch_Mps      := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchMps;
 GVL_IHM.CycleSemiAuto.State.SpeedMismatchActive    := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive;
 GVL_IHM.CycleSemiAuto.State.SpeedMismatchConfirmed := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchConfirmed;
+GVL_IHM.CycleSemiAuto.State.CycleChecksInhibited   := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited;
+GVL_IHM.CycleSemiAuto.State.IgnoredCycleCheckId    := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId;
+GVL_IHM.CycleSemiAuto.State.ForceStepPrepared      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared;
+GVL_IHM.CycleSemiAuto.State.ForceStepAccepted      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepAccepted;
+GVL_IHM.CycleSemiAuto.State.ForceStepRejected      := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepRejected;
+GVL_IHM.CycleSemiAuto.State.ForceStepResult        := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult;
 // Position cycle : meme gel affichage que M1TreuilRetenue/M2TreuilBenne pendant le preset codeur.
 GVL_IHM.CycleSemiAuto.State.M1Position_M           := SEL(M1PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM, M1PosHmiHeld_M);
 GVL_IHM.CycleSemiAuto.State.M2Position_M           := SEL(M2PosDisplayFrozen, PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM, M2PosHmiHeld_M);
@@ -8266,8 +8322,9 @@ instHmiBannerFormatter(
     WinchSelected         := GVL_IHM.Modes.Cmd.SelJoystickWinch,
     CycleStep             := GVL_IHM.CycleSemiAuto.State.CycleStep,
     CycleStateStr         := GVL_IHM.CycleSemiAuto.State.CycleStateStr,
-    CycleErrorId          := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
+    CycleErrorId          := GVL_IHM.CycleSemiAuto.State.ErrorId,
     CycleStepAtError      := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
+    CycleChecksInhibited  := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
@@ -8420,6 +8477,10 @@ instTroubleshootingView(
     CycleErrorId         := PRG_03_Modes_Cycle.Data.SequenceState.Fault.ErrorId,
     CycleFaultLatched    := PRG_03_Modes_Cycle.Data.SequenceState.Fault.Latched,
     CycleFaultLatchedId  := PRG_03_Modes_Cycle.Data.SequenceState.Fault.LatchedId,
+    CycleChecksInhibited := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
+    CycleIgnoredCheckId  := PRG_03_Modes_Cycle.Data.SequenceState.IgnoredCycleCheckId,
+    CycleForceStepPrepared := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepPrepared,
+    CycleForceStepResult := PRG_03_Modes_Cycle.Data.SequenceState.ForceStepResult,
     CycleStep            := PRG_03_Modes_Cycle.Data.SequenceState.Step,
     CycleStepStr         := PRG_03_Modes_Cycle.Data.SequenceState.StepStr,
     CycleStepAtError     := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault,
@@ -8435,7 +8496,7 @@ instTroubleshootingView(
     CycleKoboldBottomTouch := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI,
     CycleSpeedMismatchActive := PRG_03_Modes_Cycle.Data.SequenceState.SpeedMismatchActive,
     CycleLimitLegalReached := GVL_IHM.Commun.LimitLegalReached,
-    CycleWinchSyncError  := PRG_04_Treuils_Benne.instWinchSync.Fault.Error,
+    CycleWinchSyncError  := PRG_04_Treuils_Benne.Data.WinchSyncError,
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     HomedM1              := PRG_02_Acquisition.Data.EncoderM1.Homed,
@@ -9576,7 +9637,7 @@ END_IF;
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut cycle (FB_CycleSemiAuto.ErrorId) — notifié à AX_STAB</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Code défaut cycle actif/latche (jamais 0 en AX_STAB)</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStepAtError">
@@ -9585,6 +9646,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Dernière étape avant le défaut (FB_CycleSemiAuto.CycleStepAtError)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleChecksInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Mode essai cycle : controles procede inhibes</xhtml>
               </documentation>
             </variable>
             <variable name="MachineHomingStep">
@@ -10099,6 +10168,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Libellé de l'étape d'origine du défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleFaultCauseStr">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cause cycle décodée pour acquittement terrain</xhtml>
               </documentation>
             </variable>
             <variable name="AntiFlickSpecial">
@@ -10662,6 +10739,8 @@ AnyBypassActive := BypassGlobalActive
 IF ModeChangePendingBlocked AND ModeChangeBlockReason &lt;&gt; '' THEN
     // Bascule de mode refusée : motif prioritaire (info opérateur, ex. "Chgt mode refuse : contacteur M1").
     SpecialConditionCandidate := ModeChangeBlockReason;
+ELSIF CycleChecksInhibited THEN
+    SpecialConditionCandidate := 'ESSAI CYCLE: CONTROLES PROCEDE INHIBES - PROTECTIONS MACHINE ACTIVES';
 ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN
@@ -10934,9 +11013,36 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 ELSE
                     StepAtErrorStr := '?';
             END_CASE;
-            // Message compact : ID défaut (ErrorId) + étape d'origine + acquitter.
-            // Le détail de la cause est consultable dans le dépannage (GVL_Troubleshooting).
-            OperatorActionCandidate := CONCAT('[PUPITRE] Defaut #', CONCAT(WORD_TO_STRING(CycleErrorId), CONCAT(' (etape ', CONCAT(StepAtErrorStr, ') - acquitter'))));
+            // Décodage priorisé : l'opérateur voit la grandeur fautive, pas un masque.
+            // Bits cycle : 0 limite, 1 synchro, 2 vitesse, 3 IHM, 4 tempo,
+            // 5 stabilisation, 6 position, 7 FDC haut, 8/9 paliers, 10 arrêt.
+            IF (CycleErrorId AND 16#0001) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'limite legale de profondeur atteinte';
+            ELSIF (CycleErrorId AND 16#0002) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'synchronisme M1/M2 bloquant';
+            ELSIF (CycleErrorId AND 16#0004) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'ecart vitesse M1/M2 confirme';
+            ELSIF (CycleErrorId AND 16#0008) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'communication IHM perdue';
+            ELSIF (CycleErrorId AND 16#0010) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'tempo maximale etape depassee';
+            ELSIF (CycleErrorId AND 16#0020) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'stabilisation remontee hors tolerance';
+            ELSIF (CycleErrorId AND 16#0040) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'ecart position M1/M2 &gt; 1,5 m (anti-telescopage)';
+            ELSIF (CycleErrorId AND 16#0080) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'M1/M2 hors FDC haut pendant translation P1';
+            ELSIF (CycleErrorId AND 16#0100) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'palier 5 interdit sur M1 ou M2 pendant plongee';
+            ELSIF (CycleErrorId AND 16#0200) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'palier 4 non confirme sur M1 ou M2 en recherche Kobold';
+            ELSIF (CycleErrorId AND 16#0400) &lt;&gt; 0 THEN
+                CycleFaultCauseStr := 'arret mecanique M1/M2 non confirme avant plongee';
+            ELSE
+                CycleFaultCauseStr := CONCAT('cause cycle inconnue #', WORD_TO_STRING(CycleErrorId));
+            END_IF;
+            OperatorActionCandidate := CONCAT('[CYCLE] ', CONCAT(CycleFaultCauseStr,
+                                         CONCAT(' (', CONCAT(StepAtErrorStr, ') - cause disparue puis acquitter'))));
         ELSE
             OperatorActionCandidate := '[CYCLE] Cycle en cours...';
     END_CASE;
@@ -11826,6 +11932,38 @@ Prev := Hmi;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Bitfield défaut latché figé</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleChecksInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Contrôles procédé inhibés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleIgnoredCheckId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Contrôles procédé ignorés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleForceStepPrepared">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [STAT] Step préparé, commandes neutres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleForceStepResult">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Motif forçage</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleStep">
               <type>
                 <derived name="E_AutoCycleStep" />
@@ -12622,6 +12760,10 @@ GVL_Troubleshooting.G_CycleSemiAuto.Idx204_Error                     := CycleErr
 GVL_Troubleshooting.G_CycleSemiAuto.Idx205_ErrorId                   := CycleErrorId;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx217_FaultLatched               := CycleFaultLatched;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx218_FaultLatchedId             := CycleFaultLatchedId;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx219_CycleChecksInhibited       := CycleChecksInhibited;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx220_IgnoredCycleCheckId        := CycleIgnoredCheckId;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx221_ForceStepPrepared          := CycleForceStepPrepared;
+GVL_Troubleshooting.G_CycleSemiAuto.Idx222_ForceStepResult            := CycleForceStepResult;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx206_Step                      := CycleStep;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx207_StepStr                   := CycleStepStr;
 GVL_Troubleshooting.G_CycleSemiAuto.Idx208_StepAtError               := CycleStepAtError;
@@ -13380,6 +13522,7 @@ TimeLast := TimeCurrent;
               <Object Name="ST_CycleCfg" ObjectId="19cafd99-3b26-50ad-b40a-cdf9fb79d238" />
               <Object Name="ST_CycleMachineHomingCfg" ObjectId="892dec72-1fe2-5fad-a62f-d1ead6f61579" />
               <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
+              <Object Name="E_CycleDepthStopMode" ObjectId="a4e533cc-1a07-5fca-8da6-b652a120d4dd" />
             </Folder>
             <Folder Name="2_TRANSLATION">
               <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />

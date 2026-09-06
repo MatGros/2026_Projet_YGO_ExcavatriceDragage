@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-03T10:40:18.595814" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-03T10:40:18.595814">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T06:23:26.921838" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T06:23:26.921838">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -55,7 +55,7 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut cycle actif ou mémorisé, à acquitter</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -63,7 +63,7 @@
                 <WORD />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code défaut cycle</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code affiché : actif, ou latched après repli AX_STAB</xhtml>
               </documentation>
             </variable>
             <variable name="CycleStep">
@@ -224,6 +224,54 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée du dernier cycle achevé (figée à X13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleChecksInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Contrôles procédé cycle inhibés, protections machine actives</xhtml>
+              </documentation>
+            </variable>
+            <variable name="IgnoredCycleCheckId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔎 Contrôles procédé actifs mais ignorés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepPrepared">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Step préparé, commandes neutres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepAccepted">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">✅ Impulsion préparation acceptée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepRejected">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Impulsion préparation refusée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ForceStepResult">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📝 Motif accepté/refusé</xhtml>
               </documentation>
             </variable>
           </struct>

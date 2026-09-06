@@ -1319,10 +1319,13 @@ M1WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
 M1WinchCfg.SlowdownDistanceTop_M  := _CommunCfgPersist.WinchSlowdownDistanceTop_M;
 M1WinchCfg.SlowdownDistanceBottom_M := _CommunCfgPersist.WinchSlowdownDistanceBottom_M;
 M1WinchCfg.SlowdownMaxStep        := _CommunCfgPersist.WinchSlowdownMaxStep;
-// Cadence de rampe palier (FB_WinchStepShaper) : montee +1 cran / delai, descente immediate.
+// Cadence/interlocks : descente normale 500 ms, inversion vers descente 500 ms,
+// montee normale 700 ms, inversion vers montee 800 ms.
 // Champs non portes par la persistante -> assignes explicitement (le defaut de type n'est
-// pas applique au runtime pour ce VAR local de struct). 1 s montee / 0,5 s descente.
-M1WinchCfg.StepRampDelayAscent    := T#1000ms;
+// pas applique au runtime pour ce VAR local de struct). 0,7 s montee / 0,5 s descente.
+M1WinchCfg.DirectionInterlockDelayAscent  := T#800ms;
+M1WinchCfg.DirectionInterlockDelayDescent := T#500ms;
+M1WinchCfg.StepRampDelayAscent    := T#700ms;
 M1WinchCfg.StepRampDelayDescent   := T#500ms;
 
 instWinchM1(
@@ -1384,8 +1387,11 @@ M2WinchCfg.SpeedStepTable         := _WinchSpeedStepTable;
 M2WinchCfg.SlowdownDistanceTop_M  := _CommunCfgPersist.WinchSlowdownDistanceTop_M;
 M2WinchCfg.SlowdownDistanceBottom_M := _CommunCfgPersist.WinchSlowdownDistanceBottom_M;
 M2WinchCfg.SlowdownMaxStep        := _CommunCfgPersist.WinchSlowdownMaxStep;
-// Cadence de rampe palier (FB_WinchStepShaper) : montee +1 cran / delai, descente immediate.
-M2WinchCfg.StepRampDelayAscent    := T#1000ms;
+// Cadence/interlocks identiques M1 : descente normale 500 ms, inversion vers descente
+// 500 ms, montee normale 700 ms, inversion vers montee 800 ms.
+M2WinchCfg.DirectionInterlockDelayAscent  := T#800ms;
+M2WinchCfg.DirectionInterlockDelayDescent := T#500ms;
+M2WinchCfg.StepRampDelayAscent    := T#700ms;
 M2WinchCfg.StepRampDelayDescent   := T#500ms;
 
 instWinchM2(
@@ -1765,7 +1771,13 @@ Data.WinchM2State                 := WinchM2State;
 Data.WinchM1Safety                := WinchM1Safety;
 Data.WinchM2Safety                := WinchM2Safety;
 Data.SyncState                    := SyncState;
-Data.WinchSyncError               := instWinchSync.Fault.Error;
+// Signal BLOQUANT unique du cycle : le bit 0 Fault.Error est un simple warning
+// (degradation palier 1), il ne doit jamais faire basculer le grafcet en AX_STAB.
+// Les protections critiques restent : deviation confirmee, contacteurs, et Meca E.
+Data.WinchSyncError               := instWinchSync.SyncDeviationFault
+                                     OR instWinchSync.ContactorMismatch
+                                     OR WinchM1Safety.ErrorMecaE
+                                     OR WinchM2Safety.ErrorMecaE;
 Data.WinchSyncSignedDeltaPosM     := instWinchSync.SignedDeltaPosM;
 Data.BucketState                  := BucketState;
 Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;

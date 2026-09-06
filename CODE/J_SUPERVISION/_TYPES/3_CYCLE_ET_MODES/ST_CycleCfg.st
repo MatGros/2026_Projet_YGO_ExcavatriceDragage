@@ -1,11 +1,11 @@
 (* ═══════════════════════════════════════════════════════════════
    ST_CycleCfg — Configuration du cycle semi-automatique
-   SetDepth_M/SetOffset_M protégés par persistance GVL_PERSISTENT
+   SetDepth_M et DepthStopMode protégés par persistance GVL_PERSISTENT
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_CycleCfg :
 STRUCT
     SetDepth_M         : REAL := -12.5; (* 📐 Profondeur de dragage cible (m, négative) *)
-    SetOffset_M        : REAL := 1.5;   (* 📐 Décalage cible de fermeture de la benne (m) *)
+    DepthStopMode      : E_CycleDepthStopMode := E_CycleDepthStopMode.KOBOLD_ONLY; (* 🧭 Source arrêt AX7 *)
     DrainTime          : TIME := T#5s;  (* ⏱️ Durée d'égouttage du godet en AX13 (configurable IHM) *)
     RaiseOffBottom_M   : REAL := 0.5;   (* 📐 Décollement du fond en AX8 : RaiseTarget = TouchPosition + ce champ (réglable essais, GEL Q16) *)
     CtrlAscentMaxStep  : INT  := 1;     (* 🚀 Palier max montée contrôle AX11, borné [1..2] côté FB (GEL Q16) *)

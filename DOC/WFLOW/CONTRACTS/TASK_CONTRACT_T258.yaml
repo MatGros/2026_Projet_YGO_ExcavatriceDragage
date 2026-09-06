@@ -1,0 +1,26 @@
+contract:
+  task_id: T258
+  criticality: C3
+  strategy: patch
+  objective: Rendre le cycle semi-auto exploitable au SAT J2 sans regressser les protections machine ni les modes maintenance.
+  acceptance:
+    - id: AC1
+      statement: Les contrats T258-A a T258-E sont tous satisfaits et leurs preuves sont disponibles.
+      verified_by: Validation de chaque contrat enfant et revue finale du diff reel.
+    - id: AC2
+      statement: Aucun changement du lot ne modifie le comportement MAINT_N1 ou MAINT_N2.
+      verified_by: Tests STruC++ bit a bit des requetes, interlocks et sorties avant/apres.
+    - id: AC3
+      statement: Pour tout POU touche, le nom du fichier est identique au nom du POU et le suffixe correspond au langage du bundle.
+      verified_by: Revue structurelle du bundle PLCopenXML et gates de structure.
+  scope:
+    allowed: [CODE/G_CYCLE/FB_CycleSemiAuto.st, CODE/M_MAIN/PRG_03_Modes_Cycle.st, CODE/M_MAIN/PRG_04_Treuils_Benne.st, CODE/J_SUPERVISION/, TOOLS/TEST_AUTO_CI/, TOOLS/AGENT_WORKFLOW/scripts/, DOC/AF/, DOC/WFLOW/]
+    forbidden: [PRJ_CODESYS/PROJ_Full_ImportExport/Device.export, ARCHIVES/]
+  conservation:
+    must_survive: [AU et PowerCutOff, protections treuils et interlocks finaux, Reset sur front, absence de redemarrage automatique, fonctionnement valide MAINT_N1/N2, handoff AX3 vers diving sous joystick maintenu]
+    dropped_on_purpose: []
+  evidence_required: [check_linkage, run_all_gates, bundle, tests_strucpp, revue_diff, sat_plan]
+  alert_duty: Toute ambiguite de polarite Kobold, geometrie ou safety suspend l implementation concernee.
+status: PENDING
+execution: {executed_by: Codex, completed_at: '', status: PENDING, summary: '', evidence_submitted: []}
+validation: {status: PENDING, validated_by: '', validated_at: '', notes: ''}

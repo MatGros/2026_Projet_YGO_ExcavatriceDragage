@@ -1,6 +1,6 @@
-Error compiling source files:
-
-FB_Main_EndToEnd.st:361:18: error: Cannot assign E_AUTOCYCLESTEP to E_CYCLESTEP
- 361 | CycleStep     := prg03.CycleStep;
-     |                  ^
+Error: C++ compilation failed:
+C:\Users\ZEDVICTUS\AppData\Local\Temp\st2c_WINCH_INTEG_ynnfedjc\strucpp_tmp\strucpp-test-hZnHjd\generated.cpp: In member function 'void strucpp::FB_MAIN_ENDTOEND::operator()()':
+C:\Users\ZEDVICTUS\AppData\Local\Temp\st2c_WINCH_INTEG_ynnfedjc\strucpp_tmp\strucpp-test-hZnHjd\generated.cpp:19564:19: error: 'struct strucpp::ST_SEQUENCEPUBLICSTATE' has no member named 'DUMPATTREMIEDESCENTLOCKED'
+19564 |     SEQSTATELOCAL.DUMPATTREMIEDESCENTLOCKED = SEQDUMPATTREMIEDESCENTLOCKED;
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~
 

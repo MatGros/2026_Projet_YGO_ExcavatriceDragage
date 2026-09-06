@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T11:31:08.172698" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T11:31:08.172698">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-05T22:13:19.053561" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-05T22:13:19.053561">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -146,6 +146,38 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Bitfield fige a l'apparition du defaut latche</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx219_CycleChecksInhibited">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = controles procede inhibes, protections actives</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx220_IgnoredCycleCheckId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Causes procede actives mais ignorees</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx221_ForceStepPrepared">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">1 = cible preparee, commandes neutres</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Idx222_ForceStepResult">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Motif accepte/refuse du forçage</xhtml>
               </documentation>
             </variable>
             <variable name="Idx206_Step">

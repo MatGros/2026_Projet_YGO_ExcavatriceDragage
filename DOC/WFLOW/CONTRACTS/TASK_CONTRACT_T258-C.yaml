@@ -1,0 +1,20 @@
+contract:
+  task_id: T258-C
+  criticality: C3
+  strategy: patch
+  objective: Rendre la pretension, fermeture et remontee AX9 a AX12 coherentes avec le geste operateur et la geometrie des deux treuils.
+  acceptance:
+    - {id: AC1, statement: AX9 a AX12 ne produisent ReqAscent ou ReqClose qu avec JoystickPull Y+ et homme-mort., verified_by: Tests directions Y+, Y-, X et neutre.}
+    - {id: AC2, statement: M1 et M2 utilisent chacun leur position fond et leur cible de decollement., verified_by: Test avec positions absolues decalees et meme deplacement relatif.}
+    - {id: AC3, statement: AX11 decide avec WinchSyncDeltaM compense et non M1 moins M2 brut., verified_by: Tests tolerance inferieure, bord et superieure avec offset benne.}
+    - {id: AC4, statement: Un defaut d un seul treuil neutralise physiquement les deux en SEMI_AUTO le meme scan., verified_by: Test integration PRG03 PRG04.}
+    - {id: AC5, statement: Le nom du fichier est identique au nom du POU et le suffixe correspond au langage du bundle., verified_by: Revue bundle et gates structurels.}
+  scope:
+    allowed: [CODE/G_CYCLE/FB_CycleSemiAuto.st, CODE/M_MAIN/PRG_03_Modes_Cycle.st, CODE/M_MAIN/PRG_04_Treuils_Benne.st, TOOLS/TEST_AUTO_CI/, TOOLS/AGENT_WORKFLOW/scripts/]
+    forbidden: [PRJ_CODESYS/PROJ_Full_ImportExport/Device.export]
+  conservation: {must_survive: [Barriere atomique strictement SEMI_AUTO, comportement MAINT_N1/N2], dropped_on_purpose: [Cible M2 derivee de M1, comparaison brute M1-M2 AX11]}
+  evidence_required: [tests_strucpp, test_integration, check_linkage]
+  alert_duty: Toute incoherence sur le signe de CablePosM ou WinchSyncDeltaM suspend le changement de transition.
+status: PENDING
+execution: {executed_by: Codex, completed_at: '', status: PENDING, summary: '', evidence_submitted: []}
+validation: {status: PENDING, validated_by: '', validated_at: '', notes: ''}

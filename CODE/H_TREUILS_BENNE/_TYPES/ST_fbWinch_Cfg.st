@@ -16,12 +16,12 @@ STRUCT
     SpeedStepTable                  : ST_SpeedStepTable;   // Table de seuils des paliers de vitesse
 
     // === INTERLOCK CHANGEMENT DE SENS ===
-    DirectionInterlockDelayAscent       : TIME := T#800ms;   // Delai interlock changement de sens montee (DeadTimeOppositeDir 700ms + 100ms)
-    DirectionInterlockDelayDescent     : TIME := T#800ms;   // Delai interlock changement de sens descente (DeadTimeOppositeDir 700ms + 100ms)
+    DirectionInterlockDelayAscent       : TIME := T#800ms;   // Delai interlock inversion vers montee
+    DirectionInterlockDelayDescent     : TIME := T#500ms;   // Delai interlock inversion vers descente
 
     // === CADENCE DE RAMPE PALIER ===
-    StepRampDelay                   : TIME := T#900ms;   // [cible] Tempo de rampe palier (usage aval)
-    StepRampDelayAscent             : TIME := T#900ms;   // [08a] Cadence palier montee (D10, dedie)
+    StepRampDelay                   : TIME := T#700ms;   // [cible] Tempo de rampe palier (usage aval)
+    StepRampDelayAscent             : TIME := T#700ms;   // [08a] Cadence palier montee (D10, dedie)
     StepRampDelayDescent         : TIME := T#500ms;   // [08a] Cadence palier descending (D10, dedie)
 
     // === RETOMBÉE CONTACTEURS ===
@@ -36,4 +36,3 @@ STRUCT
     SpeedStepHystMargin             : REAL := 2.0;   // [08a] Marge d'hysteresis palier (%)
 END_STRUCT
 END_TYPE
-

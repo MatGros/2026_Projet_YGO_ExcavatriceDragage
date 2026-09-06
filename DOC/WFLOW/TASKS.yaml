@@ -5814,3 +5814,115 @@ tasks:
   - Bundle regenere + G200/gates verts
   contrat: ''
   bloque_par: []
+
+- id: T258
+  parent_id: ''
+  statut: 🔒
+  criticite: C3
+  domaine: CYCLE_SEMI_AUTO_SAT
+  agent: Codex
+  date: '2026-09-05T23:30:27+02:00'
+  titre: Fiabiliser le cycle semi-auto pour SAT J2
+  contexte: 'Revue croisee automatisme/safety, CI et IHM du 2026-09-05 : plan initial bloque tant que directions, Kobold, arret AX8, geometrie extraction, forçage et preuves CI ne sont pas corriges.'
+  description: 'Parent d execution phasee T258-A a T258-E. Strategie patch stricte, aucune refonte large avant SAT.'
+  objectifs:
+  - Cycle AX4 a AX12 deterministe et testable scan par scan
+  - Protections machine toujours actives, controles procede temporairement inhibables et visibles
+  - Forçage de step transactionnel sans commande au scan de preparation
+  - Neutralite MAINT_N1 et MAINT_N2 prouvee
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258.yaml
+  bloque_par: []
+
+- id: T258-A
+  parent_id: T258
+  statut: ⏳
+  criticite: C3
+  domaine: TEST_CI_CYCLE
+  agent: Codex
+  date: '2026-09-06T00:05:00+02:00'
+  titre: Etablir le socle de preuve STruC++ cycle et inter-PRG
+  contexte: 'Les tests actuels ne cablent ni Kobold reel, ni commissioning/forçage et le harness PRG04 ne reproduit pas la barriere atomique.'
+  description: 'Adapter les harness/tests avant validation fonctionnelle et ajouter les gardes statiques fix+guard.'
+  objectifs:
+  - Tests scan-par-scan AX4 a AX12 et priorites concurrentes
+  - Preuve atomicite SEMI_AUTO et neutralite bit a bit MAINT_N1/N2
+  - Interdiction automatique du pseudo-feedback Kobold et des ecarts bruts AX11
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258-A.yaml
+  bloque_par: []
+
+- id: T258-B
+  parent_id: T258
+  statut: ⬜
+  criticite: C3
+  domaine: CYCLE_DIVING_KOBOLD
+  agent: Codex
+  date: '2026-09-05T23:30:27+02:00'
+  titre: Fiabiliser AX4 a AX8 diving et sequence Kobold
+  contexte: 'Le contacteur alimente le capteur sans retour auxiliaire. La DI unique suit la sequence terrain a confirmer 0 hors eau, 1 immergee, 0 au fond.'
+  description: 'Qualifier Y-, alimentation capteur, immersion stable, fond apres immersion et arret mecanique commun.'
+  objectifs:
+  - Aucun faux feedback de contacteur Kobold
+  - Fond impossible sans immersion prealablement qualifiee
+  - AX8 vers AX9 impossible tant que M1 et M2 ne sont pas physiquement arretes
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258-B.yaml
+  bloque_par:
+  - T258-A
+
+- id: T258-C
+  parent_id: T258
+  statut: ⬜
+  criticite: C3
+  domaine: CYCLE_EXTRACTION
+  agent: Codex
+  date: '2026-09-05T23:30:27+02:00'
+  titre: Fiabiliser AX9 a AX12 pretension, fermeture et remontee
+  contexte: 'Le code accepte toute deflexion joystick, partage une cible M1 avec M2 et compare un ecart brut incompatible avec l offset benne.'
+  description: 'Qualifier Y+, memoriser les deux positions fond et utiliser le delta synchronise compense.'
+  objectifs:
+  - Aucune montee ou fermeture sans intention Y+ et homme-mort
+  - Chaque treuil atteint sa propre cible de pretension
+  - AX11 utilise WinchSyncDeltaM et conserve les barrieres finales atomiques
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258-C.yaml
+  bloque_par:
+  - T258-A
+  - T258-B
+
+- id: T258-D
+  parent_id: T258
+  statut: ⬜
+  criticite: C3
+  domaine: COMMISSIONING_IHM
+  agent: Codex
+  date: '2026-09-05T23:30:27+02:00'
+  titre: Ajouter mode essai controle et forçage transactionnel de step
+  contexte: 'Le forçage actuel execute la cible dans le meme scan et ne publie aucun accepte/refuse. L inhibition demandee ne doit jamais masquer les protections machine.'
+  description: 'Ajouter inhibition limitee des controles procede, diagnostic ambre et preparation/reprise de step en deux temps.'
+  objectifs:
+  - Inhibition non persistante, bornee commissioning et visible partout
+  - Causes ignorees toujours calculees et journalisees
+  - Scan de preparation et attente de reprise sans aucune demande actionneur
+  - Cibles contextuelles refusees sans registres valides
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258-D.yaml
+  bloque_par:
+  - T258-A
+
+- id: T258-E
+  parent_id: T258
+  statut: ⬜
+  criticite: C3
+  domaine: VALIDATION_SAT
+  agent: Codex
+  date: '2026-09-05T23:30:27+02:00'
+  titre: Integrer, documenter et qualifier le lot cycle SAT J2
+  contexte: 'Cloture seulement apres tests cibles, AF conforme au code, bundle frais, G200 et gates complets.'
+  description: 'Revue flux G7 vers actionneurs, regression maintenance, documentation et protocole SAT terrain.'
+  objectifs:
+  - AF04/AF10/AF12/AF14 coherentes avec le code livre
+  - Bundle frais et G200 sans erreur
+  - Palier C puis 21 gates PASS
+  - Limites de preuve CI et controles terrain explicitement restitues
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T258-E.yaml
+  bloque_par:
+  - T258-B
+  - T258-C
+  - T258-D
