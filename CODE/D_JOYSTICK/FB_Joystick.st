@@ -25,6 +25,7 @@ VAR_INPUT
 
     // === PERMIS SECURITE ===
     ArmingPermit              : BOOL;       // --> [SAFE] Permission d'armement homme-mort ; FALSE = armement bloqué
+    DirectInversionPermit     : BOOL;       // --> [SAFE] Inversion Y sans neutre, AX8 semi-auto uniquement
 
     // === ACQUISITION MATERIELLE & DIAGNOSTIC ===
     BusCanOpenOP              : ST_Diag_Device; // --> [HW]   Etat presence noeud CAN
@@ -212,7 +213,7 @@ IF NeutralXYEdge.Q THEN
     InversionLockActive := FALSE;
 END_IF;
 
-IF FlipX OR FlipY THEN
+IF FlipX OR (FlipY AND NOT (DirectInversionPermit AND DeadmanArmed)) THEN
     InversionLockActive := TRUE;
     DeadmanArmed := FALSE;
     DeadmanArmPending := FALSE;
