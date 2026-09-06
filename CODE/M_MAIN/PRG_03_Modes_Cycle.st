@@ -218,6 +218,7 @@ instCycleSemiAuto(
     DiveStartMinM           := GVL_IHM.CycleSemiAuto.Cfg.DiveStartMin_M, // altimetrie lancement Kobold (AT4)
     CfgRaiseOffBottomM      := GVL_IHM.CycleSemiAuto.Cfg.RaiseOffBottom_M,   // GEL Q16 : decollement du fond AX8 (reglable IHM)
     CfgCtrlAscentMaxStep    := GVL_IHM.CycleSemiAuto.Cfg.CtrlAscentMaxStep,  // GEL Q16 : palier max montee controle AX11 [1..2]
+    CfgCtrlAscentDistanceM  := GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M, // Distance controle AX11 depuis AX10
     M1_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber, // palier applique (0..5) : garde palier<>4 en plongee (GT-dive-retry) + cause 8 (palier 5)
     M2_SpeedStepApplied     := PRG_04_Treuils_Benne.Data.WinchM2State.StepNumber,
     SampleCount            := _CycleSampleCount
