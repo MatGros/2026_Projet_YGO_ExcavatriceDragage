@@ -1414,7 +1414,7 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
                 <derived name="E_CycleDepthStopMode" />
               </type>
               <initialValue>
-                <simpleValue value="E_CycleDepthStopMode.KOBOLD_ONLY" />
+                <simpleValue value="E_CycleDepthStopMode.KOBOLD_OR_SETPOINT" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
@@ -5447,7 +5447,7 @@ jeton "dernier capteur franchi" (front + libération sur mouvement confirmé) �
               <EnumValue>
                 <Name>AX9_RAISE_OFF_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Retente les cables (palier 1), decollement du fond ; selecteur couplage BOTH/M1/M2 accessible</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee synchronisee : retendre les cables ; selecteur couplage BOTH/M1/M2 accessible</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>

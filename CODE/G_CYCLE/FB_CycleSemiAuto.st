@@ -18,6 +18,7 @@ VAR_INPUT
     JoystickDeflected       : BOOL;         // --> [CMD] Manche deflecte (non centre)
     JoystickPush            : BOOL;         // --> [CMD] Intention Y descente qualifiee (axe Y pousse uniquement)
     JoystickPull            : BOOL;         // --> [CMD] Intention Y montee qualifiee (axe Y tire uniquement)
+    JoystickRight           : BOOL;         // --> [CMD] Intention X vers P1 qualifiee (axe X positif)
     DeadmanArmed            : BOOL;         // --> [CMD] Appui homme-mort (fenetre 3 s)
     HeartbeatIhmOk          : BOOL;         // --> [SAFE] IHM<->PLC valide
 
@@ -227,7 +228,7 @@ VAR CONSTANT
     CST_DiveStartStopTimeout : TIME := T#5s; // Plafond anti-blocage ; timeout -> defaut latche, jamais depart
     CST_DiveStartSpeedThresholdMps : REAL := 0.02; // Vitesse quasi nulle, alignee FB_Modes
     CST_RaiseOffBottomDefaultM : REAL := 0.5;   // Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM <= 0
-    CST_ExtractionStepDelay    : TIME := T#500ms;
+    CST_ExtractionStepDelay    : TIME := T#1s;
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -265,7 +266,7 @@ IF (DiveStartMinM >= 0.5) AND (DiveStartMinM <= 8.0) THEN
 ELSE
     DiveStartMinEff := 4.0;
 END_IF;
-RaiseOffBottomEff := SEL(CfgRaiseOffBottomM > 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
+RaiseOffBottomEff := SEL(CfgRaiseOffBottomM <= 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 
 // ⏱️ Chronomètre du cycle : compte tant que le séquenceur est actif (Lifecycle.Busy).
@@ -1050,7 +1051,7 @@ CASE State OF
 
     E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM:
         CycleStep := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
-        CycleStateStr := 'AX9 - Retente les cables (palier 1), decollement du fond';
+        CycleStateStr := 'AX9 - Montee synchronisee : retendre les cables';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -1058,7 +1059,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#0409;
-        OperatorAction := 'AX9 - Maintenir la montee palier 1 : retente des cables, decollement du fond.';
+        OperatorAction := 'AX9 - Maintenir la montee synchronisee : retendre les cables.';
 
         // Palier 1 (doux). Selecteur couplage BOTH/M1/M2 = garde cote PRG_04 (GEL Q15),
         // le sequenceur commande toujours les deux treuils symetriquement.
@@ -1107,7 +1108,7 @@ CASE State OF
 
     E_AutoCycleStep.AX11_CTRL_ASCENT:
         CycleStep := E_AutoCycleStep.AX11_CTRL_ASCENT;
-        CycleStateStr := 'AX11 - Remontee lente de controle';
+        CycleStateStr := 'AX11 - Montee controlee : surveillance visuelle M1/M2';
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
@@ -1115,7 +1116,7 @@ CASE State OF
         WaitingForOperator := NOT JoystickDeflected;
         WaitingForProcess := JoystickDeflected;
         OperatorActionId := 16#040B;
-        OperatorAction := 'AX11 - Maintenir la montee de controle : palier et synchronisme.';
+        OperatorAction := 'AX11 - Maintenir la montee : surveiller visuellement M1/M2 (securites actives).';
 
         // Palier max reglable IHM, borne [1..2] (defaut 1 / P1 ; P2 possible au besoin).
         WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
@@ -1218,7 +1219,7 @@ CASE State OF
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
         // Geste operateur (manche defleci) -> phase d'ouverture benne.
-        IF JoystickDeflected THEN
+        IF DeadmanArmed AND JoystickPush THEN
             State := E_AutoCycleStep.AX15B_DUMP_OPEN;
         END_IF;
 
@@ -1229,8 +1230,8 @@ CASE State OF
         Lifecycle.Done := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
         ExpectedDirection := -1;
-        WaitingForOperator := NOT JoystickDeflected;
-        WaitingForProcess := JoystickDeflected;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPush);
+        WaitingForProcess := DeadmanArmed AND JoystickPush;
         OperatorActionId := 16#040B;
         OperatorAction := 'AX15b - Maintenir : ouverture complete de la benne, vidage a la tremie.';
 
@@ -1240,14 +1241,14 @@ CASE State OF
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
 
-        BucketCmd.ReqOpen := CycleMotionPermit;
+        BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
         // Option operateur (bit IHM) : descendre la benne dans la gueule de tremie
         // pour aider la vidange -> repositionnement couple M1+M2 (AX15C). Prioritaire
         // sur la fin de vidage.
         IF RepositionRequest THEN
             State := E_AutoCycleStep.AX15C_DUMP_REPOSITION;
-        ELSIF JoystickDeflected AND Benne_Done AND Benne_IsOpen THEN
+        ELSIF DeadmanArmed AND JoystickPush AND Benne_Done AND Benne_IsOpen THEN
             BucketCmd.ReqOpen := FALSE;
             State := E_AutoCycleStep.AX18_DONE_SYNC;
         END_IF;
@@ -1293,8 +1294,8 @@ CASE State OF
         Lifecycle.Busy := FALSE;
         ExpectedAxis := E_OperatorAxis.JOYSTICK_X;
         ExpectedDirection := 1;
-        WaitingForOperator := TRUE;
-        WaitingForProcess := FALSE;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickRight);
+        WaitingForProcess := DeadmanArmed AND JoystickRight;
         OperatorActionId := 16#040D;
         OperatorAction := 'AX18 - Cycle termine. Aller en P1 (joystick vers la droite) pour recommencer.';
 
@@ -1309,7 +1310,7 @@ CASE State OF
         // referencee, la passe suivante enchaine sur la translation P1 (pas de retour AX0).
         // Relance sur StartCycle OU FRONT joystick (geste franc) - pas sur simple maintien,
         // pour que AX18 (Lifecycle.Done + msg) soit reellement observable / tracable.
-        IF StartEdge.Q OR JoyDeflectedEdge.Q THEN
+        IF StartEdge.Q OR (DeadmanArmed AND JoystickRight) THEN
             SampleCountDone := FALSE;
             Lifecycle.Done := FALSE;
             State := E_AutoCycleStep.AX2_TRANSLATE_P1;

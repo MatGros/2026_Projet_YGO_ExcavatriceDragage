@@ -242,7 +242,7 @@ action MANUELLE benne (WinchSel=2) / DumpAtTremie / ExtractionAssist.</xhtml>
                 <derived name="E_CycleDepthStopMode" />
               </type>
               <initialValue>
-                <simpleValue value="E_CycleDepthStopMode.KOBOLD_ONLY" />
+                <simpleValue value="E_CycleDepthStopMode.KOBOLD_OR_SETPOINT" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
@@ -856,7 +856,7 @@ fournie par la configuration persistante de l'appelant.
               <EnumValue>
                 <Name>AX9_RAISE_OFF_BOTTOM</Name>
                 <Documentation>
-                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Retente les cables (palier 1), decollement du fond ; selecteur couplage BOTH/M1/M2 accessible</xhtml>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Montee synchronisee : retendre les cables ; selecteur couplage BOTH/M1/M2 accessible</xhtml>
                 </Documentation>
               </EnumValue>
               <EnumValue>
@@ -10694,7 +10694,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX7_SEARCH_BOTTOM: Banner.SequenceProgressText := 'Cycle: RECHERCHE FOND';
             E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: Banner.SequenceProgressText := 'Cycle: FOND CONFIRMÉ';
             E_AutoCycleStep.AX_DIVING_RETRY: Banner.SequenceProgressText := 'Cycle: REPRISE PLONGÉE';
-            E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: Banner.SequenceProgressText := 'Cycle: RETENTE CÂBLES';
+            E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: Banner.SequenceProgressText := 'Cycle: MONTEE SYNCHRONISEE - RETENDRE CABLES';
             E_AutoCycleStep.AX10_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
             E_AutoCycleStep.AX11_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: MONTÉE CONTRÔLE';
             E_AutoCycleStep.AX12_LOADED_ASCENT: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
@@ -10969,7 +10969,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
         E_AutoCycleStep.AX_DIVING_RETRY:
             OperatorActionCandidate := '[JOY] Reprise plongee : remonter au FDC haut';
         E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM:
-            OperatorActionCandidate := '[JOY] Tirer montee (P1) : retente et decollage';
+            OperatorActionCandidate := '[JOY] Tirer : montee synchronisee et retendre les cables';
         E_AutoCycleStep.AX10_CLOSE_BUCKET:
             OperatorActionCandidate := '[JOY] Tirer montee : fermeture de la benne';
         E_AutoCycleStep.AX11_CTRL_ASCENT:
@@ -10999,7 +10999,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_AutoCycleStep.AX7_SEARCH_BOTTOM: StepAtErrorStr := 'AX7 (recherche fond)';
                 E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: StepAtErrorStr := 'AX8 (fond confirme)';
                 E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'AX_DIVING_RETRY (reprise plongee)';
-                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (retente cables)';
+                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (montee synchronisee - retendre cables)';
                 E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10 (fermeture benne)';
                 E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11 (remontee controle)';
                 E_AutoCycleStep.AX12_LOADED_ASCENT: StepAtErrorStr := 'AX12 (remontee chargee)';

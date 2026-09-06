@@ -25,7 +25,7 @@ TYPE E_AutoCycleStep :
   AX8_BOTTOM_CONFIRMED := 8,    (* Fond confirme : coupure instantanee treuils, set bit fond, TouchPositionM / RaiseTargetM *)
 
   (* --- EXTRACTION (4 steps) --- *)
-  AX9_RAISE_OFF_BOTTOM := 9,    (* Retente les cables (palier 1), decollement du fond ; selecteur couplage BOTH/M1/M2 accessible *)
+  AX9_RAISE_OFF_BOTTOM := 9,    (* Montee synchronisee : retendre les cables ; selecteur couplage BOTH/M1/M2 accessible *)
   AX10_CLOSE_BUCKET    := 10,   (* Fermeture benne, treuils explicitement 0 *)
   AX11_CTRL_ASCENT     := 11,   (* Montee controle palier max reglable [1..2] + surveillance ecart vitesse M1/M2 ; benne mal fermee autorisee *)
   AX12_LOADED_ASCENT   := 12,   (* Montee en charge : palier 4 si benne fermee, palier 1 si mal fermee ; pas de ralenti 1 m avant top *)
