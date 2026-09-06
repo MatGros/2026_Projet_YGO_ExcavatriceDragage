@@ -360,6 +360,7 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
               <value name="AX_STAB" value="19" />
               <value name="AX_DIVING_RETRY" value="20" />
               <value name="AX3_WAIT_DIVE_START" value="21" />
+              <value name="AX10_WAIT_ASCENT_START" value="22" />
             </values>
           </enum>
         </baseType>
@@ -500,6 +501,12 @@ Cible translation sélectionnée (1=Trémie, 3=P1)</xhtml>
                 <Name>AX3_WAIT_DIVE_START</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition benne-&gt;plongee : sorties neutres jusqu'a l'arret mecanique confirme M1/M2, joystick pousse maintenu</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX10_WAIT_ASCENT_START</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition fermeture-&gt;montee : sorties neutres jusqu'a l'arret confirme M1/M2, joystick tire maintenu</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

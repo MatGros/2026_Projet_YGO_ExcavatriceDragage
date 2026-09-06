@@ -6,6 +6,7 @@ STRUCT
     BtnStart          : BOOL; (* ▶️ Lancement cycle automatique *)
     BtnPause          : BOOL; (* ⏸️ Pause cycle automatique *)
     BtnAbort          : BOOL; (* ⏹️ Abandon / arrêt cycle automatique *)
+    BtnResumeAfterFault : BOOL; (* Reprise consciente depuis AX_STAB vers l'etape d'origine *)
     BtnReset          : BOOL; (* 🔁 Reset dédié FB_Cycle, jamais mélangé au reset défauts général () *)
     BtnSkipDrain      : BOOL; (* ⏭️ Passer l'étape d'égouttage X9 (front) *)
     BtnReposition     : BOOL; (* ⬇️ Option maintenue : repositionnement couplé M1+M2 pendant le vidage trémie (X11b <-> X11c) *)

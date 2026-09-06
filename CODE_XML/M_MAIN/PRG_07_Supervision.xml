@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.587329" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.587329">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T20:11:45.505336" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T20:11:45.505336">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -803,6 +803,7 @@ fournie par la configuration persistante de l'appelant.
               <value name="AX_STAB" value="19" />
               <value name="AX_DIVING_RETRY" value="20" />
               <value name="AX3_WAIT_DIVE_START" value="21" />
+              <value name="AX10_WAIT_ASCENT_START" value="22" />
             </values>
           </enum>
         </baseType>
@@ -943,6 +944,12 @@ fournie par la configuration persistante de l'appelant.
                 <Name>AX3_WAIT_DIVE_START</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition benne-&gt;plongee : sorties neutres jusqu'a l'arret mecanique confirme M1/M2, joystick pousse maintenu</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX10_WAIT_ASCENT_START</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition fermeture-&gt;montee : sorties neutres jusqu'a l'arret confirme M1/M2, joystick tire maintenu</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>
@@ -8320,6 +8327,7 @@ GVL_IHM.CycleSemiAuto.State.ErrorId                := SEL(PRG_03_Modes_Cycle.Dat
 GVL_IHM.CycleSemiAuto.State.CycleStep              := PRG_03_Modes_Cycle.Data.SequenceState.Step;
 GVL_IHM.CycleSemiAuto.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.SequenceState.StepStr;
 GVL_IHM.CycleSemiAuto.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
+GVL_IHM.CycleSemiAuto.State.ResumeAfterFaultAvailable := PRG_03_Modes_Cycle.Data.SequenceState.ResumeAfterFaultAvailable;
 GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
@@ -10730,6 +10738,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX_DIVING_RETRY: Banner.SequenceProgressText := 'Cycle: REPRISE PLONGÉE';
             E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: Banner.SequenceProgressText := 'Cycle: MONTEE SYNCHRONISEE - RETENDRE CABLES';
             E_AutoCycleStep.AX10_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
+            E_AutoCycleStep.AX10_WAIT_ASCENT_START: Banner.SequenceProgressText := 'Cycle: STABILISATION AVANT MONTEE';
             E_AutoCycleStep.AX11_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: MONTÉE CONTRÔLE';
             E_AutoCycleStep.AX12_LOADED_ASCENT: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
             E_AutoCycleStep.AX13_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
@@ -11055,6 +11064,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'AX_DIVING_RETRY (reprise plongee)';
                 E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (montee synchronisee - retendre cables)';
                 E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10 (fermeture benne)';
+                E_AutoCycleStep.AX10_WAIT_ASCENT_START: StepAtErrorStr := 'AX10b (stabilisation avant montee)';
                 E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11 (remontee controle)';
                 E_AutoCycleStep.AX12_LOADED_ASCENT: StepAtErrorStr := 'AX12 (remontee chargee)';
                 E_AutoCycleStep.AX13_DRAIN_PAUSE: StepAtErrorStr := 'AX13 (egouttage)';
@@ -11095,8 +11105,9 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             ELSE
                 CycleFaultCauseStr := CONCAT('cause cycle inconnue #', WORD_TO_STRING(CycleErrorId));
             END_IF;
-            OperatorActionCandidate := CONCAT('[CYCLE] ', CONCAT(CycleFaultCauseStr,
-                                         CONCAT(' (', CONCAT(StepAtErrorStr, ') - cause disparue puis acquitter'))));
+            OperatorActionCandidate := CONCAT('[CYCLE] Defaut a ', CONCAT(StepAtErrorStr,
+                                         CONCAT(' : ', CONCAT(CycleFaultCauseStr,
+                                         '). Choisir Reprendre ou Abandonner.'))));
         ELSE
             OperatorActionCandidate := '[CYCLE] Cycle en cours...';
     END_CASE;

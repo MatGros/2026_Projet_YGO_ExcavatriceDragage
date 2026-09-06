@@ -264,6 +264,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             E_AutoCycleStep.AX_DIVING_RETRY: Banner.SequenceProgressText := 'Cycle: REPRISE PLONGÉE';
             E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: Banner.SequenceProgressText := 'Cycle: MONTEE SYNCHRONISEE - RETENDRE CABLES';
             E_AutoCycleStep.AX10_CLOSE_BUCKET: Banner.SequenceProgressText := 'Cycle: FERMETURE BENNE';
+            E_AutoCycleStep.AX10_WAIT_ASCENT_START: Banner.SequenceProgressText := 'Cycle: STABILISATION AVANT MONTEE';
             E_AutoCycleStep.AX11_CTRL_ASCENT: Banner.SequenceProgressText := 'Cycle: MONTÉE CONTRÔLE';
             E_AutoCycleStep.AX12_LOADED_ASCENT: Banner.SequenceProgressText := 'Cycle: REMONTÉE CHARGÉE';
             E_AutoCycleStep.AX13_DRAIN_PAUSE: Banner.SequenceProgressText := 'Cycle: ÉGOUTTAGE';
@@ -589,6 +590,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'AX_DIVING_RETRY (reprise plongee)';
                 E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (montee synchronisee - retendre cables)';
                 E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10 (fermeture benne)';
+                E_AutoCycleStep.AX10_WAIT_ASCENT_START: StepAtErrorStr := 'AX10b (stabilisation avant montee)';
                 E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11 (remontee controle)';
                 E_AutoCycleStep.AX12_LOADED_ASCENT: StepAtErrorStr := 'AX12 (remontee chargee)';
                 E_AutoCycleStep.AX13_DRAIN_PAUSE: StepAtErrorStr := 'AX13 (egouttage)';
@@ -629,8 +631,9 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
             ELSE
                 CycleFaultCauseStr := CONCAT('cause cycle inconnue #', WORD_TO_STRING(CycleErrorId));
             END_IF;
-            OperatorActionCandidate := CONCAT('[CYCLE] ', CONCAT(CycleFaultCauseStr,
-                                         CONCAT(' (', CONCAT(StepAtErrorStr, ') - cause disparue puis acquitter'))));
+            OperatorActionCandidate := CONCAT('[CYCLE] Defaut a ', CONCAT(StepAtErrorStr,
+                                         CONCAT(' : ', CONCAT(CycleFaultCauseStr,
+                                         '). Choisir Reprendre ou Abandonner.'))));
         ELSE
             OperatorActionCandidate := '[CYCLE] Cycle en cours...';
     END_CASE;

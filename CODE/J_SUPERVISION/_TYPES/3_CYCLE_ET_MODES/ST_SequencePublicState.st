@@ -33,5 +33,6 @@ STRUCT
     ForceStepResult     : STRING(120);      // Motif accepte/refuse
     BottomTouchConfirmed        : BOOL;                    // Contact fond Kobold confirmé (manuel + bypass)
     WinchDescentAuth_M3         : BOOL;                    // Autorisation positive descente treuil selon position M3 (P1/Maintenance) — PRG_04 §5
+    ResumeAfterFaultAvailable : BOOL;     // Reprise AX_STAB disponible apres disparition de la cause
 END_STRUCT
 END_TYPE
