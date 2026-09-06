@@ -34,5 +34,6 @@ STRUCT
     ForceStepAccepted      : BOOL;        (* ✅ Impulsion préparation acceptée *)
     ForceStepRejected      : BOOL;        (* ❌ Impulsion préparation refusée *)
     ForceStepResult        : STRING(120); (* 📝 Motif accepté/refusé *)
+    ResumeAfterFaultAvailable : BOOL;    (* Reprise AX_STAB disponible apres disparition de la cause *)
 END_STRUCT
 END_TYPE

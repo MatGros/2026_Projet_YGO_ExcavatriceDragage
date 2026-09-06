@@ -603,6 +603,14 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation positive descente treuil selon position M3 (P1/Maintenance) — PRG_04 §5</xhtml>
               </documentation>
             </variable>
+            <variable name="ResumeAfterFaultAvailable">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Reprise AX_STAB disponible apres disparition de la cause</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -902,6 +910,7 @@ M1 : contacteurs retombés</xhtml>
               <value name="AX_STAB" value="19" />
               <value name="AX_DIVING_RETRY" value="20" />
               <value name="AX3_WAIT_DIVE_START" value="21" />
+              <value name="AX10_WAIT_ASCENT_START" value="22" />
             </values>
           </enum>
         </baseType>
@@ -1042,6 +1051,12 @@ M1 : contacteurs retombés</xhtml>
                 <Name>AX3_WAIT_DIVE_START</Name>
                 <Documentation>
                   <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition benne-&gt;plongee : sorties neutres jusqu'a l'arret mecanique confirme M1/M2, joystick pousse maintenu</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>AX10_WAIT_ASCENT_START</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Transition fermeture-&gt;montee : sorties neutres jusqu'a l'arret confirme M1/M2, joystick tire maintenu</xhtml>
                 </Documentation>
               </EnumValue>
             </EnumValueDocumentation>

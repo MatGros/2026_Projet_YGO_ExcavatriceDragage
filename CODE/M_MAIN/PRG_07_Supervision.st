@@ -554,6 +554,7 @@ GVL_IHM.CycleSemiAuto.State.ErrorId                := SEL(PRG_03_Modes_Cycle.Dat
 GVL_IHM.CycleSemiAuto.State.CycleStep              := PRG_03_Modes_Cycle.Data.SequenceState.Step;
 GVL_IHM.CycleSemiAuto.State.CycleStateStr          := PRG_03_Modes_Cycle.Data.SequenceState.StepStr;
 GVL_IHM.CycleSemiAuto.State.CycleStepAtError       := PRG_03_Modes_Cycle.Data.SequenceState.StepAtFault;
+GVL_IHM.CycleSemiAuto.State.ResumeAfterFaultAvailable := PRG_03_Modes_Cycle.Data.SequenceState.ResumeAfterFaultAvailable;
 GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;

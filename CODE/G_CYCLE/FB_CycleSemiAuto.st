@@ -26,6 +26,7 @@ VAR_INPUT
     // === COMMANDES OPERATEUR ===
     StartCycle              : BOOL;         // --> [CMD] Demande lancement / reprise (IHM)
     AbortCycle              : BOOL;         // --> [CMD] Demande abandon (IHM)
+    ResumeAfterFault        : BOOL;         // --> [CMD] Reprise consciente depuis AX_STAB vers l'etape d'origine
 
     // === CIBLES ET CONFIGURATION ===
     SelTarget               : INT;          // --> [CFG] RESERVE (C3.1 : le cycle part toujours de P1, plus de selection de cible). Cable, non consomme.
@@ -81,7 +82,7 @@ VAR_INPUT
     RepositionRequest      : BOOL;         // --> [CMD] Option IHM (maintenue) : repositionnement couple M1+M2 pendant le vidage tremie (AX15B <-> AX15C)
     CfgCommissioningEnable : BOOL;         // --> [CFG] Case IHM mise en service : deverrouille le forcage de step
     CfgCycleChecksInhibit  : BOOL;         // --> [TST] Activation controles procede inhibes en mise en service
-    CfgForceStepTarget     : INT;          // --> [CFG] Step cible du forcage (0=AX0 .. 20=AX_DIVING_RETRY), borne dans le FB
+    CfgForceStepTarget     : INT;          // --> [CFG] Step cible du forcage (0=AX0 .. 22=AX10_WAIT_ASCENT_START), borne dans le FB
     CfgForceStepApply      : BOOL;         // --> [CMD] Applique le forcage (front) — impulsion, le GRAFCET reprend ensuite
 
     // === CONFIG DIVING / EXTRACTION (GEL 2026-09-03) ===
@@ -122,6 +123,7 @@ VAR_OUTPUT
     CycleStep               : E_AutoCycleStep;          // <-- [STAT] Etape active du Grafcet
     CycleStateStr           : STRING(80);           // <-- [STAT] Libelle en clair de l'etape
     CycleStepAtError        : E_AutoCycleStep;          // <-- [DIAG] Etape specifique au moment du defaut
+    ResumeAfterFaultAvailable : BOOL;                   // <-- [STAT] Reprise AX_STAB autorisee
     OperatorActionId        : WORD;                 // <-- [DIAG] ID action operateur requise
     OperatorAction          : STRING(120);          // <-- [DIAG] Message explicatif pour l'IHM
     ExpectedAxis            : E_OperatorAxis;       // <-- [STAT] Organe joystick/bouton attendu
@@ -142,6 +144,7 @@ VAR
     StartEdge               : R_TRIG;       // . [LOC] Detecteur front montant StartCycle
     DeadmanArmedEdge        : R_TRIG;       // . [LOC] Detecteur front montant DeadmanArmed (demarrage joystick)
     AbortEdge               : R_TRIG;       // . [LOC] Detecteur front montant AbortCycle
+    ResumeAfterFaultEdge    : R_TRIG;       // . [LOC] Detecteur front montant reprise AX_STAB
     ErrorEdge               : R_TRIG;       // . [LOC] Detecteur front montant Error
     JoyDeflectedEdge        : R_TRIG;       // . [LOC] Front montant JoystickDeflected (relance AX18 sur geste franc, pas maintien)
     ForceStepApplyEdge      : R_TRIG;       // . [LOC] Detecteur front montant CfgForceStepApply
@@ -217,6 +220,7 @@ VAR
     DrainingTime            : TIME := T#5s;     // . [LOC] Temps d'egouttage par defaut
     StepMaxTimeout          : TIME := T#60s;    // . [LOC] Tempo max d'etape
     DiveStartStopTimer      : TON;              // . [LOC] Confirmation arret mecanique avant depart couple
+    AscentStartStopTimer    : TON;              // . [LOC] Confirmation arret mecanique avant depart montee couplee
     DiveStartTimeoutTimer   : TON;              // . [LOC] Plafond attente arret mecanique (sanction defaut)
     DiveStartStopped        : BOOL;              // . [LOC] Les deux treuils sont physiquement arretes et mesures valides
     CST_KoboldStabTime      : TIME := T#500ms;  // . [LOC] Stabilisation feedback Kobold
@@ -236,6 +240,7 @@ VAR CONSTANT
     CST_StepLoaded : INT := 4;   // Palier montee en charge AX12 (bridage strict <= 4, jamais palier 5)
     CST_KoboldInitTimeout : TIME := T#3s;   // Fenetre max de confirmation retour contacteur Kobold en AX5
     CST_DiveStartStopConfirmTime : TIME := T#300ms; // Confirmation stable des 6 faits d'arret + validite vitesses
+    CST_AscentStartStopConfirmTime : TIME := T#750ms; // Purge redemarrage apres fermeture benne
     CST_DiveStartStopTimeout : TIME := T#5s; // Plafond anti-blocage ; timeout -> defaut latche, jamais depart
     CST_DiveStartSpeedThresholdMps : REAL := 0.02; // Vitesse quasi nulle, alignee FB_Modes
     CST_RaiseOffBottomDefaultM : REAL := 0.5;   // Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM <= 0
@@ -250,6 +255,7 @@ ResetEdge(CLK := Reset);
 StartEdge(CLK := StartCycle);
 DeadmanArmedEdge(CLK := DeadmanArmed);
 AbortEdge(CLK := AbortCycle);
+ResumeAfterFaultEdge(CLK := ResumeAfterFault);
 SkipDrainEdge(CLK := SkipDrainRequest);
 KoboldRiseEdge(CLK := KoboldImmersed);
 KoboldFallEdge(CLK := KoboldImmersed);
@@ -265,6 +271,8 @@ DiveStartStopped := M1_SpeedValid AND M2_SpeedValid
                     AND (ABS(M2_MeasuredSpeedMps) < CST_DiveStartSpeedThresholdMps);
 DiveStartStopTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START) AND DiveStartStopped,
                    PT := CST_DiveStartStopConfirmTime);
+AscentStartStopTimer(IN := (State = E_AutoCycleStep.AX10_WAIT_ASCENT_START) AND DiveStartStopped,
+                     PT := CST_AscentStartStopConfirmTime);
 // AX3_WAIT_DIVE_START est une attente de condition mecanique, sans sanction
 // temporelle : l'arret confirme reste obligatoire pour passer en AX4.
 DiveStartTimeoutTimer(IN := FALSE, PT := CST_DiveStartStopTimeout);
@@ -471,8 +479,20 @@ IgnoredCycleCheckId := 0;
 IF CycleChecksInhibited AND StepMaxTimer.Q THEN IgnoredCycleCheckId := IgnoredCycleCheckId OR 16#0010; END_IF;
 IF CycleChecksInhibited AND PalierNot4Timer.Q THEN IgnoredCycleCheckId := IgnoredCycleCheckId OR 16#0200; END_IF;
 
+// Reprise AX_STAB autorisee seulement si la cause live a disparu, la machine est
+// arretee et le joystick est au neutre. La commande de reprise acquitte sur front.
+ResumeAfterFaultAvailable := (State = E_AutoCycleStep.AX_STAB)
+                             AND Fault.Latched
+                             AND NOT Fault.Error
+                             AND PowerContactorEngaged
+                             AND DiveStartStopped
+                             AND NOT JoystickDeflected
+                             AND (CycleStepAtError <> E_AutoCycleStep.AX_STAB);
+
 // Appel du socle de defaut
-instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+instFault(Enable := Enable,
+          Reset := Reset OR (ResumeAfterFaultEdge.Q AND ResumeAfterFaultAvailable),
+          Causes := instCauses);
 Fault := instFault.Fault;
 ErrorEdge(CLK := Fault.Error);
 {endregion}
@@ -504,7 +524,7 @@ IF ForceStepApplyEdge.Q AND NOT AbortEdge.Q THEN
     ForceStepCandidate := E_AutoCycleStep.AX0_REPOS;
     IF (Mode = E_Mode.SEMI_AUTO) AND NOT Fault.Latched
        AND NOT JoystickDeflected AND DiveStartStopped
-       AND (CfgForceStepTarget >= 0) AND (CfgForceStepTarget <= 21)
+       AND (CfgForceStepTarget >= 0) AND (CfgForceStepTarget <= 22)
        AND (CfgForceStepTarget <> 18) AND (CfgForceStepTarget <> 19) THEN
         CASE CfgForceStepTarget OF
             0:  ForceStepCandidate := E_AutoCycleStep.AX0_REPOS;
@@ -528,6 +548,7 @@ IF ForceStepApplyEdge.Q AND NOT AbortEdge.Q THEN
             18: ForceStepCandidate := E_AutoCycleStep.AX18_DONE_SYNC;
             20: ForceStepCandidate := E_AutoCycleStep.AX_DIVING_RETRY;
             21: ForceStepCandidate := E_AutoCycleStep.AX3_WAIT_DIVE_START;
+            22: ForceStepCandidate := E_AutoCycleStep.AX10_WAIT_ASCENT_START;
         END_CASE;
         IF (CfgForceStepTarget = 7) AND NOT KoboldImmersionQualified THEN
             ForceStepRejected := TRUE;
@@ -576,6 +597,16 @@ END_IF;
 // Le mode SEMI_AUTO peut être sélectionné sous AU/défaut (FB_Modes), mais le cycle
 // ne tourne JAMAIS sans puissance (PowerContactorEngaged) ni avec un codeur défaillant
 // (EncoderFaultPresent) — les données de position invalides rendraient le Grafcet erroné.
+// Reprise explicite depuis AX_STAB : les sorties restent neutres jusqu'a un
+// nouveau geste operateur, aucune remise en mouvement automatique.
+IF ResumeAfterFaultEdge.Q AND ResumeAfterFaultAvailable AND NOT ResetEdge.Q THEN
+    PausedState := CycleStepAtError;
+    State := CycleStepAtError;
+    WaitingResume := TRUE;
+    ForceStepPrepared := FALSE;
+    ForceStepWaiting := FALSE;
+END_IF;
+
 IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     IF ForceStepWaiting THEN
         WaitingResume := FALSE;
@@ -1132,18 +1163,29 @@ CASE State OF
 
         IF DeadmanArmed AND JoystickPull AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.ReqClose := FALSE;
-            // AX10 -> AX11 : la transition conserve la meme intention operateur;
-            // demarrage direct de la montee lente controlee sans pause artificielle.
-            WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
-            WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
-            WinchM1Cmd.StepTgt  := CtrlAscentMaxStepEff;
-            WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
-            WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
-            WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
-            // Nouvelle reference de controle : position reelle au depart
-            // d'AX11, apres extraction/fermeture, et non le contact fond.
-            // Une distance configuree a 0 desactive volontairement AX11 et
-            // enchaine directement AX12 sans demander de relacher le joystick.
+            // Transition vers l'etape dediee de stabilisation, symetrique a AX21.
+            State := E_AutoCycleStep.AX10_WAIT_ASCENT_START;
+        END_IF;
+
+    E_AutoCycleStep.AX10_WAIT_ASCENT_START:
+        CycleStep := E_AutoCycleStep.AX10_WAIT_ASCENT_START;
+        CycleStateStr := 'AX10b - Stabilisation avant montee';
+        Lifecycle.Busy := TRUE;
+        Lifecycle.Done := FALSE;
+        ExpectedAxis := E_OperatorAxis.JOYSTICK_Y;
+        ExpectedDirection := 1;
+        WaitingForOperator := NOT (DeadmanArmed AND JoystickPull);
+        WaitingForProcess := NOT AscentStartStopTimer.Q;
+        OperatorActionId := 16#040A;
+        OperatorAction := 'AX10b - Maintenir le joystick tire : attente arret M1/M2 avant montee.';
+
+        // Etape de transfert symetrique a AX3_WAIT_DIVE_START : aucune commande
+        // treuil pendant la retombee, purge interlock et confirmation arret physique.
+        WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
+        WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        BucketCmd.ReqOpen := FALSE; BucketCmd.ReqClose := FALSE;
+
+        IF AscentStartStopTimer.Q AND DeadmanArmed AND JoystickPull THEN
             CtrlAscentStartM1 := M1_CablePosM;
             CtrlAscentStartM2 := M2_CablePosM;
             IF CfgCtrlAscentDistanceM <= 0.0 THEN
@@ -1386,7 +1428,7 @@ CASE State OF
 
     E_AutoCycleStep.AX_STAB:
         CycleStep := E_AutoCycleStep.AX_STAB;
-        CycleStateStr := 'AX_STAB - Cycle en attente / stabilisation sur anomalie';
+        CycleStateStr := 'AX_STAB - Defaut cycle : etape origine memorisee, choisir reprise ou abandon';
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE;
         TranslationCmd.ReqStart := FALSE;
@@ -1400,7 +1442,11 @@ CASE State OF
         WaitingForOperator := TRUE;
         WaitingForProcess := FALSE;
         OperatorActionId := 16#0480;
-        OperatorAction := 'AX_STAB - Cycle stabilise sur anomalie : acquitter le defaut pour reinitialiser.';
+        IF ResumeAfterFaultAvailable THEN
+            OperatorAction := 'AX_STAB - Cause disparue et arret confirme : appuyer Reprendre defaut ou Abandonner.';
+        ELSE
+            OperatorAction := 'AX_STAB - Sorties neutres : supprimer la cause, mettre le joystick au neutre, puis choisir Reprendre ou Abandonner.';
+        END_IF;
 
 END_CASE;
 END_IF;

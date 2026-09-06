@@ -171,6 +171,7 @@ instCycleSemiAuto(
     HeartbeatIhmOk          := GVL_IHM.Commun.HeartbeatIhmOk,
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
     AbortCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnAbort,
+    ResumeAfterFault        := GVL_IHM.CycleSemiAuto.Cmd.BtnResumeAfterFault,
     SelTarget               := GVL_IHM.TranslationM3.Cmd.SelTarget,
     SetDepthM               := GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M,
     DepthStopMode           := GVL_IHM.CycleSemiAuto.Cfg.DepthStopMode,
@@ -290,6 +291,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.Step                   := instCycleSemiAuto.CycleStep;
     Data.SequenceState.StepStr                := instCycleSemiAuto.CycleStateStr;
     Data.SequenceState.StepAtFault            := instCycleSemiAuto.CycleStepAtError;
+    Data.SequenceState.ResumeAfterFaultAvailable := instCycleSemiAuto.ResumeAfterFaultAvailable;
     Data.SequenceState.OperatorActionId       := instCycleSemiAuto.OperatorActionId;
     Data.SequenceState.OperatorAction         := instCycleSemiAuto.OperatorAction;
     Data.SequenceState.ExpectedAxis           := instCycleSemiAuto.ExpectedAxis;
@@ -377,6 +379,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.Step                   := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.StepStr                := 'ASSIST_MODE';
     Data.SequenceState.StepAtFault            := E_AutoCycleStep.AX0_REPOS;
+    Data.SequenceState.ResumeAfterFaultAvailable := FALSE;
     Data.SequenceState.ExpectedAxis           := E_OperatorAxis.JOYSTICK_Y;
     Data.SequenceState.ExpectedDirection      := WinchBothMotionDirection;
     Data.SequenceState.WaitingForOperator     := FALSE;
@@ -442,6 +445,7 @@ ELSE
     Data.SequenceState.Step                    := E_AutoCycleStep.AX0_REPOS;
     Data.SequenceState.StepStr                 := 'AX0_REPOS';
     Data.SequenceState.StepAtFault             := E_AutoCycleStep.AX0_REPOS;
+    Data.SequenceState.ResumeAfterFaultAvailable := FALSE;
     Data.SequenceState.OperatorActionId        := 0;
     Data.SequenceState.OperatorAction          := '';
     Data.SequenceState.ExpectedAxis            := E_OperatorAxis.NONE;
