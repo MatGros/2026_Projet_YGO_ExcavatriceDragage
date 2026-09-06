@@ -1204,7 +1204,7 @@ pas une vitesse continue.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="7" />
+                <simpleValue value="7.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
@@ -1448,10 +1448,10 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.5" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décollement du fond en AX8 : RaiseTarget = TouchPosition + ce champ (réglable essais, GEL Q16)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = compensation interne par défaut pour le décollement AX8</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentMaxStep">
@@ -1514,10 +1514,10 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance palier contrôle montée assistée (PRG_04)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = distance de contrôle interne par défaut</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -7155,6 +7155,28 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant le point d'arret anticipe ou le jog unitaire M2 est force au palier 1 (m) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepUp">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en montée/fermeture (1..5) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en descente/ouverture (1..5) -- reglable IHM</xhtml>
               </documentation>
             </variable>
           </struct>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:32:12.451376" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:32:12.451376">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T17:14:58.702008" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T17:14:58.702008">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -166,7 +166,7 @@ pas une vitesse continue.
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="7" />
+                <simpleValue value="7.5" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Limite haute d'exploitation NORMALE (m), commun M1/M2</xhtml>
@@ -276,10 +276,10 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.5" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décollement du fond en AX8 : RaiseTarget = TouchPosition + ce champ (réglable essais, GEL Q16)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = compensation interne par défaut pour le décollement AX8</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentMaxStep">
@@ -342,10 +342,10 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance palier contrôle montée assistée (PRG_04)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = distance de contrôle interne par défaut</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
@@ -1546,6 +1546,28 @@ palier : 1..5</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Distance avant le point d'arret anticipe ou le jog unitaire M2 est force au palier 1 (m) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepUp">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en montée/fermeture (1..5) -- reglable IHM</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaxStepDown">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en descente/ouverture (1..5) -- reglable IHM</xhtml>
               </documentation>
             </variable>
           </struct>

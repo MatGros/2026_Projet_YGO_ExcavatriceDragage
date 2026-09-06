@@ -384,7 +384,17 @@ instCauses[0].Active   := LimitLegalReached
 instCauses[0].Latching := TRUE;
 instCauses[0].Texte    := 'Limite legale de profondeur atteinte pendant descente';
 
-instCauses[1].Active   := WinchSyncError AND (State <> E_AutoCycleStep.AX0_REPOS) AND (State <> E_AutoCycleStep.AX_STAB);
+// PRG_04 purge FB_WinchSync pendant AX8..AX11, mais PRG_03 peut encore lire
+// le diagnostic du scan precedent a l'entree AX8. Ces phases sont volontairement
+// dissymetriques (contact fond, retente, fermeture, controle) : aucun vieux bit
+// de synchronisme ne doit provoquer un repli AX_STAB avant la purge.
+instCauses[1].Active   := WinchSyncError
+                          AND (State <> E_AutoCycleStep.AX0_REPOS)
+                          AND (State <> E_AutoCycleStep.AX_STAB)
+                          AND (State <> E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
+                          AND (State <> E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
+                          AND (State <> E_AutoCycleStep.AX10_CLOSE_BUCKET)
+                          AND (State <> E_AutoCycleStep.AX11_CTRL_ASCENT);
 instCauses[1].Latching := TRUE;
 instCauses[1].Texte    := 'Desynchronisme treuils M1/M2 bloquant';
 
@@ -793,13 +803,13 @@ CASE State OF
 
         IF Translation_At_P1 THEN
             ExpectedDirection := 0;
-            WaitingForOperator := FALSE;
-            WaitingForProcess := TRUE;
+            WaitingForOperator := JoystickDeflected;
+            WaitingForProcess := NOT JoystickDeflected;
             OperatorActionId := 16#0402;
-            OperatorAction := 'AX2 - Position P1 atteinte.';
+            OperatorAction := 'AX2 - P1 atteint : relacher le joystick au neutre avant ouverture benne.';
             TranslationCmd.ReqStart := FALSE;
             TranslationCmd.PositionTgt := 0;
-            IF TranslationStopTimer.Q THEN
+            IF TranslationStopTimer.Q AND NOT JoystickDeflected THEN
                 State := E_AutoCycleStep.AX3_OPEN_BUCKET;
             END_IF;
         ELSE
@@ -1232,10 +1242,13 @@ CASE State OF
         TranslationCmd.PositionTgt := 1; // Trémie
         TranslationCmd.ReqStart := CycleMotionPermit;
 
-        IF JoystickDeflected AND Translation_At_Tremie THEN
+        IF Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
             TranslationCmd.PositionTgt := 0;
-            IF TranslationStopTimer.Q THEN
+            WaitingForOperator := JoystickDeflected;
+            WaitingForProcess := NOT JoystickDeflected;
+            OperatorAction := 'AX14 - Tremie atteinte : relacher le joystick au neutre avant ouverture benne.';
+            IF TranslationStopTimer.Q AND NOT JoystickDeflected THEN
                 State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
             END_IF;
         END_IF;

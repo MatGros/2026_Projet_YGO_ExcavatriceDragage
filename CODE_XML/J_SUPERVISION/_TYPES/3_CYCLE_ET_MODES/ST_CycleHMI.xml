@@ -98,10 +98,10 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.5" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Décollement du fond en AX8 : RaiseTarget = TouchPosition + ce champ (réglable essais, GEL Q16)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = compensation interne par défaut pour le décollement AX8</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlAscentMaxStep">
@@ -164,10 +164,10 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="2" />
+                <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Distance palier contrôle montée assistée (PRG_04)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 0 = distance de contrôle interne par défaut</xhtml>
               </documentation>
             </variable>
             <variable name="Initialized">
