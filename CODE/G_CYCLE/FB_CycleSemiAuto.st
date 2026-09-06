@@ -200,6 +200,7 @@ VAR
     SkipDrainEdge           : R_TRIG;       // . [LOC] Front bouton IHM "passer egouttage"
     DrainTimeEff            : TIME;         // . [LOC] Duree d'egouttage effective (CfgDrainTime bornee au defaut interne)
     StabilizationTimer      : TON;          // . [LOC] Temporisation maximale de remontee lente
+    TranslationStopTimer    : TON;          // . [LOC] Confirmation arret M3 sur FDC avant etape benne
     SpeedMismatchTimer      : TON;          // . [LOC] Confirmation temporelle ecart de vitesse
     StepMaxTimer            : TON;          // . [LOC] Tempo max d'etape
     ExtractionStepDelayTimer : TON;
@@ -219,6 +220,7 @@ VAR
     CST_KoboldPowerUpTime   : TIME := T#500ms;  // . [LOC] Etablissement alimentation capteur Kobold
     CST_KoboldBottomConfirmTime : TIME := T#100ms; // . [LOC] Anti-rebond contact fond
     CST_BottomTouchStabTime : TIME := T#2s;     // . [LOC] Stabilisation arret apres contact fond
+    CST_TranslationStopConfirmTime : TIME := T#300ms; // . [LOC] Confirmation arret M3 sur FDC trémie
 
     // === SOCLE DEFAUT TRANSVERSE ===
     instFault               : FB_FaultCore;                  // * [INST] Socle defaut transverse
@@ -294,6 +296,14 @@ StabilizationTimer(
           AND ExtractionStepDelayTimer.Q,
     PT := CtrlAscentTimeout);
 
+// Arrêt M3 confirmé avant de quitter AX14 : le FDC seul ne suffit pas si le
+// variateur est encore en décélération. L'homme-mort peut rester armé pour AX15B.
+TranslationStopTimer(
+    IN := (State = E_AutoCycleStep.AX14_TRANSLATE_DUMP)
+          AND Translation_At_Tremie
+          AND NOT Translation_Busy,
+    PT := CST_TranslationStopConfirmTime);
+
 // AX5 : le contacteur alimente le capteur ; aucun retour auxiliaire n existe.
 KoboldInitTimer(IN := (State = E_AutoCycleStep.AX5_KOBOLD_INIT) AND DeadmanArmed AND JoystickPush,
                 PT := CST_KoboldPowerUpTime);
@@ -315,8 +325,7 @@ StepMaxPrevState := State;
 ExtractionStepDelayTimer(
     IN := ((State = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
         OR (State = E_AutoCycleStep.AX10_CLOSE_BUCKET)
-        OR (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
-        OR (State = E_AutoCycleStep.AX12_LOADED_ASCENT))
+        OR (State = E_AutoCycleStep.AX11_CTRL_ASCENT))
        AND (State = ExtractionDelayState),
     PT := CST_ExtractionStepDelay);
 IF State <> ExtractionDelayState THEN
@@ -817,6 +826,8 @@ CASE State OF
         // X3 = etape benne seule : treuils explicitement neutralises (config treuil unique par etape).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
 
         // Pilotage benne 2 sens : pousse (Y-) -> ouvre, tire (Y+) -> ferme
         IF DeadmanArmed AND JoystickPush THEN
@@ -1161,10 +1172,10 @@ CASE State OF
 
         // Benne bien fermee -> palier 4 ; benne mal fermee (a peu pres) -> palier 1.
         // Pas de ralentissement 1 m avant la position top (montee franche).
-        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM1Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
-        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
@@ -1220,7 +1231,10 @@ CASE State OF
 
         IF JoystickDeflected AND Translation_At_Tremie THEN
             TranslationCmd.ReqStart := FALSE;
-            State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
+            TranslationCmd.PositionTgt := 0;
+            IF TranslationStopTimer.Q THEN
+                State := E_AutoCycleStep.AX15A_DUMP_ARRIVE;
+            END_IF;
         END_IF;
 
     E_AutoCycleStep.AX15A_DUMP_ARRIVE:
@@ -1238,6 +1252,8 @@ CASE State OF
         // Config treuil UNIQUE : arret des deux treuils (aucune descente couplee ici).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
 
         // Geste operateur (manche defleci) -> phase d'ouverture benne.
         IF DeadmanArmed AND JoystickPush THEN
@@ -1261,6 +1277,8 @@ CASE State OF
         // d'ecart M1/M2 volontaire ni de faux SafeStop concordance contacteurs).
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
 
         BucketCmd.ReqOpen := DeadmanArmed AND JoystickPush;
 
@@ -1294,6 +1312,8 @@ CASE State OF
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
         WinchM2Cmd.RunRequest := CycleMotionPermit;
         WinchM2Cmd.StepTgt := CST_StepSlow;
+        TranslationCmd.ReqStart := FALSE;
+        TranslationCmd.PositionTgt := 0;
 
         // La benne reste ouverte pendant le repositionnement (on finit l'ouverture si besoin).
         BucketCmd.ReqOpen := CycleMotionPermit AND NOT Benne_IsOpen;

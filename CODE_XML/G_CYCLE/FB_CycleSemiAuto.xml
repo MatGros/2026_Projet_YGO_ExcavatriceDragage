@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:24:18.748317" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:24:18.748317">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T15:32:13.675922" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T15:32:13.675922">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2256,8 +2256,7 @@ StepMaxPrevState := State;
 ExtractionStepDelayTimer(
     IN := ((State = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
         OR (State = E_AutoCycleStep.AX10_CLOSE_BUCKET)
-        OR (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
-        OR (State = E_AutoCycleStep.AX12_LOADED_ASCENT))
+        OR (State = E_AutoCycleStep.AX11_CTRL_ASCENT))
        AND (State = ExtractionDelayState),
     PT := CST_ExtractionStepDelay);
 IF State &lt;&gt; ExtractionDelayState THEN
@@ -3102,10 +3101,10 @@ CASE State OF
 
         // Benne bien fermee -&gt; palier 4 ; benne mal fermee (a peu pres) -&gt; palier 1.
         // Pas de ralentissement 1 m avant la position top (montee franche).
-        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM1Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
-        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := SEL(Benne_IsClosed, CST_StepSlow, CST_StepLoaded);
 
