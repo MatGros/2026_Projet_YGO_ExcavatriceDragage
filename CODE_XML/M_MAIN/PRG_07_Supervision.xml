@@ -287,7 +287,7 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="1" />
+                <simpleValue value="2" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🚀 Palier max montée contrôle AX11, borné [1..2] côté FB (GEL Q16)</xhtml>
@@ -3325,7 +3325,7 @@ Cause de blocage prioritaire</xhtml>
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="4" />
+                <simpleValue value="2" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en montée/fermeture (1..5) -- reglable IHM</xhtml>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T16:52:58.977987" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T16:52:58.977987">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T17:44:00.524344" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T17:44:00.524344">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -88,7 +88,7 @@
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="4" />
+                <simpleValue value="2" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en montée/fermeture (1..5) -- reglable IHM</xhtml>

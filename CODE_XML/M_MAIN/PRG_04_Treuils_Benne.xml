@@ -2777,7 +2777,7 @@ TRUE = relais sens + C1..C4 tous retombés (ex-FwdRevSpeedFeedbackOff)</xhtml>
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="4" />
+                <simpleValue value="2" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Plafond palier benne en montée/fermeture (1..5) -- reglable IHM</xhtml>
@@ -11855,6 +11855,14 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Double demande de sens refusée</xhtml>
               </documentation>
             </variable>
+            <variable name="BucketRequestedStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier joystick benne avant plafond de configuration</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -11871,7 +11879,8 @@ END_IF;
    🪜 -B : la sortie est désormais un PALIER (StepTgt, 1-5) au lieu d'un
        pourcentage. En SEMI_AUTO, passthrough de ReqWinch.StepTgt ; en manuel,
        le joystick est le producteur UNIQUE du palier (passthrough de
-       Joystick.AxisY.StepTgt), boutons/both = palier 5, override benne = palier 1.
+       Joystick.AxisY.StepTgt), boutons/both = palier 5, override benne = palier
+       joystick borne par le plafond de configuration.
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -11906,10 +11915,12 @@ ELSE
         RunRequest := Context.BucketM2RunRequest AND (Joystick.AxisX.Direction = 0);
         ReqAscent  := Context.BucketM2ReqAscent;
         ReqDescend := Context.BucketM2ReqDescend;
+        // Le plafond benne borne la consigne joystick ; il ne la remplace pas.
+        BucketRequestedStep := LIMIT(1, Joystick.AxisY.StepTgt, 5);
         IF ReqDescend THEN
-            StepTgt := Cfg.BucketOverrideStepDownTgt;
+            StepTgt := MIN(BucketRequestedStep, Cfg.BucketOverrideStepDownTgt);
         ELSE
-            StepTgt := Cfg.BucketOverrideStepUpTgt;
+            StepTgt := MIN(BucketRequestedStep, Cfg.BucketOverrideStepUpTgt);
         END_IF;
     ELSE
         // ── Pont SEMI_AUTO : consomme la demande du séquenceur de cycle ──
