@@ -24,5 +24,6 @@ STRUCT
     BrakeCommandOpenConfirmed    : BOOL; // TRUE = contacteur/bobine desserrage confirmé
     RequestedDriveControlWord    : WORD; // 0=None, 1=Fwd, 2=Rev, 7=Reset AC600
     RequestedDriveFreqHz         : REAL;
+    ReqTremieSemantic            : BOOL; // TRUE = mouvement demande vers Tremie, independant de InvertDriveDirection
 END_STRUCT
 END_TYPE

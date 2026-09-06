@@ -11732,6 +11732,14 @@ Cause de blocage prioritaire</xhtml>
                 <REAL />
               </type>
             </variable>
+            <variable name="ReqTremieSemantic">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = mouvement demande vers Tremie, independant de InvertDriveDirection</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -21975,8 +21983,9 @@ DiveStartStopped := M1_SpeedValid AND M2_SpeedValid
                     AND (ABS(M2_MeasuredSpeedMps) &lt; CST_DiveStartSpeedThresholdMps);
 DiveStartStopTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START) AND DiveStartStopped,
                    PT := CST_DiveStartStopConfirmTime);
-DiveStartTimeoutTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START),
-                      PT := CST_DiveStartStopTimeout);
+// AX3_WAIT_DIVE_START est une attente de condition mecanique, sans sanction
+// temporelle : l'arret confirme reste obligatoire pour passer en AX4.
+DiveStartTimeoutTimer(IN := FALSE, PT := CST_DiveStartStopTimeout);
 
 // Config diving/extraction bornee (repli defaut interne si non reglee / valeur implausible).
 // DiveStartMinM = altimetrie de lancement Kobold dans le referentiel M1_CablePosM
@@ -22166,10 +22175,9 @@ instCauses[9].Active   := PalierNot4Timer.Q AND NOT CycleChecksInhibited
 instCauses[9].Latching := TRUE;
 instCauses[9].Texte    := 'Palier 4 non confirme sur M1 et/ou M2 pendant la recherche Kobold';
 
-instCauses[10].Active   := DiveStartTimeoutTimer.Q
-                           AND (State = E_AutoCycleStep.AX3_WAIT_DIVE_START);
+instCauses[10].Active   := FALSE;
 instCauses[10].Latching := TRUE;
-instCauses[10].Texte    := 'Arret mecanique M1/M2 non confirme avant plongee';
+instCauses[10].Texte    := 'Reserve - attente arret mecanique AX3 sans defaut temporel';
 
 instCauses[11].Active   := (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM)
                            AND (DepthStopMode &lt;&gt; E_CycleDepthStopMode.KOBOLD_ONLY)
@@ -49926,6 +49934,14 @@ Data.BothBlockReason              := BothBlockReason;
                 <BOOL />
               </type>
             </variable>
+            <variable name="M3_CycleTranslationStepAuthorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[SAFE] En SEMI_AUTO, M3 autorise uniquement en AX2/AX14</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimBtnIHM_Active">
               <type>
                 <BOOL />
@@ -50304,6 +50320,22 @@ M3_ReqMaintenance_Active := instArbM3.ReqMaintenance;
 M3_CommandConflict := instArbM3.CommandConflict;
 M3_SpeedCmd_Active := instArbM3.SpeedPct;
 
+// Verrou independant du G7 et de l'arbitrage joystick : en SEMI_AUTO, aucune
+// commande M3 ne doit survivre hors des deux etapes explicitement dediees a la
+// translation. Ce veto couvre notamment AX3/AX10/AX15 (manoeuvres benne), meme
+// si une demande ReqTranslation ou un etat interne restait accidentellement actif.
+M3_CycleTranslationStepAuthorized :=
+    (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX2_TRANSLATE_P1)
+    OR (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX14_TRANSLATE_DUMP);
+
+IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+   AND NOT M3_CycleTranslationStepAuthorized THEN
+    M3_RunRequest_Active := FALSE;
+    M3_ReqTremie_Active := FALSE;
+    M3_ReqMaintenance_Active := FALSE;
+    M3_SpeedCmd_Active := 0.0;
+END_IF;
+
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
 // de commande variateur en sortie — les bits ReqTremie/ReqMaintenance restent le sens sémantique réel.
 
@@ -50558,6 +50590,19 @@ TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeR
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
+TranslationFinalInterlockRequest.ReqTremieSemantic := M3_ReqTremie_Active;
+
+// Derniere barriere avant PRG_06 : neutralisation immediate du variateur ET du
+// frein M3 hors AX2/AX14 en SEMI_AUTO. Elle reste volontairement redondante avec
+// le veto amont pour qu'une rampe ou un sens memorise dans FB_Translation ne
+// puisse alimenter M3 pendant une etape benne.
+IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+   AND NOT M3_CycleTranslationStepAuthorized THEN
+    TranslationFinalInterlockRequest.BrakeReleaseRequest := FALSE;
+    TranslationFinalInterlockRequest.RequestedDriveControlWord := 0;
+    TranslationFinalInterlockRequest.RequestedDriveFreqHz := 0.0;
+    TranslationFinalInterlockRequest.ReqTremieSemantic := FALSE;
+END_IF;
 
 {endregion}
 
@@ -51198,6 +51243,14 @@ Remplace le zeroage binaire instantane de l'ex-§2ter.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Demande frein M3 arbitree</xhtml>
               </documentation>
             </variable>
+            <variable name="M3_TremieHardStopActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [SAFE] FDC brut Tremie coupe immediatement le sens Tremie</xhtml>
+              </documentation>
+            </variable>
             <variable name="PowerKeepAliveACmd">
               <type>
                 <BOOL />
@@ -51551,17 +51604,29 @@ M3SafeStopSafetyInfo := PRG_05_Translation.Data.TranslationSafety.SafeStop
 
 M3BlockedBySafetyInfo := M3PowerCutOffSafetyInfo OR M3SafeStopSafetyInfo;
 
+// Coupure directionnelle ultime sur le FDC physique Tremie. Cette barriere lit
+// le DI qualifie du meme scan et ne depend ni du decodeur de position, ni du G7,
+// ni du step courant. Le recul vers P1/Maintenance reste autorise.
+M3_TremieHardStopActive := PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI
+                           AND PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic;
+
 instTranslationOutputInterlockM3(
     Enable                     := M3InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop,
-    EffectivePermitM3_Tremie   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie,
+    EffectivePermitM3_Tremie   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
+                                  AND NOT PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI,
     EffectivePermitM3_Maintenance := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance,
-    BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest,
+    BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest
+                                  AND NOT M3_TremieHardStopActive,
     BrakeCommandOpenConfirmed  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
-    RequestedDriveControlWord  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord,
-    RequestedDriveFreqHz       := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz
+    RequestedDriveControlWord  := SEL(M3_TremieHardStopActive,
+                                      PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord,
+                                      WORD#0),
+    RequestedDriveFreqHz       := SEL(M3_TremieHardStopActive,
+                                      PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz,
+                                      0.0)
 );
 
 TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;

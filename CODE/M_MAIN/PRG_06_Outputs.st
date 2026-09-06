@@ -93,6 +93,7 @@ VAR
     M2SpeedContactor4            : BOOL; // . [LOC] Ordre contacteur palier 4 treuil M2
     M2BrakeCmd                   : BOOL; // . [LOC] Ordre desserrage frein M2
     TranslationBrakeCmd          : BOOL; // . [LOC] Demande frein M3 arbitree
+    M3_TremieHardStopActive      : BOOL; // . [SAFE] FDC brut Tremie coupe immediatement le sens Tremie
     PowerKeepAliveACmd           : BOOL; // . [LOC] Maintien puissance voie A
     PowerKeepAliveBCmd           : BOOL; // . [LOC] Maintien puissance voie B
     EmergencyArmingCmd           : BOOL; // . [LOC] Impulsion rearmement puissance AU
@@ -390,17 +391,29 @@ M3SafeStopSafetyInfo := PRG_05_Translation.Data.TranslationSafety.SafeStop
 
 M3BlockedBySafetyInfo := M3PowerCutOffSafetyInfo OR M3SafeStopSafetyInfo;
 
+// Coupure directionnelle ultime sur le FDC physique Tremie. Cette barriere lit
+// le DI qualifie du meme scan et ne depend ni du decodeur de position, ni du G7,
+// ni du step courant. Le recul vers P1/Maintenance reste autorise.
+M3_TremieHardStopActive := PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI
+                           AND PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic;
+
 instTranslationOutputInterlockM3(
     Enable                     := M3InterlockEnable,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.SafeStop,
-    EffectivePermitM3_Tremie   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie,
+    EffectivePermitM3_Tremie   := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Tremie
+                                  AND NOT PRG_02_Acquisition.HwIn.Translation.M3_PosTremie_DI,
     EffectivePermitM3_Maintenance := PRG_05_Translation.Data.TranslationFinalInterlockRequest.EffectivePermitM3_Maintenance,
-    BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest,
+    BrakeReleaseRequest        := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeReleaseRequest
+                                  AND NOT M3_TremieHardStopActive,
     BrakeCommandOpenConfirmed  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed,
-    RequestedDriveControlWord  := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord,
-    RequestedDriveFreqHz       := PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz
+    RequestedDriveControlWord  := SEL(M3_TremieHardStopActive,
+                                      PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveControlWord,
+                                      WORD#0),
+    RequestedDriveFreqHz       := SEL(M3_TremieHardStopActive,
+                                      PRG_05_Translation.Data.TranslationFinalInterlockRequest.RequestedDriveFreqHz,
+                                      0.0)
 );
 
 TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;

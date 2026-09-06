@@ -12,6 +12,8 @@ CYCLE = (ROOT / "CODE/G_CYCLE/FB_CycleSemiAuto.st").read_text(encoding="utf-8-si
 PRG03 = (ROOT / "CODE/M_MAIN/PRG_03_Modes_Cycle.st").read_text(encoding="utf-8-sig")
 PRG04 = (ROOT / "CODE/M_MAIN/PRG_04_Treuils_Benne.st").read_text(encoding="utf-8-sig")
 PRG07 = (ROOT / "CODE/M_MAIN/PRG_07_Supervision.st").read_text(encoding="utf-8-sig")
+PRG05 = (ROOT / "CODE/M_MAIN/PRG_05_Translation.st").read_text(encoding="utf-8-sig")
+PRG06 = (ROOT / "CODE/M_MAIN/PRG_06_Outputs.st").read_text(encoding="utf-8-sig")
 WINCH_SYNC = (ROOT / "CODE/H_TREUILS_BENNE/FB_WinchSync.st").read_text(encoding="utf-8-sig")
 
 required_cycle = {
@@ -21,6 +23,9 @@ required_cycle = {
     "distance AX11 M1": "M1_CablePosM >= (CtrlAscentStartM1 + CtrlAscentDistEffM)",
     "distance AX11 M2": "M2_CablePosM >= (CtrlAscentStartM2 + CtrlAscentDistEffM)",
     "arret mecanique AX8": "BottomTouchStabTimer.Q AND DiveStartStopped",
+    "attente AX3 conserve arret physique": "IF DiveStartStopTimer.Q AND DeadmanArmed AND JoystickPush THEN",
+    "timeout AX3 desactive": "DiveStartTimeoutTimer(IN := FALSE, PT := CST_DiveStartStopTimeout)",
+    "cause timeout AX3 neutralisee": "instCauses[10].Active   := FALSE",
     "mode essai visible": "CycleChecksInhibited",
     "mode essai borne semi-auto": "CycleChecksInhibited := CfgCycleChecksInhibit AND (Mode = E_Mode.SEMI_AUTO)",
     "fin egouttage autonome": "IF DrainingTimer.Q OR SkipDrainEdge.Q THEN",
@@ -40,6 +45,7 @@ for forbidden, label in (
     ("ABS(M1_CablePosM - M2_CablePosM) <= CtrlAscentToleranceM", "ecart brut AX11"),
     ("CST_CoupledPosBacklashM", "seuil synchro local cycle duplique"),
     ("IF JoystickDeflected AND (DrainingTimer.Q OR SkipDrainEdge.Q) THEN", "geste joystick cache encore requis pour quitter AX13"),
+    ("DiveStartTimeoutTimer.Q\n                           AND (State = E_AutoCycleStep.AX3_WAIT_DIVE_START)", "timeout AX3 encore routé vers un défaut"),
 ):
     if forbidden in CYCLE or forbidden in PRG03:
         errors.append(label)
@@ -71,6 +77,12 @@ for token, label in (
         errors.append(label)
 if "JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive" not in PRG03:
     errors.append("liaison JoystickPull PRG02 vers cycle")
+for token, source, label in (
+    ("TranslationFinalInterlockRequest.ReqTremieSemantic := M3_ReqTremie_Active", PRG05, "sens Tremie semantique non publie vers PRG06"),
+    ("AND PRG_05_Translation.Data.TranslationFinalInterlockRequest.ReqTremieSemantic", PRG06, "FDC Tremie final encore dependant du mot variateur inverse"),
+):
+    if token not in source:
+        errors.append(label)
 for token, label in (
     ("BottomTouchConfirmed   := instCycleSemiAuto.BottomTouched", "fond qualifie non publie"),
     ("Data.SequenceState.CycleChecksInhibited   := FALSE", "neutralisation etat essai hors semi-auto"),

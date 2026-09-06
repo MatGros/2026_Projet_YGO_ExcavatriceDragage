@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T16:24:58.821287" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T16:24:58.821287">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T18:06:03.855297" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T18:06:03.855297">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -465,6 +465,14 @@
               <type>
                 <REAL />
               </type>
+            </variable>
+            <variable name="ReqTremieSemantic">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = mouvement demande vers Tremie, independant de InvertDriveDirection</xhtml>
+              </documentation>
             </variable>
           </struct>
         </baseType>
@@ -2108,6 +2116,14 @@ M1 : contacteurs retombés</xhtml>
                 <BOOL />
               </type>
             </variable>
+            <variable name="M3_CycleTranslationStepAuthorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">[SAFE] En SEMI_AUTO, M3 autorise uniquement en AX2/AX14</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimBtnIHM_Active">
               <type>
                 <BOOL />
@@ -2486,6 +2502,22 @@ M3_ReqMaintenance_Active := instArbM3.ReqMaintenance;
 M3_CommandConflict := instArbM3.CommandConflict;
 M3_SpeedCmd_Active := instArbM3.SpeedPct;
 
+// Verrou independant du G7 et de l'arbitrage joystick : en SEMI_AUTO, aucune
+// commande M3 ne doit survivre hors des deux etapes explicitement dediees a la
+// translation. Ce veto couvre notamment AX3/AX10/AX15 (manoeuvres benne), meme
+// si une demande ReqTranslation ou un etat interne restait accidentellement actif.
+M3_CycleTranslationStepAuthorized :=
+    (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX2_TRANSLATE_P1)
+    OR (PRG_03_Modes_Cycle.Data.SequenceState.Step = E_AutoCycleStep.AX14_TRANSLATE_DUMP);
+
+IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+   AND NOT M3_CycleTranslationStepAuthorized THEN
+    M3_RunRequest_Active := FALSE;
+    M3_ReqTremie_Active := FALSE;
+    M3_ReqMaintenance_Active := FALSE;
+    M3_SpeedCmd_Active := 0.0;
+END_IF;
+
 // InvertDirection est appliqué dans FB_Translation (InvertDriveDirection), uniquement au mot
 // de commande variateur en sortie — les bits ReqTremie/ReqMaintenance restent le sens sémantique réel.
 
@@ -2740,6 +2772,19 @@ TranslationFinalInterlockRequest.BrakeReleaseRequest := instTranslationM3.BrakeR
 TranslationFinalInterlockRequest.BrakeCommandOpenConfirmed := instTranslationM3.BrakeCommandOpenConfirmed;
 TranslationFinalInterlockRequest.RequestedDriveControlWord := instTranslationM3.RequestedDriveControlWord;
 TranslationFinalInterlockRequest.RequestedDriveFreqHz := instTranslationM3.RequestedDriveFreqHz;
+TranslationFinalInterlockRequest.ReqTremieSemantic := M3_ReqTremie_Active;
+
+// Derniere barriere avant PRG_06 : neutralisation immediate du variateur ET du
+// frein M3 hors AX2/AX14 en SEMI_AUTO. Elle reste volontairement redondante avec
+// le veto amont pour qu'une rampe ou un sens memorise dans FB_Translation ne
+// puisse alimenter M3 pendant une etape benne.
+IF (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO)
+   AND NOT M3_CycleTranslationStepAuthorized THEN
+    TranslationFinalInterlockRequest.BrakeReleaseRequest := FALSE;
+    TranslationFinalInterlockRequest.RequestedDriveControlWord := 0;
+    TranslationFinalInterlockRequest.RequestedDriveFreqHz := 0.0;
+    TranslationFinalInterlockRequest.ReqTremieSemantic := FALSE;
+END_IF;
 
 {endregion}
 

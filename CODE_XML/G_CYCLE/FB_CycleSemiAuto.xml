@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T17:32:31.562939" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T17:32:31.562939">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T18:03:50.055185" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T18:03:50.055185">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2244,8 +2244,9 @@ DiveStartStopped := M1_SpeedValid AND M2_SpeedValid
                     AND (ABS(M2_MeasuredSpeedMps) &lt; CST_DiveStartSpeedThresholdMps);
 DiveStartStopTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START) AND DiveStartStopped,
                    PT := CST_DiveStartStopConfirmTime);
-DiveStartTimeoutTimer(IN := (State = E_AutoCycleStep.AX3_WAIT_DIVE_START),
-                      PT := CST_DiveStartStopTimeout);
+// AX3_WAIT_DIVE_START est une attente de condition mecanique, sans sanction
+// temporelle : l'arret confirme reste obligatoire pour passer en AX4.
+DiveStartTimeoutTimer(IN := FALSE, PT := CST_DiveStartStopTimeout);
 
 // Config diving/extraction bornee (repli defaut interne si non reglee / valeur implausible).
 // DiveStartMinM = altimetrie de lancement Kobold dans le referentiel M1_CablePosM
@@ -2435,10 +2436,9 @@ instCauses[9].Active   := PalierNot4Timer.Q AND NOT CycleChecksInhibited
 instCauses[9].Latching := TRUE;
 instCauses[9].Texte    := 'Palier 4 non confirme sur M1 et/ou M2 pendant la recherche Kobold';
 
-instCauses[10].Active   := DiveStartTimeoutTimer.Q
-                           AND (State = E_AutoCycleStep.AX3_WAIT_DIVE_START);
+instCauses[10].Active   := FALSE;
 instCauses[10].Latching := TRUE;
-instCauses[10].Texte    := 'Arret mecanique M1/M2 non confirme avant plongee';
+instCauses[10].Texte    := 'Reserve - attente arret mecanique AX3 sans defaut temporel';
 
 instCauses[11].Active   := (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM)
                            AND (DepthStopMode &lt;&gt; E_CycleDepthStopMode.KOBOLD_ONLY)
