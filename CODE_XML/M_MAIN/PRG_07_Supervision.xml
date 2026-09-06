@@ -10740,7 +10740,7 @@ IF ModeChangePendingBlocked AND ModeChangeBlockReason &lt;&gt; '' THEN
     // Bascule de mode refusée : motif prioritaire (info opérateur, ex. "Chgt mode refuse : contacteur M1").
     SpecialConditionCandidate := ModeChangeBlockReason;
 ELSIF CycleChecksInhibited THEN
-    SpecialConditionCandidate := 'ESSAI CYCLE: CONTROLES PROCEDE INHIBES - PROTECTIONS MACHINE ACTIVES';
+    SpecialConditionCandidate := 'ESSAI CYCLE : CONTROLES INHIBES';
 ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN

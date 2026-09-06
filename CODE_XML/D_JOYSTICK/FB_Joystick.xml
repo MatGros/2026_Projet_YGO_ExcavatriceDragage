@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T07:31:45.381137" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T07:31:45.381137">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T09:04:43.557858" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T09:04:43.557858">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -705,7 +705,7 @@ Seuils de changement de palier (0..100%)</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, AX8 semi-auto uniquement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, extraction semi-auto AX8..AX12</xhtml>
               </documentation>
             </variable>
             <variable name="BusCanOpenOP">

@@ -1138,13 +1138,12 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
 
-        IF ExtractionStepDelayTimer.Q
-           AND StabilizationTimer.Q
-           AND (M1_CablePosM >= (CtrlAscentStartM1 + CtrlAscentDistEffM))
+        IF (M1_CablePosM >= (CtrlAscentStartM1 + CtrlAscentDistEffM))
            AND (M2_CablePosM >= (CtrlAscentStartM2 + CtrlAscentDistEffM))
            AND NOT WinchSyncError THEN
-            // La transition d'etat n'emet aucun mouvement : AX12 reste
-            // conditionne a DeadmanArmed + JoystickPull dans ses commandes.
+            // Transition strictement sur la distance CFG (2 m par defaut)
+            // et le synchronisme FB_WinchSync. Les commandes AX12 restent
+            // protegees par homme-mort + joystick.
             State := E_AutoCycleStep.AX12_LOADED_ASCENT;
         END_IF;
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T07:37:32.766231" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T07:37:32.766231">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T09:03:50.832378" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T09:03:50.832378">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3377,7 +3377,15 @@ instJoystick(
     // 🔧 Producteur = PRG_04_Treuils_Benne (combiné interlock benne) via le bus Data.
     //    TRUE = armement autorisé (polarité positive NC-100).
     ArmingPermit              := PRG_04_Treuils_Benne.Data.ArmingPermit,
-    DirectInversionPermit     := GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED,
+    // Autorise l'inversion directe du joystick pendant toute l'extraction.
+    // Le deadman reste obligatoire ; seule la remise au neutre est supprimee
+    // aux transitions AX8 -&gt; AX12 pour conserver la commande maintenue.
+    DirectInversionPermit     :=
+        (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX8_BOTTOM_CONFIRMED)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX10_CLOSE_BUCKET)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX11_CTRL_ASCENT)
+        OR (GVL_IHM.CycleSemiAuto.State.CycleStep = E_AutoCycleStep.AX12_LOADED_ASCENT),
     BusCanOpenOP              := instDiagCanOpen.DeviceCanOpenMaster,
     JoystickOP                := instDiagCanOpen.DeviceJoystick,
     RawX                      := HwIn.Operator.JoyXRaw_ANA1,
@@ -6212,7 +6220,7 @@ Ready := Enable AND NOT Fault.Latched;
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, AX8 semi-auto uniquement</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Inversion Y sans neutre, extraction semi-auto AX8..AX12</xhtml>
               </documentation>
             </variable>
             <variable name="BusCanOpenOP">

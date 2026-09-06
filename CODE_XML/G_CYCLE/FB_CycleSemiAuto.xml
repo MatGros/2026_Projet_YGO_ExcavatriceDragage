@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T08:59:52.483728" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T08:59:52.483728">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T09:02:44.076316" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T09:02:44.076316">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3079,13 +3079,12 @@ CASE State OF
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
 
-        IF ExtractionStepDelayTimer.Q
-           AND StabilizationTimer.Q
-           AND (M1_CablePosM &gt;= (CtrlAscentStartM1 + CtrlAscentDistEffM))
+        IF (M1_CablePosM &gt;= (CtrlAscentStartM1 + CtrlAscentDistEffM))
            AND (M2_CablePosM &gt;= (CtrlAscentStartM2 + CtrlAscentDistEffM))
            AND NOT WinchSyncError THEN
-            // La transition d'etat n'emet aucun mouvement : AX12 reste
-            // conditionne a DeadmanArmed + JoystickPull dans ses commandes.
+            // Transition strictement sur la distance CFG (2 m par defaut)
+            // et le synchronisme FB_WinchSync. Les commandes AX12 restent
+            // protegees par homme-mort + joystick.
             State := E_AutoCycleStep.AX12_LOADED_ASCENT;
         END_IF;
 
