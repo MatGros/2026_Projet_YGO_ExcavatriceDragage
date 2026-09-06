@@ -187,8 +187,10 @@ instCycleSemiAuto(
     M2_ContactorsReleased   := PRG_02_Acquisition.HwIn.Winch.M2_ContactorsReleased_DI,
     M1_BrakeApplied         := NOT PRG_02_Acquisition.HwIn.Winch.M1_BrakeIsOpen_DI,
     M2_BrakeApplied         := NOT PRG_02_Acquisition.HwIn.Winch.M2_BrakeIsOpen_DI,
-    SpeedMismatchThresholdMps := 1.5,   // Seuil écart vitesse M1/M2 (revue : ~1-2 m/s, retenu 1.5)
-    SpeedMismatchTimeout    := T#500ms, // Tempo confirmation écart vitesse (revue)
+    // Le synchronisme M1/M2 est arbitré exclusivement par PRG_04 / FB_WinchSync.
+    // Aucun seuil local G7 ne doit interrompre AX11->AX12 avec le joystick maintenu.
+    SpeedMismatchThresholdMps := 0.0,   // Contrôle local G7 désactivé
+    SpeedMismatchTimeout    := T#0ms,   // Désactivé ; protections FB_WinchSync conservées
     CableLimitM1AscentM     := _CommunCfgPersist.CfgCableLimitAscent_M,
     M1TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM1Safety.CableLimitAscent,
     M2TopLimitReached       := PRG_04_Treuils_Benne.Data.WinchM2Safety.CableLimitAscent,

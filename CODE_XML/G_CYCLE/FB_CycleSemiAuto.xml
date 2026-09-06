@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T16:07:49.076755" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T16:07:49.076755">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T16:45:46.389272" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T16:45:46.389272">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1887,7 +1887,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation arret M3 sur FDC avant etape benne</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation arret physique M3 sur FDC avant etape benne</xhtml>
               </documentation>
             </variable>
             <variable name="SpeedMismatchTimer">
@@ -2056,10 +2056,10 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#300ms" />
+                <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation arret M3 sur FDC trémie</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Confirmation arret physique M3 sur FDC P1/trémie</xhtml>
               </documentation>
             </variable>
             <variable name="instFault">
@@ -2372,10 +2372,12 @@ instCauses[6].Active   := FALSE;
 instCauses[6].Latching := TRUE;
 instCauses[6].Texte    := 'Reserve - synchronisme arbitre exclusivement par PRG_04';
 
-// AX2 : pendant la translation vers P1 les treuils M1/M2 doivent RESTER au FDC
-// logiciel haut (WinchesAtTopWindow, calcul PRG_03). S'ils quittent la fenetre
-// -&gt; defaut latche, sortie cycle (GEL SEMI_AUTO cause 7 / Q10).
-instCauses[7].Active   := NOT WinchesAtTopWindow AND (State = E_AutoCycleStep.AX2_TRANSLATE_P1);
+// AX2 : en production, pendant la translation vers P1 les treuils M1/M2 doivent
+// RESTER au FDC logiciel haut. En mise en service, ce contrôle de procédé est
+// inhibable par TglCycleChecksInhibit ; les protections machine PRG04 restent actives.
+instCauses[7].Active   := NOT CycleChecksInhibited
+                          AND NOT WinchesAtTopWindow
+                          AND (State = E_AutoCycleStep.AX2_TRANSLATE_P1);
 instCauses[7].Latching := TRUE;
 instCauses[7].Texte    := 'Treuils M1/M2 hors FDC haut pendant la translation vers P1';
 

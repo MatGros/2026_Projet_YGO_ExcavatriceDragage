@@ -200,7 +200,7 @@ VAR
     SkipDrainEdge           : R_TRIG;       // . [LOC] Front bouton IHM "passer egouttage"
     DrainTimeEff            : TIME;         // . [LOC] Duree d'egouttage effective (CfgDrainTime bornee au defaut interne)
     StabilizationTimer      : TON;          // . [LOC] Temporisation maximale de remontee lente
-    TranslationStopTimer    : TON;          // . [LOC] Confirmation arret M3 sur FDC avant etape benne
+    TranslationStopTimer    : TON;          // . [LOC] Confirmation arret physique M3 sur FDC avant etape benne
     SpeedMismatchTimer      : TON;          // . [LOC] Confirmation temporelle ecart de vitesse
     StepMaxTimer            : TON;          // . [LOC] Tempo max d'etape
     ExtractionStepDelayTimer : TON;
@@ -220,7 +220,7 @@ VAR
     CST_KoboldPowerUpTime   : TIME := T#500ms;  // . [LOC] Etablissement alimentation capteur Kobold
     CST_KoboldBottomConfirmTime : TIME := T#100ms; // . [LOC] Anti-rebond contact fond
     CST_BottomTouchStabTime : TIME := T#2s;     // . [LOC] Stabilisation arret apres contact fond
-    CST_TranslationStopConfirmTime : TIME := T#300ms; // . [LOC] Confirmation arret M3 sur FDC trémie
+    CST_TranslationStopConfirmTime : TIME := T#500ms; // . [LOC] Confirmation arret physique M3 sur FDC P1/trémie
 
     // === SOCLE DEFAUT TRANSVERSE ===
     instFault               : FB_FaultCore;                  // * [INST] Socle defaut transverse
@@ -414,10 +414,12 @@ instCauses[6].Active   := FALSE;
 instCauses[6].Latching := TRUE;
 instCauses[6].Texte    := 'Reserve - synchronisme arbitre exclusivement par PRG_04';
 
-// AX2 : pendant la translation vers P1 les treuils M1/M2 doivent RESTER au FDC
-// logiciel haut (WinchesAtTopWindow, calcul PRG_03). S'ils quittent la fenetre
-// -> defaut latche, sortie cycle (GEL SEMI_AUTO cause 7 / Q10).
-instCauses[7].Active   := NOT WinchesAtTopWindow AND (State = E_AutoCycleStep.AX2_TRANSLATE_P1);
+// AX2 : en production, pendant la translation vers P1 les treuils M1/M2 doivent
+// RESTER au FDC logiciel haut. En mise en service, ce contrôle de procédé est
+// inhibable par TglCycleChecksInhibit ; les protections machine PRG04 restent actives.
+instCauses[7].Active   := NOT CycleChecksInhibited
+                          AND NOT WinchesAtTopWindow
+                          AND (State = E_AutoCycleStep.AX2_TRANSLATE_P1);
 instCauses[7].Latching := TRUE;
 instCauses[7].Texte    := 'Treuils M1/M2 hors FDC haut pendant la translation vers P1';
 
