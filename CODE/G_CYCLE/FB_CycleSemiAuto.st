@@ -292,8 +292,7 @@ DrainTimeEff := SEL(CfgDrainTime <= T#0s, CfgDrainTime, DrainingTime);
 // positions memorisees au fond ne doit bloquer le passage lorsque les mesures
 // courantes sont valides.
 StabilizationTimer(
-    IN := (State = E_AutoCycleStep.AX11_CTRL_ASCENT)
-          AND ExtractionStepDelayTimer.Q,
+    IN := (State = E_AutoCycleStep.AX11_CTRL_ASCENT),
     PT := CtrlAscentTimeout);
 
 // Arrêt M3 confirmé avant de quitter AX14 : le FDC seul ne suffit pas si le
@@ -324,8 +323,7 @@ StepMaxTimer(IN := FALSE, PT := StepMaxTimeout);
 StepMaxPrevState := State;
 ExtractionStepDelayTimer(
     IN := ((State = E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM)
-        OR (State = E_AutoCycleStep.AX10_CLOSE_BUCKET)
-        OR (State = E_AutoCycleStep.AX11_CTRL_ASCENT))
+        OR (State = E_AutoCycleStep.AX10_CLOSE_BUCKET))
        AND (State = ExtractionDelayState),
     PT := CST_ExtractionStepDelay);
 IF State <> ExtractionDelayState THEN
@@ -1115,14 +1113,14 @@ CASE State OF
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         BucketCmd.ReqClose := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
 
-        IF DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
+        IF DeadmanArmed AND JoystickPull AND (Benne_Done AND (Benne_IsClosed OR Benne_IsRoughlyClosed)) THEN
             BucketCmd.ReqClose := FALSE;
             // AX10 -> AX11 : la transition conserve la meme intention operateur;
-            // le timer inter-etape impose la pause de 500 ms avant mouvement.
-            WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
+            // demarrage direct de la montee lente controlee sans pause artificielle.
+            WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
             WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
             WinchM1Cmd.StepTgt  := CtrlAscentMaxStepEff;
-            WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
+            WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
             WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
             WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
             // Nouvelle reference de controle : position reelle au depart
@@ -1145,10 +1143,10 @@ CASE State OF
         OperatorAction := 'AX11 - Maintenir la montee : surveiller visuellement M1/M2 (securites actives).';
 
         // Palier max reglable IHM, borne [1..2] (defaut 1 / P1 ; P2 possible au besoin).
-        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
+        WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM1Cmd.ReqAscent := TRUE; WinchM1Cmd.ReqDescend := FALSE;
         WinchM1Cmd.StepTgt  := CtrlAscentMaxStepEff;
-        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
+        WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull;
         WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
         WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
 
