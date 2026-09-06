@@ -166,6 +166,8 @@ VAR
     StopPositionM2          : REAL;         // . [LOC] Position M2 apres arret mecanique stabilise AX8
     RaiseTargetM1           : REAL;         // . [LOC] Cible M1 de decollement du fond
     RaiseTargetM2           : REAL;         // . [LOC] Cible M2 de decollement du fond
+    CtrlAscentStartM1       : REAL;         // . [LOC] Position de depart AX11 M1
+    CtrlAscentStartM2       : REAL;         // . [LOC] Position de depart AX11 M2
     BottomContextValid      : BOOL;         // . [LOC] Positions fond M1/M2 qualifiees
     StopPositionCaptured    : BOOL;         // . [LOC] Position stabilisee capturee une seule fois en AX8
     DepthSetpointValid      : BOOL;         // . [LOC] Consigne valide et au-dessus de la limite legale
@@ -1113,6 +1115,10 @@ CASE State OF
             WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
             WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
             WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
+            // Nouvelle reference de controle : position reelle au depart
+            // d'AX11, apres extraction/fermeture, et non le contact fond.
+            CtrlAscentStartM1 := M1_CablePosM;
+            CtrlAscentStartM2 := M2_CablePosM;
             State := E_AutoCycleStep.AX11_CTRL_ASCENT;
         END_IF;
 
@@ -1138,8 +1144,8 @@ CASE State OF
 
         IF ExtractionStepDelayTimer.Q
            AND StabilizationTimer.Q
-           AND (M1_CablePosM >= (TouchPositionM1 + CtrlAscentDistM))
-           AND (M2_CablePosM >= (TouchPositionM2 + CtrlAscentDistM))
+           AND (M1_CablePosM >= (CtrlAscentStartM1 + CtrlAscentDistM))
+           AND (M2_CablePosM >= (CtrlAscentStartM2 + CtrlAscentDistM))
            AND NOT WinchSyncError THEN
             // La transition d'etat n'emet aucun mouvement : AX12 reste
             // conditionne a DeadmanArmed + JoystickPull dans ses commandes.

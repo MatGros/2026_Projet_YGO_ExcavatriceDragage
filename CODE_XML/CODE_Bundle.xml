@@ -21326,6 +21326,22 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible M2 de decollement du fond</xhtml>
               </documentation>
             </variable>
+            <variable name="CtrlAscentStartM1">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position de depart AX11 M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlAscentStartM2">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position de depart AX11 M2</xhtml>
+              </documentation>
+            </variable>
             <variable name="BottomContextValid">
               <type>
                 <BOOL />
@@ -22712,6 +22728,10 @@ CASE State OF
             WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPull AND ExtractionStepDelayTimer.Q;
             WinchM2Cmd.ReqAscent := TRUE; WinchM2Cmd.ReqDescend := FALSE;
             WinchM2Cmd.StepTgt  := CtrlAscentMaxStepEff;
+            // Nouvelle reference de controle : position reelle au depart
+            // d'AX11, apres extraction/fermeture, et non le contact fond.
+            CtrlAscentStartM1 := M1_CablePosM;
+            CtrlAscentStartM2 := M2_CablePosM;
             State := E_AutoCycleStep.AX11_CTRL_ASCENT;
         END_IF;
 
@@ -22737,8 +22757,8 @@ CASE State OF
 
         IF ExtractionStepDelayTimer.Q
            AND StabilizationTimer.Q
-           AND (M1_CablePosM &gt;= (TouchPositionM1 + CtrlAscentDistM))
-           AND (M2_CablePosM &gt;= (TouchPositionM2 + CtrlAscentDistM))
+           AND (M1_CablePosM &gt;= (CtrlAscentStartM1 + CtrlAscentDistM))
+           AND (M2_CablePosM &gt;= (CtrlAscentStartM2 + CtrlAscentDistM))
            AND NOT WinchSyncError THEN
             // La transition d'etat n'emet aucun mouvement : AX12 reste
             // conditionne a DeadmanArmed + JoystickPull dans ses commandes.
