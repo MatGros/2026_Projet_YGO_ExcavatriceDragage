@@ -2,19 +2,20 @@ contract:
   task_id: T259
   criticality: C2
   strategy: patch
-  objective: Implémenter le shunt de forçage direct des sorties hardware (contacteurs et freins) en mode MAINT_N2 sous mot de passe IHM dans PRG_06_Outputs.
+  objective: Ajouter un forçage en parallèle (OR pur //) sur les sorties hardware dans PRG_06_Outputs sous condition MAINT_N2 et mot de passe, sans modifier ni altérer la chaîne de calcul nominale existante.
   acceptance:
-    - {id: AC1, statement: Les commandes IHM dédiées sont déclarées dans GVL_IHM (MaintenanceN2.Cmd) et inaccessibles hors mot de passe N2., verified_by: Audit interface GVL_IHM et gating mode.}
-    - {id: AC2, statement: Le shunt dans PRG_06_Outputs force directement les sorties physiques au Palier 1 sous condition stricte Auth.Mode = MAINT_N2 et PasswordN2_Active., verified_by: Tests d'activation des sorties physiques en MAINT_N2.}
-    - {id: AC3, statement: L'interverrouillage logique Montée/Descente est garanti mutuellement exclusif (anti-court-circuit phase-phase)., verified_by: Test d'injection simultanée Montée + Descente -> aucune activation conflictuelle.}
-    - {id: AC4, statement: Les coupures AU et la butée physique haute ultime (M1M2_TopPositionFree_DI) restent non-bypassables., verified_by: Test d'interdiction montée sous capteur haut ouvert et arrêt sous AU.}
-    - {id: AC5, statement: Les sorties forcées sont rebouclées dans Data.* pour que le banc de simulation FB_SimBench et les diagnostics reflètent le mouvement., verified_by: Test de rebouclage simulation.}
+    - {id: AC1, statement: La chaîne de calcul nominale des sorties existantes dans PRG_06_Outputs reste 100% intacte et non modifiée., verified_by: Audit diff de PRG_06_Outputs montrant aucune altération du flux nominal.}
+    - {id: AC2, statement: Le forçage N2 est greffé en dérivation parallèle (OR pur //) sur chaque sortie finale (contacteurs sens/palier 1 et freins)., verified_by: Vérification de la structure Output_DQ := Output_Nominal OR Forcage_N2.}
+    - {id: AC3, statement: Les commandes IHM dédiées dans GVL_IHM (MaintenanceN2.Cmd) sont inactives hors Auth.Mode = MAINT_N2 et mot de passe N2 actif., verified_by: Test d'inhibition automatique hors mode N2.}
+    - {id: AC4, statement: La branche de forçage N2 garantit l'interverrouillage mutuellement exclusif Montée/Descente (anti-court-circuit phase-phase)., verified_by: Test d'injection simultanée Montée + Descente -> aucune activation conflictuelle.}
+    - {id: AC5, statement: Les coupures AU et la butée physique haute ultime (M1M2_TopPositionFree_DI) restent non-bypassables même sous forçage., verified_by: Test d'interdiction montée sous capteur haut ouvert et arrêt sous AU.}
+    - {id: AC6, statement: Les sorties finales après forçage sont rebouclées dans Data.* pour que le banc de simulation FB_SimBench et les diagnostics reflètent le mouvement., verified_by: Test de rebouclage simulation.}
   scope:
     allowed: [CODE/J_SUPERVISION/, CODE/M_MAIN/PRG_06_Outputs.st, CODE_XML/, DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md]
     forbidden: [PRJ_CODESYS/PROJ_Full_ImportExport/Device.export]
-  conservation: {must_survive: [Anti-court-circuit, Coupure AU, Butée haute physique, Garde anti-chatter], dropped_on_purpose: []}
+  conservation: {must_survive: [Chaîne nominale intacte, Anti-court-circuit, Coupure AU, Butée haute physique, Garde anti-chatter], dropped_on_purpose: []}
   evidence_required: [bundle_xml, g200_linkage, gates_palier_c]
-  alert_duty: Ne jamais autoriser l'activation conjointe des contacteurs de sens Fwd et Rev.
+  alert_duty: Ne jamais autoriser l'activation conjointe des contacteurs de sens Fwd et Rev ni modifier la logique nominale amont.
 status: TODO
 execution: {executed_by: '', completed_at: '', status: PENDING, summary: '', evidence_submitted: []}
 validation: {status: PENDING, validated_by: '', validated_at: '', notes: ''}
