@@ -428,7 +428,6 @@ ELSE
     END_IF;
 END_CASE;
 
-
 {endregion}
 
 {region "§1bis Securite M3"}
