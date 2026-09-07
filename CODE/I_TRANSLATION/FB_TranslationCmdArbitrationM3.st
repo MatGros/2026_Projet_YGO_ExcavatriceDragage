@@ -63,8 +63,9 @@ ELSE
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         PositioningActive := TRUE;
         SelTarget := ReqTranslation.PositionTgt;
-        // PositionTgt=0 en SEMI_AUTO : jog bidirectionnel autorisé par AX2.
-        CycleTargetDirectionOk := (SelTarget = 0)
+        // PositionTgt=3 (P1) en AX2 : jog bidirectionnel autorisé, mais la
+        // cible d'arrêt reste P1 dans FB_Translation.
+        CycleTargetDirectionOk := (SelTarget = 3)
                                OR ((SelTarget = 1) AND Joystick.AxisX.DirectionPositive)
                                OR ((SelTarget <> 1) AND Joystick.AxisX.DirectionNegative);
         CycleJoystickAxisOk := CycleTargetDirectionOk AND Joystick.AxisY.AtNeutral;
@@ -72,7 +73,7 @@ ELSE
         IF RunRequest THEN
             SpeedPct := 100.0;
             IF (SelTarget = 1)
-               OR ((SelTarget = 0) AND Joystick.AxisX.DirectionPositive) THEN
+               OR ((SelTarget = 3) AND Joystick.AxisX.DirectionPositive) THEN
                 ReqTremie := TRUE;
             ELSE
                 ReqMaintenance := TRUE;

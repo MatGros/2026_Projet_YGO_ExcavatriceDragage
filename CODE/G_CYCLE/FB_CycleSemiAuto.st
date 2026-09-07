@@ -842,7 +842,7 @@ CASE State OF
         // Le controle "chariot pas a droite de P1" est fait en AX1_INIT, pas ici.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
-        TranslationCmd.PositionTgt := 0;          // AX2 : jog bidirectionnel, cible dynamique
+        TranslationCmd.PositionTgt := 3;          // AX2 : jog bidirectionnel, cible d'arrêt P1
 
         IF Translation_At_P1 THEN
             ExpectedDirection := 0;
@@ -851,7 +851,7 @@ CASE State OF
             OperatorActionId := 16#0402;
             OperatorAction := 'AX2 - P1 atteint : relacher le joystick au neutre avant ouverture benne.';
             TranslationCmd.ReqStart := FALSE;
-            TranslationCmd.PositionTgt := 0;
+            TranslationCmd.PositionTgt := 3;
             IF TranslationStopTimer.Q AND NOT JoystickDeflected THEN
                 State := E_AutoCycleStep.AX3_OPEN_BUCKET;
             END_IF;
@@ -863,7 +863,7 @@ CASE State OF
             WaitingForProcess := JoystickDeflected;
             OperatorActionId := 16#0402;
             OperatorAction := 'AX2 - Pousser le joystick a gauche ou a droite : arret automatique sur P1.';
-            TranslationCmd.PositionTgt := 0;
+            TranslationCmd.PositionTgt := 3;
             TranslationCmd.ReqStart := TranslationTremiePermit OR TranslationP1Permit;
         END_IF;
 
