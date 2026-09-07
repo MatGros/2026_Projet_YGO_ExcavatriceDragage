@@ -230,6 +230,8 @@ instCycleSemiAuto(
     Translation_At_P1       := PRG_05_Translation.Data.M3_AtP1Stable,
     Translation_At_Tremie   := PRG_05_Translation.Data.M3_AtTremieStable,
     Translation_At_Maintenance := PRG_05_Translation.Data.M3_AtMaintenanceStable,
+    Translation_PosP1        := PRG_02_Acquisition.HwIn.Translation.M3_PosP1_DI,
+    Translation_PosMaintenance := PRG_02_Acquisition.HwIn.Translation.M3_PosMaintenance_DI,
     Translation_Busy        := PRG_05_Translation.Data.TranslationBusy,
     Translation_Done        := PRG_05_Translation.Data.TranslationDone,
     Benne_Busy              := PRG_04_Treuils_Benne.Data.BucketBusy,

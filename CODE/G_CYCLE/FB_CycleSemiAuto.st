@@ -59,6 +59,8 @@ VAR_INPUT
     Translation_At_P1           : BOOL;     // --> [HW] Capteur position P1 (arret travail)
     Translation_At_Tremie       : BOOL;     // --> [HW] Capteur fin de course tremie
     Translation_At_Maintenance : BOOL;     // --> [HW] Capteur fin de course maintenance
+    Translation_PosP1            : BOOL;     // --> [HW] Etat brut capteur P1 (diagnostic de zone)
+    Translation_PosMaintenance   : BOOL;     // --> [HW] Etat brut capteur Maintenance (diagnostic de zone)
     Translation_Busy            : BOOL;     // --> [HW] Mouvement translation en cours
     Translation_Done            : BOOL;     // --> [HW] Cible translation atteinte
 
@@ -840,7 +842,7 @@ CASE State OF
         // Le controle "chariot pas a droite de P1" est fait en AX1_INIT, pas ici.
         WinchM1Cmd.RunRequest := FALSE; WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := FALSE; WinchM1Cmd.StepTgt := 0;
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
-        TranslationCmd.PositionTgt := 3;          // repere P1 pour PRG_05 (info ; pas de pilotage cycle)
+        TranslationCmd.PositionTgt := 0;          // AX2 : jog bidirectionnel, cible dynamique
 
         IF Translation_At_P1 THEN
             ExpectedDirection := 0;
@@ -854,15 +856,15 @@ CASE State OF
                 State := E_AutoCycleStep.AX3_OPEN_BUCKET;
             END_IF;
         ELSE
-            // Entre tremie et P1 : l'operateur pousse le joystick VERS LA DROITE (axe
-            // Tremie--P2--P1--Maintenance : P1 est a droite de la tremie). Maintien requis ;
-            // ralenti PV + arret FDC P1 assures par PRG_05. Transition sur P1 STABILISE.
-            ExpectedDirection := 1;
+            // AX2 accepte les deux sens ; la cible effective suit le sens du joystick.
+            // Si Maintenance=1 et P1=0, cela permet de se dégager d'un dépassement.
+            ExpectedDirection := 0;
             WaitingForOperator := NOT JoystickDeflected;
             WaitingForProcess := JoystickDeflected;
             OperatorActionId := 16#0402;
-            OperatorAction := 'AX2 - Pousser le joystick vers la droite : arret automatique sur P1.';
-            TranslationCmd.ReqStart := TranslationP1Permit;
+            OperatorAction := 'AX2 - Pousser le joystick a gauche ou a droite : arret automatique sur P1.';
+            TranslationCmd.PositionTgt := 0;
+            TranslationCmd.ReqStart := TranslationTremiePermit OR TranslationP1Permit;
         END_IF;
 
     E_AutoCycleStep.AX3_OPEN_BUCKET:
@@ -1456,6 +1458,18 @@ CASE State OF
         OperatorActionId := 16#0480;
         IF ResumeAfterFaultAvailable THEN
             OperatorAction := 'AX_STAB - Cause disparue et arret confirme : appuyer Reprendre defaut ou Abandonner.';
+        ELSIF Translation_PosMaintenance AND NOT Translation_PosP1 THEN
+            // Reprise boot : Maintenance active + P1 retombe = chariot déjà au-delà
+            // de P1. Ne jamais proposer de continuer à droite vers Maintenance.
+            // Le retour gauche traverse P1 ; le front P1 réarme AtP1 et la branche
+            // précédente termine AX2 normalement.
+            ExpectedDirection := 1;
+            WaitingForOperator := NOT JoystickDeflected;
+            WaitingForProcess := JoystickDeflected;
+            OperatorActionId := 16#0402;
+            OperatorAction := 'AX2 - M3 au-dela de P1 : pousser vers la tremie (gauche) pour retrouver P1.';
+            TranslationCmd.PositionTgt := 1;      // sens retour vers Trémie
+            TranslationCmd.ReqStart := TranslationTremiePermit;
         ELSE
             OperatorAction := 'AX_STAB - Sorties neutres : supprimer la cause, mettre le joystick au neutre, puis choisir Reprendre ou Abandonner.';
         END_IF;

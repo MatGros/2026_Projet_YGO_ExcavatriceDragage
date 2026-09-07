@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T17:32:32.434264" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T17:32:32.434264">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T17:17:15.519210" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T17:17:15.519210">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -872,13 +872,16 @@ ELSE
     IF Auth.Mode = E_Mode.SEMI_AUTO THEN
         PositioningActive := TRUE;
         SelTarget := ReqTranslation.PositionTgt;
-        CycleTargetDirectionOk := ((SelTarget = 1) AND Joystick.AxisX.DirectionPositive)
+        // PositionTgt=0 en SEMI_AUTO : jog bidirectionnel autorisé par AX2.
+        CycleTargetDirectionOk := (SelTarget = 0)
+                               OR ((SelTarget = 1) AND Joystick.AxisX.DirectionPositive)
                                OR ((SelTarget &lt;&gt; 1) AND Joystick.AxisX.DirectionNegative);
         CycleJoystickAxisOk := CycleTargetDirectionOk AND Joystick.AxisY.AtNeutral;
         RunRequest := ReqTranslation.ReqStart AND Context.HeightInterlockOk AND CycleJoystickAxisOk;
         IF RunRequest THEN
             SpeedPct := 100.0;
-            IF SelTarget = 1 THEN
+            IF (SelTarget = 1)
+               OR ((SelTarget = 0) AND Joystick.AxisX.DirectionPositive) THEN
                 ReqTremie := TRUE;
             ELSE
                 ReqMaintenance := TRUE;
