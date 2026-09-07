@@ -3073,20 +3073,20 @@ fournie par la configuration persistante de l'appelant.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 05</xhtml>
               </documentation>
             </variable>
-            <variable name="CtrlInt01">
+            <variable name="CtrlInt01_SetPage">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 01</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 01 (Consigne changement de page)</xhtml>
               </documentation>
             </variable>
-            <variable name="CtrlInt02">
+            <variable name="CtrlInt02_ActualPage">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 02</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 02 (Page courante affichée)</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlInt03">

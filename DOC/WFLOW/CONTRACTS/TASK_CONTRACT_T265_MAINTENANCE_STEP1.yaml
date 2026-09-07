@@ -1,0 +1,58 @@
+contract:
+  task_id: T265_MAINTENANCE_STEP1
+  criticality: C3
+  strategy: patch
+  objective: >
+    En position Maintenance M3 validée par le jeton de front, limiter les deux
+    treuils M1/M2 au palier 1 en montée comme en descente, sans réglage IHM.
+  acceptance:
+    - id: AC1
+      statement: "M3_AtMaintenanceStable actif impose CommonMaxStepAscent = 1 et CommonMaxStepDescent = 1 au maximum."
+      verified_by: "Relecture ST et trace des consignes paliers"
+    - id: AC2
+      statement: "La limite finale M2 reste à 1 même si une logique benne spécifique propose un plafond supérieur."
+      verified_by: "Relecture ST et test FB_Winch M2"
+    - id: AC3
+      statement: "La condition de bridage utilise M3_AtMaintenanceStable et non SensorsWord."
+      verified_by: "Inspection statique du code"
+    - id: AC4
+      statement: "Hors position Maintenance validée, le comportement existant des paliers est conservé."
+      verified_by: "Test de non-régression des clamps existants"
+    - id: AC5
+      statement: "Le nom du fichier est identique au nom du POU PRG_04_Treuils_Benne."
+      verified_by: "G310_check_code_structure.py"
+    - id: AC6
+      statement: "Le suffixe correspond au langage ST genere dans le bundle."
+      verified_by: "Inspection CODE_XML/CODE_Bundle.xml"
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T265_MAINTENANCE_STEP1.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+  conservation:
+    must_survive:
+      - "Clamps hors position Maintenance, synchronisation M1/M2 et limitations de sécurité existants"
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute incohérence de position ou de sécurité doit être signalée avant
+    validation machine.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-07T00:00:00+02:00"
+  status: PENDING
+  summary: "Plafond fixe palier 1 ajouté dans l'agrégateur commun et en protection finale M2."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Validation humaine et essai CODESYS requis."

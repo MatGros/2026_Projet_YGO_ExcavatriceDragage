@@ -212,6 +212,10 @@ VAR
     EffectiveMaxStepAscent    : INT;
     EffectiveMaxStepDescent  : INT;
 
+    // Plafonds fixes de sécurité en position Maintenance (non réglables IHM).
+    MaintenanceMaxStepAscent  : INT;
+    MaintenanceMaxStepDescent : INT;
+
     // Agrégateur de clamp de palier — bornes communes M1=M2 puis M2-propre
     CommonMaxStepAscent   : INT;
     CommonMaxStepDescent : INT;
@@ -1171,6 +1175,13 @@ Data.ArmingAvailability.AnyAxisAvail       := ArmAnyAxisAvail;
 CommonMaxStepAscent   := EffectiveMaxStepAscent;
 CommonMaxStepDescent := EffectiveMaxStepDescent;
 
+// Plafond fixe demandé : en position Maintenance validée par front, les deux
+// treuils restent limités au palier 1 dans les deux sens. Ces valeurs ne sont
+// volontairement pas exposées comme consignes IHM : une IHM ne doit pas pouvoir
+// relever un garde-fou de vitesse.
+MaintenanceMaxStepAscent  := 1;
+MaintenanceMaxStepDescent := 1;
+
 // SECURITE ISO 13849 - posture fail-safe : bridage vitesse hors homing.
 // Codeurs non references => position non fiable => plafond palier 1 sur M1 ET M2,
 // montee ET descente. Symetrique (aucun vecteur contacteur M1<>M2). Sans ce garde-fou,
@@ -1196,6 +1207,13 @@ END_IF;
 // En couple les 2 treuils sont lies : la limite benne s'applique aux 2.
 IF CoupledBoth AND (BucketNotClosedAscentCapStep1 OR SlackCableAscentCapStep1) THEN
     CommonMaxStepAscent := 1;
+END_IF;
+
+// Position Maintenance atteinte : bridage commun M1/M2, montée et descente.
+// Ne pas utiliser SensorsWord ici : il décrit une zone, pas une position validée.
+IF PRG_05_Translation.Data.M3_AtMaintenanceStable THEN
+    CommonMaxStepAscent  := MIN(CommonMaxStepAscent, MaintenanceMaxStepAscent);
+    CommonMaxStepDescent := MIN(CommonMaxStepDescent, MaintenanceMaxStepDescent);
 END_IF;
 
 // Planchers communs : 1 (neutre) en montée ; en descente, 0 hors plongée.
@@ -1237,6 +1255,13 @@ IF ManualBucketJogActive THEN
 END_IF;
 IF BucketNotClosedAscentCapStep1 OR SlackCableAscentCapStep1 THEN
     M2MaxStepUp := 1;
+END_IF;
+
+// Protection finale M2 : les limites spécifiques benne ne peuvent pas remonter
+// le plafond fixe de sécurité appliqué en position Maintenance.
+IF PRG_05_Translation.Data.M3_AtMaintenanceStable THEN
+    M2MaxStepUp   := MIN(M2MaxStepUp, MaintenanceMaxStepAscent);
+    M2MaxStepDown := MIN(M2MaxStepDown, MaintenanceMaxStepDescent);
 END_IF;
 M2MinStepUp   := CommonMinStepUp;
 M2MinStepDown := CommonMinStepDown;

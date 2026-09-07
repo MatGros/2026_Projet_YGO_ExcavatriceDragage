@@ -182,6 +182,23 @@ IF ArrivalEdge.Q THEN
     ArrivalWasMaintenance := CommandedMaintenance;
 END_IF;
 
+// Verrou d'arrivee extreme M3 : le FdC securite est une preuve d'arret de sens,
+// meme si le capteur de position cible n'a pas encore produit son front (cas
+// d'arrivee rapide / decalage de scans). On ne ferme pas le frein ici : le verrou
+// ne fait que maintenir la rampe a zero et empecher une re-demande du meme sens.
+// Liberation uniquement par une demande explicite du sens inverse (logique ci-dessous).
+IF NOT BypassLimitSwitch THEN
+    IF CommandedTremie AND LimitSwitchTremie THEN
+        ArrivalLock := TRUE;
+        ArrivalWasTremie := TRUE;
+        ArrivalWasMaintenance := FALSE;
+    ELSIF CommandedMaintenance AND LimitSwitchMaintenance THEN
+        ArrivalLock := TRUE;
+        ArrivalWasTremie := FALSE;
+        ArrivalWasMaintenance := TRUE;
+    END_IF;
+END_IF;
+
 IF ArrivalLock AND ((ReqTremie AND NOT ArrivalWasTremie) OR (ReqMaintenance AND NOT ArrivalWasMaintenance)) THEN
     ArrivalLock := FALSE;
 END_IF;

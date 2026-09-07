@@ -11,10 +11,10 @@ STRUCT
     CtrlWord03 : WORD; // IHM→PLC : registre WORD local 03
     CtrlWord04 : WORD; // IHM→PLC : registre WORD local 04
     CtrlWord05 : WORD; // IHM→PLC : registre WORD local 05
-    CtrlInt01  : INT;  // IHM→PLC : registre INT local 01
-    CtrlInt02  : INT;  // IHM→PLC : registre INT local 02
-    CtrlInt03  : INT;  // IHM→PLC : registre INT local 03
-    CtrlInt04  : INT;  // IHM→PLC : registre INT local 04
-    CtrlInt05  : INT;  // IHM→PLC : registre INT local 05
+    CtrlInt01_SetPage    : INT;  // IHM→PLC : registre INT local 01 (Consigne changement de page)
+    CtrlInt02_ActualPage : INT;  // IHM→PLC : registre INT local 02 (Page courante affichée)
+    CtrlInt03            : INT;  // IHM→PLC : registre INT local 03
+    CtrlInt04            : INT;  // IHM→PLC : registre INT local 04
+    CtrlInt05            : INT;  // IHM→PLC : registre INT local 05
 END_STRUCT
 END_TYPE
