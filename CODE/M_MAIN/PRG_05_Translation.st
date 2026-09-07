@@ -92,6 +92,12 @@ VAR
     M3_SensorsWordPrev   : BYTE;   // detection franchissement (RAZ jeton sans dependance frequence)
     M3_SensorsWordChanged : BOOL;
     M3_AtWorkPositionStable : BOOL; // Diagnostic zone travail M3 (ne vaut pas preuve exacte d'autorisation)
+    M3_AtPositionBootRestored : BOOL; // . [LOC] Restauration unique des jetons AtPosition après boot
+    M3_BootRestoreApplied      : BOOL; // . [LOC] Inhibe les fronts du même scan que la restauration
+    M3_BootPositionLock        : BOOL; // . [LOC] Verrou anti-RAZ des jetons pendant stabilisation boot
+    M3_BootPositionLockTimer   : TON;  // . [LOC] Fenêtre de stabilisation capteurs après boot
+    M3_BootSensorsWordCandidate : BYTE; // . [LOC] Mot capteurs candidat avant restauration
+    M3_BootSensorsStableTimer   : TON;  // . [LOC] Validation du mot capteurs après stabilisation E/S
     TonTremieProcessBlock : TON;
 
     // 🕵️ Trace de blocage terrain (publiée via Data.TranslationTrace, consommée FB_TroubleshootingView)
@@ -198,20 +204,75 @@ TonM3ConfirmedMoving(IN := M3_ConfirmedMoving, PT := T#1s500ms);
 // dependance a la frequence variateur (souvent 0 au banc -> l'ancien RAZ ne se
 // declenchait jamais -> jeton colle). Un franchissement qui EST une arrivee re-arme
 // le bon jeton via les branches TranslationAtXxx ci-dessous (priorite sur la RAZ).
+// Amorçage du mot précédent avant le premier calcul : un capteur déjà actif au
+// boot n'est pas un franchissement et ne doit pas effacer la restauration.
+IF NOT M3_AtPositionBootRestored THEN
+    M3_SensorsWordPrev := instPosDecoderM3.SensorsWord;
+END_IF;
 M3_SensorsWordChanged := (instPosDecoderM3.SensorsWord <> M3_SensorsWordPrev);
 M3_SensorsWordPrev := instPosDecoderM3.SensorsWord;
+M3_BootRestoreApplied := FALSE;
+M3_BootPositionLockTimer(IN := M3_BootPositionLock, PT := T#2s);
+IF M3_BootPositionLock
+   AND (M3_ConfirmedMoving OR M3_ReqTremie_Active OR M3_ReqMaintenance_Active OR M3_SensorsWordChanged OR M3_BootPositionLockTimer.Q) THEN
+    M3_BootPositionLock := FALSE;
+END_IF;
 
-IF instPosDecoderM3.TranslationAtTremie THEN
+// Restauration sûre des jetons AtPosition : attendre que les E/S aient fourni
+// le même mot capteurs pendant 500 ms. Sans cette attente, le premier cycle
+// pouvait lire une valeur par défaut EtherCAT/CANopen (ex. P2), restaurer le
+// mauvais jeton, puis verrouiller cette mauvaise position.
+IF NOT M3_AtPositionBootRestored THEN
+    IF instPosDecoderM3.SensorsWord <> M3_BootSensorsWordCandidate THEN
+        M3_BootSensorsWordCandidate := instPosDecoderM3.SensorsWord;
+        M3_BootSensorsStableTimer(IN := FALSE, PT := T#500ms);
+    ELSE
+        M3_BootSensorsStableTimer(IN := TRUE, PT := T#500ms);
+    END_IF;
+ELSE
+    M3_BootSensorsStableTimer(IN := FALSE, PT := T#500ms);
+END_IF;
+
+// Le RETAIN n'est accepté que si le mot capteurs présent au boot est stable.
+// Si le pont a bougé hors tension, aucun ancien jeton n'est réinjecté.
+IF NOT M3_AtPositionBootRestored
+   AND NOT M3_ConfirmedMoving
+   AND NOT M3_ReqTremie_Active
+   AND NOT M3_ReqMaintenance_Active
+   AND M3_BootSensorsStableTimer.Q THEN
+    CASE instPosDecoderM3.SensorsWord OF
+        2#11111:
+            M3_AtTremieStable := GVL_PERSISTENT._TranslationAtTremiePersisted OR instPosDecoderM3.TranslationPosTremie;
+            M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
+        2#01111:
+            M3_AtPVStable := GVL_PERSISTENT._TranslationAtPVPersisted OR instPosDecoderM3.TranslationPosPV;
+            M3_AtTremieStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
+        2#00111:
+            M3_AtP2Stable := GVL_PERSISTENT._TranslationAtP2Persisted OR instPosDecoderM3.TranslationPosP2;
+            M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
+        2#00011:
+            M3_AtP1Stable := GVL_PERSISTENT._TranslationAtP1Persisted OR instPosDecoderM3.TranslationPosP1;
+            M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtMaintenanceStable := FALSE;
+        2#00000:
+            M3_AtMaintenanceStable := GVL_PERSISTENT._TranslationAtMaintenancePersisted OR instPosDecoderM3.TranslationPosMaintenance;
+            M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
+    END_CASE;
+    M3_AtPositionBootRestored := TRUE;
+    M3_BootRestoreApplied := TRUE;
+    M3_BootPositionLock := TRUE;
+END_IF;
+
+IF NOT M3_BootPositionLock AND NOT M3_BootRestoreApplied AND instPosDecoderM3.TranslationAtTremie THEN
     M3_AtTremieStable := TRUE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF instPosDecoderM3.TranslationAtPV THEN
+ELSIF NOT M3_BootPositionLock AND NOT M3_BootRestoreApplied AND instPosDecoderM3.TranslationAtPV THEN
     M3_AtPVStable := TRUE; M3_AtTremieStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF instPosDecoderM3.TranslationAtP2 THEN
+ELSIF NOT M3_BootPositionLock AND NOT M3_BootRestoreApplied AND instPosDecoderM3.TranslationAtP2 THEN
     M3_AtP2Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF instPosDecoderM3.TranslationAtP1 THEN
+ELSIF NOT M3_BootPositionLock AND NOT M3_BootRestoreApplied AND instPosDecoderM3.TranslationAtP1 THEN
     M3_AtP1Stable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtMaintenanceStable := FALSE;
-ELSIF instPosDecoderM3.TranslationAtMaintenance THEN
+ELSIF NOT M3_BootPositionLock AND NOT M3_BootRestoreApplied AND instPosDecoderM3.TranslationAtMaintenance THEN
     M3_AtMaintenanceStable := TRUE; M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE;
-ELSIF M3_SensorsWordChanged THEN
+ELSIF NOT M3_BootPositionLock AND NOT M3_BootRestoreApplied AND M3_SensorsWordChanged THEN
     // Le mot capteurs a change sans que ce soit une arrivee -> on a quitte le dernier point.
     M3_AtTremieStable := FALSE; M3_AtPVStable := FALSE; M3_AtP2Stable := FALSE; M3_AtP1Stable := FALSE; M3_AtMaintenanceStable := FALSE;
 END_IF;
@@ -234,6 +295,51 @@ M3_AtWorkPositionStable := (NOT instPosDecoderM3.Incoherent)
                AND NOT M3_ConfirmedMoving
                AND NOT M3_ReqTremie_Active
                AND NOT M3_ReqMaintenance_Active ) );
+
+// Mémorisation persistante : un mot capteurs exact et stable au repos prime
+// sur le jeton RAM, qui peut avoir été perdu juste avant la coupure.
+IF NOT M3_ConfirmedMoving
+   AND NOT M3_ReqTremie_Active
+   AND NOT M3_ReqMaintenance_Active THEN
+    CASE instPosDecoderM3.SensorsWord OF
+        2#11111:
+            GVL_PERSISTENT._TranslationAtTremiePersisted := TRUE;
+            GVL_PERSISTENT._TranslationAtPVPersisted := FALSE;
+            GVL_PERSISTENT._TranslationAtP2Persisted := FALSE;
+            GVL_PERSISTENT._TranslationAtP1Persisted := FALSE;
+            GVL_PERSISTENT._TranslationAtMaintenancePersisted := FALSE;
+        2#01111:
+            GVL_PERSISTENT._TranslationAtTremiePersisted := FALSE;
+            GVL_PERSISTENT._TranslationAtPVPersisted := TRUE;
+            GVL_PERSISTENT._TranslationAtP2Persisted := FALSE;
+            GVL_PERSISTENT._TranslationAtP1Persisted := FALSE;
+            GVL_PERSISTENT._TranslationAtMaintenancePersisted := FALSE;
+        2#00111:
+            GVL_PERSISTENT._TranslationAtTremiePersisted := FALSE;
+            GVL_PERSISTENT._TranslationAtPVPersisted := FALSE;
+            GVL_PERSISTENT._TranslationAtP2Persisted := TRUE;
+            GVL_PERSISTENT._TranslationAtP1Persisted := FALSE;
+            GVL_PERSISTENT._TranslationAtMaintenancePersisted := FALSE;
+        2#00011:
+            GVL_PERSISTENT._TranslationAtTremiePersisted := FALSE;
+            GVL_PERSISTENT._TranslationAtPVPersisted := FALSE;
+            GVL_PERSISTENT._TranslationAtP2Persisted := FALSE;
+            GVL_PERSISTENT._TranslationAtP1Persisted := TRUE;
+            GVL_PERSISTENT._TranslationAtMaintenancePersisted := FALSE;
+        2#00000:
+            GVL_PERSISTENT._TranslationAtTremiePersisted := FALSE;
+            GVL_PERSISTENT._TranslationAtPVPersisted := FALSE;
+            GVL_PERSISTENT._TranslationAtP2Persisted := FALSE;
+            GVL_PERSISTENT._TranslationAtP1Persisted := FALSE;
+            GVL_PERSISTENT._TranslationAtMaintenancePersisted := TRUE;
+        ELSE
+            GVL_PERSISTENT._TranslationAtTremiePersisted := M3_AtTremieStable;
+            GVL_PERSISTENT._TranslationAtPVPersisted := M3_AtPVStable;
+            GVL_PERSISTENT._TranslationAtP2Persisted := M3_AtP2Stable;
+            GVL_PERSISTENT._TranslationAtP1Persisted := M3_AtP1Stable;
+            GVL_PERSISTENT._TranslationAtMaintenancePersisted := M3_AtMaintenanceStable;
+    END_CASE;
+END_IF;
 
 {endregion}
 

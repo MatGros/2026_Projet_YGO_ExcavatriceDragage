@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T15:11:20.881813" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T15:11:20.881813">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T16:47:50.903263" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T16:47:50.903263">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1456,6 +1456,14 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémoire page IHM précédente (détection front changement de page)</xhtml>
               </documentation>
             </variable>
+            <variable name="ModeBootInitialized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Applique SEMI_AUTO une seule fois au démarrage PLC</xhtml>
+              </documentation>
+            </variable>
             <variable name="CycleDepthLowerBound_M">
               <type>
                 <REAL />
@@ -1515,7 +1523,14 @@ CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
 CycleSetDepthEffective_M := MAX(GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M, CycleDepthLowerBound_M);
 
 // 📄 Événement changement de page IHM : sélection automatique du mode (page 5 = MAINT_N1, page 1 = SEMI_AUTO)
-IF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage &lt;&gt; PrevActualPage THEN
+IF NOT ModeBootInitialized THEN
+    // Sécurité d'exploitation : après boot PLC, le mode demandé repart en
+    // SEMI_AUTO. La page affichée est mémorisée comme référence afin qu'une
+    // page IHM restaurée ne force pas MAINT_N1 au premier scan.
+    ModeBootInitialized := TRUE;
+    GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
+    PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
+ELSIF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage &lt;&gt; PrevActualPage THEN
     PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
     IF PrevActualPage = 5 THEN
         GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;

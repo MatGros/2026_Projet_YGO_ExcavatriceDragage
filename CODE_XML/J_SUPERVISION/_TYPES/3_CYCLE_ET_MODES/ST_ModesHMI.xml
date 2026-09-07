@@ -60,10 +60,10 @@
                 <derived name="E_Mode" />
               </type>
               <initialValue>
-                <simpleValue value="E_Mode.MAINT_N1" />
+                <simpleValue value="E_Mode.SEMI_AUTO" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM ()</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Mode par défaut au boot PLC ; accès MAINT filtré côté IHM</xhtml>
               </documentation>
             </variable>
             <variable name="BtnFaultReset">
