@@ -40,6 +40,7 @@ VAR
     DumpAtTremieBucketOpenArmed   : BOOL;   // . [LOC] Armement ouverture benne à la trémie
     CycleInitPositionOk           : BOOL;   // . [LOC] Posture de départ cycle SEMI_AUTO : chariot P1 + treuils au capteur haut (± CST_CycleInitWindowM)
     CycleWinchesAtTopOk           : BOOL;   // . [LOC] Treuils M1 ET M2 dans la fenêtre FDC logiciel haut (± CST_CycleInitWindowM) - surveillé en AX2
+    PrevActualPage                : INT := 0; // . [LOC] Mémoire page IHM précédente (détection front changement de page)
 END_VAR
 
 VAR CONSTANT
@@ -48,6 +49,16 @@ END_VAR
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE & INTENTION OPÉRATEUR ===
 {region "§1 Modes machine"}
+
+// 📄 Événement changement de page IHM : sélection automatique du mode (page 5 = MAINT_N1, page 1 = SEMI_AUTO)
+IF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage <> PrevActualPage THEN
+    PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
+    IF PrevActualPage = 5 THEN
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
+    ELSIF PrevActualPage = 1 THEN
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
+    END_IF;
+END_IF;
 
 instModes(
     Enable                  := TRUE,

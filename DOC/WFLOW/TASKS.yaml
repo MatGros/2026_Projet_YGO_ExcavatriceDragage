@@ -5966,3 +5966,81 @@ tasks:
   - Banniere MES NON SECURISE affichee des qu un des 5 flags bypass est actif
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T261.yaml
   bloque_par: []
+
+- id: T262
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: CYCLE_AUTO_BENNE
+  agent: ''
+  date: '2026-09-07T12:45:00+02:00'
+  titre: Seuil configurable de transition AX10_CLOSE_BUCKET avant fermeture complète
+  contexte: 'Demande client cycle automatique : réduire l effort appliqué sur M2 seul pendant la fermeture de benne. La benne est exprimée en pourcentage d ouverture : 0 % = benne fermée, 100 % = benne ouverte.'
+  description: 'Ajouter un paramètre de seuil de transition, borné de 0 à 50 %. Si le paramètre vaut 0 %, conserver strictement le comportement actuel fondé sur l information benne fermée. Si le paramètre est supérieur à 0 %, autoriser le passage au step suivant de AX10_CLOSE_BUCKET lorsque ActualBucketOpeningPct < seuil configuré, afin de ne pas maintenir inutilement l effort sur M2 seul. Les protections de mouvement, FDC, AU, freinage et validation de fin de cycle restent inchangées.'
+  objectifs:
+  - 'Paramètre de configuration unique, borné et visible, avec valeur par défaut 0 %.'
+  - 'À 0 %, AX10_CLOSE_BUCKET utilise exactement la condition actuelle benne fermée, sans régression.'
+  - 'À 1..50 %, la transition AX10_CLOSE_BUCKET est autorisée uniquement si ActualBucketOpeningPct < seuil.'
+  - 'Une valeur hors plage est saturée à 0..50 % et ne contourne aucune barrière de sécurité.'
+  - 'Le comportement M2 seul est réduit sans suppression des contrôles FDC, AU, frein et défaut mouvement.'
+  - 'Tests scan-par-scan et validation cycle auto couvrent 0 %, seuil actif, limite 50 % et valeurs hors plage.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml
+  bloque_par: []
+
+- id: T263
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: SECURITE_SYNCHRO_BENNE
+  agent: Codex
+  date: '2026-09-07T13:05:00+02:00'
+  titre: Étendre à 4 s le maintien d'inhibition synchro après pilotage benne
+  contexte: 'Défaut écart/synchronisme rapporté pendant le pilotage manuel de la benne. Une temporisation TOF existante de 2 s maintient déjà l inhibition après retombée ; la mesure demandée est de l étendre à 4 s, sans créer de second temporisateur.'
+  description: 'Modifier uniquement BucketActivityHold dans PRG_04_Treuils_Benne : conserver les mêmes sources d activité et passer PT de T#2s à T#4s. Le contrôle final des sorties PRG_06 reste inchangé et continue de surveiller les discordances physiques M1/M2.'
+  objectifs:
+  - 'Une seule temporisation BucketActivityHold existe avec PT = T#4s.'
+  - 'La synchro process et le cross-check MecaE restent inhibés pendant l activité benne et 4 s après sa retombée.'
+  - 'Aucune seconde inhibition ni aucun bypass de sécurité n est ajouté.'
+  - 'Le contrôle final PRG_06.instSyncContactorFinal reste actif et inchangé.'
+  - 'Bundle régénéré et liaison G200 sans erreur.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T263_BUCKET_SYNC_HOLD_4S.yaml
+  bloque_par: []
+
+- id: T264
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: LIVRAISON_SECURITE_AU
+  agent: Antigravity
+  date: '2026-09-07T14:10:00+02:00'
+  titre: Retrait des bypass ingénierie AU (BypassAuPowerCutOff et RedundancyTestA) à la livraison machine
+  contexte: 'Pendant la mise en service (MES), BypassAuPowerCutOff et BypassAuRedundancyTestA ont été initialisés à TRUE au boot PLC dans GVL_BypassRetain.st pour les besoins d essai. Pour la livraison finale client et la conformité ISO 13849, ces bypass doivent être impérativement remis à FALSE par défaut.'
+  description: 'Remettre BypassAuPowerCutOff := FALSE et BypassAuRedundancyTestA := FALSE par défaut dans GVL_BypassRetain.st. Vérifier le bon déclenchement de la coupure de puissance par le PLC sur défauts critiques et la disparition du bandeau IHM NON SECURISE.'
+  objectifs:
+  - BypassAuPowerCutOff remis à FALSE par défaut dans GVL_BypassRetain.st
+  - BypassAuRedundancyTestA et BypassAuRedundancyTestB à FALSE par défaut
+  - BypassAuArmingPreconditions et BypassAuRedundancyTest à FALSE par défaut
+  - Coupure de puissance automate opérationnelle et vérifiée sur défaut critique
+  - Disparition de l alerte IHM 'AU: BYPASS INGENIERIE MES ACTIF - NON SECURISE'
+  - Bundle XML régénéré et validation mécanique Palier C 100% PASS
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T264_RETRAIT_BYPASS_POWER_CUTOFF_LIVRAISON.yaml
+  bloque_par: []
+
+- id: T269
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: SECURITE_TREUILS_BENNE
+  agent: Codex
+  date: '2026-09-07T14:35:00+02:00'
+  titre: Empêcher le faux MecaD pendant ouverture benne au FdC haut
+  contexte: 'Le snapshot 20260907_143114 montre ErrorMecaD M1/M2 et SafeStop pendant la manœuvre benne alors que le FdC haut est actif volontairement. Le FdC doit continuer à interdire la montée, mais l escalade MecaD ne doit pas déclencher l AU quand BenneBusy ou BenneHoldStillActive est actif.'
+  description: 'Gater uniquement l armement de MecaD par BenneBusy/BenneHoldStillActive dans FB_Safety_Winch. Conserver la barrière AscentPermit, les retours contacteurs/frein, les chaînes SafeStop/PowerCutOff hors manœuvre benne et aucun bypass IHM.'
+  objectifs:
+  - 'Pendant ouverture/fermeture benne avec FdC haut actif, aucun faux ErrorID 12 MecaD ni AU ne doit être généré par cette cause.'
+  - 'AscentPermit reste FALSE dès que le FdC haut est atteint, y compris pendant la manœuvre benne.'
+  - 'Hors BenneBusy/BenneHoldStillActive, un non-arrêt réel au FdC continue à déclencher MecaD après PostRampTimeout.'
+  - 'Aucun bypass, aucune modification des sorties physiques et aucune suppression de la surveillance FdC.'
+  - 'G497, bundle PLCopenXML, G200 et gates Palier C sont exécutés; test CODESYS sans bypass requis avant machine réelle.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T269_MECAD_BUCKET_TOP.yaml
+  bloque_par: []

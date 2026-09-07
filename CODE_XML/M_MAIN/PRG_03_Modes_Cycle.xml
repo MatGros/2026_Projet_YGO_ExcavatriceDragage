@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T10:09:14.060367" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T10:09:14.060367">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T12:30:31.360561" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T12:30:31.360561">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1429,6 +1429,17 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Treuils M1 ET M2 dans la fenêtre FDC logiciel haut (± CST_CycleInitWindowM) - surveillé en AX2</xhtml>
               </documentation>
             </variable>
+            <variable name="PrevActualPage">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémoire page IHM précédente (détection front changement de page)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_CycleInitWindowM">
               <type>
                 <REAL />
@@ -1463,6 +1474,16 @@ M1 : contacteurs retombés</xhtml>
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE &amp; INTENTION OPÉRATEUR ===
 {region "§1 Modes machine"}
+
+// 📄 Événement changement de page IHM : sélection automatique du mode (page 5 = MAINT_N1, page 1 = SEMI_AUTO)
+IF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage &lt;&gt; PrevActualPage THEN
+    PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
+    IF PrevActualPage = 5 THEN
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
+    ELSIF PrevActualPage = 1 THEN
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
+    END_IF;
+END_IF;
 
 instModes(
     Enable                  := TRUE,

@@ -34561,9 +34561,14 @@ IF NOT BypassGlobal THEN
     instCauses[10].Latching := TRUE;
     instCauses[10].Texte    := 'Surchauffe thermique frein treuil';
 
-    // Cause 11 : Méca D escalade capteur haut (latched)
+    // Cause 11 : Méca D escalade capteur haut (latched).
+    // Pendant une manoeuvre benne, M1 peut être volontairement maintenu au FdC
+    // avec le frein ouvert/transitionnel : le FdC reste une barrière de permis,
+    // mais cette situation n'est pas une non-arret de montée a escalader en AU.
     IF NOT (BypassSafety OR BypassMecaD) THEN
-        UncommandedActiveD := NOT TopPositionSensor AND NOT InReferencingMode AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
+        UncommandedActiveD := NOT (BenneBusy OR BenneHoldStillActive)
+            AND NOT TopPositionSensor AND NOT InReferencingMode
+            AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
         TonMecaD(IN := UncommandedActiveD, PT := PostRampTimeout);
         IF TonMecaD.Q THEN MecaDFaultLatched := TRUE; END_IF;
     ELSE
@@ -47609,6 +47614,17 @@ Data.DataValid := NOT Data.InputModules.Fault
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Treuils M1 ET M2 dans la fenêtre FDC logiciel haut (± CST_CycleInitWindowM) - surveillé en AX2</xhtml>
               </documentation>
             </variable>
+            <variable name="PrevActualPage">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="0" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémoire page IHM précédente (détection front changement de page)</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_CycleInitWindowM">
               <type>
                 <REAL />
@@ -47643,6 +47659,16 @@ Data.DataValid := NOT Data.InputModules.Fault
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE &amp; INTENTION OPÉRATEUR ===
 {region "§1 Modes machine"}
+
+// 📄 Événement changement de page IHM : sélection automatique du mode (page 5 = MAINT_N1, page 1 = SEMI_AUTO)
+IF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage &lt;&gt; PrevActualPage THEN
+    PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
+    IF PrevActualPage = 5 THEN
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
+    ELSIF PrevActualPage = 1 THEN
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
+    END_IF;
+END_IF;
 
 instModes(
     Enable                  := TRUE,
@@ -48656,7 +48682,7 @@ CmdOpen_IHM déclenché par ce mécanisme (diagnostic IHM)</xhtml>
                 <derived name="TOF" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien de la coupure surveillance synchro ~2 s APRES la fin d'une action benne (transitoire d'arret treuils : coast + settle codeur -&gt; faux ecart M1/M2)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Maintien de la coupure surveillance synchro 4 s APRES la fin d'une action benne (transitoire d'arret treuils : coast + settle codeur -&gt; faux ecart M1/M2)</xhtml>
               </documentation>
             </variable>
             <variable name="SafeStopM1_Active">
@@ -49345,7 +49371,7 @@ BucketActivityHold(IN := instBucket.Lifecycle.Busy
     OR instArbBucket.CmdOpen_IHM
     OR instArbBucket.CmdClose_IHM
     OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
-    OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose, PT := T#2s);
+    OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose, PT := T#4s);
 
 SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
@@ -49834,8 +49860,8 @@ instSafetyWinchM1(
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
-    // Polarité FB_Safety_Winch (NC) : TRUE = circuit fermé / position libre.
-    // Le DI brut est "TopPositionFree" (TRUE = hors FdC / libre), donc passage direct sans NOT.
+    // FB_Safety_Winch attend le contact NC : TRUE = circuit sain / FdC haut libre.
+    // FALSE = FdC haut atteint ou rupture de chaîne ; le FB bloque alors la montée.
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
@@ -49904,7 +49930,7 @@ instSafetyWinchM2(
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
-    // Même polarité NC que M1 : TRUE = circuit fermé / position libre.
+    // Même contact NC que M1 : TRUE = FdC haut libre, FALSE = FdC atteint/chaîne ouverte.
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
@@ -54097,7 +54123,7 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
             <BOOL />
           </type>
           <initialValue>
-            <simpleValue value="FALSE" />
+            <simpleValue value="TRUE" />
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">neutralise PowerCutOffRequest dans l'AU : le PLC ne fait plus chuter la chaine (coup-de-poing reste dur)</xhtml>

@@ -3,18 +3,18 @@ contract:
   criticality: C3
   strategy: patch
   objective: >
-    Corriger la polarite du capteur haut transmis a FB_Safety_Winch afin que le
-    FdC haut actif soit interprete comme TRUE et n'engendre plus MecaD pendant
-    l'arret d'ouverture benne M1/M2.
+    Corriger le raccordement du contact NC haut transmis a FB_Safety_Winch :
+    TRUE signifie circuit sain / zone haute libre, FALSE signifie FdC atteint
+    ou rupture de chaîne. Cette polarité doit conserver le blocage montée sûr.
   acceptance:
     - id: AC1
-      statement: "Le DI TopPositionFree est inverse avant transmission a FB_Safety_Winch pour M1 et M2."
+      statement: "Le DI TopPositionFree est transmis directement, sans double inversion, pour M1 et M2."
       verified_by: "Relecture PRG_04_Treuils_Benne.st"
     - id: AC2
-      statement: "Au FdC haut actif, TopPositionSensor vaut TRUE et la condition NOT TopPositionSensor de MecaD est inactive."
+      statement: "Hors FdC, TopPositionSensor vaut TRUE et la montée peut être autorisée par ce critère; au FdC ou sur rupture, il vaut FALSE et NOT TopPositionSensor bloque la montée."
       verified_by: "Analyse de polarite FB_Safety_Winch.st et trace CODESYS"
     - id: AC3
-      statement: "Hors FdC haut, le DI libre reste traduit en TopPositionSensor FALSE uniquement lorsque le FdC est atteint."
+      statement: "La chaîne NC reste à TRUE hors FdC; elle tombe à FALSE uniquement au FdC ou sur rupture de câblage."
       verified_by: "Test des deux etats du DI"
     - id: AC4
       statement: "Le nom du fichier est identique au nom du POU PRG_04_Treuils_Benne."

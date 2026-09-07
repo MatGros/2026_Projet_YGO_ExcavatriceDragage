@@ -369,9 +369,14 @@ IF NOT BypassGlobal THEN
     instCauses[10].Latching := TRUE;
     instCauses[10].Texte    := 'Surchauffe thermique frein treuil';
 
-    // Cause 11 : Méca D escalade capteur haut (latched)
+    // Cause 11 : Méca D escalade capteur haut (latched).
+    // Pendant une manoeuvre benne, M1 peut être volontairement maintenu au FdC
+    // avec le frein ouvert/transitionnel : le FdC reste une barrière de permis,
+    // mais cette situation n'est pas une non-arret de montée a escalader en AU.
     IF NOT (BypassSafety OR BypassMecaD) THEN
-        UncommandedActiveD := NOT TopPositionSensor AND NOT InReferencingMode AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
+        UncommandedActiveD := NOT (BenneBusy OR BenneHoldStillActive)
+            AND NOT TopPositionSensor AND NOT InReferencingMode
+            AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
         TonMecaD(IN := UncommandedActiveD, PT := PostRampTimeout);
         IF TonMecaD.Q THEN MecaDFaultLatched := TRUE; END_IF;
     ELSE
