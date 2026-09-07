@@ -8311,12 +8311,12 @@ Valeur brute axe X (0..10000)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 01 (Consigne changement de page)</xhtml>
               </documentation>
             </variable>
-            <variable name="CtrlInt02_ActualPage">
+            <variable name="CtrlInt02">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 02 (Page courante affichée)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 02</xhtml>
               </documentation>
             </variable>
             <variable name="CtrlInt03">
@@ -8402,12 +8402,12 @@ Valeur brute axe X (0..10000)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 05</xhtml>
               </documentation>
             </variable>
-            <variable name="StatusInt01">
+            <variable name="StatusInt01_ActualPage">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 01</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 01 (Page courante affichée)</xhtml>
               </documentation>
             </variable>
             <variable name="StatusInt02">
@@ -38759,6 +38759,23 @@ IF ArrivalEdge.Q THEN
     ArrivalWasMaintenance := CommandedMaintenance;
 END_IF;
 
+// Verrou d'arrivee extreme M3 : le FdC securite est une preuve d'arret de sens,
+// meme si le capteur de position cible n'a pas encore produit son front (cas
+// d'arrivee rapide / decalage de scans). On ne ferme pas le frein ici : le verrou
+// ne fait que maintenir la rampe a zero et empecher une re-demande du meme sens.
+// Liberation uniquement par une demande explicite du sens inverse (logique ci-dessous).
+IF NOT BypassLimitSwitch THEN
+    IF CommandedTremie AND LimitSwitchTremie THEN
+        ArrivalLock := TRUE;
+        ArrivalWasTremie := TRUE;
+        ArrivalWasMaintenance := FALSE;
+    ELSIF CommandedMaintenance AND LimitSwitchMaintenance THEN
+        ArrivalLock := TRUE;
+        ArrivalWasTremie := FALSE;
+        ArrivalWasMaintenance := TRUE;
+    END_IF;
+END_IF;
+
 IF ArrivalLock AND ((ReqTremie AND NOT ArrivalWasTremie) OR (ReqMaintenance AND NOT ArrivalWasMaintenance)) THEN
     ArrivalLock := FALSE;
 END_IF;
@@ -47892,7 +47909,12 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
-    Data.SequenceState.WinchDescentAuth_M3           := TRUE;
+    Data.SequenceState.WinchDescentAuth_M3 :=
+        NOT GVL_IHM.Commun.Cfg.TglEnableWinchDescentLock_M3
+        OR PRG_05_Translation.Data.M3_AtP1Stable
+        OR PRG_05_Translation.Data.M3_AtMaintenanceStable
+        OR GVL_IHM.M3Translation.Bypass.LimitSwitch
+        OR GVL_IHM.M3Translation.Bypass.Global;
 
 ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2) THEN
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
@@ -47979,13 +48001,12 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // Si TglEnableWinchDescentLock_M3 est actif (défaut), descente M1/M2 interdite tant que le pont M3
     // n'est pas ARRETE STABLE a P1 (travail) ou a Maintenance. En transit / PV / P2 / Tremie -&gt; pas de paye de cable.
     // Echappatoire : désactivation via bouton IHM TglEnableWinchDescentLock_M3, bypass FdC M3 ou bypass global M3.
-    // Position de travail = STATIQUE (mot capteurs M3), pas le jeton de franchissement :
-    // au boot PLC, pont deja pose a P1/Maintenance -&gt; descente autorisee sans devoir
-    // franchir un capteur d'abord (M3_AtWorkPositionStable couvre M3_AtP1/Maint jetons
-    // + lecture directe mot 00011 / 00000).
+    // Position de travail exacte = jeton AtP1/AtMaintenance issu d'un front.
+    // Le mot capteurs reste une information de zone et n'autorise pas la descente.
     Data.SequenceState.WinchDescentAuth_M3     :=
         NOT GVL_IHM.Commun.Cfg.TglEnableWinchDescentLock_M3
-        OR PRG_05_Translation.Data.M3_AtWorkPositionStable
+        OR PRG_05_Translation.Data.M3_AtP1Stable
+        OR PRG_05_Translation.Data.M3_AtMaintenanceStable
         OR GVL_IHM.M3Translation.Bypass.LimitSwitch
         OR GVL_IHM.M3Translation.Bypass.Global;
 
@@ -48043,7 +48064,7 @@ ELSE
     Data.SequenceState.ForceStepRejected       := FALSE;
     Data.SequenceState.ForceStepResult         := '';
     Data.SequenceState.BottomTouchConfirmed       := FALSE;
-    Data.SequenceState.WinchDescentAuth_M3           := TRUE;
+    Data.SequenceState.WinchDescentAuth_M3 := FALSE;
 END_IF;
 
 {endregion}
@@ -49813,7 +49834,9 @@ instSafetyWinchM1(
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
-    TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
+    // Polarité normalisée FB_Safety_Winch : TRUE = FdC haut atteint.
+    // Le DI brut est "TopPositionFree" (TRUE = hors FdC), donc inversion requise.
+    TopPositionSensor      := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
@@ -49881,7 +49904,8 @@ instSafetyWinchM2(
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
-    TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
+    // Même polarité normalisée que M1 : TRUE = FdC haut atteint.
+    TopPositionSensor      := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
@@ -51098,7 +51122,7 @@ front capteur (M3_AtXxxStable) sinon zone entre 2 capteurs (SensorsWord).</xhtml
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">M3 arrete P1 ou Maintenance — lecture STATIQUE mot capteurs (vrai des le boot)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic zone travail M3 (ne vaut pas preuve exacte d'autorisation)</xhtml>
               </documentation>
             </variable>
             <variable name="TonTremieProcessBlock">
@@ -51267,6 +51291,8 @@ END_IF;
 // n'autorise donc la lecture statique QUE si le pont est A L'ARRET et sans cible en cours,
 // sinon la descente treuil serait permise pendant le transit P2-&gt;P1 (5 m). Le jeton
 // M3_AtP1Stable (front) reste la voie normale quand le pont vient d'arriver.
+// Information de supervision uniquement : 00011 couvre toute la zone P2-&gt;P1.
+// Le verrou de descente consomme directement les jetons AtP1/AtMaintenance.
 M3_AtWorkPositionStable := (NOT instPosDecoderM3.Incoherent)
     AND ( M3_AtP1Stable OR M3_AtMaintenanceStable
           OR ( (instPosDecoderM3.SensorsWord = 2#00011 OR instPosDecoderM3.SensorsWord = 2#00000)

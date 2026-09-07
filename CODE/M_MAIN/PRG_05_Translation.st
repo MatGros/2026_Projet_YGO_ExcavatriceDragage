@@ -91,7 +91,7 @@ VAR
     M3_StatusText        : STRING(80);
     M3_SensorsWordPrev   : BYTE;   // detection franchissement (RAZ jeton sans dependance frequence)
     M3_SensorsWordChanged : BOOL;
-    M3_AtWorkPositionStable : BOOL; // M3 arrete P1 ou Maintenance — lecture STATIQUE mot capteurs (vrai des le boot)
+    M3_AtWorkPositionStable : BOOL; // Diagnostic zone travail M3 (ne vaut pas preuve exacte d'autorisation)
     TonTremieProcessBlock : TON;
 
     // 🕵️ Trace de blocage terrain (publiée via Data.TranslationTrace, consommée FB_TroubleshootingView)
@@ -226,6 +226,8 @@ END_IF;
 // n'autorise donc la lecture statique QUE si le pont est A L'ARRET et sans cible en cours,
 // sinon la descente treuil serait permise pendant le transit P2->P1 (5 m). Le jeton
 // M3_AtP1Stable (front) reste la voie normale quand le pont vient d'arriver.
+// Information de supervision uniquement : 00011 couvre toute la zone P2->P1.
+// Le verrou de descente consomme directement les jetons AtP1/AtMaintenance.
 M3_AtWorkPositionStable := (NOT instPosDecoderM3.Incoherent)
     AND ( M3_AtP1Stable OR M3_AtMaintenanceStable
           OR ( (instPosDecoderM3.SensorsWord = 2#00011 OR instPosDecoderM3.SensorsWord = 2#00000)

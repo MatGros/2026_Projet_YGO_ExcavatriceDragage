@@ -1,0 +1,60 @@
+contract:
+  task_id: T266_M3_FDC_ARRIVAL_LOCK
+  criticality: C3
+  strategy: patch
+  objective: >
+    Verrouiller la rampe de translation M3 dès qu'un FdC extrême correspondant au
+    sens commandé est actif, même si le front du capteur cible arrive avec un scan
+    de décalage, sans commander la fermeture anticipée du frein.
+  acceptance:
+    - id: AC1
+      statement: "Avec CommandedTremie et LimitSwitchTremie actifs, ArrivalLock passe à TRUE et RampTargetPct reste à zéro."
+      verified_by: "Relecture FB_Translation.st et test de séquence FdC Trémie"
+    - id: AC2
+      statement: "Avec CommandedMaintenance et LimitSwitchMaintenance actifs, ArrivalLock passe à TRUE et RampTargetPct reste à zéro."
+      verified_by: "Relecture FB_Translation.st et test de séquence FdC Maintenance"
+    - id: AC3
+      statement: "Le verrou FdC ne force pas BrakeCmd à FALSE ; la fermeture reste pilotée par FB_Brake après décélération."
+      verified_by: "Relecture de la section Commande variateur et frein"
+    - id: AC4
+      statement: "Une demande du sens inverse explicite est la seule condition de libération du verrou FdC."
+      verified_by: "Test directionnel inverse et relecture de la condition de libération"
+    - id: AC5
+      statement: "Le fichier est identique au nom du POU FB_Translation."
+      verified_by: "G310_check_code_structure.py"
+    - id: AC6
+      statement: "Le suffixe correspond au langage ST genere dans le bundle."
+      verified_by: "Inspection CODE_XML/CODE_Bundle.xml"
+  scope:
+    allowed:
+      - CODE/I_TRANSLATION/FB_Translation.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T266_M3_FDC_ARRIVAL_LOCK.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+  conservation:
+    must_survive:
+      - "Libération du verrou par commande inverse et séquence de décélération existante"
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute réouverture du frein avant arrêt réel ou tout contournement du FdC doit
+    être signalé avant validation terrain.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-07T00:00:00+02:00"
+  status: PENDING
+  summary: "ArrivalLock est également posé par le FdC extrême du sens commandé."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Essai contrôlé CODESYS requis."

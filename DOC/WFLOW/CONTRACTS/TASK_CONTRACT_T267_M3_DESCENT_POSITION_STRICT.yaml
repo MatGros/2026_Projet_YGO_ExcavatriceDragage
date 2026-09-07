@@ -1,0 +1,58 @@
+contract:
+  task_id: T267_M3_DESCENT_POSITION_STRICT
+  criticality: C3
+  strategy: patch
+  objective: >
+    Avec TglEnableWinchDescentLock_M3 actif, interdire la descente M1/M2 hors des
+    positions P1 ou Maintenance validees par jeton AtP1/AtMaintenance, sans utiliser
+    le mot capteurs de zone comme preuve de position exacte.
+  acceptance:
+    - id: AC1
+      statement: "En SEMI_AUTO et en MAINT_N1/MAINT_N2, TglEnableWinchDescentLock_M3 actif n'autorise la descente que si M3_AtP1Stable ou M3_AtMaintenanceStable est actif."
+      verified_by: "Relecture PRG_03_Modes_Cycle.st et test des modes"
+    - id: AC2
+      statement: "Le mot SensorsWord = 00011 ne suffit plus à autoriser la descente."
+      verified_by: "Inspection du calcul WinchDescentAuth_M3"
+    - id: AC3
+      statement: "En mode DISABLE, WinchDescentAuth_M3 vaut FALSE."
+      verified_by: "Relecture de la branche de neutralisation"
+    - id: AC4
+      statement: "Le fichier est identique au nom du POU PRG_03_Modes_Cycle."
+      verified_by: "G310_check_code_structure.py"
+    - id: AC5
+      statement: "Le suffixe correspond au langage ST genere dans le bundle."
+      verified_by: "Inspection CODE_XML/CODE_Bundle.xml"
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T267_M3_DESCENT_POSITION_STRICT.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+  conservation:
+    must_survive:
+      - "Bypass explicit existant et diagnostics M3 de supervision"
+    dropped_on_purpose:
+      - "Fallback SensorsWord utilise comme preuve d'autorisation de descente"
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute descente autorisee hors jeton P1/Maintenance ou tout bypass implicite
+    doit etre signale avant essai machine.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-07T00:00:00+02:00"
+  status: PENDING
+  summary: "Verrou strict AtP1/AtMaintenance applique dans les branches SEMI_AUTO et Maintenance."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Essai utilisateur requis."

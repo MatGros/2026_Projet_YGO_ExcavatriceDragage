@@ -314,7 +314,12 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
-    Data.SequenceState.WinchDescentAuth_M3           := TRUE;
+    Data.SequenceState.WinchDescentAuth_M3 :=
+        NOT GVL_IHM.Commun.Cfg.TglEnableWinchDescentLock_M3
+        OR PRG_05_Translation.Data.M3_AtP1Stable
+        OR PRG_05_Translation.Data.M3_AtMaintenanceStable
+        OR GVL_IHM.M3Translation.Bypass.LimitSwitch
+        OR GVL_IHM.M3Translation.Bypass.Global;
 
 ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2) THEN
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
@@ -401,13 +406,12 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // Si TglEnableWinchDescentLock_M3 est actif (défaut), descente M1/M2 interdite tant que le pont M3
     // n'est pas ARRETE STABLE a P1 (travail) ou a Maintenance. En transit / PV / P2 / Tremie -> pas de paye de cable.
     // Echappatoire : désactivation via bouton IHM TglEnableWinchDescentLock_M3, bypass FdC M3 ou bypass global M3.
-    // Position de travail = STATIQUE (mot capteurs M3), pas le jeton de franchissement :
-    // au boot PLC, pont deja pose a P1/Maintenance -> descente autorisee sans devoir
-    // franchir un capteur d'abord (M3_AtWorkPositionStable couvre M3_AtP1/Maint jetons
-    // + lecture directe mot 00011 / 00000).
+    // Position de travail exacte = jeton AtP1/AtMaintenance issu d'un front.
+    // Le mot capteurs reste une information de zone et n'autorise pas la descente.
     Data.SequenceState.WinchDescentAuth_M3     :=
         NOT GVL_IHM.Commun.Cfg.TglEnableWinchDescentLock_M3
-        OR PRG_05_Translation.Data.M3_AtWorkPositionStable
+        OR PRG_05_Translation.Data.M3_AtP1Stable
+        OR PRG_05_Translation.Data.M3_AtMaintenanceStable
         OR GVL_IHM.M3Translation.Bypass.LimitSwitch
         OR GVL_IHM.M3Translation.Bypass.Global;
 
@@ -465,7 +469,7 @@ ELSE
     Data.SequenceState.ForceStepRejected       := FALSE;
     Data.SequenceState.ForceStepResult         := '';
     Data.SequenceState.BottomTouchConfirmed       := FALSE;
-    Data.SequenceState.WinchDescentAuth_M3           := TRUE;
+    Data.SequenceState.WinchDescentAuth_M3 := FALSE;
 END_IF;
 
 {endregion}

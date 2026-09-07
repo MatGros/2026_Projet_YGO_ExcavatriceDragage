@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T08:02:15.980764" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T08:02:15.980764">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T10:10:16.326644" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T10:10:16.326644">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2289,7 +2289,7 @@ front capteur (M3_AtXxxStable) sinon zone entre 2 capteurs (SensorsWord).</xhtml
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">M3 arrete P1 ou Maintenance — lecture STATIQUE mot capteurs (vrai des le boot)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Diagnostic zone travail M3 (ne vaut pas preuve exacte d'autorisation)</xhtml>
               </documentation>
             </variable>
             <variable name="TonTremieProcessBlock">
@@ -2458,6 +2458,8 @@ END_IF;
 // n'autorise donc la lecture statique QUE si le pont est A L'ARRET et sans cible en cours,
 // sinon la descente treuil serait permise pendant le transit P2-&gt;P1 (5 m). Le jeton
 // M3_AtP1Stable (front) reste la voie normale quand le pont vient d'arriver.
+// Information de supervision uniquement : 00011 couvre toute la zone P2-&gt;P1.
+// Le verrou de descente consomme directement les jetons AtP1/AtMaintenance.
 M3_AtWorkPositionStable := (NOT instPosDecoderM3.Incoherent)
     AND ( M3_AtP1Stable OR M3_AtMaintenanceStable
           OR ( (instPosDecoderM3.SensorsWord = 2#00011 OR instPosDecoderM3.SensorsWord = 2#00000)
@@ -4344,6 +4346,23 @@ IF ArrivalEdge.Q THEN
     ArrivalLock := TRUE;
     ArrivalWasTremie := CommandedTremie;
     ArrivalWasMaintenance := CommandedMaintenance;
+END_IF;
+
+// Verrou d'arrivee extreme M3 : le FdC securite est une preuve d'arret de sens,
+// meme si le capteur de position cible n'a pas encore produit son front (cas
+// d'arrivee rapide / decalage de scans). On ne ferme pas le frein ici : le verrou
+// ne fait que maintenir la rampe a zero et empecher une re-demande du meme sens.
+// Liberation uniquement par une demande explicite du sens inverse (logique ci-dessous).
+IF NOT BypassLimitSwitch THEN
+    IF CommandedTremie AND LimitSwitchTremie THEN
+        ArrivalLock := TRUE;
+        ArrivalWasTremie := TRUE;
+        ArrivalWasMaintenance := FALSE;
+    ELSIF CommandedMaintenance AND LimitSwitchMaintenance THEN
+        ArrivalLock := TRUE;
+        ArrivalWasTremie := FALSE;
+        ArrivalWasMaintenance := TRUE;
+    END_IF;
 END_IF;
 
 IF ArrivalLock AND ((ReqTremie AND NOT ArrivalWasTremie) OR (ReqMaintenance AND NOT ArrivalWasMaintenance)) THEN
