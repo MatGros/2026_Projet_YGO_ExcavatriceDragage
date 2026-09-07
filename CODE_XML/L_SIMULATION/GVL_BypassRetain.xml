@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T06:28:48.884687" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T06:28:48.884687">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T10:51:59.347663" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T10:51:59.347663">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -138,7 +138,7 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
             <BOOL />
           </type>
           <initialValue>
-            <simpleValue value="FALSE" />
+            <simpleValue value="TRUE" />
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">saute le seul test canal A (TEST_A + RESTORE_A) : IDLE -&gt; TEST_B ; canal B toujours qualifie (latch B actif)</xhtml>

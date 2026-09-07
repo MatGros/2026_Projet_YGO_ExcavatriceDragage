@@ -11,10 +11,10 @@ STRUCT
     StatusWord03 : WORD; // PLC→IHM : registre WORD local 03
     StatusWord04 : WORD; // PLC→IHM : registre WORD local 04
     StatusWord05 : WORD; // PLC→IHM : registre WORD local 05
-    StatusInt01  : INT;  // PLC→IHM : registre INT local 01
-    StatusInt02  : INT;  // PLC→IHM : registre INT local 02
-    StatusInt03  : INT;  // PLC→IHM : registre INT local 03
-    StatusInt04  : INT;  // PLC→IHM : registre INT local 04
-    StatusInt05  : INT;  // PLC→IHM : registre INT local 05
+    StatusInt01_ActualPage : INT;  // PLC→IHM : registre INT local 01 (Page courante affichée)
+    StatusInt02            : INT;  // PLC→IHM : registre INT local 02
+    StatusInt03            : INT;  // PLC→IHM : registre INT local 03
+    StatusInt04            : INT;  // PLC→IHM : registre INT local 04
+    StatusInt05            : INT;  // PLC→IHM : registre INT local 05
 END_STRUCT
 END_TYPE

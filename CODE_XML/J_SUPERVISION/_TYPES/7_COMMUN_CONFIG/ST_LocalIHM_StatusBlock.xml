@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T06:42:49.846743" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T06:42:49.846743">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T10:26:45.271337" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T10:26:45.271337">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -66,12 +66,12 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 05</xhtml>
               </documentation>
             </variable>
-            <variable name="StatusInt01">
+            <variable name="StatusInt01_ActualPage">
               <type>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 01</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 01 (Page courante affichée)</xhtml>
               </documentation>
             </variable>
             <variable name="StatusInt02">
