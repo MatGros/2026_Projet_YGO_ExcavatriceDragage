@@ -1,0 +1,78 @@
+contract:
+  task_id: T262
+  criticality: C2
+  strategy: patch
+  objective: >
+    Permettre, par un seuil configurable de 0 à 50 %, la transition anticipée de
+    AX10_CLOSE_BUCKET lorsque l ouverture réelle de la benne est inférieure au
+    seuil, tout en conservant le comportement historique à 0 % et toutes les
+    barrières de sécurité.
+  acceptance:
+    - id: AC1
+      statement: "La configuration est bornée à 0..50 % et sa valeur par défaut est 0 %."
+      verified_by: "test unitaire de saturation et inspection de la valeur initiale"
+    - id: AC2
+      statement: "Avec Cfg=0 %, AX10_CLOSE_BUCKET ne change pas de condition et attend l'information actuelle benne fermée."
+      verified_by: "test cycle auto avec benne à 1..10 % puis benne fermée"
+    - id: AC3
+      statement: "Avec Cfg>0 %, le passage au step suivant est vrai seulement lorsque ActualBucketOpeningPct < Cfg."
+      verified_by: "tests aux valeurs seuil-1, seuil, seuil+1 et 50 %"
+    - id: AC4
+      statement: "Le seuil ne neutralise ni AU, ni FDC, ni freinage, ni défaut de mouvement et ne commande pas un redémarrage automatique."
+      verified_by: "revue de flux PRG/FB et tests de coupure des permis"
+    - id: AC5
+      statement: "Le scénario de fermeture ne maintient pas inutilement l'effort sur M2 seul après validation du seuil, sans supprimer la synchronisation et les limites finales."
+      verified_by: "simulation/rejeu cycle AX10 avec trace M1/M2, demandes et étapes"
+    - id: AC6
+      statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste sans erreur."
+      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report"
+    - id: AC7
+      statement: "Pour chaque fichier ST autorisé, le nom de fichier est identique au nom de POU et le suffixe est égal au langage généré dans le bundle."
+      verified_by: "gates structurels et revue du bundle"
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st
+      - CODE_XML/CODE_Bundle.xml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/FB_Safety_Winch.st
+      - CODE/B_AU_SECURITE/*
+  conservation:
+    must_survive:
+      - "La condition historique benne fermée lorsque le seuil vaut 0 %."
+      - "Les contrôles FDC, AU, freinage, synchronisation et défaut mouvement."
+      - "La convention ActualBucketOpeningPct : 0 % fermé, 100 % ouvert."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: >
+    Toute incohérence entre le pourcentage réel, l'information benne fermée,
+    l'étape AX10 et la synchronisation M1/M2 doit être signalée avant toute
+    implémentation.
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    Tâche créée pour cadrer le seuil de transition configurable de la fermeture
+    de benne en cycle automatique.
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Validation humaine et choix final du nom de configuration requis avant
+    implémentation.

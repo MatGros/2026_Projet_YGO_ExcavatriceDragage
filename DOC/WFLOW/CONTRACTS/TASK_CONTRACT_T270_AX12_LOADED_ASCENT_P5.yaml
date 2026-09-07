@@ -1,0 +1,33 @@
+contract:
+  task_id: T270_AX12_LOADED_ASCENT_P5
+  criticality: C3
+  strategy: patch
+  objective: "Passer uniquement la remontée en charge AX12 du cycle automatique au palier 5."
+  acceptance:
+    - id: AC1
+      statement: "CST_StepLoaded vaut 5 dans FB_CycleSemiAuto."
+      verified_by: "Relecture ST"
+    - id: AC2
+      statement: "AX9, AX10 et AX11 restent inchangés."
+      verified_by: "Diff ciblé"
+    - id: AC3
+      statement: "Les clamps FdC, AU, synchronisme, maintenance, benne et configuration aval restent prioritaires."
+      verified_by: "Relecture PRG_04 et test CODESYS"
+    - id: AC4
+      statement: "Les conditions de plongée AX4..AX8 restent inchangées."
+      verified_by: "Diff ciblé"
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T270_AX12_LOADED_ASCENT_P5.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "AX9 P1, AX10 et AX11"
+      - "Permis FdC, AU et interlocks PRG_04"
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - bundle
+status: IN_PROGRESS

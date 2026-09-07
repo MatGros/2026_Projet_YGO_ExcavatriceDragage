@@ -1,0 +1,35 @@
+contract:
+  task_id: T271_RAISE_OFF_BOTTOM_ZERO_DIRECT_AX10
+  criticality: C3
+  strategy: patch
+  objective: "Avec RaiseOffBottom_M = 0, passer directement d'AX8 stabilisé à AX10 fermeture benne; conserver AX9 uniquement pour une valeur positive."
+  acceptance:
+    - id: AC1
+      statement: "RaiseOffBottom_M <= 0 produit RaiseOffBottomEff = 0 et la transition AX8 va directement à AX10."
+      verified_by: "Relecture FB_CycleSemiAuto.st"
+    - id: AC2
+      statement: "RaiseOffBottom_M > 0 conserve AX9 et la cible de décollement configurée."
+      verified_by: "Test cycle avec valeur positive"
+    - id: AC3
+      statement: "Le message AX10 de fermeture benne est affiché après le passage direct."
+      verified_by: "Trace CycleStateStr/OperatorAction"
+    - id: AC4
+      statement: "Les sécurités AU, FdC, arrêt stabilisé et permis de benne restent inchangés."
+      verified_by: "Diff ciblé et G200"
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T271_RAISE_OFF_BOTTOM_ZERO_DIRECT_AX10.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "AX4..AX8 diving"
+      - "AX9 pour distance positive"
+      - "AX10 fermeture benne"
+    dropped_on_purpose: ["Décollement interne automatique de 0,5 m lorsque la configuration vaut 0"]
+  evidence_required:
+    - check_linkage
+    - bundle
+status: IN_PROGRESS

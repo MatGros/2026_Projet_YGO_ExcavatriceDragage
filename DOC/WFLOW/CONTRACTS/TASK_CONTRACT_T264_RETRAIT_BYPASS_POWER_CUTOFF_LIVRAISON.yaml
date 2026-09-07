@@ -1,0 +1,68 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T264
+# Retrait des bypass ingénierie AU (BypassAuPowerCutOff / Redundancy / Preconditions) à la livraison machine
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T264
+  criticality: C3
+  strategy: patch
+  objective: >
+    Remettre à FALSE toutes les valeurs par défaut des bypass d ingénierie AU
+    dans GVL_BypassRetain (notamment BypassAuPowerCutOff et BypassAuRedundancyTestA)
+    pour la recette finale et la livraison client, garantissant la sécurité machine
+    nominale et la coupure de puissance effective par l automate.
+
+  acceptance:
+    - id: AC1
+      statement: "BypassAuPowerCutOff est initialisé à FALSE par défaut dans GVL_BypassRetain.st."
+      verified_by: "Revue GVL_BypassRetain.st et export XML."
+    - id: AC2
+      statement: "Tous les bypass d ingénierie AU (BypassAuArmingPreconditions, BypassAuRedundancyTest, BypassAuRedundancyTestA, BypassAuRedundancyTestB, BypassAuPowerCutOff) sont à FALSE au boot."
+      verified_by: "Revue GVL_BypassRetain.st."
+    - id: AC3
+      statement: "Sur défaut critique (PowerCutOffRequest), la sortie de coupure automate fait chuter la chaîne d AU matérielle."
+      verified_by: "Test fonctionnel de coupure puissance sur défaut sécurité."
+    - id: AC4
+      statement: "Le message d alerte IHM 'AU: BYPASS INGENIERIE MES ACTIF - NON SECURISE' n est plus présent au démarrage nominal."
+      verified_by: "Vérification bannière IHM et GVL_Troubleshooting."
+    - id: AC5
+      statement: "Validation mécanique 100% PASS (G200, Gates Palier C) et bundle de livraison généré."
+      verified_by: "G200_check_linkage.py et run_all_gates.py --palier C."
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/GVL_BypassRetain.st
+      - CODE_XML/
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T264_RETRAIT_BYPASS_POWER_CUTOFF_LIVRAISON.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+
+  conservation:
+    must_survive:
+      - "Logique nominale de sécurité AU (FB_Safety_EmergencyManagement) 100% intacte."
+      - "Coup-de-poing physique et sécurité matérielle durs prioritaires."
+    dropped_on_purpose: []
+
+  evidence_required:
+    - bundle_xml
+    - g200_linkage
+    - gates_palier_c
+
+  alert_duty: >
+    Ne jamais livrer une machine industrielle avec des bypass d ingénierie AU
+    actifs par défaut au démarrage automate (exigence ISO 13849 / Directive Machines).
+
+status: TODO
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

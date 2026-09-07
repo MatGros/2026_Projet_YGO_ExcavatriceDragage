@@ -1,0 +1,62 @@
+contract:
+  task_id: T272_M3_DESCENT_STATE_GATE
+  criticality: C3
+  strategy: patch
+  objective: >
+    Le verrou de descente des treuils M1/M2 doit consommer les états de position
+    validés de GVL_IHM.M3Translation.State, jamais les entrées capteurs brutes.
+  acceptance:
+    - id: AC1
+      statement: "Avec le verrou actif et sans bypass, transit/PV/P2/Trémie interdit la descente."
+      verified_by: "test CODESYS et lecture WinchDescentAuth_M3"
+    - id: AC2
+      statement: "P1 ou Maintenance validé dans State autorise la descente."
+      verified_by: "test CODESYS"
+    - id: AC3
+      statement: "Le calcul ne référence aucun M3_PosMaintenance_DI/M3_PosP1_DI."
+      verified_by: "rg source"
+    - id: AC4
+      statement: "Le bundle est frais et G200 est PASS sans erreur."
+      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py"
+    - id: AC5
+      statement: "Le nom de fichier est identique au nom de POU PRG_03_Modes_Cycle.st."
+      verified_by: "lecture du bundle PLCopenXML"
+    - id: AC6
+      statement: "Le suffixe est identique au langage généré dans le bundle ; PRG_03_Modes_Cycle.st reste du ST pur."
+      verified_by: "lecture du bundle PLCopenXML"
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE_XML/CODE_Bundle.xml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_05_Translation.st
+  conservation:
+    must_survive:
+      - "Bypass LimitSwitch et Global restent inchangés."
+      - "La règle P1 OU Maintenance reste inchangée."
+      - "Aucune sortie physique n'est modifiée."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute incohérence de polarité, de source d'état ou de mode doit être signalée
+    avant extension du périmètre.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-07T15:20:00+02:00"
+  status: COMPLETED
+  summary: "Le permis utilise GVL_IHM.M3Translation.State.AtP1/AtMaintenance. Bundle et G200 validés."
+  evidence_submitted:
+    - "bundle: PASS frais"
+    - "G200: PASS, 0 erreur"
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Recette CODESYS sur machine/simulation à effectuer par l'humain."

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T07:25:30.738218" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T07:25:30.738218">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T13:35:00.259141" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T13:35:00.259141">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1173,7 +1173,7 @@
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Decollement du fond en AX8 : RaiseTargetM = TouchPositionM + ce champ (reglable IHM ; &lt;= 0 -&gt; 0,5 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Decollement du fond en AX8 (reglable IHM ; 0 -&gt; passage direct AX10, &gt;0 -&gt; AX9)</xhtml>
               </documentation>
             </variable>
             <variable name="CfgCtrlAscentMaxStep">
@@ -1885,7 +1885,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <REAL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CfgRaiseOffBottomM borne (&gt;0, defaut 0,5 m)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] CfgRaiseOffBottomM borne (0 = pas d'AX9)</xhtml>
               </documentation>
             </variable>
             <variable name="DiveStartMinEff">
@@ -2175,10 +2175,10 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
                 <INT />
               </type>
               <initialValue>
-                <simpleValue value="4" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier montee en charge AX12 (bridage strict &lt;= 4, jamais palier 5)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier montee en charge AX12 (P5, plafonds de securite aval conserves)</xhtml>
               </documentation>
             </variable>
             <variable name="CST_KoboldInitTimeout">
@@ -2234,17 +2234,6 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Vitesse quasi nulle, alignee FB_Modes</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_RaiseOffBottomDefaultM">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.5" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM &lt;= 0</xhtml>
               </documentation>
             </variable>
             <variable name="CST_ExtractionStepDelay">
@@ -2310,7 +2299,7 @@ IF (DiveStartMinM &gt;= 0.5) AND (DiveStartMinM &lt;= 8.0) THEN
 ELSE
     DiveStartMinEff := 4.0;
 END_IF;
-RaiseOffBottomEff := SEL(CfgRaiseOffBottomM &lt;= 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
+RaiseOffBottomEff := SEL(CfgRaiseOffBottomM &lt;= 0.0, 0.0, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM &lt;= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
@@ -3106,9 +3095,14 @@ CASE State OF
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
-        // Transition vers AX9 apres 2 secondes de stabilisation a l arret (freins serres)
+        // Apres stabilisation a l arret (freins serres), 0 m signifie fermeture benne
+        // immediate (AX10). Une valeur &gt; 0 passe par AX9 pour decoller/retendre.
         IF BottomTouchStabTimer.Q AND DiveStartStopped AND StopPositionCaptured THEN
-            State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
+            IF RaiseOffBottomEff &lt;= 0.0 THEN
+                State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+            ELSE
+                State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
+            END_IF;
         END_IF;
 
     E_AutoCycleStep.AX_DIVING_RETRY:

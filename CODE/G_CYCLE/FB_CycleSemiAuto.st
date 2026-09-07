@@ -87,7 +87,7 @@ VAR_INPUT
 
     // === CONFIG DIVING / EXTRACTION (GEL 2026-09-03) ===
     DiveStartMinM          : REAL;         // --> [CFG] Altimetrie de lancement Kobold (AT4 : AX4 -> AX5), reglable IHM (~3..5 m ; <= 0 -> defaut interne)
-    CfgRaiseOffBottomM     : REAL;         // --> [CFG] Decollement du fond en AX8 : RaiseTargetM = TouchPositionM + ce champ (reglable IHM ; <= 0 -> 0,5 m)
+    CfgRaiseOffBottomM     : REAL;         // --> [CFG] Decollement du fond en AX8 (reglable IHM ; 0 -> passage direct AX10, >0 -> AX9)
     CfgCtrlAscentMaxStep   : INT;          // --> [CFG] Palier max montee controle AX11, borne [1..2] (defaut 1)
     CfgCtrlAscentDistanceM : REAL;         // --> [CFG] Distance controle AX11 depuis son depart (m)
     M1_SpeedStepApplied    : INT;          // --> [HW] Palier vitesse effectivement applique M1 (0 = inconnu ; garde palier <> 4 en diving)
@@ -197,7 +197,7 @@ VAR
     KoboldImmersionQualified: BOOL;         // . [LOC] DI haute stable observee sous alimentation
     DivingRetryTrig         : BOOL;         // . [LOC] Synthese GT-dive-retry (erreur Kobold / joystick relache / palier < 4 confirme en AX5..AX7)
     CtrlAscentMaxStepEff    : INT;          // . [LOC] CfgCtrlAscentMaxStep borne [1..2]
-    RaiseOffBottomEff       : REAL;         // . [LOC] CfgRaiseOffBottomM borne (>0, defaut 0,5 m)
+    RaiseOffBottomEff       : REAL;         // . [LOC] CfgRaiseOffBottomM borne (0 = pas d'AX9)
     DiveStartMinEff         : REAL;         // . [LOC] DiveStartMinM borne (defaut interne si <= 0)
 
     // === TEMPORISATEURS INTERNES ===
@@ -237,13 +237,12 @@ VAR CONSTANT
     // Paliers de vitesse treuil par etape (StepTgt des demandes WinchMxCmd, 1..5 ; 0 = arret).
     CST_StepSlow   : INT := 1;   // Palier lent : retente AX9, controle AX11, repositionnement AX15C
     CST_StepDive   : INT := 4;   // Palier plongee Kobold AX4..AX7 : palier 4 MINI ET MAXI impose, palier 5 interdit (GEL Q9)
-    CST_StepLoaded : INT := 4;   // Palier montee en charge AX12 (bridage strict <= 4, jamais palier 5)
+    CST_StepLoaded : INT := 5;   // Palier montee en charge AX12 (P5, plafonds de securite aval conserves)
     CST_KoboldInitTimeout : TIME := T#3s;   // Fenetre max de confirmation retour contacteur Kobold en AX5
     CST_DiveStartStopConfirmTime : TIME := T#300ms; // Confirmation stable des 6 faits d'arret + validite vitesses
     CST_AscentStartStopConfirmTime : TIME := T#500ms; // Purge redemarrage apres fermeture benne
     CST_DiveStartStopTimeout : TIME := T#5s; // Plafond anti-blocage ; timeout -> defaut latche, jamais depart
     CST_DiveStartSpeedThresholdMps : REAL := 0.02; // Vitesse quasi nulle, alignee FB_Modes
-    CST_RaiseOffBottomDefaultM : REAL := 0.5;   // Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM <= 0
     CST_ExtractionStepDelay    : TIME := T#1s;
 END_VAR
 
@@ -286,7 +285,7 @@ IF (DiveStartMinM >= 0.5) AND (DiveStartMinM <= 8.0) THEN
 ELSE
     DiveStartMinEff := 4.0;
 END_IF;
-RaiseOffBottomEff := SEL(CfgRaiseOffBottomM <= 0.0, CST_RaiseOffBottomDefaultM, CfgRaiseOffBottomM);
+RaiseOffBottomEff := SEL(CfgRaiseOffBottomM <= 0.0, 0.0, CfgRaiseOffBottomM);
 CtrlAscentMaxStepEff := LIMIT(1, CfgCtrlAscentMaxStep, 2);
 CtrlAscentDistEffM := SEL(CfgCtrlAscentDistanceM <= 0.0, CtrlAscentDistM, CfgCtrlAscentDistanceM);
 
@@ -1082,9 +1081,14 @@ CASE State OF
         WinchM2Cmd.RunRequest := FALSE; WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := FALSE; WinchM2Cmd.StepTgt := 0;
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
-        // Transition vers AX9 apres 2 secondes de stabilisation a l arret (freins serres)
+        // Apres stabilisation a l arret (freins serres), 0 m signifie fermeture benne
+        // immediate (AX10). Une valeur > 0 passe par AX9 pour decoller/retendre.
         IF BottomTouchStabTimer.Q AND DiveStartStopped AND StopPositionCaptured THEN
-            State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
+            IF RaiseOffBottomEff <= 0.0 THEN
+                State := E_AutoCycleStep.AX10_CLOSE_BUCKET;
+            ELSE
+                State := E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM;
+            END_IF;
         END_IF;
 
     E_AutoCycleStep.AX_DIVING_RETRY:
