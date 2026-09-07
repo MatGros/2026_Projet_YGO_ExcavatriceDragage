@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.450923" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.450923">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T10:06:22.607055" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T10:06:22.607055">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -996,6 +996,23 @@ IF ArrivalEdge.Q THEN
     ArrivalLock := TRUE;
     ArrivalWasTremie := CommandedTremie;
     ArrivalWasMaintenance := CommandedMaintenance;
+END_IF;
+
+// Verrou d'arrivee extreme M3 : le FdC securite est une preuve d'arret de sens,
+// meme si le capteur de position cible n'a pas encore produit son front (cas
+// d'arrivee rapide / decalage de scans). On ne ferme pas le frein ici : le verrou
+// ne fait que maintenir la rampe a zero et empecher une re-demande du meme sens.
+// Liberation uniquement par une demande explicite du sens inverse (logique ci-dessous).
+IF NOT BypassLimitSwitch THEN
+    IF CommandedTremie AND LimitSwitchTremie THEN
+        ArrivalLock := TRUE;
+        ArrivalWasTremie := TRUE;
+        ArrivalWasMaintenance := FALSE;
+    ELSIF CommandedMaintenance AND LimitSwitchMaintenance THEN
+        ArrivalLock := TRUE;
+        ArrivalWasTremie := FALSE;
+        ArrivalWasMaintenance := TRUE;
+    END_IF;
 END_IF;
 
 IF ArrivalLock AND ((ReqTremie AND NOT ArrivalWasTremie) OR (ReqMaintenance AND NOT ArrivalWasMaintenance)) THEN

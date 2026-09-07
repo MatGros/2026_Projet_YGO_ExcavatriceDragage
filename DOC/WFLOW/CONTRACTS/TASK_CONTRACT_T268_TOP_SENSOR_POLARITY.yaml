@@ -1,0 +1,56 @@
+contract:
+  task_id: T268_TOP_SENSOR_POLARITY
+  criticality: C3
+  strategy: patch
+  objective: >
+    Corriger la polarite du capteur haut transmis a FB_Safety_Winch afin que le
+    FdC haut actif soit interprete comme TRUE et n'engendre plus MecaD pendant
+    l'arret d'ouverture benne M1/M2.
+  acceptance:
+    - id: AC1
+      statement: "Le DI TopPositionFree est inverse avant transmission a FB_Safety_Winch pour M1 et M2."
+      verified_by: "Relecture PRG_04_Treuils_Benne.st"
+    - id: AC2
+      statement: "Au FdC haut actif, TopPositionSensor vaut TRUE et la condition NOT TopPositionSensor de MecaD est inactive."
+      verified_by: "Analyse de polarite FB_Safety_Winch.st et trace CODESYS"
+    - id: AC3
+      statement: "Hors FdC haut, le DI libre reste traduit en TopPositionSensor FALSE uniquement lorsque le FdC est atteint."
+      verified_by: "Test des deux etats du DI"
+    - id: AC4
+      statement: "Le nom du fichier est identique au nom du POU PRG_04_Treuils_Benne."
+      verified_by: "G310_check_code_structure.py"
+    - id: AC5
+      statement: "Le suffixe correspond au langage ST genere dans le bundle."
+      verified_by: "Inspection CODE_XML/CODE_Bundle.xml"
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T268_TOP_SENSOR_POLARITY.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+  conservation:
+    must_survive:
+      - "Interlocks haut logiciels, bypass explicites et logique MecaD existante"
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Toute inversion de polarite differente du cablage reel doit etre signalee avant
+    essai machine.
+status: IN_PROGRESS
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-07T00:00:00+02:00"
+  status: PENDING
+  summary: "TopPositionSensor est maintenant normalise TRUE au FdC haut pour M1/M2."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Verifier le DI physique et tester ouverture benne sur FdC haut."
