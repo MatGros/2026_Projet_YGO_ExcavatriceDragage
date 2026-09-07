@@ -80,15 +80,29 @@ contract:
 # ═══════════════════════════════════════════════════════════════════════════
 # 🚦 SUIVI
 # ═══════════════════════════════════════════════════════════════════════════
-status: PENDING
+status: COMPLETED
 
 execution:
-  executed_by: "..."
-  completed_at: "..."
-  status: PENDING
+  executed_by: "claude-sonnet-5 (Claude Code)"
+  completed_at: "2026-09-07T03:05:00+02:00"
+  status: COMPLETED
   summary: >
-    (à remplir en fin de travail)
-  evidence_submitted: []
+    GVL_BypassRetain.st : +BypassAuRedundancyTestA / +BypassAuRedundancyTestB (RETAIN,
+    commentaires TRACE MES). FB_Safety_EmergencyManagement.st : +2 VAR_INPUT
+    BypassRedundancyTestA/B, +2 locaux BypassTestA/B = OR(global, granulaire) calcules
+    au §5 ; step 0 aiguille RESTORE_B (A+B) / TEST_B (A seul) / TEST_A (rien) ; step 2
+    RESTORE_A -> RESTORE_B si BypassTestB ; banniere MES etendue aux 5 flags. PRG_06_Outputs.st :
+    cablage des 2 entrees sur GVL_BypassRetain. bypass_retain_orphans_allowed.txt : +2 noms
+    (meme justification que BypassAuRedundancyTest : consommes direct par PRG_06, jamais IHM).
+    Aucune touche aux steps PULSE/CONFIRM, aborts, exigence chaine fermee, StartupCheck.
+    Compile CODESYS utilisateur : 0 erreur (2 warnings preexistants hors perimetre).
+    NON COMMITE. Essais MES A seul / B seul / A+B a faire.
+  evidence_submitted:
+    - "generate_codesys_bundle.py : PASS (bundle fresh)"
+    - "G200_check_linkage.py --report : PASS (0 erreur, 1790 instances)"
+    - "G491 (anti-orphelin bypass RETAIN) : PASS apres ajout allowlist"
+    - "run_all_gates.py --palier C : 4 FAIL preexistants hors perimetre (G340, G406 BannerFormatter, G430, G483 T181-14) - baseline identique T260 ; aucun ne cite les 3 fichiers du lot"
+    - "compile CODESYS (import bundle utilisateur) : 0 erreur, 2 warnings preexistants"
 
 validation:
   status: PENDING

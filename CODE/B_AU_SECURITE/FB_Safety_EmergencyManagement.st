@@ -27,7 +27,9 @@ VAR_INPUT
     // shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
     // 3 bypass ORTHOGONAUX — chacun a un perimetre strict, ne pas melanger :
     BypassArmingPreconditions : BOOL := FALSE; // --> [TST] Arme malgre chaine ouverte / contacteur engage / lockout / coupure ; CONFIRM acquis sans retour contacteur ; leve CHAIN_DROP
-    BypassRedundancyTest      : BOOL := FALSE; // --> [TST] Saute UNIQUEMENT l'auto-test A/B (IDLE -> RESTORE_B, pas de latch RedundancyTestFailed). Armable, CONFIRM, aborts ET exigence chaine fermee restent normaux. Chaine ouverte -> + BypassArmingPreconditions.
+    BypassRedundancyTest      : BOOL := FALSE; // --> [TST] Saute l'auto-test A/B COMPLET (IDLE -> RESTORE_B, aucun latch RedundancyTestFailed) = alias BypassRedundancyTestA + B. Armable, CONFIRM, aborts ET exigence chaine fermee restent normaux. Chaine ouverte -> + BypassArmingPreconditions.
+    BypassRedundancyTestA     : BOOL := FALSE; // --> [TST] Saute le seul test canal A (TEST_A + RESTORE_A) : IDLE -> TEST_B. Latch A neutralise ; canal B toujours qualifie (latch B actif). Meme logique, un canal a la fois.
+    BypassRedundancyTestB     : BOOL := FALSE; // --> [TST] Saute le seul test canal B (TEST_B) : RESTORE_A -> RESTORE_B. Latch B neutralise ; canal A toujours qualifie (latch A actif).
     BypassPowerCutOff         : BOOL := FALSE; // --> [TST] Neutralise PowerCutOffRequest DANS ce FB : le PLC ne fait plus chuter la chaine par coupure metier. BtnEmergencyCutOff reste dur.
 END_VAR
 VAR_OUTPUT
@@ -46,6 +48,8 @@ VAR
     // === DRAPEAUX & FORCAGES LOGIQUES ===
     ForceTestA              : BOOL; // . [LOC] Forcage coupure canal A pendant test
     ForceTestB              : BOOL; // . [LOC] Forcage coupure canal B pendant test
+    BypassTestA             : BOOL; // . [LOC] BypassRedundancyTest OR BypassRedundancyTestA : saute le test canal A
+    BypassTestB             : BOOL; // . [LOC] BypassRedundancyTest OR BypassRedundancyTestB : saute le test canal B
     StartupCheckDone        : BOOL; // . [LOC] Autotest demarrage effectue
     StartupCheckOK          : BOOL; // . [LOC] Resultat autotest demarrage (latche)
     StartupFail             : BOOL; // . [LOC] Autotest demarrage echoue (cause bit3, latchee via socle)
@@ -212,6 +216,12 @@ END_IF;
 //  - BtnEmergencyCutOff (coup-de-poing / IHM) reste traité à part et reste TOUJOURS dur.
 CutOffActive := PowerCutOffRequest AND NOT BypassPowerCutOff AND NOT BypassArmingPreconditions;
 
+// 🔀 Bypass auto-test redondance, granulaire par canal : le bypass global BypassRedundancyTest
+//    vaut A + B. Un canal bypassé n'est pas forcé/vérifié et son latch RedundancyTestFailed est
+//    sauté ; l'autre canal garde son test croisé et son abort CST_ABORT_REDUNDANCY_x normaux.
+BypassTestA := BypassRedundancyTest OR BypassRedundancyTestA;
+BypassTestB := BypassRedundancyTest OR BypassRedundancyTestB;
+
 IF Enable THEN
     // 🛑 Coupure immédiate de toute séquence en cours
     IF ArmingSeqStep <> CST_STEP_IDLE THEN
@@ -298,12 +308,16 @@ IF Enable THEN
                 PreArmDelayActive := FALSE;
                 RedundancyTestFailedCause := FALSE;
                 EmergencyArmingFailedCause := FALSE;
-                // 🛠️ BypassRedundancyTest (MES trace) : saute la coupure test A/B. On passe par
-                //    RESTORE_B (maintien PowerKeepAlive A+B établi CST_KeepAliveHold) AVANT la
-                //    demande contacteur de puissance -> CHAIN OK puis, 1 s plus tard, le gros
-                //    contacteur. Pas de claquement simultané.
-                IF BypassRedundancyTest THEN
+                // 🛠️ Bypass MES trace : saute tout ou partie de l'auto-test A/B.
+                //  - A+B bypassés : direct RESTORE_B (maintien PowerKeepAlive A+B établi
+                //    CST_KeepAliveHold) AVANT la demande contacteur -> CHAIN OK puis gros
+                //    contacteur 1 s après, pas de claquement simultané.
+                //  - A seul bypassé : on démarre au test canal B (TEST_B).
+                //  - Aucun bypass : test croisé complet, canal A d'abord (TEST_A).
+                IF BypassTestA AND BypassTestB THEN
                     ArmingSeqStep := CST_STEP_RESTORE_B;
+                ELSIF BypassTestA THEN
+                    ArmingSeqStep := CST_STEP_TEST_B;
                 ELSE
                     ArmingSeqStep := CST_STEP_TEST_A;
                 END_IF;
@@ -333,7 +347,12 @@ IF Enable THEN
 
             IF TonRestoreA.Q THEN
                 IF EmergencyChainClosed OR BypassArmingPreconditions THEN
-                    ArmingSeqStep := CST_STEP_TEST_B;
+                    // 🔀 Canal B bypassé (MES trace) : on saute TEST_B, direct RESTORE_B.
+                    IF BypassTestB THEN
+                        ArmingSeqStep := CST_STEP_RESTORE_B;
+                    ELSE
+                        ArmingSeqStep := CST_STEP_TEST_B;
+                    END_IF;
                 ELSE
                     LastAbortStep := CST_STEP_RESTORE_A;
                     LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A);
@@ -359,7 +378,8 @@ IF Enable THEN
             END_IF;
 
         4: // CST_STEP_RESTORE_B
-            // 🟰 Point d'entrée du chemin BypassRedundancyTest : les deux canaux PowerKeepAlive
+            // 🟰 Point d'entrée des chemins bypass (BypassTestA+B direct, BypassTestB depuis
+            //    RESTORE_A) : les deux canaux PowerKeepAlive
             //    sont (ré)établis et TENUS CST_KeepAliveHold avant la demande contacteur de
             //    puissance -> CHAIN OK s'entend d'abord, le gros contacteur 1 s après.
             //    La boucle DOIT s'être refermée pour passer au pulse (sauf BypassArmingPreconditions).
@@ -572,7 +592,8 @@ Status.Done  := PowerContactorEngaged;
 // opérateurs (FB_Hmi_BannerFormatter lit Diag.ErrorId / scalaires).
 IF NOT Enable THEN
     Status.OperatorMessage := 'AU neutralisee (Enable=FALSE)';
-ELSIF (BypassArmingPreconditions OR BypassRedundancyTest OR BypassPowerCutOff) THEN
+ELSIF (BypassArmingPreconditions OR BypassRedundancyTest OR BypassRedundancyTestA
+       OR BypassRedundancyTestB OR BypassPowerCutOff) THEN
     Status.OperatorMessage := 'AU: BYPASS INGENIERIE MES ACTIF - NON SECURISE - retirer avant exploitation';
 ELSIF StartupFail THEN
     Status.OperatorMessage := 'AU: autotest demarrage echoue - verifier boucle/contacteur puis Reset';

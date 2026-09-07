@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.577586" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.577586">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T06:28:48.884687" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T06:28:48.884687">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -130,7 +130,29 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute UNIQUEMENT l'auto-test A/B (IDLE -&gt; RESTORE_B)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute l'auto-test A/B COMPLET (IDLE -&gt; RESTORE_B) = alias BypassAuRedundancyTestA + B</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassAuRedundancyTestA">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute le seul test canal A (TEST_A + RESTORE_A) : IDLE -&gt; TEST_B ; canal B toujours qualifie (latch B actif)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassAuRedundancyTestB">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute le seul test canal B (TEST_B) : ... RESTORE_A -&gt; RESTORE_B ; canal A toujours qualifie (latch A actif)</xhtml>
           </documentation>
         </variable>
         <variable name="BypassAuPowerCutOff">
