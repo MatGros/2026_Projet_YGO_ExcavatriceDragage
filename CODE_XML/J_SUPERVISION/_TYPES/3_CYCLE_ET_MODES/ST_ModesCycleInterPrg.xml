@@ -592,7 +592,23 @@ M1 : contacteurs retombés</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact fond Kobold confirmé (manuel + bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirmé (Kobold ou consigne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomStopByKobold">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirmé par contact Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomStopBySetpoint">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirmé par limite de travail/consigne</xhtml>
               </documentation>
             </variable>
             <variable name="WinchDescentAuth_M3">

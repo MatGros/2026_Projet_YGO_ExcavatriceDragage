@@ -6095,3 +6095,41 @@ tasks:
   - 'Bundle et G200 passés.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T272_M3_DESCENT_STATE_GATE.yaml
   bloque_par: []
+
+- id: T273
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: TREUILS_BENNE_TRANSLATION
+  agent: Antigravity
+  date: '2026-09-07T16:40:00+02:00'
+  titre: Révision cinématique treuils en maintenance (Descente frein, Remontée synchro/fermée P1 & Inhibition défauts)
+  contexte: 'Besoin d optimiser et sécuriser les mouvements treuils en maintenance : descente par relâchement de frein, remontée assistée synchro/fermée en P1 et étude d inhibition ciblée de certains défauts.'
+  description: 'Étude d architecture et proposition technique pour la commande de descente par ouverture frein contrôlée, la remontée sécurisée M1+M2 bridée au Palier 1, et l inhibition sélective de défauts non critiques en mode Maintenance (MAINT_N1 / MAINT_N2).'
+  objectifs:
+  - 'Spécifier la commande de descente avec relâchement de frein et les gardes de sécurité (survitesse, mou de câble).'
+  - 'Spécifier la remontée assistée synchro M1+M2 ou benne fermée bridée à P1 en maintenance.'
+  - 'Définir la matrice d inhibition sélective des défauts en Maintenance (défauts process masqués vs sécurités dures préservées).'
+  - 'Rédiger la proposition technique et le plan d implémentation pour validation humaine.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T273_WINCH_MAINTENANCE_DESCENTE_FREIN_REMONTEE_P1.yaml
+  bloque_par: []
+
+- id: T274
+  parent_id: ''
+  statut: ⬜
+  criticite: C2
+  domaine: CYCLE_AUTO_EXTRACTION
+  agent: Antigravity
+  date: '2026-09-07T16:55:00+02:00'
+  titre: Alignement des limites de profondeur (SetDepth_M -29m, Limite Légale -30m, Max Treuils -50m)
+  contexte: 'Ajustement et cohérence des seuils de profondeur d exploitation : consigne cycle auto à -29m, limite légale à -30m et limite basse physique treuils à -50m.'
+  description: 'Mise à jour des configurations par défaut et structures persistantes dans ST_CycleCfg.st, GVL_PERSISTENT.st et vérification de la hiérarchie des gardes de profondeur.'
+  objectifs:
+  - 'SetDepth_M configuré par défaut à -29.0 m dans ST_CycleCfg et _CycleCfgPersist.'
+  - 'Limite légale calée à -30.0 m dans GVL_PERSISTENT et ST_CommunCfg.'
+  - 'Limite basse physique treuils calée à -50.0 m pour M1 et M2.'
+  - 'Vérification de non-régression et régénération du bundle XML.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T274_ALIGNEMENT_LIMITES_PROFONDEUR.yaml
+  bloque_par: []
+
+

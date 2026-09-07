@@ -102,6 +102,8 @@ VAR_OUTPUT
     SpeedMismatchActive     : BOOL;         // <-- [DIAG] Seuil vitesse depasse sur cycle courant
     SpeedMismatchConfirmed  : BOOL;         // <-- [DIAG] Ecart vitesse confirme pendant timeout
     BottomTouched           : BOOL;         // <-- [STAT] Fond touche (latch AX8, efface a AX0 / AX_STAB / Reset) - variable d'info GEL AX8
+    BottomStopByKobold      : BOOL;         // <-- [STAT] AX8 confirme par contact Kobold
+    BottomStopBySetpoint    : BOOL;         // <-- [STAT] AX8 confirme par limite de travail/consigne de position
     BottomStopSource        : STRING(24);  // <-- [DIAG] Source arret fond : KOBOLD ou CONSIGNE
     CycleChecksInhibited    : BOOL;         // <-- [STAT] Controles procede inhibes ; protections machine actives
     IgnoredCycleCheckId     : WORD;         // <-- [DIAG] Causes procede actives mais ignorees
@@ -583,6 +585,8 @@ IF ResetEdge.Q THEN
     PausedState := E_AutoCycleStep.AX0_REPOS;
     SavedState := E_AutoCycleStep.AX0_REPOS;
     BottomTouched := FALSE;
+    BottomStopByKobold := FALSE;
+    BottomStopBySetpoint := FALSE;
     BottomStopSource := '';
     BottomContextValid := FALSE;
     StopPositionCaptured := FALSE;
@@ -761,6 +765,8 @@ CASE State OF
         OperatorAction := 'AX0 - Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
         SampleCountDone := FALSE;   // F2: réarmement du front de comptage à chaque entrée en X0
         BottomTouched   := FALSE;   // info fond touche effacee au repos
+        BottomStopByKobold := FALSE;
+        BottomStopBySetpoint := FALSE;
         BottomStopSource := '';
 
         // Transition si système sain et réarmé (front reset ou démarrage).
@@ -1038,7 +1044,9 @@ CASE State OF
             TouchPositionM1 := M1_CablePosM;
             TouchPositionM2 := M2_CablePosM;
             BottomTouched  := TRUE;   // variable d'info latchee (GEL AX8) - effacee a AX0 / AX_STAB / Reset
-            IF DepthStopBySetpoint AND NOT KoboldBottomTimer.Q THEN
+            BottomStopByKobold := KoboldImmersionQualified AND KoboldBottomTimer.Q;
+            BottomStopBySetpoint := DepthStopBySetpoint AND NOT BottomStopByKobold;
+            IF BottomStopBySetpoint THEN
                 BottomStopSource := 'CONSIGNE PROFONDEUR';
             ELSE
                 BottomStopSource := 'KOBOLD';

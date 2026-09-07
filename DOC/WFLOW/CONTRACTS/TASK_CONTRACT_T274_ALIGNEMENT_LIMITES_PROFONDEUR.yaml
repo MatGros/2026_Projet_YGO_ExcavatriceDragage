@@ -1,0 +1,39 @@
+version: '1.0'
+task_id: T274
+type: PATCH
+title: Alignement des limites de profondeur (SetDepth_M -29m, Limite Légale -30m, Limite Treuils -50m)
+date: '2026-09-07T16:55:00+02:00'
+author: Antigravity
+
+context:
+  description: >
+    Mise en cohérence et ajustement des seuils de profondeur pour l'exploitation :
+    - Profondeur cible de consigne du cycle automatique (SetDepth_M) fixée à -29.0 m.
+    - Limite légale de profondeur (LimitLegalDepthMinAllowed_M) fixée à -30.0 m (Garde de sécurité réglementaire).
+    - Limite basse physique maximale des treuils (CfgCableLimitDescent_M M1/M2) confirmée/calée à -50.0 m.
+
+scope:
+  in_scope:
+    - Mise à jour des valeurs par défaut dans ST_CycleCfg.st, ST_WinchCfg.st et GVL_PERSISTENT.st.
+    - Vérification de la hiérarchie des gardes (SetDepth_M >= LimitLegal >= CableLimit).
+    - Validation mécanique (Bundle XML, G200 Liaison).
+  out_of_scope:
+    - Modification de la logique de détection Kobold ou du GRAFCET du cycle.
+
+objectifs_testables:
+  - id: OBJ-01
+    description: ST_CycleCfg.SetDepth_M initialisé par défaut à -29.0 m.
+    critere_succes: Valeur -29.0 m présente dans ST_CycleCfg et _CycleCfgPersist.
+  - id: OBJ-02
+    description: _CommunCfgPersist.LimitLegalDepthMinAllowed_M calé à -30.0 m.
+    critere_succes: Valeur -30.0 m confirmée dans GVL_PERSISTENT et ST_CommunCfg.
+  - id: OBJ-03
+    description: CfgCableLimitDescent_M pour M1 et M2 calé à -50.0 m.
+    critere_succes: Valeur -50.0 m confirmée dans ST_WinchCfg et _WinchM1CfgPersist / _WinchM2CfgPersist.
+  - id: OBJ-04
+    description: Bundle PLCopenXML régénéré et G200 PASS.
+    critere_succes: 0 erreur de compilation et liaison validée.
+
+livrables:
+  - Code mis à jour dans CODE/ (ST_CycleCfg, GVL_PERSISTENT, etc.).
+  - Bundle XML fraîchement généré.

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T08:02:17.665536" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T08:02:17.665536">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T15:09:41.915334" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T15:09:41.915334">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -95,7 +95,15 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Retour physique réel capteur contact de fond Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Fond confirmé par Kobold uniquement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionFondAtteinte">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Fond confirmé par limite de travail/consigne</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldContactorCmd">

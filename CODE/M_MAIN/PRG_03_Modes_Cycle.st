@@ -41,6 +41,8 @@ VAR
     CycleInitPositionOk           : BOOL;   // . [LOC] Posture de départ cycle SEMI_AUTO : chariot P1 + treuils au capteur haut (± CST_CycleInitWindowM)
     CycleWinchesAtTopOk           : BOOL;   // . [LOC] Treuils M1 ET M2 dans la fenêtre FDC logiciel haut (± CST_CycleInitWindowM) - surveillé en AX2
     PrevActualPage                : INT := 0; // . [LOC] Mémoire page IHM précédente (détection front changement de page)
+    CycleDepthLowerBound_M        : REAL; // . [LOC] Borne sûre commune : légale et limites descentes M1/M2
+    CycleSetDepthEffective_M      : REAL; // . [LOC] Consigne cycle bornée avant consommation par FB_CycleSemiAuto
 END_VAR
 
 VAR CONSTANT
@@ -49,6 +51,13 @@ END_VAR
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE & INTENTION OPÉRATEUR ===
 {region "§1 Modes machine"}
+
+// Protection de cohérence profondeur : les positions sont négatives ; la consigne
+// doit rester supérieure ou égale à chacune des trois limites aval.
+CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
+                             MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M,
+                                 _WinchM2CfgPersist.CfgCableLimitDescent_M));
+CycleSetDepthEffective_M := MAX(GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M, CycleDepthLowerBound_M);
 
 // 📄 Événement changement de page IHM : sélection automatique du mode (page 5 = MAINT_N1, page 1 = SEMI_AUTO)
 IF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage <> PrevActualPage THEN
@@ -186,7 +195,7 @@ instCycleSemiAuto(
     AbortCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnAbort,
     ResumeAfterFault        := GVL_IHM.CycleSemiAuto.Cmd.BtnResumeAfterFault,
     SelTarget               := GVL_IHM.M3Translation.Cmd.SelTarget,
-    SetDepthM               := GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M,
+    SetDepthM               := CycleSetDepthEffective_M,
     DepthStopMode           := GVL_IHM.CycleSemiAuto.Cfg.DepthStopMode,
     KoboldImmersed          := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI, // DI brut Kobold (fronts AX6/AX7) - convention a confirmer au banc
     LimitLegalReached       := GVL_IHM.Commun.LimitLegalReached,
@@ -324,6 +333,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.ForceStepRejected      := instCycleSemiAuto.ForceStepRejected;
     Data.SequenceState.ForceStepResult        := instCycleSemiAuto.ForceStepResult;
     Data.SequenceState.BottomTouchConfirmed   := instCycleSemiAuto.BottomTouched;
+    Data.SequenceState.BottomStopByKobold     := instCycleSemiAuto.BottomStopByKobold;
+    Data.SequenceState.BottomStopBySetpoint   := instCycleSemiAuto.BottomStopBySetpoint;
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
@@ -415,6 +426,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.ForceStepRejected      := FALSE;
     Data.SequenceState.ForceStepResult        := '';
     Data.SequenceState.BottomTouchConfirmed       := BottomPositionConfirmed;
+    Data.SequenceState.BottomStopByKobold         := FALSE;
+    Data.SequenceState.BottomStopBySetpoint       := FALSE;
     // Verrou descente treuil = GENERAL en MAINT (plus seulement pendant l'assist vidage) :
     // Si TglEnableWinchDescentLock_M3 est actif (défaut), descente M1/M2 interdite tant que le pont M3
     // n'est pas ARRETE STABLE a P1 (travail) ou a Maintenance. En transit / PV / P2 / Tremie -> pas de paye de cable.
@@ -482,6 +495,8 @@ ELSE
     Data.SequenceState.ForceStepRejected       := FALSE;
     Data.SequenceState.ForceStepResult         := '';
     Data.SequenceState.BottomTouchConfirmed       := FALSE;
+    Data.SequenceState.BottomStopByKobold         := FALSE;
+    Data.SequenceState.BottomStopBySetpoint       := FALSE;
     Data.SequenceState.WinchDescentAuth_M3 := FALSE;
 END_IF;
 

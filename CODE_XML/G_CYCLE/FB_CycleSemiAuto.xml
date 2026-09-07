@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T13:35:00.259141" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T13:35:00.259141">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T15:09:32.944931" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T15:09:32.944931">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1265,6 +1265,22 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fond touche (latch AX8, efface a AX0 / AX_STAB / Reset) - variable d'info GEL AX8</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomStopByKobold">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] AX8 confirme par contact Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomStopBySetpoint">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] AX8 confirme par limite de travail/consigne de position</xhtml>
               </documentation>
             </variable>
             <variable name="BottomStopSource">
@@ -2597,6 +2613,8 @@ IF ResetEdge.Q THEN
     PausedState := E_AutoCycleStep.AX0_REPOS;
     SavedState := E_AutoCycleStep.AX0_REPOS;
     BottomTouched := FALSE;
+    BottomStopByKobold := FALSE;
+    BottomStopBySetpoint := FALSE;
     BottomStopSource := '';
     BottomContextValid := FALSE;
     StopPositionCaptured := FALSE;
@@ -2775,6 +2793,8 @@ CASE State OF
         OperatorAction := 'AX0 - Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
         SampleCountDone := FALSE;   // F2: réarmement du front de comptage à chaque entrée en X0
         BottomTouched   := FALSE;   // info fond touche effacee au repos
+        BottomStopByKobold := FALSE;
+        BottomStopBySetpoint := FALSE;
         BottomStopSource := '';
 
         // Transition si système sain et réarmé (front reset ou démarrage).
@@ -3052,7 +3072,9 @@ CASE State OF
             TouchPositionM1 := M1_CablePosM;
             TouchPositionM2 := M2_CablePosM;
             BottomTouched  := TRUE;   // variable d'info latchee (GEL AX8) - effacee a AX0 / AX_STAB / Reset
-            IF DepthStopBySetpoint AND NOT KoboldBottomTimer.Q THEN
+            BottomStopByKobold := KoboldImmersionQualified AND KoboldBottomTimer.Q;
+            BottomStopBySetpoint := DepthStopBySetpoint AND NOT BottomStopByKobold;
+            IF BottomStopBySetpoint THEN
                 BottomStopSource := 'CONSIGNE PROFONDEUR';
             ELSE
                 BottomStopSource := 'KOBOLD';

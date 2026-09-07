@@ -84,6 +84,7 @@ VAR
     M2HomingDisplaySettle   : TON;    // . [LOC] Prolonge le gel M2 apres retombee HomingBusy
     M1PosDisplayFrozen      : BOOL;   // . [LOC] Gel affichage position M1 actif
     M2PosDisplayFrozen      : BOOL;   // . [LOC] Gel affichage position M2 actif
+    CycleDepthLowerBound_M  : REAL;   // . [LOC] Borne profondeur cycle : legale et limites descentes M1/M2
 END_VAR
 
 {region "§1 Horloge, heartbeat et reset machine"}
@@ -183,6 +184,14 @@ IF instCfgPersistBridgeCommun.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
+// Une consigne hors borne est corrigée avant persistance et avant affichage IHM.
+// Les profondeurs étant négatives, MAX retient la limite la moins profonde.
+CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
+                              MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M,
+                                  _WinchM2CfgPersist.CfgCableLimitDescent_M));
+IF GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M < CycleDepthLowerBound_M THEN
+    GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M := CycleDepthLowerBound_M;
+END_IF;
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
 IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
@@ -605,7 +614,10 @@ GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
-GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
+// Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
+// pas être présenté comme un contact Kobold.
+GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_03_Modes_Cycle.Data.SequenceState.BottomStopByKobold;
+GVL_IHM.CycleSemiAuto.State.PositionFondAtteinte   := PRG_03_Modes_Cycle.Data.SequenceState.BottomStopBySetpoint;
 GVL_IHM.CycleSemiAuto.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 GVL_IHM.CycleSemiAuto.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
 GVL_IHM.CycleSemiAuto.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
@@ -641,6 +653,7 @@ GVL_IHM.MaintenanceN2.State.ActiveForcing := GVL_IHM.MaintenanceN2.Cmd.BtnM1Asce
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM3Maintenance
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnBothBrakeRelease
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM3BrakeRelease;
 
 
