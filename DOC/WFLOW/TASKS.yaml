@@ -5934,35 +5934,15 @@ tasks:
   domaine: MAINTENANCE_N2_IHM
   agent: Antigravity
   date: '2026-09-07T00:56:00+02:00'
-  titre: Shunt forçage direct sorties hardware en MAINT_N2 sous mot de passe IHM
-  contexte: 'Besoins de décoinçage d urgence et test unitaire des contacteurs/freins en maintenance experte sans dépendre des FBs amont ni du joystick CAN.'
-  description: 'Ajout des commandes IHM dédiées dans GVL_IHM.MaintenanceN2 et shunt direct dans PRG_06_Outputs (M1/M2/Both Montée/Descente Palier 1, Freins M1/M2/M3 seuls) sous condition Auth.Mode = MAINT_N2 et mot de passe N2 actif.'
+  titre: Forçage parallèle (OR //) sorties hardware en MAINT_N2 sous mot de passe IHM
+  contexte: 'Besoins de décoinçage d urgence et test unitaire des contacteurs/freins en maintenance experte sans toucher ni altérer la chaîne de commande nominale.'
+  description: 'Ajout de commandes IHM dédiées dans GVL_IHM.MaintenanceN2 et greffe en dérivation parallèle (OR pur //) sur les sorties de PRG_06_Outputs (Output_DQ := Output_Nominal OR Forcage_N2) pour M1/M2/Both Montée/Descente Palier 1 et Freins M1/M2/M3 seuls, sous condition Auth.Mode = MAINT_N2 et mot de passe N2 actif.'
   objectifs:
+  - Chaîne de calcul nominale existante conservée à 100% sans aucune altération
+  - Branchement en parallèle (OR //) au niveau de l affectation finale des sorties
   - Commandes IHM dédiées dans GVL_IHM protégées par mot de passe N2
-  - Shunt direct dans PRG_06_Outputs indépendant des FBs amont
-  - Exclusion mutuelle stricte Montée/Descente (anti-court-circuit 400V)
+  - Exclusion mutuelle stricte Montée/Descente (anti-court-circuit 400V) sur la branche forçage
   - Maintien du FDC haut physique ultime et de la coupure AU
   - Rebouclage propre dans Data.* vers le banc de simulation FB_SimBench
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T259.yaml
-  bloque_par: []
-
-- id: T260
-  parent_id: ''
-  statut: ⏳
-  criticite: C2
-  domaine: SUPERVISION_IHM
-  agent: ClaudeCode
-  date: '2026-09-07T01:05:26+02:00'
-  titre: Fix affichage M2PositionCorrected qui saute au basculement WinchSel 0->2 / fin de jog
-  contexte: 'Diagnostic DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_WINCHSEL_M2_OFFSET_20260906.md. M2PositionCorrected = CablePosM2 - OffsetTargetM ; OffsetTargetM bascule entre nominal (Config.OffsetCloseM) et ecart mesure live (CablePosM2-CablePosM1) selon le mode/l etat -> saut de ~0.7 m alors que les tambours sont immobiles. Regression de conception des commits 2026-09-04 (bb2bf240, c5981e41). Aucun chemin securite touche (FdC/MecaE/SYNC lisent ActiveOffsetM, inchange).'
-  description: 'Nouvel offset d affichage FB_Bucket.DisplayOffsetM = Config.OffsetCloseM/OffsetOpenM selon l etat franc (IsClosed/IsOpen), gele en position intermediaire. M2PositionCorrected (PRG_04:1631) repointe sur DisplayOffsetM. DeltaPositionCorrected_M reste sur OffsetTargetM (garde son sens synchro en manoeuvre, non affiche par l operateur). Pas de variable persistante, pas de pente, pas de capture au referencement (ecarte : derive inter-session).'
-  objectifs:
-  - 'M2PositionCorrected strictement constant sur basculement WinchSel 0->2 tambours a l arret (test sim)'
-  - 'M2PositionCorrected strictement constant en fin de jog benne a l arret'
-  - 'Aucune derive inter-session (DisplayOffsetM = constante config, pas une valeur apprise)'
-  - 'Pas au franchissement franc ouvert<->ferme accepte et documente (la benne a parcouru sa course)'
-  - 'Position_M et BucketOpening_Pct inchanges, calcul temps reel'
-  - 'ActiveOffsetM et tous les consommateurs FdC/MecaE/SYNC inchanges'
-  - 'Bundle frais + G200 PASS + palier C sans regression vs baseline'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T260.yaml
   bloque_par: []
