@@ -19,6 +19,7 @@ VAR_INPUT
 
     // === MODE ARBITRE ===
     Mode                        : E_Mode;                                    // --> [CMD] Mode machine (referencement : MAINT_N2 seul)
+    BootReady                   : BOOL;                                      // --> [HW] Acquisition + codeurs valides apres boot
 
     // === PERMIS SECURITE ===
     TopPositionSensor           : BOOL;                                      // --> [SAFE] Capteur haut (FDC logiciel) commun M1/M2
@@ -460,7 +461,7 @@ CASE SeqStep OF
         IF MachineHomed
            OR ((Mode <> E_Mode.MAINT_N1) AND (Mode <> E_Mode.MAINT_N2)) THEN
             SeqStep := E_MachineHomingTxState.HX0_REPOS;
-        ELSIF ExplicitValidationPulse AND (Mode = E_Mode.MAINT_N2) THEN
+        ELSIF BootReady AND ExplicitValidationPulse AND (Mode = E_Mode.MAINT_N2) THEN
             CommitPublished := FALSE;   // datum invalide tant qu'il est refait (HT1b, deplace de HX0)
             CommitDone      := FALSE;
             IF NOT TopPositionSensor THEN
@@ -634,6 +635,9 @@ ELSIF (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT)
       OR (SeqStep = E_MachineHomingTxState.HX6_HOMED) THEN
     MachineHomingStep := E_MachineHomingStep.VALID;
     MachineHomingInstruction := 'HX5 - RefHoming Etat benne enregistre - fin homing';
+ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) AND NOT BootReady THEN
+    MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
+    MachineHomingInstruction := 'HX1 - Homing inhibe : attendre boot codeurs puis passer en MAINT_N2';
 ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) THEN
     IF Mode <> E_Mode.MAINT_N2 THEN
         MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;

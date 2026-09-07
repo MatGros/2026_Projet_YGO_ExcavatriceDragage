@@ -46,7 +46,7 @@ VAR_GLOBAL
     SimJoystickBagotement_Active       : BOOL := FALSE; // TRUE = bagotement au relâchement (petit balancement autour du neutre)
 
     // 🎛️ STIMULI BOUTONS IHM M3 — simulation des boutons IHM Translation M3 (Trémie/Maintenance).
-    // Pilotent GVL_IHM.TranslationM3.Cmd.BtnTremie/BtnMaintenance UNIQUEMENT en mode simulation
+    // Pilotent GVL_IHM.M3Translation.Cmd.BtnTremie/BtnMaintenance UNIQUEMENT en mode simulation
     // ET quand JoyMaster est inactif (le joystick prime sinon). Défaut FALSE = bouton relâché.
     SimBtnTremie         : BOOL := FALSE; // TRUE = bouton IHM "vers Trémie" simulé appuyé
     SimBtnMaintenance    : BOOL := FALSE; // TRUE = bouton IHM "vers Maintenance" simulé appuyé

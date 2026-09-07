@@ -11,7 +11,7 @@ VAR_GLOBAL
     JOY1Joystick : ST_JoystickHMI; (* 🕹️ Variables d'échange IHM Joystick (noeud CANopen JOY1) *)
     Modes   : ST_ModesHMI;  (* 🎚️ Variables d'échange IHM Modes de marche *)
     Emergency : ST_EmergencyHMI; (* 🛡️ Variables d'échange IHM chaîne AU / sécurité — sorties de Modes *)
-    TranslationM3 : ST_TranslationHMI;(* ↔️ Variables d'échange IHM Translation M3 *)
+    M3Translation : ST_TranslationHMI;(* ↔️ Variables d'échange IHM Translation M3 *)
     CycleSemiAuto   : ST_CycleHMI;    (* 🔄 Commandes, états et diagnostic cycle semi-automatique *)
     CycleMachineHoming : ST_CycleMachineHomingHMI;     (* 🎯 Cycle de référencement machine (FB_CycleMachineHoming) — MAINT_N2 *)
     Banner  : ST_HmiBanner; (* 🖥️ Bandeau : 4 champs de conduite + état position M3 dédié (AF-07 §4) *)

@@ -56,7 +56,7 @@ VAR_INPUT
     WinchM1                  : ST_WinchHMI;      (* --> [HW] GVL_IHM.M1TreuilRetenue *)
     WinchM2                  : ST_WinchBenneHMI; (* --> [HW] GVL_IHM.M2TreuilBenne — porte Bucket *)
     Sync                     : ST_SyncHMI;       (* --> [HW] GVL_IHM.M1M2Sync *)
-    Translation              : ST_TranslationHMI;(* --> [HW] GVL_IHM.TranslationM3 *)
+    Translation              : ST_TranslationHMI;(* --> [HW] GVL_IHM.M3Translation *)
     Commun                   : ST_CommunHMI;     (* --> [HW] GVL_IHM.Commun *)
     Network                  : ST_NetworkDiagHMI;(* --> [HW] GVL_IHM.Network *)
     JoystickHMI              : ST_JoystickHMI;   (* --> [HW] GVL_IHM.JOY1Joystick *)

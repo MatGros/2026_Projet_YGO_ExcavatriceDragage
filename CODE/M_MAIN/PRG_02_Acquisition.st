@@ -225,7 +225,9 @@ instDiagEthercat(
     DeviceEncoderM2StateRaw  := HwReal.Winch.COD2_DeviceState,
     DeviceEncoderM2SimBypass := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive,
     NetworkBypassActive      := GVL_IHM.Network.Bypass.Global,
-    EcatBusBypassActive      := GVL_IHM.Network.Bypass.BusEthercat,
+    // ⚠️ TEST MES TEMPORAIRE : inhibition EtherCAT forcée par le code.
+    // Aucun champ IHM ne peut piloter ce bypass pendant l'essai.
+    EcatBusBypassActive      := TRUE,
     VariateurBypassActive    := GVL_IHM.Network.Bypass.VariateurM3,
     EncoderM1BypassActive    := GVL_IHM.Network.Bypass.EncoderM1,
     EncoderM2BypassActive    := GVL_IHM.Network.Bypass.EncoderM2
@@ -468,6 +470,8 @@ instCycleMachineHoming(
     Enable                     := TRUE,
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM OR GVL_IHM.CycleMachineHoming.Cmd.BtnAbort,
     Mode                       := PRG_03_Modes_Cycle.Data.Auth.Mode,
+    // Garde boot : aucun homing/G7 tant que acquisition + codeurs ne sont pas valides.
+    BootReady                  := Data.DataValid AND Data.EncoderM1.Ready AND Data.EncoderM2.Ready,
     TopPositionSensor          := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
     WinchesMechanicallyStopped  := MachineHomingMechanicalStopOk,
     M1Status                   := MachineHomingM1Status,

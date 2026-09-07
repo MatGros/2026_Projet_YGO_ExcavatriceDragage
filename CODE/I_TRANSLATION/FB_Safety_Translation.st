@@ -36,7 +36,7 @@ VAR_INPUT
     LimitSwitchMaintenance : BOOL;     // --> [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)
     SensorWordIncoherent: BOOL;        // --> [HW] Mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)
 
-    // 🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass)
+    // 🔧 Bypass des surveillances (GVL_IHM.M3Translation.Bypass)
     BypassGlobal          : BOOL := FALSE;   // --> [TST] Bypass GLOBAL : ignore TOUTES les surveillances ci-dessous (prioritaire)
     BypassOperatorComm    : BOOL := FALSE;   // --> [TST] Bypass perte communication opérateur
     BypassDriveComm       : BOOL := FALSE;   // --> [TST] Bypass perte communication drive

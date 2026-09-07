@@ -458,6 +458,7 @@ instSafetyEmergencyManagement(
     // 🛠️ Bypass ingenierie MES (RETAIN, jamais IHM) — trace timing chaine/contacteur
     BypassArmingPreconditions := GVL_BypassRetain.BypassAuArmingPreconditions,
     BypassRedundancyTest := GVL_BypassRetain.BypassAuRedundancyTest,
+    // Bypass canal A uniquement par la variable d'ingénierie RETAIN, jamais par l'IHM.
     BypassRedundancyTestA := GVL_BypassRetain.BypassAuRedundancyTestA,
     BypassRedundancyTestB := GVL_BypassRetain.BypassAuRedundancyTestB,
     BypassPowerCutOff := GVL_BypassRetain.BypassAuPowerCutOff

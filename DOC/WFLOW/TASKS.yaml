@@ -5949,11 +5949,11 @@ tasks:
 
 - id: T261
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C3
   domaine: AU_SECURITE
   agent: Claude Code
-  date: '2026-09-07T02:30:00'
+  date: '2026-09-07T03:05:00'
   titre: Bypass granulaire auto-test redondance AU par canal keepalive A / B
   contexte: 'En MES un seul canal PowerKeepAlive (A ou B) peut avoir son cablage/DI pret. Le BypassAuRedundancyTest actuel est tout-ou-rien (IDLE->RESTORE_B) et empeche de qualifier le canal deja pret.'
   description: 'Ajouter deux flags RETAIN BypassAuRedundancyTestA / BypassAuRedundancyTestB (GVL_BypassRetain), entrees FB BypassRedundancyTestA / BypassRedundancyTestB, cables via PRG_06. bypassTestA saute TEST_A + RESTORE_A ; bypassTestB saute TEST_B. Le latch RedundancyTestFailedCause n est saute que pour le canal bypasse. BypassRedundancyTest global conserve = alias A+B.'

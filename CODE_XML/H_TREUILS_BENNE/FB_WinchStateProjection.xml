@@ -6173,7 +6173,7 @@ ResetEdge(CLK := Reset);
 IF NOT Enable OR NOT PowerContactorEngaged THEN
     BrakeTimeout(IN := FALSE, PT := T#500ms);
     StepDelay(IN := FALSE, PT := CST_StepRampFloorDelay);
-    RestartDelay(IN := FALSE, PT := T#1000ms);
+    RestartDelay(IN := FALSE, PT := T#500ms);
     DeadTime(IN := FALSE);
     DeadTimePending := FALSE;
     DeadTimeElapsed := T#0ms;
@@ -6223,7 +6223,7 @@ END_IF;
 
 // ── 3. Réarmement anti-redémarrage automatique ──────────────────────────
 // Après timeout : cause disparue + front Reset, puis demande moteur à zéro,
-// puis nouvelle demande distincte. La retombée + T#1000ms sera ensuite refaite.
+// puis nouvelle demande distincte. La retombée + T#500ms sera ensuite refaite.
 IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
     IF NOT MotorRequest THEN
         NeutralRequestSeen := TRUE;
@@ -6237,16 +6237,16 @@ IF RestartInhibit AND NOT Error AND NOT ResetRequired AND NOT ResetEdge.Q THEN
 END_IF;
 
 // ── 4. Mémorisation de l'arrêt : temporisation d'anti-redémarrage chaud ──────────
-// La temporisation RestartDelay (1500ms) s'arme à l'arrêt du mouvement (NOT MotorRequest) et
+// La temporisation RestartDelay (500ms) s'arme à l'arrêt du mouvement (NOT MotorRequest) et
 // s'écoule pendant la pause à l'arrêt (au lieu de repartir de zéro à chaque nouvel appui) —
-// permet un redémarrage instantané si la pause dépasse 1.5s. Le décompte ne démarre/continue que
+// permet un redémarrage instantané si la pause dépasse 500ms. Le décompte ne démarre/continue que
 // si le moteur n'est plus demandé ET que le frein est physiquement confirmé fermé
 // (NOT BrakeFeedback = bobine retombée, mâchoires serrées). Garde le comportement "purge pendant
 // la pause" (RestartRequired ne s'arme qu'à NOT MotorRequest, indépendant de la tempo).
 IF NOT MotorRequest THEN
     RestartRequired := TRUE;
 END_IF;
-RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#750ms);
+RestartDelay(IN := RestartRequired AND NOT MotorRequest AND NOT BrakeFeedback AND NOT RestartInhibit, PT := T#500ms);
 RestartDelayElapsed := RestartDelay.ET;
 IF RestartDelay.Q THEN
     RestartRequired := FALSE;
