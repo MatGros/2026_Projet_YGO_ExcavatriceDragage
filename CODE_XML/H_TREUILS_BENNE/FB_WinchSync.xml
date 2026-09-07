@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:24:18.748936" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:24:18.748936">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T09:20:24.668968" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T09:20:24.668968">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -339,7 +339,7 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.1" />
+                <simpleValue value="3" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET CONFIGURATION ===
@@ -351,7 +351,7 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.5" />
+                <simpleValue value="6" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil 2 (Fault) — ecart critique (m)</xhtml>
@@ -1462,7 +1462,10 @@ IF NOT BypassGlobal THEN
     FaultActive := SyncEnable AND HomedAndReliableM1 AND HomedAndReliableM2 AND (DeltaPosM &gt; CfgSyncCriticalToleranceM);
 
     // Latch Warn : reste actif tant que la cause persiste OU que Reset n'a pas ete demande
-    IF WarnActive THEN
+    // Auto-purge si la synchronisation n'est pas autorisee (SyncEnable=FALSE)
+    IF NOT SyncEnable OR NOT HomedAndReliableM1 OR NOT HomedAndReliableM2 THEN
+        WarnLatched := FALSE;
+    ELSIF WarnActive THEN
         WarnLatched := TRUE;
     ELSIF ResetEdge.Q AND NOT WarnActive THEN
         WarnLatched := FALSE;

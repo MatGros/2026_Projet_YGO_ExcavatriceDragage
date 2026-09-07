@@ -395,7 +395,14 @@ BucketNotClosedAscentCapStep1 := NOT ManualBucketJogActive
 // tort. Le TOF ne masque QUE FB_WinchSync (gate sur instWinchSync.Enable §4). MecaE
 // croisé (tolérance ~2,5 m, absorbe le coast), MecaA et survitesse restent ACTIFS via
 // CrossCheckEnable := SyncOperationPermit (inchangé) -> aucun trou de sécurité.
-BucketActivityHold(IN := instBucket.Lifecycle.Busy OR ManualBucketJogActive, PT := T#2s);
+BucketActivityHold(IN := instBucket.Lifecycle.Busy
+    OR ManualBucketJogActive
+    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen
+    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose
+    OR instArbBucket.CmdOpen_IHM
+    OR instArbBucket.CmdClose_IHM
+    OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
+    OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose, PT := T#2s);
 
 SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
@@ -404,6 +411,10 @@ SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
     AND NOT instBucket.Lifecycle.Busy
     AND NOT ManualBucketJogActive
+    AND NOT GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen
+    AND NOT GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose
+    AND NOT instArbBucket.CmdOpen_IHM
+    AND NOT instArbBucket.CmdClose_IHM
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose
     // Pas de surveillance de synchronisme pendant les phases ou M1/M2 travaillent

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T23:12:31.743536" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T23:12:31.743536">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T09:32:44.229194" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T09:32:44.229194">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -6191,7 +6191,14 @@ BucketNotClosedAscentCapStep1 := NOT ManualBucketJogActive
 // tort. Le TOF ne masque QUE FB_WinchSync (gate sur instWinchSync.Enable §4). MecaE
 // croisé (tolérance ~2,5 m, absorbe le coast), MecaA et survitesse restent ACTIFS via
 // CrossCheckEnable := SyncOperationPermit (inchangé) -&gt; aucun trou de sécurité.
-BucketActivityHold(IN := instBucket.Lifecycle.Busy OR ManualBucketJogActive, PT := T#2s);
+BucketActivityHold(IN := instBucket.Lifecycle.Busy
+    OR ManualBucketJogActive
+    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen
+    OR GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose
+    OR instArbBucket.CmdOpen_IHM
+    OR instArbBucket.CmdClose_IHM
+    OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
+    OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose, PT := T#2s);
 
 SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
@@ -6200,6 +6207,10 @@ SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy
     AND NOT instBucket.Lifecycle.Busy
     AND NOT ManualBucketJogActive
+    AND NOT GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen
+    AND NOT GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose
+    AND NOT instArbBucket.CmdOpen_IHM
+    AND NOT instArbBucket.CmdClose_IHM
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
     AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose
     // Pas de surveillance de synchronisme pendant les phases ou M1/M2 travaillent
@@ -13482,7 +13493,7 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.1" />
+                <simpleValue value="3" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== REGLAGES ET CONFIGURATION ===
@@ -13494,7 +13505,7 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="0.5" />
+                <simpleValue value="6" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil 2 (Fault) — ecart critique (m)</xhtml>
@@ -16414,7 +16425,10 @@ IF NOT BypassGlobal THEN
     FaultActive := SyncEnable AND HomedAndReliableM1 AND HomedAndReliableM2 AND (DeltaPosM &gt; CfgSyncCriticalToleranceM);
 
     // Latch Warn : reste actif tant que la cause persiste OU que Reset n'a pas ete demande
-    IF WarnActive THEN
+    // Auto-purge si la synchronisation n'est pas autorisee (SyncEnable=FALSE)
+    IF NOT SyncEnable OR NOT HomedAndReliableM1 OR NOT HomedAndReliableM2 THEN
+        WarnLatched := FALSE;
+    ELSIF WarnActive THEN
         WarnLatched := TRUE;
     ELSIF ResetEdge.Q AND NOT WarnActive THEN
         WarnLatched := FALSE;

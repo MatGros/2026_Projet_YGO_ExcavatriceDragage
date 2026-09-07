@@ -82,7 +82,10 @@ IF NOT BypassGlobal THEN
     FaultActive := SyncEnable AND HomedAndReliableM1 AND HomedAndReliableM2 AND (DeltaPosM > CfgSyncCriticalToleranceM);
 
     // Latch Warn : reste actif tant que la cause persiste OU que Reset n'a pas ete demande
-    IF WarnActive THEN
+    // Auto-purge si la synchronisation n'est pas autorisee (SyncEnable=FALSE)
+    IF NOT SyncEnable OR NOT HomedAndReliableM1 OR NOT HomedAndReliableM2 THEN
+        WarnLatched := FALSE;
+    ELSIF WarnActive THEN
         WarnLatched := TRUE;
     ELSIF ResetEdge.Q AND NOT WarnActive THEN
         WarnLatched := FALSE;
