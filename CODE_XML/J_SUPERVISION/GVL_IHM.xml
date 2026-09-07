@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T04:21:46.853609" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T04:21:46.853609">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T06:42:50.677820" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T06:42:50.677820">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -468,6 +468,41 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    GVL_PERSISTENT via FB_CfgPersistBridge_fbJoystick_Cfg. La calibration du neutre reste
    dans GVL_PERSISTENT (bouton Calibrate). Pas de Bypass (concept absent de ce struct).
    ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_LocalIHM">
+        <baseType>
+          <struct>
+            <variable name="CtrlBlock">
+              <type>
+                <derived name="ST_LocalIHM_CtrlBlock" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : commandes cycliques locales</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusBlock">
+              <type>
+                <derived name="ST_LocalIHM_StatusBlock" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : états cycliques locaux</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b39b9fb0-0aad-5e68-8c80-2b6c913309a3</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_LocalIHM — Échange cyclique IHM local
+   -----------------------------------------------------------------------
+   📄 Frontière : GVL_IHM.LocalIHM
+   🎯 Rôle : regrouper les blocs de commandes et d'états de l'IHM locale.
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_MaintenanceN2HMI">
@@ -2682,6 +2717,204 @@ fournie par la configuration persistante de l'appelant.
    🧬 Pattern cfg : aligné sur ST_CycleCfg / ST_WinchCfg (préfixe ST_&lt;Domaine&gt;Cfg,
       instance persistante dans GVL_PERSISTENT, pont FB_CfgPersistBridge_* à venir).
    📄 Doc métier : DOC/AF/AF_Partie-08_Fonction_Joystick_v2.5.md (§5bis)
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_LocalIHM_CtrlBlock">
+        <baseType>
+          <struct>
+            <variable name="CtrlWord01">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 01</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlWord02">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 02</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlWord03">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlWord04">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 04</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlWord05">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 05</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlInt01">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 01</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlInt02">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 02</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlInt03">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlInt04">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 04</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlInt05">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 05</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a6ea7b24-19db-57a2-a2a6-8b27b9bf5f8a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_LocalIHM_CtrlBlock — Bloc cyclique de commandes IHM locales
+   -----------------------------------------------------------------------
+   📄 Frontière : GVL_IHM.LocalIHM.CtrlBlock
+   🎯 Rôle : réserver 5 WORD et 5 INT IHM→PLC pour l'échange local continu.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_LocalIHM_StatusBlock">
+        <baseType>
+          <struct>
+            <variable name="StatusWord01">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 01</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord02">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 02</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord03">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord04">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 04</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord05">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 05</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt01">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 01</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt02">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 02</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt03">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt04">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 04</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt05">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 05</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>01fb5de3-730c-545b-bd73-11889b8d40b9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_LocalIHM_StatusBlock — Bloc cyclique d'états IHM locaux
+   -----------------------------------------------------------------------
+   📄 Frontière : GVL_IHM.LocalIHM.StatusBlock
+   🎯 Rôle : réserver 5 WORD et 5 INT PLC→IHM pour l'échange local continu.
    =======================================================================</xhtml>
         </documentation>
       </dataType>
@@ -7601,6 +7834,14 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal)</xhtml>
           </documentation>
         </variable>
+        <variable name="LocalIHM">
+          <type>
+            <derived name="ST_LocalIHM" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Blocs cycliques IHM local : CtrlBlock + StatusBlock</xhtml>
+          </documentation>
+        </variable>
         <variable name="HmiInitDone">
           <type>
             <BOOL />
@@ -7647,9 +7888,12 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
           <Folder Name="_TYPES">
             <Folder Name="7_COMMUN_CONFIG">
               <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
+              <Object Name="ST_LocalIHM" ObjectId="b39b9fb0-0aad-5e68-8c80-2b6c913309a3" />
               <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
               <Object Name="ST_BypassCommun" ObjectId="2553c0a8-2717-5217-9345-551661085587" />
               <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
+              <Object Name="ST_LocalIHM_CtrlBlock" ObjectId="a6ea7b24-19db-57a2-a2a6-8b27b9bf5f8a" />
+              <Object Name="ST_LocalIHM_StatusBlock" ObjectId="01fb5de3-730c-545b-bd73-11889b8d40b9" />
               <Object Name="ST_BypassNetwork" ObjectId="b983f7fc-8c50-586b-bda1-7708d152c981" />
               <Object Name="ST_BypassSync" ObjectId="f65a7185-61a7-56a0-8f9e-37d0e97f5130" />
               <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />

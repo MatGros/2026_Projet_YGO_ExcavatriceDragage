@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T06:42:49.846743" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T06:42:49.846743">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_LocalIHM_StatusBlock">
+        <baseType>
+          <struct>
+            <variable name="StatusWord01">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 01</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord02">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 02</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord03">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord04">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 04</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord05">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 05</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt01">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 01</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt02">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 02</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt03">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt04">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 04</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt05">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 05</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>01fb5de3-730c-545b-bd73-11889b8d40b9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_LocalIHM_StatusBlock — Bloc cyclique d'états IHM locaux
+   -----------------------------------------------------------------------
+   📄 Frontière : GVL_IHM.LocalIHM.StatusBlock
+   🎯 Rôle : réserver 5 WORD et 5 INT PLC→IHM pour l'échange local continu.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_LocalIHM_StatusBlock" ObjectId="01fb5de3-730c-545b-bd73-11889b8d40b9" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

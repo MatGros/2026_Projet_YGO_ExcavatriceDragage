@@ -1,0 +1,52 @@
+contract:
+  task_id: T262
+  criticality: C2
+  strategy: patch
+  objective: >
+    Exposer dans GVL_IHM.LocalIHM une frontière cyclique dédiée avec un bloc
+    CtrlBlock IHM→PLC et un bloc StatusBlock PLC→IHM, chacun portant cinq WORD
+    et cinq INT réservés à l'échange local continu.
+  acceptance:
+    - id: AC1
+      statement: "GVL_IHM.LocalIHM existe et contient exactement CtrlBlock et StatusBlock de types DUT dédiés."
+      verified_by: "Revue CODE/J_SUPERVISION/GVL_IHM.st et génération du bundle PLCopenXML."
+    - id: AC2
+      statement: "CtrlBlock contient CtrlWord01..05 et CtrlInt01..05, avec les types WORD/INT attendus."
+      verified_by: "G310_check_code_structure.py et revue ST_LocalIHM_CtrlBlock.st."
+    - id: AC3
+      statement: "StatusBlock contient StatusWord01..05 et StatusInt01..05, avec les types WORD/INT attendus."
+      verified_by: "G310_check_code_structure.py et revue ST_LocalIHM_StatusBlock.st."
+    - id: AC4
+      statement: "Aucune logique métier, sécurité ou persistance n'écrit ces registres dans ce lot."
+      verified_by: "git diff et rg des producteurs hors déclaration des DUT."
+    - id: AC5
+      statement: "Les structures existantes de GVL_IHM et le heartbeat Commun restent inchangés fonctionnellement."
+      verified_by: "run_all_gates.py --palier C et revue git diff."
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_LocalIHM.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_LocalIHM_CtrlBlock.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_LocalIHM_StatusBlock.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE_XML/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_LOCAL_IHM_BLOCKS.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+  conservation:
+    must_survive:
+      - "GVL_IHM.Commun.TglHeartbeatIhm et TglHeartbeatPlc conservent leur sémantique existante."
+      - "Chaque structure IHM existante conserve son nom et son interface."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  alert_duty: >
+    Tout besoin de donner une sémantique métier aux registres génériques ou de
+    les raccorder à une commande doit faire l'objet d'un lot complémentaire.

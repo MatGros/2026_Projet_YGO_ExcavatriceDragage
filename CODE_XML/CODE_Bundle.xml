@@ -7915,6 +7915,239 @@ Valeur brute axe X (0..10000)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_LocalIHM">
+        <baseType>
+          <struct>
+            <variable name="CtrlBlock">
+              <type>
+                <derived name="ST_LocalIHM_CtrlBlock" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : commandes cycliques locales</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusBlock">
+              <type>
+                <derived name="ST_LocalIHM_StatusBlock" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : états cycliques locaux</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b39b9fb0-0aad-5e68-8c80-2b6c913309a3</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_LocalIHM — Échange cyclique IHM local
+   -----------------------------------------------------------------------
+   📄 Frontière : GVL_IHM.LocalIHM
+   🎯 Rôle : regrouper les blocs de commandes et d'états de l'IHM locale.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_LocalIHM_CtrlBlock">
+        <baseType>
+          <struct>
+            <variable name="CtrlWord01">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 01</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlWord02">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 02</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlWord03">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlWord04">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 04</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlWord05">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre WORD local 05</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlInt01">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 01</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlInt02">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 02</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlInt03">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlInt04">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 04</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CtrlInt05">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IHM→PLC : registre INT local 05</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>a6ea7b24-19db-57a2-a2a6-8b27b9bf5f8a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_LocalIHM_CtrlBlock — Bloc cyclique de commandes IHM locales
+   -----------------------------------------------------------------------
+   📄 Frontière : GVL_IHM.LocalIHM.CtrlBlock
+   🎯 Rôle : réserver 5 WORD et 5 INT IHM→PLC pour l'échange local continu.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_LocalIHM_StatusBlock">
+        <baseType>
+          <struct>
+            <variable name="StatusWord01">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 01</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord02">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 02</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord03">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord04">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 04</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusWord05">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre WORD local 05</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt01">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 01</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt02">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 02</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt03">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 03</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt04">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 04</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StatusInt05">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">PLC→IHM : registre INT local 05</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>01fb5de3-730c-545b-bd73-11889b8d40b9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_LocalIHM_StatusBlock — Bloc cyclique d'états IHM locaux
+   -----------------------------------------------------------------------
+   📄 Frontière : GVL_IHM.LocalIHM.StatusBlock
+   🎯 Rôle : réserver 5 WORD et 5 INT PLC→IHM pour l'échange local continu.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_M3DriveFeedback">
         <baseType>
           <struct>
@@ -30736,7 +30969,29 @@ shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Saute UNIQUEMENT l'auto-test A/B (IDLE -&gt; RESTORE_B, pas de latch RedundancyTestFailed). Armable, CONFIRM, aborts ET exigence chaine fermee restent normaux. Chaine ouverte -&gt; + BypassArmingPreconditions.</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Saute l'auto-test A/B COMPLET (IDLE -&gt; RESTORE_B, aucun latch RedundancyTestFailed) = alias BypassRedundancyTestA + B. Armable, CONFIRM, aborts ET exigence chaine fermee restent normaux. Chaine ouverte -&gt; + BypassArmingPreconditions.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassRedundancyTestA">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Saute le seul test canal A (TEST_A + RESTORE_A) : IDLE -&gt; TEST_B. Latch A neutralise ; canal B toujours qualifie (latch B actif). Meme logique, un canal a la fois.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassRedundancyTestB">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Saute le seul test canal B (TEST_B) : RESTORE_A -&gt; RESTORE_B. Latch B neutralise ; canal A toujours qualifie (latch A actif).</xhtml>
               </documentation>
             </variable>
             <variable name="BypassPowerCutOff">
@@ -30827,6 +31082,22 @@ shunt materiel des sorties PowerKeepAlive. ⛔ NON SECURISE tant qu'actif.
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Forcage coupure canal B pendant test</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassTestA">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] BypassRedundancyTest OR BypassRedundancyTestA : saute le test canal A</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BypassTestB">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] BypassRedundancyTest OR BypassRedundancyTestB : saute le test canal B</xhtml>
               </documentation>
             </variable>
             <variable name="StartupCheckDone">
@@ -31382,6 +31653,12 @@ END_IF;
 //  - BtnEmergencyCutOff (coup-de-poing / IHM) reste traité à part et reste TOUJOURS dur.
 CutOffActive := PowerCutOffRequest AND NOT BypassPowerCutOff AND NOT BypassArmingPreconditions;
 
+// 🔀 Bypass auto-test redondance, granulaire par canal : le bypass global BypassRedundancyTest
+//    vaut A + B. Un canal bypassé n'est pas forcé/vérifié et son latch RedundancyTestFailed est
+//    sauté ; l'autre canal garde son test croisé et son abort CST_ABORT_REDUNDANCY_x normaux.
+BypassTestA := BypassRedundancyTest OR BypassRedundancyTestA;
+BypassTestB := BypassRedundancyTest OR BypassRedundancyTestB;
+
 IF Enable THEN
     // 🛑 Coupure immédiate de toute séquence en cours
     IF ArmingSeqStep &lt;&gt; CST_STEP_IDLE THEN
@@ -31468,12 +31745,16 @@ IF Enable THEN
                 PreArmDelayActive := FALSE;
                 RedundancyTestFailedCause := FALSE;
                 EmergencyArmingFailedCause := FALSE;
-                // 🛠️ BypassRedundancyTest (MES trace) : saute la coupure test A/B. On passe par
-                //    RESTORE_B (maintien PowerKeepAlive A+B établi CST_KeepAliveHold) AVANT la
-                //    demande contacteur de puissance -&gt; CHAIN OK puis, 1 s plus tard, le gros
-                //    contacteur. Pas de claquement simultané.
-                IF BypassRedundancyTest THEN
+                // 🛠️ Bypass MES trace : saute tout ou partie de l'auto-test A/B.
+                //  - A+B bypassés : direct RESTORE_B (maintien PowerKeepAlive A+B établi
+                //    CST_KeepAliveHold) AVANT la demande contacteur -&gt; CHAIN OK puis gros
+                //    contacteur 1 s après, pas de claquement simultané.
+                //  - A seul bypassé : on démarre au test canal B (TEST_B).
+                //  - Aucun bypass : test croisé complet, canal A d'abord (TEST_A).
+                IF BypassTestA AND BypassTestB THEN
                     ArmingSeqStep := CST_STEP_RESTORE_B;
+                ELSIF BypassTestA THEN
+                    ArmingSeqStep := CST_STEP_TEST_B;
                 ELSE
                     ArmingSeqStep := CST_STEP_TEST_A;
                 END_IF;
@@ -31503,7 +31784,12 @@ IF Enable THEN
 
             IF TonRestoreA.Q THEN
                 IF EmergencyChainClosed OR BypassArmingPreconditions THEN
-                    ArmingSeqStep := CST_STEP_TEST_B;
+                    // 🔀 Canal B bypassé (MES trace) : on saute TEST_B, direct RESTORE_B.
+                    IF BypassTestB THEN
+                        ArmingSeqStep := CST_STEP_RESTORE_B;
+                    ELSE
+                        ArmingSeqStep := CST_STEP_TEST_B;
+                    END_IF;
                 ELSE
                     LastAbortStep := CST_STEP_RESTORE_A;
                     LastAbortCause := INT_TO_WORD(CST_ABORT_TIMEOUT_RESTORE_A);
@@ -31529,7 +31815,8 @@ IF Enable THEN
             END_IF;
 
         4: // CST_STEP_RESTORE_B
-            // 🟰 Point d'entrée du chemin BypassRedundancyTest : les deux canaux PowerKeepAlive
+            // 🟰 Point d'entrée des chemins bypass (BypassTestA+B direct, BypassTestB depuis
+            //    RESTORE_A) : les deux canaux PowerKeepAlive
             //    sont (ré)établis et TENUS CST_KeepAliveHold avant la demande contacteur de
             //    puissance -&gt; CHAIN OK s'entend d'abord, le gros contacteur 1 s après.
             //    La boucle DOIT s'être refermée pour passer au pulse (sauf BypassArmingPreconditions).
@@ -31742,7 +32029,8 @@ Status.Done  := PowerContactorEngaged;
 // opérateurs (FB_Hmi_BannerFormatter lit Diag.ErrorId / scalaires).
 IF NOT Enable THEN
     Status.OperatorMessage := 'AU neutralisee (Enable=FALSE)';
-ELSIF (BypassArmingPreconditions OR BypassRedundancyTest OR BypassPowerCutOff) THEN
+ELSIF (BypassArmingPreconditions OR BypassRedundancyTest OR BypassRedundancyTestA
+       OR BypassRedundancyTestB OR BypassPowerCutOff) THEN
     Status.OperatorMessage := 'AU: BYPASS INGENIERIE MES ACTIF - NON SECURISE - retirer avant exploitation';
 ELSIF StartupFail THEN
     Status.OperatorMessage := 'AU: autotest demarrage echoue - verifier boucle/contacteur puis Reset';
@@ -52001,6 +52289,8 @@ instSafetyEmergencyManagement(
     // 🛠️ Bypass ingenierie MES (RETAIN, jamais IHM) — trace timing chaine/contacteur
     BypassArmingPreconditions := GVL_BypassRetain.BypassAuArmingPreconditions,
     BypassRedundancyTest := GVL_BypassRetain.BypassAuRedundancyTest,
+    BypassRedundancyTestA := GVL_BypassRetain.BypassAuRedundancyTestA,
+    BypassRedundancyTestB := GVL_BypassRetain.BypassAuRedundancyTestB,
     BypassPowerCutOff := GVL_BypassRetain.BypassAuPowerCutOff
 );
 
@@ -53331,7 +53621,29 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute UNIQUEMENT l'auto-test A/B (IDLE -&gt; RESTORE_B)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute l'auto-test A/B COMPLET (IDLE -&gt; RESTORE_B) = alias BypassAuRedundancyTestA + B</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassAuRedundancyTestA">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute le seul test canal A (TEST_A + RESTORE_A) : IDLE -&gt; TEST_B ; canal B toujours qualifie (latch B actif)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="BypassAuRedundancyTestB">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">saute le seul test canal B (TEST_B) : ... RESTORE_A -&gt; RESTORE_B ; canal A toujours qualifie (latch A actif)</xhtml>
           </documentation>
         </variable>
         <variable name="BypassAuPowerCutOff">
@@ -53542,6 +53854,14 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🌐 Signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="LocalIHM">
+          <type>
+            <derived name="ST_LocalIHM" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Blocs cycliques IHM local : CtrlBlock + StatusBlock</xhtml>
           </documentation>
         </variable>
         <variable name="HmiInitDone">
@@ -54423,6 +54743,9 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
               <Object Name="ST_BypassSync" ObjectId="f65a7185-61a7-56a0-8f9e-37d0e97f5130" />
               <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
               <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
+              <Object Name="ST_LocalIHM" ObjectId="b39b9fb0-0aad-5e68-8c80-2b6c913309a3" />
+              <Object Name="ST_LocalIHM_CtrlBlock" ObjectId="a6ea7b24-19db-57a2-a2a6-8b27b9bf5f8a" />
+              <Object Name="ST_LocalIHM_StatusBlock" ObjectId="01fb5de3-730c-545b-bd73-11889b8d40b9" />
               <Object Name="ST_SyncCfg" ObjectId="a3eb8b55-b4ee-5884-9780-22df0c7ecf3c" />
               <Object Name="ST_SyncCmd" ObjectId="c4516adb-d5c4-5442-aed3-fe5c7a9333fa" />
               <Object Name="ST_SyncHMI" ObjectId="50cffbad-b7f0-5ef2-9fe2-7e401d6bec9a" />
