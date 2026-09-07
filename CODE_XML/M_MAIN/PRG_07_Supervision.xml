@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T20:11:45.505336" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T20:11:45.505336">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T04:23:05.391372" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T04:23:05.391372">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -8363,6 +8363,19 @@ GVL_IHM.CycleSemiAuto.State.DeadmanArmed           := PRG_02_Acquisition.Data.Jo
 // JoystickDeflected (FB_CycleSemiAuto, alimenté par PRG_03) = NOT AtNeutralXY. Un seul signal
 // « joystick défléchi » est projeté à l'IHM.
 GVL_IHM.CycleSemiAuto.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
+
+// ---------- §3h. État forçage Maintenance N2 ----------
+GVL_IHM.MaintenanceN2.State.Authorized    := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
+GVL_IHM.MaintenanceN2.State.ActiveForcing := GVL_IHM.MaintenanceN2.Cmd.BtnM1Ascent
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM1Descend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM2Ascent
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM2Descend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnBothAscent
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnBothDescend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM3BrakeRelease;
+
 
 instHmiBannerFormatter(
     Enable                := TRUE,

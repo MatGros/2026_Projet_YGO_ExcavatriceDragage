@@ -8088,6 +8088,160 @@ Valeur brute axe X (0..10000)</xhtml>
    =======================================================================</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_MaintenanceN2Cmd">
+        <baseType>
+          <struct>
+            <variable name="BtnM1Ascent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== Commandes Mouvements N2 (Palier 1 Vitesse Lente) ===
+⬆️ M1 Montée seul (Relais Fwd + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM1Descend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ M1 Descente seul (Relais Rev + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM2Ascent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬆️ M2 Montée / Fermeture seul (Relais Fwd + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM2Descend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ M2 Descente / Ouverture seul (Relais Rev + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnBothAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬆️ M1 + M2 Montée couplée (Relais Fwd + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnBothDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ M1 + M2 Descente couplée (Relais Rev + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM1BrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== Commandes Freins N2 Seuls (Vérification mécanique) ===
+🔓 Desserrage direct frein treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM2BrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Desserrage direct frein treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM3BrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Desserrage direct frein translation M3</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>57e1fd10-69a3-5cda-8e7d-2d4699e05039</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛠️ ST_MaintenanceN2Cmd — Commandes manuelles IHM en mode MAINT_N2
+   ───────────────────────────────────────────────────────────────
+   📄 Commandes de forçage unitaire et couplé sous mot de passe IHM.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_MaintenanceN2HMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_MaintenanceN2Cmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_MaintenanceN2State" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>89a09722-df33-586b-82e7-817aa3518379</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛠️ ST_MaintenanceN2HMI — Données d'échange IHM pour la maintenance N2
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration canonique Cmd / State pour la maintenance experte N2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_MaintenanceN2State">
+        <baseType>
+          <struct>
+            <variable name="Authorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Mode MAINT_N2 actif et mot de passe N2 déverrouillé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveForcing">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Au moins une commande manuelle N2 est active ce cycle</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>013cfb0c-b28a-5f98-9504-3a06c8a5de63</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛠️ ST_MaintenanceN2State — État et qualification du forçage MAINT_N2
+   ───────────────────────────────────────────────────────────────
+   📄 Retours d'état de l'accès et des forçages N2 vers l'IHM.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_ModesCmd">
         <baseType>
           <struct>
@@ -52835,6 +52989,19 @@ GVL_IHM.CycleSemiAuto.State.DeadmanArmed           := PRG_02_Acquisition.Data.Jo
 // « joystick défléchi » est projeté à l'IHM.
 GVL_IHM.CycleSemiAuto.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
+// ---------- §3h. État forçage Maintenance N2 ----------
+GVL_IHM.MaintenanceN2.State.Authorized    := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
+GVL_IHM.MaintenanceN2.State.ActiveForcing := GVL_IHM.MaintenanceN2.Cmd.BtnM1Ascent
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM1Descend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM2Ascent
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM2Descend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnBothAscent
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnBothDescend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM3BrakeRelease;
+
+
 instHmiBannerFormatter(
     Enable                := TRUE,
     SimulationModeActive  := GVL_Simulation.SimulationModeActive,
@@ -53372,6 +53539,14 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Tableau lecture seule des permis canoniques, produit par PRG_07</xhtml>
+          </documentation>
+        </variable>
+        <variable name="MaintenanceN2">
+          <type>
+            <derived name="ST_MaintenanceN2HMI" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛠️ Commandes manuelles et forçages en mode MAINT_N2 sous mot de passe</xhtml>
           </documentation>
         </variable>
         <addData>
@@ -54154,6 +54329,9 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
               <Object Name="ST_CycleMachineHomingCmd" ObjectId="9a7a4500-30c5-5bb1-9b3d-3215396cab97" />
               <Object Name="ST_CycleMachineHomingHMI" ObjectId="42bd473a-7e78-5433-b67f-4e45c4b7c366" />
               <Object Name="ST_CycleState" ObjectId="3316cae9-98ac-5b12-9b8d-a24f1a7445d8" />
+              <Object Name="ST_MaintenanceN2Cmd" ObjectId="57e1fd10-69a3-5cda-8e7d-2d4699e05039" />
+              <Object Name="ST_MaintenanceN2HMI" ObjectId="89a09722-df33-586b-82e7-817aa3518379" />
+              <Object Name="ST_MaintenanceN2State" ObjectId="013cfb0c-b28a-5f98-9504-3a06c8a5de63" />
               <Object Name="ST_ModesCmd" ObjectId="edbd07e7-72fc-5cee-a795-a49979bf9667" />
               <Object Name="ST_ModesCycleInterPrg" ObjectId="c66e2ea9-61f6-5705-86e7-b9f19e28d4f1" />
               <Object Name="ST_ModesHMI" ObjectId="a5e45711-d0fd-5c8a-87d0-1b76ece4083c" />

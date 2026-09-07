@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T04:21:34.185714" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T04:21:34.185714">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_MaintenanceN2HMI">
+        <baseType>
+          <struct>
+            <variable name="Cmd">
+              <type>
+                <derived name="ST_MaintenanceN2Cmd" />
+              </type>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="ST_MaintenanceN2State" />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>89a09722-df33-586b-82e7-817aa3518379</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛠️ ST_MaintenanceN2HMI — Données d'échange IHM pour la maintenance N2
+   ───────────────────────────────────────────────────────────────
+   📄 Structuration canonique Cmd / State pour la maintenance experte N2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_MaintenanceN2Cmd">
+        <baseType>
+          <struct>
+            <variable name="BtnM1Ascent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== Commandes Mouvements N2 (Palier 1 Vitesse Lente) ===
+⬆️ M1 Montée seul (Relais Fwd + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM1Descend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ M1 Descente seul (Relais Rev + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM2Ascent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬆️ M2 Montée / Fermeture seul (Relais Fwd + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM2Descend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ M2 Descente / Ouverture seul (Relais Rev + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnBothAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬆️ M1 + M2 Montée couplée (Relais Fwd + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnBothDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ M1 + M2 Descente couplée (Relais Rev + Palier 1 + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM1BrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== Commandes Freins N2 Seuls (Vérification mécanique) ===
+🔓 Desserrage direct frein treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM2BrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Desserrage direct frein treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM3BrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Desserrage direct frein translation M3</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>57e1fd10-69a3-5cda-8e7d-2d4699e05039</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛠️ ST_MaintenanceN2Cmd — Commandes manuelles IHM en mode MAINT_N2
+   ───────────────────────────────────────────────────────────────
+   📄 Commandes de forçage unitaire et couplé sous mot de passe IHM.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_MaintenanceN2State">
+        <baseType>
+          <struct>
+            <variable name="Authorized">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🟢 Mode MAINT_N2 actif et mot de passe N2 déverrouillé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ActiveForcing">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚡ Au moins une commande manuelle N2 est active ce cycle</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>013cfb0c-b28a-5f98-9504-3a06c8a5de63</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🛠️ ST_MaintenanceN2State — État et qualification du forçage MAINT_N2
+   ───────────────────────────────────────────────────────────────
+   📄 Retours d'état de l'accès et des forçages N2 vers l'IHM.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="3_CYCLE_ET_MODES">
+              <Object Name="ST_MaintenanceN2HMI" ObjectId="89a09722-df33-586b-82e7-817aa3518379" />
+              <Object Name="ST_MaintenanceN2Cmd" ObjectId="57e1fd10-69a3-5cda-8e7d-2d4699e05039" />
+              <Object Name="ST_MaintenanceN2State" ObjectId="013cfb0c-b28a-5f98-9504-3a06c8a5de63" />
+            </Folder>
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
