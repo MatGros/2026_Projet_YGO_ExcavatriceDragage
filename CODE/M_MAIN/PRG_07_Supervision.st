@@ -158,7 +158,7 @@ IF instCfgPersistBridgeSync.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
-instCfgPersistBridgeTranslation(Hmi := GVL_IHM.TranslationM3.Cfg, Persist := _TranslationCfgPersist);
+instCfgPersistBridgeTranslation(Hmi := GVL_IHM.M3Translation.Cfg, Persist := _TranslationCfgPersist);
 IF instCfgPersistBridgeTranslation.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
@@ -196,14 +196,14 @@ END_IF;
 // Consigne variateur M3 (SetFreq_Hz) : pas de bridge Cfg dédié (c'est une Cmd, pas une
 // Cfg) → initialisation manuelle au 1er cycle à partir du persist RETAIN _TranslationSetFreq_Hz.
 // Le flag Cmd.Initialized distingue le 1er passage (restaure) des suivants (survit).
-IF NOT GVL_IHM.TranslationM3.Cmd.Initialized THEN
-    GVL_IHM.TranslationM3.Cmd.SetFreq_Hz := _TranslationSetFreq_Hz;
-    GVL_IHM.TranslationM3.Cmd.Initialized := TRUE;
+IF NOT GVL_IHM.M3Translation.Cmd.Initialized THEN
+    GVL_IHM.M3Translation.Cmd.SetFreq_Hz := _TranslationSetFreq_Hz;
+    GVL_IHM.M3Translation.Cmd.Initialized := TRUE;
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 // Recopie continue (après restauration) : toute consigne changée en session survit au
 // prochain boot/reset chaud, pas seulement le défaut d'usine.
-_TranslationSetFreq_Hz := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
+_TranslationSetFreq_Hz := GVL_IHM.M3Translation.Cmd.SetFreq_Hz;
 
 // Acquittement du bandeau « config restaurée » par l'opérateur (front) → efface le flag.
 instAckConfigRestored(CLK := GVL_IHM.Commun.BtnAckConfigRestored);
@@ -216,11 +216,11 @@ END_IF;
 // au 1er cycle (Bypass.Initialized=FALSE), si un bypass global RETAIN est actif, on le
 // rejoue sur l'IHM, puis on marque Initialized pour ne pas réécraser les actions suivantes
 // de l'opérateur. Même pattern pour chaque domaine (Translation / M1 / M2 / Sync / Commun).
-IF NOT GVL_IHM.TranslationM3.Bypass.Initialized THEN
+IF NOT GVL_IHM.M3Translation.Bypass.Initialized THEN
     IF BypassTranslationGlobal THEN
-        GVL_IHM.TranslationM3.Bypass.Global := TRUE;
+        GVL_IHM.M3Translation.Bypass.Global := TRUE;
     END_IF;
-    GVL_IHM.TranslationM3.Bypass.Initialized := TRUE;
+    GVL_IHM.M3Translation.Bypass.Initialized := TRUE;
 END_IF;
 
 IF NOT GVL_IHM.M1TreuilRetenue.Bypass.Initialized THEN
@@ -281,7 +281,7 @@ END_IF;
 // ---------- §2c. Synchronisation bidirectionnelle IHM ↔ RETAIN ----------
 // 🔄 SYNC BIDIRECTIONNEL (dernier-écrit-gagne), factorisé dans FB_MirrorBypassRetain
 // (CODE/A_COMMUN) : si l'IHM a changé → RETAIN ; sinon → IHM := RETAIN.
-instMirrorBypassTranslation(Hmi := GVL_IHM.TranslationM3.Bypass.Global, RetainVal := BypassTranslationGlobal, Prev := PrevTranslationBypass);
+instMirrorBypassTranslation(Hmi := GVL_IHM.M3Translation.Bypass.Global, RetainVal := BypassTranslationGlobal, Prev := PrevTranslationBypass);
 instMirrorBypassM1(Hmi := GVL_IHM.M1TreuilRetenue.Bypass.Global, RetainVal := BypassWinchM1Global, Prev := PrevM1Bypass);
 instMirrorBypassM2(Hmi := GVL_IHM.M2TreuilBenne.Bypass.Global, RetainVal := BypassWinchM2Global, Prev := PrevM2Bypass);
 instMirrorBypassSync(Hmi := GVL_IHM.M1M2Sync.Bypass.Global, RetainVal := BypassSyncGlobal, Prev := PrevSyncBypass);
@@ -417,7 +417,7 @@ GVL_IHM.Commun.WinchSymmetry.MaxSyncDeviation_M       := _WinchSymmetryDataPersi
 // ---------- §3d. Bypass simulation (retours simulés vers IHM) ----------
 GVL_IHM.M1TreuilRetenue.Bypass.ContactorFeedback := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 GVL_IHM.M2TreuilBenne.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
-GVL_IHM.TranslationM3.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
+GVL_IHM.M3Translation.Bypass.ContactorFeedback   := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 // Ces deux indicateurs ne décrivent PAS le domaine simulation : ils publient
 // l'état des bypasss réellement consommés par FB_Safety_Winch.
 GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_IHM.Commun.Bypass.SlackCable;
@@ -431,7 +431,7 @@ GVL_IHM.M1TreuilRetenue.Safety := PRG_04_Treuils_Benne.Data.WinchM1Safety;
 GVL_IHM.M2TreuilBenne.Safety := PRG_04_Treuils_Benne.Data.WinchM2Safety;
 GVL_IHM.M1M2Sync.State := PRG_04_Treuils_Benne.Data.SyncState;
 GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
-GVL_IHM.TranslationM3.State := PRG_05_Translation.Data.TranslationState;
+GVL_IHM.M3Translation.State := PRG_05_Translation.Data.TranslationState;
 
 // ---------- §3e-bis. Gel affichage position pendant transaction preset codeur (anti-clignotement, voir VAR) ----------
 M1HomingDisplaySettle(IN := NOT GVL_IHM.M1TreuilRetenue.State.Encoder.HomingBusy, PT := T#2s);
@@ -452,7 +452,7 @@ ELSE
     M2PosHmiHeld_M          := GVL_IHM.M2TreuilBenne.State.Position_M;
     M2PosCorrectedHmiHeld_M := GVL_IHM.M2TreuilBenne.Bucket.State.M2PositionCorrected;
 END_IF;
-GVL_IHM.TranslationM3.Safety := PRG_05_Translation.Data.TranslationSafety;
+GVL_IHM.M3Translation.Safety := PRG_05_Translation.Data.TranslationSafety;
 
 GVL_IHM.Modes.State.CurrentMode := PRG_03_Modes_Cycle.Data.Auth.Mode;
 // — Chaîne AU / sécurité : sortie de Modes.State vers GVL_IHM.Emergency —
@@ -527,7 +527,7 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Latched
                                       OR GVL_IHM.M1TreuilRetenue.Safety.Error
                                       OR GVL_IHM.M2TreuilBenne.Safety.Error
-                                      OR GVL_IHM.TranslationM3.Safety.Error
+                                      OR GVL_IHM.M3Translation.Safety.Error
                                       OR GVL_IHM.M1M2Sync.State.Error
                                       OR GVL_IHM.M2TreuilBenne.Bucket.State.Error
                                       OR GVL_IHM.CycleSemiAuto.State.Error
@@ -604,7 +604,7 @@ GVL_IHM.CycleSemiAuto.State.ResumeAfterFaultAvailable := PRG_03_Modes_Cycle.Data
 GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
-GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.TranslationM3.Cmd.SelTarget;
+GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
 GVL_IHM.CycleSemiAuto.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 GVL_IHM.CycleSemiAuto.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
@@ -660,7 +660,7 @@ instHmiBannerFormatter(
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
     BypassWinchM2Active   := GVL_IHM.M2TreuilBenne.Bypass.Global,
-    BypassTranslation     := GVL_IHM.TranslationM3.Bypass.Global,
+    BypassTranslation     := GVL_IHM.M3Translation.Bypass.Global,
     BypassSyncActive      := GVL_IHM.M1M2Sync.Bypass.Global,
     SyncDegradedActive    := PRG_04_Treuils_Benne.Data.SyncState.SyncDeviationWarn,
     LegalLimitReached     := GVL_IHM.Commun.LimitLegalReached,
@@ -683,15 +683,15 @@ instHmiBannerFormatter(
     DeadmanArmed                := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral           := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
     CycleAutoBusy               := PRG_03_Modes_Cycle.Data.SequenceState.Lifecycle.Busy,
-    M3AtP1                      := GVL_IHM.TranslationM3.State.AtP1,
-    M3StatusText                := GVL_IHM.TranslationM3.State.M3StatusText,
-    TranslationMotionErrorId    := GVL_IHM.TranslationM3.State.ErrorId,
-    TranslationFinalInterlockErrorId := GVL_IHM.TranslationM3.State.FinalInterlockErrorId,
+    M3AtP1                      := GVL_IHM.M3Translation.State.AtP1,
+    M3StatusText                := GVL_IHM.M3Translation.State.M3StatusText,
+    TranslationMotionErrorId    := GVL_IHM.M3Translation.State.ErrorId,
+    TranslationFinalInterlockErrorId := GVL_IHM.M3Translation.State.FinalInterlockErrorId,
     WinchDescentLockedByM3 := NOT PRG_03_Modes_Cycle.Data.SequenceState.WinchDescentAuth_M3,
     M3AtTremieStable := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
     WinchM1Safety               := GVL_IHM.M1TreuilRetenue.Safety,
     WinchM2Safety               := GVL_IHM.M2TreuilBenne.Safety,
-    TranslationSafety           := GVL_IHM.TranslationM3.Safety,
+    TranslationSafety           := GVL_IHM.M3Translation.Safety,
     BucketErrorId               := GVL_IHM.M2TreuilBenne.Bucket.State.ErrorId,
     SyncErrorId                 := GVL_IHM.M1M2Sync.State.ErrorId,
     SyncContactorDiag           := PRG_06_Outputs.Data.SyncContactorDiag,
@@ -790,7 +790,7 @@ instTroubleshootingView(
     WinchM1              := GVL_IHM.M1TreuilRetenue,
     WinchM2              := GVL_IHM.M2TreuilBenne,
     Sync                 := GVL_IHM.M1M2Sync,
-    Translation          := GVL_IHM.TranslationM3,
+    Translation          := GVL_IHM.M3Translation,
     Commun               := GVL_IHM.Commun,
     Network              := GVL_IHM.Network,
     JoystickHMI          := GVL_IHM.JOY1Joystick,

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T07:12:55.868734" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T07:12:55.868734">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T08:02:16.398498" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T08:02:16.398498">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -371,7 +371,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
           <struct>
             <variable name="GlobalContextText">
               <type>
-                <string length="80" />
+                <string length="120" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Macro : [RÉEL/SIMU] [MODE] [COUPLAGE]</xhtml>
@@ -1810,7 +1810,7 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Miroir lecture seule de GVL_IHM.TranslationM3.Cmd.SelTarget</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Miroir lecture seule de GVL_IHM.M3Translation.Cmd.SelTarget</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldContactFond">
@@ -8978,7 +8978,7 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ Variables d'échange IHM chaîne AU / sécurité — sorties de Modes</xhtml>
           </documentation>
         </variable>
-        <variable name="TranslationM3">
+        <variable name="M3Translation">
           <type>
             <derived name="ST_TranslationHMI" />
           </type>

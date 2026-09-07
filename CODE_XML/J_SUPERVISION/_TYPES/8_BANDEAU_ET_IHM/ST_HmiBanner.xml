@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.570901" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.570901">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T08:46:06.877223" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T08:46:06.877223">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -28,7 +28,7 @@
           <struct>
             <variable name="GlobalContextText">
               <type>
-                <string length="80" />
+                <string length="120" />
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">1. Macro : [RÉEL/SIMU] [MODE] [COUPLAGE]</xhtml>

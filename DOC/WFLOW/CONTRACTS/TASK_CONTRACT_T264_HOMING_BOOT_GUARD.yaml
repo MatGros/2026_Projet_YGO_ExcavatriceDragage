@@ -1,0 +1,46 @@
+contract:
+  task_id: T264
+  criticality: C3
+  strategy: patch
+  objective: >
+    Empêcher tout lancement automatique ou validation de homing machine après AU
+    tant que le boot d'acquisition et les deux codeurs ne sont pas valides.
+    HX1 reste une étape informative et le référencement mouvement reste réservé à MAINT_N2.
+  acceptance:
+    - id: AC1
+      statement: "BootReady FALSE interdit l'auto-armement et les transitions vers HX2/HX3."
+      verified_by: "Revue FB_CycleMachineHoming.st et test de garde sur auto-armement/validation."
+    - id: AC2
+      statement: "HX1 n'émet aucun ordre mouvement et affiche l'attente du boot codeurs puis MAINT_N2."
+      verified_by: "Revue du CASE HX1 et des sorties CmdWinch."
+    - id: AC3
+      statement: "BootReady TRUE ne supprime pas la validation opérateur en MAINT_N2."
+      verified_by: "Revue de la condition ExplicitValidationPulse."
+    - id: AC4
+      statement: "Le bundle PLCopenXML et G200 sont sans erreur."
+      verified_by: "generate_codesys_bundle.py et G200_check_linkage.py --report."
+    - id: AC5
+      statement: "Le nom de fichier est egal au nom de POU; le suffixe est egal au langage du bundle."
+      verified_by: "G310 et G390."
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleMachineHoming.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE_XML/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T264_HOMING_BOOT_GUARD.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Démarrage automatique d'un mouvement de homing
+      - Bypass de la chaîne AU
+  source_of_truth:
+    - CODE/G_CYCLE/FB_CycleMachineHoming.st
+    - CODE/M_MAIN/PRG_02_Acquisition.st
+  implementation_constraints:
+    - "BootReady est produit à partir de DataValid et Ready des deux codeurs."
+    - "HX1 est une information opérateur; aucune sortie de mouvement n'est produite à cette étape."
+  structural_criteria:
+    - "Chaque POU conserve un fichier portant exactement son nom et le suffixe ST."
+    - "Les objets générés dans CODE_XML conservent le nom POU et le langage ST."
+  evidence_required:
+    - check_linkage
+    - bundle

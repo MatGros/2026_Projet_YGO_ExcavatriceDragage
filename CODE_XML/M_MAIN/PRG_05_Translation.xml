@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T18:06:03.855297" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T18:06:03.855297">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T08:02:15.980764" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T08:02:15.980764">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2357,7 +2357,7 @@ Data.M3_SensorWordIncoherent := instPosDecoderM3.Incoherent;
 // 🔒 Bypass.Global NE lève PLUS cet interlock (contrairement aux autres
 // causes de l'axe M3) — risque de collision jugé trop grave pour être levé par un bypass
 // générique. Seul Bypass.MinHeight (dédié, conscient) lève l'anti-collision hauteur.
-M3_HeightInterlockOk := GVL_IHM.TranslationM3.Bypass.MinHeight
+M3_HeightInterlockOk := GVL_IHM.M3Translation.Bypass.MinHeight
                         OR (PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
                             AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable
                             AND (PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM &gt;= GVL_PERSISTENT._TranslationMinHeightM1M2_M)
@@ -2401,8 +2401,8 @@ END_IF;
 // ⚠️ Signal PAS ENCORE CÂBLÉ (ST_HwMachine) : polarité TRUE = bloqué à CONFIRMER au câblage.
 TonTremieProcessBlock(
     IN := PRG_02_Acquisition.HwIn.Machine.TremieFull_OR_GateRaised_DI
-          AND NOT GVL_IHM.TranslationM3.Bypass.LimitSwitch
-          AND NOT GVL_IHM.TranslationM3.Bypass.Global,
+          AND NOT GVL_IHM.M3Translation.Bypass.LimitSwitch
+          AND NOT GVL_IHM.M3Translation.Bypass.Global,
     PT := T#200ms);
 M3_TremieProcessBlock := TonTremieProcessBlock.Q;
 
@@ -2475,11 +2475,11 @@ M3_AtWorkPositionStable := (NOT instPosDecoderM3.Incoherent)
 // 🎛️ Stimuli boutons IHM M3 : en simulation ET JoyMaster inactif, les stimuli pilotent les
 // boutons IHM (SEL) ; sinon la valeur IHM réelle est conservée (jamais écrasée, producteur unique).
 SimBtnIHM_Active := GVL_Simulation.SimulationModeActive AND NOT GVL_IHM.Modes.Cmd.TglJoystickMaster;
-ArbM3_IHM.BtnTremie         := SEL(SimBtnIHM_Active, GVL_IHM.TranslationM3.Cmd.BtnTremie, GVL_Simulation.SimBtnTremie);
-ArbM3_IHM.BtnMaintenance    := SEL(SimBtnIHM_Active, GVL_IHM.TranslationM3.Cmd.BtnMaintenance, GVL_Simulation.SimBtnMaintenance);
-ArbM3_IHM.SelPositioning    := GVL_IHM.TranslationM3.Cmd.SelPositioning;
-ArbM3_IHM.SetFreq_Hz        := GVL_IHM.TranslationM3.Cmd.SetFreq_Hz;
-ArbM3_IHM.BypassGlobal      := GVL_IHM.TranslationM3.Bypass.Global;
+ArbM3_IHM.BtnTremie         := SEL(SimBtnIHM_Active, GVL_IHM.M3Translation.Cmd.BtnTremie, GVL_Simulation.SimBtnTremie);
+ArbM3_IHM.BtnMaintenance    := SEL(SimBtnIHM_Active, GVL_IHM.M3Translation.Cmd.BtnMaintenance, GVL_Simulation.SimBtnMaintenance);
+ArbM3_IHM.SelPositioning    := GVL_IHM.M3Translation.Cmd.SelPositioning;
+ArbM3_IHM.SetFreq_Hz        := GVL_IHM.M3Translation.Cmd.SetFreq_Hz;
+ArbM3_IHM.BypassGlobal      := GVL_IHM.M3Translation.Bypass.Global;
 
 ArbM3_Context.HeightInterlockOk := M3_HeightInterlockOk;
 ArbM3_Cfg.MaxFreq_Hz            := GVL_PERSISTENT._TranslationMaxFreq_Hz;
@@ -2575,7 +2575,7 @@ instSafetyTranslationM3(
     DriveOperational        := PRG_02_Acquisition.Data.Network.DriveM3.Operational,
     DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
-    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
+    BrakeFeedback           := SEL(GVL_IHM.M3Translation.Bypass.ContactorFeedback OR GVL_IHM.M3Translation.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
     BrakeCmd                := instTranslationM3.BrakeReleaseRequest,
     RunRequest              := M3_RunRequest_Active,
     ReqTremie               := M3_ReqTremie_Active,
@@ -2583,17 +2583,17 @@ instSafetyTranslationM3(
     LimitSwitchTremie       := M3_LimitSwitchTremieStable,
     LimitSwitchMaintenance  := M3_LimitSwitchMaintenanceStable,
     SensorWordIncoherent    := instPosDecoderM3.Incoherent,
-    BypassGlobal            := GVL_IHM.TranslationM3.Bypass.Global,
-    BypassOperatorComm      := GVL_IHM.TranslationM3.Bypass.OperatorComm,
-    BypassDriveComm         := GVL_IHM.TranslationM3.Bypass.DriveComm,
-    BypassPhaseRotation     := GVL_IHM.TranslationM3.Bypass.PhaseRotation,
-    BypassBrakeThermal      := GVL_IHM.TranslationM3.Bypass.BrakeThermal,
-    BypassMecaB             := GVL_IHM.TranslationM3.Bypass.MecaB,
-    BypassMecaA             := GVL_IHM.TranslationM3.Bypass.MecaA,
-    BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.LimitSwitch,
-    BypassSensorIncoherent  := GVL_IHM.TranslationM3.Bypass.SensorIncoherent,
-    BypassSafety            := GVL_IHM.TranslationM3.Bypass.Safety,
-    BypassProcess           := GVL_IHM.TranslationM3.Bypass.Process
+    BypassGlobal            := GVL_IHM.M3Translation.Bypass.Global,
+    BypassOperatorComm      := GVL_IHM.M3Translation.Bypass.OperatorComm,
+    BypassDriveComm         := GVL_IHM.M3Translation.Bypass.DriveComm,
+    BypassPhaseRotation     := GVL_IHM.M3Translation.Bypass.PhaseRotation,
+    BypassBrakeThermal      := GVL_IHM.M3Translation.Bypass.BrakeThermal,
+    BypassMecaB             := GVL_IHM.M3Translation.Bypass.MecaB,
+    BypassMecaA             := GVL_IHM.M3Translation.Bypass.MecaA,
+    BypassLimitSwitch       := GVL_IHM.M3Translation.Bypass.LimitSwitch,
+    BypassSensorIncoherent  := GVL_IHM.M3Translation.Bypass.SensorIncoherent,
+    BypassSafety            := GVL_IHM.M3Translation.Bypass.Safety,
+    BypassProcess           := GVL_IHM.M3Translation.Bypass.Process
 );
 
 // SafeStop réellement appliqué au mouvement = agrégat InputModuleFault OR safety M3
@@ -2645,7 +2645,7 @@ EffectivePermitM3_Maintenance := instSafetyTranslationM3.MaintenanceLimitClear
 // === ⚙️ §2 EXÉCUTION PILOTAGE TRANSLATION M3 ===
 
 // 🔧 Assemblage de la config FB_Translation (C3) — SOURCE UNIQUE : GVL_PERSISTENT.
-// Fini le double sourcing (rampes flat + vitesses d'approche via GVL_IHM.TranslationM3.Cfg).
+// Fini le double sourcing (rampes flat + vitesses d'approche via GVL_IHM.M3Translation.Cfg).
 // Les 3 vitesses d'approche sont lues dans _TranslationCfgPersist (miroir persistant de
 // ST_TranslationCfg, synchronisé par FB_CfgPersistBridge_TranslationCfg dans PRG_07) — la
 // valeur reflète toute modification IHM persistée. Les délais (DirectionInterlockDelay,
@@ -2668,7 +2668,7 @@ instTranslationM3(
     SafeStop                := M3_SafeStop_Aggregate,
     ReqTremie               := M3_ReqTremie_Active,
     ReqMaintenance          := M3_ReqMaintenance_Active,
-    InvertDriveDirection    := GVL_IHM.TranslationM3.Cmd.InvertDirection,
+    InvertDriveDirection    := GVL_IHM.M3Translation.Cmd.InvertDirection,
     SpeedTgt_Pct            := M3_SpeedCmd_Active,
     PositionSensorTarget    := M3_PositionSensorTarget,
     SlowdownSensorTremie       := instPosDecoderM3.TranslationPosPV,
@@ -2691,9 +2691,9 @@ instTranslationM3(
     DriveStatusWord         := PRG_02_Acquisition.Data.M3.StatusWord,
     DriveActualFreqHz       := UINT_TO_REAL(PRG_02_Acquisition.Data.M3.ActualFrequencyHz) / 100.0,
     Cfg                     := TranslationCfg,
-    BrakeFeedback           := SEL(GVL_IHM.TranslationM3.Bypass.ContactorFeedback OR GVL_IHM.TranslationM3.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
-    BypassContactorCheck    := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.ContactorFeedback,
-    BypassLimitSwitch       := GVL_IHM.TranslationM3.Bypass.Global OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
+    BrakeFeedback           := SEL(GVL_IHM.M3Translation.Bypass.ContactorFeedback OR GVL_IHM.M3Translation.Bypass.Global, PRG_02_Acquisition.HwIn.Translation.M3_BrakeIsOpen_DI, instTranslationM3.BrakeReleaseRequest),
+    BypassContactorCheck    := GVL_IHM.M3Translation.Bypass.Global OR GVL_IHM.M3Translation.Bypass.ContactorFeedback,
+    BypassLimitSwitch       := GVL_IHM.M3Translation.Bypass.Global OR GVL_IHM.M3Translation.Bypass.LimitSwitch
 );
 
 // 📐 Estimateur de position continue M3 (odométrie + recalage 5 capteurs)
@@ -3138,7 +3138,7 @@ Data.TranslationTrace                 := TranslationTrace;
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass)
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔧 Bypass des surveillances (GVL_IHM.M3Translation.Bypass)
 --&gt; [TST] Bypass GLOBAL : ignore TOUTES les surveillances ci-dessous (prioritaire)</xhtml>
               </documentation>
             </variable>

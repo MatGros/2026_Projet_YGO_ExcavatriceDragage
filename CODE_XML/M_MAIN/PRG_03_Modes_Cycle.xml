@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T20:12:37.586762" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T20:12:37.586762">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T08:01:31.011169" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T08:01:31.011169">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1475,11 +1475,11 @@ instModes(
     SelHomingApproachEnable := GVL_IHM.Commun.Cfg.SelHomingApproachEnable,
     EncoderFaultPresent     := (PRG_02_Acquisition.HwIn.Winch.COD1_DeviceState &lt;&gt; DEVICE_STATE.RUNNING) OR (PRG_02_Acquisition.HwIn.Winch.COD2_DeviceState &lt;&gt; DEVICE_STATE.RUNNING),
     JoystickWinchSelectRequest := GVL_IHM.Modes.Cmd.SelJoystickWinch,
-    SelMaintenanceZoneAccess := GVL_IHM.TranslationM3.Cmd.TglMaintenanceZoneAccess,
+    SelMaintenanceZoneAccess := GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess,
     // T248 — sequencement auto benne en couple (force temporairement le sel. a 2)
     CoupledBucketSeqEnable  := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing,
     M3AtTremie              := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie,
-    AllowWinchMoveAtTremie  := GVL_IHM.TranslationM3.Cmd.TglAllowWinchMoveAtTremie,
+    AllowWinchMoveAtTremie  := GVL_IHM.M3Translation.Cmd.TglAllowWinchMoveAtTremie,
     JoystickPull            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionPositive,
     JoystickPush            := PRG_02_Acquisition.Data.Joystick.AxisY.DirectionNegative,
     BucketIsOpen            := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
@@ -1587,7 +1587,7 @@ instCycleSemiAuto(
     StartCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnStart,
     AbortCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnAbort,
     ResumeAfterFault        := GVL_IHM.CycleSemiAuto.Cmd.BtnResumeAfterFault,
-    SelTarget               := GVL_IHM.TranslationM3.Cmd.SelTarget,
+    SelTarget               := GVL_IHM.M3Translation.Cmd.SelTarget,
     SetDepthM               := GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M,
     DepthStopMode           := GVL_IHM.CycleSemiAuto.Cfg.DepthStopMode,
     KoboldImmersed          := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI, // DI brut Kobold (fronts AX6/AX7) - convention a confirmer au banc
@@ -1823,8 +1823,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.WinchDescentAuth_M3     :=
         NOT GVL_IHM.Commun.Cfg.TglEnableWinchDescentLock_M3
         OR PRG_05_Translation.Data.M3_AtWorkPositionStable
-        OR GVL_IHM.TranslationM3.Bypass.LimitSwitch
-        OR GVL_IHM.TranslationM3.Bypass.Global;
+        OR GVL_IHM.M3Translation.Bypass.LimitSwitch
+        OR GVL_IHM.M3Translation.Bypass.Global;
 
 ELSE
     // Neutralisation déterministe (DISABLE)

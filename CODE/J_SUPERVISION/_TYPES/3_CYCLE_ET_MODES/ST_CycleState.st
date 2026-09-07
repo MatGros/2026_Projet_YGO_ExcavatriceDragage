@@ -10,7 +10,7 @@ STRUCT
     ErrorId                : WORD;        (* ❌ Code affiché : actif, ou latched après repli AX_STAB *)
     CycleStep              : E_AutoCycleStep; (* 🔄 Étape courante du Grafcet *)
     CycleStateStr          : STRING(80);  (* 📝 Libellé texte de l'étape courante *)
-    SelTarget              : INT;         (* 🎯 Miroir lecture seule de GVL_IHM.TranslationM3.Cmd.SelTarget *)
+    SelTarget              : INT;         (* 🎯 Miroir lecture seule de GVL_IHM.M3Translation.Cmd.SelTarget *)
     KoboldContactFond      : BOOL;        (* 🔌 Retour physique réel capteur contact de fond Kobold *)
     KoboldContactorCmd     : BOOL;        (* 🔌 Commande contacteur Kobold (calculée par FB_Cycle) *)
     LimitLegalReached      : BOOL;        (* 📐 Miroir de GVL_IHM.Commun.LimitLegalReached *)

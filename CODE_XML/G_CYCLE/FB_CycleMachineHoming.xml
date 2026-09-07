@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.399045" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.399045">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T08:27:01.271730" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T08:27:01.271730">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -720,6 +720,14 @@
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MODE ARBITRE ===
 --&gt; [CMD] Mode machine (referencement : MAINT_N2 seul)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BootReady">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Acquisition + codeurs valides apres boot</xhtml>
               </documentation>
             </variable>
             <variable name="TopPositionSensor">
@@ -1850,7 +1858,7 @@ CASE SeqStep OF
         IF MachineHomed
            OR ((Mode &lt;&gt; E_Mode.MAINT_N1) AND (Mode &lt;&gt; E_Mode.MAINT_N2)) THEN
             SeqStep := E_MachineHomingTxState.HX0_REPOS;
-        ELSIF ExplicitValidationPulse AND (Mode = E_Mode.MAINT_N2) THEN
+        ELSIF BootReady AND ExplicitValidationPulse AND (Mode = E_Mode.MAINT_N2) THEN
             CommitPublished := FALSE;   // datum invalide tant qu'il est refait (HT1b, deplace de HX0)
             CommitDone      := FALSE;
             IF NOT TopPositionSensor THEN
@@ -2024,6 +2032,9 @@ ELSIF (SeqStep = E_MachineHomingTxState.HX5_BUCKET_COMMIT)
       OR (SeqStep = E_MachineHomingTxState.HX6_HOMED) THEN
     MachineHomingStep := E_MachineHomingStep.VALID;
     MachineHomingInstruction := 'HX5 - RefHoming Etat benne enregistre - fin homing';
+ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) AND NOT BootReady THEN
+    MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;
+    MachineHomingInstruction := 'HX1 - Homing inhibe : attendre boot codeurs puis passer en MAINT_N2';
 ELSIF (SeqStep = E_MachineHomingTxState.HX1_CHOICE) THEN
     IF Mode &lt;&gt; E_Mode.MAINT_N2 THEN
         MachineHomingStep := E_MachineHomingStep.OFFSET_UNKNOWN;

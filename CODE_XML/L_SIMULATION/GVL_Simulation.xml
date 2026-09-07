@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.579119" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.579119">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T08:02:15.543384" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T08:02:15.543384">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -248,7 +248,7 @@ Translation M3 Arrière vers Trémie (RawX=0, RawY=5000)</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🎛️ STIMULI BOUTONS IHM M3 — simulation des boutons IHM Translation M3 (Trémie/Maintenance).
-Pilotent GVL_IHM.TranslationM3.Cmd.BtnTremie/BtnMaintenance UNIQUEMENT en mode simulation
+Pilotent GVL_IHM.M3Translation.Cmd.BtnTremie/BtnMaintenance UNIQUEMENT en mode simulation
 ET quand JoyMaster est inactif (le joystick prime sinon). Défaut FALSE = bouton relâché.
 TRUE = bouton IHM "vers Trémie" simulé appuyé</xhtml>
           </documentation>
