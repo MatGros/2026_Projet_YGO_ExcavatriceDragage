@@ -65,7 +65,7 @@
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="-20" />
+                <simpleValue value="-29" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Profondeur de dragage cible (m, négative)</xhtml>
@@ -369,7 +369,15 @@
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Retour physique réel capteur contact de fond Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Fond confirmé par Kobold uniquement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionFondAtteinte">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Fond confirmé par limite de travail/consigne</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldContactorCmd">

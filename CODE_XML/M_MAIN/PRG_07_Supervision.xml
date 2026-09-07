@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T08:01:30.215372" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T08:01:30.215372">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T15:11:21.321555" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T15:11:21.321555">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -243,7 +243,7 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="-20" />
+                <simpleValue value="-29" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Profondeur de dragage cible (m, négative)</xhtml>
@@ -7851,6 +7851,14 @@ geles pendant HomingLifecycle.Busy). Affichage seul, aucune decision machine ici
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Gel affichage position M2 actif</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleDepthLowerBound_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Borne profondeur cycle : legale et limites descentes M1/M2</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -7964,6 +7972,14 @@ IF instCfgPersistBridgeCommun.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
+// Une consigne hors borne est corrigée avant persistance et avant affichage IHM.
+// Les profondeurs étant négatives, MAX retient la limite la moins profonde.
+CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
+                              MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M,
+                                  _WinchM2CfgPersist.CfgCableLimitDescent_M));
+IF GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M &lt; CycleDepthLowerBound_M THEN
+    GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M := CycleDepthLowerBound_M;
+END_IF;
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
 IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
@@ -8386,7 +8402,10 @@ GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
-GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
+// Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
+// pas être présenté comme un contact Kobold.
+GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_03_Modes_Cycle.Data.SequenceState.BottomStopByKobold;
+GVL_IHM.CycleSemiAuto.State.PositionFondAtteinte   := PRG_03_Modes_Cycle.Data.SequenceState.BottomStopBySetpoint;
 GVL_IHM.CycleSemiAuto.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 GVL_IHM.CycleSemiAuto.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
 GVL_IHM.CycleSemiAuto.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
@@ -8422,6 +8441,7 @@ GVL_IHM.MaintenanceN2.State.ActiveForcing := GVL_IHM.MaintenanceN2.Cmd.BtnM1Asce
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM3Maintenance
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnBothBrakeRelease
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM3BrakeRelease;
 
 

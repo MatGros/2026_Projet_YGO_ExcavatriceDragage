@@ -5229,7 +5229,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <REAL />
               </type>
               <initialValue>
-                <simpleValue value="-20" />
+                <simpleValue value="-29" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Profondeur de dragage cible (m, négative)</xhtml>
@@ -5709,7 +5709,15 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Retour physique réel capteur contact de fond Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Fond confirmé par Kobold uniquement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PositionFondAtteinte">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">📐 Fond confirmé par limite de travail/consigne</xhtml>
               </documentation>
             </variable>
             <variable name="KoboldContactorCmd">
@@ -8717,6 +8725,14 @@ Valeur brute axe X (0..10000)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Desserrage direct frein treuil M2</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnBothBrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Desserrage direct freins M1 + M2</xhtml>
+              </documentation>
+            </variable>
             <variable name="BtnM3BrakeRelease">
               <type>
                 <BOOL />
@@ -11341,7 +11357,23 @@ TRUE = Défaut sécurité actif</xhtml>
                 <BOOL />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact fond Kobold confirmé (manuel + bypass)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirmé (Kobold ou consigne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomStopByKobold">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirmé par contact Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomStopBySetpoint">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fond confirmé par limite de travail/consigne</xhtml>
               </documentation>
             </variable>
             <variable name="WinchDescentAuth_M3">
@@ -21785,6 +21817,22 @@ FirstScanDone := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Fond touche (latch AX8, efface a AX0 / AX_STAB / Reset) - variable d'info GEL AX8</xhtml>
               </documentation>
             </variable>
+            <variable name="BottomStopByKobold">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] AX8 confirme par contact Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BottomStopBySetpoint">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] AX8 confirme par limite de travail/consigne de position</xhtml>
+              </documentation>
+            </variable>
             <variable name="BottomStopSource">
               <type>
                 <string length="24" />
@@ -23115,6 +23163,8 @@ IF ResetEdge.Q THEN
     PausedState := E_AutoCycleStep.AX0_REPOS;
     SavedState := E_AutoCycleStep.AX0_REPOS;
     BottomTouched := FALSE;
+    BottomStopByKobold := FALSE;
+    BottomStopBySetpoint := FALSE;
     BottomStopSource := '';
     BottomContextValid := FALSE;
     StopPositionCaptured := FALSE;
@@ -23293,6 +23343,8 @@ CASE State OF
         OperatorAction := 'AX0 - Demander le demarrage du cycle (Bouton IHM ou armement Homme-Mort).';
         SampleCountDone := FALSE;   // F2: réarmement du front de comptage à chaque entrée en X0
         BottomTouched   := FALSE;   // info fond touche effacee au repos
+        BottomStopByKobold := FALSE;
+        BottomStopBySetpoint := FALSE;
         BottomStopSource := '';
 
         // Transition si système sain et réarmé (front reset ou démarrage).
@@ -23570,7 +23622,9 @@ CASE State OF
             TouchPositionM1 := M1_CablePosM;
             TouchPositionM2 := M2_CablePosM;
             BottomTouched  := TRUE;   // variable d'info latchee (GEL AX8) - effacee a AX0 / AX_STAB / Reset
-            IF DepthStopBySetpoint AND NOT KoboldBottomTimer.Q THEN
+            BottomStopByKobold := KoboldImmersionQualified AND KoboldBottomTimer.Q;
+            BottomStopBySetpoint := DepthStopBySetpoint AND NOT BottomStopByKobold;
+            IF BottomStopBySetpoint THEN
                 BottomStopSource := 'CONSIGNE PROFONDEUR';
             ELSE
                 BottomStopSource := 'KOBOLD';
@@ -47619,6 +47673,22 @@ Data.DataValid := NOT Data.InputModules.Fault
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémoire page IHM précédente (détection front changement de page)</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleDepthLowerBound_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Borne sûre commune : légale et limites descentes M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleSetDepthEffective_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne cycle bornée avant consommation par FB_CycleSemiAuto</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_CycleInitWindowM">
               <type>
                 <REAL />
@@ -47653,6 +47723,13 @@ Data.DataValid := NOT Data.InputModules.Fault
 
 // === 🔀 §1 ARBITRAGE DES MODES MACHINE &amp; INTENTION OPÉRATEUR ===
 {region "§1 Modes machine"}
+
+// Protection de cohérence profondeur : les positions sont négatives ; la consigne
+// doit rester supérieure ou égale à chacune des trois limites aval.
+CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
+                             MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M,
+                                 _WinchM2CfgPersist.CfgCableLimitDescent_M));
+CycleSetDepthEffective_M := MAX(GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M, CycleDepthLowerBound_M);
 
 // 📄 Événement changement de page IHM : sélection automatique du mode (page 5 = MAINT_N1, page 1 = SEMI_AUTO)
 IF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage &lt;&gt; PrevActualPage THEN
@@ -47790,7 +47867,7 @@ instCycleSemiAuto(
     AbortCycle              := GVL_IHM.CycleSemiAuto.Cmd.BtnAbort,
     ResumeAfterFault        := GVL_IHM.CycleSemiAuto.Cmd.BtnResumeAfterFault,
     SelTarget               := GVL_IHM.M3Translation.Cmd.SelTarget,
-    SetDepthM               := GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M,
+    SetDepthM               := CycleSetDepthEffective_M,
     DepthStopMode           := GVL_IHM.CycleSemiAuto.Cfg.DepthStopMode,
     KoboldImmersed          := PRG_02_Acquisition.HwIn.Machine.M1_M2_KoboldBottomTouch_DI, // DI brut Kobold (fronts AX6/AX7) - convention a confirmer au banc
     LimitLegalReached       := GVL_IHM.Commun.LimitLegalReached,
@@ -47928,6 +48005,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.ForceStepRejected      := instCycleSemiAuto.ForceStepRejected;
     Data.SequenceState.ForceStepResult        := instCycleSemiAuto.ForceStepResult;
     Data.SequenceState.BottomTouchConfirmed   := instCycleSemiAuto.BottomTouched;
+    Data.SequenceState.BottomStopByKobold     := instCycleSemiAuto.BottomStopByKobold;
+    Data.SequenceState.BottomStopBySetpoint   := instCycleSemiAuto.BottomStopBySetpoint;
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
@@ -48019,6 +48098,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.ForceStepRejected      := FALSE;
     Data.SequenceState.ForceStepResult        := '';
     Data.SequenceState.BottomTouchConfirmed       := BottomPositionConfirmed;
+    Data.SequenceState.BottomStopByKobold         := FALSE;
+    Data.SequenceState.BottomStopBySetpoint       := FALSE;
     // Verrou descente treuil = GENERAL en MAINT (plus seulement pendant l'assist vidage) :
     // Si TglEnableWinchDescentLock_M3 est actif (défaut), descente M1/M2 interdite tant que le pont M3
     // n'est pas ARRETE STABLE a P1 (travail) ou a Maintenance. En transit / PV / P2 / Tremie -&gt; pas de paye de cable.
@@ -48086,6 +48167,8 @@ ELSE
     Data.SequenceState.ForceStepRejected       := FALSE;
     Data.SequenceState.ForceStepResult         := '';
     Data.SequenceState.BottomTouchConfirmed       := FALSE;
+    Data.SequenceState.BottomStopByKobold         := FALSE;
+    Data.SequenceState.BottomStopBySetpoint       := FALSE;
     Data.SequenceState.WinchDescentAuth_M3 := FALSE;
 END_IF;
 
@@ -52323,6 +52406,22 @@ Remplace le zeroage binaire instantane de l'ex-§2ter.
 . [LOC] Demande agregative coupure puissance</xhtml>
               </documentation>
             </variable>
+            <variable name="MaintenanceN2BrakeForceM1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [SAFE] Forçage frein M1 autorisé et protégé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MaintenanceN2BrakeForceM2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [SAFE] Forçage frein M2 autorisé et protégé</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchOutputCoupled">
               <type>
                 <BOOL />
@@ -52549,6 +52648,29 @@ M2SpeedContactor4 := instM2Sc4Protector.Cmd;
 // Frein recalculé APRÈS filtrage des relais de sens (pas de protecteur propre, cf. supra).
 M1BrakeCmd := M1RelayFwd OR M1RelayRev;
 M2BrakeCmd := M2RelayFwd OR M2RelayRev;
+
+// Desserrage freins M1/M2 uniquement en maintenance niveau 2.
+// Branche parallèle strictement bornée : MAINT_N2, chaîne AU fermée et puissance
+// engagée. Le desserrage seul est volontaire pour permettre une descente par
+// gravité ; les relais de sens, paliers, frein M3 et la chaîne nominale ne sont
+// pas modifiés. L'AU physique coupe l'énergie en amont.
+// Le bouton couplé est prioritaire sur les deux boutons individuels ; l'OR est
+// réalisé sur les commandes finales de frein, jamais sur les demandes amont.
+PowerCutOffReq := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff
+               OR PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff
+               OR PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;
+MaintenanceN2BrakeForceM1 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+    AND PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI
+    AND PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
+    AND (GVL_IHM.MaintenanceN2.Cmd.BtnBothBrakeRelease
+         OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease);
+MaintenanceN2BrakeForceM2 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+    AND PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI
+    AND PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
+    AND (GVL_IHM.MaintenanceN2.Cmd.BtnBothBrakeRelease
+         OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease);
+M1BrakeCmd := M1BrakeCmd OR MaintenanceN2BrakeForceM1;
+M2BrakeCmd := M2BrakeCmd OR MaintenanceN2BrakeForceM2;
 {endregion}
 
 {region "🔀 §2quinquies Concordance contacteurs M1/M2"}
@@ -53205,6 +53327,14 @@ geles pendant HomingLifecycle.Busy). Affichage seul, aucune decision machine ici
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Gel affichage position M2 actif</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleDepthLowerBound_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Borne profondeur cycle : legale et limites descentes M1/M2</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -53318,6 +53448,14 @@ IF instCfgPersistBridgeCommun.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
 
+// Une consigne hors borne est corrigée avant persistance et avant affichage IHM.
+// Les profondeurs étant négatives, MAX retient la limite la moins profonde.
+CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
+                              MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M,
+                                  _WinchM2CfgPersist.CfgCableLimitDescent_M));
+IF GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M &lt; CycleDepthLowerBound_M THEN
+    GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M := CycleDepthLowerBound_M;
+END_IF;
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
 IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
@@ -53740,7 +53878,10 @@ GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
-GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_03_Modes_Cycle.Data.SequenceState.BottomTouchConfirmed;
+// Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
+// pas être présenté comme un contact Kobold.
+GVL_IHM.CycleSemiAuto.State.KoboldContactFond      := PRG_03_Modes_Cycle.Data.SequenceState.BottomStopByKobold;
+GVL_IHM.CycleSemiAuto.State.PositionFondAtteinte   := PRG_03_Modes_Cycle.Data.SequenceState.BottomStopBySetpoint;
 GVL_IHM.CycleSemiAuto.State.KoboldContactorCmd     := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqKoboldMeasureEnable;
 GVL_IHM.CycleSemiAuto.State.LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached;
 GVL_IHM.CycleSemiAuto.State.LimitLegalDepth_M      := _CommunCfgPersist.LimitLegalDepthMinAllowed_M;
@@ -53776,6 +53917,7 @@ GVL_IHM.MaintenanceN2.State.ActiveForcing := GVL_IHM.MaintenanceN2.Cmd.BtnM1Asce
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM3Maintenance
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnBothBrakeRelease
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM3BrakeRelease;
 
 

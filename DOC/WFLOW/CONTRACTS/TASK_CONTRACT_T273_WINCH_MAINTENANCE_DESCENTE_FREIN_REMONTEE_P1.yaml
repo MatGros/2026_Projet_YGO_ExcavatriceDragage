@@ -1,0 +1,49 @@
+version: '1.0'
+task_id: T273
+type: REBUILD_ANALYSE
+title: Revoir cinématique Winch en Maintenance (Descente relâchement frein & Remontée synchro / fermée en P1)
+date: '2026-09-07T16:40:00+02:00'
+author: Antigravity
+
+context:
+  description: >
+    En mode Maintenance (MAINT_N1 / MAINT_N2) et lors des repositionnements opérateur,
+    la cinématique des treuils M1/M2 et de la benne doit être revue pour proposer :
+    1. Descente assistée par simple relâchement des freins (descente gravitaire / roue libre contrôlée)
+       sans forcer l'entraînement moteur ou avec cinématique spécifique.
+    2. Remontée synchronisée M1+M2 ou remontée benne fermée au Palier 1 (P1) pour sécuriser
+       le tambour, éviter le mou de câble et garantir le retour sécurisé en position haute.
+    3. Étude d'inhibition sélective ou totale de certains défauts non critiques en mode Maintenance
+       (ex. discordances d'écart M1/M2, défauts process de synchro, glissement, etc.) pour permettre
+       les manœuvres de dégagement et de réglage sans blocage intempestif, tout en préservant
+       les sécurités vitales (AU matériel, thermique freins, survitesse absolue).
+
+scope:
+  in_scope:
+    - Analyse de faisabilité et architecture de commande dans PRG_04_Treuils_Benne, FB_Winch, FB_Brake et FB_Bucket.
+    - Proposition d'une cinématique de descente sécurisée (ouverture frein contrôlée / commande sans survitesse).
+    - Proposition de remontée assistée synchro ou benne fermée bridée à P1 en mode Maintenance.
+    - Définition de la matrice d'inhibition sélective des défauts selon le niveau de maintenance (MAINT_N1 vs MAINT_N2).
+    - Définition des conditions de sécurité (gardes mou de câble, survitesse MecaA/MecaE, fin de course haut).
+    - Rédaction du dossier d'arbitrage et des spécifications associées avant implémentation code.
+  out_of_scope:
+    - Modifications directes du code ST sans validation préalable du dossier technique.
+    - Modification des cycles automatiques Semi-Auto (AX0..AX12).
+
+objectifs_testables:
+  - id: OBJ-01
+    description: Documenter la séquence de commande de relâchement de frein en descente maintenance et les gardes associées.
+    critere_succes: Fiche d'arbitrage rédigée avec chronogrammes et analyse des risques.
+  - id: OBJ-02
+    description: Définir la logique de sélection et de bridage à P1 pour la remontée synchro / benne fermée en maintenance.
+    critere_succes: Interface IHM / Automate spécifiée sans conflit avec l'arbitrage existant.
+  - id: OBJ-03
+    description: Établir la matrice d'inhibition des défauts en Maintenance (défauts masqués/inhibés vs sécurités dures maintenues).
+    critere_succes: Matrice claire identifiant chaque code d'erreur et son comportement en MAINT_N1 / MAINT_N2.
+  - id: OBJ-04
+    description: Valider la conformité avec les standards de sécurité machine (ISO 13849, AF01, AF10).
+    critere_succes: Validation formelle des sécurités positives (AU, freins à manque de courant).
+
+livrables:
+  - Contrat de tâche T273 et entrée TASKS.yaml.
+  - Dossier de proposition technique / architecture cinématique maintenance.

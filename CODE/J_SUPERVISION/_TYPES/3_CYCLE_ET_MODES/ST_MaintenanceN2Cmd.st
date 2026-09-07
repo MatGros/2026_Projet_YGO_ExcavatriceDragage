@@ -20,6 +20,7 @@ STRUCT
     // === Commandes Freins N2 Seuls (Vérification mécanique) ===
     BtnM1BrakeRelease    : BOOL; (* 🔓 Desserrage direct frein treuil M1 *)
     BtnM2BrakeRelease    : BOOL; (* 🔓 Desserrage direct frein treuil M2 *)
+    BtnBothBrakeRelease  : BOOL; (* 🔓 Desserrage direct freins M1 + M2 *)
     BtnM3BrakeRelease    : BOOL; (* 🔓 Desserrage direct frein translation M3 *)
 END_STRUCT
 END_TYPE

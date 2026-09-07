@@ -100,6 +100,8 @@ VAR
 
     // === ⚙️ VARIABLES LOCALES INTERNES ===
     PowerCutOffReq                   : BOOL; // . [LOC] Demande agregative coupure puissance
+    MaintenanceN2BrakeForceM1        : BOOL; // . [SAFE] Forçage frein M1 autorisé et protégé
+    MaintenanceN2BrakeForceM2        : BOOL; // . [SAFE] Forçage frein M2 autorisé et protégé
 
     // === 🔒 CONCORDANCE SORTIES TREUILS M1/M2 (§2ter) ===
     WinchOutputCoupled               : BOOL; // . [LOC] Treuils couples (synchro OU both) : arme instSyncContactorFinal
@@ -297,6 +299,29 @@ M2SpeedContactor4 := instM2Sc4Protector.Cmd;
 // Frein recalculé APRÈS filtrage des relais de sens (pas de protecteur propre, cf. supra).
 M1BrakeCmd := M1RelayFwd OR M1RelayRev;
 M2BrakeCmd := M2RelayFwd OR M2RelayRev;
+
+// Desserrage freins M1/M2 uniquement en maintenance niveau 2.
+// Branche parallèle strictement bornée : MAINT_N2, chaîne AU fermée et puissance
+// engagée. Le desserrage seul est volontaire pour permettre une descente par
+// gravité ; les relais de sens, paliers, frein M3 et la chaîne nominale ne sont
+// pas modifiés. L'AU physique coupe l'énergie en amont.
+// Le bouton couplé est prioritaire sur les deux boutons individuels ; l'OR est
+// réalisé sur les commandes finales de frein, jamais sur les demandes amont.
+PowerCutOffReq := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerCutOff
+               OR PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerCutOff
+               OR PRG_05_Translation.Data.TranslationFinalInterlockRequest.PowerCutOff;
+MaintenanceN2BrakeForceM1 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+    AND PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI
+    AND PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
+    AND (GVL_IHM.MaintenanceN2.Cmd.BtnBothBrakeRelease
+         OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease);
+MaintenanceN2BrakeForceM2 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+    AND PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI
+    AND PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
+    AND (GVL_IHM.MaintenanceN2.Cmd.BtnBothBrakeRelease
+         OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease);
+M1BrakeCmd := M1BrakeCmd OR MaintenanceN2BrakeForceM1;
+M2BrakeCmd := M2BrakeCmd OR MaintenanceN2BrakeForceM2;
 {endregion}
 
 {region "🔀 §2quinquies Concordance contacteurs M1/M2"}

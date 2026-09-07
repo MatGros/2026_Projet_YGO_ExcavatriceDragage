@@ -137,6 +137,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Desserrage direct frein treuil M2</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnBothBrakeRelease">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Desserrage direct freins M1 + M2</xhtml>
+              </documentation>
+            </variable>
             <variable name="BtnM3BrakeRelease">
               <type>
                 <BOOL />

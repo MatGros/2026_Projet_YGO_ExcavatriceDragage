@@ -31,7 +31,9 @@ STRUCT
     ForceStepAccepted   : BOOL;             // Impulsion preparation acceptee
     ForceStepRejected   : BOOL;             // Impulsion preparation refusee
     ForceStepResult     : STRING(120);      // Motif accepte/refuse
-    BottomTouchConfirmed        : BOOL;                    // Contact fond Kobold confirmé (manuel + bypass)
+    BottomTouchConfirmed        : BOOL;                    // Fond confirmé (Kobold ou consigne)
+    BottomStopByKobold          : BOOL;                    // Fond confirmé par contact Kobold
+    BottomStopBySetpoint        : BOOL;                    // Fond confirmé par limite de travail/consigne
     WinchDescentAuth_M3         : BOOL;                    // Autorisation positive descente treuil selon position M3 (P1/Maintenance) — PRG_04 §5
     ResumeAfterFaultAvailable : BOOL;     // Reprise AX_STAB disponible apres disparition de la cause
 END_STRUCT
