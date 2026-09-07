@@ -19,5 +19,6 @@ VAR_GLOBAL
     Commun  : ST_CommunHMI; (* 🌐 Signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
     HmiInitDone : BOOL;               (* 🚩 Indicateur d'initialisation IHM depuis PERSISTENT *)
     Permits : ST_PermitVisibilityHMI; (* Tableau lecture seule des permis canoniques, produit par PRG_07 *)
+    MaintenanceN2 : ST_MaintenanceN2HMI; (* 🛠️ Commandes manuelles et forçages en mode MAINT_N2 sous mot de passe *)
 END_VAR
 

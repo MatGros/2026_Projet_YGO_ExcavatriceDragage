@@ -583,6 +583,19 @@ GVL_IHM.CycleSemiAuto.State.DeadmanArmed           := PRG_02_Acquisition.Data.Jo
 // « joystick défléchi » est projeté à l'IHM.
 GVL_IHM.CycleSemiAuto.State.JoystickDeflected   := NOT PRG_02_Acquisition.Data.Joystick.AtNeutralXY;
 
+// ---------- §3h. État forçage Maintenance N2 ----------
+GVL_IHM.MaintenanceN2.State.Authorized    := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
+GVL_IHM.MaintenanceN2.State.ActiveForcing := GVL_IHM.MaintenanceN2.Cmd.BtnM1Ascent
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM1Descend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM2Ascent
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM2Descend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnBothAscent
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnBothDescend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM3BrakeRelease;
+
+
 instHmiBannerFormatter(
     Enable                := TRUE,
     SimulationModeActive  := GVL_Simulation.SimulationModeActive,

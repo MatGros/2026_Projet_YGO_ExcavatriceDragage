@@ -66,4 +66,15 @@ validation:
   validated_by: "..."
   validated_at: "..."
   notes: >
-    En attente du test simulation utilisateur (AC1/AC2) puis visa orchestrateur avant commit.
+    Sim OK (basculement 0->2 sans saut, BucketOpening_Pct temps reel). Code commite
+    5fe37cb0 sur backup/mes-septembre-20260902 (non pousse). En attente essais MES reels
+    ci-dessous puis visa orchestrateur.
+  mes_essais_a_faire:
+    - "E1 : basculement WinchSel 0->2 en MAINT, tambours a l arret -> M2PositionCorrected ne bouge pas (snapshot avant/apres)."
+    - "E2 : fin de jog benne unitaire M2 a l arret -> aucun saut differe de M2PositionCorrected sur bande stable."
+    - "E3 : benne en position intermediaire (mi-course) -> M2PositionCorrectedValid = FALSE, bargraphe masque/grise cote IHM."
+    - "E4 : franchissement FRANC ferme->ouvert -> un pas de recalage attendu (la benne a parcouru sa course, tambour M2 a tourne) - a confirmer non genant."
+    - "E5 : jog M2 reel (Y defleche) -> M2PositionCorrected suit le deplacement M2."
+    - "E6 : benne fermee qui derive (eau/charge) au-dela de +/-1 m -> passe intermediaire, Valid=FALSE ; retour en bande -> Valid=TRUE sans saut ; OffsetStateMismatchWarn si ecart brut > OffsetCloseM + CoherenceLimitM."
+    - "E7 : levage couple benne fermee (ClassCanRun=FALSE) -> IsClosed maintenu, Valid=TRUE, M2PositionCorrected suit le levage."
+    - "E8 : non-regression -> Position_M et BucketOpening_Pct temps reel inchanges ; aucun faux defaut SYNC/MecaE/FdC au basculement de mode."
