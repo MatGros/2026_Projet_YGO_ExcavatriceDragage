@@ -1,0 +1,70 @@
+contract:
+  task_id: T263
+  criticality: C3
+  strategy: patch
+  objective: >
+    Étendre de 2 s à 4 s le maintien de l'inhibition de la surveillance de
+    synchronisme après la fin d'une action benne, en réutilisant l'unique TOF
+    existant et sans toucher au contrôle final des sorties physiques.
+  acceptance:
+    - id: AC1
+      statement: "Une seule instance BucketActivityHold de type TOF existe dans PRG_04 et son PT vaut T#4s."
+      verified_by: "revue ST et recherche exhaustive des temporisations BucketActivityHold"
+    - id: AC2
+      statement: "Le gate instWinchSync.Enable reste FALSE pendant l'activité benne et pendant 4 s après la retombée de toutes les commandes benne."
+      verified_by: "test scan-par-scan avec front de retombée et mesure de la fenêtre 4 s"
+    - id: AC3
+      statement: "CrossCheckEnable des deux FB_Safety_Winch reste piloté par SyncOperationPermit et aucun bypass de sécurité n'est ajouté."
+      verified_by: "revue PRG_04 et test de non-régression MecaE/AU/FDC"
+    - id: AC4
+      statement: "PRG_06.instSyncContactorFinal conserve Enable=TRUE et son comportement de surveillance des discordances physiques."
+      verified_by: "diff ciblé PRG_06 et test de concordance sorties M1/M2"
+    - id: AC5
+      statement: "Pour chaque fichier ST autorisé, le nom de fichier est identique au nom de POU et le suffixe est égal au langage généré dans le bundle."
+      verified_by: "gates structurels et revue du bundle"
+    - id: AC6
+      statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste sans erreur."
+      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report"
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE_XML/M_MAIN/PRG_04_Treuils_Benne.xml
+      - CODE_XML/CODE_Bundle.xml
+      - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_SynchroPilotageBenne_20260907.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T263_BUCKET_SYNC_HOLD_4S.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/H_TREUILS_BENNE/FB_SyncDeviation.st
+      - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+  conservation:
+    must_survive:
+      - "Les sources existantes de BucketActivityHold et l'inhibition amont SyncOperationPermit."
+      - "La purge des latches FB_WinchSync lorsque Enable=FALSE."
+      - "La surveillance finale PRG_06 des discordances physiques."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: >
+    Si le défaut persiste après 4 s ou provient de PRG_06, arrêter l'implémentation
+    et poursuivre le diagnostic sans ajouter de temporisation supplémentaire.
+status: PENDING
+execution:
+  executed_by: Codex
+  completed_at: ''
+  status: PENDING
+  summary: >
+    Patch préparé pour passer l'unique maintien d'inhibition synchro benne de 2 s à 4 s.
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ''
+  validated_at: ''
+  notes: >
+    Validation humaine et essai sur machine requis avant exploitation réelle.

@@ -55,6 +55,8 @@ IF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage <> PrevActualPage THEN
     PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
     IF PrevActualPage = 5 THEN
         GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;
+    ELSIF PrevActualPage = 4 THEN
+        GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N2;
     ELSIF PrevActualPage = 1 THEN
         GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
     END_IF;
@@ -327,8 +329,8 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
     Data.SequenceState.WinchDescentAuth_M3 :=
         NOT GVL_IHM.Commun.Cfg.TglEnableWinchDescentLock_M3
-        OR PRG_05_Translation.Data.M3_AtP1Stable
-        OR PRG_05_Translation.Data.M3_AtMaintenanceStable
+        OR GVL_IHM.M3Translation.State.AtP1
+        OR GVL_IHM.M3Translation.State.AtMaintenance
         OR GVL_IHM.M3Translation.Bypass.LimitSwitch
         OR GVL_IHM.M3Translation.Bypass.Global;
 
@@ -421,8 +423,8 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     // Le mot capteurs reste une information de zone et n'autorise pas la descente.
     Data.SequenceState.WinchDescentAuth_M3     :=
         NOT GVL_IHM.Commun.Cfg.TglEnableWinchDescentLock_M3
-        OR PRG_05_Translation.Data.M3_AtP1Stable
-        OR PRG_05_Translation.Data.M3_AtMaintenanceStable
+        OR GVL_IHM.M3Translation.State.AtP1
+        OR GVL_IHM.M3Translation.State.AtMaintenance
         OR GVL_IHM.M3Translation.Bypass.LimitSwitch
         OR GVL_IHM.M3Translation.Bypass.Global;
 

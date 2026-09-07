@@ -4,6 +4,15 @@ Trace le programme CODESYS testé/validé à un instant donné, pour retrouver q
 
 Une entrée par jalon significatif — pas besoin de logguer chaque sous-version mineure. Lignes courtes (~70 caractères), style `·` compact.
 
+### `MES_055_SEANCE_20260907` — 2026-09-07 — fiabilisation benne, synchro IHM/Modes, bypass AU boot & FdC haut
+- **Branche** : `backup/mes-septembre-20260902`.
+- **Faits marquants** :
+  - Coupure immédiate de `instWinchSync` et extension `BucketActivityHold` à 4s sur mouvement benne (MES-051).
+  - Renommage registres pages IHM (`StatusInt01_ActualPage`) et sélection automatique des modes sur front de page 1/5 (MES-052, MES-055).
+  - Initialisation au boot de `BypassAuPowerCutOff := TRUE` (MES-053) et contrat associé `T264` (retrait livraison).
+  - Revert conservateur et encadrement contractuel `T268` sur le capteur FdC haut treuils (MES-054).
+- **Registre MES** : Entrée [MES-051 à MES-055](WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService_20260907.md).
+
 ### `MES_048_TRACE_WINCH_PLEINE_VITESSE` — 2026-09-05 — validation descente/montée synchro 100% vitesse à vide
 - **Branche** : `backup/mes-septembre-20260902` (HEAD `35fe44ff`).
 - **Preuve terrain** : `Suivi_Winch_D_M_PleineVitesse_Avide_20260905_31.trace` (45.8 s / 459 scans @ 100 ms).

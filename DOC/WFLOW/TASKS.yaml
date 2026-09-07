@@ -5929,11 +5929,11 @@ tasks:
 
 - id: T259
   parent_id: ''
-  statut: ⬜
+  statut: ⏳
   criticite: C2
   domaine: MAINTENANCE_N2_IHM
-  agent: Antigravity
-  date: '2026-09-07T00:56:00+02:00'
+  agent: Codex
+  date: '2026-09-07T15:30:00+02:00'
   titre: Forçage parallèle (OR //) sorties hardware en MAINT_N2 sous mot de passe IHM
   contexte: 'Besoins de décoinçage d urgence et test unitaire des contacteurs/freins en maintenance experte sans toucher ni altérer la chaîne de commande nominale.'
   description: 'Ajout de commandes IHM dédiées dans GVL_IHM.MaintenanceN2 et greffe en dérivation parallèle (OR pur //) sur les sorties de PRG_06_Outputs (Output_DQ := Output_Nominal OR Forcage_N2) pour M1/M2/Both Montée/Descente Palier 1 et Freins M1/M2/M3 seuls, sous condition Auth.Mode = MAINT_N2 et mot de passe N2 actif.'
@@ -6043,4 +6043,55 @@ tasks:
   - 'Aucun bypass, aucune modification des sorties physiques et aucune suppression de la surveillance FdC.'
   - 'G497, bundle PLCopenXML, G200 et gates Palier C sont exécutés; test CODESYS sans bypass requis avant machine réelle.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T269_MECAD_BUCKET_TOP.yaml
+  bloque_par: []
+
+- id: T270
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: CYCLE_AUTO_EXTRACTION
+  agent: Codex
+  date: '2026-09-07T14:45:00+02:00'
+  titre: Remontée en charge AX12 au palier 5
+  contexte: 'Demande opérateur : la remontée en cycle automatique doit utiliser P5 sur AX12. AX10 et AX11 restent inchangés.'
+  description: 'Modifier uniquement CST_StepLoaded de FB_CycleSemiAuto; les plafonds de sécurité aval PRG_04 restent prioritaires.'
+  objectifs:
+  - 'AX12 commande P5 par défaut.'
+  - 'AX9 reste P1 et AX10/AX11 sont inchangés.'
+  - 'Les conditions AX4..AX8, FdC, AU et interlocks ne sont pas modifiées.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T270_AX12_LOADED_ASCENT_P5.yaml
+  bloque_par: []
+
+- id: T271
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: CYCLE_AUTO_EXTRACTION
+  agent: Codex
+  date: '2026-09-07T15:00:00+02:00'
+  titre: RaiseOffBottom à zéro : passage direct fermeture benne AX10
+  contexte: 'La configuration GVL_IHM.CycleSemiAuto.Cfg.RaiseOffBottom_M = 0 ne doit pas déclencher une remontée interne de 0,5 m; le cycle doit fermer directement la benne après AX8 stabilisé.'
+  description: 'Conserver AX9 uniquement lorsque la distance configurée est strictement positive. Après AX8 et arrêt confirmé, la valeur zéro passe à AX10 et affiche le message fermeture benne.'
+  objectifs:
+  - 'Cfg = 0 : AX8 stabilisé -> AX10_CLOSE_BUCKET sans AX9.'
+  - 'Cfg > 0 : comportement AX9 existant conservé.'
+  - 'Conditions de plongée AX4..AX8 et sécurités inchangées.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T271_RAISE_OFF_BOTTOM_ZERO_DIRECT_AX10.yaml
+  bloque_par: []
+
+- id: T272
+  parent_id: ''
+  statut: ⏳
+  criticite: C3
+  domaine: TREUILS_BENNE_TRANSLATION
+  agent: Codex
+  date: '2026-09-07T15:20:00+02:00'
+  titre: Verrou descente M3 basé sur State.AtMaintenance/AtP1
+  contexte: 'Le verrou de descente ne doit pas utiliser les entrées brutes de position. La source consommée est l état validé GVL_IHM.M3Translation.State.'
+  description: 'Remplacer les faits internes PRG_05 utilisés dans WinchDescentAuth_M3 par State.AtP1 et State.AtMaintenance, sans modifier les bypass ni les sorties physiques.'
+  objectifs:
+  - 'Verrou actif et sans bypass : transit/PV/P2/Trémie interdit; P1 ou Maintenance validé autorise.'
+  - 'Aucun M3_PosMaintenance_DI ou M3_PosP1_DI dans le calcul du permis.'
+  - 'Bundle et G200 passés.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T272_M3_DESCENT_STATE_GATE.yaml
   bloque_par: []
