@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════════════════════════ *)
 TYPE ST_ModesCmd :
 STRUCT
-    SelMode            : E_Mode := E_Mode.MAINT_N1; (* 🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM () *)
+    SelMode            : E_Mode := E_Mode.SEMI_AUTO; (* 🖥️ Mode par défaut au boot PLC ; accès MAINT filtré côté IHM *)
     BtnFaultReset      : BOOL;   (* 🔔 Acquittement défauts/alarmes domaine sécurité/métier — jamais Modes/Cycle *)
     BtnModeReset       : BOOL;   (* 🔁 Acquittement défaut FB_Modes uniquement () *)
     (* Cycle de référencement machine -> GVL_IHM.CycleMachineHoming (ST_CycleMachineHomingHMI), plus dans Modes. *)

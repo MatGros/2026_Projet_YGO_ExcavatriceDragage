@@ -110,6 +110,12 @@ VAR_GLOBAL PERSISTENT RETAIN
     // Reprise odométrie après reboot — recopie continue (PRG_05_Translation).
     _TranslationPosEstimated_M          : REAL := 0.0;   // Dernière position estimée connue (m)
     _TranslationPosEstimatedInitialized : BOOL := FALSE;  // TRUE dès la première calibration sur capteur
+    // Jetons AtPosition M3 retenus pour reprise contrôlée après redémarrage.
+    _TranslationAtTremiePersisted      : BOOL := FALSE;
+    _TranslationAtPVPersisted           : BOOL := FALSE;
+    _TranslationAtP2Persisted           : BOOL := FALSE;
+    _TranslationAtP1Persisted           : BOOL := FALSE;
+    _TranslationAtMaintenancePersisted  : BOOL := FALSE;
 
     // 🕹️ JOYSTICK
     _JoystickNeutralX : INT := 5000; // Point neutre axe X (0..10000)

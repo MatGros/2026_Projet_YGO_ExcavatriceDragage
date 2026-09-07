@@ -41,6 +41,7 @@ VAR
     CycleInitPositionOk           : BOOL;   // . [LOC] Posture de départ cycle SEMI_AUTO : chariot P1 + treuils au capteur haut (± CST_CycleInitWindowM)
     CycleWinchesAtTopOk           : BOOL;   // . [LOC] Treuils M1 ET M2 dans la fenêtre FDC logiciel haut (± CST_CycleInitWindowM) - surveillé en AX2
     PrevActualPage                : INT := 0; // . [LOC] Mémoire page IHM précédente (détection front changement de page)
+    ModeBootInitialized            : BOOL; // . [LOC] Applique SEMI_AUTO une seule fois au démarrage PLC
     CycleDepthLowerBound_M        : REAL; // . [LOC] Borne sûre commune : légale et limites descentes M1/M2
     CycleSetDepthEffective_M      : REAL; // . [LOC] Consigne cycle bornée avant consommation par FB_CycleSemiAuto
 END_VAR
@@ -60,7 +61,14 @@ CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
 CycleSetDepthEffective_M := MAX(GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M, CycleDepthLowerBound_M);
 
 // 📄 Événement changement de page IHM : sélection automatique du mode (page 5 = MAINT_N1, page 1 = SEMI_AUTO)
-IF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage <> PrevActualPage THEN
+IF NOT ModeBootInitialized THEN
+    // Sécurité d'exploitation : après boot PLC, le mode demandé repart en
+    // SEMI_AUTO. La page affichée est mémorisée comme référence afin qu'une
+    // page IHM restaurée ne force pas MAINT_N1 au premier scan.
+    ModeBootInitialized := TRUE;
+    GVL_IHM.Modes.Cmd.SelMode := E_Mode.SEMI_AUTO;
+    PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
+ELSIF GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage <> PrevActualPage THEN
     PrevActualPage := GVL_IHM.LocalIHM.StatusBlock.StatusInt01_ActualPage;
     IF PrevActualPage = 5 THEN
         GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N1;

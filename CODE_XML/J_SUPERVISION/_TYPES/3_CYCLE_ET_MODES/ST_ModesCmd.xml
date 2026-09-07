@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.520055" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.520055">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T16:47:50.463189" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T16:47:50.463189">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -31,10 +31,10 @@
                 <derived name="E_Mode" />
               </type>
               <initialValue>
-                <simpleValue value="E_Mode.MAINT_N1" />
+                <simpleValue value="E_Mode.SEMI_AUTO" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Demande de changement de mode de marche — accès N2 filtré côté IHM ()</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🖥️ Mode par défaut au boot PLC ; accès MAINT filtré côté IHM</xhtml>
               </documentation>
             </variable>
             <variable name="BtnFaultReset">
