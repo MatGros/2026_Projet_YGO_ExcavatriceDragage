@@ -1,0 +1,67 @@
+contract:
+  task_id: T263
+  criticality: C3
+  strategy: patch
+  objective: >
+    Publier dans GVL_IHM une image de visualisation lecture seule des E/S hardware,
+    sous IOHW (libellé PascalCase recommandé IoHw), avec deux sous-structures In et Out.
+    L'image doit couvrir les 67 voies nommées du mapping Device_IO_20260831.csv,
+    les cinq modules VBus, les équipements EtherCAT (maître, COD1, COD2, AC600)
+    et CANopen (maître, JOY1), sans ajouter aucune écriture depuis l'IHM.
+  acceptance:
+    - id: AC1
+      statement: "GVL_IHM contient IoHw avec In et Out, documentés comme observation PLC→IHM uniquement."
+      verified_by: "Revue GVL_IHM.st et DUT associés."
+    - id: AC2
+      statement: "IoHw.In publie les voies d'entrée nommées, états device/bus et états des 5 modules VBus."
+      verified_by: "Comparaison exhaustive avec Device_IO_20260831.csv et ST_HardwareImage."
+    - id: AC3
+      statement: "IoHw.Out publie les valeurs de sortie effectivement produites/observées, sans port de commande IHM."
+      verified_by: "G200 et recherche des producteurs uniques; aucun champ IoHw.Out consommé comme commande. PRG_06_Outputs reste le POU producteur ST pur des sorties finales."
+    - id: AC4
+      statement: "Les voies EtherCAT et CANopen sont séparées et identifiées par équipement; aucune voie non documentée n'est renommée silencieusement."
+      verified_by: "Revue CSV, FB_Diag_Ethercat, FB_Diag_CanOpen et DUT hardware."
+    - id: AC5
+      statement: "Les champs réservés/non câblés restent explicitement identifiés et ne sont pas présentés comme des états valides."
+      verified_by: "Revue des voies VH_0800END bit5 et VH_0808ETP bit5."
+    - id: AC6
+      statement: "GVL_IHM.Commun, LocalIHM et heartbeat restent fonctionnellement inchangés."
+      verified_by: "Diff ciblé et gates."
+    - id: AC7
+      statement: "Le nom de fichier est égal au nom de POU."
+      verified_by: "Revue des fichiers PRG_02_Acquisition.st et PRG_06_Outputs.st."
+    - id: AC8
+      statement: "Le suffixe est égal au langage du bundle."
+      verified_by: "Revue du bundle PLCopenXML et des sources ST."
+  scope:
+    allowed:
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_IoHw.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_IoHw_In.st
+      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_IoHw_Out.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE_XML/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T263_IHM_IOHW_READONLY.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Toute écriture IHM vers une sortie physique
+      - Toute modification de la chaîne AU ou des interlocks
+  source_of_truth:
+    - TOOLS/AGENT_WORKFLOW/config/Device_IO_20260831.csv
+    - CODE/J_SUPERVISION/_TYPES/4_JOYSTICK_ACQUISITION/ST_HardwareImage.st
+    - CODE/J_SUPERVISION/_TYPES/6_DIAG_ET_CHAINES/ST_IOModuleDiag.st
+    - CODE/C_DIAG_RESEAUX/FB_Diag_Ethercat.st
+    - CODE/C_DIAG_RESEAUX/FB_Diag_CanOpen.st
+  implementation_constraints:
+    - "PRG_02_Acquisition.st reste le producteur ST pur des images d'entrée et diagnostics acquisition."
+    - "PRG_06_Outputs.st reste le producteur ST pur des sorties finales; IoHw.Out n'est jamais une entrée de commande."
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  design_decision:
+    - "IOHW est conservé comme libellé demandé; les identifiants ST suivent PascalCase: IoHw, In, Out."
+    - "Out signifie image observée des sorties produites, pas une interface de commande."
+    - "Les canaux bruts réservés/non câblés sont exposés avec un statut explicite, jamais comme une mesure sûre."

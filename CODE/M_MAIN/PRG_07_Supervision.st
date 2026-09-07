@@ -466,6 +466,52 @@ GVL_IHM.Emergency.State.ArmingBusy  := PRG_06_Outputs.EmergencyState.ArmingBusy;
 GVL_IHM.Emergency.State.MaintainA_Cmd := PRG_06_Outputs.PowerKeepAliveACmd;
 GVL_IHM.Emergency.State.MaintainB_Cmd := PRG_06_Outputs.PowerKeepAliveBCmd;
 GVL_IHM.Emergency.State.ArmPulse_Cmd  := PRG_06_Outputs.EmergencyArmingCmd;
+
+// =======================================================================
+// 👁️ IOHW — miroir lecture seule pour visualisation IHM
+// -----------------------------------------------------------------------
+// Producteur unique de l'image IHM : PRG_07 recopie les images déjà produites
+// par PRG_02/PRG_06. Aucun champ GVL_IHM.IoHw n'est consommé comme commande.
+// Les deux voies réservées/non documentées restent visibles explicitement.
+// =======================================================================
+GVL_IHM.IoHw.In.Hardware := PRG_02_Acquisition.HwReal;
+GVL_IHM.IoHw.In.Network := PRG_02_Acquisition.Data.Network;
+GVL_IHM.IoHw.In.InputModules := PRG_02_Acquisition.Data.InputModules;
+GVL_IHM.IoHw.In.DataValid := PRG_02_Acquisition.Data.DataValid;
+GVL_IHM.IoHw.In.COD1_AccValue := COD1_AccValue;
+GVL_IHM.IoHw.In.COD2_AccValue := COD2_AccValue;
+GVL_IHM.IoHw.In.JoyAna3Raw := joyANA3;
+GVL_IHM.IoHw.In.JoyAna4Raw := joyANA4;
+GVL_IHM.IoHw.In.Vh0800EndBit05Reserved := FALSE;
+
+GVL_IHM.IoHw.Out.Logical := PRG_06_Outputs.Data;
+GVL_IHM.IoHw.Out.M1_RelayAscent_DQ := M1_RelayAscent_DQ;
+GVL_IHM.IoHw.Out.M1_RelayDescent_DQ := M1_RelayDescent_DQ;
+GVL_IHM.IoHw.Out.M2_RelayAscent_Close_DQ := M2_RelayAscent_Close_DQ;
+GVL_IHM.IoHw.Out.M2_RelayDescent_Open_DQ := M2_RelayDescent_Open_DQ;
+GVL_IHM.IoHw.Out.M1_SpeedContactor_1_DQ := M1_SpeedContactor_1_DQ;
+GVL_IHM.IoHw.Out.M1_SpeedContactor_2_DQ := M1_SpeedContactor_2_DQ;
+GVL_IHM.IoHw.Out.M1_SpeedContactor_3_DQ := M1_SpeedContactor_3_DQ;
+GVL_IHM.IoHw.Out.M1_SpeedContactor_4_DQ := M1_SpeedContactor_4_DQ;
+GVL_IHM.IoHw.Out.M2_SpeedContactor_1_DQ := M2_SpeedContactor_1_DQ;
+GVL_IHM.IoHw.Out.M2_SpeedContactor_2_DQ := M2_SpeedContactor_2_DQ;
+GVL_IHM.IoHw.Out.M2_SpeedContactor_3_DQ := M2_SpeedContactor_3_DQ;
+GVL_IHM.IoHw.Out.M2_SpeedContactor_4_DQ := M2_SpeedContactor_4_DQ;
+GVL_IHM.IoHw.Out.M1_BrakeRelease_RQ := M1_BrakeRelease_RQ;
+GVL_IHM.IoHw.Out.M2_BrakeRelease_RQ := M2_BrakeRelease_RQ;
+GVL_IHM.IoHw.Out.M3_BrakeRelease_RQ := M3_BrakeRelease_RQ;
+GVL_IHM.IoHw.Out.M1_M2_KoboldMeasureEnable_DQ := M1_M2_KoboldMeasureEnable_DQ;
+GVL_IHM.IoHw.Out.EmergencyArming_RQ := EmergencyArming_RQ;
+GVL_IHM.IoHw.Out.PowerKeepAlive_A_RQ := PowerKeepAlive_A_RQ;
+GVL_IHM.IoHw.Out.PowerKeepAlive_B_RQ := PowerKeepAlive_B_RQ;
+GVL_IHM.IoHw.Out.COD1_PresettTrigCmd := COD1_PresettTrigCmd;
+GVL_IHM.IoHw.Out.COD1_CodeSeqTrigCmd := COD1_CodeSeqTrigCmd;
+GVL_IHM.IoHw.Out.COD1_PresetValue := COD1_PresetValue;
+GVL_IHM.IoHw.Out.COD2_PresettTrigCmd := COD2_PresettTrigCmd;
+GVL_IHM.IoHw.Out.COD2_CodeSeqTrigCmd := COD2_CodeSeqTrigCmd;
+GVL_IHM.IoHw.Out.COD2_PresetValue := COD2_PresetValue;
+GVL_IHM.IoHw.Out.M3_CommandWord := M3_CommandWord;
+GVL_IHM.IoHw.Out.M3_SetpointFrequencyHz := M3_SetpointFrequencyHz;
 GVL_IHM.Emergency.State.Diag := PRG_06_Outputs.EmergencyDiag;
 // États publics FB AU (Ready/Done/Fault/OperatorMessage) — miroir Status du FB
 // (produits par PRG_06). Busy non exposé : redondant avec ArmingBusy (déjà câblé).

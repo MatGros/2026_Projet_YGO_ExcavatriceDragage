@@ -7538,6 +7538,316 @@ Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_IoHw">
+        <baseType>
+          <struct>
+            <variable name="In">
+              <type>
+                <derived name="ST_IoHw_In" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées, états bus et diagnostics hardware</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Out">
+              <type>
+                <derived name="ST_IoHw_Out" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sorties produites observées, pas un port de commande</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>29fa0c3a-9059-5150-9a4e-2ec34a58caea</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_IoHw — Image I/O hardware lecture seule publiée pour l'IHM
+   -----------------------------------------------------------------------
+   IOHW demandé par l'IHM, identifiants ST conformes PascalCase : IoHw.
+   In et Out sont deux images PLC→IHM. Aucun accès IHM n'est utilisé comme
+   écriture vers une E/S physique.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_IoHw_In">
+        <baseType>
+          <struct>
+            <variable name="Hardware">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées physiques normalisées (Winch/Translation/Operator/Machine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Network">
+              <type>
+                <derived name="ST_AcquisitionNetworkDiagnostics" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT + CANopen + esclaves</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InputModules">
+              <type>
+                <derived name="ST_IOModuleDiag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">5 cartes VBus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DataValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Scan acquisition valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_AccValue">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT COD1 : valeur accélération brute (voie %IW7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_AccValue">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT COD2 : valeur accélération brute (voie %IW103)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyAna3Raw">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CANopen JOY1 : entrée analogique 3 brute</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyAna4Raw">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CANopen JOY1 : entrée analogique 4 brute</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndBit05Reserved">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0800END bit 5 : voie présente, fonction non documentée</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5880fb51-cb52-5f74-a58f-5a6f1b225ee9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_IoHw_In — Image exhaustive des entrées hardware pour visualisation IHM
+   -----------------------------------------------------------------------
+   Producteur : PRG_07_Supervision (recopie de PRG_02_Acquisition).
+   Rôle : observation PLC→IHM uniquement. Aucun champ n'est une commande.
+   Les images Hardware/Network/Modules reprennent les sources qualifiées;
+   les champs Raw complètent les voies présentes dans Device_IO_20260831.csv.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_IoHw_Out">
+        <baseType>
+          <struct>
+            <variable name="Logical">
+              <type>
+                <derived name="ST_OutputsInterPrg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commandes finales logiques effectivement produites</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayAscent_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Local_Digital_IO — sorties relais direction M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayDescent_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayAscent_Close_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayDescent_Open_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_1_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0808ETP — contacteurs de vitesse M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SpeedContactor_2_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_3_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_4_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_1_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_2_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_3_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_4_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0008ER — freins et mesure Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_M2_KoboldMeasureEnable_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyArming_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0008ER_1 — réarmement AU et maintien puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAlive_A_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PowerKeepAlive_B_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="COD1_PresettTrigCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT — PDO de sortie codeurs COD1/COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_CodeSeqTrigCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="COD1_PresetValue">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="COD2_PresettTrigCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="COD2_CodeSeqTrigCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="COD2_PresetValue">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="M3_CommandWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT — PDO de sortie variateur AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_SetpointFrequencyHz">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>132caa91-53b4-5991-89f7-649c12866a2c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_IoHw_Out — Image exhaustive des sorties hardware pour visualisation IHM
+   -----------------------------------------------------------------------
+   Producteur : PRG_07_Supervision (recopie de PRG_06/PRG_02).
+   Rôle : observation PLC→IHM uniquement. Ces champs ne sont jamais des
+   consignes écrites par l'IHM et ne constituent pas un retour électrique.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="ST_JoystickChecklist">
         <baseType>
           <struct>
@@ -22026,7 +22336,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation arret fond touche (2s en AX8)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation arret fond touche (500ms en AX8)</xhtml>
               </documentation>
             </variable>
             <variable name="RetryJoyReleaseTimer">
@@ -22305,7 +22615,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#2s0ms" />
+                <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation arret apres contact fond</xhtml>
@@ -22405,7 +22715,7 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#750ms" />
+                <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Purge redemarrage apres fermeture benne</xhtml>
@@ -53179,6 +53489,52 @@ GVL_IHM.Emergency.State.ArmingBusy  := PRG_06_Outputs.EmergencyState.ArmingBusy;
 GVL_IHM.Emergency.State.MaintainA_Cmd := PRG_06_Outputs.PowerKeepAliveACmd;
 GVL_IHM.Emergency.State.MaintainB_Cmd := PRG_06_Outputs.PowerKeepAliveBCmd;
 GVL_IHM.Emergency.State.ArmPulse_Cmd  := PRG_06_Outputs.EmergencyArmingCmd;
+
+// =======================================================================
+// 👁️ IOHW — miroir lecture seule pour visualisation IHM
+// -----------------------------------------------------------------------
+// Producteur unique de l'image IHM : PRG_07 recopie les images déjà produites
+// par PRG_02/PRG_06. Aucun champ GVL_IHM.IoHw n'est consommé comme commande.
+// Les deux voies réservées/non documentées restent visibles explicitement.
+// =======================================================================
+GVL_IHM.IoHw.In.Hardware := PRG_02_Acquisition.HwReal;
+GVL_IHM.IoHw.In.Network := PRG_02_Acquisition.Data.Network;
+GVL_IHM.IoHw.In.InputModules := PRG_02_Acquisition.Data.InputModules;
+GVL_IHM.IoHw.In.DataValid := PRG_02_Acquisition.Data.DataValid;
+GVL_IHM.IoHw.In.COD1_AccValue := COD1_AccValue;
+GVL_IHM.IoHw.In.COD2_AccValue := COD2_AccValue;
+GVL_IHM.IoHw.In.JoyAna3Raw := joyANA3;
+GVL_IHM.IoHw.In.JoyAna4Raw := joyANA4;
+GVL_IHM.IoHw.In.Vh0800EndBit05Reserved := FALSE;
+
+GVL_IHM.IoHw.Out.Logical := PRG_06_Outputs.Data;
+GVL_IHM.IoHw.Out.M1_RelayAscent_DQ := M1_RelayAscent_DQ;
+GVL_IHM.IoHw.Out.M1_RelayDescent_DQ := M1_RelayDescent_DQ;
+GVL_IHM.IoHw.Out.M2_RelayAscent_Close_DQ := M2_RelayAscent_Close_DQ;
+GVL_IHM.IoHw.Out.M2_RelayDescent_Open_DQ := M2_RelayDescent_Open_DQ;
+GVL_IHM.IoHw.Out.M1_SpeedContactor_1_DQ := M1_SpeedContactor_1_DQ;
+GVL_IHM.IoHw.Out.M1_SpeedContactor_2_DQ := M1_SpeedContactor_2_DQ;
+GVL_IHM.IoHw.Out.M1_SpeedContactor_3_DQ := M1_SpeedContactor_3_DQ;
+GVL_IHM.IoHw.Out.M1_SpeedContactor_4_DQ := M1_SpeedContactor_4_DQ;
+GVL_IHM.IoHw.Out.M2_SpeedContactor_1_DQ := M2_SpeedContactor_1_DQ;
+GVL_IHM.IoHw.Out.M2_SpeedContactor_2_DQ := M2_SpeedContactor_2_DQ;
+GVL_IHM.IoHw.Out.M2_SpeedContactor_3_DQ := M2_SpeedContactor_3_DQ;
+GVL_IHM.IoHw.Out.M2_SpeedContactor_4_DQ := M2_SpeedContactor_4_DQ;
+GVL_IHM.IoHw.Out.M1_BrakeRelease_RQ := M1_BrakeRelease_RQ;
+GVL_IHM.IoHw.Out.M2_BrakeRelease_RQ := M2_BrakeRelease_RQ;
+GVL_IHM.IoHw.Out.M3_BrakeRelease_RQ := M3_BrakeRelease_RQ;
+GVL_IHM.IoHw.Out.M1_M2_KoboldMeasureEnable_DQ := M1_M2_KoboldMeasureEnable_DQ;
+GVL_IHM.IoHw.Out.EmergencyArming_RQ := EmergencyArming_RQ;
+GVL_IHM.IoHw.Out.PowerKeepAlive_A_RQ := PowerKeepAlive_A_RQ;
+GVL_IHM.IoHw.Out.PowerKeepAlive_B_RQ := PowerKeepAlive_B_RQ;
+GVL_IHM.IoHw.Out.COD1_PresettTrigCmd := COD1_PresettTrigCmd;
+GVL_IHM.IoHw.Out.COD1_CodeSeqTrigCmd := COD1_CodeSeqTrigCmd;
+GVL_IHM.IoHw.Out.COD1_PresetValue := COD1_PresetValue;
+GVL_IHM.IoHw.Out.COD2_PresettTrigCmd := COD2_PresettTrigCmd;
+GVL_IHM.IoHw.Out.COD2_CodeSeqTrigCmd := COD2_CodeSeqTrigCmd;
+GVL_IHM.IoHw.Out.COD2_PresetValue := COD2_PresetValue;
+GVL_IHM.IoHw.Out.M3_CommandWord := M3_CommandWord;
+GVL_IHM.IoHw.Out.M3_SetpointFrequencyHz := M3_SetpointFrequencyHz;
 GVL_IHM.Emergency.State.Diag := PRG_06_Outputs.EmergencyDiag;
 // États publics FB AU (Ready/Done/Fault/OperatorMessage) — miroir Status du FB
 // (produits par PRG_06). Busy non exposé : redondant avec ArmingBusy (déjà câblé).
@@ -53862,6 +54218,14 @@ arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)</xhtml>
           </type>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Blocs cycliques IHM local : CtrlBlock + StatusBlock</xhtml>
+          </documentation>
+        </variable>
+        <variable name="IoHw">
+          <type>
+            <derived name="ST_IoHw" />
+          </type>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">👁️ IOHW lecture seule : In/Out hardware, EtherCAT, CANopen et modules VBus</xhtml>
           </documentation>
         </variable>
         <variable name="HmiInitDone">
@@ -54743,6 +55107,9 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
               <Object Name="ST_BypassSync" ObjectId="f65a7185-61a7-56a0-8f9e-37d0e97f5130" />
               <Object Name="ST_CommunCfg" ObjectId="a78d6264-59a9-5814-98b4-1f4ebf760abf" />
               <Object Name="ST_CommunHMI" ObjectId="c70dffad-a257-5d3a-a06b-7714d39fa9a5" />
+              <Object Name="ST_IoHw" ObjectId="29fa0c3a-9059-5150-9a4e-2ec34a58caea" />
+              <Object Name="ST_IoHw_In" ObjectId="5880fb51-cb52-5f74-a58f-5a6f1b225ee9" />
+              <Object Name="ST_IoHw_Out" ObjectId="132caa91-53b4-5991-89f7-649c12866a2c" />
               <Object Name="ST_LocalIHM" ObjectId="b39b9fb0-0aad-5e68-8c80-2b6c913309a3" />
               <Object Name="ST_LocalIHM_CtrlBlock" ObjectId="a6ea7b24-19db-57a2-a2a6-8b27b9bf5f8a" />
               <Object Name="ST_LocalIHM_StatusBlock" ObjectId="01fb5de3-730c-545b-bd73-11889b8d40b9" />
