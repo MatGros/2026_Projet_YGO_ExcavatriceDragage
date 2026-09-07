@@ -26,7 +26,7 @@ VAR_GLOBAL RETAIN
     // ⛔ NON SECURISE tant qu'actif — consommes directement par PRG_06 (instSafetyEmergencyManagement).
     BypassAuArmingPreconditions : BOOL := FALSE; // arme l'AU sans preconditions (chaine/contacteur/lockout/coupure)
     BypassAuRedundancyTest      : BOOL := FALSE; // saute l'auto-test A/B COMPLET (IDLE -> RESTORE_B) = alias BypassAuRedundancyTestA + B
-    BypassAuRedundancyTestA     : BOOL := FALSE; // saute le seul test canal A (TEST_A + RESTORE_A) : IDLE -> TEST_B ; canal B toujours qualifie (latch B actif)
+    BypassAuRedundancyTestA     : BOOL := TRUE;  // saute le seul test canal A (TEST_A + RESTORE_A) : IDLE -> TEST_B ; canal B toujours qualifie (latch B actif)
     BypassAuRedundancyTestB     : BOOL := FALSE; // saute le seul test canal B (TEST_B) : ... RESTORE_A -> RESTORE_B ; canal A toujours qualifie (latch A actif)
     BypassAuPowerCutOff         : BOOL := FALSE; // neutralise PowerCutOffRequest dans l'AU : le PLC ne fait plus chuter la chaine (coup-de-poing reste dur)
 

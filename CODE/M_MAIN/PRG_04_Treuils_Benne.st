@@ -895,9 +895,9 @@ instSafetyWinchM1(
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
-    // Polarité normalisée FB_Safety_Winch : TRUE = FdC haut atteint.
-    // Le DI brut est "TopPositionFree" (TRUE = hors FdC), donc inversion requise.
-    TopPositionSensor      := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
+    // Polarité FB_Safety_Winch (NC) : TRUE = circuit fermé / position libre.
+    // Le DI brut est "TopPositionFree" (TRUE = hors FdC / libre), donc passage direct sans NOT.
+    TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
@@ -965,8 +965,8 @@ instSafetyWinchM2(
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
-    // Même polarité normalisée que M1 : TRUE = FdC haut atteint.
-    TopPositionSensor      := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
+    // Même polarité NC que M1 : TRUE = circuit fermé / position libre.
+    TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
