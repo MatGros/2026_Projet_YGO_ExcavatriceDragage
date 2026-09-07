@@ -1,0 +1,98 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE — T261
+# Bypass granulaire de l auto-test de redondance AU par canal keepalive A / B
+# Base : FB_Safety_EmergencyManagement.st (sequence d armement, steps 0..4)
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  task_id: T261
+  criticality: C3
+  strategy: patch
+  objective: >
+    Permettre en mise en service de sauter l auto-test A/B d UN SEUL canal
+    PowerKeepAlive (A ou B) au lieu de tout ou rien : le canal dont le cablage
+    est pret est qualifie normalement (force + verif chute chaine + latch), le
+    canal non pret est saute. Le bypass global BypassRedundancyTest reste
+    l equivalent A+B et le comportement d exploitation (aucun flag) est inchange.
+
+  acceptance:
+    - id: AC1
+      statement: "Aucun flag bypass actif : la sequence reste IDLE -> TEST_A -> RESTORE_A -> TEST_B -> RESTORE_B -> PULSE, avec latch RedundancyTestFailedCause et aborts CST_ABORT_REDUNDANCY_A/B inchanges (non-regression T205)."
+      verified_by: "run_all_gates.py --palier C (CI fonctionnel AU) + revue git diff step 0..4"
+    - id: AC2
+      statement: "BypassRedundancyTestA seul actif : la sequence est IDLE -> TEST_B -> RESTORE_B -> PULSE ; TEST_A et RESTORE_A sont sautes ; RedundancyTestFailedCause n est PAS latche sur un defaut canal A ; un canal B colle (EmergencyChainClosed reste TRUE apres ForceTestB) latche toujours RedundancyTestFailedCause + LastAbortCause = CST_ABORT_REDUNDANCY_B."
+      verified_by: "Test sim dedie : ForceTestB laisse chaine fermee -> latch B ; ForceTestA non emis. Revue code step 0 + step 3."
+    - id: AC3
+      statement: "BypassRedundancyTestB seul actif : la sequence est IDLE -> TEST_A -> RESTORE_A -> RESTORE_B -> PULSE ; TEST_B est saute ; RedundancyTestFailedCause n est PAS latche sur un defaut canal B ; un canal A colle latche toujours RedundancyTestFailedCause + LastAbortCause = CST_ABORT_REDUNDANCY_A."
+      verified_by: "Test sim dedie : ForceTestA laisse chaine fermee -> latch A ; ForceTestB non emis. Revue code step 1 -> step 2 -> RESTORE_B."
+    - id: AC4
+      statement: "BypassRedundancyTestA ET BypassRedundancyTestB actifs, OU BypassRedundancyTest global actif : la sequence est IDLE -> RESTORE_B directement (comportement actuel strictement inchange), maintien PowerKeepAlive A+B tenu CST_KeepAliveHold avant demande contacteur."
+      verified_by: "Revue code step 0 : condition (bypassTestA AND bypassTestB) -> CST_STEP_RESTORE_B. Test sim : chrono identique a la baseline BypassRedundancyTest."
+    - id: AC5
+      statement: "Exigence EmergencyChainClosed pour passer PULSE/CONFIRM, verif retour PowerContactorEngaged en CONFIRM, aborts RESTORE_A/RESTORE_B et effet de BypassArmingPreconditions sont inchanges quel que soit l etat des 2 nouveaux flags."
+      verified_by: "git diff : aucune ligne des steps 4 (RESTORE_B garde du test chaine), 5 (PULSE), 6 (CONFIRM) modifiee hors aiguillage step 2/3 ; grep BypassArmingPreconditions inchange."
+    - id: AC6
+      statement: "Status.OperatorMessage affiche 'AU: BYPASS INGENIERIE MES ACTIF - NON SECURISE - retirer avant exploitation' des qu au moins un des 5 flags (BypassArmingPreconditions, BypassRedundancyTest, BypassRedundancyTestA, BypassRedundancyTestB, BypassPowerCutOff) est TRUE."
+      verified_by: "Revue code bloc OperatorMessage (l.~575) : condition OR etendue aux 2 nouveaux flags."
+    - id: AC7
+      statement: "GVL_BypassRetain expose BypassAuRedundancyTestA / BypassAuRedundancyTestB : BOOL := FALSE en zone RETAIN, commentees TRACE MES / NON SECURISE, jamais ecrites par l IHM ; PRG_06 les cable sur les entrees FB BypassRedundancyTestA / BypassRedundancyTestB."
+      verified_by: "grep GVL_IHM sur les 2 noms = 0 ; revue appel instSafetyEmergencyManagement dans PRG_06_Outputs.st."
+    - id: AC8
+      statement: "Patch editorial sur les POU FB_Safety_EmergencyManagement et PRG_06_Outputs : le nom de fichier reste egal au nom de POU et le suffixe reste identique au langage genere dans le bundle, sans renommage ni reclassement ; aucun fichier CODE/ cree ou supprime."
+      verified_by: "git diff --stat : uniquement lignes internes des 3 fichiers ST + CODE_XML regenere."
+
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/GVL_BypassRetain.st
+      - CODE/B_AU_SECURITE/FB_Safety_EmergencyManagement.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE_XML/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/B_AU_SECURITE/_TYPES/
+      - DOC/STDS/NAMING_CONVENTION.md
+      - CODE/J_SUPERVISION/GVL_IHM.xml
+
+  conservation:
+    must_survive:
+      - "Sequence complete A/B et double latch quand aucun flag granulaire n est pose (exploitation)."
+      - "Chemin BypassRedundancyTest global = IDLE -> RESTORE_B, chrono et maintien A+B CST_KeepAliveHold inchanges."
+      - "Aborts CST_ABORT_TIMEOUT_RESTORE_A / RESTORE_B et exigence chaine fermee avant PULSE."
+      - "StartupCheck de mise sous tension (l.173) : hors sujet, aucune ligne touchee."
+      - "CONFIRM exige PowerContactorEngaged (sauf BypassArmingPreconditions) — non modifie."
+    dropped_on_purpose:
+      - "Sous bypass d un canal, aucune preuve que ce canal coupe reellement la chaine — assume et signale par la banniere MES."
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+
+  alert_duty: >
+    Si un autre consommateur de BypassRedundancyTest (gate CI, doc AF, IHM diag)
+    suppose le caractere tout-ou-rien du bypass, le signaler immediatement avant
+    d elargir le patch. Tout doute sur l aiguillage step 2 -> RESTORE_B (settle
+    RESTORE_A vs KeepAliveHold) est remonte, pas tranche seul.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 🚦 SUIVI
+# ═══════════════════════════════════════════════════════════════════════════
+status: PENDING
+
+execution:
+  executed_by: "..."
+  completed_at: "..."
+  status: PENDING
+  summary: >
+    (à remplir en fin de travail)
+  evidence_submitted: []
+
+validation:
+  status: PENDING
+  validated_by: "..."
+  validated_at: "..."
+  notes: >
+    (visa orchestrateur + essais MES réels A seul / B seul / A+B)

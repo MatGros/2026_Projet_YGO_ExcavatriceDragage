@@ -13,6 +13,10 @@ STRUCT
     BtnBothAscent        : BOOL; (* ⬆️ M1 + M2 Montée couplée (Relais Fwd + Palier 1 + Frein) *)
     BtnBothDescend       : BOOL; (* ⬇️ M1 + M2 Descente couplée (Relais Rev + Palier 1 + Frein) *)
 
+    // === Commandes Translation M3 (Petite Vitesse 10.0 Hz + Frein) ===
+    BtnM3Tremie          : BOOL; (* ⬅️ M3 vers Trémie (Mot Cmd 1 + Freq 10 Hz + Frein) *)
+    BtnM3Maintenance     : BOOL; (* ➡️ M3 vers Maintenance (Mot Cmd 2 + Freq 10 Hz + Frein) *)
+
     // === Commandes Freins N2 Seuls (Vérification mécanique) ===
     BtnM1BrakeRelease    : BOOL; (* 🔓 Desserrage direct frein treuil M1 *)
     BtnM2BrakeRelease    : BOOL; (* 🔓 Desserrage direct frein treuil M2 *)

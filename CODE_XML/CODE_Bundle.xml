@@ -8140,6 +8140,23 @@ Valeur brute axe X (0..10000)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⬇️ M1 + M2 Descente couplée (Relais Rev + Palier 1 + Frein)</xhtml>
               </documentation>
             </variable>
+            <variable name="BtnM3Tremie">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== Commandes Translation M3 (Petite Vitesse 10.0 Hz + Frein) ===
+⬅️ M3 vers Trémie (Mot Cmd 1 + Freq 10 Hz + Frein)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BtnM3Maintenance">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">➡️ M3 vers Maintenance (Mot Cmd 2 + Freq 10 Hz + Frein)</xhtml>
+              </documentation>
+            </variable>
             <variable name="BtnM1BrakeRelease">
               <type>
                 <BOOL />
@@ -52997,6 +53014,8 @@ GVL_IHM.MaintenanceN2.State.ActiveForcing := GVL_IHM.MaintenanceN2.Cmd.BtnM1Asce
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM2Descend
     OR GVL_IHM.MaintenanceN2.Cmd.BtnBothAscent
     OR GVL_IHM.MaintenanceN2.Cmd.BtnBothDescend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM3Tremie
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM3Maintenance
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM3BrakeRelease;

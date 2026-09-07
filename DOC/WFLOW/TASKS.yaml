@@ -5946,3 +5946,23 @@ tasks:
   - Rebouclage propre dans Data.* vers le banc de simulation FB_SimBench
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T259.yaml
   bloque_par: []
+
+- id: T261
+  parent_id: ''
+  statut: ⬜
+  criticite: C3
+  domaine: AU_SECURITE
+  agent: Claude Code
+  date: '2026-09-07T02:30:00'
+  titre: Bypass granulaire auto-test redondance AU par canal keepalive A / B
+  contexte: 'En MES un seul canal PowerKeepAlive (A ou B) peut avoir son cablage/DI pret. Le BypassAuRedundancyTest actuel est tout-ou-rien (IDLE->RESTORE_B) et empeche de qualifier le canal deja pret.'
+  description: 'Ajouter deux flags RETAIN BypassAuRedundancyTestA / BypassAuRedundancyTestB (GVL_BypassRetain), entrees FB BypassRedundancyTestA / BypassRedundancyTestB, cables via PRG_06. bypassTestA saute TEST_A + RESTORE_A ; bypassTestB saute TEST_B. Le latch RedundancyTestFailedCause n est saute que pour le canal bypasse. BypassRedundancyTest global conserve = alias A+B.'
+  objectifs:
+  - Le canal non bypasse garde son auto-test A/B complet et son abort CST_ABORT_REDUNDANCY_A/B
+  - bypassTestA sur canal A seul => sequence IDLE->TEST_B->RESTORE_B->PULSE, latch A neutralise, latch B actif
+  - bypassTestB sur canal B seul => sequence TEST_A->RESTORE_A->RESTORE_B->PULSE, latch B neutralise, latch A actif
+  - A+B (ou BypassRedundancyTest global) => comportement actuel IDLE->RESTORE_B inchange
+  - Exigence chaine fermee, CONFIRM contacteur, aborts et BypassArmingPreconditions inchanges
+  - Banniere MES NON SECURISE affichee des qu un des 5 flags bypass est actif
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T261.yaml
+  bloque_par: []
