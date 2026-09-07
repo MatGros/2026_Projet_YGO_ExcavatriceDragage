@@ -591,6 +591,8 @@ GVL_IHM.MaintenanceN2.State.ActiveForcing := GVL_IHM.MaintenanceN2.Cmd.BtnM1Asce
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM2Descend
     OR GVL_IHM.MaintenanceN2.Cmd.BtnBothAscent
     OR GVL_IHM.MaintenanceN2.Cmd.BtnBothDescend
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM3Tremie
+    OR GVL_IHM.MaintenanceN2.Cmd.BtnM3Maintenance
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease
     OR GVL_IHM.MaintenanceN2.Cmd.BtnM3BrakeRelease;
