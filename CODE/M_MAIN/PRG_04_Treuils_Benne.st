@@ -134,7 +134,7 @@ VAR
     SafeStopM2_Raw          : BOOL;
     WinchContactorMismatchLvl1 : BOOL;   // . [LOC] niveau 1 : discordance contacteurs M1/M2 confirmee (amont OU vecteurs finaux) -> SafeStop
     SyncOperationPermit        : BOOL;   // . [LOC] Gate canonique : la surveillance d'ecart M1/M2 (synchro process + MecaE croise) est autorisee. FAUX pendant tout homing / toute manipulation benne.
-    BucketActivityHold         : TOF;    // . [LOC] Maintien de la coupure surveillance synchro ~2 s APRES la fin d'une action benne (transitoire d'arret treuils : coast + settle codeur -> faux ecart M1/M2)
+    BucketActivityHold         : TOF;    // . [LOC] Maintien de la coupure surveillance synchro 4 s APRES la fin d'une action benne (transitoire d'arret treuils : coast + settle codeur -> faux ecart M1/M2)
     SafeStopM1_Active       : BOOL;
     SafeStopM2_Active       : BOOL;
     // Disponibilité de mouvement par axe/sens + conditions de base ArmingPermit
@@ -406,7 +406,7 @@ BucketActivityHold(IN := instBucket.Lifecycle.Busy
     OR instArbBucket.CmdOpen_IHM
     OR instArbBucket.CmdClose_IHM
     OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
-    OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose, PT := T#2s);
+    OR PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose, PT := T#4s);
 
 SyncOperationPermit := PRG_03_Modes_Cycle.Data.Auth.SyncEnable
     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 0)
@@ -895,8 +895,8 @@ instSafetyWinchM1(
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
-    // Polarité FB_Safety_Winch (NC) : TRUE = circuit fermé / position libre.
-    // Le DI brut est "TopPositionFree" (TRUE = hors FdC / libre), donc passage direct sans NOT.
+    // FB_Safety_Winch attend le contact NC : TRUE = circuit sain / FdC haut libre.
+    // FALSE = FdC haut atteint ou rupture de chaîne ; le FB bloque alors la montée.
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
@@ -965,7 +965,7 @@ instSafetyWinchM2(
     BrakeThermalFeedback   := NOT PRG_02_Acquisition.HwIn.Machine.M1_M2_M3_BrakeThermalOk_DI,
     SlackCableDetected     := NOT PRG_02_Acquisition.HwIn.Winch.M2_TensionedCable_DI,
     PhaseRotationOk        := PRG_02_Acquisition.HwIn.Machine.PhaseRotationOk_DI,
-    // Même polarité NC que M1 : TRUE = circuit fermé / position libre.
+    // Même contact NC que M1 : TRUE = FdC haut libre, FALSE = FdC atteint/chaîne ouverte.
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,

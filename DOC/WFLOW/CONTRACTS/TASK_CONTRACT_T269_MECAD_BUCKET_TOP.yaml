@@ -1,0 +1,38 @@
+contract:
+  task_id: T269_MECAD_BUCKET_TOP
+  criticality: C3
+  strategy: patch
+  objective: >
+    Empêcher le faux déclenchement MecaD pendant une manœuvre benne volontaire
+    lorsque le treuil maintenu se trouve sur le FdC haut, sans neutraliser le
+    permis de montée ni les protections du FdC.
+  acceptance:
+    - id: AC1
+      statement: "MecaD n'est pas armé lorsque BenneBusy ou BenneHoldStillActive est TRUE."
+      verified_by: "Relecture FB_Safety_Winch.st et G497"
+    - id: AC2
+      statement: "Le FdC haut continue de bloquer AscentPermit indépendamment de cette inhibition MecaD."
+      verified_by: "Relecture du calcul AscentPermit"
+    - id: AC3
+      statement: "Hors manœuvre benne, un FdC atteint avec arrêt non confirmé continue d'escalader en MecaD après PostRampTimeout."
+      verified_by: "Test fonctionnel CODESYS sans bypass"
+    - id: AC4
+      statement: "Aucun bypass IHM ou modification des sorties physiques n'est ajouté."
+      verified_by: "Revue du diff"
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T269_MECAD_BUCKET_TOP.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "AscentPermit et la barrière FdC haut"
+      - "MecaD hors manœuvre benne"
+      - "Chaînes PowerCutOff et SafeStop existantes"
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+status: IN_PROGRESS
