@@ -18,6 +18,7 @@ VAR_GLOBAL
     Network : ST_NetworkDiagHMI;(* 📡 Variables d'échange IHM Diagnostics réseau *)
     Commun  : ST_CommunHMI; (* 🌐 Signaux communs, pas propres à un axe (TopPositionSensorActive, BrakeThermalFault, LimitLegal) *)
     LocalIHM : ST_LocalIHM; (* 🔌 Blocs cycliques IHM local : CtrlBlock + StatusBlock *)
+    IoHw : ST_IoHw; (* 👁️ IOHW lecture seule : In/Out hardware, EtherCAT, CANopen et modules VBus *)
     HmiInitDone : BOOL;               (* 🚩 Indicateur d'initialisation IHM depuis PERSISTENT *)
     Permits : ST_PermitVisibilityHMI; (* Tableau lecture seule des permis canoniques, produit par PRG_07 *)
     MaintenanceN2 : ST_MaintenanceN2HMI; (* 🛠️ Commandes manuelles et forçages en mode MAINT_N2 sous mot de passe *)

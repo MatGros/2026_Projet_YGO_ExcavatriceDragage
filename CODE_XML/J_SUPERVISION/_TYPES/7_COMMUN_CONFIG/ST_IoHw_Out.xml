@@ -1,0 +1,525 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T07:12:55.075064" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T07:12:55.075064">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_IoHw_Out">
+        <baseType>
+          <struct>
+            <variable name="Logical">
+              <type>
+                <derived name="ST_OutputsInterPrg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commandes finales logiques effectivement produites</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayAscent_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Local_Digital_IO — sorties relais direction M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayDescent_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayAscent_Close_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayDescent_Open_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_1_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0808ETP — contacteurs de vitesse M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SpeedContactor_2_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_3_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_4_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_1_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_2_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_3_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_4_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0008ER — freins et mesure Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_M2_KoboldMeasureEnable_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyArming_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0008ER_1 — réarmement AU et maintien puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAlive_A_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PowerKeepAlive_B_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="COD1_PresettTrigCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT — PDO de sortie codeurs COD1/COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_CodeSeqTrigCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="COD1_PresetValue">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="COD2_PresettTrigCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="COD2_CodeSeqTrigCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="COD2_PresetValue">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="M3_CommandWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT — PDO de sortie variateur AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_SetpointFrequencyHz">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>132caa91-53b4-5991-89f7-649c12866a2c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_IoHw_Out — Image exhaustive des sorties hardware pour visualisation IHM
+   -----------------------------------------------------------------------
+   Producteur : PRG_07_Supervision (recopie de PRG_06/PRG_02).
+   Rôle : observation PLC→IHM uniquement. Ces champs ne sont jamais des
+   consignes écrites par l'IHM et ne constituent pas un retour électrique.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_OutputsInterPrg">
+        <baseType>
+          <struct>
+            <variable name="M1RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🪝 Ordres actionneurs finaux treuil M1 ===
+🛗 Ordre contacteur montee treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Ordre contacteur descente treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 1 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 2 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 3 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 4 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Ordre desserrage frein M1 (1=Desserrer)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🪝 Ordres actionneurs finaux treuil M2 ===
+🛗 Ordre contacteur montee/fermeture treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Ordre contacteur descente/ouverture treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 1 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 2 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 3 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 4 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Ordre desserrage frein M2 (1=Desserrer)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🔀 Concordance contacteurs M1/M2 (instance FB_SyncContactor sur vecteurs finaux) ===
+Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorMismatchEscalated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Niveau 2 persistant → escalade PowerCutOff via latch MecaE (PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncContactorDiag">
+              <type>
+                <derived name="ST_SyncContactorDiag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détail : quel contacteur diverge + niveau atteint (IHM / troubleshooting)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationBrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ↔️ Ordre actionneur final translation M3 ===
+🔓 Demande frein M3 arbitree</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAliveACmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚨 Chaîne réarmement puissance AU ===
+🔒 Maintien puissance voie A (1=Maintenu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAliveBCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Maintien puissance voie B (1=Maintenu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Impulsion rearmement puissance AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestCutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Test de redondance AU en cours (canal A ou B coupe) — consommé par FB_SimBench</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Requête coupure métier (arrêt d'urgence) — consommé par FB_SimBench</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ad92990b-f67b-5e7c-903a-3396ec929922</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📤 ST_OutputsInterPrg — Bus d'échange inter-PRG produit par PRG_06_Outputs
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les ordres actionneurs finaux (M1/M2/M3, AU) produits
+      par PRG_06_Outputs et rebouclés par FB_SimBench (instancié dans
+      PRG_02_Acquisition) pour le banc de simulation intégré.
+   📤 Producteur unique : PRG_06_Outputs (VAR_OUTPUT Data : ST_OutputsInterPrg).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §5
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SyncContactorDiag">
+        <baseType>
+          <struct>
+            <variable name="RelayFwdMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais montée M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais descente M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step1Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 1 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 2 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 3 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 4 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MismatchLevel">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = aucun · 1 = discordance confirmée (SafeStop) · 2 = escalade (PowerCutOff)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e71417df-d1db-5140-ade6-a84ec0d571c8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔀 ST_SyncContactorDiag — Diagnostic discordance contacteurs M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : dire EN CLAIR quel contacteur diverge entre M1 et M2 et à quel
+      niveau on est (aucun / mismatch confirmé / escalade). Consommé par le
+      bandeau IHM et le troubleshooting pour répondre « pourquoi ça bloque ».
+   🔒 Bits nommés (pas de masque hexa, AF03 §4). Plusieurs bits peuvent être
+      TRUE simultanément (toutes les divergences détectées).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_IoHw_Out" ObjectId="132caa91-53b4-5991-89f7-649c12866a2c" />
+            </Folder>
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_OutputsInterPrg" ObjectId="ad92990b-f67b-5e7c-903a-3396ec929922" />
+            </Folder>
+          </Folder>
+        </Folder>
+        <Folder Name="H_TREUILS_BENNE">
+          <Folder Name="_TYPES">
+            <Object Name="ST_SyncContactorDiag" ObjectId="e71417df-d1db-5140-ade6-a84ec0d571c8" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

@@ -190,7 +190,7 @@ VAR
     KoboldFallEdge          : F_TRIG;       // . [LOC] Front DI Kobold 1->0 (fond, AX7)
     KoboldInitTimer         : TON;          // . [LOC] Fenetre de verif retour contacteur Kobold en AX5
     KoboldStabTimer         : TON;          // . [LOC] Stabilisation feedback Kobold sous tension (500ms en AX6)
-    BottomTouchStabTimer    : TON;          // . [LOC] Stabilisation arret fond touche (2s en AX8)
+    BottomTouchStabTimer    : TON;          // . [LOC] Stabilisation arret fond touche (500ms en AX8)
     RetryJoyReleaseTimer    : TON;          // . [LOC] Anti-rebond relache joystick pendant diving (>= 200 ms avant reprise)
     PalierNot4Timer         : TON;          // . [LOC] Confirmation palier bloque < 4 en plongee (tolere la rampe 1->4)
     KoboldBottomTimer       : TON;          // . [LOC] Confirmation DI Kobold basse apres immersion
@@ -226,7 +226,7 @@ VAR
     CST_KoboldStabTime      : TIME := T#500ms;  // . [LOC] Stabilisation feedback Kobold
     CST_KoboldPowerUpTime   : TIME := T#500ms;  // . [LOC] Etablissement alimentation capteur Kobold
     CST_KoboldBottomConfirmTime : TIME := T#100ms; // . [LOC] Anti-rebond contact fond
-    CST_BottomTouchStabTime : TIME := T#2s;     // . [LOC] Stabilisation arret apres contact fond
+    CST_BottomTouchStabTime : TIME := T#500ms;  // . [LOC] Stabilisation arret apres contact fond
     CST_TranslationStopConfirmTime : TIME := T#500ms; // . [LOC] Confirmation arret physique M3 sur FDC P1/trémie
 
     // === SOCLE DEFAUT TRANSVERSE ===
@@ -240,7 +240,7 @@ VAR CONSTANT
     CST_StepLoaded : INT := 4;   // Palier montee en charge AX12 (bridage strict <= 4, jamais palier 5)
     CST_KoboldInitTimeout : TIME := T#3s;   // Fenetre max de confirmation retour contacteur Kobold en AX5
     CST_DiveStartStopConfirmTime : TIME := T#300ms; // Confirmation stable des 6 faits d'arret + validite vitesses
-    CST_AscentStartStopConfirmTime : TIME := T#750ms; // Purge redemarrage apres fermeture benne
+    CST_AscentStartStopConfirmTime : TIME := T#500ms; // Purge redemarrage apres fermeture benne
     CST_DiveStartStopTimeout : TIME := T#5s; // Plafond anti-blocage ; timeout -> defaut latche, jamais depart
     CST_DiveStartSpeedThresholdMps : REAL := 0.02; // Vitesse quasi nulle, alignee FB_Modes
     CST_RaiseOffBottomDefaultM : REAL := 0.5;   // Decollement du fond par defaut (AX8) si CfgRaiseOffBottomM <= 0

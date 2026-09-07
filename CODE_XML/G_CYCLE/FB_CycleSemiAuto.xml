@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T20:11:29.771861" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T20:11:29.771861">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T07:25:30.738218" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T07:25:30.738218">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1829,7 +1829,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <derived name="TON" />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation arret fond touche (2s en AX8)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation arret fond touche (500ms en AX8)</xhtml>
               </documentation>
             </variable>
             <variable name="RetryJoyReleaseTimer">
@@ -2108,7 +2108,7 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#2s0ms" />
+                <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Stabilisation arret apres contact fond</xhtml>
@@ -2208,7 +2208,7 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#750ms" />
+                <simpleValue value="TIME#500ms" />
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Purge redemarrage apres fermeture benne</xhtml>

@@ -1,0 +1,1396 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-07T07:12:55.468986" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-07T07:12:55.468986">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation>
+          <property name="Project" type="string">Generated</property>
+        </ProjectInformation>
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes>
+      <dataType name="ST_IoHw">
+        <baseType>
+          <struct>
+            <variable name="In">
+              <type>
+                <derived name="ST_IoHw_In" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées, états bus et diagnostics hardware</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Out">
+              <type>
+                <derived name="ST_IoHw_Out" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Sorties produites observées, pas un port de commande</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>29fa0c3a-9059-5150-9a4e-2ec34a58caea</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_IoHw — Image I/O hardware lecture seule publiée pour l'IHM
+   -----------------------------------------------------------------------
+   IOHW demandé par l'IHM, identifiants ST conformes PascalCase : IoHw.
+   In et Out sont deux images PLC→IHM. Aucun accès IHM n'est utilisé comme
+   écriture vers une E/S physique.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_IoHw_In">
+        <baseType>
+          <struct>
+            <variable name="Hardware">
+              <type>
+                <derived name="ST_HardwareImage" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées physiques normalisées (Winch/Translation/Operator/Machine)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Network">
+              <type>
+                <derived name="ST_AcquisitionNetworkDiagnostics" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT + CANopen + esclaves</xhtml>
+              </documentation>
+            </variable>
+            <variable name="InputModules">
+              <type>
+                <derived name="ST_IOModuleDiag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">5 cartes VBus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DataValid">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Scan acquisition valide</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_AccValue">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT COD1 : valeur accélération brute (voie %IW7)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_AccValue">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT COD2 : valeur accélération brute (voie %IW103)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyAna3Raw">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CANopen JOY1 : entrée analogique 3 brute</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyAna4Raw">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CANopen JOY1 : entrée analogique 4 brute</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndBit05Reserved">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0800END bit 5 : voie présente, fonction non documentée</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>5880fb51-cb52-5f74-a58f-5a6f1b225ee9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_IoHw_In — Image exhaustive des entrées hardware pour visualisation IHM
+   -----------------------------------------------------------------------
+   Producteur : PRG_07_Supervision (recopie de PRG_02_Acquisition).
+   Rôle : observation PLC→IHM uniquement. Aucun champ n'est une commande.
+   Les images Hardware/Network/Modules reprennent les sources qualifiées;
+   les champs Raw complètent les voies présentes dans Device_IO_20260831.csv.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_IoHw_Out">
+        <baseType>
+          <struct>
+            <variable name="Logical">
+              <type>
+                <derived name="ST_OutputsInterPrg" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Commandes finales logiques effectivement produites</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayAscent_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Local_Digital_IO — sorties relais direction M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_RelayDescent_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayAscent_Close_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_RelayDescent_Open_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_1_DQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0808ETP — contacteurs de vitesse M1/M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SpeedContactor_2_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_3_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_SpeedContactor_4_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_1_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_2_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_3_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M2_SpeedContactor_4_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0008ER — freins et mesure Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M3_BrakeRelease_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="M1_M2_KoboldMeasureEnable_DQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="EmergencyArming_RQ">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">VH_0008ER_1 — réarmement AU et maintien puissance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAlive_A_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="PowerKeepAlive_B_RQ">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="COD1_PresettTrigCmd">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT — PDO de sortie codeurs COD1/COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_CodeSeqTrigCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="COD1_PresetValue">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="COD2_PresettTrigCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="COD2_CodeSeqTrigCmd">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+            <variable name="COD2_PresetValue">
+              <type>
+                <UDINT />
+              </type>
+            </variable>
+            <variable name="M3_CommandWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">EtherCAT — PDO de sortie variateur AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_SetpointFrequencyHz">
+              <type>
+                <WORD />
+              </type>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>132caa91-53b4-5991-89f7-649c12866a2c</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   ST_IoHw_Out — Image exhaustive des sorties hardware pour visualisation IHM
+   -----------------------------------------------------------------------
+   Producteur : PRG_07_Supervision (recopie de PRG_06/PRG_02).
+   Rôle : observation PLC→IHM uniquement. Ces champs ne sont jamais des
+   consignes écrites par l'IHM et ne constituent pas un retour électrique.
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_AcquisitionNetworkDiagnostics">
+        <baseType>
+          <struct>
+            <variable name="CanOpenMaster">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Diagnostic maître CANopen</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Joystick">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🕹️ Diagnostic esclave Joystick MCB560</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EthercatMaster">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Diagnostic maître EtherCAT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostic esclave Codeur M1 (COD1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧲 Diagnostic esclave Codeur M2 (COD2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DriveM3">
+              <type>
+                <derived name="ST_Diag_Device" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⚙️ Diagnostic esclave Variateur M3 (AC600)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>0c2483c3-e64e-5f3f-bfcc-41828a26d24e</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🔌 ST_AcquisitionNetworkDiagnostics — Diagnostics réseaux qualifiés
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les états opérationnels et diagnostics des bus CANopen
+      et EtherCAT produits par PRG_02_Acquisition.
+   📤 Producteur unique : PRG_02_Acquisition (Data.Network).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HardwareImage">
+        <baseType>
+          <struct>
+            <variable name="Winch">
+              <type>
+                <derived name="ST_HwWinch" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Treuils M1/M2 + codeurs</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Translation">
+              <type>
+                <derived name="ST_HwTranslation" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Translation M3 + variateur</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Operator">
+              <type>
+                <derived name="ST_HwOperator" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Opérateur / Joystick / bus CAN</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Machine">
+              <type>
+                <derived name="ST_HwMachine" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Entrées brutes domaine Sécurités/Communs Machine</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>6f8e5f63-0c17-53f0-bfdd-b43b9a736035</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HardwareImage — Structure globale d'image matérielle (Frontière HwIn)
+   ───────────────────────────────────────────────────────────────
+   🎨 Agrège les 4 sous-domaines matériels : Winch, Translation, Operator, Machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_IOModuleDiag">
+        <baseType>
+          <struct>
+            <variable name="LocalDigitalIoOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module Local_Digital_IO OK (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0800EndOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0800END OK (DI8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0808EtpOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0808ETP OK (DI8/DO8)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008ErOk">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0008ER OK (DO8 Relais Freins/Kobold)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Vh0008Er1Ok">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Module VH_0008ER_1 OK (DO8 Relais AU/PowerKeepAlive)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Fault">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Défaut sur au moins un module E/S</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>99ce8dd2-5922-55d3-a0f2-73eba184a540</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🩺 ST_IOModuleDiag — Diagnostic carte des 5 modules E/S physiques
+   ───────────────────────────────────────────────────────────────
+   📄 Doc métier : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §3bis
+   🎨 Granularité MODULE (pas canal) : GetDeviceState() est un état de carte,
+      pas un diagnostic par voie. Un module en défaut ne dit pas *quelle*
+      TOR ment, seulement qu'aucune des TOR qu'il porte n'est fiable.
+   🔗 Producteur : PRG_02_Acquisition (5 appels GetDeviceState()).
+   🔌 Consommateurs : PRG_04 (SafeStop treuils), PRG_05 (SafeStop M3),
+      PRG_07 (recopie IHM GVL_IHM.Network.InputModules + FB_TroubleshootingView).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_OutputsInterPrg">
+        <baseType>
+          <struct>
+            <variable name="M1RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🪝 Ordres actionneurs finaux treuil M1 ===
+🛗 Ordre contacteur montee treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Ordre contacteur descente treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 1 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 2 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 3 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1SpeedContactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 4 treuil M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Ordre desserrage frein M1 (1=Desserrer)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2RelayFwd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🪝 Ordres actionneurs finaux treuil M2 ===
+🛗 Ordre contacteur montee/fermeture treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2RelayRev">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛗 Ordre contacteur descente/ouverture treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 1 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 2 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 3 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2SpeedContactor4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔌 Ordre contacteur palier 4 treuil M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2BrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔓 Ordre desserrage frein M2 (1=Desserrer)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🔀 Concordance contacteurs M1/M2 (instance FB_SyncContactor sur vecteurs finaux) ===
+Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ContactorMismatchEscalated">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Niveau 2 persistant → escalade PowerCutOff via latch MecaE (PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncContactorDiag">
+              <type>
+                <derived name="ST_SyncContactorDiag" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Détail : quel contacteur diverge + niveau atteint (IHM / troubleshooting)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TranslationBrakeCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ↔️ Ordre actionneur final translation M3 ===
+🔓 Demande frein M3 arbitree</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAliveACmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== 🚨 Chaîne réarmement puissance AU ===
+🔒 Maintien puissance voie A (1=Maintenu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerKeepAliveBCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Maintien puissance voie B (1=Maintenu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyArmingCmd">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🎯 Impulsion rearmement puissance AU</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TestCutActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Test de redondance AU en cours (canal A ou B coupe) — consommé par FB_SimBench</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PowerCutOffRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Requête coupure métier (arrêt d'urgence) — consommé par FB_SimBench</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ad92990b-f67b-5e7c-903a-3396ec929922</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   📤 ST_OutputsInterPrg — Bus d'échange inter-PRG produit par PRG_06_Outputs
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Encapsuler les ordres actionneurs finaux (M1/M2/M3, AU) produits
+      par PRG_06_Outputs et rebouclés par FB_SimBench (instancié dans
+      PRG_02_Acquisition) pour le banc de simulation intégré.
+   📤 Producteur unique : PRG_06_Outputs (VAR_OUTPUT Data : ST_OutputsInterPrg).
+   📄 Doc : DOC/AF/AF_Partie-06_Acquisition_Qualification_IO_v2.4.md §5
+   🔌 Architecture : Bus de données typé — encapsulation des échanges inter-PRG.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_Diag_Device">
+        <baseType>
+          <struct>
+            <variable name="Online">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Esclave visible sur le bus</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Operational">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Esclave en mode OP (opérationnel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Error">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Signal de défaut actif pour cet esclave</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ErrorId">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Code défaut détaillé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="State">
+              <type>
+                <derived name="E_Diag_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Phase courante du cycle de diagnostic</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StateAtError">
+              <type>
+                <derived name="E_Diag_State" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Instantané de la phase lors de l'anomalie</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   📊 ST_Diag_Device — Structure diagnostic d'un esclave ou bus
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de donnees d'état, diagnostic et alarme d'un equipement réseau
+   📄 Doc métier : DOC/AF/AF_Partie-12_Fonction_Diagnostic_v1.4.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwMachine">
+        <baseType>
+          <struct>
+            <variable name="PowerContactorEngaged_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Confirm. contacteur puissance engagé</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EmergencyChainClosed_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Boucle AU fermée (coup-de-poing + contact PLC)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PhaseRotationOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contrôle rotation phases élec. OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_M3_BrakeThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique frein M1/M2/M3 commun OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_M2_KoboldBottomTouch_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour détecteur fond Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HydraulicThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique centrale hydraulique OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ConveyorInfeedReady_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation démarrage crible (dépôt gravats)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TremieFull_OR_GateRaised_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">: Trémie pleine OU grille levée — pas encore câblé électriquement,</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>b09d9aab-fffb-5955-a0ee-fbdfe07f4a50</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwMachine — Image matérielle brute des entrées communes Machine
+   ───────────────────────────────────────────────────────────────
+   🎨 Regroupe les signaux physiques d'entrée bruts communs à la machine.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwOperator">
+        <baseType>
+          <struct>
+            <variable name="JoyXRaw_ANA1">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute analogique axe X (Translation)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyYRaw_ANA2">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute analogique axe Y (Levage)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoyBtnRaw">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Bouton brut joystick (Homme-Mort)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CanBusState">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État bus CANopen (CANbus.GetBusState)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JOY1_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device JOY1 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ce03b729-667a-50ae-8c74-7bdf588f937a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwOperator — Image matérielle brute des entrées Opérateur / Joystick
+   ───────────────────────────────────────────────────────────────
+   🎨 Regroupe les signaux physiques d'entrée bruts du joystick CANopen JOY1.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwTranslation">
+        <baseType>
+          <struct>
+            <variable name="M3_PosTremie_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position trémie</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosPV_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position point de vitesse (pré-ralentissement)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosPVP2_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P2 / petite vitesse avant P1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosP1_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position P1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_PosMaintenance_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position maintenance</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M3 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_ThermalOK_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour disjoncteur thermique moteur/variateur AC600 (1 = OK) — diagnostic seul, l'AC600 se protège lui-même</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_StatusWord">
+              <type>
+                <WORD />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Status word variateur AC600</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3_ActualFrequencyHz">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Fréquence réelle variateur AC600 (x100)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AC600_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device AC600 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>385ab449-ca64-59fe-be25-3863e9125d20</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwTranslation — Image matérielle brute des entrées Translation M3
+   ───────────────────────────────────────────────────────────────
+   🎨 Regroupe les signaux physiques d'entrée bruts de la translation M3 (AC600).
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_HwWinch">
+        <baseType>
+          <struct>
+            <variable name="M1_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M1 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M1 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M1 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ContactorsReleased_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retours contacteurs M2 retombés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_ThermalOk_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Thermique moteur M2 OK</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_BrakeIsOpen_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Retour frein M2 (1 = ouvert)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1M2_TopPositionFree_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur position haute commun M1/M2 libre</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2_TensionedCable_DI">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Capteur mou de câble M2 (câble tendu)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD1 (M1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_SpdValue">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute vitesse codeur COD1 (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD1_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD1 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_PosValue">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute position codeur COD2 (M2)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_SpdValue">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valeur brute vitesse codeur COD2 (0x6031:01 en 0.1 RPM)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Alarms">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarmes brutes COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_Warnings">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Avertissements bruts COD2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="COD2_DeviceState">
+              <type>
+                <derived name="DEVICE_STATE" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">État device COD2 (GetDeviceState)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>72c8e04d-71ee-5733-9392-791d275a6b49</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
+   🏗️ ST_HwWinch — Image matérielle brute des entrées Treuils M1 / M2
+   ───────────────────────────────────────────────────────────────
+   🎨 Regroupe les signaux physiques d'entrée bruts des treuils M1 et M2.
+   ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_SyncContactorDiag">
+        <baseType>
+          <struct>
+            <variable name="RelayFwdMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais montée M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="RelayRevMismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = relais descente M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step1Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 1 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step2Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 2 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step3Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 3 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step4Mismatch">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE = contacteur palier 4 M1 &lt;&gt; M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MismatchLevel">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">0 = aucun · 1 = discordance confirmée (SafeStop) · 2 = escalade (PowerCutOff)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e71417df-d1db-5140-ade6-a84ec0d571c8</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔀 ST_SyncContactorDiag — Diagnostic discordance contacteurs M1/M2
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : dire EN CLAIR quel contacteur diverge entre M1 et M2 et à quel
+      niveau on est (aucun / mismatch confirmé / escalade). Consommé par le
+      bandeau IHM et le troubleshooting pour répondre « pourquoi ça bloque ».
+   🔒 Bits nommés (pas de masque hexa, AF03 §4). Plusieurs bits peuvent être
+      TRUE simultanément (toutes les divergences détectées).
+   📄 Doc : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="E_Diag_State">
+        <baseType>
+          <enum>
+            <values>
+              <value name="DISABLED" value="0" />
+              <value name="READY" value="1" />
+              <value name="INIT" value="2" />
+              <value name="MONITORING" value="3" />
+              <value name="ERROR" value="4" />
+              <value name="SIMULATED" value="5" />
+            </values>
+          </enum>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/enumvaluedocumentation" handleUnknown="implementation">
+            <EnumValueDocumentation>
+              <EnumValue>
+                <Name>DISABLED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Désactivé (surveillance non active)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>READY</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Opérationnel réel, pas de défaut</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>INIT</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Initialisation / Recherche de réseau</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>MONITORING</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Surveillance active (états transitoires)</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>ERROR</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Anomalie de communication</xhtml>
+                </Documentation>
+              </EnumValue>
+              <EnumValue>
+                <Name>SIMULATED</Name>
+                <Documentation>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">Bypass simulation ou bypass réseau IHM — pas le bus réel</xhtml>
+                </Documentation>
+              </EnumValue>
+            </EnumValueDocumentation>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+            <Attributes>
+              <Attribute Name="qualified_only" Value="" />
+              <Attribute Name="strict" Value="" />
+            </Attributes>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>e56e22b9-6e46-55bd-973d-b226ca7d1e70</ObjectId>
+          </data>
+        </addData>
+      </dataType>
+    </dataTypes>
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Folder Name="J_SUPERVISION">
+          <Folder Name="_TYPES">
+            <Folder Name="7_COMMUN_CONFIG">
+              <Object Name="ST_IoHw" ObjectId="29fa0c3a-9059-5150-9a4e-2ec34a58caea" />
+              <Object Name="ST_IoHw_In" ObjectId="5880fb51-cb52-5f74-a58f-5a6f1b225ee9" />
+              <Object Name="ST_IoHw_Out" ObjectId="132caa91-53b4-5991-89f7-649c12866a2c" />
+            </Folder>
+            <Folder Name="4_JOYSTICK_ACQUISITION">
+              <Object Name="ST_AcquisitionNetworkDiagnostics" ObjectId="0c2483c3-e64e-5f3f-bfcc-41828a26d24e" />
+              <Object Name="ST_HardwareImage" ObjectId="6f8e5f63-0c17-53f0-bfdd-b43b9a736035" />
+              <Object Name="ST_HwMachine" ObjectId="b09d9aab-fffb-5955-a0ee-fbdfe07f4a50" />
+              <Object Name="ST_HwOperator" ObjectId="ce03b729-667a-50ae-8c74-7bdf588f937a" />
+            </Folder>
+            <Folder Name="6_DIAG_ET_CHAINES">
+              <Object Name="ST_IOModuleDiag" ObjectId="99ce8dd2-5922-55d3-a0f2-73eba184a540" />
+            </Folder>
+            <Folder Name="1_TREUILS_BENNE">
+              <Object Name="ST_OutputsInterPrg" ObjectId="ad92990b-f67b-5e7c-903a-3396ec929922" />
+              <Object Name="ST_HwWinch" ObjectId="72c8e04d-71ee-5733-9392-791d275a6b49" />
+            </Folder>
+            <Folder Name="2_TRANSLATION">
+              <Object Name="ST_HwTranslation" ObjectId="385ab449-ca64-59fe-be25-3863e9125d20" />
+            </Folder>
+          </Folder>
+        </Folder>
+        <Folder Name="C_DIAG_RESEAUX">
+          <Object Name="ST_Diag_Device" ObjectId="1a6fb2b8-82ac-552b-8495-0e1a5e2f26f9" />
+          <Object Name="E_Diag_State" ObjectId="e56e22b9-6e46-55bd-973d-b226ca7d1e70" />
+        </Folder>
+        <Folder Name="H_TREUILS_BENNE">
+          <Folder Name="_TYPES">
+            <Object Name="ST_SyncContactorDiag" ObjectId="e71417df-d1db-5140-ade6-a84ec0d571c8" />
+          </Folder>
+        </Folder>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
