@@ -1,0 +1,66 @@
+contract:
+  task_id: T286
+  criticality: C2
+  strategy: patch
+  objective: >
+    Refactorer par phases les tests CI A à G afin qu'ils prouvent uniquement des
+    comportements logiciels utiles à la non-régression de mise en service.
+  acceptance:
+    - id: AC1
+      statement: "Chaque test CI A à G porte une preuve logicielle observable ; les preuves site restent dans les AF ou procédures de réception."
+      verified_by: "Audit des titres, commentaires et assertions des harnais ciblés."
+    - id: AC2
+      statement: "Les scénarios de régression identifiés pour A, B, C, E, F et G sont tracés dans une matrice domaine-risque-garde-fou."
+      verified_by: "Matrice versionnée dans le rapport de tâche."
+    - id: AC3
+      statement: "Un verdict de domaine distingue compilation, assertions, liaison G200 et preuve site non exécutée."
+      verified_by: "Revue du runner et des rapports produits sur un domaine pilote."
+    - id: AC4
+      statement: "Aucun test ou rapport existant n'est supprimé sans revue humaine de la phase concernée."
+      verified_by: "Diff Git de chaque phase et visa humain explicite."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/WFLOW/AUDITS/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T286_REFACTOR_CI_NON_REGRESSION_A_G.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/CODE_Bundle.xml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Suppression automatique de scratch, test, rapport ou archive.
+  conservation:
+    must_survive:
+      - "Les preuves site et exigences AF."
+      - "Les scénarios logiciels utiles déjà validés."
+      - "Les scratchs et rapports existants, jusqu'à décision humaine explicite."
+    dropped_on_purpose: []
+  evidence_required:
+    - "Contrat validé par check_task_contract.py."
+    - "Diff et résultats des tests ciblés à chaque phase."
+    - "G200 frais pour toute phase touchant une preuve de liaison."
+  models_allowed:
+    - "Codex"
+  alert_duty: >
+    Tout faux vert, essai site présenté comme CI, test non déterministe, défaut de
+    liaison ou régression d'un scénario de mise en service est signalé avant modification.
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    Phase 0 : matrice des risques et tri garder/réécrire/retirer.
+    Phase 1 : A_COMMUN et B_AU_SECURITE.
+    Phase 2 : C_DIAG_RESEAUX et E_CODEURS.
+    Phase 3 : F_MODES et G_CYCLE.
+    Phase 4 : verdict de domaine et garde-fous anti-faux-vert.
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Démarrage phase par phase, avec validation humaine entre phases."

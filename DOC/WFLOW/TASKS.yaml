@@ -1,4 +1,17 @@
 tasks:
+- id: T286
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: OUTILLAGE
+  agent: ''
+  date: '2026-09-13T23:30:00+02:00'
+  titre: Refactor CI non-régression mise en service — domaines A à G
+  contexte: Réduire les faux verts et prioriser les scénarios de mise en service à risque.
+  description: 'Phases 0 à 4. Contrat: TASK_CONTRACT_T286_REFACTOR_CI_NON_REGRESSION_A_G.yaml'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T286_REFACTOR_CI_NON_REGRESSION_A_G.yaml
+  objectifs: []
+  bloque_par: []
 - id: T285
   parent_id: ''
   statut: '✅'
