@@ -1,0 +1,83 @@
+contract:
+  task_id: T287
+  criticality: C3
+  strategy: patch
+  objective: >
+    Préserver l'arrêt directionnel immédiat de M3 aux butées et distinguer un arrêt
+    normal d'un mouvement réel persistant : alarme SafeStop à 2,5 s puis PowerCutOff
+    à 5 s, sans modifier FB_Brake.
+  acceptance:
+    - id: AC1
+      statement: "À chaque butée, la commande du sens interdit est annulée au même scan ; le sens opposé reste disponible."
+      verified_by: "Tests ciblés FB_Translation, interlock final et revue des liaisons PRG_05/PRG_06."
+    - id: AC2
+      statement: "Butée active, requête maintenue et fréquence réelle nulle ne produisent ni SafeStop ni PowerCutOff."
+      verified_by: "Scénarios CI Trémie et P1/Maintenance, avec DriveStatusWord.0 à 1 et fréquence nulle."
+    - id: AC3
+      statement: "Une fréquence réelle persistante supérieure au seuil pendant 2,5 s produit SafeStop et une alarme explicite, sans PowerCutOff."
+      verified_by: "Scénario CI chronométré aux frontières 2,49 s / 2,5 s."
+    - id: AC4
+      statement: "La même fréquence réelle persistante pendant 5 s produit PowerCutOff mémorisé ; le réarmement exige disparition de la cause et front Reset."
+      verified_by: "Scénario CI chronométré aux frontières 4,99 s / 5 s et scénario Reset."
+    - id: AC5
+      statement: "FB_Brake et son interface restent strictement inchangés."
+      verified_by: "Diff Git : aucune modification sous CODE/A_COMMUN/FB_Brake.st ni dans ses tests unitaires."
+    - id: AC6
+      statement: "Le nom de chaque fichier POU reste identique au nom du POU, et son suffixe correspond au langage généré dans le bundle."
+      verified_by: "Gates structurels et bundle PLCopenXML frais."
+  scope:
+    allowed:
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - CODE/I_TRANSLATION/_TYPES/
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+      - DOC/WFLOW/AUDITS/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/A_COMMUN/FB_Brake.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/A_COMMUN/tests/test_fb_brake.st
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE_BACKUP/
+      - Suppression automatique de scratch, test, rapport ou archive.
+  conservation:
+    must_survive:
+      - "Freinage immédiat et interdiction du sens qui pousse vers une butée active."
+      - "Coupure immédiate existante côté Trémie et possibilité de repartir dans le sens opposé."
+      - "Défauts critiques existants : thermique frein, mouvement non commandé, perte de cohérence capteurs et défaut variateur."
+      - "FB_Brake, ses délais, son interface et ses tests unitaires."
+    dropped_on_purpose:
+      - "Escalade immédiate d'une butée active sans preuve de mouvement réel persistant."
+  evidence_required:
+    - "Contrat contrôlé par check_task_contract.py."
+    - "Tests CI ciblés M3, avec chronogrammes aux seuils 2,5 s et 5 s."
+    - "G200 --report et palier de gates adapté, bundle frais après modification CODE/."
+    - "Diff Git attestant l'absence de modification de FB_Brake."
+    - "Recette CODESYS/terrain humaine : fréquence réelle, retour frein et arrêt aux deux extrémités."
+  models_allowed:
+    - "Codex"
+  alert_duty: >
+    Stopper et signaler toute incohérence entre la butée physique Trémie et P1/Maintenance,
+    toute ambiguïté sur le statut SafeStop/PowerCutOff ou toute proposition nécessitant une
+    modification de FB_Brake.
+
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    Phase 0 : compléter l'AF avec les oracles et inventorier les barrières des deux extrémités.
+    Phase 1 : réécrire les tests CI ciblés, sans toucher au code ni à FB_Brake.
+    Phase 2 : visa humain des tests et du comportement cible.
+    Phase 3 : modifier uniquement la logique M3 autorisée, puis valider CI, G200 et gates.
+    Phase 4 : recette humaine CODESYS/terrain et décision séparée sur un éventuel besoin FB_Brake.
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "FB_Brake est explicitement gelé jusqu'à décision humaine après les validations M3."

@@ -1,4 +1,17 @@
 tasks:
+- id: T287
+  parent_id: T286
+  statut: '⬜'
+  criticite: C3
+  domaine: TRANSLATION_M3
+  agent: ''
+  date: '2026-09-13T23:55:00+02:00'
+  titre: Régression M3 sur butées — escalade graduée sans toucher FB_Brake
+  contexte: Arrêt directionnel immédiat conservé ; qualifie un mouvement réel persistant après arrêt.
+  description: 'Phases contrôlées. Contrat: TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml
+  objectifs: []
+  bloque_par: []
 - id: T286
   parent_id: ''
   statut: '⬜'
