@@ -6201,6 +6201,22 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T278_AU_ALARMS_FILTERING_AND_AUTO_RESET.yaml
   bloque_par: []
 
+- id: T279
+  parent_id: ''
+  statut: ⏳
+  criticite: C2
+  domaine: OUTILLAGE
+  agent: Codex
+  date: '2026-09-13T17:10:56+02:00'
+  titre: 'Hygiène workspace agents et CI'
+  contexte: 'Des scratchs .tmp_* et .dsh_tmp sont apparus à la racine ; la convention DOC/WFLOW et CODE_XML existe mais n est pas appliquée mécaniquement.'
+  description: 'Rendre la convention effective par directives, ignore Git, gate d hygiène et correction ciblée des runners, sans supprimer les artefacts existants avant une phase dédiée validée.'
+  objectifs:
+  - 'Préserver CODE_XML et DOC/WFLOW comme emplacements des livrables et preuves durables.'
+  - 'Interdire et détecter mécaniquement les scratchs à la racine.'
+  - 'Confinir les scratchs CI et gates dans leurs répertoires outillage dédiés.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T279_WORKSPACE_HYGIENE.yaml
+  bloque_par: []
 
 
 

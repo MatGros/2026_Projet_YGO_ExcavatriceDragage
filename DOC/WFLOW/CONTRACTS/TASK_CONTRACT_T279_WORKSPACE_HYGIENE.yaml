@@ -1,0 +1,74 @@
+contract:
+  task_id: T279
+  criticality: C2
+  strategy: patch
+  objective: >
+    Rendre effective la convention existante : les preuves durables restent dans
+    DOC/WFLOW et CODE_XML, tandis qu'aucun scratch agent, CI ou gate ne peut
+    apparaître à la racine du dépôt.
+  acceptance:
+    - id: AC1
+      statement: "La documentation agent définit sans ambiguïté le routage des bundles, preuves durables, rapports CI, états d'agent et scratchs jetables."
+      verified_by: "Revue du diff de AGENTS.md, STRUCTURE_AND_CLEANUP.md et subagent_preamble.md contre la table de routage T279."
+    - id: AC2
+      statement: "Les règles Git ignorent les seules zones scratch autorisées et ne masquent ni DOC/WFLOW, ni CODE_XML/CODE_Bundle.xml, ni un scratch interdit à la racine."
+      verified_by: "git check-ignore -v sur scratchs autorisés ; git check-ignore -q DOC/WFLOW/AUDITS/T279_probe.md, CODE_XML/CODE_Bundle.xml et .tmp_t279_probe/x retourne faux."
+    - id: AC2B
+      statement: "La phase 1 ne modifie ni runner ni gate et documente les exceptions historiques et transitoires à régulariser."
+      verified_by: "git diff --name-only limité aux directives, ignore et contrat ; revue de la mention status historique et CODE_XML.freshness."
+    - id: AC3
+      statement: "Un dossier scratch .tmp_* ou .dsh_tmp créé à la racine est détecté comme non conforme."
+      verified_by: "Test automatisé du gate d'hygiène sur un dépôt temporaire avec cas conforme et cas non conforme."
+    - id: AC4
+      statement: "L'exécution d'un test CI ciblé ne crée aucun nouveau dossier temporaire à la racine et affiche le chemin de son scratch autorisé sans le supprimer automatiquement."
+      verified_by: "Snapshot top-level avant/après du runner ciblé, sortie console indiquant le scratch sous TOOLS/TEST_AUTO_CI/.tmp_* et inspection du code sans opération de suppression."
+  scope:
+    allowed:
+      - .gitignore
+      - AGENTS.md
+      - TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md
+      - TOOLS/AGENT_WORKFLOW/docs/STRUCTURE_AND_CLEANUP.md
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - TOOLS/AGENT_WORKFLOW/config/workspace_hygiene_baseline.json
+      - TOOLS/TEST_AUTO_CI/run_tests.py
+      - TOOLS/TEST_AUTO_CI/.gitignore
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T279_WORKSPACE_HYGIENE.yaml
+      - DOC/WFLOW/AUDITS/
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/CODE_Bundle.xml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Suppression, déplacement ou modification de tout artefact temporaire existant avant validation explicite de la phase 4.
+      - Suppression, déplacement ou désindexation automatique d'un artefact par un script, un gate ou un agent.
+  conservation:
+    must_survive:
+      - "CODE_XML/ reste le répertoire du bundle PLCopenXML versionné."
+      - "DOC/WFLOW/ reste l'espace des preuves, contrats, audits, REX, rapports d'orchestration et diagnostics durables."
+      - "Les suites et rapports CI versionnés sous TOOLS/TEST_AUTO_CI/RESULTS/ restent inchangés hors nécessité démontrée."
+    dropped_on_purpose: []
+  evidence_required:
+    - "Validation du contrat par check_task_contract.py."
+    - "Phase 1 : git check-ignore et git status --short avant/après."
+    - "Tests unitaires du gate d'hygiène."
+    - "git diff --check et git status --short avant chaque passage de phase."
+  models_allowed:
+    - "Codex"
+  alert_duty: >
+    Toute zone actuellement suivie par Git sous .dsh_tmp ou .tmp_* est un risque
+    de contamination historique : la signaler et l'inventorier, sans suppression
+    ni git rm hors phase 4 validée par l'humain.
+
+status: PENDING
+execution:
+  executed_by: "Codex"
+  completed_at: ""
+  status: PENDING
+  summary: "Phase 0 : contrat de cadrage créé ; aucune suppression ni modification d'outillage."
+  evidence_submitted: []
+validation:
+  status: APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-09-13T17:10:56+02:00"
+  notes: "Phase 0 jugée claire et déjà structurée ; autorisation de cadrer T279."

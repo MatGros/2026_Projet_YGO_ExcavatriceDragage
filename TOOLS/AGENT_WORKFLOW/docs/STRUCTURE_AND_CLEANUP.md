@@ -103,10 +103,25 @@ Avant suppression :
 
 ### Fichier temporaire
 
-- sortie générée : `AGENT_WORKFLOW/reports/` ou dossier temporaire explicite ;
-- aucun fichier temporaire à la racine du projet ;
-- supprimer les rapports après exploitation, sauf preuve utile ;
-- ne jamais supprimer `CODE_Bundle.xml` ou export CODESYS sans validation.
+> Norme T279 : **classer toute sortie avant de l'écrire**. Un chemin non prévu
+> par cette table est interdit, il ne doit jamais être masqué par `.gitignore`.
+
+| Catégorie | Emplacement obligatoire | Git | Durée de vie |
+|---|---|---|---|
+| Bundle PLCopenXML | `CODE_XML/CODE_Bundle.xml` | versionné | livrable durable |
+| Contrat, audit, REX, diagnostic, rapport d'orchestration | sous-dossier métier de `DOC/WFLOW/` | versionné | preuve durable |
+| Résultat CI publiable | `TOOLS/TEST_AUTO_CI/RESULTS/<DOMAINE>/reports/` | selon politique CI | régénérable / preuve |
+| État de session agent | `TOOLS/AGENT_WORKFLOW/status/` | local, ignoré pour les nouvelles sorties | session ; historique régularisé en phase 4 T279 |
+| Scratch CI | `TOOLS/TEST_AUTO_CI/.tmp_<run>/` | ignoré | fin du run |
+| Scratch gate | `TOOLS/AGENT_WORKFLOW/.tmp/<run>/` | ignoré | fin du gate |
+| Scratch racine | interdit | **non ignoré, visible** | n/a |
+
+- Il est interdit de créer, déplacer ou rediriger un scratch agent, CI ou gate vers la racine du dépôt.
+- `TEMP` et `TMP` peuvent être redéfinis seulement par un runner, vers son scratch autorisé ou vers le temp système hors dépôt ; jamais vers la racine.
+- Avant et après tout test ou gate, exécuter `git status --short`, signaler tout chemin nouveau hors table et ne pas l'ignorer pour masquer l'écart.
+- `G390_check_bundle_freshness.py` conserve son scratch sous `TOOLS/AGENT_WORKFLOW/.tmp/g390_freshness_<id>/` ; il n'existe plus d'exemption `CODE_XML.freshness/` à la racine.
+- **Aucune suppression automatique** par script, agent, gate ou runner : un outil détecte, localise et informe ; seul l'humain décide et réalise le nettoyage. Les rapports et scratchs restent donc présents dans leur emplacement autorisé jusqu'à intervention humaine.
+- Aucun fichier temporaire à la racine du projet ; ne jamais supprimer `CODE_Bundle.xml` ou export CODESYS sans validation.
 
 ### Dossier inattendu
 
