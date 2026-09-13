@@ -1,0 +1,44 @@
+version: '1.0'
+task_id: T276
+type: REBUILD_ANALYSE
+title: Déblocage translation M3 depuis AtP1 vers Maintenance lors de l activation zone maintenance (gestion FdC soft)
+date: '2026-09-07T17:55:00+02:00'
+author: Antigravity
+
+context:
+  description: >
+    Constat opérationnel sur M3 (Translation chariot) :
+    Lorsque le chariot est arrêté en position de travail P1 (`M3_AtP1Stable` / mot capteurs 00011) et que l'opérateur
+    active ensuite l'autorisation d'accès à la zone Maintenance (`TglMaintenanceZoneAccess` / `MaintenanceM3TargetEnable`),
+    le mouvement direct vers Maintenance reste bloqué car la coupure dure / FdC logiciel intermédiaire
+    `M3_LimitSwitchMaintenanceEffective` (calculée à P1 quand la zone était désactivée) s'est verrouillée/latchée dans
+    `M3_LimitSwitchMaintenanceStable`.
+    Actuellement, pour déverrouiller ce latch, l'opérateur doit repartir en sens inverse vers la Trémie (`M3_ReqTremie_Active`)
+    puis revenir vers la Maintenance.
+    Le but est d'analyser la faisabilité d'un déverrouillage propre sans manœuvre inutile tout en garantissant
+    l'interdiction absolue de franchissement si l'autorisation zone maintenance n'est pas active.
+
+scope:
+  in_scope:
+    - Analyse de la logique de latch `M3_LimitSwitchMaintenanceStable` et `M3_LimitSwitchMaintenanceEffective` dans `PRG_05_Translation.st`.
+    - Analyse des conditions de front de franchissement dans `FB_Translation_PositionDecoder.st` (`TranslationAtMaintenance`, mot `00001` / `00000`).
+    - Étude d'une libération automatique et sécurisée du FdC virtuel P1 lors du passage `MaintenanceM3TargetEnable = TRUE` quand le chariot est déjà à P1.
+    - Vérification des verrous de sécurité et des risques de dépassement mécanique (tampon extrême 00000).
+  out_of_scope:
+    - Neutralisation des fins de course physiques Trémie (11111) et Maintenance (00000).
+    - Modification du cycle automatique semi-auto.
+
+objectifs_testables:
+  - id: OBJ-01
+    description: Identifier le mécanisme de verrouillage à P1 et la condition exacte empêchant le redémarrage direct vers Maintenance.
+    critere_succes: Cause racine documentée dans la proposition technique.
+  - id: OBJ-02
+    description: Proposer une solution logique permettant le départ direct P1 -> Maintenance dès activation de la zone maintenance sans exiger de recul vers Trémie.
+    critere_succes: Solution rédigée préservant le rôle de barrière dure de P1 lorsque l'accès maintenance est OFF.
+  - id: OBJ-03
+    description: Valider la non-régression de la sécurité machine (zéro franchissement intempestif de P1 si zone maintenance OFF).
+    critere_succes: Validation des critères de sécurité ISO 13849 et AF11.
+
+livrables:
+  - Contrat de tâche T276 et entrée dans TASKS.yaml.
+  - Dossier d'analyse technique et proposition de patch pour PRG_05_Translation.
