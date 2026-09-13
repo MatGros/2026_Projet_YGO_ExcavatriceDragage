@@ -18,7 +18,8 @@ Fournir à l'agent les règles de construction des documents `DOC/` sans lui imp
 
 La structure, le nommage des fichiers et le nettoyage sont définis dans
 `STRUCTURE_AND_CLEANUP.md`. Aucun agent ne crée de dossier ou de fichier temporaire hors des
-emplacements autorisés.
+emplacements autorisés. La table normative T279 de ce document distingue explicitement
+preuves durables `DOC/WFLOW`, bundle `CODE_XML`, rapports CI et scratchs jetables.
 
 - 🇫🇷 Écrire en français sauf terme technique, nom de variable ou citation.
 - 🎯 Utiliser des titres explicites et des listes/tableaux courts.

@@ -102,6 +102,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("B", "210", "G210 â€” Cablage CFC natif",                        [sys.executable, f"{S}/G210_check_cfc_wiring.py"]),
     # Palier C â€” fin de lot (G340..G420)
     ("C", "340", "G340 â€” Liens documentaires",                      [sys.executable, f"{S}/G340_check_doc_links.py"]),
+    ("C", "345", "G345 â€” Hygiene workspace (T279)",                [sys.executable, f"{S}/G345_check_workspace_hygiene.py"]),
     ("C", "350", "G350 â€” Collision noms HW (REX 2026-08-05)",       [sys.executable, f"{S}/G350_check_hw_name_collision.py", "."]),
     ("C", "360", "G360 â€” Interlock changement de sens (REX 2026-08-05)", [sys.executable, f"{S}/G360_check_direction_change_interlock.py", "."]),
     ("C", "370", "G370 â€” Cablage position calibree (REX 2026-08-06)", [sys.executable, f"{S}/G370_check_position_calibration_wiring.py", "."]),

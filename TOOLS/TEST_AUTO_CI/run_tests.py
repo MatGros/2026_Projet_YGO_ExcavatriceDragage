@@ -21,8 +21,9 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 import time as _time
+from contextlib import contextmanager
+from uuid import uuid4
 
 # Configuration encodage UTF-8 sous Windows
 if sys.platform == "win32":
@@ -152,6 +153,19 @@ def _find_strucpp_temp_dir(before: set, tmp_root: pathlib.Path) -> pathlib.Path 
     return max(new_dirs, key=lambda p: p.stat().st_mtime)
 
 
+@contextmanager
+def _preserved_ci_scratch(fb_name: str):
+    """Fournit un scratch CI local, conserve pour inspection humaine (T279)."""
+    safe_name = re.sub(r"[^A-Za-z0-9_-]", "_", fb_name)
+    scratch = TEST_AUTO_CI / f".tmp_{safe_name}_{uuid4().hex[:12]}"
+    scratch.mkdir(parents=True, exist_ok=False)
+    print(f"[SCRATCH CI CONSERVE] {scratch}")
+    try:
+        yield str(scratch)
+    finally:
+        print(f"[NETTOYAGE MANUEL REQUIS] {scratch}")
+
+
 
 def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = False,
             enable_chronogram: bool = True, generate_reports: bool = True) -> dict:
@@ -192,9 +206,8 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
     _log(f"\n=== {fb_name} (domaine {domain}) ===")
 
     t_conv_start = _time.perf_counter()
-    # STruCpp peut conserver brièvement un handle Windows dans le dossier de conversion.
-    # Le résultat compilation/ASSERT fait foi ; un nettoyage différé ne doit pas le masquer.
-    with tempfile.TemporaryDirectory(prefix=f"st2c_{fb_name}_", ignore_cleanup_errors=True) as tmp:
+    # Le scratch est conserve afin que l'humain puisse examiner les sources et binaires generes.
+    with _preserved_ci_scratch(fb_name) as tmp:
         converted_dir = pathlib.Path(tmp)
         # Flag de priorité basse sous Windows pour préserver 100% de la réactivité du PC
         subproc_flags = subprocess.BELOW_NORMAL_PRIORITY_CLASS if sys.platform == "win32" else 0
@@ -209,7 +222,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             if debug:
                 print(f"[ERREUR] Conversion echouee pour {fb_name}")
                 print(result.stderr, file=sys.stderr)
-            return {"ok": False, "tests": [{"name": "(conversion)", "passed": False, "detail": "echec conversion moulinette"}], "report": None, "timings": {"conversion": t_conv}}
+            return {"ok": False, "tests": [{"name": "(conversion)", "passed": False, "detail": "echec conversion moulinette"}], "report": None, "timings": {"conversion": t_conv}, "scratch": converted_dir}
 
         converted_files = [str(converted_dir / s.name) for s in sources]
         out_cpp = converted_dir / f"{fb_name}.cpp"
@@ -222,7 +235,8 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         # dans son propre sous-dossier TEMP via l'env TEMP/TMP (respecte par STruCpp comme tout
         # binaire Windows standard) : le diff avant/apres ne voit plus alors que SES propres
         # sous-dossiers strucpp-test-*, quel que soit le nombre de jobs concurrents.
-        job_tmp_root = pathlib.Path(tempfile.mkdtemp(prefix=f"ci_job_{fb_name}_"))
+        job_tmp_root = converted_dir / "strucpp_job"
+        job_tmp_root.mkdir(parents=True, exist_ok=False)
         job_env = dict(os.environ, TEMP=str(job_tmp_root), TMP=str(job_tmp_root))
         tmp_root = job_tmp_root
         before = {p for p in tmp_root.glob("strucpp-test-*") if p.is_dir()}
@@ -407,7 +421,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                 "af_warnings": af_warnings, "extra_test_warnings": extra_test_warnings,
                 "encapsulation_report": encapsulation_report,
                 "report_group": report_group, "section_kwargs": section_kwargs,
-                "timings": timings}
+                "timings": timings, "scratch": converted_dir}
 
 
 def main() -> int:
@@ -557,6 +571,8 @@ def main() -> int:
             except Exception:
                 uri = str(res["report"])
             print(f"  Rapport HTML : {uri}")
+        if res.get("scratch"):
+            print(f"  Scratch CI conserve : {res['scratch']}")
     for group_name, path in group_report_paths.items():
         try:
             uri = pathlib.Path(path).resolve().as_uri()

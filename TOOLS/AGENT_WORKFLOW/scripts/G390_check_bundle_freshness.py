@@ -9,6 +9,7 @@ import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from uuid import uuid4
 
 
 def main() -> int:
@@ -38,14 +39,10 @@ def main() -> int:
         print("ERROR: bundle timestamp missing", file=sys.stderr)
         return 2
 
-    # Repertoire de travail manuel sous le projet (jamais tempfile.TemporaryDirectory) :
-    # le sandbox DSH (Windows) refuse toute ecriture dans les repertoires crees par
-    # tempfile.mkdtemp/TemporaryDirectory (WinError 5, acces refuse), ce qui faisait
-    # echouer la copie de CODE/ en aveugle. Un sous-dossier du projet reste writable.
-    scratch = root / (out_dir.name + ".freshness")
-    if scratch.exists():
-        shutil.rmtree(scratch, ignore_errors=True)
+    # Scratch sous l'outillage, jamais a la racine et jamais supprime automatiquement.
+    scratch = root / "TOOLS" / "AGENT_WORKFLOW" / ".tmp" / f"g390_freshness_{uuid4().hex[:12]}"
     scratch.mkdir(parents=True, exist_ok=True)
+    print(f"INFO: scratch G390 conserve : {scratch.relative_to(root)}")
     try:
         temp_root = scratch
         temp_code = temp_root / "CODE"
@@ -78,7 +75,7 @@ def main() -> int:
             print("FAIL: CODE_XML/CODE_Bundle.xml is stale")
             return 1
     finally:
-        shutil.rmtree(scratch, ignore_errors=True)
+        print(f"INFO: nettoyage manuel requis pour : {scratch.relative_to(root)}")
 
     print("PASS: CODE_XML/CODE_Bundle.xml is fresh")
     return 0

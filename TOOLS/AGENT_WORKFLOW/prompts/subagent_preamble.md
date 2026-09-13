@@ -57,7 +57,9 @@ tout critère générique d'acceptation. Ta restitution se juge **contre eux**, 
   ```
   - `<SESSION>` : id unique de ta mission (ex. `task-AF10`, ou horodatage).
   - `<etat>` : `en_cours | ok | fail | attente_validation | termine`.
-- Les fichiers vivent dans `TOOLS/AGENT_WORKFLOW/status/` (git-ignore, jamais commités).
+- Les nouveaux fichiers vivent dans `TOOLS/AGENT_WORKFLOW/status/` (local et ignoré).
+  Des fichiers historiques peuvent encore être suivis : ne pas les supprimer ni les désindexer,
+  leur régularisation relève de la phase 4 T279.
 - Le suivi en direct se fait via :
   ```bash
   python TOOLS/AGENT_WORKFLOW/scripts/agent_heartbeat.py watch            # tous
@@ -65,8 +67,8 @@ tout critère générique d'acceptation. Ta restitution se juge **contre eux**, 
   ```
 - **Cible** : ne pas dépasser ~10s sans un log d'étape, autant que les tours le
   permettent (un outil long peut déroger — le signaler dans le log suivant).
-- Ne journalise jamais ailleurs que dans cette zone dédiée (pas de fichiers
-  temp jetables `_tmp_*`, cf. Interdits absolus).
+- Ne journalise jamais ailleurs que dans cette zone dédiée. Toute preuve durable va dans le
+  sous-dossier métier de `DOC/WFLOW/`, pas dans un scratch.
 
 ## 🚨 Devoir d'alerte — non négociable
 
@@ -144,6 +146,13 @@ Hors scope constaté (devoir d'alerte) : ...
 - Commit, push, reset, rebase — **jamais**, la validation est humaine
 - Modifier `PRJ_CODESYS/PROJ_Full_ImportExport/Device.export`
 - Créer des scripts ou fichiers temporaires jetables (`_tmp_*.py`, `tmp.sh`) ou bricoler des écritures via Heredoc shell (`cat << EOF`) : utiliser exclusivement les outils d'édition natifs (`view_file`, `replace_file_content`, `write_to_file`).
+- Créer un dossier scratch `.tmp_*`, `.dsh_tmp`, `tmp`, `.tmpsandbox`, `scratch` ou
+  `CODE_XML.freshness` à la racine, ou rediriger `TEMP`/`TMP` vers la racine. Un runner peut
+  seulement utiliser le temp système hors dépôt ou son scratch autorisé par
+  `STRUCTURE_AND_CLEANUP.md`. Avant et après tout test/gate : exécuter `git status --short`
+  et signaler tout chemin hors table ; ne jamais l'ignorer pour le masquer.
+- Supprimer, déplacer ou désindexer automatiquement un artefact, même temporaire : l'outil doit
+  seulement le détecter et signaler son chemin ; le nettoyage est une action humaine explicite.
 - Élargir le scope au-delà de la tâche : signaler, ne pas décider
 - Annoncer « terminé » sans les preuves ci-dessus
 

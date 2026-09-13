@@ -256,6 +256,22 @@ d'application → `4bis.` vérification mécanique **bloquante** → `5.` REX ve
 
 ⚠️ L'utilisateur applique **tout manuellement** dans CODESYS 3.5 (copie du ST puis import PLCopenXML).
 
+## 🧹 Routage des sorties agents et CI (T279)
+
+Avant toute écriture, classer la sortie selon la table canonique
+`TOOLS/AGENT_WORKFLOW/docs/STRUCTURE_AND_CLEANUP.md` : les preuves durables vont sous
+`DOC/WFLOW/`, le bundle reste `CODE_XML/CODE_Bundle.xml`, et les scratchs ne vont **jamais**
+à la racine ni dans `.codex/`. Les scratchs racine (`.tmp_*`, `.dsh_tmp`, `tmp`,
+`.tmpsandbox`, `scratch`, `CODE_XML.freshness`) restent volontairement visibles dans Git.
+
+`TEMP`/`TMP` ne peuvent pointer que vers le temp système hors dépôt ou le scratch autorisé
+du runner. Avant et après chaque test ou gate : `git status --short` ; tout chemin hors table
+est signalé, jamais ajouté à `.gitignore` pour le masquer.
+
+🚫 **Aucune suppression automatique** : scripts, gates et agents détectent les artefacts et
+affichent leur chemin, mais ne les effacent, déplacent ni désindexent. Le nettoyage relève
+exclusivement d'une décision et d'une action humaine explicites.
+
 ---
 
 ## 📖 Documentation
