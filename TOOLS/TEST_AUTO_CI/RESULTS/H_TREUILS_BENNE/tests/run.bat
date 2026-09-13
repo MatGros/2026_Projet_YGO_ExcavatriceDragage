@@ -7,7 +7,7 @@ echo   TEST_AUTO_CI : Domaine H_TREUILS_BENNE
 echo   Rapport + Chronogrammes complets
 echo ========================================================
 
-python "%SCRIPT_DIR%..\..\..\run_tests.py" --domain H_TREUILS_BENNE %*
+python "%SCRIPT_DIR%..\..\..\scripts\run_tests.py" --domain H_TREUILS_BENNE %*
 
 echo.
 pause

@@ -1,0 +1,28 @@
+﻿#!/usr/bin/env python3
+"""Raccourci : lance les tests du domaine _TROUBLESHOOTING avec mesure du temps et calibrage multithread.
+"""
+import pathlib
+import subprocess
+import sys
+import time
+
+def FindRunner() -> pathlib.Path:
+    """Trouve le runner canonique sans dependre de la profondeur du workspace."""
+    for parent in pathlib.Path(__file__).resolve().parents:
+        candidate = parent / "scripts" / "run_tests.py"
+        if candidate.is_file():
+            return candidate
+    raise FileNotFoundError("scripts/run_tests.py introuvable depuis ce raccourci troubleshooting")
+
+
+RUN_TESTS = FindRunner()
+
+if __name__ == "__main__":
+    start = time.perf_counter()
+    code = subprocess.call([sys.executable, str(RUN_TESTS), "--domain", "_TROUBLESHOOTING", *sys.argv[1:]])
+    elapsed = time.perf_counter() - start
+    minutes = int(elapsed // 60)
+    seconds = elapsed % 60
+    t_str = f"{minutes}m {seconds:.2f}s" if minutes > 0 else f"{seconds:.2f}s"
+    print(f"\n⏱️  Duree totale domaine _TROUBLESHOOTING : {t_str}")
+    sys.exit(code)

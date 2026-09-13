@@ -57,11 +57,15 @@
     {
       "name": "TC-P05-008 Bascule de mode sous AU (treuils a l arret mecanique)",
       "passed": true
+    },
+    {
+      "name": "TC-P05-009 M3AtTremie force selecteur=2 (jamais couple), meme benne deja ouverte",
+      "passed": true
     }
   ],
   "summary": {
-    "total": 14,
-    "passed": 14,
+    "total": 15,
+    "passed": 15,
     "failed": 0
   }
 }

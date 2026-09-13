@@ -1,0 +1,74 @@
+contract:
+  task_id: T281
+  criticality: C2
+  strategy: patch
+  objective: >
+    Unifier les deux implementations du runner CI dans scripts/run_tests.py,
+    conserver un point d'entree racine compatible, puis mesurer un domaine CI
+    avant toute optimisation ou politique de retention d'archives.
+  acceptance:
+    - id: AC1
+      statement: "scripts/run_tests.py porte les comportements valides des deux runners, dont le scratch T279 conserve et l'isolation TEMP par job."
+      verified_by: "Revue du diff semantique et test statique des invariants T279 sur scripts/run_tests.py."
+    - id: AC2
+      statement: "TOOLS/TEST_AUTO_CI/run_tests.py reste present comme relais de compatibilite et ne contient plus une seconde implementation du runner."
+      verified_by: "Test statique : le relais cible scripts/run_tests.py et aucune fonction de compilation ou d'archivage n'y subsiste."
+    - id: AC3
+      statement: "Les lanceurs batch racine appellent scripts/run_tests.py de maniere explicite."
+      verified_by: "Revue de run_all_tests.bat, run_fb.bat, RUN_MES_TESTS_LOCAL.bat et GENERATE_ALL_REPORTS_WITH_CHRONOGRAMS.bat."
+    - id: AC4
+      statement: "Les deux points d'entree exposent la meme aide CLI et un essai chronometre d'un domaine produit un verdict et les temps par etape."
+      verified_by: "py -3.13 TOOLS/TEST_AUTO_CI/scripts/run_tests.py --help ; py -3.13 TOOLS/TEST_AUTO_CI/run_tests.py --help ; py -3.13 TOOLS/TEST_AUTO_CI/scripts/run_tests.py --domain D_JOYSTICK --fast -j 1."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/scripts/run_tests.py
+      - TOOLS/TEST_AUTO_CI/run_tests.py
+      - TOOLS/TEST_AUTO_CI/run_all_tests.bat
+      - TOOLS/TEST_AUTO_CI/run_fb.bat
+      - TOOLS/TEST_AUTO_CI/RUN_MES_TESTS_LOCAL.bat
+      - TOOLS/TEST_AUTO_CI/GENERATE_ALL_REPORTS_WITH_CHRONOGRAMS.bat
+      - TOOLS/TEST_AUTO_CI/README.md
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T281_UNIFIER_RUNNER_CI.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/CODE_Bundle.xml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Suppression de l'un ou l'autre fichier run_tests.py.
+      - Regle de suppression automatique d'archives.
+      - Optimisation du moteur de compilation avant mesure de reference validee.
+  conservation:
+    must_survive:
+      - "Les deux commandes historiques run_tests.py et scripts/run_tests.py."
+      - "Le comportement T279 : scratch conserve et nettoyage humain explicite."
+      - "Les validations VAR_IN_OUT, couverture AF, encapsulation et generation de rapports."
+    dropped_on_purpose: []
+  evidence_required:
+    - "check_task_contract.py : PASS."
+    - "Tests statiques de non-duplication et invariants T279 : PASS."
+    - "Aide CLI identique via les deux points d'entree."
+    - "Mesure de reference d'un domaine CI, verdict et temps par etape."
+  models_allowed:
+    - "Codex"
+  alert_duty: >
+    Toute divergence de verdict entre les deux points d'entree, tout echec de
+    compilation non preexistant et toute creation de scratch hors zone autorisee
+    est signalee avant une optimisation ou une suppression.
+
+status: COMPLETED
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-13T21:22:00+02:00"
+  status: COMPLETED
+  summary: "scripts/run_tests.py est canonique ; le point d'entree racine est un relais compatible. Baseline D_JOYSTICK verte en 25.29 s."
+  evidence_submitted:
+    - "check_task_contract.py : PASS (0 erreur, 0 avertissement)."
+    - "Tests statiques T279/T281 : 4 PASS."
+    - "Aide CLI identique depuis scripts/run_tests.py et run_tests.py."
+    - "D_JOYSTICK --fast -j 1 : FB_Joystick 29/29 PASS, 25.29 s, scratch racine nouveau = 0."
+validation:
+  status: APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-09-13T21:10:00+02:00"
+  notes: "Conserver les deux fichiers ; scripts/ est le canonique et la racine sert de point d'entree compatible."

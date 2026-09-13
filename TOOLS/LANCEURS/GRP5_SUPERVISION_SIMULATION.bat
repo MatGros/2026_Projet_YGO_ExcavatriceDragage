@@ -7,7 +7,7 @@ echo    (J_SUPERVISION, L_SIMULATION)
 echo =======================================================================
 echo.
 
-python TOOLS\TEST_AUTO_CI\run_tests.py --domain J_SUPERVISION L_SIMULATION
+python TOOLS\TEST_AUTO_CI\scripts\run_tests.py --domain J_SUPERVISION L_SIMULATION
 
 echo.
 echo =======================================================================

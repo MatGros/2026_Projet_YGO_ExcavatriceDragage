@@ -225,3 +225,51 @@ TEST 'TC-P05-008 Bascule de mode sous AU (treuils a l arret mecanique)'
        M1ContactorsReleased := TRUE, M2ContactorsReleased := TRUE);
     ASSERT_EQ(FB.Auth.Mode, E_Mode.SEMI_AUTO, 'Bascule MAINT_N1 -> SEMI_AUTO sous AU (treuils arretes)');
 END_TEST
+
+(* =========================================================================
+   GARDE ABSOLUE TREMIE — REX MES 2026-09-04 : M1 a reellement descendu a la
+   Tremie (couple, WinchSel=0) alors que seule l'ouverture benne etait demandee.
+   T248 (BucketSeqSatisfied) se levait a tort si la benne etait deja ouverte
+   d'une action precedente -> bascule immediate WinchSel 2->0 sans re-verifier
+   la position M3. Fix : M3AtTremie force Auth.JoystickWinchSelectArbitrated=2
+   en PRIORITE ABSOLUE, quel que soit l'etat de BucketSeqSatisfied/T248/requete
+   operateur -> le couple (0) devient physiquement impossible a la Tremie.
+   ========================================================================= *)
+
+TEST 'TC-P05-009 M3AtTremie force selecteur=2 (jamais couple), meme benne deja ouverte'
+    (* Cas du REX : benne DEJA ouverte (BucketIsOpen=TRUE) + manche pousse (JoystickPush) +
+       WinchSel demande = 0 (couple) -> SANS la garde, T248 leverait BucketSeqSatisfied et
+       bascule immediatement en couple (0). AVEC M3AtTremie=TRUE, le select DOIT rester 2. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE,
+       M1ContactorsReleased := TRUE, M2ContactorsReleased := TRUE,
+       CoupledBucketSeqEnable := TRUE, JoystickWinchSelectRequest := 0,
+       JoystickPush := TRUE, JoystickPull := FALSE,
+       BucketIsOpen := TRUE, BucketIsClosed := FALSE,
+       M3AtTremie := TRUE);
+    ASSERT_EQ(FB.Auth.JoystickWinchSelectArbitrated, 2, 'M3AtTremie=TRUE -> selecteur force a 2, jamais 0, meme benne deja ouverte');
+
+    ADVANCE_TIME(10000000);
+
+    (* Le meme scenario, un peu plus tard (BucketSeqSatisfied aurait eu le temps de se lever) :
+       le select doit rester bloque a 2 tant que M3AtTremie est vrai. *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE,
+       M1ContactorsReleased := TRUE, M2ContactorsReleased := TRUE,
+       CoupledBucketSeqEnable := TRUE, JoystickWinchSelectRequest := 0,
+       JoystickPush := TRUE, JoystickPull := FALSE,
+       BucketIsOpen := TRUE, BucketIsClosed := FALSE,
+       M3AtTremie := TRUE);
+    ASSERT_EQ(FB.Auth.JoystickWinchSelectArbitrated, 2, 'M3AtTremie=TRUE persistant -> selecteur reste a 2 (jamais de couple a la Tremie)');
+
+    (* Des que M3AtTremie retombe (pont quitte la Tremie), le comportement T248 normal reprend
+       et peut a nouveau amener le select a 0 (mouvement couple autorise ailleurs). *)
+    FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, SelMode := E_Mode.MAINT_N1,
+       EncoderFaultPresent := FALSE, MachineHomed := TRUE,
+       M1ContactorsReleased := TRUE, M2ContactorsReleased := TRUE,
+       CoupledBucketSeqEnable := TRUE, JoystickWinchSelectRequest := 0,
+       JoystickPush := TRUE, JoystickPull := FALSE,
+       BucketIsOpen := TRUE, BucketIsClosed := FALSE,
+       M3AtTremie := FALSE);
+    ASSERT_EQ(FB.Auth.JoystickWinchSelectArbitrated, 0, 'M3AtTremie=FALSE -> T248 reprend la main, couple a nouveau possible (benne deja ouverte -> BucketSeqSatisfied)');
+END_TEST

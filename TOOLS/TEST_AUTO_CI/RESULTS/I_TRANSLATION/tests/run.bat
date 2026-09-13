@@ -7,7 +7,7 @@ echo   TEST_AUTO_CI : Domaine I_TRANSLATION
 echo   Rapport + Chronogrammes complets
 echo ========================================================
 
-python "%SCRIPT_DIR%..\..\..\run_tests.py" --domain I_TRANSLATION %*
+python "%SCRIPT_DIR%..\..\..\scripts\run_tests.py" --domain I_TRANSLATION %*
 
 echo.
 pause

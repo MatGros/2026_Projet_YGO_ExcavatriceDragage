@@ -7,7 +7,7 @@ echo   TEST_AUTO_CI : Domaine G_CYCLE
 echo   Rapport + Chronogrammes complets
 echo ========================================================
 
-python "%SCRIPT_DIR%..\..\..\run_tests.py" --domain G_CYCLE %*
+python "%SCRIPT_DIR%..\..\..\scripts\run_tests.py" --domain G_CYCLE %*
 
 echo.
 pause

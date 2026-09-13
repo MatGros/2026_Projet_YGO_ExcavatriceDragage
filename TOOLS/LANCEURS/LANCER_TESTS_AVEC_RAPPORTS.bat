@@ -6,7 +6,7 @@ echo 🧪 LANCEMENT COMPLET DU BANC DE TESTS CI (AVEC RAPPORTS HTML & INDEX)
 echo =======================================================================
 echo.
 
-python TOOLS\TEST_AUTO_CI\run_tests.py --all
+python TOOLS\TEST_AUTO_CI\scripts\run_tests.py --all
 
 echo.
 echo =======================================================================

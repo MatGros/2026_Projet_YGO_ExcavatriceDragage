@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "file": "test_fb_winchloadestimator.st",
+  "results": [
+    {
+      "name": "TC-P10-T181-18a Gate : Enable FALSE -> sorties neutres",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-T181-18b Classement vitesse : 0.5 m/s -> bande 2, montee",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-T181-18c Classement vitesse : 1.5 m/s -> bande 4",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-T181-18d Descente : aucune estimation de charge",
+      "passed": true
+    },
+    {
+      "name": "TC-P10-T181-18e Vitesse mesuree negative -> defaut latche, bande 0",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0
+  }
+}

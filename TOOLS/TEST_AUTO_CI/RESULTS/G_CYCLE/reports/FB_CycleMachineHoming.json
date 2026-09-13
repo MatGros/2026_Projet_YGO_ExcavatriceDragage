@@ -12,7 +12,16 @@
     },
     {
       "name": "TC-P09-H010 : validation 3 appuis HX1 -> HX2 en MAINT_N2 (pas sur capteur)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "FB.MACHINEHOMINGSEQSTEP expected 2, got 1",
+        "file": "test_fb_cyclemachinehoming.st",
+        "line": 98,
+        "message": "3 appuis -> HX2",
+        "expected": "2",
+        "actual": "1"
+      }
     },
     {
       "name": "TC-P09-H012 : entree cycle sur front commande IHM StartRequest, en MAINT_N2",
@@ -32,12 +41,21 @@
     },
     {
       "name": "TC-P09-H090 : guide BOTH_NOT_HOMED, entree cycle, AC4, HomingError -> FAILED",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_EQ",
+        "detail": "FB.MACHINEHOMINGSEQSTEP expected 2, got 1",
+        "file": "test_fb_cyclemachinehoming.st",
+        "line": 203,
+        "message": "3 appuis -> HX2",
+        "expected": "2",
+        "actual": "1"
+      }
     }
   ],
   "summary": {
     "total": 8,
-    "passed": 8,
-    "failed": 0
+    "passed": 6,
+    "failed": 2
   }
 }

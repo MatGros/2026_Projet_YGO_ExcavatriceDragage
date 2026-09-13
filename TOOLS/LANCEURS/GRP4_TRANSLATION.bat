@@ -7,7 +7,7 @@ echo    (I_TRANSLATION)
 echo =======================================================================
 echo.
 
-python TOOLS\TEST_AUTO_CI\run_tests.py --domain I_TRANSLATION
+python TOOLS\TEST_AUTO_CI\scripts\run_tests.py --domain I_TRANSLATION
 
 echo.
 echo =======================================================================

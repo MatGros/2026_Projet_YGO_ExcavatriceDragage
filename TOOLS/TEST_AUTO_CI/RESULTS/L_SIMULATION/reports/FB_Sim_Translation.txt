@@ -1,19 +1,32 @@
-Error: C++ compilation failed:
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Translation_ahf2so6a\strucpp-test-3cpRW6\test_main.cpp: In function 'bool test_1(strucpp::TestContext&)':
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Translation_ahf2so6a\strucpp-test-3cpRW6\test_main.cpp:13:27: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'ACTUALPOSITIONM'
-   13 |     if (!ctx.assert_eq(FB.ACTUALPOSITIONM, 0.0, "FB.ACTUALPOSITIONM", "0.0", 10, "Enable FALSE -> Position initiale 0.0m")) return false;
-      |                           ^~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Translation_ahf2so6a\strucpp-test-3cpRW6\test_main.cpp: In function 'bool test_2(strucpp::TestContext&)':
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Translation_ahf2so6a\strucpp-test-3cpRW6\test_main.cpp:21:8: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'DRIVECONTROLWORD'
-   21 |     FB.DRIVECONTROLWORD = 2;
-      |        ^~~~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Translation_ahf2so6a\strucpp-test-3cpRW6\test_main.cpp:22:8: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'DRIVEFREQCMDHZ'
-   22 |     FB.DRIVEFREQCMDHZ = 50.0;
-      |        ^~~~~~~~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Translation_ahf2so6a\strucpp-test-3cpRW6\test_main.cpp:23:8: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'BRAKECMD'
-   23 |     FB.BRAKECMD = true;
-      |        ^~~~~~~~
-C:\Users\ZEDVIC~1\AppData\Local\Temp\ci_job_FB_Sim_Translation_ahf2so6a\strucpp-test-3cpRW6\test_main.cpp:28:47: error: 'class strucpp::FB_SIM_TRANSLATION' has no member named 'ACTUALPOSITIONM'
-   28 |     if (!ctx.assert_true(static_cast<bool>(FB.ACTUALPOSITIONM >= 0.0), "FB.ACTUALPOSITIONM >= 0.0", 23, "Marche Rev -> Position evolue")) return false;
-      |                                               ^~~~~~~~~~~~~~~
+Error compiling source files:
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->═<- at offset: 3, skipped 63 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->�<- at offset: 71, skipped 2 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->—<- at offset: 93, skipped 1 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->é<- at offset: 121, skipped 1 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->─<- at offset: 131, skipped 63 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->�<- at offset: 199, skipped 2 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->ô<- at offset: 203, skipped 1 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->é<- at offset: 287, skipped 1 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->è<- at offset: 316, skipped 1 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->→<- at offset: 404, skipped 1 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->→<- at offset: 412, skipped 1 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->→<- at offset: 420, skipped 1 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->→<- at offset: 428, skipped 1 characters.
+
+FB_Sim_Translation.st:0:0: error: unexpected character: ->→<- at offset: 443, skipped 1 characters.
+
+FB_Sim_Translation.st:0:0: error: Unclosed block comment
 
