@@ -121,6 +121,7 @@ Avant suppression :
 - Avant et après tout test ou gate, exécuter `git status --short`, signaler tout chemin nouveau hors table et ne pas l'ignorer pour masquer l'écart.
 - `G390_check_bundle_freshness.py` conserve son scratch sous `TOOLS/AGENT_WORKFLOW/.tmp/g390_freshness_<id>/` ; il n'existe plus d'exemption `CODE_XML.freshness/` à la racine.
 - **Aucune suppression automatique** par script, agent, gate ou runner : un outil détecte, localise et informe ; seul l'humain décide et réalise le nettoyage. Les rapports et scratchs restent donc présents dans leur emplacement autorisé jusqu'à intervention humaine.
+- Exception approuvée : TEST_AUTO_CI/run_all_tests.bat nettoie exclusivement les scratchs .scratch/<FB>/<run>/ créés par son exécution, uniquement après un verdict global vert ; un échec conserve tous ses scratchs.
 - Aucun fichier temporaire à la racine du projet ; ne jamais supprimer `CODE_Bundle.xml` ou export CODESYS sans validation.
 
 ### Dossier inattendu

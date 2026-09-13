@@ -272,6 +272,10 @@ est signalé, jamais ajouté à `.gitignore` pour le masquer.
 affichent leur chemin, mais ne les effacent, déplacent ni désindexent. Le nettoyage relève
 exclusivement d'une décision et d'une action humaine explicites.
 
+Exception explicitement autorisée : TOOLS/TEST_AUTO_CI/run_all_tests.bat peut supprimer
+uniquement les scratchs .scratch/<FB>/<run>/ créés par son propre lancement, et seulement si
+la totalité de la CI est verte. Au moindre échec, tous les scratchs de ce lancement sont conservés.
+
 ---
 
 ## 📖 Documentation

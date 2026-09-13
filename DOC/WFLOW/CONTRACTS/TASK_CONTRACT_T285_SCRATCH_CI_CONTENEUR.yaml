@@ -1,0 +1,63 @@
+contract:
+  task_id: T285
+  criticality: C2
+  strategy: patch
+  objective: >
+    Ranger les nouveaux scratchs du runner CI dans un conteneur unique .scratch/,
+    classe par FB, et nettoyer uniquement ceux d'un run_all entièrement vert.
+  acceptance:
+    - id: AC1
+      statement: "Un nouveau scratch CI est créé sous TOOLS/TEST_AUTO_CI/.scratch/<FB>/<run>/."
+      verified_by: "Test statique du runner."
+    - id: AC2
+      statement: "Le runner conserve et signale le scratch sans le supprimer."
+      verified_by: "Test statique : aucun rmtree ou TemporaryDirectory."
+    - id: AC3
+      statement: "Git ignore le conteneur .scratch/."
+      verified_by: "git check-ignore sur .scratch : PASS."
+    - id: AC4
+      statement: "run_all_tests.bat nettoie uniquement les scratchs de son run après un verdict global vert ; un échec les conserve."
+      verified_by: "Test statique du flag --cleanup-scratch et des deux branches vert/échec."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/scripts/run_tests.py
+      - TOOLS/TEST_AUTO_CI/.gitignore
+      - TOOLS/TEST_AUTO_CI/run_all_tests.bat
+      - AGENTS.md
+      - TOOLS/AGENT_WORKFLOW/docs/STRUCTURE_AND_CLEANUP.md
+      - TOOLS/AGENT_WORKFLOW/tests/test_T279_scratch_retention.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T285_SCRATCH_CI_CONTENEUR.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/CODE_Bundle.xml
+      - Suppression, déplacement ou désindexation des .tmp_* existants.
+      - Toute suppression automatique hors l'exception run_all explicitement décrite.
+  conservation:
+    must_survive:
+      - "Les scratchs existants et leur contenu."
+      - "Le message de nettoyage manuel requis."
+    dropped_on_purpose: []
+  evidence_required:
+    - "check_task_contract.py : PASS."
+    - "Test T279 : PASS."
+    - "git check-ignore sur .scratch : PASS."
+  models_allowed:
+    - "Codex"
+  alert_duty: "Tout scratch hors .scratch/ ou suppression non demandée est signalé."
+
+status: COMPLETED
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-13T23:15:00+02:00"
+  status: COMPLETED
+  summary: "Nouveaux scratchs sous .scratch/<FB>/<run> ; run_all nettoie seulement après CI totalement verte."
+  evidence_submitted:
+    - "pytest test_T279_scratch_retention.py : 2 PASS."
+    - "git check-ignore .scratch : PASS."
+    - "check_task_contract.py : PASS (0 erreur, 0 avertissement)."
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

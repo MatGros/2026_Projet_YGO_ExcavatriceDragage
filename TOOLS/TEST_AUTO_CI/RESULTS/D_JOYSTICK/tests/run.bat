@@ -7,7 +7,7 @@ echo   TEST_AUTO_CI : Domaine D_JOYSTICK
 echo   Rapport + Chronogrammes complets
 echo ========================================================
 
-python "%SCRIPT_DIR%..\..\..\run_tests.py" --domain D_JOYSTICK %*
+python "%SCRIPT_DIR%..\..\..\scripts\run_tests.py" --domain D_JOYSTICK %*
 
 echo.
 pause

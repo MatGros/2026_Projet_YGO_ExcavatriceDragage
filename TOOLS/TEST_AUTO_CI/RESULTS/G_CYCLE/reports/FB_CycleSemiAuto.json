@@ -31,7 +31,7 @@
       "passed": true
     },
     {
-      "name": "TC-P04-033 T258 : Retrait commissioning annule le for\u00e7age",
+      "name": "TC-P04-033 T258 : Forcage semi-auto independant du bit commissioning",
       "passed": true
     },
     {
@@ -60,19 +60,47 @@
     },
     {
       "name": "TC-P04-020 : Homme-mort relache en cours de plongee X4 -> commandes neutralisees, etape maintenue, PAS de redemarrage auto (T169-A S3)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
+        "file": "test_fb_cyclesemiauto.st",
+        "line": 353,
+        "message": "Etabli en AX4_DESCEND_DIVING"
+      }
     },
     {
       "name": "TC-P04-021 : Fond jamais atteint -> maintien AX4 car tempo max etape desactivee",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
+        "file": "test_fb_cyclesemiauto.st",
+        "line": 501,
+        "message": "Etabli en AX4_DESCEND_DIVING"
+      }
     },
     {
       "name": "TC-P04-023 : StepMaxTimer NON cumulatif - 2 etapes de 40 s (total 80 s > 60 s) sans AX_STAB",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
+        "file": "test_fb_cyclesemiauto.st",
+        "line": 589,
+        "message": "Etabli en X4"
+      }
     },
     {
-      "name": "TC-P04-026 : backstop anti-telescopage - ecart position M1/M2 > 0,5 m en phase couplee X4 -> AX_STAB",
-      "passed": true
+      "name": "TC-P04-026 : AX4 ne contient aucun seuil synchro local - PRG04 reste source unique",
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.CYCLESTEP = E_AUTOCYCLESTEP.AX4_DESCEND_DIVING expected TRUE, got FALSE",
+        "file": "test_fb_cyclesemiauto.st",
+        "line": 680,
+        "message": "Etabli en X4"
+      }
     },
     {
       "name": "TC-P04-022 : Abort+Start avec Fault.Latched actif -> cycle reste en X0 (pas de redemarrage) (T192-A S1)",
@@ -80,12 +108,19 @@
     },
     {
       "name": "TC-P04-SCEN-NOM : Parcours nominal complet X0->X13->X0 avec rebouclage et compteur",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB.TRANSLATIONCMD.REQSTART expected TRUE, got FALSE",
+        "file": "test_fb_cyclesemiauto.st",
+        "line": 849,
+        "message": "X2 : translation vers cible commandee"
+      }
     }
   ],
   "summary": {
     "total": 20,
-    "passed": 20,
-    "failed": 0
+    "passed": 15,
+    "failed": 5
   }
 }

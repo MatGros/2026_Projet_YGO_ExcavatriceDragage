@@ -7,7 +7,7 @@ echo    (F_MODES, G_CYCLE)
 echo =======================================================================
 echo.
 
-python TOOLS\TEST_AUTO_CI\run_tests.py --domain F_MODES G_CYCLE
+python TOOLS\TEST_AUTO_CI\scripts\run_tests.py --domain F_MODES G_CYCLE
 
 echo.
 echo =======================================================================

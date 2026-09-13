@@ -159,7 +159,14 @@
     },
     {
       "name": "TC-P11-031 Translation : fin de course extr\u00eame coupe le mouvement (bit6)",
-      "passed": true
+      "passed": false,
+      "failure": {
+        "assertType": "ASSERT_TRUE",
+        "detail": "FB_T.FAULT.ERROR expected TRUE, got FALSE",
+        "file": "test_fb_translation.st",
+        "line": 1188,
+        "message": "Fdc Tr\u00e9mie -> d\u00e9faut"
+      }
     },
     {
       "name": "TC-P11-032 Gate de sens : Direction=1 sans TremiePermit -> rampe bloquee (mot 0, freq 0)",
@@ -198,7 +205,7 @@
   ],
   "summary": {
     "total": 37,
-    "passed": 32,
-    "failed": 5
+    "passed": 31,
+    "failed": 6
   }
 }

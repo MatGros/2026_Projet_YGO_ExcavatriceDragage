@@ -21,8 +21,9 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 import time as _time
+from contextlib import contextmanager
+from uuid import uuid4
 
 # Configuration encodage UTF-8 sous Windows
 if sys.platform == "win32":
@@ -57,8 +58,9 @@ TEST_AUTO_CI = REPO_ROOT / "TOOLS" / "TEST_AUTO_CI"
 COMPILER_DIR = REPO_ROOT / "TOOLS" / "COMPILER_ST2C_STruCpp"
 CONVERTER = COMPILER_DIR / "convert_codesys_to_iec.py"
 STRUCPP = COMPILER_DIR / "bin" / "win32-x64" / "strucpp.exe"
-REGISTRY = TEST_AUTO_CI / "registry.yaml"
-CONFIG = TEST_AUTO_CI / "config.yaml"
+CONFIG_DIR = SCRIPT_DIR / "config"
+REGISTRY = CONFIG_DIR / "registry.yaml"
+CONFIG = CONFIG_DIR / "config.yaml"
 RUNTIME_INCLUDE = COMPILER_DIR / "bin" / "win32-x64" / "runtime" / "include"
 RUNTIME_TEST = COMPILER_DIR / "bin" / "win32-x64" / "runtime" / "test"
 
@@ -141,6 +143,19 @@ def _archive_previous_async(reports_dir: pathlib.Path, fb_name: str) -> None:
     threading.Thread(target=_archive_previous, args=(reports_dir, fb_name), daemon=True).start()
 
 
+@contextmanager
+def _preserved_ci_scratch(fb_name: str):
+    """Fournit un scratch CI local, conserve pour inspection humaine (T279)."""
+    safe_name = re.sub(r"[^A-Za-z0-9_-]", "_", fb_name)
+    scratch = TEST_AUTO_CI / ".scratch" / safe_name / uuid4().hex[:12]
+    scratch.mkdir(parents=True, exist_ok=False)
+    print(f"[SCRATCH CI CONSERVE] {scratch}")
+    try:
+        yield str(scratch)
+    finally:
+        print(f"[NETTOYAGE MANUEL REQUIS] {scratch}")
+
+
 def _find_strucpp_temp_dir(before: set, tmp_root: pathlib.Path) -> pathlib.Path | None:
     """STruCpp --test compile+build+execute dans un dossier strucpp-test-XXXXXX du TEMP
     systeme, jamais nettoye (constate empiriquement). On diffe avant/apres pour retrouver
@@ -194,7 +209,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
     t_conv_start = _time.perf_counter()
     # STruCpp peut conserver brièvement un handle Windows dans le dossier de conversion.
     # Le résultat compilation/ASSERT fait foi ; un nettoyage différé ne doit pas le masquer.
-    with tempfile.TemporaryDirectory(prefix=f"st2c_{fb_name}_", ignore_cleanup_errors=True) as tmp:
+    with _preserved_ci_scratch(fb_name) as tmp:
         converted_dir = pathlib.Path(tmp)
         # Flag de priorité basse sous Windows pour préserver 100% de la réactivité du PC
         subproc_flags = subprocess.BELOW_NORMAL_PRIORITY_CLASS if sys.platform == "win32" else 0
@@ -209,7 +224,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
             if debug:
                 print(f"[ERREUR] Conversion echouee pour {fb_name}")
                 print(result.stderr, file=sys.stderr)
-            return {"ok": False, "tests": [{"name": "(conversion)", "passed": False, "detail": "echec conversion moulinette"}], "report": None, "timings": {"conversion": t_conv}}
+            return {"ok": False, "tests": [{"name": "(conversion)", "passed": False, "detail": "echec conversion moulinette"}], "report": None, "timings": {"conversion": t_conv}, "scratch": converted_dir}
 
         converted_files = [str(converted_dir / s.name) for s in sources]
         out_cpp = converted_dir / f"{fb_name}.cpp"
@@ -220,12 +235,9 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
         # FB et publier un faux rapport vert. Isole le TEMP de CE processus
         # dans son repertoire de conversion; le runner retrouve est alors
         # necessairement celui associe au couple FB/test courant.
-        tmp_root = converted_dir / "strucpp_tmp"
-        tmp_root.mkdir(parents=True, exist_ok=True)
-        strucpp_env = os.environ.copy()
-        strucpp_env["TEMP"] = str(tmp_root)
-        strucpp_env["TMP"] = str(tmp_root)
-        strucpp_env["TMPDIR"] = str(tmp_root)
+        tmp_root = converted_dir / "strucpp_job"
+        tmp_root.mkdir(parents=True, exist_ok=False)
+        strucpp_env = dict(os.environ, TEMP=str(tmp_root), TMP=str(tmp_root))
         before = {p for p in tmp_root.glob("strucpp-test-*") if p.is_dir()}
 
         if debug:
@@ -439,7 +451,7 @@ def run_one(fb_name: str, entry: dict, cycle_time_ms: float = 10, debug: bool = 
                 "af_warnings": af_warnings, "extra_test_warnings": extra_test_warnings,
                 "encapsulation_report": encapsulation_report,
                 "report_group": report_group, "section_kwargs": section_kwargs,
-                "timings": timings}
+                "timings": timings, "scratch": converted_dir}
 
 
 def main() -> int:
@@ -451,18 +463,22 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--fb", help="Nom du FB a tester (cle du registry.yaml)")
-    group.add_argument("--domain", help="Tester tous les FB d'un domaine (ex: AU_SECURITE, JOYSTICK)")
+    group.add_argument("--domain", nargs="+", help="Tester tous les FB d'un ou plusieurs domaines (ex: A_COMMUN B_AU_SECURITE)")
     group.add_argument("--all", action="store_true", help="Tester tous les FB du registre (defaut si aucune option)")
     parser.add_argument("-j", "--jobs", type=int, default=default_workers,
                         help=f"Nombre d'instances de test en parallele (defaut calibre : {default_workers} threads)")
     parser.add_argument("--fast", "--no-chronogram", dest="fast", action="store_true",
                         help="CI rapide : simulation/assertions, sans chronogramme ni écriture de rapports")
+    parser.add_argument("--cleanup-scratch", action="store_true",
+                        help="Après un --all entièrement vert : supprime uniquement les scratchs créés par ce run.")
     parser.add_argument("--debug", action="store_true",
                          help="Affiche tous les logs intermediaires (conversion, sortie brute strucpp). "
                               "Sans cette option : uniquement le resultat final.")
     args = parser.parse_args()
     if not args.fb and not args.domain and not args.all:
         args.all = True
+    if args.cleanup_scratch and not args.all:
+        parser.error("--cleanup-scratch est réservé à --all")
 
     _ensure_gpp_in_path(args.debug)
 
@@ -478,10 +494,11 @@ def main() -> int:
     start_time = _time.perf_counter()
 
     if args.domain:
-        targets = {name: e for name, e in registry.items() if e["domain"] == args.domain}
+        req_domains = set(args.domain)
+        targets = {name: e for name, e in registry.items() if e["domain"] in req_domains}
         if not targets:
             domains = sorted({e["domain"] for e in registry.values()})
-            print(f"[ERREUR] Aucun FB dans le domaine '{args.domain}' -- domaines disponibles : {', '.join(domains)}")
+            print(f"[ERREUR] Aucun FB dans les domaines '{args.domain}' -- domaines disponibles : {', '.join(domains)}")
             return 1
     elif args.fb:
         if args.fb not in registry:
@@ -582,15 +599,14 @@ def main() -> int:
             print(f"    * Cablage production        : {timings.get('wiring', 0.0):.2f}s")
             print(f"    * Rapport HTML / JSON       : {timings.get('report_generation', 0.0):.2f}s")
             print(f"    * Total FB                  : {timings.get('total', 0.0):.2f}s")
-        elif timings and "conversion" in timings:
-            print("  -- [PROFILING] Temps des etapes --")
-            print(f"    * Conversion ST->IEC        : {timings.get('conversion', 0.0):.2f}s")
         if res["report"] and not res.get("report_group"):
             try:
                 uri = pathlib.Path(res["report"]).resolve().as_uri()
             except Exception:
                 uri = str(res["report"])
             print(f"  Rapport HTML : {uri}")
+        if res.get("scratch"):
+            print(f"  Scratch CI conserve : {res['scratch']}")
     for group_name, path in group_report_paths.items():
         try:
             uri = pathlib.Path(path).resolve().as_uri()
@@ -599,9 +615,44 @@ def main() -> int:
         print(f"Rapport groupe {group_name} : {uri}")
 
     # Génération du dashboard index.html à la racine de TEST_AUTO_CI
-    if generate_reports and (len(results) > 1 or args.all or args.domain):
+    if generate_reports:
         from html_report import render_index_dashboard
-        index_html = render_index_dashboard(results, group_report_paths)
+        index_state_file = TEST_AUTO_CI / ".state" / "index_state.json"
+        saved_state = {}
+        if index_state_file.exists():
+            try:
+                saved_state = json.loads(index_state_file.read_text(encoding="utf-8"))
+            except Exception:
+                saved_state = {}
+        for reg_name, reg_entry in registry.items():
+            if reg_name not in saved_state:
+                report_domain = reg_entry.get("domain", "AUTRES")
+                report_group = reg_entry.get("report_group")
+                report_name = report_group or reg_name
+                report_path = TEST_AUTO_CI / "RESULTS" / report_domain / "reports" / f"{report_name}.html"
+                saved_state[reg_name] = {
+                    "ok": False,
+                    "report": str(report_path) if report_path.exists() else None,
+                    "report_group": report_group,
+                    "section_kwargs": {"domain": report_domain},
+                    "tests": [],
+                }
+        now_str = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for name, res in results.items():
+            saved_state[name] = {
+                "ok": res.get("ok", False),
+                "report": str(res["report"]) if res.get("report") else None,
+                "report_group": res.get("report_group"),
+                "section_kwargs": res.get("section_kwargs", {}),
+                "tests": res.get("tests", []),
+                "updated_at": now_str,
+            }
+        index_state_file.parent.mkdir(parents=True, exist_ok=True)
+        index_state_file.write_text(
+            json.dumps(saved_state, indent=2, default=str),
+            encoding="utf-8",
+        )
+        index_html = render_index_dashboard(saved_state, group_report_paths)
         index_path = TEST_AUTO_CI / "index.html"
         index_path.write_text(index_html, encoding="utf-8")
         try:
@@ -616,6 +667,21 @@ def main() -> int:
     time_str = f"{minutes}m {seconds:.2f}s" if minutes > 0 else f"{seconds:.2f}s"
 
     n_fail = sum(1 for res in results.values() if not res["ok"])
+    if args.cleanup_scratch:
+        if n_fail:
+            print("[SCRATCHS CONSERVES] Echec CI : aucun scratch de ce run n'est supprime.")
+        else:
+            scratch_root = (TEST_AUTO_CI / ".scratch").resolve()
+            removed = 0
+            for res in results.values():
+                scratch = res.get("scratch")
+                if not scratch:
+                    continue
+                scratch_path = pathlib.Path(scratch).resolve()
+                if scratch_path.is_relative_to(scratch_root) and scratch_path.is_dir():
+                    shutil.rmtree(scratch_path)
+                    removed += 1
+            print(f"[SCRATCHS NETTOYES] {removed} scratch(s) de ce run supprime(s) apres CI verte.")
     summary = f"{len(results)} FB testes, {len(results) - n_fail} PASS, {n_fail} FAIL"
     print(f"\n{_c(summary, n_fail == 0)}")
     print(f"[TEMPS D'EXECUTION] : {time_str}")

@@ -7,7 +7,7 @@ echo   TEST_AUTO_CI : Domaine J_SUPERVISION
 echo   Rapport + Chronogrammes complets
 echo ========================================================
 
-python "%SCRIPT_DIR%..\..\..\run_tests.py" --domain J_SUPERVISION %*
+python "%SCRIPT_DIR%..\..\..\scripts\run_tests.py" --domain J_SUPERVISION %*
 
 echo.
 pause

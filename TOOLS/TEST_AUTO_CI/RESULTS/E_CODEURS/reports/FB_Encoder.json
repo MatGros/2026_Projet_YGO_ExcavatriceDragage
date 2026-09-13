@@ -46,13 +46,11 @@
       "name": "TC-P09-050 Mesure de vitesse : filtrage fenetre glissante 50ms et robustesse aux perturbations dynamiques (elasticite cable et vibrations)",
       "passed": false,
       "failure": {
-        "assertType": "ASSERT_NEAR",
-        "detail": "FB.MEASUREMENT.SPEED_MPS expected 1.5 +/- 0.05, got 0.568064",
+        "assertType": "ASSERT_FALSE",
+        "detail": "FB.MEASUREMENT.SPEEDVALID expected FALSE, got TRUE",
         "file": "test_fb_encoder.st",
-        "line": 230,
-        "message": "Vitesse nominale filtree = 1.50 m/s",
-        "expected": "1.5",
-        "actual": "0.568064"
+        "line": 203,
+        "message": "Echantillon 1 : Fenetre 50ms pas encore remplie"
       }
     },
     {
@@ -172,12 +170,12 @@
       "passed": false,
       "failure": {
         "assertType": "ASSERT_NEAR",
-        "detail": "FB.MEASUREMENT.SPEED_MPS expected 1.5 +/- 0.05, got 0.568064",
+        "detail": "FB.MEASUREMENT.SPEED_MPS expected 1.5 +/- 0.05, got 0",
         "file": "test_fb_encoder.st",
         "line": 930,
         "message": "SignedSpeed=(P[5]-P[0])/0.05 = 1.50 m/s",
         "expected": "1.5",
-        "actual": "0.568064"
+        "actual": "0"
       }
     }
   ],

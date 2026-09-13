@@ -1,8 +1,11 @@
 # Ignorer uniquement les archives horodatées (les derniers rapports actifs restent versionnés dans Git)
 RESULTS/*/reports/archive/
+# Rapports regenerables des investigations agent : les scenarios restent sous tests/.
+RESULTS/_TROUBLESHOOTING/*/reports/
 # Artefacts de build jetables du runner CI : uniquement sous TOOLS/TEST_AUTO_CI/.
 # Un .tmp_* a la racine du depot reste volontairement visible et non conforme.
-/.tmp_*/
+/.scratch/
+/.state/
 engine/*.exe
 engine/build_manifest.json
 engine/_*.log

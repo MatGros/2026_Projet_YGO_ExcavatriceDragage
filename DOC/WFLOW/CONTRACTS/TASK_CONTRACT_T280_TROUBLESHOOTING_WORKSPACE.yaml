@@ -1,0 +1,63 @@
+contract:
+  task_id: T280
+  criticality: C2
+  strategy: patch
+  objective: >
+    Normaliser l'espace de troubleshooting CI afin que chaque investigation
+    soit isolee sous un identifiant d'agent avec les repertoires tests et
+    reports predictibles, sans perdre le contenu historique.
+  acceptance:
+    - id: AC1
+      statement: "Le contenu historique actuellement a la racine de RESULTS/_TROUBLESHOOTING est range sous HUM_LEGACY/."
+      verified_by: "git diff --summary ne presente que des renommages pour les fichiers historiques ; aucune suppression sous _TROUBLESHOOTING."
+    - id: AC2
+      statement: "HUM_LEGACY contient les racines tests/ et reports/, et les scenarios, outils et rapports existants sont classes dans l'une de ces deux racines."
+      verified_by: "Inventaire Get-ChildItem et revue du README de _TROUBLESHOOTING."
+    - id: AC3
+      statement: "Le README du tool definit la convention AGENT_ID/tests et AGENT_ID/reports, ainsi que le routage des scratchs vers TOOLS/TEST_AUTO_CI/.tmp_<agent>_<run>."
+      verified_by: "Revue de TOOLS/TEST_AUTO_CI/README.md et git check-ignore -v sur un rapport futur sous _TROUBLESHOOTING/<agent>/reports/."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/
+      - TOOLS/TEST_AUTO_CI/README.md
+      - TOOLS/TEST_AUTO_CI/.gitignore
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T280_TROUBLESHOOTING_WORKSPACE.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/CODE_Bundle.xml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Suppression de fichiers existants sous RESULTS/_TROUBLESHOOTING.
+      - Modification des suites de test ST ou de la logique des runners.
+  conservation:
+    must_survive:
+      - "Tous les fichiers existants de RESULTS/_TROUBLESHOOTING, preserves par renommage Git."
+      - "Les scenarios et lanceurs de test existants."
+    dropped_on_purpose: []
+  evidence_required:
+    - "check_task_contract.py : PASS."
+    - "git diff --check : PASS."
+    - "git diff --summary montrant uniquement les renommages historiques."
+    - "git check-ignore -v sur un futur rapport agent."
+  models_allowed:
+    - "Codex"
+  alert_duty: >
+    Toute collision de nom, tout fichier non classe dans tests/ ou reports/ et
+    toute suppression Git inattendue est signale avant poursuite.
+
+status: COMPLETED
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-13T20:55:00+02:00"
+  status: COMPLETED
+  summary: "Contenu historique range sous HUM_LEGACY par renommages Git ; convention agent et ignore des rapports futurs ajoutes."
+  evidence_submitted:
+    - "check_task_contract.py : PASS (0 erreur, 0 avertissement)."
+    - "git diff --check : PASS."
+    - "run.py localise le runner canonique TOOLS/TEST_AUTO_CI/run_tests.py."
+    - "git check-ignore -v : futur rapport Codex_T280/reports/future.log ignore."
+validation:
+  status: APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-09-13T20:45:00+02:00"
+  notes: "Accord pour ranger le contenu historique sous HUM_LEGACY et documenter l'usage agent."

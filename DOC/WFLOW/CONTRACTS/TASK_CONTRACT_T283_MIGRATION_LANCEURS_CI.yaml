@@ -1,0 +1,76 @@
+contract:
+  task_id: T283
+  criticality: C2
+  strategy: patch
+  objective: >
+    Rendre chaque lanceur CI executable apres la suppression voulue du runner
+    racine, en les reliant exclusivement au runner canonique scripts/run_tests.py,
+    et placer les configurations internes sous scripts/config/.
+  acceptance:
+    - id: AC1
+      statement: "Chaque run.bat de domaine lance scripts/run_tests.py avec son domaine."
+      verified_by: "Test statique des 12 run.bat de RESULTS/*/tests."
+    - id: AC2
+      statement: "Les raccourcis Python et les lanceurs TOOLS/LANCEURS ne referencent plus le runner racine supprime."
+      verified_by: "Test statique de tous les lanceurs executables."
+    - id: AC3
+      statement: "Le lanceur B_AU_SECURITE expose une commande Python resolvable vers le runner canonique."
+      verified_by: "Execution de B_AU_SECURITE/tests/run.py --help."
+    - id: AC4
+      statement: "Le runner et son controle d'encapsulation chargent les configurations depuis scripts/config/."
+      verified_by: "Test statique des chemins de configuration et chargement YAML du registre deplace."
+    - id: AC5
+      statement: "Un chemin Windows dans le cache du dashboard ne fait pas echouer une suite de tests valide."
+      verified_by: "Garde-fou unitaire sur la serialisation JSON du cache."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/RESULTS/*/tests/run.bat
+      - TOOLS/TEST_AUTO_CI/RESULTS/*/tests/run.py
+      - TOOLS/LANCEURS/*.bat
+      - TOOLS/TEST_AUTO_CI/scripts/config/config.yaml
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - TOOLS/TEST_AUTO_CI/scripts/run_tests.py
+      - TOOLS/TEST_AUTO_CI/scripts/encapsulation_check.py
+      - TOOLS/TEST_AUTO_CI/README.md
+      - TOOLS/AGENT_WORKFLOW/tests/test_T281_runner_convergence.py
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T283_MIGRATION_LANCEURS_CI.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - CODE/
+      - CODE_XML/CODE_Bundle.xml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/TEST_AUTO_CI/RESULTS/*/reports/
+      - Toute suppression automatique.
+  conservation:
+    must_survive:
+      - "Le runner canonique TOOLS/TEST_AUTO_CI/scripts/run_tests.py."
+      - "Les options transmises aux lanceurs existants."
+    dropped_on_purpose:
+      - "Le runner racine, deja supprime explicitement par l'utilisateur."
+  evidence_required:
+    - "check_task_contract.py : PASS."
+    - "Test statique de migration : PASS."
+    - "B_AU_SECURITE/tests/run.py --help : PASS."
+  models_allowed:
+    - "Codex"
+  alert_duty: >
+    Toute reference executable restante au runner racine ou tout effet sur les
+    rapports et archives est signale immediatement.
+
+status: COMPLETED
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-13T22:15:00+02:00"
+  status: COMPLETED
+  summary: "Lanceurs migrés vers scripts/run_tests.py ; configurations déplacées sous scripts/config/ ; sérialisation WindowsPath du cache dashboard corrigée."
+  evidence_submitted:
+    - "B_AU_SECURITE/tests/run.py --help : PASS."
+    - "YAML scripts/config/config.yaml et registry.yaml : PASS."
+    - "pytest T281/T282 : 5 PASS."
+    - "Recherche de références exécutables au runner racine : 0."
+    - "check_task_contract.py : PASS (0 erreur, 0 avertissement)."
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

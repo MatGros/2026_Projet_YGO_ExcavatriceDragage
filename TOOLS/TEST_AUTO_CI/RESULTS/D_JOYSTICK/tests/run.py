@@ -6,7 +6,7 @@ import subprocess
 import sys
 import time
 
-RUN_TESTS = pathlib.Path(__file__).resolve().parents[3] / "run_tests.py"
+RUN_TESTS = pathlib.Path(__file__).resolve().parents[3] / "scripts" / "run_tests.py"
 
 if __name__ == "__main__":
     start = time.perf_counter()

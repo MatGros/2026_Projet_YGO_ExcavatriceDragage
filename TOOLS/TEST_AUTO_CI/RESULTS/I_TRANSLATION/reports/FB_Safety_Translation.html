@@ -373,7 +373,7 @@
             <span class="badge badge-pass">PASS</span>
         </div>
     </div>
-    <div class="exec-time">2026-09-03 12:21:49</div>
+    <div class="exec-time">2026-09-13 23:14:39</div>
     
     <details class="toc-details" open>
         <summary>📋 Sommaire (3 tests)</summary>
@@ -1101,7 +1101,7 @@ VAR_INPUT
     LimitSwitchMaintenance : BOOL;     // --&gt; [HW] Fin de course extrême Maintenance (ex-LimitSwitchRev)
     SensorWordIncoherent: BOOL;        // --&gt; [HW] Mot des 5 capteurs position hors combinaisons valides (FB_Translation_PositionDecoder.Incoherent)
 
-    // 🔧 Bypass des surveillances (GVL_IHM.TranslationM3.Bypass)
+    // 🔧 Bypass des surveillances (GVL_IHM.M3Translation.Bypass)
     BypassGlobal          : BOOL := FALSE;   // --&gt; [TST] Bypass GLOBAL : ignore TOUTES les surveillances ci-dessous (prioritaire)
     BypassOperatorComm    : BOOL := FALSE;   // --&gt; [TST] Bypass perte communication opérateur
     BypassDriveComm       : BOOL := FALSE;   // --&gt; [TST] Bypass perte communication drive
@@ -1258,6 +1258,9 @@ IF NOT BypassGlobal THEN
     instCauses[5].Texte    := &#x27;Mouvement non commande translation (Meca A)&#x27;;
 
     // Cause 6 : Limite extrême escalade (live)
+    // REVERT 2026-09-04 : le retrait de DriveStatusWord.0 n&#x27;a jamais ete confirme comme la
+    // cause reelle d&#x27;un defaut terrain (le defaut rapporte etait en realite bit0/MecaB,
+    // pas cette cause 6) -&gt; pas de modif safety sans confirmation terrain, retour a l&#x27;origine.
     IF NOT (BypassSafety OR BypassLimitSwitch) THEN
         OverrunCondition := (LimitSwitchTremie AND ReqTremie AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0))
                          OR (LimitSwitchMaintenance AND ReqMaintenance AND (ABS(DriveActualFreqHz) &gt; 0.5 OR DriveStatusWord.0));

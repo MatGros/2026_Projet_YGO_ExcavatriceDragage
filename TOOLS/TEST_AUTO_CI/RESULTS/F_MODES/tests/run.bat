@@ -7,7 +7,7 @@ echo   TEST_AUTO_CI : Domaine F_MODES
 echo   Rapport + Chronogrammes complets
 echo ========================================================
 
-python "%SCRIPT_DIR%..\..\..\run_tests.py" --domain F_MODES %*
+python "%SCRIPT_DIR%..\..\..\scripts\run_tests.py" --domain F_MODES %*
 
 echo.
 pause

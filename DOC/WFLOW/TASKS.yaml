@@ -1,4 +1,69 @@
 tasks:
+- id: T285
+  parent_id: ''
+  statut: '✅'
+  criticite: C2
+  domaine: OUTILLAGE
+  agent: Codex
+  date: '2026-09-13T23:00:00+02:00'
+  titre: Regrouper les scratchs CI sous un conteneur unique
+  contexte: Nouveaux scratchs sous .scratch/<FB>/<run> ; run_all nettoie seulement après succès global.
+  description: 'Contrat: TASK_CONTRACT_T285_SCRATCH_CI_CONTENEUR.yaml'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T285_SCRATCH_CI_CONTENEUR.yaml
+  objectifs: []
+  bloque_par: []
+- id: T283
+  parent_id: ''
+  statut: '✅'
+  criticite: C2
+  domaine: OUTILLAGE
+  agent: Codex
+  date: '2026-09-13T22:00:00+02:00'
+  titre: Migrer les lanceurs CI apres retrait du runner racine
+  contexte: Lanceurs migrés vers scripts/run_tests.py ; config et registre déplacés sous scripts/config/.
+  description: 'Contrat: TASK_CONTRACT_T283_MIGRATION_LANCEURS_CI.yaml'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T283_MIGRATION_LANCEURS_CI.yaml
+  objectifs: []
+  bloque_par: []
+- id: T282
+  parent_id: ''
+  statut: '✅'
+  criticite: C2
+  domaine: OUTILLAGE
+  agent: Codex
+  date: '2026-09-13T21:35:00+02:00'
+  titre: Sortir le cache dashboard de RESULTS
+  contexte: Cache index_state local sous .state, sans suppression automatique.
+  description: 'Contrat: TASK_CONTRACT_T282_DASHBOARD_STATE_LOCAL.yaml'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T282_DASHBOARD_STATE_LOCAL.yaml
+  objectifs: []
+  bloque_par: []
+- id: T281
+  parent_id: ''
+  statut: '✅'
+  criticite: C2
+  domaine: OUTILLAGE
+  agent: Codex
+  date: '2026-09-13T21:10:00+02:00'
+  titre: Unifier les deux runners TEST_AUTO_CI et mesurer une baseline
+  contexte: scripts/run_tests.py canonique ; runner racine conserve comme compatibilite.
+  description: 'Contrat: TASK_CONTRACT_T281_UNIFIER_RUNNER_CI.yaml'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T281_UNIFIER_RUNNER_CI.yaml
+  objectifs: []
+  bloque_par: []
+- id: T280
+  parent_id: ''
+  statut: '⏳'
+  criticite: C2
+  domaine: OUTILLAGE
+  agent: Codex
+  date: '2026-09-13T20:45:00+02:00'
+  titre: Normaliser le workspace CI de troubleshooting par agent
+  contexte: RESULTATS troubleshooting historiques sous HUM_LEGACY ; aucune suppression autorisee.
+  description: 'Contrat: TASK_CONTRACT_T280_TROUBLESHOOTING_WORKSPACE.yaml'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T280_TROUBLESHOOTING_WORKSPACE.yaml
+  objectifs: []
+  bloque_par: []
 - id: T122-A
   parent_id: T122
   statut: ✅
@@ -6217,8 +6282,3 @@ tasks:
   - 'Confinir les scratchs CI et gates dans leurs répertoires outillage dédiés.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T279_WORKSPACE_HYGIENE.yaml
   bloque_par: []
-
-
-
-
-

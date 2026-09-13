@@ -6,7 +6,7 @@ echo ⚡ LANCEMENT RAPIDE DU BANC DE TESTS CI (ASSERTIONS SEULES SANS HTML)
 echo =======================================================================
 echo.
 
-python TOOLS\TEST_AUTO_CI\run_tests.py --all --fast
+python TOOLS\TEST_AUTO_CI\scripts\run_tests.py --all --fast
 
 echo.
 echo =======================================================================

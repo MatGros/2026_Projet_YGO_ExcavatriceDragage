@@ -7,7 +7,7 @@ echo    (A_COMMUN, B_AU_SECURITE, C_DIAG_RESEAUX, D_JOYSTICK, E_CODEURS)
 echo =======================================================================
 echo.
 
-python TOOLS\TEST_AUTO_CI\run_tests.py --domain A_COMMUN B_AU_SECURITE C_DIAG_RESEAUX D_JOYSTICK E_CODEURS
+python TOOLS\TEST_AUTO_CI\scripts\run_tests.py --domain A_COMMUN B_AU_SECURITE C_DIAG_RESEAUX D_JOYSTICK E_CODEURS
 
 echo.
 echo =======================================================================

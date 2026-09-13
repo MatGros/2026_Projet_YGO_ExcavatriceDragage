@@ -7,7 +7,7 @@ echo    (H_TREUILS_BENNE)
 echo =======================================================================
 echo.
 
-python TOOLS\TEST_AUTO_CI\run_tests.py --domain H_TREUILS_BENNE
+python TOOLS\TEST_AUTO_CI\scripts\run_tests.py --domain H_TREUILS_BENNE
 
 echo.
 echo =======================================================================

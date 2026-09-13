@@ -1,0 +1,64 @@
+contract:
+  task_id: T282
+  criticality: C2
+  strategy: patch
+  objective: >
+    Retirer le cache technique du dashboard de RESULTS afin que ce repertoire
+    ne contienne plus que les donnees de test et de rapport, tout en preservant
+    le dashboard lors des executions partielles.
+  acceptance:
+    - id: AC1
+      statement: "Le runner lit et ecrit son etat de dashboard sous TOOLS/TEST_AUTO_CI/.state/index_state.json, jamais sous RESULTS/.index_state.json."
+      verified_by: "Test statique du runner et py -3.13 TOOLS/TEST_AUTO_CI/scripts/run_tests.py --help."
+    - id: AC2
+      statement: "Le cache .state/ est ignore localement par Git et le cache historique RESULTS/.index_state.json est retire sur decision utilisateur."
+      verified_by: "git check-ignore -v TOOLS/TEST_AUTO_CI/.state/index_state.json ; git status --short -- TOOLS/TEST_AUTO_CI/RESULTS/.index_state.json."
+    - id: AC3
+      statement: "Aucune suite ST, rapport actif ni archive utilisateur n'est supprimee par cette phase."
+      verified_by: "git diff --name-status limite aux fichiers du contrat ; aucune suppression hors RESULTS/.index_state.json."
+  scope:
+    allowed:
+      - TOOLS/TEST_AUTO_CI/scripts/run_tests.py
+      - TOOLS/TEST_AUTO_CI/.gitignore
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T282_DASHBOARD_STATE_LOCAL.yaml
+      - DOC/WFLOW/TASKS.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/.index_state.json
+    forbidden:
+      - CODE/
+      - CODE_XML/CODE_Bundle.xml
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - TOOLS/TEST_AUTO_CI/RESULTS/*/tests/
+      - Suppression automatique de cache, rapport ou archive par le runner.
+  conservation:
+    must_survive:
+      - "Le dashboard index.html et sa mise a jour lors des executions avec rapports."
+      - "Tous les scenarios de test versionnes."
+    dropped_on_purpose:
+      - "TOOLS/TEST_AUTO_CI/RESULTS/.index_state.json, cache genere versionne par erreur."
+  evidence_required:
+    - "check_task_contract.py : PASS."
+    - "Test statique de chemin : PASS."
+    - "git diff --check : PASS."
+  models_allowed:
+    - "Codex"
+  alert_duty: >
+    Toute suppression detectee hors du cache RESULTS/.index_state.json est hors
+    scope et doit etre signalee sans etre indexee ni modifiee.
+
+status: COMPLETED
+execution:
+  executed_by: "Codex"
+  completed_at: "2026-09-13T21:40:00+02:00"
+  status: COMPLETED
+  summary: "Cache dashboard retire de RESULTS et relocalise sous .state/ ignore localement."
+  evidence_submitted:
+    - "check_task_contract.py : PASS (0 erreur, 0 avertissement)."
+    - "test_T282_dashboard_state_local.py : 2 PASS."
+    - "git check-ignore -v : .state/index_state.json ignore localement."
+    - "git diff --check : PASS."
+validation:
+  status: APPROVED
+  validated_by: "Utilisateur"
+  validated_at: "2026-09-13T21:35:00+02:00"
+  notes: "Accord pour nettoyer le cache .index_state.json et le sortir de RESULTS."

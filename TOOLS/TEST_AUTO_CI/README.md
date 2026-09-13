@@ -1,5 +1,15 @@
 # 🤖 TEST_AUTO_CI
 
+## Troubleshooting agent : espace isole
+
+Les investigations exploratoires ne vont pas dans les suites CI nominales. Elles
+vont sous `RESULTS/_TROUBLESHOOTING/<AGENT_ID>/`, avec toujours `README.md`,
+`tests/` et `reports/`. Les scenarios reutilisables restent dans `tests/`; les
+rapports regenerables restent locaux dans `reports/`; les scratchs de compilation
+vont sous `TOOLS/TEST_AUTO_CI/.tmp_<agent>_<run>/`. La convention detaillee et
+le cas historique sont dans
+[`RESULTS/_TROUBLESHOOTING/README.md`](RESULTS/_TROUBLESHOOTING/README.md).
+
 Runner de tests automatisés pour FB CODESYS — 2e outil de la chaîne, **séparé** de
 `COMPILER_ST2C_STruCpp` (qui ne fait que la conversion ST → C++). Ici : registre figé +
 exécution + rapports.
@@ -9,8 +19,8 @@ exécution + rapports.
 | Dossier / fichier | Rôle |
 |---|---|
 | `scripts/` | **Scripts Python cœur** (exécutables) : `run_tests.py` (runner), `html_report.py` (rapports), `af_coverage.py` (couverture AF), `encapsulation_check.py` (encapsulation), `chronogram.py` (chronogrammes), `prod_wiring.py` (câblage prod) |
-| `config.yaml` | Temps de cycle réel automate |
-| `registry.yaml` | **Source unique de vérité** : quels FB tester, avec quoi |
+| `scripts/config/config.yaml` | Temps de cycle réel automate |
+| `scripts/config/registry.yaml` | **Source unique de vérité** : quels FB tester, avec quoi |
 | `README.md` | Documentation |
 | `MOCKS/` | Mocks des types externes (`DEVICE_STATE`, `HYSTERESIS`) |
 | `RESULTS/` | Suites de tests versionnées (`tests/*.st`, harnais) + rapports gitignorés (`reports/`) |
