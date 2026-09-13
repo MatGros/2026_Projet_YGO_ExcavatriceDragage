@@ -1,0 +1,39 @@
+version: '1.0'
+task_id: T277
+type: PATCH
+title: Désactivation automatique du bouton zone maintenance (TglMaintenanceZoneAccess) à la sortie du mode MAINT_N2
+date: '2026-09-07T18:05:00+02:00'
+author: Antigravity
+
+context:
+  description: >
+    Sécurisation des accès zone maintenance chariot M3 :
+    Le bouton / toggle IHM `GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess` autorise l'accès à la zone d'extrême droite (mot 00000).
+    Cet accès est réservé exclusivement au mode Maintenance Niveau 2 (MAINT_N2).
+    À la sortie du mode MAINT_N2 (passage en MAINT_N1, SEMI_AUTO ou DISABLE), le toggle IHM `TglMaintenanceZoneAccess`
+    doit être automatiquement remis à FALSE par l'automate pour éviter qu'une réautorisation implicite persiste
+    lors d'un retour ultérieur en mode maintenance.
+
+scope:
+  in_scope:
+    - Réinitialisation de `GVL_IHM.M3Translation.Cmd.TglMaintenanceZoneAccess := FALSE` lors de la sortie du mode MAINT_N2 (dans PRG_03_Modes_Cycle / PRG_07_Supervision).
+    - Alignement avec la réinitialisation de `Auth.MaintenanceM3TargetEnable := FALSE` dans `FB_Modes.st`.
+    - Vérification du respect de la règle du producteur unique IHM/Automate.
+    - Validation mécanique (Bundle XML, G200 Liaison).
+  out_of_scope:
+    - Modification du décodage des capteurs physiques de translation.
+
+objectifs_testables:
+  - id: OBJ-01
+    description: TglMaintenanceZoneAccess retombe inconditionnellement à FALSE dès que Mode != MAINT_N2.
+    critere_succes: Le bit IHM est effacé lors de toute transition de sortie de MAINT_N2.
+  - id: OBJ-02
+    description: Auth.MaintenanceM3TargetEnable reste strictement conditionné à Mode == MAINT_N2.
+    critere_succes: Aucun accès zone maintenance possible en MAINT_N1 ou SEMI_AUTO.
+  - id: OBJ-03
+    description: Bundle PLCopenXML régénéré et G200 PASS.
+    critere_succes: 0 erreur de compilation et liaison validée.
+
+livrables:
+  - Patch dans CODE/M_MAIN/PRG_03_Modes_Cycle.st ou PRG_07_Supervision.st.
+  - Bundle XML frais.

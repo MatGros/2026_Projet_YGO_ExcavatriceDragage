@@ -1,0 +1,42 @@
+version: '1.0'
+task_id: T275
+type: REBUILD_ANALYSE
+title: Adaptation des configurations TIME IHM en entiers (INT/DINT/REAL ms/s) avec conversion automate
+date: '2026-09-07T17:35:00+02:00'
+author: Antigravity
+
+context:
+  description: >
+    Certains panels IHM ou protocoles de supervision ne gèrent pas nativement le type IEC TIME (ou son formatage textuel).
+    Pour permettre la saisie et l'affichage fluide des temporisations depuis l'IHM :
+    1. Les temporisations de configuration (ex: DrainTime, CfgTimeoutDuration, délais d'interlock, maintien banner)
+       doivent être configurables depuis l'IHM sous forme d'entiers (INT/DINT en secondes ou millisecondes, ex: `DrainTime_s : INT;`),
+       puis converties côté automate en type `TIME` (`INT_TO_TIME`).
+    2. Les temps écoulés des temporisations actives (ex: temps restant/écoulé d'égouttage godet, durée de cycle en cours,
+       temps restant avant collage frein ou timeout) doivent également être renvoyés et publiés vers l'IHM
+       sous forme d'entiers (ex: `DrainTimeElapsed_s : INT;` ou `CurrentCycleElapsed_s : INT;`) pour un affichage dynamique (barres de progression, compteurs).
+
+scope:
+  in_scope:
+    - Inventaire de toutes les variables `TIME` de consigne et de temps écoulé exposées sous `GVL_IHM`.
+    - Remplacement des types `TIME` dans les structures d'échange IHM (`ST_*Cfg`, `ST_*State`) par des types entiers `INT` / `DINT` avec unité explicite (suffixe `_s` ou `_ms`).
+    - Ajout des variables de temps écoulé (Elapsed) en `INT` pour toutes les temporisations métier significatives (égouttage godet, cycles, timeouts).
+    - Adaptation des ponts de persistance (`FB_CfgPersistBridge_*`) et des conversions bidirectionnelles dans `PRG_07_Supervision` (`INT_TO_TIME` / `TIME_TO_INT`).
+    - Préservation du comportement applicatif et des timers physiques internes aux FB.
+  out_of_scope:
+    - Modification des timers physiques internes aux FB (`TON`, `TOF`, `TP`) qui continuent de tourner en `TIME` natif IEC.
+
+objectifs_testables:
+  - id: OBJ-01
+    description: Établir la cartographie complète des variables TIME de configuration (consignes) et d'état (temps écoulés) à exposer en INT.
+    critere_succes: Cartographie documentée avec typage INT et unité (_s / _ms).
+  - id: OBJ-02
+    description: Mettre à jour les DUT de supervision (ST_CycleCfg, ST_CycleState, ST_BucketCfg, ST_BucketState, etc.) avec des types INT normalisés.
+    critere_succes: Zéro type TIME dans les structures d'interface IHM et présence des champs Elapsed en INT.
+  - id: OBJ-03
+    description: Implémenter les conversions INT <-> TIME dans PRG_07 et les ponts de persistance sans perte de précision.
+    critere_succes: Calcul et affichage dynamique des temps écoulés validés, liaison G200 PASS.
+
+livrables:
+  - Contrat de tâche T275 et entrée dans TASKS.yaml.
+  - Patch des DUT IHM et logique de conversion automate associée.

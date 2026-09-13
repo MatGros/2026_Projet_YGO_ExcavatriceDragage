@@ -1,0 +1,45 @@
+version: '1.0'
+task_id: T278
+type: REBUILD_ANALYSE
+title: Filtrage des alarmes transitoires avant/pendant AU et séquence d auto-reset temporisé post-réarmement
+date: '2026-09-07T18:45:00+02:00'
+author: Antigravity
+
+context:
+  description: >
+    Constat opérationnel sur les alarmes et la séquence d'Arrêt d'Urgence :
+    1. Phase avant / pendant l'Arrêt d'Urgence : Dès la coupure de la chaîne ou du contacteur général,
+       une cascade de faux positifs apparaît (perte de communication bus CAN/SR4, coupure alimentation codeurs,
+       retours contacteurs discordants, variateurs offline, etc.). Ces alarmes parasites masquent la cause réelle.
+    2. Phase après réarmement de l'AU : Une fois la puissance réenclenchée (`PowerContactorEngaged = TRUE`),
+       les équipements (codeurs absolus, variateurs, bus) mettent un certain temps de boot/stabilisation (ex. 1 à 3 s).
+       Les défauts restent actuellement verrouillés et nécessitent de multiples resets manuels opérateur.
+    3. Besoin :
+       - Masquer/inhiber la capture des alarmes secondaires dérivées lorsque la chaîne AU est ouverte ou en cours de coupure.
+       - Mettre en place un auto-acquittement (Auto-Reset) temporisé et sécurisé après confirmation de réarmement puissance
+         (laissant le temps aux codeurs / bus SR4 de redevenir opérationnels), tout en conservant le blocage si un vrai défaut persiste.
+
+scope:
+  in_scope:
+    - Analyse de la propagation des alarmes dans FB_Safety_EmergencyManagement, FB_Hmi_BannerFormatter, FB_Encoder_Abs et FB_Safety_Winch / Translation.
+    - Définition d'un temps de grâce / masquage des alarmes de communication (bus SR4, CANopen, codeurs) tant que l'AU est coupée.
+    - Spécification de la séquence post-réarmement : temporisation de stabilisation matériel (`TonEquipmentsReady`, 1..3s) suivie d'une impulsion unique d'auto-reset (`AutoResetAfterArming`).
+    - Respect des normes de sécurité (l'auto-reset ne doit en aucun cas provoquer un redémarrage automatique d'un mouvement ; seuls les blocs de diagnostic sont acquittés).
+  out_of_scope:
+    - Modification de la chaîne matérielle de sécurité ou des règles de coupure immédiate.
+    - Redémarrage automatique de mouvement (interdit par ISO 13849).
+
+objectifs_testables:
+  - id: OBJ-01
+    description: Identifier et classifier les alarmes parasites déclenchées par l'ouverture de l'AU (bus, alimentation capteurs, feedbacks contacteurs).
+    critere_succes: Matrice de corrélation des alarmes parasites vs cause racine AU documentée.
+  - id: OBJ-02
+    description: Définir la logique de filtrage/masquage au bandeau et dans les journaux d'alarmes lorsque l'AU est ouverte.
+    critere_succes: Seule l'alarme primaire d'AU est mise en avant lors d'une chute de chaîne.
+  - id: OBJ-03
+    description: Spécifier la temporisation d'établissement bus/codeurs et la génération sécurisée de l'auto-reset post-réarmement.
+    critere_succes: Chronogramme et logique validés sans contournement des sécurités de mouvement.
+
+livrables:
+  - Contrat de tâche T278 et entrée dans TASKS.yaml.
+  - Proposition d'architecture technique et plan d'implémentation.

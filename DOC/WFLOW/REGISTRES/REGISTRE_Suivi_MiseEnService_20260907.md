@@ -134,3 +134,11 @@
 - [x] Rédaction du registre MES du 2026-09-07 (`MES-051` à `MES-055`).
 - [ ] Confirmation terrain de la navigation page 1 / page 5 et de l'activation des modes.
 - [ ] Clôture formelle de `T268` après confirmation définitive du câblage FdC haut.
+### MES-056 - Arret M3 sur P1/Tremie sans defaut frein apres correction AX2
+- Date : 2026-09-07 | Lieu : Banc d'essais / Machine
+- Statut : A surveiller (retour terrain positif, coupure energie a confirmer)
+- Perimetre : `FB_CycleSemiAuto.st`, `FB_TranslationCmdArbitrationM3.st`, `PRG_05_Translation.st`
+- Constat : l'arret M3 sur P1 et Tremie ne presente plus, a ce stade, le defaut de sequence/retour frein observe auparavant.
+- Validation restante : confirmer apres coupure/remise sous tension la restauration des positions et l'absence d'oscillation de commande frein.
+- Solution : AX2 conserve `PositionTgt = 3` (P1) tout en autorisant les deux sens ; AX14 conserve sa cible Tremie.
+- Commit associe : `66644de1` (`fix: conserver P1 comme cible d arret AX2`)
