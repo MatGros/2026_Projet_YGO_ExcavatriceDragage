@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "PowerShell(head -30)",
-      "Bash(cd \"C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/TOOLS\" && python -c \"from generator.cli import main; import sys;*)"
+      "Bash(cd \"C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/TOOLS\" && python -c \"from generator.cli import main; import sys;*)",
+      "Bash(python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py *)",
+      "Bash(python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py *)",
+      "Bash(python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py *)",
+      "Bash(python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py *)",
+      "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py *)",
+      "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py *)",
+      "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py *)",
+      "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py *)"
     ]
   },
   "enabledPlugins": {

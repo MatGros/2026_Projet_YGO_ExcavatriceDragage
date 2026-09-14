@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.532643" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.532643">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.379835" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.379835">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -35325,7 +35325,40 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Contact fond Kobold</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Contact fond Kobold (mode manuel)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimKoboldAutoModeActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Active le declenchement auto par seuil altimetrique M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimKoboldAutoDepth_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="-15" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil altimetrique M1 (m, negatif = sous l'eau)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimKoboldReactionTime">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de reaction simule avant publication du contact</xhtml>
               </documentation>
             </variable>
             <variable name="BtnEmergencyStop">
@@ -35440,6 +35473,26 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de Trémie à Maintenance à 100 %, modèle banc uniquement</xhtml>
               </documentation>
             </variable>
+            <variable name="CST_EncoderPointsPerRev">
+              <type>
+                <UDINT />
+              </type>
+              <initialValue>
+                <simpleValue value="8192" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mêmes constantes physiques que FB_Encoder_Scale.CablePosM, pour un calcul de profondeur
+simulée cohérent avec la position réelle publiée ailleurs (signe négatif = sous l'eau).</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_EncoderCableM_PerRev">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="2" />
+              </initialValue>
+            </variable>
             <variable name="instSimEncoderM1">
               <type>
                 <derived name="FB_Sim_Encoder" />
@@ -35552,6 +35605,31 @@ palier est encore engagé (fausse condition d'armement Méca A).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] StatusWord simulé M3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1_SimDepth_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MODE AUTO KOBOLD (SEUIL ALTIMETRIQUE) ===
+. [LOC] Profondeur simulee M1 (m, negatif = sous l'eau)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldAutoTrigger">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Profondeur M1 sous le seuil, mode auto actif</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldReactionTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps de reaction avant publication du contact</xhtml>
               </documentation>
             </variable>
             <variable name="M2_RelayFwdPrev">
@@ -35668,6 +35746,11 @@ instSimEncoderM1(
     TestOffsetPts    := M1_OffsetPts,
     RawPos           := RawPosM1
 );
+
+// Profondeur simulée M1 : même formule que FB_Encoder_Scale.CablePosM, référencée sur
+// M1_PresetValueOut (valeur appliquée au codeur lors du homing = HomingRefRaw simulé).
+M1_SimDepth_M := DINT_TO_REAL(UDINT_TO_DINT(instSimEncoderM1.RawPosOut) - UDINT_TO_DINT(M1_PresetValueOut))
+               * (CST_EncoderCableM_PerRev / UDINT_TO_REAL(CST_EncoderPointsPerRev));
 
 // Détection coupure relais M2 pour renouveler la dispersion pseudo-aléatoire (±0.1m)
 IF (M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev) THEN
@@ -35847,7 +35930,11 @@ Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
 Machine.PhaseRotationOk_DI             := TRUE;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
-Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
+// Mode auto : profondeur M1 sous le seuil configuré -&gt; temps de reaction -&gt; contact publie.
+// OU avec le stimulus manuel existant (SimKoboldContactValue), non regressif si mode auto desactive.
+KoboldAutoTrigger := SimKoboldAutoModeActive AND (M1_SimDepth_M &lt;= SimKoboldAutoDepth_M);
+KoboldReactionTimer(IN := KoboldAutoTrigger, PT := SimKoboldReactionTime);
+Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue OR KoboldReactionTimer.Q;
 Machine.HydraulicThermalOk_DI          := TRUE;
 Machine.TremieFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
 
@@ -47047,6 +47134,9 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimSyncDeviationInjectM2 := FALSE;
     GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
     GVL_Simulation.SimKoboldContactValue := FALSE;
+    GVL_Simulation.SimKoboldAutoModeActive := FALSE;
+    GVL_Simulation.SimKoboldAutoDepth_M := -15.0;
+    GVL_Simulation.SimKoboldReactionTime := T#500ms;
 END_IF;
 
 // 🔀 Aiguillages de source uniques par domaine
@@ -47244,6 +47334,9 @@ instSimBench(
     SimJoystickOvershoot_Active        := GVL_Simulation.SimJoystickOvershoot_Active,
     SimJoystickBagotement_Active       := GVL_Simulation.SimJoystickBagotement_Active,
     SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
+    SimKoboldAutoModeActive  := GVL_Simulation.SimKoboldAutoModeActive,
+    SimKoboldAutoDepth_M     := GVL_Simulation.SimKoboldAutoDepth_M,
+    SimKoboldReactionTime    := GVL_Simulation.SimKoboldReactionTime,
     BtnEmergencyStop         := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff,
     HwReal                   := HwReal,
     RawPosM1                 := _SimEncoderRawPosM1,
@@ -55233,7 +55326,43 @@ Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
-TRUE = Kobold détecte un contact fond simulé</xhtml>
+TRUE = Kobold détecte un contact fond simulé (mode manuel)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldAutoModeActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Mode auto Kobold : déclenche le contact fond par seuil altimétrique M1, avec un temps de
+réaction réaliste (latence détection). Combiné en OU avec SimKoboldContactValue — le mode
+manuel reste utilisable en parallèle. Défaut désactivé = comportement historique inchangé.
+TRUE = active le déclenchement auto par profondeur</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldAutoDepth_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="-15" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil altimétrique M1 (m, négatif = sous l'eau) déclenchant le contact fond</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldReactionTime">
+          <type>
+            <TIME />
+          </type>
+          <initialValue>
+            <simpleValue value="TIME#500ms" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de réaction simulé avant publication du contact</xhtml>
           </documentation>
         </variable>
         <variable name="SimChainOk">

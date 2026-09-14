@@ -1,0 +1,69 @@
+contract:
+  task_id: T291
+  criticality: C4
+  strategy: rebuild
+  objective: >
+    Étudier (sans coder) comment autoriser des paliers de vitesse différents
+    entre M1 et M2 en descente couplée (ex. M1=P1, M2=P5), en identifiant tous
+    les effets de bord sur le contrôle de synchronisme et le clamp de palier,
+    et produire des options techniques comparées, activables/désactivables,
+    à faire valider par un automaticien expert avant toute implémentation.
+  acceptance:
+    - id: AC1
+      statement: "Tous les consommateurs actuels d'un palier commun M1/M2 sont listés avec fichier:ligne (FB_SyncContactor, §5ter PRG_04, FB_SpeedStep, table paliers->contacteurs)."
+      verified_by: "revue documentaire, grep exhaustif, tableau de traçabilité"
+    - id: AC2
+      statement: "Au moins 2 options techniques distinctes sont proposées, chacune avec mécanisme, flag ON/OFF, risque résiduel synchro et effort d'implémentation estimé."
+      verified_by: "document d'étude livré, comparatif explicite"
+    - id: AC3
+      statement: "Aucun fichier CODE/ n'est modifié dans le cadre de cette tâche."
+      verified_by: "git diff vide sur CODE/"
+    - id: AC4
+      statement: "L'option retenue (après validation humaine) est découpée en sous-tâches numérotées, chacune testable et réversible indépendamment (pas de big-bang)."
+      verified_by: "sous-tâches T291-A/B/... créées dans TASKS.yaml avec contrats propres avant toute implémentation"
+    - id: AC5
+      statement: "Le document d'étude est explicitement transmis pour revue à un automaticien expert avant toute implémentation, avec trace de la validation."
+      verified_by: "mention de la revue dans TASKS.yaml / contrat, validation humaine consignée"
+  scope:
+    allowed:
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T291_ETUDE_PALIERS_ASYMETRIQUES_M1_M2.yaml
+      - DOC/WFLOW/AUDITS/*
+      - DOC/AF/AF_Partie-10_Fonction_Treuils_Benne_v2.3.md
+    forbidden:
+      - CODE/*
+      - CODE_XML/*
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+  conservation:
+    must_survive:
+      - "Le comportement actuel de FB_SyncContactor et du clamp §5ter, non modifiés à ce stade."
+      - "La non-reprise automatique de mouvement et l'absence de tout bypass sécurité non tracé."
+    dropped_on_purpose: []
+  evidence_required:
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: >
+    Toute option qui neutraliserait ou affaiblirait FB_SyncContactor sans
+    mécanisme de repli explicite doit être signalée comme risque majeur.
+    Le flag d'activation/désactivation doit être simple à comprendre et à
+    manœuvrer par l'utilisateur (pas un paramètre technique enfoui) — le
+    signaler si une option ne le permet pas nativement.
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    Tâche créée pour cadrer l'étude (sans code) des paliers asymétriques M1/M2
+    en descente couplée, priorité opérationnelle du 2026-09-15.
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Le document d'étude doit être revu par un automaticien expert avant toute
+    implémentation. Découpage en phases/sous-tâches à valider par l'utilisateur
+    avant de créer T291-A/B/...

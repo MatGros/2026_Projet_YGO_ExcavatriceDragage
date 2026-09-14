@@ -1,0 +1,74 @@
+contract:
+  task_id: T292
+  criticality: C2
+  strategy: patch
+  objective: >
+    Ajouter au banc de simulation un mode automatique de contact fond Kobold
+    piloté par un seuil altimétrique configurable, avec un temps de réaction
+    réaliste et une perte de contact à la remontée, sans régresser le mode
+    manuel existant.
+  acceptance:
+    - id: AC1
+      statement: "Avec SimKoboldAutoModeActive=FALSE (défaut), Machine.M1_M2_KoboldBottomTouch_DI se comporte exactement comme avant (= SimKoboldContactValue)."
+      verified_by: "test de non-régression : mode auto désactivé, contact suit uniquement le bool manuel"
+    - id: AC2
+      statement: "Avec le mode auto actif, le contact se déclenche quand la profondeur simulée M1 franchit SimKoboldAutoDepth_M, après un délai égal à SimKoboldReactionTime (TON)."
+      verified_by: "test scan-par-scan : position simulée franchissant le seuil, chronogramme du contact avec le délai attendu"
+    - id: AC3
+      statement: "Le contact retombe dès que la position remonte au-dessus du seuil (perte de contact), sans délai artificiel supplémentaire à la remontée."
+      verified_by: "test scan-par-scan : remontée au-dessus du seuil, contact retombe immédiatement"
+    - id: AC4
+      statement: "Le calcul de profondeur simulée réutilise la même formule que FB_Encoder_Scale.CablePosM (signe négatif = sous l'eau), pour rester cohérent avec la position réelle publiée ailleurs."
+      verified_by: "revue de code : même formule (RawPos - PresetValueOut) * (CableM_PerRev/PointsPerRev)"
+    - id: AC5
+      statement: "Les nouveaux paramètres (SimKoboldAutoModeActive, SimKoboldAutoDepth_M, SimKoboldReactionTime) sont réinitialisés à l'entrée en mode simulation, comme les autres stimuli GVL_Simulation."
+      verified_by: "revue de code PRG_02 §reset + test d'entrée en simulation"
+    - id: AC6
+      statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste sans erreur."
+      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report"
+  scope:
+    allowed:
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE_XML/CODE_Bundle.xml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T292_SIMBENCH_KOBOLD_AUTO_DEPTH.yaml
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/FB_Safety_Winch.st
+      - CODE/B_AU_SECURITE/*
+      - CODE/E_CODEURS/*
+  conservation:
+    must_survive:
+      - "Le comportement manuel existant SimKoboldContactValue, inchangé et toujours utilisable seul ou combiné (OU) au mode auto."
+      - "Aucune modification du code réel (hors L_SIMULATION/PRG_02 aiguillage) — ce paramètre n'existe que côté banc de simulation."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: >
+    Le sens de la profondeur (négatif = sous l'eau) doit être vérifié cohérent
+    avec CST_CycleCfgPersist.SetDepth_M (-29.0) avant implémentation. Signaler
+    toute incohérence de convention de signe.
+status: PENDING
+execution:
+  executed_by: "Claude Code"
+  completed_at: ""
+  status: IN_PROGRESS
+  summary: >
+    Implémentation en cours suite à demande urgente utilisateur (session de
+    simulation active).
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Validation humaine du seuil par défaut (-15 m) et du temps de réaction
+    par défaut (500 ms) requise.
