@@ -148,12 +148,38 @@ python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py              # TOUS les gat
 Le bloc `Auto-vérification liaison` produit par `--report` est **collé dans la restitution**.
 Sans lui, le lot est incomplet — quel que soit l'agent qui l'écrit.
 
-📣 **Bandeau de restitution obligatoire** — l'agent affiche un bandeau clair à chaque étape :
+### 📦 Diff bundle — import rapide en parallèle du bundle complet
+
+En **complément systématique** du bundle complet (jamais un remplacement), générer aussi un
+diff bundle ne contenant que les objets touchés par le lot — import CODESYS bien plus rapide
+pour l'utilisateur pendant l'itération :
+
+```powershell
+python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_diff_bundle.py . <fichier1.st> <fichier2.st> ...
+```
+
+Accepte des chemins `.st` ou des noms d'objet nus. Sortie fixe `CODE_XML/CODE_DiffBundle.xml`
+(écrasé à chaque appel, pas d'historique accumulé — même dossier que le bundle complet). Ne
+dispense **jamais** du bundle complet + `G200_check_linkage.py --report` avant de considérer un
+lot livré.
+
+📣 **Bandeau de restitution obligatoire** — l'agent affiche un bandeau clair à chaque étape,
+**y compris le diff bundle avec la liste des objets** :
 
 ```text
 ========================================
 ✅ BUNDLE EXPORTÉ : CODE_XML/CODE_Bundle.xml
 ========================================
+```
+
+```text
+========================================
+[OK] DIFF BUNDLE EXPORTE : CODE_XML/CODE_DiffBundle.xml
+========================================
+Objets inclus (+ fermeture des dependances de type) :
+  - FB_SimBench
+  - GVL_Simulation
+  - PRG_02_Acquisition
 ```
 
 ```text
@@ -165,6 +191,8 @@ Sans lui, le lot est incomplet — quel que soit l'agent qui l'écrit.
 ```
 
 - **Bandeau 1** : dès que `generate_codesys_bundle.py` réussit (bundle frais).
+- **Bandeau diff** : dès que `generate_codesys_diff_bundle.py` réussit, avec la liste des objets
+  — toujours à la suite du bandeau 1, jamais seul.
 - **Bandeau 2** : seulement si `run_all_gates.py` passe (bundle + gates verts).
 - Si un gate échoue → bandeau d'échec clair, **pas** de bandeau 2.
 

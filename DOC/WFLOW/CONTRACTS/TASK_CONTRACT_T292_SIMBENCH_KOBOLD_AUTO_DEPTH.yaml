@@ -56,19 +56,28 @@ contract:
     Le sens de la profondeur (négatif = sous l'eau) doit être vérifié cohérent
     avec CST_CycleCfgPersist.SetDepth_M (-29.0) avant implémentation. Signaler
     toute incohérence de convention de signe.
-status: PENDING
+status: PAUSED
 execution:
   executed_by: "Claude Code"
   completed_at: ""
-  status: IN_PROGRESS
+  status: PAUSED
   summary: >
-    Implémentation en cours suite à demande urgente utilisateur (session de
-    simulation active).
+    Implémentation faite (séquence DI 0->1->0 conforme AF_Partie-04 Addendum T258,
+    gate KoboldMeasureEnable, armement auto sur Auth.Mode=SEMI_AUTO). Revertée
+    entièrement dans le working tree (retour au commit c328a076) le 2026-09-14
+    pour isoler un symptôme sans rapport (M1 figé en simulation, cf. T293 et
+    fiche DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_M1_Statique_Simulation_20260914.md).
+    Deux diagnostics indépendants n'ont trouvé aucune écriture de ce lot sur la
+    chaîne M1 ; le blocage observé pendant les essais venait de l'interlock réel
+    PRG_04 (KoboldAutoStopRiseEdge/FallEdge, code existant non modifié) réagissant
+    légitimement au signal simulé — comportement voulu, pas un bug.
   evidence_submitted: []
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
   notes: >
-    Validation humaine du seuil par défaut (-15 m) et du temps de réaction
-    par défaut (500 ms) requise.
+    En pause : à ré-appliquer une fois le symptôme M1 figé confirmé sans rapport
+    avec ce lot (test décisif bundle isolé en cours par l'utilisateur). Validation
+    humaine du seuil par défaut (-15 m) et du temps de réaction par défaut (500 ms)
+    toujours requise avant clôture.

@@ -10,7 +10,12 @@
       "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py *)",
       "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py *)",
       "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py *)",
-      "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py *)"
+      "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py *)",
+      "Bash(python TOOLS/AGENT_WORKFLOW/scripts/*)",
+      "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/*)",
+      "Bash(cd \"C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/*)",
+      "Bash(python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_diff_bundle.py *)",
+      "Bash(cd \"C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\" && python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_diff_bundle.py *)"
     ]
   },
   "enabledPlugins": {

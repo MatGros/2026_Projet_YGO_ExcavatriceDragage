@@ -83,10 +83,7 @@ VAR_INPUT
     SimJoystickOvershoot_Active        : BOOL := FALSE;   (* --> [TST] Dépassement de montée au-delà de 100% (défaut capteur hors plage) *)
     SimJoystickBagotement_Active       : BOOL := FALSE;   (* --> [TST] Bagotement au relâchement (petit balancement autour du neutre) *)
 
-    SimKoboldContactValue      : BOOL := FALSE;   (* --> [TST] Contact fond Kobold (mode manuel) *)
-    SimKoboldAutoModeActive    : BOOL := FALSE;   (* --> [TST] Active le declenchement auto par seuil altimetrique M1 *)
-    SimKoboldAutoDepth_M       : REAL := -15.0;   (* --> [CFG] Seuil altimetrique M1 (m, negatif = sous l'eau) *)
-    SimKoboldReactionTime      : TIME := T#500ms; (* --> [CFG] Temps de reaction simule avant publication du contact *)
+    SimKoboldContactValue      : BOOL := FALSE;   (* --> [TST] Contact fond Kobold *)
     BtnEmergencyStop           : BOOL := FALSE;    (* --> [TST] Simulation appui coup-de-poing AU *)
 
     // ── Image réelle fallback ────────────────────────────────────────────────
@@ -114,10 +111,6 @@ END_VAR
 
 VAR CONSTANT
     CST_M3FullTravelTimeS       : REAL := 8.0; // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
-    // Mêmes constantes physiques que FB_Encoder_Scale.CablePosM, pour un calcul de profondeur
-    // simulée cohérent avec la position réelle publiée ailleurs (signe négatif = sous l'eau).
-    CST_EncoderPointsPerRev     : UDINT := 8192;
-    CST_EncoderCableM_PerRev    : REAL := 2.0;
 END_VAR
 
 VAR
@@ -141,11 +134,6 @@ VAR
 
     M3_ActualFreqHz            : UINT;   (* . [LOC] Fréquence simulée M3 *)
     M3_StatusWordSim           : WORD;   (* . [LOC] StatusWord simulé M3 *)
-
-    // === MODE AUTO KOBOLD (SEUIL ALTIMETRIQUE) ===
-    M1_SimDepth_M               : REAL;   (* . [LOC] Profondeur simulee M1 (m, negatif = sous l'eau) *)
-    KoboldAutoTrigger           : BOOL;   (* . [LOC] Profondeur M1 sous le seuil, mode auto actif *)
-    KoboldReactionTimer         : TON;    (* . [LOC] Temps de reaction avant publication du contact *)
 
     // Roulis dynamique avec dispersion pseudo-aléatoire (±0.1m autour de l'anticipation)
     M2_RelayFwdPrev            : BOOL;   (* . [LOC] Mémoire relais Fwd N-1 *)
@@ -202,11 +190,6 @@ instSimEncoderM1(
     TestOffsetPts    := M1_OffsetPts,
     RawPos           := RawPosM1
 );
-
-// Profondeur simulée M1 : même formule que FB_Encoder_Scale.CablePosM, référencée sur
-// M1_PresetValueOut (valeur appliquée au codeur lors du homing = HomingRefRaw simulé).
-M1_SimDepth_M := DINT_TO_REAL(UDINT_TO_DINT(instSimEncoderM1.RawPosOut) - UDINT_TO_DINT(M1_PresetValueOut))
-               * (CST_EncoderCableM_PerRev / UDINT_TO_REAL(CST_EncoderPointsPerRev));
 
 // Détection coupure relais M2 pour renouveler la dispersion pseudo-aléatoire (±0.1m)
 IF (M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev) THEN
@@ -386,11 +369,7 @@ Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
 Machine.PhaseRotationOk_DI             := TRUE;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
-// Mode auto : profondeur M1 sous le seuil configuré -> temps de reaction -> contact publie.
-// OU avec le stimulus manuel existant (SimKoboldContactValue), non regressif si mode auto desactive.
-KoboldAutoTrigger := SimKoboldAutoModeActive AND (M1_SimDepth_M <= SimKoboldAutoDepth_M);
-KoboldReactionTimer(IN := KoboldAutoTrigger, PT := SimKoboldReactionTime);
-Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue OR KoboldReactionTimer.Q;
+Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue;
 Machine.HydraulicThermalOk_DI          := TRUE;
 Machine.TremieFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
 

@@ -59,13 +59,7 @@ VAR_GLOBAL
     SimSyncDeviationOffset_M    : REAL := 0.5; // Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset
 
     // 🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
-    SimKoboldContactValue       : BOOL := FALSE; // TRUE = Kobold détecte un contact fond simulé (mode manuel)
-    // 🧪 Mode auto Kobold : déclenche le contact fond par seuil altimétrique M1, avec un temps de
-    //    réaction réaliste (latence détection). Combiné en OU avec SimKoboldContactValue — le mode
-    //    manuel reste utilisable en parallèle. Défaut désactivé = comportement historique inchangé.
-    SimKoboldAutoModeActive     : BOOL := FALSE; // TRUE = active le déclenchement auto par profondeur
-    SimKoboldAutoDepth_M        : REAL := -15.0; // Seuil altimétrique M1 (m, négatif = sous l'eau) déclenchant le contact fond
-    SimKoboldReactionTime       : TIME := T#500ms; // Temps de réaction simulé avant publication du contact
+    SimKoboldContactValue       : BOOL := FALSE; // TRUE = Kobold détecte un contact fond simulé
     // 🧪 Contrôle granulaire de la chaîne AU : TRUE = simuler la chaîne fermée (on peut armer) ;
     //    FALSE = chaîne ouverte (on ne peut pas armer). Défaut FALSE → à la ré-entrée en simu,
     //    la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).
