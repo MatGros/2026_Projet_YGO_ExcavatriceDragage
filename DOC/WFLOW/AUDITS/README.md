@@ -71,6 +71,14 @@ mais ne suivent plus les évolutions du dépôt. On n'y range donc que du défin
 | `TEST_FRAMEWORK_AUDIT_v1.0.md` | Audit du framework de tests supprimé | `v0.5.1` |
 | `Architecture/` — 10 fichiers C4 : `PLAN_Reconstruction_C4`, `CONTRAT_C4_CANONIQUE`, `TABLE_POU_ACTIFS_VS_LEGACY`, `RU_C4_FINAL`, `SPEC_C4_2_Contrats_Publics_Minimaux`, `PLAN_Migration_C4_2_Contrats`, `BLOCAGE_C4_2_Reset_Encoder`, `PROPOSITION_C4_INTENTIONS_AMONT`, `TRACE_C4_SAFETY_MOUVEMENTS`, `PLAN_Migration_MainTask_CFC` | Analyse C4 fondée sur une **safety séparée des mouvements** (13 POU) | 2026-08 — **périmés** : la décision par procédés (`Architecture/RU_C4_ARCHITECTURE_PROCEDES.md`) les remplace. 🚫 Ne jamais reconstruire cette cible. Conservés pour la traçabilité des cycles prouvés |
 | `Architecture_Migration7POU/` — 7 fichiers : `AUDIT_M0_GEL_ETAT_INITIAL`, `PLAN_EXECUTION_MIGRATION_7POU`, `REGISTRE_ARBITRAGES_MIGRATION`, `TEST_IMPORT_PRG_ACQUISITION_CFC_XML`, `EVALUATION_ARCHIVAGE_CODE_LEGACY`, `DIAGRAMME_ARCHITECTURE_CFC_TARGET`, `RU_C4_ARCHITECTURE_PROCEDES` | Migration vers l'architecture 7 POU (M0→M8) | 2026-08-16 — **soldée** : renumérotation M7 faite (`PRG_02`→`PRG_07`), conversion CFC natif **M8 abandonnée** (code en ST + PLCopenXML). Cible reportée dans `AF_Partie-02` §2/§4 |
+| `ALERTE_PERMITS_NON_INTEGRES_BARRIERE_FINALE_20260901.md` | Permis directionnels non câblés à la barrière finale (treuils M1/M2) | 2026-09-14 — **corrigé** : PRG_04/PRG_06, bundle 254/254 0 erreur, G200 PASS |
+| `AUDIT_T171-CR_ANIMATION_TRACE_20260828.md` | Certification indépendante animation trace T171 | 2026-09-14 — T171 ✅ terminé, conclusion actée |
+| `REVUE_T125_MODES_DRAGAGE_v0.2.md` | Revue indépendante modes dragage T125 | 2026-09-14 — T125 ✅ terminé, 5 corrections intégrées |
+| `T184_BINDINGS_IHM_MIGRATION.md` | Migration bindings IHM T184 | 2026-09-14 — T184 ✅, grep de contrôle 0 occurrence ancien nommage |
+| `T197_BINDINGS_IHM_MIGRATION.md` | Migration bindings IHM T197 | 2026-09-14 — T197 ✅, grep de contrôle 0 occurrence |
+| `PLAN_RootCauseMasking_HmiBanner_20260826.md` | Root cause masking bandeau alarmes IHM | 2026-09-14 — tests CI 6/6, 21 gates 100% PASS, bundle frais |
+| `FB_WinchStateProjection_DESIGN.md` | Design `FB_WinchStateProjection` | 2026-09-14 — implémenté (`CODE/H_TREUILS_BENNE/FB_WinchStateProjection.st`) |
+| `T216_OLLAMA_CONTRE_EXPERTISE_INPUT_20260901.md` | Prompt de consultation externe (contre-expertise Ollama) | 2026-09-14 — consommé, à usage unique |
 
 ---
 
