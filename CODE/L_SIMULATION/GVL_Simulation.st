@@ -58,6 +58,19 @@ VAR_GLOBAL
     SimSyncDeviationInjectM2    : BOOL := FALSE; // Front montant : ajoute SimSyncDeviationOffset_M à la position M2 simulée
     SimSyncDeviationOffset_M    : REAL := 0.5; // Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset
 
+    // 🪝 MODÈLE M2 / KOBOLD — réglages de banc, actifs exclusivement via FB_SimBench.
+    // M2 est calculé depuis M1 pendant une descente BOTH effective. Le coefficient est
+    // issu de la trace 2026-09-05 ; TRUE par défaut pour reproduire le comportement mesuré.
+    SimM2CoupledDescentModelActive : BOOL := TRUE;
+    SimM2CoupledDescentFactor      : REAL := 0.9333; // Ratio déplacement M2 / déplacement M1 en descente BOTH (mesure: 0,6 m / 9 m)
+
+    // Le mode auto est armé sur entrée SEMI_AUTO pendant la simulation et libéré à sa sortie.
+    // Une désactivation opérateur pendant une plongée est prise en compte à la plongée suivante.
+    SimKoboldAutoModeActive    : BOOL := FALSE;
+    SimKoboldAutoDepth_M       : REAL := -15.0;  // Altitude fond signée (m), négative sous l'eau
+    SimKoboldPowerUpTime       : TIME := T#50ms; // Réponse sonde après alimentation Kobold
+    SimKoboldCoast_M           : REAL := 1.0;   // Roulis déterministe M1/M2 après arrêt Kobold (m)
+
     // 🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
     SimKoboldContactValue       : BOOL := FALSE; // TRUE = Kobold détecte un contact fond simulé
     // 🧪 Contrôle granulaire de la chaîne AU : TRUE = simuler la chaîne fermée (on peut armer) ;

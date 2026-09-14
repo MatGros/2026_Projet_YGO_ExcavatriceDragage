@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T20:17:37.195110" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T20:17:37.195110">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T23:50:45.921096" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T23:50:45.921096">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -3063,6 +3063,39 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Offset écart synchro</xhtml>
               </documentation>
             </variable>
+            <variable name="SimM2CoupledDescentModelActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="TRUE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] M2 calculé depuis M1 en descente BOTH</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimM2CoupledDescentFactor">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.9333" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Ratio déplacement M2/M1 mesuré: 0,6m d'écart sur 9m</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchBothDescentIntent">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Intention BOTH descente PRG_03</xhtml>
+              </documentation>
+            </variable>
             <variable name="SimM3SensorsWordOverrideActive">
               <type>
                 <BOOL />
@@ -3192,18 +3225,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Contact fond Kobold (mode manuel)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldMeasureEnable">
-              <type>
-                <BOOL />
-              </type>
-              <initialValue>
-                <simpleValue value="FALSE" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Contacteur mesure Kobold active (PRG_04.Data.KoboldContactorCmdArbitrated, N-1)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Contact fond Kobold</xhtml>
               </documentation>
             </variable>
             <variable name="SimKoboldAutoModeActive">
@@ -3214,7 +3236,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Active le declenchement auto par seuil altimetrique M1 (necessite aussi KoboldMeasureEnable)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Kobold positionnel automatique armé</xhtml>
               </documentation>
             </variable>
             <variable name="SimKoboldAutoDepth_M">
@@ -3225,32 +3247,43 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <simpleValue value="-15" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Seuil altimetrique M1 (m, negatif = sous l'eau)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Fond Kobold signé</xhtml>
               </documentation>
             </variable>
-            <variable name="SimKoboldReactionTime">
+            <variable name="SimKoboldPowerUpTime">
               <type>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#500ms" />
+                <simpleValue value="TIME#50ms" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de reaction simule avant publication du contact</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de réponse sonde</xhtml>
               </documentation>
             </variable>
-            <variable name="SimM2CoupledDescentModelActive">
+            <variable name="SimKoboldCoast_M">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="1" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Roulis déterministe plongée Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldMeasureEnable">
               <type>
                 <BOOL />
               </type>
               <initialValue>
-                <simpleValue value="TRUE" />
+                <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [TST] Modele position M2=f(M1) en descente couplee, calibre trace reelle (defaut actif)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Alimentation Kobold effectivement arbitrée</xhtml>
               </documentation>
             </variable>
-            <variable name="M1_MeasuredDepth_M">
+            <variable name="M1_CablePos_M">
               <type>
                 <REAL />
               </type>
@@ -3258,7 +3291,7 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <simpleValue value="0" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position M1 reellement mesuree/referencee (Data.EncoderM1.Measurement.CablePosM, N-1) -- source unique pour seuil Kobold et modele M2, evite tout ecart de reference avec M1_PresetValueOut</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Position M1 signée, référence homing effective</xhtml>
               </documentation>
             </variable>
             <variable name="BtnEmergencyStop">
@@ -3373,103 +3406,6 @@ palier est encore engagé (fausse condition d'armement Méca A).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de Trémie à Maintenance à 100 %, modèle banc uniquement</xhtml>
               </documentation>
             </variable>
-            <variable name="CST_EncoderPointsPerRev">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="8192" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Mêmes constantes physiques que FB_Encoder_Scale.CablePosM, pour un calcul de profondeur
-simulée cohérent avec la position réelle publiée ailleurs (signe négatif = sous l'eau).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_EncoderCableM_PerRev">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="2" />
-              </initialValue>
-            </variable>
-            <variable name="CST_M2CoupledModelSlope">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.8837" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Modele position M2 = f(M1) en descente couplee, calibre par regression lineaire sur
-trace reelle Suivi_WinchMatinDescMontee_20260905_29 (RMSE 3cm, fit valide sur [1.6;8.85]m
-releve). Formule appliquee en SIGNE (meme convention que M1_MeasuredDepth_M : + enroule,
-- sous l'eau) : la pente &lt;1 fait croitre l'ecart |M1-M2| au fur et a mesure de la descente,
-y compris au-dela de la plage mesuree (extrapolation lineaire assumee, a confirmer au banc
-si l'ecart mesure diverge du modele en profondeur).</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_M2CoupledModelOffset_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="1.1728" />
-              </initialValue>
-            </variable>
-            <variable name="CST_M2CoupledModelDispersion_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.03" />
-              </initialValue>
-            </variable>
-            <variable name="CST_M2CoupledModelMaxDivergence_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.6" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ecart M1/M2 toujours borne SOUS la tolerance reelle du controle benne
-(GVL_PERSISTENT._BucketCfgPersist.Config.CoherenceLimitM = 1.0 m) : au-dela, le
-modele ne doit jamais generer lui-meme le fault ErrorID:02 "ecart max autorise".</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_M2CoupledModelBlendTime">
-              <type>
-                <TIME />
-              </type>
-              <initialValue>
-                <simpleValue value="TIME#300ms" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Lissage continu de la position M2 affichee (evite tout saut d'entree/sortie de plage) :
-filtre PT1, pas de EXPT, cout CPU minimal.</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CST_PlcCycleTimeS">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.01" />
-              </initialValue>
-            </variable>
-            <variable name="CST_M2CoupledModelSyncTolerance_M">
-              <type>
-                <REAL />
-              </type>
-              <initialValue>
-                <simpleValue value="0.3" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Le modele ne s'arme que si M1/M2 sont deja synchronises au moment ou la descente couplee
-demarre (ex. pas juste apres un jog benne independant) : evite tout rattrapage brutal.</xhtml>
-              </documentation>
-            </variable>
             <variable name="instSimEncoderM1">
               <type>
                 <derived name="FB_Sim_Encoder" />
@@ -3509,14 +3445,6 @@ demarre (ex. pas juste apres un jog benne independant) : evite tout rattrapage b
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Modèle sécurité</xhtml>
-              </documentation>
-            </variable>
-            <variable name="FilterM2Model">
-              <type>
-                <derived name="FB_Filter" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">* [INST] Lissage continu position M2 affichee (bumpless)</xhtml>
               </documentation>
             </variable>
             <variable name="M1_PresetCmd">
@@ -3592,131 +3520,6 @@ demarre (ex. pas juste apres un jog benne independant) : evite tout rattrapage b
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] StatusWord simulé M3</xhtml>
               </documentation>
             </variable>
-            <variable name="KoboldTouchTrigger">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MODE AUTO KOBOLD (SEUIL ALTIMETRIQUE) ===
-. [LOC] Profondeur M1 sous le seuil (evenement de perte/contact)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldReactionTimer">
-              <type>
-                <derived name="TON" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Temps de reaction apres DQ avant armement (DI=1)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldArmedRise">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front montant "circuit arme" (fin de temporisation)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="KoboldAutoDI">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Etat DI mode auto : arme (rise)=TRUE, touche/perte (fall)=FALSE</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2CoupledDescentActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== MODELE M2 DESCENTE COUPLEE (calage trace reelle) ===
-. [LOC] M1 et M2 commandes descente simultanement</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2CoupledDescentEdge">
-              <type>
-                <derived name="R_TRIG" />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front entree en descente couplee, retire la dispersion</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2ModelDispersion_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Petite variation aleatoire courante</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2ModelRandomSeed">
-              <type>
-                <UDINT />
-              </type>
-              <initialValue>
-                <simpleValue value="246813579" />
-              </initialValue>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Generateur LCG dedie au modele M2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2ModelActive">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Modele M2 applique ce scan (arme+couple)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2ModelArmedThisPhase">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Arme au front descente couplee, seulement si M1/M2 deja synchronises</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2ModelEstimated_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 estimee par le modele (m, signee : + enroule, - sous l'eau)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2IndependentPos_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 independante (relais+roulis), meme convention signee</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2TargetPos_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Cible avant lissage (modele ou independant selon M2ModelActive)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2DisplayedPos_M">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 affichee apres lissage continu (bumpless)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="M2ModelRawPos">
-              <type>
-                <UDINT />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position M2 affichee, convertie en points bruts codeur</xhtml>
-              </documentation>
-            </variable>
             <variable name="M2_RelayFwdPrev">
               <type>
                 <BOOL />
@@ -3756,6 +3559,121 @@ demarre (ex. pas juste apres un jog benne independant) : evite tout rattrapage b
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance de roulis M2 courante</xhtml>
               </documentation>
             </variable>
+            <variable name="M1_EffectiveCoastM">
+              <type>
+                <REAL />
+              </type>
+              <initialValue>
+                <simpleValue value="0.35" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Distance de roulis M1 courante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2CoupledDescentActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Conditions effectives du modèle positionnel</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2CoupledDescentPrevious">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémoire armement trajectoire M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1CoupledDescentStartRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Origine brute M1 de la trajectoire courante</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2CoupledDescentStartRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Origine brute M2 propre à son référencement</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M1CoupledDeltaRaw">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Variation signée M1 depuis le début de descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2CoupledDeltaRaw">
+              <type>
+                <DINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Variation signée M2 calculée depuis M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2CoupledDeltaMagnitudeRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Valeur absolue du delta M2 pour bouclage UDINT</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M2CoupledTargetRaw">
+              <type>
+                <UDINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Position brute M2 dérivée, modulo 2^32</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldMeasureEnablePrevious">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front alimentation Kobold</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldAutoEpisodeActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mode auto figé pour une plongée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldAutoDepthEpisode_M">
+              <type>
+                <REAL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Fond figé durant une plongée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="KoboldPowerUpEpisodeTime">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Délai sonde figé durant une plongée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="instKoboldPowerUpTimer">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Réponse sonde après alimentation</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">═══════════════════════════════════════════════════════════════
@@ -3788,6 +3706,10 @@ demarre (ex. pas juste apres un jog benne independant) : evite tout rattrapage b
 {region "§1 Repli image reelle banc desactive"}
 IF NOT Enable THEN
     // 🔌 Banc désactivé : repli sur l'image réelle, aucune simulation en cours
+    M2CoupledDescentPrevious := FALSE;
+    KoboldMeasureEnablePrevious := FALSE;
+    KoboldAutoEpisodeActive := FALSE;
+    instKoboldPowerUpTimer(IN := FALSE);
     Ready       := FALSE;
     Busy        := FALSE;
     Done        := FALSE;
@@ -3817,6 +3739,22 @@ M2_PresetCmd := (M2_PresetTriggerCmd = 2);
 M1_OffsetPts := REAL_TO_DINT(SimSyncDeviationOffset_M * 4096.0);
 M2_OffsetPts := REAL_TO_DINT(SimSyncDeviationOffset_M * 4096.0);
 
+// Une plongée auto fige ses réglages avant l'arrêt : modifier l'IHM pendant AX5..AX8
+// ne crée ni faux front fond ni changement de roulis en cours de mouvement.
+IF KoboldMeasureEnable AND NOT KoboldMeasureEnablePrevious THEN
+    KoboldAutoEpisodeActive := SimKoboldAutoModeActive;
+    KoboldAutoDepthEpisode_M := SimKoboldAutoDepth_M;
+    KoboldPowerUpEpisodeTime := SimKoboldPowerUpTime;
+END_IF;
+KoboldMeasureEnablePrevious := KoboldMeasureEnable;
+
+IF KoboldAutoEpisodeActive THEN
+    M1_EffectiveCoastM := SimKoboldCoast_M;
+    M2_EffectiveCoastM := SimKoboldCoast_M;
+ELSE
+    M1_EffectiveCoastM := SimWinchCoast_M;
+END_IF;
+
 // Instance modèle codeur M1
 instSimEncoderM1(
     Enable           := TRUE,
@@ -3826,14 +3764,15 @@ instSimEncoderM1(
     PresetCmd        := M1_PresetCmd,
     PresetValue      := M1_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
-    CoastDistanceM   := SimWinchCoast_M,
+    CoastDistanceM   := M1_EffectiveCoastM,
     TestOffsetCmd    := SimSyncDeviationInjectM1,
     TestOffsetPts    := M1_OffsetPts,
     RawPos           := RawPosM1
 );
 
-// Détection coupure relais M2 pour renouveler la dispersion pseudo-aléatoire (±0.1m)
-IF (M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev) THEN
+// Hors plongée Kobold, dispersion M2 renouvelée avant le prochain mouvement.
+IF NOT KoboldAutoEpisodeActive
+   AND ((M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev)) THEN
     // Générateur LCG 32-bit standard : X_{n+1} = (1103515245 * X_n + 12345) MOD 2^31
     RandomSeed := (RandomSeed * 1103515245 + 12345) AND 16#7FFFFFFF;
     // Dispersion pseudo-aléatoire entre -0.10 m et +0.10 m
@@ -3841,6 +3780,14 @@ IF (M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev
 END_IF;
 M2_RelayFwdPrev := M2_RelayFwd;
 M2_RelayRevPrev := M2_RelayRev;
+
+// Le codeur absolu travaille modulo 2^32. Après un homing M2 effectué alors
+// que son brut vaut 0, une descente doit donc poursuivre à 16#FFFFFFFF.
+// FB_Sim_Encoder borne volontairement à 0 ; le banc rétablit ici le bouclage
+// physique avant son appel, y compris pour un mouvement M2 non couplé.
+IF M2_RelayRev AND NOT M2_RelayFwd AND (RawPosM2 = 0) THEN
+    RawPosM2 := 16#FFFFFFFF;
+END_IF;
 
 // Instance modèle codeur M2 (avec roulis et dispersion)
 instSimEncoderM2(
@@ -3857,46 +3804,56 @@ instSimEncoderM2(
     RawPos           := RawPosM2
 );
 
-// Modele M2 = f(M1) en descente couplee, calibre sur trace reelle. N'affecte que la position
-// PUBLIEE (Winch.COD2_PosValue) : RawPosM2 continue d'evoluer en tache de fond via
-// instSimEncoderM2 (roulis/relais inchanges). Lissage continu (FilterM2Model, PT1) : la cible
-// bascule modele/independant sans jamais sauter, ni aux transitions ni au bit
-// SimM2CoupledDescentModelActive lui-meme. Grandeurs SIGNEES (pas de ABS) : + enroule,
-// - sous l'eau, meme convention que M1_MeasuredDepth_M -- l'ecart |M1-M2| croit avec la profondeur
-// (pente &lt; 1), il ne doit jamais etre replie par une valeur absolue.
-M2IndependentPos_M := DINT_TO_REAL(UDINT_TO_DINT(instSimEncoderM2.RawPosOut) - UDINT_TO_DINT(M2_PresetValueOut))
-                     * (CST_EncoderCableM_PerRev / UDINT_TO_REAL(CST_EncoderPointsPerRev));
-
-M2CoupledDescentActive := M1_RelayRev AND M2_RelayRev;
-M2CoupledDescentEdge(CLK := M2CoupledDescentActive);
-IF M2CoupledDescentEdge.Q THEN
-    M2ModelRandomSeed := (M2ModelRandomSeed * 1103515245 + 12345) AND 16#7FFFFFFF;
-    M2ModelDispersion_M := ((UDINT_TO_REAL(M2ModelRandomSeed MOD 2000) / 1000.0) - 1.0) * CST_M2CoupledModelDispersion_M;
-    // Armement uniquement si M1/M2 sont deja synchronises au moment ou la descente couplee
-    // demarre (jamais juste apres un jog benne independant) : evite tout rattrapage brutal.
-    // Reste arme en continu ensuite (pas de plage haute/basse) pour que l'ecart continue de se
-    // creuser tant que la descente couplee se poursuit.
-    M2ModelArmedThisPhase := ABS(M2IndependentPos_M - M1_MeasuredDepth_M) &lt;= CST_M2CoupledModelSyncTolerance_M;
+// M2 est dérivé de M1 uniquement pendant la descente BOTH effectivement appliquée.
+// Les deux origines mémorisées évitent tout saut : l'écart initial est conservé.
+M2CoupledDescentActive := SimM2CoupledDescentModelActive
+                          AND WinchBothDescentIntent
+                          AND M1_RelayRev AND M2_RelayRev
+                          AND NOT M1_RelayFwd AND NOT M2_RelayFwd;
+IF M2CoupledDescentActive AND NOT M2CoupledDescentPrevious THEN
+    M1CoupledDescentStartRaw := RawPosM1;
+    M2CoupledDescentStartRaw := RawPosM2;
 END_IF;
+IF M2CoupledDescentActive THEN
+    // Chaque codeur conserve sa propre référence brute. Seul le déplacement de
+    // M1 est transposé sur M2 ; les origines brutes ne sont jamais égalisées.
+    IF RawPosM1 &gt;= M1CoupledDescentStartRaw THEN
+        M1CoupledDeltaRaw := UDINT_TO_DINT(RawPosM1 - M1CoupledDescentStartRaw);
+    ELSE
+        M1CoupledDeltaRaw := -UDINT_TO_DINT(M1CoupledDescentStartRaw - RawPosM1);
+    END_IF;
+    M2CoupledDeltaRaw := REAL_TO_DINT(DINT_TO_REAL(M1CoupledDeltaRaw)
+                                      * SimM2CoupledDescentFactor);
 
-M2ModelActive := M2ModelArmedThisPhase AND M2CoupledDescentActive;
-// Ecart borne : jamais au-dela de CST_M2CoupledModelMaxDivergence_M (&lt; tolerance reelle du
-// controle benne CoherenceLimitM), quelle que soit la profondeur -- evite tout depassement
-// numerique et tout declenchement du fault benne ErrorID:02 genere par le modele lui-meme.
-M2ModelEstimated_M := M1_MeasuredDepth_M
-                     + LIMIT(-CST_M2CoupledModelMaxDivergence_M,
-                              (CST_M2CoupledModelSlope - 1.0) * M1_MeasuredDepth_M + CST_M2CoupledModelOffset_M,
-                              CST_M2CoupledModelMaxDivergence_M)
-                     + M2ModelDispersion_M;
+    // Addition signée explicite dans l'espace UDINT. Si M2 part de 0 et que
+    // le delta est négatif, le compteur boucle par 16#FFFFFFFF au lieu de rester figé.
+    IF M2CoupledDeltaRaw &gt;= 0 THEN
+        M2CoupledDeltaMagnitudeRaw := DINT_TO_UDINT(M2CoupledDeltaRaw);
+        IF M2CoupledDeltaMagnitudeRaw &lt;= (16#FFFFFFFF - M2CoupledDescentStartRaw) THEN
+            M2CoupledTargetRaw := M2CoupledDescentStartRaw + M2CoupledDeltaMagnitudeRaw;
+        ELSE
+            M2CoupledTargetRaw := M2CoupledDeltaMagnitudeRaw
+                                  - (16#FFFFFFFF - M2CoupledDescentStartRaw) - 1;
+        END_IF;
+    ELSE
+        M2CoupledDeltaMagnitudeRaw := DINT_TO_UDINT(-M2CoupledDeltaRaw);
+        IF M2CoupledDeltaMagnitudeRaw &lt;= M2CoupledDescentStartRaw THEN
+            M2CoupledTargetRaw := M2CoupledDescentStartRaw - M2CoupledDeltaMagnitudeRaw;
+        ELSE
+            M2CoupledTargetRaw := 16#FFFFFFFF
+                                  - (M2CoupledDeltaMagnitudeRaw - M2CoupledDescentStartRaw) + 1;
+        END_IF;
+    END_IF;
+    RawPosM2 := M2CoupledTargetRaw;
+END_IF;
+M2CoupledDescentPrevious := M2CoupledDescentActive;
 
-M2TargetPos_M := SEL(M2ModelActive, M2IndependentPos_M, M2ModelEstimated_M);
-FilterM2Model(ValueIn := M2TargetPos_M, TimeConst := CST_M2CoupledModelBlendTime, CycleTimeS := CST_PlcCycleTimeS);
-M2DisplayedPos_M := FilterM2Model.ValueOut;
-
-// Meme convention SIGNEE que M1_MeasuredDepth_M : CablePosM = (RawPos-Preset)*scale, donc l'inverse
-// est direct (pas de signe a inverser).
-M2ModelRawPos := DINT_TO_UDINT(UDINT_TO_DINT(M2_PresetValueOut)
-                 + REAL_TO_DINT(M2DisplayedPos_M * (UDINT_TO_REAL(CST_EncoderPointsPerRev) / CST_EncoderCableM_PerRev)));
+// Le roulis de plongée doit rester chargé jusqu'au scan de retombée des relais.
+// Le contacteur Kobold peut tomber un scan avant les commandes treuils.
+IF NOT KoboldMeasureEnable AND NOT M1_RelayRev AND NOT M2_RelayRev
+   AND NOT M1_RelayFwd AND NOT M2_RelayFwd THEN
+    KoboldAutoEpisodeActive := FALSE;
+END_IF;
 
 // Recopie structures Winch simulées :
 // 🛑 POLARITÉ DE FREIN SIMULÉ : 1 = contacteur commandé = frein OUVERT.
@@ -3926,11 +3883,14 @@ Winch.COD1_Alarms              := 0;
 Winch.COD1_Warnings            := 0;
 Winch.COD1_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING (bus OK)
 
-// Flag desactive (defaut historique) : position publiee = modele codeur M2 independant exact,
-// aucune regression. Flag actif : position lissee en continu (RawPosM2 continue d'evoluer en
-// tache de fond dans tous les cas, aucune discontinuite possible sur toggle du flag).
-Winch.COD2_PosValue            := SEL(SimM2CoupledDescentModelActive, instSimEncoderM2.RawPosOut, M2ModelRawPos);
-Winch.COD2_SpdValue            := instSimEncoderM2.RawSpdOut;
+IF M2CoupledDescentActive THEN
+    Winch.COD2_PosValue := RawPosM2;
+    Winch.COD2_SpdValue := REAL_TO_DINT(DINT_TO_REAL(instSimEncoderM1.RawSpdOut)
+                                         * SimM2CoupledDescentFactor);
+ELSE
+    Winch.COD2_PosValue := instSimEncoderM2.RawPosOut;
+    Winch.COD2_SpdValue := instSimEncoderM2.RawSpdOut;
+END_IF;
 Winch.COD2_Alarms              := 0;
 Winch.COD2_Warnings            := 0;
 Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING
@@ -4054,20 +4014,15 @@ Machine.PowerContactorEngaged_DI   := instSimSafety.SimContactorOk;
 Machine.EmergencyChainClosed_DI    := instSimSafety.SimChainOk;
 Machine.PhaseRotationOk_DI             := TRUE;
 Machine.M1_M2_M3_BrakeThermalOk_DI     := TRUE;
-// Mode auto, sequence reproduite depuis PRG_04_Treuils_Benne.st §KoboldAutoStop (reference,
-// non modifiee) : DQ actif -&gt; temporisation -&gt; DI=1 (circuit arme/immerge, front montant) -&gt;
-// seuil de profondeur franchi -&gt; DI=0 (perte de signal = contact fond, front descendant).
-KoboldReactionTimer(IN := SimKoboldAutoModeActive AND KoboldMeasureEnable, PT := SimKoboldReactionTime);
-KoboldArmedRise(CLK := KoboldReactionTimer.Q);
-KoboldTouchTrigger := SimKoboldAutoModeActive AND (M1_MeasuredDepth_M &lt;= SimKoboldAutoDepth_M);
-IF KoboldArmedRise.Q THEN
-    KoboldAutoDI := TRUE;
+instKoboldPowerUpTimer(IN := KoboldAutoEpisodeActive AND KoboldMeasureEnable
+                        AND (M1_CablePos_M &gt; KoboldAutoDepthEpisode_M),
+                        PT := KoboldPowerUpEpisodeTime);
+IF KoboldAutoEpisodeActive THEN
+    Machine.M1_M2_KoboldBottomTouch_DI := instKoboldPowerUpTimer.Q
+                                           AND (M1_CablePos_M &gt; KoboldAutoDepthEpisode_M);
+ELSE
+    Machine.M1_M2_KoboldBottomTouch_DI := SimKoboldContactValue;
 END_IF;
-IF KoboldTouchTrigger OR NOT KoboldMeasureEnable OR NOT SimKoboldAutoModeActive THEN
-    KoboldAutoDI := FALSE;
-END_IF;
-// OU avec le stimulus manuel existant (SimKoboldContactValue), non regressif si mode auto desactive.
-Machine.M1_M2_KoboldBottomTouch_DI     := SimKoboldContactValue OR KoboldAutoDI;
 Machine.HydraulicThermalOk_DI          := TRUE;
 Machine.TremieFull_OR_GateRaised_DI    := FALSE; // Pas encore câblé, simulé inactif par défaut
 
@@ -4383,6 +4338,22 @@ Done := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Front descendant desactivation simulation</xhtml>
               </documentation>
             </variable>
+            <variable name="SimulationSemiAutoActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Simulation et mode SEMI_AUTO simultanés</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SimulationSemiAutoPrevious">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Mémoire transition SEMI_AUTO simulé</xhtml>
+              </documentation>
+            </variable>
             <variable name="ENCODER_POINTS_PER_REV">
               <type>
                 <UDINT />
@@ -4466,22 +4437,25 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimSyncDeviationInjectM2 := FALSE;
     GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
     GVL_Simulation.SimKoboldContactValue := FALSE;
-    GVL_Simulation.SimKoboldAutoDepth_M := -15.0;
-    GVL_Simulation.SimKoboldReactionTime := T#500ms;
-    GVL_Simulation.SimM2CoupledDescentModelActive := TRUE;
+    GVL_Simulation.SimKoboldAutoModeActive := FALSE;
 END_IF;
+
+// 🪝 Kobold automatique : armement unique à l'entrée en SEMI_AUTO sur banc.
+// Une action opérateur à FALSE reste donc effective pendant le mode courant.
+SimulationSemiAutoActive := GVL_Simulation.SimulationModeActive
+                            AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO);
+IF SimulationSemiAutoActive AND NOT SimulationSemiAutoPrevious THEN
+    GVL_Simulation.SimKoboldAutoModeActive := TRUE;
+ELSIF NOT SimulationSemiAutoActive AND SimulationSemiAutoPrevious THEN
+    GVL_Simulation.SimKoboldAutoModeActive := FALSE;
+END_IF;
+SimulationSemiAutoPrevious := SimulationSemiAutoActive;
 
 // 🔀 Aiguillages de source uniques par domaine
 WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
 TranslationInputSourceSimulated := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimTranslationActive;
 OperatorInputSourceSimulated    := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimOperatorActive;
 MachineInputSourceSimulated     := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimSafetyActive;
-
-// 🧪 Kobold auto simule : arme uniquement pendant le cycle automatique (mode SEMI_AUTO), desarme
-// des la sortie -- evite d'interferer avec un essai qui ne porte pas sur le Kobold (joystick
-// manuel, autres modes). Lecture N-1 de PRG_03 (meme motif que HomingPermit ligne 536/589).
-GVL_Simulation.SimKoboldAutoModeActive := GVL_Simulation.SimulationModeActive
-    AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO);
 {endregion}
 
 {region "§1 Acquisition brute — HwReal"}
@@ -4660,6 +4634,10 @@ instSimBench(
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
     SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
+    SimM2CoupledDescentModelActive := GVL_Simulation.SimM2CoupledDescentModelActive,
+    SimM2CoupledDescentFactor := GVL_Simulation.SimM2CoupledDescentFactor,
+    WinchBothDescentIntent   := PRG_03_Modes_Cycle.Data.WinchBothIntent.Active
+                                AND PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend,
     SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
     SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,
     SimJoystickLeft_Rev_TREMIE_Active  := GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active,
@@ -4672,12 +4650,12 @@ instSimBench(
     SimJoystickOvershoot_Active        := GVL_Simulation.SimJoystickOvershoot_Active,
     SimJoystickBagotement_Active       := GVL_Simulation.SimJoystickBagotement_Active,
     SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
-    KoboldMeasureEnable      := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated,
     SimKoboldAutoModeActive  := GVL_Simulation.SimKoboldAutoModeActive,
     SimKoboldAutoDepth_M     := GVL_Simulation.SimKoboldAutoDepth_M,
-    SimKoboldReactionTime    := GVL_Simulation.SimKoboldReactionTime,
-    SimM2CoupledDescentModelActive := GVL_Simulation.SimM2CoupledDescentModelActive,
-    M1_MeasuredDepth_M       := Data.EncoderM1.Measurement.CablePosM,
+    SimKoboldPowerUpTime     := GVL_Simulation.SimKoboldPowerUpTime,
+    SimKoboldCoast_M         := GVL_Simulation.SimKoboldCoast_M,
+    KoboldMeasureEnable      := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated,
+    M1_CablePos_M            := Data.EncoderM1.Measurement.CablePosM,
     BtnEmergencyStop         := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff,
     HwReal                   := HwReal,
     RawPosM1                 := _SimEncoderRawPosM1,
@@ -5004,96 +4982,6 @@ Data.DataValid := NOT Data.InputModules.Fault
         <addData>
           <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
             <ObjectId>212fd0f8-509e-536e-99de-b75543d86add</ObjectId>
-          </data>
-        </addData>
-      </pou>
-      <pou name="FB_Filter" pouType="functionBlock">
-        <interface>
-          <inputVars>
-            <variable name="ValueIn">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== CONSIGNES DE PILOTAGE &amp; CONFIGURATION ===
---&gt; [CMD] Valeur brute a filtrer</xhtml>
-              </documentation>
-            </variable>
-            <variable name="TimeConst">
-              <type>
-                <TIME />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Constante de temps du filtre (ex: T#200ms)</xhtml>
-              </documentation>
-            </variable>
-            <variable name="CycleTimeS">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Temps de cycle reel de la tache en secondes (ex: 0.02)</xhtml>
-              </documentation>
-            </variable>
-          </inputVars>
-          <outputVars>
-            <variable name="ValueOut">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SORTIES LISSÉES ===
-&lt;-- [STAT] Valeur lissee par filtre PT1</xhtml>
-              </documentation>
-            </variable>
-          </outputVars>
-          <localVars>
-            <variable name="T">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== VARIABLES LOCALES INTERNES ===
-. [LOC]  Constante de temps convertie en secondes</xhtml>
-              </documentation>
-            </variable>
-            <variable name="Alpha">
-              <type>
-                <REAL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC]  Facteur d'attenuation du filtre exponentiel</xhtml>
-              </documentation>
-            </variable>
-          </localVars>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   ⚙️ FB_Filter — Filtre passe-bas premier ordre (PT1 numérique)
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Filtre exponentiel discret y[k] = a*x[k] + (1-a)*y[k-1]
-             avec a = CycleTimeS / (T + CycleTimeS). Pass-through si T=0 ou Cycle=0.
-   📄 Domaine : CODE/A_COMMUN (fonction de filtrage générale)
-   =======================================================================</xhtml>
-          </documentation>
-        </interface>
-        <body>
-          <ST>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">
-
-T := TIME_TO_REAL(TimeConst) / 1000.0; // ms → s
-
-IF T &lt;= 0.0 OR CycleTimeS &lt;= 0.0 THEN
-    ValueOut := ValueIn;
-ELSE
-    Alpha    := CycleTimeS / (T + CycleTimeS);
-    ValueOut := Alpha * ValueIn + (1.0 - Alpha) * ValueOut;
-END_IF;
-</xhtml>
-          </ST>
-        </body>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>39721efb-445f-5f0c-882a-6b2b978076bc</ObjectId>
           </data>
         </addData>
       </pou>
@@ -12305,16 +12193,28 @@ Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset</xhtml>
           </documentation>
         </variable>
-        <variable name="SimKoboldContactValue">
+        <variable name="SimM2CoupledDescentModelActive">
           <type>
             <BOOL />
           </type>
           <initialValue>
-            <simpleValue value="FALSE" />
+            <simpleValue value="TRUE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
-TRUE = Kobold détecte un contact fond simulé (mode manuel)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 MODÈLE M2 / KOBOLD — réglages de banc, actifs exclusivement via FB_SimBench.
+M2 est calculé depuis M1 pendant une descente BOTH effective. Le coefficient est
+issu de la trace 2026-09-05 ; TRUE par défaut pour reproduire le comportement mesuré.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM2CoupledDescentFactor">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.9333" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Ratio déplacement M2 / déplacement M1 en descente BOTH (mesure: 0,6 m / 9 m)</xhtml>
           </documentation>
         </variable>
         <variable name="SimKoboldAutoModeActive">
@@ -12325,10 +12225,8 @@ TRUE = Kobold détecte un contact fond simulé (mode manuel)</xhtml>
             <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Mode auto Kobold : déclenche le contact fond par seuil altimétrique M1, avec un temps de
-réaction réaliste (latence détection). Combiné en OU avec SimKoboldContactValue — le mode
-manuel reste utilisable en parallèle. Défaut désactivé = comportement historique inchangé.
-TRUE = active le déclenchement auto par profondeur ; défaut désactivé pour ne pas interférer avec un test qui ne porte pas sur le Kobold (déclenche l'interlock réel PRG_04 si activé)</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Le mode auto est armé sur entrée SEMI_AUTO pendant la simulation et libéré à sa sortie.
+Une désactivation opérateur pendant une plongée est prise en compte à la plongée suivante.</xhtml>
           </documentation>
         </variable>
         <variable name="SimKoboldAutoDepth_M">
@@ -12339,31 +12237,41 @@ TRUE = active le déclenchement auto par profondeur ; défaut désactivé pour n
             <simpleValue value="-15" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil altimétrique M1 (m, négatif = sous l'eau) déclenchant le contact fond</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Altitude fond signée (m), négative sous l'eau</xhtml>
           </documentation>
         </variable>
-        <variable name="SimKoboldReactionTime">
+        <variable name="SimKoboldPowerUpTime">
           <type>
             <TIME />
           </type>
           <initialValue>
-            <simpleValue value="TIME#500ms" />
+            <simpleValue value="TIME#50ms" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de réaction simulé avant publication du contact</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Réponse sonde après alimentation Kobold</xhtml>
           </documentation>
         </variable>
-        <variable name="SimM2CoupledDescentModelActive">
+        <variable name="SimKoboldCoast_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis déterministe M1/M2 après arrêt Kobold (m)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldContactValue">
           <type>
             <BOOL />
           </type>
           <initialValue>
-            <simpleValue value="TRUE" />
+            <simpleValue value="FALSE" />
           </initialValue>
           <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Modèle position M2 calé sur M1 en descente couplée, calibré sur trace réelle
-(Suivi_WinchMatinDescMontee_20260905_29, régression linéaire RMSE 3cm). Actif par défaut ;
-FALSE = ancienne simulation M2 indépendante par relais uniquement.</xhtml>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
+TRUE = Kobold détecte un contact fond simulé</xhtml>
           </documentation>
         </variable>
         <variable name="SimChainOk">
@@ -12414,16 +12322,6 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
         </Folder>
         <Folder Name="M_MAIN">
           <Object Name="PRG_02_Acquisition" ObjectId="212fd0f8-509e-536e-99de-b75543d86add" />
-        </Folder>
-        <Folder Name="A_COMMUN">
-          <Object Name="FB_Filter" ObjectId="39721efb-445f-5f0c-882a-6b2b978076bc" />
-          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
-          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
-          <Folder Name="_TYPES">
-            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
-            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
-            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
-          </Folder>
         </Folder>
         <Folder Name="J_SUPERVISION">
           <Folder Name="_TYPES">
@@ -12492,6 +12390,15 @@ la chaîne est ouverte et le contacteur non engagé (on n'a pas armé).</xhtml>
           <Object Name="ST_fbJoystick_Cfg" ObjectId="15265f47-4d56-5d85-af5c-415e86b1194e" />
           <Object Name="FB_AxisScale" ObjectId="e974ff21-ff4c-5a4b-ba11-7923dd2c8334" />
           <Object Name="ST_fbJoystick_AxisCmd" ObjectId="b6fd2799-de8b-52a1-87c0-15b96ff2b5f6" />
+        </Folder>
+        <Folder Name="A_COMMUN">
+          <Object Name="FB_CycleTime" ObjectId="ac308017-0ba5-51da-b58a-b5951d04dc0f" />
+          <Object Name="FB_FaultCore" ObjectId="182a55ac-4f1f-5204-b2e2-869f3904964e" />
+          <Folder Name="_TYPES">
+            <Object Name="ST_Fault" ObjectId="ffe904a3-501c-5aac-bc38-202f178a61f2" />
+            <Object Name="ST_FaultCause" ObjectId="dafea4e6-0b73-5895-8c57-ef302142ebf7" />
+            <Object Name="ST_Lifecycle" ObjectId="b6983c9c-4d76-5d4e-899b-e996cbf34849" />
+          </Folder>
         </Folder>
         <Folder Name="F_MODES">
           <Object Name="E_Mode" ObjectId="e54280f0-d415-50d8-9acc-a2932bad84c4" />

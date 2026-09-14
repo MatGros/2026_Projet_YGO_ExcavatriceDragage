@@ -316,6 +316,26 @@ Le sélecteur est atomique par domaine : `HwIn.<Domaine> := HwSim.<Domaine>` ou
 Au front descendant du bit maître, tous les flags de domaine et stimuli ci-dessus reprennent leurs
 valeurs nominales. Les positions codeurs persistantes ne sont pas des stimuli et ne sont pas effacées.
 
+## 5bis. 🪝 Simulation plongée Kobold et dynamique M2
+
+Le banc ne contourne aucune protection : il publie des mesures et DI plausibles à
+`PRG_02`, puis `PRG_03` à `PRG_06` appliquent le cycle et les interlocks habituels.
+
+- `SimM2CoupledDescentModelActive` est actif par défaut. Pendant une descente BOTH
+  réellement appliquée, le codeur M2 suit la position M1 depuis les deux origines
+  capturées à l'entrée : `M2_raw = M2_raw_depart + 0,9333 × (M1_raw - M1_raw_depart)`.
+  Ce facteur correspond à la mesure terrain d'environ 0,6 m d'écart sur 9 m de descente
+  (`1 - 0,6 / 9 ≈ 0,9333`).
+  La divergence se prolonge à toute profondeur. M2 seul, montée et arrêt gardent le
+  modèle indépendant ; la dernière position calculée devient sa position de reprise.
+- `SimKoboldAutoModeActive` est armé à l'entrée SEMI_AUTO en simulation et libéré à
+  la sortie. Le contacteur Kobold ouvre une épisode qui fige profondeur et délai.
+  Le signal DI reste bas hors alimentation, devient haut après `SimKoboldPowerUpTime`
+  au-dessus de `SimKoboldAutoDepth_M`, puis retombe au fond. Les paramètres modifiés
+  pendant une plongée ne s'appliquent qu'à la suivante.
+- `SimKoboldCoast_M` est chargé avant la coupure des relais afin que les deux codeurs
+  prolongent le mouvement après l'arrêt Kobold sans repositionnement artificiel.
+
 ## 6. 🔍 Observation et diagnostic
 
 En vue instance de `PRG_02_Acquisition`, lire côte à côte les trois `ST_HardwareImage` homologues :

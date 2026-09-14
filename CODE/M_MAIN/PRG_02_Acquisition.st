@@ -63,6 +63,8 @@ VAR
 
     SimulationModeRise                : R_TRIG; // . [LOC] Front montant activation simulation
     SimulationModeFall                : F_TRIG; // . [LOC] Front descendant desactivation simulation
+    SimulationSemiAutoActive          : BOOL;   // . [LOC] Simulation et mode SEMI_AUTO simultanés
+    SimulationSemiAutoPrevious        : BOOL;   // . [LOC] Mémoire transition SEMI_AUTO simulé
 END_VAR
 
 VAR CONSTANT
@@ -114,7 +116,19 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimSyncDeviationInjectM2 := FALSE;
     GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
     GVL_Simulation.SimKoboldContactValue := FALSE;
+    GVL_Simulation.SimKoboldAutoModeActive := FALSE;
 END_IF;
+
+// 🪝 Kobold automatique : armement unique à l'entrée en SEMI_AUTO sur banc.
+// Une action opérateur à FALSE reste donc effective pendant le mode courant.
+SimulationSemiAutoActive := GVL_Simulation.SimulationModeActive
+                            AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.SEMI_AUTO);
+IF SimulationSemiAutoActive AND NOT SimulationSemiAutoPrevious THEN
+    GVL_Simulation.SimKoboldAutoModeActive := TRUE;
+ELSIF NOT SimulationSemiAutoActive AND SimulationSemiAutoPrevious THEN
+    GVL_Simulation.SimKoboldAutoModeActive := FALSE;
+END_IF;
+SimulationSemiAutoPrevious := SimulationSemiAutoActive;
 
 // 🔀 Aiguillages de source uniques par domaine
 WinchInputSourceSimulated       := GVL_Simulation.SimulationModeActive AND GVL_Simulation.SimWinchActive;
@@ -299,6 +313,10 @@ instSimBench(
     SimSyncDeviationInjectM1 := GVL_Simulation.SimSyncDeviationInjectM1,
     SimSyncDeviationInjectM2 := GVL_Simulation.SimSyncDeviationInjectM2,
     SimSyncDeviationOffset_M := GVL_Simulation.SimSyncDeviationOffset_M,
+    SimM2CoupledDescentModelActive := GVL_Simulation.SimM2CoupledDescentModelActive,
+    SimM2CoupledDescentFactor := GVL_Simulation.SimM2CoupledDescentFactor,
+    WinchBothDescentIntent   := PRG_03_Modes_Cycle.Data.WinchBothIntent.Active
+                                AND PRG_03_Modes_Cycle.Data.WinchBothIntent.ReqDescend,
     SimM3SensorsWordOverrideActive := GVL_Simulation.SimM3SensorsWordOverrideActive,
     SimM3SensorsWord               := GVL_Simulation.SimM3SensorsWord,
     SimJoystickLeft_Rev_TREMIE_Active  := GVL_Simulation.SimJoystickLeft_Rev_TREMIE_Active,
@@ -311,6 +329,12 @@ instSimBench(
     SimJoystickOvershoot_Active        := GVL_Simulation.SimJoystickOvershoot_Active,
     SimJoystickBagotement_Active       := GVL_Simulation.SimJoystickBagotement_Active,
     SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
+    SimKoboldAutoModeActive  := GVL_Simulation.SimKoboldAutoModeActive,
+    SimKoboldAutoDepth_M     := GVL_Simulation.SimKoboldAutoDepth_M,
+    SimKoboldPowerUpTime     := GVL_Simulation.SimKoboldPowerUpTime,
+    SimKoboldCoast_M         := GVL_Simulation.SimKoboldCoast_M,
+    KoboldMeasureEnable      := PRG_04_Treuils_Benne.Data.KoboldContactorCmdArbitrated,
+    M1_CablePos_M            := Data.EncoderM1.Measurement.CablePosM,
     BtnEmergencyStop         := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff,
     HwReal                   := HwReal,
     RawPosM1                 := _SimEncoderRawPosM1,
