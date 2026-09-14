@@ -1,42 +1,42 @@
 tasks:
 - id: T293
   parent_id: ''
-  statut: '⏸️'
+  statut: '✅'
   criticite: C2
   domaine: SIMULATION
-  agent: Claude Code
-  date: '2026-09-14T23:00:00+02:00'
+  agent: Codex
+  date: '2026-09-14T23:40:26+02:00'
+  avancement: 'Termine : modele M2 couple a M1 valide au banc CODESYS par l utilisateur.'
+  completed_at: '2026-09-15T01:40:00+02:00'
+  plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T292_T293_SIMULATION_20260914.md
   titre: 'SimBench — Modèle position M2 calé sur M1 en descente couplée (calibration trace réelle)'
-  contexte: 'Demande utilisateur : la simulation M2 (relais + roulis indépendant) ne reproduit pas fidèlement le comportement réel mesuré en descente couplée M1+M2. Analyse de la trace réelle Suivi_WinchMatinDescMontee_20260905_29 (régression linéaire, RMSE 3cm) donne M2PositionCorrected = 0.8837 * M1_Position + 1.1728 sur la plage [1.6m ; 8.0m]. Doit être activable/désactivable via un bit actif PAR DEFAUT (TRUE) ; désactivé = retour strict à l ancienne simulation M2 indépendante par relais.
-
-    ⏸️ PAUSE 2026-09-14 : implémentation faite puis itérée plusieurs fois (correction convention de signe M1 signée au lieu de ABS, bornage de la divergence à ±0.6m sous CoherenceLimitM=1.0m, lissage continu bumpless via FB_Filter, armement conditionné à la synchronisation M1/M2 au début de la phase). Symptôme utilisateur en parallèle : M1TreuilRetenue.State.Position_M reste figé en simulation. Deux diagnostics indépendants (sous-agents) + isolation par revert complet du lot (CODE/L_SIMULATION/FB_SimBench.st, GVL_Simulation.st, CODE/M_MAIN/PRG_02_Acquisition.st restaurés au commit c328a076, AVANT toute trace de ce lot, bundle régénéré et vérifié 0 occurrence de SimM2CoupledDescentModelActive/SimKoboldAutoModeActive) n ont montré AUCUNE écriture de ce lot sur la chaîne M1 (M1_RelayFwd/Rev, Winch.COD1_PosValue, instSimEncoderM1). Le symptôme M1 figé reste à investiguer par l utilisateur avec ce bundle isolé (test décisif en cours). Le code de ce lot (T293) est donc RÉVERTÉ dans le working tree actuel — à ré-appliquer une fois le symptôme M1 confirmé sans rapport, ou à corriger si le test décisif prouve un lien.'
-  description: 'Ajouter GVL_Simulation.SimM2CoupledDescentModelActive (BOOL, défaut TRUE). Dans FB_SimBench : détecter la descente couplée (M1_RelayRev AND M2_RelayRev), calculer M1_AbsDepth_M = ABS(profondeur M1 simulée, même formule que le calcul Kobold T292), et si le flag est actif ET coupled ET M1_AbsDepth_M dans [1.6;8.0], substituer Winch.COD2_PosValue par le modèle (pente/offset calibrés + petite dispersion aléatoire), au lieu de la valeur issue du modèle codeur M2 indépendant. Hors de ces conditions, comportement strictement inchangé. Hypothèse de convention de signe à valider au banc : M1_AbsDepth_M suppose que M1TreuilRetenue.State.Position_M correspond à une distance descendue positive croissante, cohérente avec le sens RawPos décroissant en descente déjà utilisé pour le calcul Kobold (T292) — à confirmer par l utilisateur si divergence terrain observée.'
+  contexte: 'Reprise demandee le 2026-09-14 : abandon de l integration precedente. Ralentissement M2 uniquement en descente M1/M2 Both, selon precision utilisateur. Regression fournie locale, pas un modele absolu universel.'
+  description: 'M2_raw = M2_raw_depart + 0.8837 * (M1_raw - M1_raw_depart) pendant Both descente effective a toute profondeur. Le bit SimM2CoupledDescentModelActive desactive le modele sans saut.'
   objectifs:
-  - 'Flag désactivé : comportement strictement identique à l ancienne simulation M2 (relais + roulis), aucune régression.'
-  - 'Flag activé (défaut) ET descente couplée ET M1 dans [1.6m;8.0m] : Winch.COD2_PosValue suit le modèle calibré (pente 0.8837, offset 1.1728m) avec une petite dispersion aléatoire.'
-  - 'Hors plage [1.6m;8.0m] ou hors descente couplée : retour à la position issue du modèle codeur M2 indépendant existant, sans discontinuité brutale non documentée.'
-  - 'Constantes du modèle (pente, offset, bornes, dispersion) déclarées en VAR CONSTANT nommées, aucun nombre magique dans le corps.'
-  - 'Gates G200 + palier C PASS ; bundle régénéré.'
+  - 'Calcul uniquement sous bit actif ET Both descente ET deux relais descente effectifs.'
+  - 'Aucun saut de position, plateau artificiel, saturation de divergence ou override de M2PositionCorrected.'
+  - 'Montee et commandes unitaires gardent la dynamique existante.'
+  - 'Tests ST, integration M1 mobile, bundle, G200 et gates selon contrat.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T293_SIMBENCH_M2_COUPLED_DESCENT_MODEL.yaml
   bloque_par: []
 - id: T292
   parent_id: ''
-  statut: '⏸️'
+  statut: '✅'
   criticite: C2
   domaine: SIMULATION
-  agent: Claude Code
-  date: '2026-09-14T23:00:00+02:00'
+  agent: Codex
+  date: '2026-09-14T23:40:26+02:00'
+  avancement: 'Termine : simulation Kobold et dynamique de fond validees au banc CODESYS par l utilisateur.'
+  completed_at: '2026-09-15T01:40:00+02:00'
+  plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T292_T293_SIMULATION_20260914.md
   titre: 'SimBench — Kobold automatique par seuil altimétrique + temps de réaction réaliste'
-  contexte: 'Demande urgente utilisateur (en simulation actuellement) : le contact fond Kobold (GVL_Simulation.SimKoboldContactValue) est aujourd hui un simple bool manuel forcé sans lien avec la position. Besoin : un paramètre de seuil altimétrique (ex. -15 m) qui déclenche automatiquement le contact fond quand M1/M2 descend sous ce seuil, avec un temps de réaction réaliste (latence détection avant publication du signal), et perte du contact à la remontée au-dessus du seuil. Doit rester activable/désactivable (mode auto optionnel, comportement manuel existant conservé si désactivé).
-
-    ⏸️ PAUSE 2026-09-14 : implémentation faite puis corrigée (séquence DI conforme AF_Partie-04 Addendum T258 : 0→1→0 hors eau→immersion→fond, gate sur KoboldMeasureEnable=PRG_04.Data.KoboldContactorCmdArbitrated, armement automatique sur Auth.Mode=SEMI_AUTO au lieu d un bit statique). Confusion en session avec un interlock réel PRG_04 (KoboldAutoStopRiseEdge/FallEdge → KoboldBottomTouchLatched → coupure ProcessPermitM1/M2_Descend, code EXISTANT non modifié) qui bloque légitimement la descente une fois le fond simulé touché — comportement voulu, pas un bug, mais source de confusion avec un symptôme sans rapport (M1 figé, voir T293). Lot entièrement RÉVERTÉ dans le working tree (retour au commit c328a076, avant toute trace de ce lot) pour isoler le symptôme M1. À ré-appliquer une fois le symptôme M1 confirmé sans rapport.'
-  description: 'Ajouter à GVL_Simulation : SimKoboldAutoModeActive (BOOL, défaut FALSE), SimKoboldAutoDepth_M (REAL, défaut -15.0), SimKoboldReactionTime (TIME, défaut T#500ms). Dans FB_SimBench : calculer la profondeur simulée M1 à partir de RawPos/PresetValueOut (même formule que FB_Encoder_Scale.CablePosM), gater une temporisation TON sur (AutoModeActive AND Depth<=Seuil), et publier Machine.M1_M2_KoboldBottomTouch_DI := SimKoboldContactValue OR instKoboldReactionTimer.Q (OU avec le bool manuel existant, non régressif si mode auto désactivé).'
+  contexte: 'Reprise demandee le 2026-09-14 : abandon de l integration precedente. DI haute apres alimentation puis basse au fond signe, arret par le vrai cycle et roulis simule.'
+  description: 'Plan propose : SimKoboldAutoModeActive arme a l entree SEMI_AUTO en simulation et desarme a la sortie ; desactivation manuelle maintenue. Fond -15 m, alimentation 50 ms et roulis 1 m +/-0.1 m proposes.'
   objectifs:
-  - 'Mode auto désactivé (défaut) : comportement strictement identique à l existant (SimKoboldContactValue seul).'
-  - 'Mode auto activé : le contact fond se déclenche automatiquement quand la profondeur simulée M1 franchit le seuil configuré, après le temps de réaction configuré.'
-  - 'Le contact retombe (perte) dès que la position remonte au-dessus du seuil.'
-  - 'Paramètres exposés et reset à l entrée en simulation comme les autres stimuli (PRG_02 §reset).'
-  - 'Gates G200 + palier C PASS ; bundle régénéré.'
+  - 'DI 0->1->0 : alimentation, delai, puis franchissement du fond signe.'
+  - 'Mode automatique inactif : stimulus manuel exclusif conserve.'
+  - 'Aucun gel de codeur au seuil ; arret dynamique commande par le programme.'
+  - 'Tests ST et cycle AX5 a AX8, bundle, G200 et gates selon contrat.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T292_SIMBENCH_KOBOLD_AUTO_DEPTH.yaml
   bloque_par: []
 - id: T291

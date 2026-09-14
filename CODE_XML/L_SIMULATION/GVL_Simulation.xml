@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T21:23:23.154812" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T21:23:23.154812">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T22:08:14.831648" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T22:08:14.831648">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -318,6 +318,75 @@ Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">Écart signé injecté, mètres ; persiste dans la position simulée jusqu'au reset/preset</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM2CoupledDescentModelActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="TRUE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">🪝 MODÈLE M2 / KOBOLD — réglages de banc, actifs exclusivement via FB_SimBench.
+M2 est calculé depuis M1 pendant une descente BOTH effective. Le coefficient est
+issu de la trace 2026-09-05 ; TRUE par défaut pour reproduire le comportement mesuré.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimM2CoupledDescentFactor">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="0.9333" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Ratio déplacement M2 / déplacement M1 en descente BOTH (mesure: 0,6 m / 9 m)</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldAutoModeActive">
+          <type>
+            <BOOL />
+          </type>
+          <initialValue>
+            <simpleValue value="FALSE" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Le mode auto est armé sur entrée SEMI_AUTO pendant la simulation et libéré à sa sortie.
+Une désactivation opérateur pendant une plongée est prise en compte à la plongée suivante.</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldAutoDepth_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="-15" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Altitude fond signée (m), négative sous l'eau</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldPowerUpTime">
+          <type>
+            <TIME />
+          </type>
+          <initialValue>
+            <simpleValue value="TIME#50ms" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Réponse sonde après alimentation Kobold</xhtml>
+          </documentation>
+        </variable>
+        <variable name="SimKoboldCoast_M">
+          <type>
+            <REAL />
+          </type>
+          <initialValue>
+            <simpleValue value="1" />
+          </initialValue>
+          <documentation>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Roulis déterministe M1/M2 après arrêt Kobold (m)</xhtml>
           </documentation>
         </variable>
         <variable name="SimKoboldContactValue">

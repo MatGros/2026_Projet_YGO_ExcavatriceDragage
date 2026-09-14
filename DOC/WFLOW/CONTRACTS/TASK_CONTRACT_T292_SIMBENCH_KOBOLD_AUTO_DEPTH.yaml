@@ -3,29 +3,35 @@ contract:
   criticality: C2
   strategy: patch
   objective: >
-    Ajouter au banc de simulation un mode automatique de contact fond Kobold
-    piloté par un seuil altimétrique configurable, avec un temps de réaction
-    réaliste et une perte de contact à la remontée, sans régresser le mode
-    manuel existant.
+    Simuler la DI Kobold 0->1->0 sous alimentation, avec fond signe configurable et roulis mecanique, activable automatiquement en SEMI_AUTO et desactivable par l operateur.
   acceptance:
     - id: AC1
-      statement: "Avec SimKoboldAutoModeActive=FALSE (défaut), Machine.M1_M2_KoboldBottomTouch_DI se comporte exactement comme avant (= SimKoboldContactValue)."
-      verified_by: "test de non-régression : mode auto désactivé, contact suit uniquement le bool manuel"
+      statement: "Automatisme inactif : la DI suit exclusivement SimKoboldContactValue."
+      verified_by: "Test ST comparatif des deux valeurs du stimulus manuel."
     - id: AC2
-      statement: "Avec le mode auto actif, le contact se déclenche quand la profondeur simulée M1 franchit SimKoboldAutoDepth_M, après un délai égal à SimKoboldReactionTime (TON)."
-      verified_by: "test scan-par-scan : position simulée franchissant le seuil, chronogramme du contact avec le délai attendu"
+      statement: "Entree en simulation SEMI_AUTO ou entree SEMI_AUTO en simulation : SimKoboldAutoModeActive devient TRUE. Une desactivation manuelle reste effective jusqu a la prochaine entree. Sortie de mode ou simulation : FALSE."
+      verified_by: "Test ST des fronts de mode, maintien sur dix scans et desactivation manuelle."
     - id: AC3
-      statement: "Le contact retombe dès que la position remonte au-dessus du seuil (perte de contact), sans délai artificiel supplémentaire à la remontée."
-      verified_by: "test scan-par-scan : remontée au-dessus du seuil, contact retombe immédiatement"
+      statement: "Sous alimentation finale et au-dessus du fond signe configure, la DI passe a TRUE apres SimKoboldPowerUpTime propose a 50 ms. Sans alimentation ou au fond, la DI est FALSE."
+      verified_by: "Chronogrammes ST alimentation, 50 ms, seuils -5/-15/-25 m et coupure."
     - id: AC4
-      statement: "Le calcul de profondeur simulée réutilise la même formule que FB_Encoder_Scale.CablePosM (signe négatif = sous l'eau), pour rester cohérent avec la position réelle publiée ailleurs."
-      verified_by: "revue de code : même formule (RawPos - PresetValueOut) * (CableM_PerRev/PointsPerRev)"
+      statement: "Au franchissement du fond, les codeurs poursuivent leur mouvement selon les relais et le roulis. SimKoboldCoast_M propose a 1 m avec dispersion commune bornee a 0.1 m ne modifie pas les arrets hors plongee Kobold."
+      verified_by: "Test integration cycle AX5 a AX8 et mesure des distances entre DI basse, relais bas et arret des codeurs."
     - id: AC5
-      statement: "Les nouveaux paramètres (SimKoboldAutoModeActive, SimKoboldAutoDepth_M, SimKoboldReactionTime) sont réinitialisés à l'entrée en mode simulation, comme les autres stimuli GVL_Simulation."
-      verified_by: "revue de code PRG_02 §reset + test d'entrée en simulation"
+      statement: "La profondeur est signee et coherente avec la reference homing effective de FB_Encoder_Scale."
+      verified_by: "Test conversion points/metres avant et apres homing ; aucune valeur absolue."
     - id: AC6
-      statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste sans erreur."
-      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report"
+      statement: "M1 continue a evoluer sous commande descente effective ; les protections et le routage reel/simule gardent leur comportement."
+      verified_by: "Test integration M1 et revue du diff des appels et selecteurs."
+    - id: AC7
+      statement: "Le nom de fichier est identique au nom de POU pour PRG_02_Acquisition."
+      verified_by: "G310_check_code_structure.py."
+    - id: AC8
+      statement: "Le suffixe ST correspond au langage ST genere dans le bundle."
+      verified_by: "G310_check_code_structure.py et inspection du POU genere."
+    - id: AC9
+      statement: "Le bundle est frais et G200 ne rapporte aucune erreur de liaison."
+      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report, palier C et suite complete."
   scope:
     allowed:
       - CODE/L_SIMULATION/GVL_Simulation.st
@@ -35,6 +41,9 @@ contract:
       - DOC/WFLOW/TASKS.yaml
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T292_SIMBENCH_KOBOLD_AUTO_DEPTH.yaml
       - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+      - DOC/WFLOW/CONTRACTS/PLAN_T292_T293_SIMULATION_20260914.md
+      - TOOLS/AGENT_WORKFLOW/scripts/check_simulation_t292_t293.py
+      - TOOLS/TEST_AUTO_CI/TESTS/L_SIMULATION/
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - CODE/FB_Safety_Winch.st
@@ -42,21 +51,23 @@ contract:
       - CODE/E_CODEURS/*
   conservation:
     must_survive:
-      - "Le comportement manuel existant SimKoboldContactValue, inchangé et toujours utilisable seul ou combiné (OU) au mode auto."
-      - "Aucune modification du code réel (hors L_SIMULATION/PRG_02 aiguillage) — ce paramètre n'existe que côté banc de simulation."
-    dropped_on_purpose: []
+      - "Les algorithmes de protection et sorties physiques restent inchanges."
+      - "Homing et positions acquises restent dans le modele codeur unique."
+    dropped_on_purpose:
+      - "L ancienne proposition est remplacee par le plan de reprise sur demande utilisateur."
   evidence_required:
     - check_linkage
     - run_all_gates
     - bundle
+    - diff_bundle
   models_allowed:
     - "omni/cx/gpt-5.6-terra"
     - "omni/cc/claude-sonnet-5"
   alert_duty: >
-    Le sens de la profondeur (négatif = sous l'eau) doit être vérifié cohérent
-    avec CST_CycleCfgPersist.SetDepth_M (-29.0) avant implémentation. Signaler
-    toute incohérence de convention de signe.
-status: PAUSED
+    Ne pas extrapoler les mesures ni annoncer une validation terrain.
+    Plan C2/patch en attente de validation humaine avant ST.
+
+status: IN_PROGRESS
 execution:
   executed_by: "Claude Code"
   completed_at: ""
@@ -81,3 +92,9 @@ validation:
     avec ce lot (test décisif bundle isolé en cours par l'utilisateur). Validation
     humaine du seuil par défaut (-15 m) et du temps de réaction par défaut (500 ms)
     toujours requise avant clôture.
+reprise:
+  actor: Codex
+  updated_at: '2026-09-14T23:40:26+02:00'
+  status: IMPLEMENTATION_IN_PROGRESS
+  plan: DOC/WFLOW/CONTRACTS/PLAN_T292_T293_SIMULATION_20260914.md
+  notes: 'Execution et validation ci-dessus conservent le compte rendu historique du lot retire. La reprise actuelle abandonne cette integration sur demande utilisateur.'

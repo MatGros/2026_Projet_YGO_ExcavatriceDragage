@@ -3,29 +3,36 @@ contract:
   criticality: C2
   strategy: patch
   objective: >
-    Ajouter au banc de simulation un modèle de position M2 calé sur M1 en
-    descente couplée, calibré sur trace réelle (régression linéaire, RMSE
-    3cm), activable/désactivable par un bit actif par défaut, sans régresser
-    le mode indépendant existant.
+    Calculer continument la position simulee M2 depuis M1 uniquement en descente
+    M1/M2 Both, avec facteur issu des mesures et bit de desactivation.
   acceptance:
     - id: AC1
-      statement: "Avec SimM2CoupledDescentModelActive=FALSE, Winch.COD2_PosValue suit exactement instSimEncoderM2.RawPosOut comme avant (aucune régression)."
-      verified_by: "test de non-régression flag désactivé"
+      statement: "Le calcul positionnel requiert le bit actif, une intention Both descente et les deux relais descente effectifs sans relais montee."
+      verified_by: "Test ST matrice Both, directions, relais et bit ON/OFF."
     - id: AC2
-      statement: "Avec le flag actif (défaut TRUE), M1 et M2 commandés en descente simultanée (M1_RelayRev AND M2_RelayRev), et M1_AbsDepth_M dans [1.6;8.0]m, Winch.COD2_PosValue suit le modèle (pente 0.8837, offset 1.1728m) à la dispersion près."
-      verified_by: "test scan-par-scan : position M2 publiée = f(M1) dans la plage"
+      statement: "M2_raw est calcule a toute profondeur depuis les origines de phase M1/M2 et le facteur 0.9333 (mesure ~0.6 m d ecart sur 9 m), sans offset affine ni borne de profondeur."
+      verified_by: "Test ST de la formule aux profondeurs -5, -15 et -25 m avec ecart initial non nul."
     - id: AC3
-      statement: "Hors plage [1.6;8.0]m ou hors descente couplée (un seul treuil descend, ou remontée), Winch.COD2_PosValue revient à la position du modèle codeur M2 indépendant."
-      verified_by: "test scan-par-scan : sortie de plage / arrêt descente couplée -> retour au modèle indépendant"
+      statement: "Bit OFF depuis le depart : la trajectoire M2 est identique au modele actuel. Desactivation en mouvement : reprise du facteur normal depuis la position acquise, sans saut de position."
+      verified_by: "Comparaison ST baseline et test bascule a mi-descente."
     - id: AC4
-      statement: "Toutes les constantes du modèle (pente, offset, bornes, amplitude dispersion) sont déclarées en VAR CONSTANT nommées, aucun littéral numérique dans le corps du calcul."
-      verified_by: "revue de code"
+      statement: "La montee, M1 seul, M2 seul et le roulis conservent leur dynamique hors ralentissement Both."
+      verified_by: "Tests ST direction et commande unitaire, puis arret et reprise."
     - id: AC5
-      statement: "La dispersion aléatoire reste bornée à l'amplitude configurée (CST_M2CoupledModelDispersion_M) et ne dérive pas dans le temps."
-      verified_by: "test : dispersion tirée à chaque entrée en descente couplée, toujours dans [-amplitude;+amplitude]"
+      statement: "La position publiee provient de la trajectoire M2 issue de M1 ; aucun plateau a 2.63 m ni offset affine d affichage n est ecrit dans le codeur. La vitesse publiee est coherente avec le facteur applique."
+      verified_by: "Test position/vitesse et garde-fou source automatique."
     - id: AC6
-      statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste sans erreur."
-      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report"
+      statement: "Aucune limitation cachee de l ecart ne neutralise les protections benne/synchronisme. M1 reste mobile sous relais descente effectif."
+      verified_by: "Test integration des deux fonctions et comparaison M1 avec modele M2 desactive."
+    - id: AC7
+      statement: "Le nom de fichier est identique au nom de POU pour PRG_02_Acquisition."
+      verified_by: "G310_check_code_structure.py."
+    - id: AC8
+      statement: "Le suffixe ST correspond au langage ST genere dans le bundle."
+      verified_by: "G310_check_code_structure.py et inspection du POU genere."
+    - id: AC9
+      statement: "Le bundle est frais et G200 ne rapporte aucune erreur de liaison."
+      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report, palier C et suite complete."
   scope:
     allowed:
       - CODE/L_SIMULATION/GVL_Simulation.st
@@ -35,6 +42,9 @@ contract:
       - DOC/WFLOW/TASKS.yaml
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T293_SIMBENCH_M2_COUPLED_DESCENT_MODEL.yaml
       - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+      - DOC/WFLOW/CONTRACTS/PLAN_T292_T293_SIMULATION_20260914.md
+      - TOOLS/AGENT_WORKFLOW/scripts/check_simulation_t292_t293.py
+      - TOOLS/TEST_AUTO_CI/TESTS/L_SIMULATION/
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - CODE/FB_Safety_Winch.st
@@ -43,22 +53,23 @@ contract:
       - CODE/H_TREUILS_BENNE/*
   conservation:
     must_survive:
-      - "Le comportement indépendant existant de FB_Sim_Encoder pour M2, inchangé quand le flag est désactivé ou hors conditions d'activation."
-      - "instSimEncoderM2.RawPosOut continue d'évoluer en continu en tâche de fond même quand le modèle override l'affichage, pour éviter tout saut à la désactivation."
-    dropped_on_purpose: []
+      - "Les algorithmes de protection et sorties physiques restent inchanges."
+      - "Homing et positions acquises restent dans le modele codeur unique."
+    dropped_on_purpose:
+      - "L ancienne proposition est remplacee par le plan de reprise sur demande utilisateur."
   evidence_required:
     - check_linkage
     - run_all_gates
     - bundle
+    - diff_bundle
   models_allowed:
     - "omni/cx/gpt-5.6-terra"
     - "omni/cc/claude-sonnet-5"
   alert_duty: >
-    Hypothèse de convention de signe non vérifiée au banc : M1_AbsDepth_M
-    suppose une correspondance avec M1TreuilRetenue.State.Position_M du
-    terrain (distance descendue positive croissante). À confirmer par
-    l'utilisateur après test ; signaler toute divergence observée.
-status: PAUSED
+    Ne pas extrapoler les mesures ni annoncer une validation terrain.
+    Plan C2/patch en attente de validation humaine avant ST.
+
+status: IN_PROGRESS
 execution:
   executed_by: "Claude Code"
   completed_at: ""
@@ -86,3 +97,9 @@ validation:
     rapport avec ce lot. Validation au banc toujours requise pour confirmer
     la convention de signe et l'exactitude du modèle sur d'autres traces
     réelles avant clôture.
+reprise:
+  actor: Codex
+  updated_at: '2026-09-14T23:40:26+02:00'
+  status: IMPLEMENTATION_IN_PROGRESS
+  plan: DOC/WFLOW/CONTRACTS/PLAN_T292_T293_SIMULATION_20260914.md
+  notes: 'Execution et validation ci-dessus conservent le compte rendu historique du lot retire. La reprise actuelle abandonne cette integration sur demande utilisateur.'
