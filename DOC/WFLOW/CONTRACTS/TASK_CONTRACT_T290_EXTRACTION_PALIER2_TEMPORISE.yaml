@@ -1,0 +1,77 @@
+contract:
+  task_id: T290
+  criticality: C3
+  strategy: patch
+  objective: >
+    Remplacer le plafond palier 1 fixe pendant toute la durée de l'extraction
+    (PRG_04_Treuils_Benne.st §5ter, CommonMaxStepAscent sous ExtractionControlActive)
+    par un plafond temporisé : palier 1 pendant les 1-2 premières secondes, puis
+    palier 2 tant que l'extraction reste active, sans affaiblir aucune autre
+    source de clamp du §5ter.
+  acceptance:
+    - id: AC1
+      statement: "Dès le front de ExtractionControlActive, CommonMaxStepAscent reste plafonné à 1 pendant une durée configurée/fixe (1-2 s, valeur à valider avec l'utilisateur)."
+      verified_by: "test scan-par-scan : chronogramme du plafond depuis le front ExtractionControlActive"
+    - id: AC2
+      statement: "Après ce délai, CommonMaxStepAscent est plafonné à 2 (jamais plus) tant que ExtractionControlActive reste vrai."
+      verified_by: "test scan-par-scan : plafond = 2 après le délai, retombe à l'état antérieur à la retombée d'ExtractionControlActive"
+    - id: AC3
+      statement: "Aucune autre source de clamp du §5ter (hors-homing HomedAndReliable, SyncDeviationWarn, position Maintenance M3, benne non fermée/mou de câble en pilotage couplé) n'est affaiblie, contournée ou retardée par ce changement."
+      verified_by: "revue de code + tests combinés : chaque source déclenchée seule ramène bien le plafond à 1 malgré le délai extraction écoulé"
+    - id: AC4
+      statement: "Le MIN final entre toutes les sources de plafond du §5ter continue de s'appliquer : le palier 2 n'est effectif que si aucune autre source ne plafonne plus bas."
+      verified_by: "test combiné : ExtractionControlActive + une autre source active simultanément -> plafond le plus bas gagne"
+    - id: AC5
+      statement: "Le délai est isolé dans une temporisation dédiée (TON), gatée strictement sur ExtractionControlActive, sans réutiliser ni modifier un timer existant d'un autre usage."
+      verified_by: "revue de code : nouvelle instance TON dédiée, remise à zéro hors ExtractionControlActive"
+    - id: AC6
+      statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste sans erreur."
+      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report"
+  scope:
+    allowed:
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE_XML/CODE_Bundle.xml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T290_EXTRACTION_PALIER2_TEMPORISE.yaml
+      - DOC/AF/AF_Partie-10_Fonction_Treuils_Benne_v2.3.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/FB_Safety_Winch.st
+      - CODE/B_AU_SECURITE/*
+  conservation:
+    must_survive:
+      - "Le bridage à 1 pendant hors-homing (HomedAndReliable), inchangé et prioritaire."
+      - "Le bridage à 1 sur SyncDeviationWarn, inchangé et prioritaire."
+      - "Le bridage commun sous position Maintenance M3, inchangé et prioritaire."
+      - "Le bridage à 1 benne non fermée / mou de câble en pilotage couplé, inchangé et prioritaire."
+      - "La règle de l'agrégateur : plafond = MIN des sources, jamais un palier au-delà de la source la plus restrictive."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: >
+    La valeur exacte du délai (1 s, 1.5 s, 2 s) n'est pas encore validée par
+    l'utilisateur — la signaler et obtenir confirmation avant implémentation.
+    Toute interaction possible entre ce nouveau plafond temporisé et une autre
+    source de clamp du §5ter doit être signalée avant tout code.
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    Tâche créée pour cadrer le déplafonnement temporisé palier 1 -> palier 2
+    pendant l'extraction, afin de réduire l'échauffement moteur en conservant
+    toutes les autres barrières de sécurité du §5ter.
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Validation humaine de la durée exacte du délai et de l'absence d'effet de
+    bord sur les autres sources de clamp requise avant implémentation.

@@ -114,6 +114,9 @@ IF SimulationModeFall.Q THEN
     GVL_Simulation.SimSyncDeviationInjectM2 := FALSE;
     GVL_Simulation.SimSyncDeviationOffset_M := 0.5;
     GVL_Simulation.SimKoboldContactValue := FALSE;
+    GVL_Simulation.SimKoboldAutoModeActive := FALSE;
+    GVL_Simulation.SimKoboldAutoDepth_M := -15.0;
+    GVL_Simulation.SimKoboldReactionTime := T#500ms;
 END_IF;
 
 // 🔀 Aiguillages de source uniques par domaine
@@ -311,6 +314,9 @@ instSimBench(
     SimJoystickOvershoot_Active        := GVL_Simulation.SimJoystickOvershoot_Active,
     SimJoystickBagotement_Active       := GVL_Simulation.SimJoystickBagotement_Active,
     SimKoboldContactValue    := GVL_Simulation.SimKoboldContactValue,
+    SimKoboldAutoModeActive  := GVL_Simulation.SimKoboldAutoModeActive,
+    SimKoboldAutoDepth_M     := GVL_Simulation.SimKoboldAutoDepth_M,
+    SimKoboldReactionTime    := GVL_Simulation.SimKoboldReactionTime,
     BtnEmergencyStop         := GVL_IHM.Emergency.Cmd.BtnEmergencyCutOff,
     HwReal                   := HwReal,
     RawPosM1                 := _SimEncoderRawPosM1,

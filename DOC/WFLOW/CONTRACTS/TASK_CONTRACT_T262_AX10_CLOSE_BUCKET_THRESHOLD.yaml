@@ -15,8 +15,8 @@ contract:
       statement: "Avec Cfg=0 %, AX10_CLOSE_BUCKET ne change pas de condition et attend l'information actuelle benne fermée."
       verified_by: "test cycle auto avec benne à 1..10 % puis benne fermée"
     - id: AC3
-      statement: "Avec Cfg>0 %, le passage au step suivant est vrai seulement lorsque ActualBucketOpeningPct < Cfg."
-      verified_by: "tests aux valeurs seuil-1, seuil, seuil+1 et 50 %"
+      statement: "Avec Cfg>0 %, le passage au step suivant est vrai lorsque ActualBucketOpeningPct < Cfg OU lorsque l'information benne fermée historique est vraie (OU logique, pas un remplacement du fallback)."
+      verified_by: "tests aux valeurs seuil-1, seuil, seuil+1, 50 %, et cas fermé avec %>=seuil (dérive capteur)"
     - id: AC4
       statement: "Le seuil ne neutralise ni AU, ni FDC, ni freinage, ni défaut de mouvement et ne commande pas un redémarrage automatique."
       verified_by: "revue de flux PRG/FB et tests de coupure des permis"

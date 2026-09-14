@@ -1,4 +1,58 @@
 tasks:
+- id: T292
+  parent_id: ''
+  statut: '⏳'
+  criticite: C2
+  domaine: SIMULATION
+  agent: Claude Code
+  date: '2026-09-14T00:00:00+02:00'
+  titre: 'SimBench — Kobold automatique par seuil altimétrique + temps de réaction réaliste'
+  contexte: 'Demande urgente utilisateur (en simulation actuellement) : le contact fond Kobold (GVL_Simulation.SimKoboldContactValue) est aujourd hui un simple bool manuel forcé sans lien avec la position. Besoin : un paramètre de seuil altimétrique (ex. -15 m) qui déclenche automatiquement le contact fond quand M1/M2 descend sous ce seuil, avec un temps de réaction réaliste (latence détection avant publication du signal), et perte du contact à la remontée au-dessus du seuil. Doit rester activable/désactivable (mode auto optionnel, comportement manuel existant conservé si désactivé).'
+  description: 'Ajouter à GVL_Simulation : SimKoboldAutoModeActive (BOOL, défaut FALSE), SimKoboldAutoDepth_M (REAL, défaut -15.0), SimKoboldReactionTime (TIME, défaut T#500ms). Dans FB_SimBench : calculer la profondeur simulée M1 à partir de RawPos/PresetValueOut (même formule que FB_Encoder_Scale.CablePosM), gater une temporisation TON sur (AutoModeActive AND Depth<=Seuil), et publier Machine.M1_M2_KoboldBottomTouch_DI := SimKoboldContactValue OR instKoboldReactionTimer.Q (OU avec le bool manuel existant, non régressif si mode auto désactivé).'
+  objectifs:
+  - 'Mode auto désactivé (défaut) : comportement strictement identique à l existant (SimKoboldContactValue seul).'
+  - 'Mode auto activé : le contact fond se déclenche automatiquement quand la profondeur simulée M1 franchit le seuil configuré, après le temps de réaction configuré.'
+  - 'Le contact retombe (perte) dès que la position remonte au-dessus du seuil.'
+  - 'Paramètres exposés et reset à l entrée en simulation comme les autres stimuli (PRG_02 §reset).'
+  - 'Gates G200 + palier C PASS ; bundle régénéré.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T292_SIMBENCH_KOBOLD_AUTO_DEPTH.yaml
+  bloque_par: []
+- id: T291
+  parent_id: ''
+  statut: '⬜'
+  criticite: C4
+  domaine: SECURITE_SYNCHRO_TREUILS
+  agent: ''
+  date: '2026-09-14T00:00:00+02:00'
+  titre: 'Étude — Paliers asymétriques M1/M2 en descente couplée (ex. M1=P1, M2=P5)'
+  contexte: 'Demande prioritaire client : pouvoir descendre M1 en palier 1 (lent) pendant que M2 descend en palier 5 (rapide), simultanément, en pilotage couplé. Aujourd hui la synchro (FB_SyncContactor, debounce 500 ms) et le clamp §5ter supposent un palier commun M1=M2 (CommonMaxStepAscent/Descent) ; des paliers différents déclencheraient très probablement un ContactorMismatch -> SafeStop. Piste utilisateur : modifier la table paliers -> contacteurs vitesse (actuellement P4 = certains contacteurs, P5 = 4 contacteurs vitesse enclenchés) plutôt qu un patch profond du contrôle de synchronisme. Précision utilisateur (2026-09-14) : impact large et transverse (synchro contacteurs, table paliers) — exige une solution fiable, activable/désactivable simplement, compréhensible, et une progression PAR ÉTAPES/PHASES, pas un big-bang. Solution finale à faire challenger par un automaticien expert avant implémentation.'
+  description: 'Phase 0 (cette tâche) : étude d impact uniquement, aucune implémentation. Cartographier tous les consommateurs de palier commun M1/M2 (FB_SyncContactor, §5ter clamp, FB_SpeedStep, table paliers->contacteurs) et proposer 2-3 options techniques comparées (ex. option A : nouvelle table de correspondance palier->contacteurs par treuil sans passage obligé par un palier commun intermédiaire ; option B : mécanisme dédié de dérogation temporaire au contrôle de synchronisme, borné et tracé). Chaque option doit préciser : le flag d activation/désactivation, le risque résiduel côté FB_SyncContactor et §5ter, et l effort d implémentation. Découper la solution retenue en sous-tâches/phases numérotées (T291-A, T291-B, ...) après validation humaine + automaticien.'
+  objectifs:
+  - 'Cartographie exhaustive des consommateurs actuels du palier commun M1/M2 (FB_SyncContactor, §5ter, FB_SpeedStep, table contacteurs).'
+  - '2-3 options techniques comparées, chacune avec : mécanisme, flag ON/OFF, risque résiduel synchro, effort.'
+  - 'Aucun code modifié dans CODE/ à ce stade (étude uniquement).'
+  - 'Découpage explicite en phases/sous-tâches numérotées pour l option retenue, chacune testable et réversible indépendamment.'
+  - 'Document d étude soumis à un automaticien expert avant toute implémentation (validation humaine explicite requise).'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T291_ETUDE_PALIERS_ASYMETRIQUES_M1_M2.yaml
+  bloque_par: []
+- id: T290
+  parent_id: ''
+  statut: '⬜'
+  criticite: C3
+  domaine: TREUILS_BENNE
+  agent: ''
+  date: '2026-09-14T00:00:00+02:00'
+  titre: Déplafonnement temporisé Palier 1 → Palier 2 en extraction (§5ter)
+  contexte: 'Demande client : en extraction (ExtractionControlActive), CommonMaxStepAscent est bridé en dur à 1 (PRG_04_Treuils_Benne.st §5ter, ~ligne 1204-1206), pour toute la manœuvre. Le palier 1 est trop lent : couple insuffisant, chauffe moteur. Précision utilisateur (2026-09-14) : pas de condition sur le taux de fermeture benne — on passe naturellement de palier 1 à palier 2 après un temps minimal (de l ordre de 1 à 2 s) une fois l extraction engagée, puis on continue en descendant sous le palier d eau.'
+  description: 'Ajouter une temporisation (TON) gatée sur ExtractionControlActive : plafond palier 1 pendant les 1-2 premières secondes (valeur exacte à confirmer), puis relèvement du plafond à 2 tant que ExtractionControlActive reste actif. Ne modifier aucune autre source de clamp du §5ter (Maintenance, hors-homing, SyncDeviationWarn, benne non fermée en couplé, position Maintenance M3).'
+  objectifs:
+  - 'CommonMaxStepAscent reste à 1 pendant les X premières secondes (1-2 s, valeur à valider) d ExtractionControlActive.'
+  - 'CommonMaxStepAscent passe à 2 (jamais plus) après ce délai, tant qu ExtractionControlActive est actif.'
+  - 'Aucune autre source du §5ter (hors-homing, SyncDeviationWarn, Maintenance M3, benne non fermée couplée) n est affaiblie ou contournée par ce changement.'
+  - 'Le MIN final entre toutes les sources de plafond continue de s appliquer normalement (le palier 2 ne devient effectif que si aucune autre source ne plafonne plus bas).'
+  - 'Gates G200 + palier C PASS ; zéro régression sur les TC extraction/synchro existants.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T290_EXTRACTION_PALIER2_TEMPORISE.yaml
+  bloque_par: []
 - id: T289
   parent_id: ''
   statut: '⬜'
@@ -6109,14 +6163,14 @@ tasks:
   date: '2026-09-07T12:45:00+02:00'
   titre: Seuil configurable de transition AX10_CLOSE_BUCKET avant fermeture complète
   contexte: 'Demande client cycle automatique : réduire l effort appliqué sur M2 seul pendant la fermeture de benne. La benne est exprimée en pourcentage d ouverture : 0 % = benne fermée, 100 % = benne ouverte.'
-  description: 'Ajouter un paramètre de seuil de transition, borné de 0 à 50 %. Si le paramètre vaut 0 %, conserver strictement le comportement actuel fondé sur l information benne fermée. Si le paramètre est supérieur à 0 %, autoriser le passage au step suivant de AX10_CLOSE_BUCKET lorsque ActualBucketOpeningPct < seuil configuré, afin de ne pas maintenir inutilement l effort sur M2 seul. Les protections de mouvement, FDC, AU, freinage et validation de fin de cycle restent inchangées.'
+  description: 'Ajouter un paramètre de seuil de transition, borné de 0 à 50 %. Si le paramètre vaut 0 %, conserver strictement le comportement actuel fondé sur l information benne fermée. Si le paramètre est supérieur à 0 %, autoriser le passage au step suivant de AX10_CLOSE_BUCKET lorsque ActualBucketOpeningPct < seuil configuré, OU lorsque l information benne fermée historique est vraie (filet de sécurité en cas de dérive du capteur %). Les protections de mouvement, FDC, AU, freinage et validation de fin de cycle restent inchangées. Précision utilisateur (2026-09-14) : à seuil >0 %, la transition ne doit jamais perdre le fallback "benne fermée" — les deux conditions sont un OU, pas un remplacement.'
   objectifs:
   - 'Paramètre de configuration unique, borné et visible, avec valeur par défaut 0 %.'
   - 'À 0 %, AX10_CLOSE_BUCKET utilise exactement la condition actuelle benne fermée, sans régression.'
-  - 'À 1..50 %, la transition AX10_CLOSE_BUCKET est autorisée uniquement si ActualBucketOpeningPct < seuil.'
+  - 'À 1..50 %, la transition AX10_CLOSE_BUCKET est autorisée si ActualBucketOpeningPct < seuil OU si l information benne fermée est vraie (OU, jamais un remplacement du fallback historique).'
   - 'Une valeur hors plage est saturée à 0..50 % et ne contourne aucune barrière de sécurité.'
   - 'Le comportement M2 seul est réduit sans suppression des contrôles FDC, AU, frein et défaut mouvement.'
-  - 'Tests scan-par-scan et validation cycle auto couvrent 0 %, seuil actif, limite 50 % et valeurs hors plage.'
+  - 'Tests scan-par-scan et validation cycle auto couvrent 0 %, seuil actif, limite 50 %, valeurs hors plage, et le cas fermé-mais-%>seuil (dérive capteur).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml
   bloque_par: []
 
