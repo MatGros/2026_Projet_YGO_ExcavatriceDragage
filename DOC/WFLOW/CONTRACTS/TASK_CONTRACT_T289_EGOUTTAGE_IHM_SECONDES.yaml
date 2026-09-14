@@ -1,0 +1,74 @@
+contract:
+  task_id: T289
+  criticality: C2
+  strategy: patch
+  objective: >
+    Ajouter des champs IHM en secondes (INT) pour la consigne et le temps écoulé
+    de la temporisation d'égouttage AX13, en conservant le champ TIME existant
+    (informatif) et sans modifier le comportement réel de la tempo PLC (TON).
+  acceptance:
+    - id: AC1
+      statement: "Une nouvelle variable IHM de consigne égouttage en INT secondes existe, convertie en TIME en interne, bornée de la même façon que CfgDrainTime actuel (<=0 -> défaut interne)."
+      verified_by: "revue de code + test unitaire de conversion et de saturation"
+    - id: AC2
+      statement: "Une nouvelle variable IHM de temps écoulé égouttage en INT secondes existe, alimentée depuis DrainingTimer.ET converti, mise à jour à chaque scan pendant AX13."
+      verified_by: "test cycle auto : valeur croît de 0 à la consigne effective pendant AX13, puis se fige/retombe hors AX13"
+    - id: AC3
+      statement: "Le champ TIME existant (CfgDrainTime / ST_CycleCfg.DrainTime) reste présent, inchangé dans son typage et son câblage, à titre informatif."
+      verified_by: "diff ciblé : aucune suppression ni changement de type sur CfgDrainTime / ST_CycleCfg.DrainTime"
+    - id: AC4
+      statement: "Le comportement de l'étape AX13 (SkipDrainRequest/bypass, PT effectif de DrainingTimer, transition AX13->AX14) est strictement inchangé."
+      verified_by: "test de non-régression AX13 : bypass immédiat, tempo par défaut, tempo configurée"
+    - id: AC5
+      statement: "La conversion INT(s) <-> TIME ne produit aucun dépassement silencieux ni valeur négative exploitable en entrée PLC."
+      verified_by: "test aux bornes (0, valeur max INT plausible, valeur négative rejetée/saturée)"
+    - id: AC6
+      statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste sans erreur."
+      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report"
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
+      - CODE_XML/CODE_Bundle.xml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T289_EGOUTTAGE_IHM_SECONDES.yaml
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/FB_Safety_Winch.st
+      - CODE/B_AU_SECURITE/*
+  conservation:
+    must_survive:
+      - "Le champ TIME existant CfgDrainTime / ST_CycleCfg.DrainTime, inchangé."
+      - "Le bypass SkipDrainRequest et le comportement de la TON DrainingTimer."
+      - "La borne défaut interne (DrainingTime = T#5s) quand la consigne configurée est <= 0."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: >
+    Toute ambiguïté sur le nommage des nouvelles variables IHM (consigne/écoulé
+    en secondes) ou sur la borne max représentable en INT doit être signalée
+    avant toute implémentation.
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    Tâche créée pour cadrer l'ajout de champs IHM en secondes (consigne + temps
+    écoulé) pour la temporisation d'égouttage AX13, en conservant le champ TIME
+    existant à titre informatif.
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: >
+    Validation humaine et choix final du nommage des nouvelles variables requis
+    avant implémentation.

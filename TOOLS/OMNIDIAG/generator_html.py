@@ -662,20 +662,19 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
       box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
     }}
 
-    /* Conteneur des cartes : mode Rail DIN (horizontal) ou Grille (multiligne) */
+    /* Conteneur des cartes : mode Accordéon Compact (par défaut) ou Tout Déployé (Large) */
     .rack-cards-scroll {{
       flex: 1;
       overflow-x: auto;
       overflow-y: auto;
       padding: 1.25rem;
       display: flex;
-      gap: 1.25rem;
+      gap: 0.85rem;
       background: #0b1120;
       align-items: flex-start;
       scroll-behavior: smooth;
     }}
-    .rack-cards-scroll.grid-mode {{
-      flex-wrap: wrap;
+    .rack-cards-scroll.accordion-mode {{
       justify-content: center;
     }}
 
@@ -687,8 +686,13 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
       display: flex;
       flex-direction: column;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-      transition: border-color 0.25s, box-shadow 0.25s;
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                  flex-basis 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.25s,
+                  border-color 0.25s;
       flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
     }}
     .rack-card.dual-card {{
       width: 580px;
@@ -699,6 +703,82 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
     .rack-card.rack-card-targeted {{
       border-color: var(--accent-blue) !important;
       box-shadow: 0 0 24px rgba(56, 189, 248, 0.45) !important;
+    }}
+
+    /* COMPORTEMENT ACCORDÉON (Compact par défaut pour tenir sur 1 seul écran) */
+    .rack-cards-scroll.accordion-mode .rack-card.dual-card:not(.active-slot):not(:hover) {{
+      width: 155px;
+      flex: 0 0 155px;
+      cursor: pointer;
+    }}
+    .rack-cards-scroll.accordion-mode .rack-card.single-card:not(.active-slot):not(:hover) {{
+      width: 105px;
+      flex: 0 0 105px;
+      cursor: pointer;
+    }}
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .rack-card-sub,
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .rack-card-range,
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .ch-desc,
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .ch-addr,
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .ch-var,
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .col-badge {{
+      display: none !important;
+    }}
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .rack-channel-row {{
+      grid-template-columns: 14px 18px !important;
+      justify-content: center;
+      padding: 3px 2px !important;
+      gap: 3px !important;
+    }}
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .rack-col {{
+      padding: 0.35rem 0.2rem !important;
+    }}
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .col-title {{
+      font-size: 0.58rem !important;
+      text-align: center;
+      width: 100%;
+    }}
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .rack-card-head {{
+      padding: 0.5rem 0.4rem !important;
+      text-align: center;
+    }}
+    .rack-cards-scroll.accordion-mode .rack-card:not(.active-slot):not(:hover) .rack-card-name {{
+      font-size: 0.72rem !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }}
+
+    /* EXPANSION AU SURVOL OU AU CLIC (.active-slot) */
+    .rack-cards-scroll.accordion-mode .rack-card.dual-card:hover,
+    .rack-cards-scroll.accordion-mode .rack-card.dual-card.active-slot {{
+      width: 580px !important;
+      flex: 0 0 580px !important;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.3);
+      border-color: var(--accent-blue);
+      z-index: 20;
+    }}
+    .rack-cards-scroll.accordion-mode .rack-card.single-card:hover,
+    .rack-cards-scroll.accordion-mode .rack-card.single-card.active-slot {{
+      width: 310px !important;
+      flex: 0 0 310px !important;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.3);
+      border-color: var(--accent-blue);
+      z-index: 20;
+    }}
+
+    /* MODE TOUT DÉPLOYÉ (Capture d'écran / Balade Large) */
+    .rack-cards-scroll.all-expanded {{
+      justify-content: flex-start;
+      overflow-x: auto !important;
+    }}
+    .rack-cards-scroll.all-expanded .rack-card.dual-card {{
+      width: 580px !important;
+      flex: 0 0 580px !important;
+    }}
+    .rack-cards-scroll.all-expanded .rack-card.single-card {{
+      width: 310px !important;
+      flex: 0 0 310px !important;
     }}
 
     .rack-card-head {{
@@ -1135,8 +1215,8 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
           <button class="btn-rack-action" onclick="clearAllLeds()" title="Éteindre toutes les LEDs allumées">
             💡 Tout Éteindre
           </button>
-          <button class="btn-rack-action" id="btnToggleLayout" onclick="toggleRackLayoutMode()">
-            📑 Passer en mode Multiligne
+          <button class="btn-rack-action" id="btnToggleExpandAll" onclick="toggleExpandAll()" title="Déployer toutes les cartes simultanément pour capture d'écran">
+            ↔️ Tout Déployer (Capture)
           </button>
           <button class="btn-rack-action" onclick="clearRackTarget()">
             🧹 Effacer Repère
@@ -1171,7 +1251,7 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
         <span id="rackMatchCount" style="font-size:0.8rem;color:#94a3b8;white-space:nowrap;"></span>
       </div>
 
-      <div class="rack-cards-scroll" id="rackCardsContainer" onscroll="syncRackSlider()">
+      <div class="rack-cards-scroll accordion-mode" id="rackCardsContainer" onscroll="syncRackSlider()">
         <!-- Généré dynamiquement par renderRack() -->
       </div>
     </div>
@@ -1455,6 +1535,7 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
         const card = document.createElement('div');
         card.className = `rack-card ${{isDual ? 'dual-card' : 'single-card'}}`;
         card.id = `rack-mod-${{mod.dev_id}}`;
+        card.onclick = (e) => toggleCardActive(mod.dev_id, e);
 
         let bodyHtml = '';
 
@@ -1598,20 +1679,39 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
       showToast('💡 Toutes les LEDs sont éteintes.');
     }}
 
-    function toggleRackLayoutMode() {{
-      isGridMode = !isGridMode;
+    let isAllExpanded = false;
+
+    function toggleExpandAll() {{
+      isAllExpanded = !isAllExpanded;
       const container = document.getElementById('rackCardsContainer');
-      const btn = document.getElementById('btnToggleLayout');
-      if (isGridMode) {{
-        container.classList.add('grid-mode');
-        btn.innerHTML = '↔️ Passer en mode Rail DIN';
-        showToast('Mode Grille Multiligne activé');
+      const btn = document.getElementById('btnToggleExpandAll');
+      if (isAllExpanded) {{
+        container.classList.remove('accordion-mode');
+        container.classList.add('all-expanded');
+        btn.innerHTML = '🗜️ Vue Compacte (1 Écran)';
+        btn.style.borderColor = 'var(--accent-blue)';
+        btn.style.color = 'var(--accent-blue)';
+        showToast('🖼️ Mode Tout Déployé (Vue Large / Capture)');
       }} else {{
-        container.classList.remove('grid-mode');
-        btn.innerHTML = '📑 Passer en mode Multiligne';
-        showToast('Mode Rail DIN (horizontal) activé');
+        container.classList.remove('all-expanded');
+        container.classList.add('accordion-mode');
+        btn.innerHTML = '↔️ Tout Déployer (Capture)';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+        showToast('🗜️ Mode Accordéon Compact (1 Écran)');
       }}
       syncRackSlider();
+    }}
+
+    function toggleCardActive(devId, event) {{
+      if (event && event.target.closest('.rack-channel-row')) return;
+      const card = document.getElementById('rack-mod-' + devId);
+      if (!card) return;
+      const wasActive = card.classList.contains('active-slot');
+      document.querySelectorAll('.rack-card.active-slot').forEach(c => c.classList.remove('active-slot'));
+      if (!wasActive) {{
+        card.classList.add('active-slot');
+      }}
     }}
 
     function scrollRack(direction) {{
@@ -1643,6 +1743,8 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
     function jumpToSlot(devId) {{
       const card = document.getElementById('rack-mod-' + devId);
       if (card) {{
+        document.querySelectorAll('.rack-card.active-slot').forEach(c => c.classList.remove('active-slot'));
+        card.classList.add('active-slot');
         card.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
         card.classList.add('rack-card-targeted');
         setTimeout(() => {{ card.classList.remove('rack-card-targeted'); }}, 1800);
@@ -1659,12 +1761,16 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
         led.classList.toggle('led-on');
       }}
 
-      // 2. Mettre en valeur la voie
+      // 2. Mettre en valeur la voie et maintenir le slot ouvert
       clearRackTarget();
       if (row) {{
         row.classList.add('channel-targeted');
         const card = row.closest('.rack-card');
-        if (card) card.classList.add('rack-card-targeted');
+        if (card) {{
+          document.querySelectorAll('.rack-card.active-slot').forEach(c => c.classList.remove('active-slot'));
+          card.classList.add('active-slot');
+          card.classList.add('rack-card-targeted');
+        }}
 
         // 3. Copier dans le presse-papier les données de diagnostic
         const varName = row.dataset.var || '[Réserve]';
@@ -1710,6 +1816,8 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
 
         const card = targetRow.closest('.rack-card');
         if (card) {{
+          document.querySelectorAll('.rack-card.active-slot').forEach(c => c.classList.remove('active-slot'));
+          card.classList.add('active-slot');
           card.classList.add('rack-card-targeted');
           card.scrollIntoView({{ behavior: 'smooth', block: 'nearest', inline: 'center' }});
         }}
