@@ -1,0 +1,98 @@
+{
+  "PRE_01": {
+    "cause_racine": "⚡ Contacteur frein M1 resté enclenché en armoire ou contact de recopie bloqué (aucun capteur sur treuil).",
+    "action_conducteur": "🕹️ Mettre les manipulateurs treuils au neutre. Relancer le Preflight.",
+    "action_maintenance": "🧰 Tester le contacteur frein M1 en armoire. Mesurer 0V sur la bobine de défreinage à l'arrêt. Remplacer si contacts collés.",
+    "points_test": "Cmd: M1_BrakeRelease_RQ (VH_0008ER · %QX27.0) | Retour: M1_BrakeIsOpen_DI (VH_0800END · %IX225.0)"
+  },
+  "PRE_02": {
+    "cause_racine": "⚡ Contacteur frein M2 resté enclenché en armoire ou contact de recopie bloqué (aucun capteur sur treuil).",
+    "action_conducteur": "🕹️ Mettre le manipulateur benne au neutre. Relancer le Preflight.",
+    "action_maintenance": "🧰 Tester le contacteur frein M2 en armoire. Mesurer 0V sur la bobine de défreinage à l'arrêt. Remplacer si contacts soudés.",
+    "points_test": "Cmd: M2_BrakeRelease_RQ (VH_0008ER · %QX27.1) | Retour: M2_BrakeIsOpen_DI (VH_0800END · %IX225.1)"
+  },
+  "PRE_03": {
+    "cause_racine": "⚡ Contacteur/relais frein translation M3 resté enclenché en armoire (aucun capteur sur chariot).",
+    "action_conducteur": "🕹️ Mettre le manipulateur translation au neutre. Relancer le Preflight.",
+    "action_maintenance": "🧰 Contrôler le relais/contacteur frein M3 en armoire. Mesurer 0V sur la bobine à l'arrêt.",
+    "points_test": "Cmd: M3_BrakeRelease_RQ (VH_0008ER · %QX27.2) | Retour: M3_BrakeIsOpen_DI (VH_0800END · %IX225.2)"
+  },
+  "PRE_04": {
+    "cause_racine": "🚨 Contacteur de puissance sens/vitesse M1 resté collé fermé ou contact auxiliaire NC coupé.",
+    "action_conducteur": "🛑 Ne pas enclencher la puissance. Couper les commandes en cabine.",
+    "action_maintenance": "🧰 Consigner armoire. Contrôler les pôles de puissance du contacteur KM_M1 et les auxiliaires NO. Remplacer si soudé.",
+    "points_test": "Retour: M1_ContactorsReleased_DI (Local_Digital_IO · %IX0.0) | Cmd: M1_RelayAscent/Descent_DQ (%QX0.0, %QX0.1)"
+  },
+  "PRE_05": {
+    "cause_racine": "🚨 Contacteur de puissance sens/vitesse M2 resté collé fermé ou contact auxiliaire NC coupé.",
+    "action_conducteur": "🛑 Ne pas enclencher la puissance. Couper les commandes en cabine.",
+    "action_maintenance": "🧰 Consigner armoire. Contrôler les pôles de puissance du contacteur KM_M2 et les auxiliaires NO. Remplacer si soudé.",
+    "points_test": "Retour: M2_ContactorsReleased_DI (Local_Digital_IO · %IX0.2) | Cmd: M2_RelayAscent/Descent_DQ (%QX0.2, %QX0.3)"
+  },
+  "PRE_06": {
+    "cause_racine": "🔥 Disjoncteur magnétothermique moteur M1 déclenché ou sonde thermique bilame/PTC en surchauffe.",
+    "action_conducteur": "⏳ Laisser refroidir 15 min. Vérifier absence de blocage mécanique visuel sur le treuil.",
+    "action_maintenance": "🧰 Contrôler disjoncteur moteur Q_M1 en armoire. Mesurer isolement enroulements et serrage bornes puissance. Réarmer Q_M1.",
+    "points_test": "Retour: M1_ThermalOk_DI (Local_Digital_IO · %IX0.1 · contact NC)"
+  },
+  "PRE_07": {
+    "cause_racine": "🔥 Disjoncteur moteur M2 déclenché ou défaut de la moto-ventilation forcée.",
+    "action_conducteur": "⏳ Laisser refroidir 15 min. Vérifier que la benne n'est pas coincée.",
+    "action_maintenance": "🧰 Contrôler disjoncteur moteur Q_M2 en armoire. Vérifier moto-ventilateur forcé et courant absorbé. Réarmer Q_M2.",
+    "points_test": "Retour: M2_ThermalOk_DI (Local_Digital_IO · %IX0.3 · contact NC)"
+  },
+  "PRE_08": {
+    "cause_racine": "⚡ Disjoncteur protection freins déclenché en armoire (court-circuit bobine ou surchauffe redresseur).",
+    "action_conducteur": "🛑 Ne pas lancer de mouvement treuils ou translation.",
+    "action_maintenance": "🧰 Armoire : mesurer résistance ohmique des bobines freins M1/M2/M3 et ponts redresseurs. Réarmer disjoncteur freins.",
+    "points_test": "Retour: M1_M2_M3_BrakeThermalOk_DI (VH_0800END · %IX225.3 · contact NC)"
+  },
+  "PRE_09": {
+    "cause_racine": "🔌 Défaut alimentation réseau 400V : 2 phases inversées, phase manquante ou sous-tension.",
+    "action_conducteur": "👀 Vérifier le voltmètre général en cabine et la source d'alimentation (groupe ou réseau quai).",
+    "action_maintenance": "🧰 Armoire tête : vérifier LEDs relais phases. Mesurer 400V entre phases. Permuter 2 phases amont si inversion.",
+    "points_test": "Retour: PhaseRotationOk_DI (VH_0800END · %IX225.4 · contact NC)"
+  },
+  "PRE_10": {
+    "cause_racine": "🪢 Câble benne mou (benne posée au sol ou au fond de l'eau) ou roulette palpeuse anti-mou bloquée.",
+    "action_conducteur": "🕹️ Passer en manuel lent / dérogation : retendre doucement le câble M2 jusqu'à extinction du voyant mou.",
+    "action_maintenance": "🧰 Tambour M2 : contrôler liberté mécanique de la roulette palpeuse anti-mou et alignement du câble dans les gorges.",
+    "points_test": "Retour: M2_TensionedCable_DI (Local_Digital_IO · %IX0.4 · contact NC)"
+  },
+  "PRE_11": {
+    "cause_racine": "📐 Combinaison capteurs translation M3 impossible (ex: Trémie et Maintenance actives en même temps).",
+    "action_conducteur": "👀 Vérifier visuellement la position du portique sur les rails de roulement.",
+    "action_maintenance": "🧰 Voie de roulement : tester les détecteurs inductifs de cames translation M3. Nettoyer les capteurs et vérifier la boîte chariot.",
+    "points_test": "Entrées cames: M3_PosTremie..M3_PosMaintenance (VH_0808ETP · %IX224.0 à %IX224.4)"
+  },
+  "PRE_12": {
+    "cause_racine": "🚨 DANGER CRITIQUE : contacteur général puissance fermé alors que la boucle arrêt d'urgence est ouverte (pôles soudés).",
+    "action_conducteur": "🛑 COUPURE GÉNÉRALE IMMÉDIATE. Frapper coup de poing AU cabine ou couper disjoncteur général. Évacuer la machine.",
+    "action_maintenance": "⚠️ DANGER DE MORT. Consigner l'alimentation à la source. Remplacer contacteur ligne puissance KM_Power et contrôler le bloc sécurité AU.",
+    "points_test": "Retours: PowerContactorEngaged_DI (%IX225.6) et EmergencyChainClosed_DI (%IX225.7) sur VH_0800END"
+  },
+  "PRE_13": {
+    "cause_racine": "📡 Perte communication bus codeur M1 ou coupure de l'alimentation 24V capteur.",
+    "action_conducteur": "🛑 Ne pas passer en mode Semi-Auto ou Automatique.",
+    "action_maintenance": "🧰 Treuil M1 : contrôler voyants LED sur codeur absolu (Node 1). Vérifier connecteur M12, blindage câble et alim 24V.",
+    "points_test": "Bus codeur: COD1_CODEUR (Node 1) | Alim 24V codeur M1"
+  },
+  "PRE_14": {
+    "cause_racine": "📡 Perte communication bus codeur M2 ou connecteur M12 desserré sur touret.",
+    "action_conducteur": "🛑 Ne pas passer en mode Semi-Auto ou Automatique.",
+    "action_maintenance": "🧰 Treuil M2 : contrôler voyants LED sur codeur absolu (Node 2). Inspecter le câble souple de touret et la connectique M12.",
+    "points_test": "Bus codeur: COD2_CODEUR (Node 2) | Alim 24V codeur M2"
+  },
+  "PRE_15": {
+    "cause_racine": "🎯 Treuil M1 non référencé depuis mise sous tension ou position mesurée en dehors de l'épure autorisée.",
+    "action_conducteur": "🕹️ Sélectionner l'écran Homing en cabine et lancer la procédure de référencement guidée M1.",
+    "action_maintenance": "🧰 Contrôler le capteur came zéro de homing M1. Vérifier l'offset de référence et les seuils de butées logicielles dans CODESYS.",
+    "points_test": "Détecteur zéro homing: M1M2_TopPositionFree_DI (Local_Digital_IO · %IX0.7) | Config: GVL_Config"
+  },
+  "PRE_16": {
+    "cause_racine": "🎯 Treuil M2 non calibré (homing requis) ou position de benne hors plage admissible.",
+    "action_conducteur": "🕹️ Sélectionner l'écran Homing en cabine et lancer la procédure de référencement guidée M2.",
+    "action_maintenance": "🧰 Contrôler le capteur de référence zéro benne M2. Vérifier les limites de course logicielles haute et basse dans CODESYS.",
+    "points_test": "Détecteur zéro homing: M1M2_TopPositionFree_DI (Local_Digital_IO · %IX0.7) | Config: GVL_Config"
+  }
+}
