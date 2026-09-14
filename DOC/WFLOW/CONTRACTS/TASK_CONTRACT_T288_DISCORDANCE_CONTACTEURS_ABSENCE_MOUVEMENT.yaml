@@ -1,0 +1,79 @@
+contract:
+  task_id: T288
+  criticality: C2
+  strategy: patch
+  objective: >
+    Couvrir la discordance à l'enclenchement des contacteurs treuils M1/M2 :
+    si un ordre de mouvement (sens/vitesse/frein) est envoyé mais que le retour
+    ContactorsReleased_DI reste bloqué à 1 pendant un délai paramétré (3 s),
+    lever l'alarme bloquante SafeStop latched (ErrorID:16) sans alourdir le
+    catalogue d'alarmes, avec adaptation du libellé pour mentionner l'absence
+    de mouvement ou la discordance contacteurs.
+  acceptance:
+    - id: AC1
+      statement: "En commande active (sens + frein), si ContactorsReleased_DI reste à 1 pendant plus de 3 s, la Cause 15 (ErrorID:16) se lève et passe le treuil en SafeStop latched."
+      verified_by: "Test unitaire CI simulant commande sans retombée de ContactorsReleased_DI."
+    - id: AC2
+      statement: "Si ContactorsReleased_DI passe à 0 normalement (contacteurs collés) mais que le codeur ne bouge pas (delta < 2 cm), la Cause 15 continue de se déclencher à 3 s."
+      verified_by: "Test de non-régression sur le scénario nominal Cause 15 existant."
+    - id: AC3
+      statement: "Le libellé de l'ErrorID:16 dans FB_Safety_Winch et FB_Hmi_BannerFormatter affiche explicitement l'absence de mouvement ou discordance contacteurs."
+      verified_by: "Revue de code et inspection du banner formatter."
+    - id: AC4
+      statement: "Le réarmement du défaut exige la retombée de la commande et un front montant sur Reset."
+      verified_by: "Scénario CI vérifiant l'interdiction de réarmement automatique."
+    - id: AC5
+      statement: "Aucun éclatement du type ST_Fault (WORD 16 bits) : l'architecture des 16 causes FB_Safety_Winch reste stable et compatible."
+      verified_by: "Contrôle des structures ST et compilation bundle."
+    - id: AC6
+      statement: "G200 liaison et suite des gates 100% PASS."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report et run_all_gates.py."
+  scope:
+    allowed:
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T288_DISCORDANCE_CONTACTEURS_ABSENCE_MOUVEMENT.yaml
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/
+    forbidden:
+      - CODE/A_COMMUN/FB_Brake.st
+      - CODE/B_AU_SECURITE/
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE_BACKUP/
+  conservation:
+    must_survive:
+      - "Toutes les causes de sécurité existantes 0 à 15 de FB_Safety_Winch."
+      - "Les verrouillages Méca A, B, C, D, E."
+      - "L'encapsulation et le câblage PRG_04/PRG_06."
+    dropped_on_purpose:
+      - "L'inhibition aveugle du watchdog de mouvement lorsque ContactorsReleased_DI reste à 1."
+  implementation_details:
+    phase_1_safety_logic:
+      target: "CODE/H_TREUILS_BENNE/FB_Safety_Winch.st"
+      description: >
+        Dans TonNoMovement, surveiller (MovementCommanded AND BrakeFeedback) combiné à :
+        (FwdRevSpeedFeedbackOff OR NOT PositionMovementDetected).
+        Ainsi, si les contacteurs ne collent pas (FwdRevSpeedFeedbackOff = TRUE) après le timeout,
+        OU si les contacteurs collent mais le codeur ne progresse pas, TonNoMovement.Q passe à TRUE.
+        Mettre à jour instCauses[15].Texte := 'Absence mouvement ou discordance contacteurs';
+    phase_2_hmi_banner:
+      target: "CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st"
+      description: >
+        Actualiser les messages ErrorID:16 pour M1 et M2 dans les sections live et historique :
+        '[M1] ErrorID:16 - absence mouvement ou discordance contacteurs'
+        '[M2] ErrorID:16 - absence mouvement ou discordance contacteurs'
+    phase_3_documentation:
+      target: "DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md"
+      description: >
+        Documenter dans l'AF-10 §F10.xx que la Cause 15 couvre désormais le non-enclenchement
+        des contacteurs (discordance de commande) en plus de l'absence de déplacement codeur.
+    phase_4_mechanical_validation:
+      scripts:
+        - "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py ."
+        - "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report"
+        - "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+  evidence_required:
+    - "Contrat contrôlé par check_task_contract.py."
+    - "Tests CI démontrant le déclenchement du défaut sous 3 s quand ContactorsReleased_DI = 1."
+    - "G200 --report 0 erreur."

@@ -151,7 +151,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(raw)))
         self.send_header("Cache-Control", "no-store")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers(); self.wfile.write(raw)
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
 
     def body(self) -> dict:
         length = int(self.headers.get("Content-Length", "0"))
@@ -167,10 +177,37 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         try:
             if path in ("/", "/index.html"):
                 self.send_response(302); self.send_header("Location", "/TASK_VIEWER.html"); self.end_headers(); return
+            if path in ("/omnidiag", "/omnidiag.html"):
+                omnidiag_html = ROOT / "TOOLS" / "OMNIDIAG" / "EXPORTS" / "omnidiag_viewer.html"
+                if not omnidiag_html.exists():
+                    import subprocess
+                    subprocess.run([sys.executable, str(ROOT / "TOOLS" / "OMNIDIAG" / "build_omnidiag.py")])
+                if omnidiag_html.exists():
+                    raw = omnidiag_html.read_bytes()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html; charset=utf-8")
+                    self.send_header("Content-Length", str(len(raw)))
+                    self.send_header("Cache-Control", "no-cache")
+                    self.end_headers(); self.wfile.write(raw); return
+                self.reply(404, {"error": "Fichier OMNIDIAG introuvable"}); return
             if path == "/api/status":
                 self.reply(200, {"status": "ok", "host": HOST, "port": self.server.server_port, "tasks": len(tasks())}); return
             if path == "/api/tasks/json":
                 state = locks(); self.reply(200, [public(t, state) for t in tasks()]); return
+            if path == "/api/omnidiag/data":
+                omnidiag_dir = str(ROOT / "TOOLS" / "OMNIDIAG")
+                if omnidiag_dir not in sys.path:
+                    sys.path.insert(0, omnidiag_dir)
+                import importlib
+                import parser as omni_parser, enricher as omni_enricher, io_mapper as omni_io_mapper
+                importlib.reload(omni_parser)
+                importlib.reload(omni_enricher)
+                importlib.reload(omni_io_mapper)
+                items = omni_parser.run_full_extraction(ROOT)
+                kb_file = ROOT / "TOOLS" / "OMNIDIAG" / "knowledge_base.json"
+                enriched = omni_enricher.enrich_all(items, kb_file)
+                rack_data = omni_io_mapper.parse_rack_io(ROOT)
+                self.reply(200, {"success": True, "items": enriched, "rack_data": rack_data}); return
             super().do_GET()
         except ValueError as exc:  # Donnees invalides (TASKS.yaml / TASK_LOCKS.json casses)
             print(f"[ERREUR DONNEES] {exc}")
@@ -182,6 +219,28 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         try:
             path, data = urllib.parse.urlparse(self.path).path, self.body()
+            if path == "/api/omnidiag/rebuild":
+                import subprocess
+                proc = subprocess.run([sys.executable, str(ROOT / "TOOLS" / "OMNIDIAG" / "build_omnidiag.py")], cwd=str(ROOT), capture_output=True, text=True, encoding="utf-8", errors="replace")
+                self.reply(200, {"success": proc.returncode == 0, "output": proc.stdout or proc.stderr}); return
+            if path == "/api/omnidiag/save-kb":
+                item_id = str(data.get("id", "")).strip()
+                if not item_id: return self.reply(400, {"success": False, "error": "ID requis"})
+                kb_file = ROOT / "TOOLS" / "OMNIDIAG" / "knowledge_base.json"
+                cur_kb = {}
+                if kb_file.exists():
+                    try: cur_kb = json.loads(kb_file.read_text(encoding="utf-8"))
+                    except Exception: pass
+                cur_kb[item_id] = {
+                    "cause_racine": str(data.get("cause_racine", "")),
+                    "action_conducteur": str(data.get("action_conducteur", "")),
+                    "action_maintenance": str(data.get("action_maintenance", "")),
+                    "points_test": str(data.get("points_test", ""))
+                }
+                kb_file.write_text(json.dumps(cur_kb, ensure_ascii=False, indent=2), encoding="utf-8")
+                import subprocess
+                subprocess.run([sys.executable, str(ROOT / "TOOLS" / "OMNIDIAG" / "build_omnidiag.py")], cwd=str(ROOT), capture_output=True, encoding="utf-8", errors="replace")
+                self.reply(200, {"success": True, "saved_id": item_id}); return
             if path == "/api/task/edit-flag/acquire": return self.acquire(data)
             if path == "/api/task/edit-flag/release": return self.release(data)
             if path == "/api/task/work-lock/acquire": return self.acquire_work(data)

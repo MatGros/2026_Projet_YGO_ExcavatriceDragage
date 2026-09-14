@@ -130,10 +130,24 @@
       "Bash(cd *)",
       "Bash(git --no-pager diff --cached --stat)",
       "Bash(git -c core.hooksPath=/dev/null commit -q -m ' *)",
-      "Bash(git --no-pager diff --cached -- DOC/WFLOW/TASKS.yaml)"
+      "Bash(git --no-pager diff --cached -- DOC/WFLOW/TASKS.yaml)",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && wc -l *.md *.yaml *.csv 2>/dev/null)",
+      "Read(//c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS/**)",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage && [ -f CODE/H_TREUILS_BENNE/FB_WinchStateProjection.st ] && echo EXISTS || echo MISSING *)",
+      "Read(//c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/**)",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"GEL_GRAFCET_HOMING_CYCLE_20260903.md\")",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"GEL_GRAFCET_SEMIAUTO_20260903.md\")",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"INTERFACES_AUDIT_A_20260831.md\")",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"INTERFACES_AUDIT_B_20260831.md\")",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"INVENTAIRE_Defauts_Bloquants_MES_20260903.md\")",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"MISE_EN_CONFORMITE_AF_QUESTIONS_v0.1.md\")",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"P3_TEST_AUDIT_PROPOSITIONS_v1.0.md\")",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"PLAN_AlarmBanner_20260820.md\")",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"PLAN_DIAGNO_ALARMES_T218_220.md\")",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"PLAN_MIGRATION_TABLES.md\")",
+      "Bash(cd /c/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/AUDITS && tail -n 10 \"PLAN_RootCauseMasking_HmiBanner_20260826.md\")"
     ],
     "ask": [
-      "Bash(git reset *)",
       "Bash(git push --force*)",
       "Bash(git clean *)"
     ]

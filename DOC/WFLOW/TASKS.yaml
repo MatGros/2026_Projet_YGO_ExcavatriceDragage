@@ -1,16 +1,40 @@
 tasks:
+- id: T288
+  parent_id: ''
+  statut: '⏳'
+  criticite: C2
+  domaine: TREUILS_BENNE
+  agent: Antigravity
+  date: '2026-09-14T13:14:00+02:00'
+  titre: Discordance commande contacteurs M1/M2 et couverture absence de mouvement
+  contexte: 'Quand un treuil est commandé (sens + vitesse + frein), si les contacteurs ne collent pas (ContactorsReleased_DI = 1), l absence de mouvement reste inhibée et aucune alarme ne se lève.'
+  description: 'Étude d impact et implémentation minimale bloquante (SafeStop) sans explosion du catalogue d alarmes. Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T288_DISCORDANCE_CONTACTEURS_ABSENCE_MOUVEMENT.yaml'
+  objectifs:
+  - "Déclencher l ErrorID:16 après 3 s si ContactorsReleased_DI reste à 1 sous commande active"
+  - "Préserver le déclenchement nominal de l ErrorID:16 sur absence de progression codeur"
+  - "Actualiser le libellé IHM de l ErrorID:16 (absence mouvement ou discordance contacteurs)"
+  bloque_par: []
 - id: T287
   parent_id: T286
-  statut: '⬜'
+  statut: '⏳'
   criticite: C3
   domaine: TRANSLATION_M3
-  agent: ''
+  agent: Codex
   date: '2026-09-13T23:55:00+02:00'
   titre: Régression M3 sur butées — escalade graduée sans toucher FB_Brake
   contexte: Arrêt directionnel immédiat conservé ; qualifie un mouvement réel persistant après arrêt.
   description: 'Phases contrôlées. Contrat: TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml
-  objectifs: []
+  objectifs:
+  - 'Qualifier le comportement actuel de FB_Brake sans modifier CODE/.'
+  - 'Fournir un chronogramme de reference pour ouverture, fermeture et neutralisation.'
+  avancement: 'STANDBY - analyse exploratoire preparee, aucun code de production modifie.'
+  livrables:
+  - 'DOC/WFLOW/AUDITS/AUDIT_FB_BRAKE_BASELINE_M3_20260914.md'
+  - 'TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/CODEX_FB_BRAKE_BASELINE/'
+  constat: 'Le banc couvre t=0, 300 ms, 399 ms, 401 ms, arret et Enable=FALSE. Le runner STruCpp echoue actuellement en compilation C++ avant execution des assertions.'
+  perimetre: 'Banc exploratoire, sans modification de FB_Brake. La fonctionnalite T287 M3 reste a reprendre apres decision explicite.'
+  reprise: 'Verifier le blocage de compilation, relancer le chronogramme, puis faire valider humainement le diff avant toute evolution.'
   bloque_par: []
 - id: T286
   parent_id: ''

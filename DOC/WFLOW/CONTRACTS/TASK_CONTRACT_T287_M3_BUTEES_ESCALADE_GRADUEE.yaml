@@ -28,12 +28,15 @@ contract:
   scope:
     allowed:
       - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - CODE/I_TRANSLATION/FB_Translation.st
       - CODE/I_TRANSLATION/_TYPES/
       - CODE/M_MAIN/PRG_05_Translation.st
       - CODE/M_MAIN/PRG_06_Outputs.st
       - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_safety_translation.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translationoutputinterlock.st
       - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
-      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.3.md
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md
       - DOC/WFLOW/AUDITS/
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml
       - DOC/WFLOW/TASKS.yaml
@@ -64,14 +67,14 @@ contract:
     toute ambiguïté sur le statut SafeStop/PowerCutOff ou toute proposition nécessitant une
     modification de FB_Brake.
 
-status: PENDING
+status: IN_PROGRESS
 execution:
-  executed_by: ""
+  executed_by: "Codex"
   completed_at: ""
-  status: PENDING
+  status: IN_PROGRESS
   summary: >
-    Phase 0 : compléter l'AF avec les oracles et inventorier les barrières des deux extrémités.
-    Phase 1 : réécrire les tests CI ciblés, sans toucher au code ni à FB_Brake.
+    Phase 0 : compléter l'AF v2.4 (brouillon non actif) avec les oracles et inventorier les barrières des deux extrémités.
+    Phase 1 : préparer les tests CI ciblés, sans les exécuter sur le PLC actuel, ni toucher au code ou à FB_Brake.
     Phase 2 : visa humain des tests et du comportement cible.
     Phase 3 : modifier uniquement la logique M3 autorisée, puis valider CI, G200 et gates.
     Phase 4 : recette humaine CODESYS/terrain et décision séparée sur un éventuel besoin FB_Brake.
