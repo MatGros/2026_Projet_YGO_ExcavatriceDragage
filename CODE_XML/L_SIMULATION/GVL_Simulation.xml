@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T17:36:57.917981" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T17:36:57.917981">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T21:23:23.154812" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T21:23:23.154812">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -329,43 +329,7 @@ Multiplicateur vitesse codeurs simulés ; 1.0 = nominal</xhtml>
           </initialValue>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">🛡️ STIMULI SAFETY — fait capteur amont, jamais une sortie de commande forcée.
-TRUE = Kobold détecte un contact fond simulé (mode manuel)</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimKoboldAutoModeActive">
-          <type>
-            <BOOL />
-          </type>
-          <initialValue>
-            <simpleValue value="FALSE" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Mode auto Kobold : déclenche le contact fond par seuil altimétrique M1, avec un temps de
-réaction réaliste (latence détection). Combiné en OU avec SimKoboldContactValue — le mode
-manuel reste utilisable en parallèle. Défaut désactivé = comportement historique inchangé.
-TRUE = active le déclenchement auto par profondeur</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimKoboldAutoDepth_M">
-          <type>
-            <REAL />
-          </type>
-          <initialValue>
-            <simpleValue value="-15" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Seuil altimétrique M1 (m, négatif = sous l'eau) déclenchant le contact fond</xhtml>
-          </documentation>
-        </variable>
-        <variable name="SimKoboldReactionTime">
-          <type>
-            <TIME />
-          </type>
-          <initialValue>
-            <simpleValue value="TIME#500ms" />
-          </initialValue>
-          <documentation>
-            <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps de réaction simulé avant publication du contact</xhtml>
+TRUE = Kobold détecte un contact fond simulé</xhtml>
           </documentation>
         </variable>
         <variable name="SimChainOk">

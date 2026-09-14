@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.337269" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.337269">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T20:20:01.671912" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T20:20:01.671912">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2782,7 +2782,7 @@ ELSIF CurrentMode = E_Mode.SEMI_AUTO THEN
                 E_AutoCycleStep.AX7_SEARCH_BOTTOM: StepAtErrorStr := 'AX7 (recherche fond)';
                 E_AutoCycleStep.AX8_BOTTOM_CONFIRMED: StepAtErrorStr := 'AX8 (fond confirme)';
                 E_AutoCycleStep.AX_DIVING_RETRY: StepAtErrorStr := 'AX_DIVING_RETRY (reprise plongee)';
-                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (montee synchronisee - retendre cables)';
+                E_AutoCycleStep.AX9_RAISE_OFF_BOTTOM: StepAtErrorStr := 'AX9 (montee sync - retendre cables)';
                 E_AutoCycleStep.AX10_CLOSE_BUCKET: StepAtErrorStr := 'AX10 (fermeture benne)';
                 E_AutoCycleStep.AX10_WAIT_ASCENT_START: StepAtErrorStr := 'AX10b (stabilisation avant montee)';
                 E_AutoCycleStep.AX11_CTRL_ASCENT: StepAtErrorStr := 'AX11 (remontee controle)';
