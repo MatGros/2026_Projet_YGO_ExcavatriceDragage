@@ -1,0 +1,65 @@
+contract:
+  task_id: T291-A
+  parent_id: T291
+  criticality: C4
+  strategy: patch
+  objective: >
+    Permettre un essai comparatif de descente du cycle automatique AX4 a AX7,
+    M1 cible palier 4 et M2 cible palier 5, avec cadencement existant conserve.
+  acceptance:
+    - id: AC1
+      statement: "Profil actif uniquement en cycle automatique, descente AX4 a AX7 ; manuel et maintenance N1/N2 gardent leurs commandes."
+      verified_by: "Tests cycle et integration avec profil ON/OFF et changement de mode."
+    - id: AC2
+      statement: "Option non persistante OFF au demarrage, capturee a l'arret avant plongee ; aucune modification du profil en mouvement."
+      verified_by: "Tests boot, selection a l'arret, bascule pendant AX4 a AX7 et nouvelle plongee."
+    - id: AC3
+      statement: "M1 parcourt 1,2,3,4 et M2 parcourt 1,2,3,4,5 avec temporisations et table contacteurs existantes."
+      verified_by: "Tests executant FB_Winch et FB_WinchStepShaper ; diff sans modification de la table ni du cadencement."
+    - id: AC4
+      statement: "Les concordances amont, finale et semi-auto acceptent exclusivement le profil attendu et ses transitions ; une direction differente ou un vecteur vitesse non autorise reste sanctionne."
+      verified_by: "Tests positifs P4/P5 et negatifs directions, paliers et chaque bit contacteur aux trois consommateurs."
+    - id: AC5
+      statement: "Les plafonds de securite, zones de ralentissement, arrets communs, surveillance geometrique et verrouillages individuels restent prioritaires."
+      verified_by: "Tests limites, SafeStop, defaut un axe, homme-mort relache ; comparaison du diff des protections."
+    - id: AC6
+      statement: "Les causes cycle 8 et 9 surveillent les paliers attendus selon le profil ; M1 palier 5 reste interdit."
+      verified_by: "Tests cause 8 M1=5, M2=5 OFF/ON ; cause 9 palier attendu absent apres temporisation existante."
+    - id: AC7
+      statement: "Le nom de fichier est identique au nom de POU ; le suffixe correspond au langage genere dans le bundle."
+      verified_by: "G200_check_linkage.py --report et run_all_gates.py --palier C."
+  scope:
+    allowed:
+      - CODE/G_CYCLE/
+      - CODE/H_TREUILS_BENNE/FB_WinchSync.st
+      - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+      - CODE/H_TREUILS_BENNE/_TYPES/
+      - CODE/M_MAIN/
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - TOOLS/AGENT_WORKFLOW/tests/
+      - DOC/WFLOW/
+      - DOC/AF/
+      - CODE_XML/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/H_TREUILS_BENNE/FB_WinchStepShaper.st
+      - CODE/H_TREUILS_BENNE/FB_SpeedStep.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+  conservation:
+    must_survive:
+      - "Hors profil : concordance stricte existante et temporisations identiques."
+      - "Aucun bypass des protections de position, sens, frein, puissance ou rearmement."
+      - "T290 et nouvelles limites H+1/H+2 exclus de cette livraison."
+    dropped_on_purpose: []
+  evidence_required: [check_linkage, run_all_gates, bundle, diff_bundle, tests_cycle, tests_winch, revue_independante]
+  alert_duty: "Tout conflit de protection ou besoin hors perimetre est signale avant modification."
+status: IN_PROGRESS
+execution:
+  executed_by: Codex
+  status: IN_PROGRESS
+  evidence_submitted: []
+validation:
+  status: PENDING
+  notes: "Utilisateur : ok go ; profil AUTO M1=P4/M2=P5 et sequencement conserves. Validation machine apres livraison uniquement."

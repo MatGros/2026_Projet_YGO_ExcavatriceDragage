@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.521516" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.521516">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T02:09:01.133579" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T02:09:01.133579">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -40,6 +40,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Intention both continue opérateur (source unique PRG_03, TOUS modes)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AutoDiveM1Step4M2Step5Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A actif : SEMI_AUTO AX4..AX7, descente M1 palier 4 / M2 palier 5</xhtml>
               </documentation>
             </variable>
             <variable name="ReqProgram">

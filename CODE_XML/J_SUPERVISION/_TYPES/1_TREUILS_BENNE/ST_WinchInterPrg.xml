@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.351641" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.351641">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T02:09:01.635784" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T02:09:01.635784">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -124,6 +124,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Ecart signe M2 - M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AutoDiveM1Step4M2Step5Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A relaye vers PRG_06 : profil final asymetrique autorise uniquement AX4..AX7</xhtml>
               </documentation>
             </variable>
             <variable name="BucketState">

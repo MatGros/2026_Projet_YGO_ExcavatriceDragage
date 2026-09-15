@@ -41,14 +41,16 @@ tasks:
   bloque_par: []
 - id: T291
   parent_id: ''
-  statut: '⬜'
+  statut: '⏳'
   criticite: C4
   domaine: SECURITE_SYNCHRO_TREUILS
-  agent: ''
-  date: '2026-09-14T00:00:00+02:00'
-  titre: 'Étude — Paliers asymétriques M1/M2 en descente couplée (ex. M1=P1, M2=P5)'
-  contexte: 'Demande prioritaire client : pouvoir descendre M1 en palier 1 (lent) pendant que M2 descend en palier 5 (rapide), simultanément, en pilotage couplé. Aujourd hui la synchro (FB_SyncContactor, debounce 500 ms) et le clamp §5ter supposent un palier commun M1=M2 (CommonMaxStepAscent/Descent) ; des paliers différents déclencheraient très probablement un ContactorMismatch -> SafeStop. Piste utilisateur : modifier la table paliers -> contacteurs vitesse (actuellement P4 = certains contacteurs, P5 = 4 contacteurs vitesse enclenchés) plutôt qu un patch profond du contrôle de synchronisme. Précision utilisateur (2026-09-14) : impact large et transverse (synchro contacteurs, table paliers) — exige une solution fiable, activable/désactivable simplement, compréhensible, et une progression PAR ÉTAPES/PHASES, pas un big-bang. Solution finale à faire challenger par un automaticien expert avant implémentation.'
-  description: 'Phase 0 (cette tâche) : étude d impact uniquement, aucune implémentation. Cartographier tous les consommateurs de palier commun M1/M2 (FB_SyncContactor, §5ter clamp, FB_SpeedStep, table paliers->contacteurs) et proposer 2-3 options techniques comparées (ex. option A : nouvelle table de correspondance palier->contacteurs par treuil sans passage obligé par un palier commun intermédiaire ; option B : mécanisme dédié de dérogation temporaire au contrôle de synchronisme, borné et tracé). Chaque option doit préciser : le flag d activation/désactivation, le risque résiduel côté FB_SyncContactor et §5ter, et l effort d implémentation. Découper la solution retenue en sous-tâches/phases numérotées (T291-A, T291-B, ...) après validation humaine + automaticien.'
+  agent: Codex
+  date: '2026-09-15T03:25:20+02:00'
+  plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
+  avancement: 'Implementation T291-A en cours : essai cycle automatique uniquement, M1 palier 4 et M2 palier 5, sequence existante conservee.'
+  titre: 'Profil essai cycle auto — descente M1 palier 4 / M2 palier 5'
+  contexte: 'Precision utilisateur 2026-09-15 : uniquement en cycle automatique SEMI_AUTO, pas en manuel ni maintenance N1/N2. Objectif essai rapide : descente M1 palier 4 comme actuellement et M2 palier 5, avec cadencement existant 1->2->3->4->5 conserve et table contacteurs inchangee.'
+  description: 'Parent de cadrage. Premier lot T291-A : toggle IHM non persistant, capture a l arret avant AX4, publication du profil actif AX4..AX7 et adaptation stricte des concordances amont/finale pour accepter uniquement le vecteur descente M1=P4/M2=P5. Les limites haut/bas et T290 restent des lots separes.'
   objectifs:
   - 'Cartographie exhaustive des consommateurs actuels du palier commun M1/M2 (FB_SyncContactor, §5ter, FB_SpeedStep, table contacteurs).'
   - '2-3 options techniques comparées, chacune avec : mécanisme, flag ON/OFF, risque résiduel synchro, effort.'
@@ -57,22 +59,43 @@ tasks:
   - 'Document d étude soumis à un automaticien expert avant toute implémentation (validation humaine explicite requise).'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T291_ETUDE_PALIERS_ASYMETRIQUES_M1_M2.yaml
   bloque_par: []
+- id: T291-A
+  parent_id: T291
+  statut: '⏳'
+  criticite: C4
+  domaine: SECURITE_SYNCHRO_TREUILS
+  agent: Codex
+  date: '2026-09-15T08:10:00+02:00'
+  plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
+  avancement: 'Patch en cours : profil AUTO AX4..AX7 M1=P4/M2=P5, sans modification manuel/maintenance.'
+  titre: 'T291-A — Essai auto descente M1=P4 / M2=P5'
+  contexte: 'Utilisateur a confirme : cycle automatique uniquement, M1 palier 4 comme actuellement, M2 palier 5, sequence existante conservee.'
+  description: 'Ajouter un toggle essai non persistant, capturer le profil avant depart plongee, commander M2 au palier 5 sur AX4..AX7 et adapter les concordances pour ce profil exact.'
+  objectifs:
+  - 'AUTO SEMI_AUTO AX4..AX7 uniquement ; manuel et maintenance inchanges.'
+  - 'M1 reste palier 4 ; M2 vise palier 5 avec cadencement existant et table contacteurs inchangee.'
+  - 'Concordance amont, publication finale PRG04 et concordance finale PRG06 acceptent seulement le profil descente exact M1=P4/M2=P5.'
+  - 'M1 palier 5, mauvais sens ou vecteur contacteur non conforme restent sanctionnes.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T291_A_AUTO_DESCENT_P4_P5.yaml
+  bloque_par: []
 - id: T290
   parent_id: ''
-  statut: '⬜'
+  statut: '⏳'
   criticite: C3
   domaine: TREUILS_BENNE
-  agent: ''
-  date: '2026-09-14T00:00:00+02:00'
-  titre: Déplafonnement temporisé Palier 1 → Palier 2 en extraction (§5ter)
-  contexte: 'Demande client : en extraction (ExtractionControlActive), CommonMaxStepAscent est bridé en dur à 1 (PRG_04_Treuils_Benne.st §5ter, ~ligne 1204-1206), pour toute la manœuvre. Le palier 1 est trop lent : couple insuffisant, chauffe moteur. Précision utilisateur (2026-09-14) : pas de condition sur le taux de fermeture benne — on passe naturellement de palier 1 à palier 2 après un temps minimal (de l ordre de 1 à 2 s) une fois l extraction engagée, puis on continue en descendant sous le palier d eau.'
-  description: 'Ajouter une temporisation (TON) gatée sur ExtractionControlActive : plafond palier 1 pendant les 1-2 premières secondes (valeur exacte à confirmer), puis relèvement du plafond à 2 tant que ExtractionControlActive reste actif. Ne modifier aucune autre source de clamp du §5ter (Maintenance, hors-homing, SyncDeviationWarn, benne non fermée en couplé, position Maintenance M3).'
+  agent: Codex
+  date: '2026-09-15T03:25:20+02:00'
+  plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
+  avancement: 'Recadre par utilisateur : pas de temporisation nouvelle ; implementation apres T291-A et recette separee.'
+  titre: 'Cycle auto extraction — autoriser palier 2 en remontee controle'
+  contexte: 'Correction utilisateur 2026-09-15 : les paliers/interlocks existants sont OK ; besoin uniquement en remontee extraction du cycle auto controle, actuellement limitee palier 1 max, pour autoriser palier 2 si les limitations existantes le permettent.'
+  description: 'Lot separe. En cycle automatique, sur la remontee extraction controlee, relever le plafond max a 2 sans ajouter de temporisation et sans modifier manuel/maintenance.'
   objectifs:
-  - 'CommonMaxStepAscent reste à 1 pendant les X premières secondes (1-2 s, valeur à valider) d ExtractionControlActive.'
-  - 'CommonMaxStepAscent passe à 2 (jamais plus) après ce délai, tant qu ExtractionControlActive est actif.'
-  - 'Aucune autre source du §5ter (hors-homing, SyncDeviationWarn, Maintenance M3, benne non fermée couplée) n est affaiblie ou contournée par ce changement.'
-  - 'Le MIN final entre toutes les sources de plafond continue de s appliquer normalement (le palier 2 ne devient effectif que si aucune autre source ne plafonne plus bas).'
-  - 'Gates G200 + palier C PASS ; zéro régression sur les TC extraction/synchro existants.'
+  - 'En remontee extraction controlee du cycle auto, le plafond demande autorise le palier 2.'
+  - 'Aucune temporisation nouvelle n est ajoutee pour T290.'
+  - 'Les interlocks, paliers logic treuils et limitations existantes restent prioritaires.'
+  - 'Manuel et maintenance restent inchanges.'
+  - 'Gates G200 + palier C PASS ; zero regression sur les TC extraction/synchro existants.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T290_EXTRACTION_PALIER2_TEMPORISE.yaml
   bloque_par: []
 - id: T289

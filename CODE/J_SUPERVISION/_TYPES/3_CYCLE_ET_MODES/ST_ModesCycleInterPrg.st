@@ -8,6 +8,7 @@ TYPE ST_ModesCycleInterPrg :
 STRUCT
     Auth          : ST_Modes_Autorisations; // Bus public d'autorisations machine (NC-110)
     WinchBothIntent : ST_WinchBothIntent;     // 🎮 Intention both continue opérateur (source unique PRG_03, TOUS modes)
+    AutoDiveM1Step4M2Step5Active : BOOL;      // Essai T291-A actif : SEMI_AUTO AX4..AX7, descente M1 palier 4 / M2 palier 5
     ReqProgram    : ST_ProgramRequest;        // Demandes programme vers PRG_04 / PRG_05
     SequenceState : ST_SequencePublicState;   // État public de la séquence
     // 🧩 Défaut de l'arbitre de mode (FB_Modes), forme cible ST_Fault (AF03 §3).

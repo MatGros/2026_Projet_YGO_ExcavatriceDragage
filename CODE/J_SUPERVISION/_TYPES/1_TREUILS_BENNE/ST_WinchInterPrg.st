@@ -31,6 +31,7 @@ STRUCT
     SyncState                    : ST_SyncState; // 🔄 Etat synchronisation treuils M1/M2
     WinchSyncError               : BOOL;         // 🚨 Defaut de desynchronisme treuils M1/M2
     WinchSyncSignedDeltaPosM     : REAL;         // 📏 Ecart signe M2 - M1 (m)
+    AutoDiveM1Step4M2Step5Active : BOOL;         // Essai T291-A relaye vers PRG_06 : profil final asymetrique autorise uniquement AX4..AX7
 
     // === 🏗️ État benne ===
     BucketState                  : ST_BucketHMIState; // 🏗️ Etat de fonctionnement benne

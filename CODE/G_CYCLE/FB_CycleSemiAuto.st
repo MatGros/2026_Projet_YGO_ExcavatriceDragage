@@ -94,6 +94,7 @@ VAR_INPUT
     CfgCtrlAscentDistanceM : REAL;         // --> [CFG] Distance controle AX11 depuis son depart (m)
     M1_SpeedStepApplied    : INT;          // --> [HW] Palier vitesse effectivement applique M1 (0 = inconnu ; garde palier <> 4 en diving)
     M2_SpeedStepApplied    : INT;          // --> [HW] Palier vitesse effectivement applique M2 (0 = inconnu)
+    CfgAutoDiveM2Step5Trial : BOOL;        // --> [CFG] Essai T291-A : M2 palier 5 en descente auto AX4..AX7, non persistant
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC & DEFECTUOSITES ===
@@ -137,6 +138,7 @@ VAR_OUTPUT
     RequestActive           : BOOL;                 // <-- [STAT] Demande de mouvement active
     CurrentCycleElapsed     : TIME;                 // <-- [DIAG] Duree ecoulee du cycle en cours (chronometre sur Lifecycle.Busy)
     LastCycleDuration       : TIME;                 // <-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)
+    AutoDiveM1Step4M2Step5Active : BOOL;            // <-- [STAT] Profil T291-A actif sur la phase plongee auto
 END_VAR
 VAR_IN_OUT
     // === STRUCTURES PARTAGEES & COMPTEURS ===
@@ -158,6 +160,8 @@ VAR
     TranslationP1Permit     : BOOL; // . [LOC] Translation vers P1 : axe X droit seul, axe Y au neutre
     TranslationTremiePermit : BOOL; // . [LOC] Translation vers tremie : axe X gauche seul, axe Y au neutre
     WinchesAtDiveStep       : BOOL; // . [LOC] M1 ET M2 confirmes au palier 4 (mesure Kobold fiable seulement a vitesse stabilisee)
+    AutoDiveM2Step5TrialLatched : BOOL := FALSE; // . [LOC] Capture essai T291-A avant depart plongee, figee jusqu'a sortie AX4..AX7
+    DiveM2StepTgt           : INT := 4;  // . [LOC] Palier cible M2 plongee : 4 nominal, 5 essai T291-A
 
     // === COMPTEUR PRELEVEMENTS (garde de front) ===
     SampleCountDone         : BOOL := FALSE; // . [LOC] F2: front de comptage SampleCount (1 seul increment par cycle)
@@ -240,7 +244,8 @@ END_VAR
 VAR CONSTANT
     // Paliers de vitesse treuil par etape (StepTgt des demandes WinchMxCmd, 1..5 ; 0 = arret).
     CST_StepSlow   : INT := 1;   // Palier lent : retente AX9, controle AX11, repositionnement AX15C
-    CST_StepDive   : INT := 4;   // Palier plongee Kobold AX4..AX7 : palier 4 MINI ET MAXI impose, palier 5 interdit (GEL Q9)
+    CST_StepDive   : INT := 4;   // Palier plongee Kobold AX4..AX7 : M1 reste palier 4
+    CST_StepDiveM2Trial : INT := 5; // Essai T291-A : M2 seul peut viser le palier 5 en AX4..AX7
     CST_StepLoaded : INT := 5;   // Palier montee en charge AX12 (P5, plafonds de securite aval conserves)
     CST_KoboldInitTimeout : TIME := T#3s;   // Fenetre max de confirmation retour contacteur Kobold en AX5
     CST_DiveStartStopConfirmTime : TIME := T#300ms; // Confirmation stable des 6 faits d'arret + validite vitesses
@@ -362,7 +367,15 @@ RetryJoyReleaseTimer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                              OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                             AND NOT (DeadmanArmed AND JoystickPush),
                      PT := T#200ms);
-WinchesAtDiveStep := (M1_SpeedStepApplied = CST_StepDive) AND (M2_SpeedStepApplied = CST_StepDive);
+DiveM2StepTgt := SEL(AutoDiveM2Step5TrialLatched, CST_StepDive, CST_StepDiveM2Trial);
+AutoDiveM1Step4M2Step5Active :=
+    AutoDiveM2Step5TrialLatched
+    AND ((State = E_AutoCycleStep.AX4_DESCEND_DIVING)
+      OR (State = E_AutoCycleStep.AX5_KOBOLD_INIT)
+      OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+      OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM));
+
+WinchesAtDiveStep := (M1_SpeedStepApplied = CST_StepDive) AND (M2_SpeedStepApplied = DiveM2StepTgt);
 PalierNot4Timer(IN := ((State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                          AND DeadmanArmed AND JoystickPush AND NOT WinchesAtDiveStep,
                     PT := T#2s);
@@ -448,10 +461,10 @@ instCauses[7].Active   := NOT CycleChecksInhibited
 instCauses[7].Latching := TRUE;
 instCauses[7].Texte    := 'Treuils M1/M2 hors FDC haut pendant la translation vers P1';
 
-// GEL cause 8 : palier vitesse > 4 (palier 5) applique pendant la plongee. Le FB commande
-// toujours CST_StepDive = 4 ; un palier 5 en retour feedback = anomalie aval -> defaut latche.
+// GEL cause 8 : M1 > 4 ou M2 au-dessus de son palier attendu pendant la plongee.
+// En nominal, M2 attendu = 4 ; en essai T291-A capture avant AX4, M2 attendu = 5.
 // (Un palier < 4 en retour est traite en reprise par GT-dive-retry, pas ici.)
-instCauses[8].Active   := (((M1_SpeedStepApplied > CST_StepDive) OR (M2_SpeedStepApplied > CST_StepDive)))
+instCauses[8].Active   := (((M1_SpeedStepApplied > CST_StepDive) OR (M2_SpeedStepApplied > DiveM2StepTgt)))
                           AND ((State = E_AutoCycleStep.AX4_DESCEND_DIVING)
                             OR (State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                             OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
@@ -593,6 +606,8 @@ IF ResetEdge.Q THEN
     BottomContextValid := FALSE;
     StopPositionCaptured := FALSE;
     KoboldImmersionQualified := FALSE;
+    AutoDiveM2Step5TrialLatched := FALSE;
+    AutoDiveM1Step4M2Step5Active := FALSE;
     IF State = E_AutoCycleStep.AX_STAB THEN
         State := E_AutoCycleStep.AX0_REPOS;
     END_IF;
@@ -668,6 +683,7 @@ IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     WaitingForOperator := FALSE;
     WaitingForProcess := FALSE;
     RequestActive := FALSE;
+    AutoDiveM1Step4M2Step5Active := FALSE;
     RETURN;
 END_IF;
 
@@ -728,6 +744,7 @@ END_IF;
 // GT-dive-retry (GEL Q11) : reprise de plongee (PAS un defaut latche). Prioritaire
 // apres le repli defaut : une vraie erreur (ErrorEdge) l'emporte.
 IF DivingRetryTrig AND (State <> E_AutoCycleStep.AX_STAB) THEN
+    AutoDiveM2Step5TrialLatched := FALSE;
     State := E_AutoCycleStep.AX_DIVING_RETRY;
 END_IF;
 
@@ -770,6 +787,8 @@ CASE State OF
         BottomStopByKobold := FALSE;
         BottomStopBySetpoint := FALSE;
         BottomStopSource := '';
+        AutoDiveM2Step5TrialLatched := FALSE;
+        AutoDiveM1Step4M2Step5Active := FALSE;
 
         // Transition si système sain et réarmé (front reset ou démarrage).
         // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
@@ -920,6 +939,7 @@ CASE State OF
         // l'arret est confirme. Une perte d'homme-mort desarme FB_Joystick et exige son
         // nouveau front physique avant que DeadmanArmed puisse redevenir vrai.
         IF DiveStartStopTimer.Q AND DeadmanArmed AND JoystickPush THEN
+            AutoDiveM2Step5TrialLatched := CfgAutoDiveM2Step5Trial;
             State := E_AutoCycleStep.AX4_DESCEND_DIVING;
         END_IF;
 
@@ -937,15 +957,15 @@ CASE State OF
         OperatorActionId := 16#0404;
         OperatorAction := 'AX4 - Maintenir la descente palier 4 (Kobold pas encore enclenche).';
 
-        // Palier 4 MINI ET MAXI (CST_StepDive), palier 5 interdit (cause 8). Tempo
-        // sequencement contacteurs conservee en aval (PRG_04 : montee progressive 1->4).
+        // M1 reste palier 4. M2 reste palier 4 nominal, ou palier 5 si l'essai
+        // T291-A a ete capture avant AX4. Sequencement contacteurs conserve en aval.
         // Contacteur Kobold PAS enclenche a cette etape.
         WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
         WinchM1Cmd.StepTgt  := CST_StepDive;
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.StepTgt  := DiveM2StepTgt;
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
         // AT4 : altimetrie de lancement atteinte (M1 <= DiveStartMinEff).
@@ -972,7 +992,7 @@ CASE State OF
         WinchM1Cmd.StepTgt  := CST_StepDive;
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.StepTgt  := DiveM2StepTgt;
         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode <> E_CycleDepthStopMode.SETPOINT_ONLY)
                                              AND DeadmanArmed AND JoystickPush;
 
@@ -1001,7 +1021,7 @@ CASE State OF
         WinchM1Cmd.StepTgt  := CST_StepDive;
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.StepTgt  := DiveM2StepTgt;
         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode <> E_CycleDepthStopMode.SETPOINT_ONLY)
                                              AND DeadmanArmed AND JoystickPush;
 
@@ -1032,7 +1052,7 @@ CASE State OF
         WinchM1Cmd.StepTgt  := CST_StepDive;
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.StepTgt  := DiveM2StepTgt;
         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode <> E_CycleDepthStopMode.SETPOINT_ONLY)
                                              AND DeadmanArmed AND JoystickPush;
 
@@ -1060,6 +1080,7 @@ CASE State OF
 
     E_AutoCycleStep.AX8_BOTTOM_CONFIRMED:
         CycleStep := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
+        AutoDiveM2Step5TrialLatched := FALSE;
         CycleStateStr := CONCAT('AX8 - Fond confirme par ', BottomStopSource);
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;

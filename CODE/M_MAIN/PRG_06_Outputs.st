@@ -349,7 +349,9 @@ instSyncContactorFinal(
                      OR GVL_IHM.M1TreuilRetenue.Bypass.Safety
                      OR GVL_IHM.M2TreuilBenne.Bypass.Safety
                      OR GVL_IHM.M1TreuilRetenue.Bypass.Process
-                     OR GVL_IHM.M2TreuilBenne.Bypass.Process
+                     OR GVL_IHM.M2TreuilBenne.Bypass.Process,
+    DescentStep45Permit := PRG_04_Treuils_Benne.Data.AutoDiveM1Step4M2Step5Active,
+    SpeedStepTable  := _WinchSpeedStepTable
 );
 Data.ContactorMismatch          := instSyncContactorFinal.ContactorMismatch;
 Data.ContactorMismatchEscalated := instSyncContactorFinal.ContactorMismatchEscalated;

@@ -1725,6 +1725,17 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Mode essai : inhibe uniquement les controles procede autorises. NON persiste.</xhtml>
               </documentation>
             </variable>
+            <variable name="TglAutoDiveM2Step5Trial">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste.</xhtml>
+              </documentation>
+            </variable>
             <variable name="BtnForceStepApply">
               <type>
                 <BOOL />
