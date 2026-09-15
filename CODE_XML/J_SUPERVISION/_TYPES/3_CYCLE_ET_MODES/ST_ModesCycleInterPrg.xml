@@ -547,12 +547,12 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée du dernier cycle SEMI_AUTO achevé (figée à X13)</xhtml>
               </documentation>
             </variable>
-            <variable name="DrainTimeElapsed">
+            <variable name="DrainTimeRemaining">
               <type>
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps ecoule en AX13 ; remis a zero hors AX13</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps restant en AX13 ; remis a zero hors AX13</xhtml>
               </documentation>
             </variable>
             <variable name="CycleChecksInhibited">

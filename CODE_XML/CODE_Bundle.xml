@@ -5864,7 +5864,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <INT />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Temps ecoule en AX13, secondes entieres ; 0 hors AX13</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compat IHM : tag historique conserve ; porte le temps restant AX13, secondes entieres ; 0 hors AX13</xhtml>
               </documentation>
             </variable>
             <variable name="CycleChecksInhibited">
@@ -11331,12 +11331,12 @@ TRUE = Défaut sécurité actif</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée du dernier cycle SEMI_AUTO achevé (figée à X13)</xhtml>
               </documentation>
             </variable>
-            <variable name="DrainTimeElapsed">
+            <variable name="DrainTimeRemaining">
               <type>
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps ecoule en AX13 ; remis a zero hors AX13</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps restant en AX13 ; remis a zero hors AX13</xhtml>
               </documentation>
             </variable>
             <variable name="CycleChecksInhibited">
@@ -22097,12 +22097,12 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)</xhtml>
               </documentation>
             </variable>
-            <variable name="DrainTimeElapsed">
+            <variable name="DrainTimeRemaining">
               <type>
                 <TIME />
               </type>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Temps ecoule en AX13 ; zero hors AX13</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Temps restant en AX13 ; zero hors AX13</xhtml>
               </documentation>
             </variable>
             <variable name="AutoDiveM1Step4M2Step5Active">
@@ -23040,7 +23040,11 @@ END_IF;
 // Egouttage AX13 : TON gaté sur l'étape (remis à 0 hors AX13). Remplace l'ancien IN:=TRUE câblé
 // qui pouvait laisser Q déjà vrai à l'entrée en AX13 (temps d'égouttage non respecté).
 DrainingTimer(IN := (State = E_AutoCycleStep.AX13_DRAIN_PAUSE), PT := DrainTimeEff);
-DrainTimeElapsed := DrainingTimer.ET;
+IF (State = E_AutoCycleStep.AX13_DRAIN_PAUSE) AND NOT DrainingTimer.Q AND NOT SkipDrainEdge.Q THEN
+    DrainTimeRemaining := DrainTimeEff - DrainingTimer.ET;
+ELSE
+    DrainTimeRemaining := T#0s;
+END_IF;
 
 // ⏱️ Stabilisation alimentation Kobold (500ms en AX6 avant surveillance fond)
 KoboldStabTimer(IN := (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) AND DeadmanArmed AND JoystickPush AND KoboldImmersed, PT := CST_KoboldStabTime);
@@ -48570,7 +48574,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
     Data.SequenceState.CurrentCycleElapsed    := instCycleSemiAuto.CurrentCycleElapsed;
     Data.SequenceState.LastCycleDuration      := instCycleSemiAuto.LastCycleDuration;
-    Data.SequenceState.DrainTimeElapsed       := instCycleSemiAuto.DrainTimeElapsed;
+    Data.SequenceState.DrainTimeRemaining     := instCycleSemiAuto.DrainTimeRemaining;
     Data.SequenceState.CycleChecksInhibited   := instCycleSemiAuto.CycleChecksInhibited;
     Data.SequenceState.IgnoredCycleCheckId    := instCycleSemiAuto.IgnoredCycleCheckId;
     Data.SequenceState.ForceStepPrepared      := instCycleSemiAuto.ForceStepPrepared;
@@ -48666,7 +48670,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
     Data.SequenceState.CurrentCycleElapsed    := T#0s;
     Data.SequenceState.LastCycleDuration      := T#0s;
-    Data.SequenceState.DrainTimeElapsed       := T#0s;
+    Data.SequenceState.DrainTimeRemaining     := T#0s;
     Data.SequenceState.CycleChecksInhibited   := FALSE;
     Data.SequenceState.IgnoredCycleCheckId    := 0;
     Data.SequenceState.ForceStepPrepared      := FALSE;
@@ -48737,7 +48741,7 @@ ELSE
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
     Data.SequenceState.CurrentCycleElapsed     := T#0s;
     Data.SequenceState.LastCycleDuration       := T#0s;
-    Data.SequenceState.DrainTimeElapsed        := T#0s;
+    Data.SequenceState.DrainTimeRemaining      := T#0s;
     Data.SequenceState.CycleChecksInhibited    := FALSE;
     Data.SequenceState.IgnoredCycleCheckId     := 0;
     Data.SequenceState.ForceStepPrepared       := FALSE;
@@ -54643,7 +54647,7 @@ GVL_IHM.CycleSemiAuto.State.ResumeAfterFaultAvailable := PRG_03_Modes_Cycle.Data
 GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
-GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT(TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeElapsed) / DINT#1000);
+GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT((TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeRemaining) + DINT#999) / DINT#1000);
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 // Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
 // pas être présenté comme un contact Kobold.

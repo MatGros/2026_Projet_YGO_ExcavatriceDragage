@@ -614,7 +614,7 @@ GVL_IHM.CycleSemiAuto.State.ResumeAfterFaultAvailable := PRG_03_Modes_Cycle.Data
 GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
-GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT(TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeElapsed) / DINT#1000);
+GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT((TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeRemaining) + DINT#999) / DINT#1000);
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 // Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
 // pas être présenté comme un contact Kobold.

@@ -1090,8 +1090,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
     ASSERT_FALSE(FB.WinchM1Cmd.RunRequest, 'X9 : treuil M1 arrete (egouttage)');
     ASSERT_FALSE(FB.WinchM2Cmd.RunRequest, 'X9 : treuil M2 arrete (egouttage)');
 
-    (* Call 18 : egouttage 5s au joystick neutre -> AX14 sans geste cache *)
-    ADVANCE_TIME(5000000000);
+    (* Call 18 : egouttage 5s au joystick neutre ; verifier le decompte avant AX14 *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
        DeadmanArmed := FALSE, JoystickDeflected := FALSE, JoystickPush := FALSE, M1_SpeedValid := TRUE, M2_SpeedValid := TRUE, M1_ContactorsReleased := TRUE, M2_ContactorsReleased := TRUE, M1_BrakeApplied := TRUE, M2_BrakeApplied := TRUE, M1_SpeedStepApplied := 4, M2_SpeedStepApplied := 4, HeartbeatIhmOk := TRUE,
        StartCycle := FALSE, SelTarget := 3, SetDepthM := -10.0,
@@ -1104,6 +1103,11 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_Busy := FALSE, Translation_Done := TRUE,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
        SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.DrainTimeRemaining = T#5s, 'AX13 : consigne restante publiee au demarrage du TON');
+    ADVANCE_TIME(2000000000);
+    FB();
+    ASSERT_TRUE(FB.DrainTimeRemaining = T#3s, 'AX13 : temps restant decremente de 5s a 3s');
+    ADVANCE_TIME(3000000000);
 
     (* ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Call 19 : X10 observÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©, translation trÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©mie *)
     FB(Enable := TRUE, Reset := FALSE, PowerContactorEngaged := TRUE, Mode := E_Mode.SEMI_AUTO,
@@ -1118,6 +1122,7 @@ WinchSyncError := FALSE, WinchSyncDeltaM := 0.0,
        Translation_Busy := FALSE, Translation_Done := FALSE,
        Benne_Busy := FALSE, Benne_Done := TRUE, Benne_IsOpen := FALSE, Benne_IsClosed := TRUE, Benne_IsRoughlyClosed := TRUE,
        SampleCount := FB.SampleCount);
+    ASSERT_TRUE(FB.DrainTimeRemaining = T#0s, 'AX13 : temps restant remis a zero a expiration TON');
     ASSERT_TRUE(FB.CycleStep = E_AutoCycleStep.AX14_TRANSLATE_DUMP, 'X10 observe : translation vers tremie');
     ASSERT_TRUE(FB.TranslationCmd.ReqStart, 'X10 : translation vers tremie commandee');
 
