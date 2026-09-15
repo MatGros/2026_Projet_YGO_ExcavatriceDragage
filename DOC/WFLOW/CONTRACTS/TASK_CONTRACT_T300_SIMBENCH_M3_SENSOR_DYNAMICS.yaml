@@ -1,0 +1,131 @@
+contract:
+  task_id: T300
+  criticality: C3
+  strategy: patch
+  planning_deliverables:
+    plan: DOC/WFLOW/CONTRACTS/PLAN_T300_SIMBENCH_M3_SENSOR_DYNAMICS.md
+    audit: DOC/WFLOW/CONTRACTS/AUDIT_T300_TC_CI.md
+    phase_contracts: 'P0-P5 dans le plan : entrées, livrables, critères de sortie et revues R0-R5.'
+    measurement_baseline: 'Q01-Q14 du plan font foi pour les mesures ; propositions à figer à R2 avant ST.'
+    current_authority: 'Planification et audit statique uniquement ; code, TC et runner inchangés.'
+  objective: >
+    Reproduire en SimBench le franchissement intermittent des capteurs M3 et le
+    balancement amorti observé aux fins de course extrêmes, pour qualifier sans
+    risque la réaction réelle de la chaîne Translation.
+  acceptance:
+    - id: AC1
+      statement: "La simulation calcule une position mécanique M3 unique et chaque DI M3 est dérivée de cette position, de la géométrie du capteur et de sa polarité validées."
+      verified_by: "Revue du flux position mécanique -> FB_Sim_Translation -> HwSim -> HwIn et tests ST par capteur."
+    - id: AC2
+      statement: "Après le franchissement d un seuil extrême qualifié, la trajectoire peut osciller de manière amortie et faire publier la séquence capteur actif, perdu, repris selon les paramètres validés."
+      verified_by: "Tests ST temporisés avec position, état capteur et extinction progressive de l oscillation observables scan par scan."
+    - id: AC3
+      statement: "Les deux sens et les deux fins de course extrêmes sont couverts sans créer de mot capteur impossible hors de la dynamique réellement configurée."
+      verified_by: "Matrice CI Trémie/Maintenance x aller/retour x oscillation activée/désactivée."
+    - id: AC4
+      statement: "La perte transitoire est transmise sans filtre ni écriture parallèle à FB_Translation_PositionDecoder, FB_Safety_Translation et PRG_05 afin de tester leur réaction effective."
+      verified_by: "Test d intégration HwSim/HwIn/PRG_05 et inspection du bus de diagnostic M3."
+    - id: AC4bis
+      statement: "Les fronts montants et descendants produits par HwSim génèrent exclusivement les mémoires et états aval par la chaîne existante ; aucun état de position aval n est injecté directement."
+      verified_by: "Trace scan par scan HwSim.Translation -> HwIn.Translation -> FB_Translation_PositionDecoder -> PRG_05 et garde-fou automatique d absence d écriture parallèle."
+    - id: AC5
+      statement: "Hors simulation active, aucune E/S réelle, commande M3, interlock, protection ou sortie physique n est modifiée par le modèle."
+      verified_by: "Test de repli SimulationModeActive=FALSE et revue des limites de dépendances simulation."
+    - id: AC6
+      statement: "Le modèle nominal sans oscillation, les positions stationnaires et SimM3SensorsWordOverrideActive conservent leur comportement déterministe existant."
+      verified_by: "Tests de non-régression FB_Sim_Translation et FB_SimBench."
+    - id: AC7
+      statement: "Chaque paramètre distingue observation, estimation utilisateur et hypothèse synthétique. Environ 1 s décrit la stabilisation capteur ; environ 10000 kg et 1 à 2 m sont des estimations à confirmer. Les profils exploratoires sont explicitement non calibrés."
+      verified_by: "Plan technique approuvé avec source de mesure, unités, plage et cas d arrêt documentés."
+    - id: AC8
+      statement: "Le bundle est frais et la liaison G200 ainsi que les gates applicables sont verts."
+      verified_by: "generate_codesys_bundle.py, generate_codesys_diff_bundle.py, G200_check_linkage.py --report et run_all_gates.py."
+    - id: AC9
+      statement: "Pour chaque POU modifié sous CODE/M_MAIN, le nom de fichier reste identique au nom du POU et son suffixe correspond au langage ST déclaré dans le bundle."
+      verified_by: "G310_check_code_structure.py et inspection du POU généré."
+    - id: AC10
+      statement: "Le modèle compose entraînement, chariot/charge suspendue et capteurs ; les perturbations mécaniques affectent le déplacement pendant marche et arrêt et les retours vitesse restent cohérents avec la dynamique simulée."
+      verified_by: "Comparaison charge vide/chargée, accélération, décélération, freinage, inversion et bilan de décroissance sans excitation."
+    - id: AC11
+      statement: "Les variations aléatoires sont bornées, tirées à des événements définis et reproductibles à graine, paramètres, pas de temps et commandes identiques."
+      verified_by: "Rejeu exact de traces à graine fixe et campagne multi-graines avec conservation du premier scénario défaillant."
+    - id: AC12
+      statement: "Le profil de référence reproduit environ 1 s de stabilisation du signal ; durée de stabilisation, période mécanique et délai de réponse du capteur sont des paramètres distincts."
+      verified_by: "Mesure de la dernière transition après franchissement et comparaison au profil choisi ; essais de part et d autre des temporisations réelles du programme."
+    - id: AC13
+      statement: "Le pas d intégration est explicite, borné et testé ; aucune saturation aux seuils capteurs ne supprime artificiellement les recroisements et aucune énergie ne croît sans excitation."
+      verified_by: "Tests numériques avec subdivision du pas, arrêt prolongé et franchissements extrêmes ; butées physiques distinctes des seuils de détection."
+    - id: AC14
+      statement: "La boucle M3 lit les sorties finales post-interlock et réinjecte les retours uniquement via HwSim puis HwIn. Les stimuli boutons passent par une frontière opérateur explicite ; aucune sélection directe via GVL_Simulation dans le métier."
+      verified_by: "Cartographie des producteurs/consommateurs, garde-fou source et test ordre amont bloqué sans nouvelle excitation mécanique."
+    - id: AC15
+      statement: "Les revues R0-R2 valident 100 % des paramètres bloquants et des seuils Q01-Q14 avant implémentation ; 0 attendu modifié uniquement pour faire passer le code."
+      verified_by: "Manifestes exigences/tests versionnés, visas de review et journal motivé de changements d oracles."
+    - id: AC16
+      statement: "Le modèle distingue ordre, état électrique, effet mécanique et retour contact du frein ; chaque délai respecte Q03 et chaque PDO Q04."
+      verified_by: "Chronogrammes magnétisation/desserrage/serrage et cas de panne après identification technologie R0."
+    - id: AC17
+      statement: "Le lot de conception livre 6 contrats de phase, 14 critères Q mesurables, un audit sourcé et un échéancier avec dépendances ; aucune source CODE ni suite CI ne change."
+      verified_by: "Revue plan/audit, validation YAML et diff des chemins modifiés."
+  scope:
+    # Noms des nouvelles briques proposés ; interfaces à valider avant ST.
+    allowed:
+      - CODE/L_SIMULATION/FB_Sim_Translation.st
+      - CODE/L_SIMULATION/FB_Sim_TranslationDrive.st
+      - CODE/L_SIMULATION/FB_Sim_SuspendedLoad.st
+      - CODE/L_SIMULATION/FB_Sim_PositionSensor.st
+      - CODE/L_SIMULATION/FB_Sim_TranslationBrake.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - TOOLS/TEST_AUTO_CI/
+      - TOOLS/AGENT_WORKFLOW/scripts/
+      - DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
+      - DOC/AF/AF_Partie-13_Fonction_Simulation/FB_Sim_Translation_v1.0.md
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T300_SIMBENCH_M3_SENSOR_DYNAMICS.yaml
+      - DOC/WFLOW/CONTRACTS/PLAN_T300_SIMBENCH_M3_SENSOR_DYNAMICS.md
+      - DOC/WFLOW/CONTRACTS/AUDIT_T300_TC_CI.md
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/I_TRANSLATION/FB_Safety_Translation.st
+      - CODE/I_TRANSLATION/FB_TranslationOutputInterlock.st
+      - Modification de protections, mappings matériel, AU ou sorties physiques sans contrat distinct approuvé.
+  conservation:
+    must_survive:
+      - "PRG_02_Acquisition reste la frontière unique entre images réelle et simulée."
+      - "HwIn reste la seule image consommée par la logique métier."
+      - "Le modèle de simulation ne génère aucune commande de mouvement et ne contourne aucun interlock ni protection."
+      - "Le reset et l absence de redémarrage automatique restent inchangés."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+    - "Trace ou observation terrain anonymisée donnant les paramètres du modèle."
+    - "Matrice temporelle capteurs M3 aux extrêmes, dans les deux sens."
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: >
+    Distinguer géométrie, oscillation mécanique et intermittence électrique.
+    Une hypothèse synthétique est permise si explicitement marquée non calibrée ;
+    elle ne constitue pas une mesure terrain. Faire valider le plan avant ST.
+    Ne jamais filtrer le comportement pour rendre les protections vertes.
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: "Conception et audit statique livrés ; implémentation non commencée. Phases P0-P5 et critères Q01-Q14 référencés dans planning_deliverables."
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Plan technique et paramètres terrain requis avant toute écriture ST."
