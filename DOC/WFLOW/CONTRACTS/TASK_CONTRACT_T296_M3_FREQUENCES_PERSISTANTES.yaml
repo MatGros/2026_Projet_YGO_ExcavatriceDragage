@@ -1,0 +1,75 @@
+contract:
+  task_id: T296
+  criticality: C3
+  strategy: patch
+  objective: >
+    Permettre de configurer et conserver les consignes de fréquence M3 demandées
+    (50 Hz en régime normal et 15 Hz en zone PV), sans contourner les protections
+    ni modifier les autres zones de translation.
+  acceptance:
+    - id: AC1
+      statement: "La consigne nominale M3 est configurable, persistée et initialisée à la valeur demandée de 50 Hz."
+      verified_by: "Inspection des types, GVL de configuration et ponts de persistance ; redémarrage contrôlé en test."
+    - id: AC2
+      statement: "La consigne M3 de la zone PV est configurable, persistée et initialisée à 15 Hz ; la zone PV est identifiée par l’état M3 existant, sans nouvelle détection concurrente."
+      verified_by: "Test du changement de zone et inspection de l’état consommé par la commande M3."
+    - id: AC3
+      statement: "La sélection des consignes respecte limites, rampes, interlocks et arrêts déjà en place ; aucun mouvement ni redémarrage automatique n’est créé par la configuration persistante."
+      verified_by: "Tests de transitions PV/non-PV, sortie/arrêt, bornes configurables et redémarrage."
+    - id: AC4
+      statement: "Les zones M3 autres que PV gardent leur comportement existant et aucune consigne ne dépasse la limite configurée du variateur."
+      verified_by: "Tests ciblés des autres positions et contrôle de la fréquence commandée par zone."
+    - id: AC5
+      statement: "Bundle frais, liaison et gates applicables sont verts avant intégration CODESYS."
+      verified_by: "Bundle PLCopenXML, rapport G200 et résultats des gates applicables."
+    - id: AC6
+      statement: "Le nom de fichier est identique au nom de POU pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Contrôle du nom de fichier/POU."
+    - id: AC7
+      statement: "Le suffixe de fichier est identique au langage déclaré dans le bundle pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Contrôle du nom de fichier/POU et inspection du PLCopenXML généré."
+  scope:
+    allowed:
+      - CODE/I_TRANSLATION/
+      - CODE/M_MAIN/PRG_05_Translation.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE_XML/
+      - TOOLS/TEST_AUTO_CI/
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.1.md
+      - DOC/WFLOW/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Modification des protections variateur, AU, interlocks ou mapping matériel sans besoin distinct validé.
+      - Modification des vitesses des treuils M1/M2.
+  conservation:
+    must_survive:
+      - "La fréquence reste sous les plafonds configurés et transite par la chaîne de commande M3 existante."
+      - "Les rampes, interlocks de position et arrêts existants restent prioritaires."
+      - "Les réglages persistants ne déclenchent pas de commande de mouvement au démarrage."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "Matrice de test fréquence par zone M3 et vérification de persistance après redémarrage contrôlé."
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Si la signification opérationnelle de PV ou sa source d’état validée est
+    ambiguë, arrêter le choix de logique et demander une décision. Aucune
+    fréquence ne doit contourner limite, rampe ou interlock.
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

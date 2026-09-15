@@ -78,6 +78,7 @@
 | Heure | Tâche / essai | OK / NOK | Observation courte | Décision |
 |---|---|---|---|---|
 |  | T291-A : AUTO M1 P4 / M2 P5 |  |  |  |
+| 15/09 (simulation) | T291-A : descente M2 palier 5 | OK | Fonctionne ; amélioration légère, pas spectaculaire. | Pré-validé en simulation ; confirmer l’intérêt en essai machine. |
 |  | T289 : égouttage AX13 |  |  |  |
 |  | T288 phase 1 : discordance commande / retour |  |  |  |
 |  | T290 : AX11 M1+M2 P2 |  |  |  |

@@ -1,0 +1,79 @@
+contract:
+  task_id: T297
+  criticality: C4
+  strategy: patch
+  objective: >
+    Exposer l’étape courante du cycle semi-automatique sur l’IHM et faciliter
+    un saut d’essai vers AX7 via le mécanisme protégé existant, sans accès direct
+    de l’IHM à l’état interne du séquenceur ni contournement des préconditions.
+  acceptance:
+    - id: AC1
+      statement: "L’IHM affiche en lecture seule GVL_IHM.CycleSemiAuto.State.CycleStep et CycleStateStr, alimentés depuis le bus séquenceur."
+      verified_by: "Suivi d’une transition de cycle dans PRG_03, PRG_07 et la variable IHM en simulation."
+    - id: AC2
+      statement: "La vue de mise en service permet de sélectionner AX7_SEARCH_BOTTOM (cible 7) et d’émettre BtnForceStepApply par impulsion, sans écrire directement CycleStep/State."
+      verified_by: "Test IHM/CODESYS de sélection et impulsion ; revue des liaisons symboliques."
+    - id: AC3
+      statement: "Le forçage exige explicitement TglCommissioning actif, SEMI_AUTO, absence de défaut mémorisé, joystick neutre et mouvement arrêté ; le toggle de mise en service est réellement consommé comme garde automate."
+      verified_by: "Tests ciblés avec chaque précondition vraie puis fausse, plus revue du chemin FB_CycleSemiAuto."
+    - id: AC4
+      statement: "AX7 reste refusée tant que l’immersion Kobold n’est pas qualifiée ; refus/acceptation et motif sont visibles sur l’IHM."
+      verified_by: "Essais simulation immersion valide/invalide et observation ForceStepAccepted/Rejected/Result."
+    - id: AC5
+      statement: "Après préparation, les demandes actionneurs restent neutres et la reprise requiert le geste Start conscient prévu avec joystick neutre ; aucun départ moteur automatique ne suit le saut."
+      verified_by: "Trace de commandes pendant préparation, puis test reprise et absence de reprise automatique."
+    - id: AC6
+      statement: "La fonction de saut est réservée à la page/au contexte de mise en service et est validée en simulation avant tout essai machine."
+      verified_by: "Inspection de disponibilité IHM et protocole de validation simulation."
+    - id: AC7
+      statement: "Le nom de fichier est identique au nom de POU pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Contrôle du nom de fichier/POU."
+    - id: AC8
+      statement: "Le suffixe de fichier est identique au langage déclaré dans le bundle pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Inspection du PLCopenXML généré."
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/J_SUPERVISION/GVL_IHM.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st
+      - TOOLS/TEST_AUTO_CI/
+      - DOC/WFLOW/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Modification des interlocks machine pour autoriser AX7 sans immersion qualifiée.
+      - Toute écriture directe IHM dans l’état interne FB_CycleSemiAuto.State/CycleStep.
+  conservation:
+    must_survive:
+      - "Le forçage ne publie la nouvelle étape qu’après préparation transactionnelle à commandes neutres."
+      - "Les conditions existantes de mouvement arrêté, neutralité joystick, absence de défaut et qualification d’immersion AX7 restent impératives."
+      - "Le retour de mode normal exige toujours un geste conscient ; aucun mouvement ne redémarre automatiquement."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "Scénarios de refus par garde manquante et scénario AX7 accepté en simulation."
+  models_allowed:
+    - "omni/cx/gpt-5.6-terra"
+    - "omni/cc/claude-sonnet-5"
+  alert_duty: >
+    Le champ CfgCommissioningEnable est câblé à l’entrée du FB mais n’apparaît
+    pas consommé dans la garde actuelle du forçage. Vérifier et traiter ce défaut
+    avant d’exposer la commande ; ne pas assouplir les autres préconditions.
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

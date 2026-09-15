@@ -1,4 +1,67 @@
 tasks:
+- id: T297
+  parent_id: ''
+  statut: '⬜'
+  criticite: C4
+  domaine: CYCLE_AUTO / IHM_MISE_EN_SERVICE
+  agent: '—'
+  date: '2026-09-15T13:16:00+02:00'
+  avancement: 'Demandé le 2026-09-15 ; cadrage seulement, aucune modification automate ou IHM engagée.'
+  titre: 'Cycle SEMI_AUTO — afficher CycleStep et préparer un saut de test vers AX7 (G7)'
+  contexte: 'Demande utilisateur : exposer sur l’IHM l’étape courante du cycle (GVL_IHM.CycleSemiAuto.State.CycleStep) et faciliter le test par saut vers G7/AX7_SEARCH_BOTTOM. Le projet contient déjà un chemin ForceStepTarget/BtnForceStepApply avec préconditions, préparation à commandes neutres et reprise consciente ; l’état est déjà projeté par PRG_07. À auditer avant usage : CfgCommissioningEnable est câblé depuis l’IHM mais sa garde n’apparaît pas consommée dans FB_CycleSemiAuto.'
+  description: 'Rendre l’étape courante clairement visible sur l’IHM et permettre de sélectionner/appliquer la cible AX7 via le mécanisme existant de forçage d’étape, après correction/confirmation de ses gardes de mise en service. Ne jamais écrire directement CycleStep/State depuis l’IHM ni supprimer les préconditions de sécurité ; afficher l’acceptation/refus et son motif.'
+  objectifs:
+  - 'Afficher en lecture seule GVL_IHM.CycleSemiAuto.State.CycleStep et CycleStateStr, en cohérence avec PRG_03 → bus séquenceur → PRG_07.'
+  - 'Exposer une action IHM simple pour sélectionner la cible 7 = AX7_SEARCH_BOTTOM et déclencher BtnForceStepApply par impulsion/front, avec retour ForceStepPrepared/Accepted/Rejected/Result.'
+  - 'Auditer et corriger avant mise à disposition la garde CfgCommissioningEnable/TglCommissioning actuellement annoncée comme déverrouillage mais non consommée dans FB_CycleSemiAuto.'
+  - 'Le saut reste indisponible hors SEMI_AUTO, sans mise en service activée, avec défaut mémorisé, joystick non neutre ou mouvement non arrêté ; l’exigence d’immersion Kobold qualifiée pour AX7 reste active.'
+  - 'Après préparation, les commandes restent neutres et un nouveau geste Start conscient au joystick neutre reste requis ; aucun démarrage automatique n’est permis.'
+  - 'Le contrôle est réservé à l’IHM de mise en service/essai, non présenté comme commande opérateur de production ; la cible AX7 est vérifiée en simulation avant essai machine.'
+  - 'Tests couvrent affichage de l’étape, sélection AX7, garde activée/désactivée, cible refusée sans immersion, joystick/mouvement non neutre, préparation neutre, confirmation Start et absence de mouvement automatique.'
+  - 'Bundle PLCopenXML, G200 liaison, tests/gates applicables PASS ; nom fichier = POU et suffixe = langage bundle pour tout POU modifié sous CODE/M_MAIN.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T297_CYCLE_IHM_FORCE_AX7.yaml
+  bloque_par: []
+- id: T296
+  parent_id: ''
+  statut: '⬜'
+  criticite: C3
+  domaine: TRANSLATION_M3 / CONFIGURATION
+  agent: '—'
+  date: '2026-09-15T13:05:00+02:00'
+  avancement: 'Demandé le 2026-09-15 ; à planifier ultérieurement, aucune modification automate engagée.'
+  titre: 'M3 — fréquences configurables et persistantes : 50 Hz standard / 15 Hz en zone PV'
+  contexte: 'Demande utilisateur : utiliser 50 Hz en régime normal et limiter M3 à 15 Hz en zone PV, avec ces consignes conservées en configuration persistante pour une mise en œuvre ultérieure.'
+  description: 'Étudier puis intégrer deux consignes de fréquence M3 persistantes : 50 Hz hors zone PV et 15 Hz en zone PV. La zone PV doit être déterminée depuis l’état/les transitions M3 déjà validés ; les fréquences et leur persistance ne doivent pas contourner les limites, rampes, interlocks ou arrêts existants.'
+  objectifs:
+  - 'La consigne nominale M3 est configurable et persistante, valeur demandée 50 Hz.'
+  - 'La consigne M3 dans la zone PV est configurable et persistante, valeur demandée 15 Hz.'
+  - 'La sélection de zone PV s’appuie sur la source d’état M3 existante et validée ; aucune détection parallèle ambiguë n’est ajoutée.'
+  - 'Les changements de fréquence respectent les rampes et interlocks existants ; aucune commande de mouvement ni reprise automatique n’est créée.'
+  - 'Tests couvrent PV/non-PV, changement de zone en mouvement, limites de consigne, redémarrage/persistance et non-régression des autres zones M3.'
+  - 'Bundle PLCopenXML, G200 liaison et gates applicables PASS avant intégration CODESYS.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T296_M3_FREQUENCES_PERSISTANTES.yaml
+  bloque_par: []
+- id: T295
+  parent_id: ''
+  statut: '⬜'
+  criticite: C3
+  domaine: CYCLE_AUTO / BENNE
+  agent: '—'
+  date: '2026-09-15T13:05:00+02:00'
+  avancement: 'Demandé le 2026-09-15 ; diagnostic et solution à traiter. Aucun changement de timeout ou de code engagé.'
+  titre: 'AX15B — [BENNE] ErrorID:03 au timeout de la commande d’ouverture'
+  contexte: 'En AX15B_DUMP_OPEN (vidage au-dessus de la trémie, libellé IHM AX15 1/1), l’ouverture de benne peut finir en [BENNE] ErrorID:03 — Timeout commande déplacement benne. Le timeout FB_Bucket est configuré par CfgTimeoutDuration (défaut déclaré 60 s) et temporisé tant que Lifecycle.Busy est actif ; la cause terrain n’est pas encore établie.'
+  description: 'Tracer de bout en bout la commande d’ouverture AX15B, l’armement/maintien de FB_Bucket.Lifecycle.Busy, la progression mesurée vers la position ouverte, les autorisations M2 et le TON de timeout. Reproduire ou analyser une trace, identifier la cause racine puis proposer et valider une correction qui évite les timeouts injustifiés sans neutraliser la détection d’un mouvement réellement bloqué.'
+  objectifs:
+  - 'Cartographier AX15B → ReqOpen → FB_Bucket OpenReq/Lifecycle.Busy → M2_RunRequest et permis → position/fin d’ouverture → ErrorID:03 et signalisation IHM.'
+  - 'Établir quand le timeout démarre, s’arrête et se réarme, quelle valeur effective est utilisée, et si la commande ou la progression peut être interrompue pendant AX15B.'
+  - 'Fonder le diagnostic sur trace/snapshot ou reproduction SimBench, en distinguant lenteur réelle, perte de commande/permis, mesure/position incohérente et durée de timeout inadaptée.'
+  - 'Soumettre une correction minimale à validation humaine ; ne pas augmenter ni supprimer le timeout sans preuve et analyse du risque.'
+  - 'Après correction : l’ouverture nominale AX15B atteint la position ouverte sans faux ErrorID:03 ; un mouvement bloqué/absence de progression conserve une détection bornée et une réaction sûre.'
+  - 'Tester aussi ouverture hors AX15B et fermeture : aucun changement non voulu des autres séquences benne, réarmement conscient conservé, aucun redémarrage automatique.'
+  - 'Bundle PLCopenXML, G200 liaison, tests de non-régression et gates applicables PASS avant intégration CODESYS.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T295_AX15B_BUCKET_OPEN_TIMEOUT.yaml
+  bloque_par: []
 - id: T294
   parent_id: ''
   statut: '⬜'
@@ -100,13 +163,13 @@ tasks:
   bloque_par: []
 - id: T291-B
   parent_id: T291
-  statut: '⏳'
+  statut: '⏸️'
   criticite: C4
   domaine: SECURITE_LIMITES_HAUTES_TREUILS
-  agent: Codex
-  date: '2026-09-15T11:34:47+02:00'
+  agent: '—'
+  date: '2026-09-15T12:07:30+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
-  avancement: 'Cadrage uniquement. Audit Git independant : REGRESSION IDENTIFIEE confiance 95 %, interaction f36c4480 + 92601d2c ; mesure codeur et SimBench hors cause.'
+  avancement: '⏸️ Mise de cote demandee le 2026-09-15. Audit exhaustif conserve : regression logicielle identifiee avec confiance 95 %, introduite par f36c4480 puis amplifiee/revelee par 92601d2c ; codeurs et SimBench hors cause. Aucun correctif automate engage.'
   titre: 'T291-B — Autorite M1 en Both et filets hauts independants M2 corrige'
   contexte: 'Decision utilisateur 2026-09-15 : en M1 seul ou M1+M2 Both, le FDC logiciel nominal et la reduction de vitesse sont pilotes par M1. M2 est suiveur et recoit le meme profil de contacteurs. En M2 seul, la position M2 corrigee geometrie benne reste la reference. Le capteur TOP mecanique commun reste independant.'
   description: 'En Both, appliquer aux deux treuils le profil derive de M1 jusqu a l arret nominal H. Conserver M2 corrige comme surveillance independante : SafeStop a H+1 et PowerCutOff a H+2 sans temporisation. Le capteur TOP mecanique provoque le stop commun et son escalade si mouvement ou contacteurs persistent.'
@@ -123,6 +186,19 @@ tasks:
   - 'B1 ⬜ Autorite M1 et profil commun pour M1/Both ; M2 seul sur reference corrigee.'
   - 'B2 ⬜ SafeStop M2 corrige a H+1.'
   - 'B3 ⬜ PowerCutOff M2 corrige a H+2 + qualification capteur TOP commun.'
+  audit_detaille:
+    verdict: 'Regression logicielle identifiee avec confiance 95 % ; logique commune au reel et a la simulation.'
+    cause: 'En Both montee AX12, M1 entre seul dans la zone haute et passe P5 vers P1 ; M2 corrige reste P5. La barriere WinchBothFinalRequestsCoherent introduite par f36c4480 refuse P1/P5 et neutralise silencieusement les deux demandes physiques.'
+    historique: '225cb085 : ralentissement individuel preexistant ; f36c4480 : conflit latent introduit par egalite stricte Both ; 92601d2c : AX12 P4 vers P5, divergence P1/P5 rendue nettement visible ; T291-A et T292/T293 hors cause.'
+    preuve_snapshot: 'AX12 a M1=7.3671875 m, M2 brut=21.64087 m, offset actif=15 m, ecart corrige≈0.7263 m ; M1=P1, M2=P5, aucune alarme ni SafeStop.'
+    trou_de_test: 'Aucun test ne couvre Both en montee avec positions corrigees M1/M2 differentes et un seul axe dans la zone de ralentissement haute.'
+    orientation: 'Ne pas supprimer la barriere finale. Harmoniser en amont le profil Both sous autorite M1 ; conserver les protections independantes M2 corrige H+1/H+2 et le capteur TOP mecanique commun.'
+    incertitude_residuelle: 'Les 5 % restants exigent une trace directe de WinchBothFinalRequestsCoherent et des demandes finales apres neutralisation, ou un test cible equivalent.'
+    preuves:
+    - DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_AX12_Arret_737m_20260915.md
+    - DOC/WFLOW/REVIEWS/REVIEW_T291B_GIT_HISTORY_AX12_20260915.md
+    - TOOLS/PLC_CSV_SNAPSHOT/RESULTS/snapshot/Snapshot_Troubleshooting_20260915_111950.csv
+  condition_reprise: 'Reprise uniquement sur demande explicite, apres validation humaine du plan C4 et definition de la reference M2 corrigee independante en position benne intermediaire.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T291_B_AUTORITE_M1_LIMITES_HAUTES.yaml
   bloque_par: []
 - id: T290
@@ -151,15 +227,17 @@ tasks:
   criticite: C2
   domaine: CYCLE_AUTO / IHM
   agent: Codex
-  date: '2026-09-15T05:38:02+02:00'
-  avancement: 'Cadrage detaille en cours ; plan technique a challenger par un expert automaticien avant toute implementation.'
-  titre: Égouttage AX13 — champs IHM consigne et temps écoulé en secondes (INT)
-  contexte: 'Demande client : le champ IHM actuel de durée d égouttage (CfgDrainTime / ST_CycleCfg.DrainTime, type TIME, écriture T#5s) est compliqué à manipuler côté panel. Le client veut aussi voir le temps écoulé pendant l égouttage (pas seulement la fin de tempo). Décision utilisateur (Mathieu, 2026-09-14) : conserver le champ TIME existant tel quel dans l IHM, à titre informatif uniquement, et ajouter en parallèle deux nouvelles variables INT en secondes (consigne + temps écoulé) exposées à l IHM. La tempo réelle côté PLC reste une TON de type TIME ; conversion INT(s) <-> TIME aux deux bouts.'
-  description: 'Ajouter à FB_CycleSemiAuto (AX13) une consigne IHM en INT secondes (convertie en TIME, bornée comme l actuel CfgDrainTime) et un temps écoulé en INT secondes alimenté depuis DrainingTimer.ET converti, sans supprimer ni modifier le champ TIME existant (CfgDrainTime / ST_CycleCfg.DrainTime).'
+  date: '2026-09-15T15:40:00+02:00'
+  plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T289_DECOMPTE_RESTANT_20260915.md
+  avancement: 'Delta implémenté : décompte restant AX13 publié sous le tag historique DrainTimeElapsed_S (compatibilité visualisation), sans changement TON/PT/transition. Bundle frais, G200 et G499 PASS. Simulation pré-validée par l’utilisateur le 2026-09-15 ; runner FB_CycleSemiAuto à relancer après correction du test.'
+  titre: Égouttage AX13 — consigne IHM et décompte du temps restant en secondes (INT)
+  contexte: 'La consigne DrainTime_S en secondes et la mesure actuelle DrainTimeElapsed_S ont été implémentées et validées en essai utilisateur. Nouvelle décision utilisateur 2026-09-15 : l’IHM ne doit pas compter de 0 vers X ; elle doit afficher le temps restant, de X vers 0. La TON métier reste en TIME et garde son comportement. L’ancien champ TIME de configuration a été retiré ; DrainTime_S reste l’unique consigne persistante.'
+  description: 'Publier sous le tag IHM historique DrainTimeElapsed_S (conservé pour compatibilité visualisation) le temps restant AX13 (consigne effective→0), calculé à partir du PT effectif moins DrainingTimer.ET, borné à zéro et remis à zéro hors AX13/après Skip. Préserver la consigne INT persistante, la TON et la transition AX13→AX14.'
   objectifs:
   - 'Nouvelle variable IHM consigne égouttage en INT secondes, convertie en TIME en interne, bornée comme CfgDrainTime actuel, sans changer le comportement de la tempo réelle'
-  - 'Nouvelle variable IHM temps écoulé égouttage en INT secondes, alimentée depuis DrainingTimer.ET converti'
-  - 'Le champ TIME existant (CfgDrainTime / ST_CycleCfg.DrainTime) reste présent et fonctionnel, non supprimé'
+  - 'Le tag IHM existant DrainTimeElapsed_S garde son nom et affiche le temps restant, décroissant de la consigne effective vers 0 pendant AX13'
+  - 'La valeur publiée sous DrainTimeElapsed_S atteint 0 à la fin de la TON/au Skip et hors AX13 ; aucun temps résiduel périmé ne reste affiché'
+  - 'DrainTime_S reste l’unique consigne persistante ; aucun champ TIME de configuration parallèle n’est réintroduit'
   - 'Zéro régression sur le comportement AX13 (SkipDrainRequest, bypass, PT effectif)'
   - 'Gates G200 + palier C PASS'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T289_EGOUTTAGE_IHM_SECONDES.yaml
@@ -195,17 +273,21 @@ tasks:
   criticite: C3
   domaine: TRANSLATION_M3
   agent: Codex
-  date: '2026-09-13T23:55:00+02:00'
+  date: '2026-09-15T12:45:29+02:00'
   titre: Régression M3 sur butées — escalade graduée sans toucher FB_Brake
-  contexte: Arrêt directionnel immédiat conservé ; qualifie un mouvement réel persistant après arrêt.
-  description: 'Phases contrôlées. Contrat: TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml'
+  contexte: 'Arrêt directionnel immédiat conservé ; qualifie un mouvement réel persistant après arrêt. Retour terrain 2026-09-15 : récidive du défaut séquence/retour frein M3 aux arrivées Trémie et P1. Une trace réelle montre des commutations capteur 0↔1 rapides pendant environ 1 s ; chemin exact encore attendu.'
+  description: 'Phases contrôlées. Ajouter une phase de reproduction SimBench déterministe des fronts/rebonds capteurs et du retour frein avant toute correction de la séquence réelle. Contrat: TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T287_M3_BUTEES_ESCALADE_GRADUEE.yaml
   objectifs:
   - 'Qualifier le comportement actuel de FB_Brake sans modifier CODE/.'
   - 'Fournir un chronogramme de reference pour ouverture, fermeture et neutralisation.'
-  avancement: 'STANDBY - analyse exploratoire preparee, aucun code de production modifie.'
+  - 'Analyser la trace réelle : capteurs M3, fronts AtPosition, commande/sens, fréquence AC600, commande/retour frein et ErrorId.'
+  - 'Reproduire en SimBench, sous scénario activable, un épisode de rebond borné 500..1200 ms avec alternance proche de 300 ms et résultat déterministe/rejouable.'
+  - 'Modéliser séparément le délai du retour frein ; ne pas confondre rebond capteur et panne frein.'
+  avancement: 'EN DIAGNOSTIC - lacune SimBench confirmée ; cause exacte du défaut frein encore à prouver par la trace réelle. Aucun code de production modifié.'
   livrables:
   - 'DOC/WFLOW/AUDITS/AUDIT_FB_BRAKE_BASELINE_M3_20260914.md'
+  - 'DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_M3_FDC_Frein_RebondCapteurs_20260915.md'
   - 'TOOLS/TEST_AUTO_CI/RESULTS/_TROUBLESHOOTING/CODEX_FB_BRAKE_BASELINE/'
   constat: 'Le banc couvre t=0, 300 ms, 399 ms, 401 ms, arret et Enable=FALSE. Le runner STruCpp echoue actuellement en compilation C++ avant execution des assertions.'
   perimetre: 'Banc exploratoire, sans modification de FB_Brake. La fonctionnalite T287 M3 reste a reprendre apres decision explicite.'
@@ -5064,10 +5146,10 @@ tasks:
   criticite: C2
   domaine: IHM / BANDEAU
   agent: ''
-  date: '2026-09-01T00:00:00'
+  date: '2026-09-15T12:45:29+02:00'
   titre: 'Enrichir le bandeau IHM (maximum d''infos : défauts actifs, état AU, homing, blocage de mode)'
   contexte: 'Donner à l''opérateur le maximum d''infos utiles au bandeau : défauts actifs (codeur, synchro, benne, translation),
-    état AU/urgence, état homing, motif du blocage de mode — sans surcharger l''affichage.
+    état AU/urgence, état homing, motif du blocage de mode — sans surcharger l''affichage. Retour terrain 2026-09-15 : défaut thermique treuil avec SafeStop actif mais aucun message dans AlarmBanner. Analyse statique : le carrousel exclut explicitement les thermiques comme warnings alors que FB_Safety_Winch les inclut dans SafeStop et PowerCutOff. Autre manque confirmé : AnyFaultActive oublie les défauts mouvement et interlock final M3.
 
     '
   objectifs:
@@ -5076,6 +5158,9 @@ tasks:
   - Conserver motif du blocage + 6 sous-conditions (déjà exposés)
   - Chaque message rentre dans le champ (G406 PASS)
   - Bundle frais + G200 PASS + gates PASS + compilation 0 avertissement
+  - Tout défaut thermique moteur ou frein M1/M2 provoquant SafeStop ou PowerCutOff affiche immédiatement un message explicite et acquittable dans AlarmBanner
+  - AnyFaultActive inclut les défauts mouvement M3 et interlock final M3 qui utilisent le même acquittement global
+  avancement: 'Anomalies terrain ajoutées le 2026-09-15 ; cadrage uniquement, aucun correctif IHM appliqué.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T220_ENRICHIR_BANDEAU.yaml
   bloque_par: []
 - id: T222

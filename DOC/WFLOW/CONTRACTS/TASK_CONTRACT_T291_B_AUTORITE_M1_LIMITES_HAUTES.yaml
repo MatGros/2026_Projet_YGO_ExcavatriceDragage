@@ -78,9 +78,14 @@ contract:
     - "B1 : autorite M1 et profil commun en M1/Both ; M2 seul sur reference corrigee."
     - "B2 : SafeStop M2 corrige H+1."
     - "B3 : PowerCutOff M2 corrige H+2 et qualification separee du capteur TOP commun."
-status: PENDING
+status: PAUSED
 validation:
-  status: PENDING
+  status: PAUSED
   validated_by: ""
   validated_at: ""
-  notes: "Plan technique et matrice de securite a valider humainement avant implementation."
+  notes: >
+    Mise de cote demandee par l utilisateur le 2026-09-15. Audit detaille conserve dans
+    TROUBLESHOOTING_AX12_Arret_737m_20260915.md et REVIEW_T291B_GIT_HISTORY_AX12_20260915.md.
+    Regression identifiee a 95 % : f36c4480 introduit la neutralisation Both sur divergence,
+    92601d2c rend visible le cas P1/P5 en AX12 ; codeurs et SimBench hors cause. Aucun code avant
+    demande explicite, validation humaine C4 et resolution des blocking_decisions.

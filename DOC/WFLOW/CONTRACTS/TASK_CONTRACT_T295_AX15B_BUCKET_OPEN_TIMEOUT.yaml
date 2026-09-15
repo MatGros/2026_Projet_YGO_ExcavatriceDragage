@@ -1,0 +1,76 @@
+contract:
+  task_id: T295
+  criticality: C3
+  strategy: patch
+  objective: >
+    Éliminer les timeouts injustifiés de l’ouverture de benne en AX15B en
+    identifiant leur cause, tout en gardant une détection sûre d’un mouvement
+    réellement bloqué.
+  acceptance:
+    - id: AC1
+      statement: "La chaîne AX15B → commande d’ouverture → FB_Bucket → mouvement M2 → position d’ouverture → watchdog/ErrorID:03 est documentée avec ses gardes et son timing exacts."
+      verified_by: "Inspection du code source et schéma de séquence référencé dans le rapport de tâche."
+    - id: AC2
+      statement: "La cause racine est étayée par une trace/snapshot ou par une reproduction SimBench contrôlée, distinguant absence de commande, perte de permis, absence de progression et timeout trop court."
+      verified_by: "Trace ou protocole de reproduction avec signaux, temps et résultat observé."
+    - id: AC3
+      statement: "La correction minimale est présentée et validée humainement avant implémentation ; aucune augmentation/suppression du watchdog n’est faite sans preuve et analyse du risque."
+      verified_by: "Décision de conception consignée dans le contrat ou le suivi de tâche."
+    - id: AC4
+      statement: "Après correction, une ouverture nominale AX15B termine sans ErrorID:03, tandis qu’un mouvement bloqué ou sans progression reste détecté dans un délai borné avec la réaction existante sûre."
+      verified_by: "Tests unitaires/intégration et essai CODESYS documenté avant essai machine."
+    - id: AC5
+      statement: "Les séquences d’ouverture hors AX15B, de fermeture, les interlocks, le Reset sur front et l’absence de redémarrage automatique ne régressent pas."
+      verified_by: "Tests ciblés de non-régression, bundle frais, G200 et gates applicables PASS."
+    - id: AC6
+      statement: "Le nom de fichier est identique au nom de POU pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Contrôle du nom de fichier/POU."
+    - id: AC7
+      statement: "Le suffixe de fichier est identique au langage déclaré dans le bundle pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Contrôle du nom de fichier/POU et inspection du PLCopenXML généré."
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - TOOLS/TEST_AUTO_CI/
+      - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/WFLOW/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Suppression ou désactivation du watchdog FB_Bucket sans décision humaine explicite.
+      - Modification des temporisations de sécurité, des interlocks ou de la commande manuelle hors besoin démontré.
+  conservation:
+    must_survive:
+      - "Le watchdog de mouvement protège toujours contre une ouverture réellement bloquée ou sans progression."
+      - "Les limites géométriques, permis M2, interlocks, arrêt normal et réarmement conscient restent actifs."
+      - "Les autres usages FB_Bucket conservent leur comportement nominal."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "Rapport causal appuyé par traces ou scénario SimBench reproductible."
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Tout défaut de câblage logique, comportement contradictoire du retour de
+    position/permis, ou risque de prolongation d'un mouvement est remonté
+    immédiatement. Ne jamais corriger un timeout en supprimant la surveillance.
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

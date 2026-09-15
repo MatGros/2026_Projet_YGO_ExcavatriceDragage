@@ -23,6 +23,7 @@ def main() -> int:
         cycle = read(root, "CODE/G_CYCLE/FB_CycleSemiAuto.st")
         prg03 = read(root, "CODE/M_MAIN/PRG_03_Modes_Cycle.st")
         prg07 = read(root, "CODE/M_MAIN/PRG_07_Supervision.st")
+        test = read(root, "TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st")
     except FileNotFoundError as exc:
         print(f"G499 FAIL: fichier absent: {exc}")
         return 1
@@ -37,25 +38,34 @@ def main() -> int:
         errors.append("conversion secondes vers TIME absente")
     if "CfgDrainTime            := CycleDrainTimeEffective" not in prg03:
         errors.append("FB_CycleSemiAuto non alimente par la consigne convertie")
-    if "DrainTimeElapsed := DrainingTimer.ET;" not in cycle:
-        errors.append("temps ecoule non produit depuis DrainingTimer.ET")
+    if "DrainTimeRemaining := DrainTimeEff - DrainingTimer.ET;" not in cycle:
+        errors.append("temps restant non calcule comme PT - ET")
+    if "NOT DrainingTimer.Q AND NOT SkipDrainEdge.Q" not in cycle:
+        errors.append("temps restant non remis a zero quand le TON termine ou Skip est demande")
     if "IF DrainingTimer.Q OR SkipDrainEdge.Q THEN" not in cycle:
         errors.append("transition AX13 par TON ou Skip introuvable")
-    if "DrainTimeElapsed    : TIME;" not in public:
+    if "DrainTimeRemaining  : TIME;" not in public:
         errors.append("champ TIME absent du bus public")
-    if "DrainTimeElapsed_S     : INT;" not in state:
-        errors.append("champ INT secondes absent de l'etat IHM")
-    if prg03.count("Data.SequenceState.DrainTimeElapsed") < 3:
+    if "DrainTimeElapsed_S     : INT;" not in state or "tag historique conserve ; porte le temps restant" not in state:
+        errors.append("tag IHM historique DrainTimeElapsed_S absent ou sémantique restante non documentee")
+    if prg03.count("Data.SequenceState.DrainTimeRemaining") < 3:
         errors.append("mapping SEMI_AUTO et remises a zero hors mode incomplets")
-    if "TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeElapsed) / DINT#1000" not in prg07:
-        errors.append("conversion elapsed TIME vers secondes absente")
+    if "State.DrainTimeElapsed_S     := DINT_TO_INT((TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeRemaining) + DINT#999) / DINT#1000)" not in prg07:
+        errors.append("conversion TIME restant vers le tag IHM historique absente")
+    for assertion in (
+        "FB.DrainTimeRemaining = T#5s",
+        "FB.DrainTimeRemaining = T#3s",
+        "FB.DrainTimeRemaining = T#0s",
+    ):
+        if assertion not in test:
+            errors.append(f"assertion test AX13 absente: {assertion}")
 
     if errors:
         for error in errors:
             print(f"G499 FAIL: {error}")
         return 1
 
-    print("G499 PASS: DrainTime_S unique [1..3600], conversion TON et elapsed IHM relies")
+    print("G499 PASS: DrainTime_S unique [1..3600], TON intact et decompte restant IHM relie")
     return 0
 
 

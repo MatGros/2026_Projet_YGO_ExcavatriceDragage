@@ -34,6 +34,12 @@ contract:
     - id: AC6
       statement: "Le nom de fichier est égal au nom du POU (FB_Hmi_BannerFormatter) et son suffixe est égal au langage Structured Text généré dans le bundle."
       verified_by: "check_task_contract.py puis G310_check_code_structure.py sur bundle frais"
+    - id: AC7
+      statement: "Un thermique moteur ou frein M1/M2 qui provoque SafeStop ou PowerCutOff produit un message explicite dans AlarmBanner ; il n'est jamais filtré comme warning non bloquant."
+      verified_by: "tests CI FB_Hmi_BannerFormatter pour M1/M2 moteur/frein, avec SafeStop et PowerCutOff"
+    - id: AC8
+      statement: "AnyFaultActive vaut TRUE pour un défaut mouvement M3 ou un défaut de la barrière finale M3 nécessitant l'acquittement global."
+      verified_by: "tests ciblés PRG_07 et vérification du périmètre FaultMachineReset_IHM"
 
   scope:
     allowed:
@@ -80,4 +86,6 @@ validation:
   notes: >
     Lot d'enrichissement (Phase 3). Dépend des champs déjà ajoutés (motif + 6
     sous-conditions). Le choix des infos à afficher et leur priorité doit être
-    validé par l'utilisateur (le max d'infos sans illisibilité).
+    validé par l'utilisateur (le max d'infos sans illisibilité). Retour terrain
+    2026-09-15 : thermique treuil avec SafeStop sans AlarmBanner et défauts M3
+    acquittables absents de AnyFaultActive.

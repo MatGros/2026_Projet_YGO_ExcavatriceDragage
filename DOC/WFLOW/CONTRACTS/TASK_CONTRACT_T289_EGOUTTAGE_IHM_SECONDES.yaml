@@ -3,86 +3,89 @@ contract:
   criticality: C2
   strategy: patch
   objective: >
-    Ajouter des champs IHM en secondes (INT) pour la consigne et le temps écoulé
-    de la temporisation d'égouttage AX13, en supprimant l'ancien champ de
-    configuration TIME devenu ambigu, sans modifier le comportement réel du TON.
+    Conserver la consigne d’égouttage AX13 en secondes et remplacer l’affichage
+    montant 0→X par le temps restant décroissant de la consigne effective vers 0,
+    sans modifier la temporisation métier.
   acceptance:
     - id: AC1
-      statement: "DrainTime_S est l'unique autorite de consigne, borne dans [1..3600] s et converti explicitement en TIME sans overflow."
-      verified_by: "revue de code + compilation cible + tests -1, 0, 1, 5, 3599, 3600, 3601 et 32767"
+      statement: "DrainTime_S est l’unique consigne IHM persistante, bornée à 1..3600 s et convertie en TIME sans dépassement silencieux."
+      verified_by: "Revue de code et tests de bornes -1, 0, 1, 5, 3599, 3600, 3601 et 32767."
     - id: AC2
-      statement: "DrainTimeElapsed_S existe dans State, progresse par secondes entieres depuis DrainingTimer.ET pendant AX13 et revient a 0 hors AX13 et apres Skip."
-      verified_by: "test cycle auto : progression monotone, transition Q, Skip, sortie puis reentree AX13 et changement de mode"
+      statement: "Le tag IHM historique DrainTimeElapsed_S reste inchangé pour préserver la visualisation, mais affiche le temps restant : consigne effective vers 0 pendant AX13."
+      verified_by: "Tests AX13 avec consignes 1 s, 5 s et valeur modifiée à la volée ; observation des valeurs entières affichées."
     - id: AC3
-      statement: "L'ancien champ ST_CycleCfg.DrainTime est supprime ; aucun faux parametre TIME modifiable ne subsiste dans Cfg."
-      verified_by: "diff cible + recherche globale des lectures GVL_IHM.CycleSemiAuto.Cfg.DrainTime"
+      statement: "La valeur restante publiée sous DrainTimeElapsed_S vaut 0 à la fin de la TON, après Skip et hors AX13 ; elle ne devient jamais négative ni périmée."
+      verified_by: "Tests TON.Q, Skip avant Q, sortie/réentrée AX13 et changement de mode."
     - id: AC4
-      statement: "Le comportement de l'étape AX13 (SkipDrainRequest/bypass, PT effectif de DrainingTimer, transition AX13->AX14) est strictement inchangé."
-      verified_by: "test de non-régression AX13 : bypass immédiat, tempo par défaut, tempo configurée"
+      statement: "Le champ TIME de configuration retiré ne réapparaît pas ; DrainTime_S reste l’unique autorité et le tag IHM DrainTimeElapsed_S est conservé sans renommage pour la mesure restante."
+      verified_by: "Inspection GVL_IHM, structures Cfg/State et compilation de la visualisation sans remappage du tag."
     - id: AC5
-      statement: "La conversion INT(s) <-> TIME ne produit aucun depassement silencieux ; la consigne est bornee a 1..3600 s et elapsed a 0..3600 s."
-      verified_by: "test des bornes et compilation de DINT_TO_TIME/TIME_TO_DINT sur la cible"
-    - id: AC7
-      statement: "La nouvelle consigne persistante DrainTime_S est initialisee a 5 s ; la rupture du tag IHM DrainTime est explicite et controlee."
-      verified_by: "inspection ST_CycleCfg/GVL_PERSISTENT + compilation cible + remplacement du tag IHM"
-    - id: AC8
-      statement: "Critere structurel CODE/MAIN : pour chaque fichier modifie, le nom de fichier est identique au nom de POU ; aucun suffixe de langage _CFC/_LD n'est ajoute et le suffixe reste identique au langage genere dans le bundle (ST pur)."
-      verified_by: "revue des noms PRG_03_Modes_Cycle.st / PRG_07_Supervision.st et inspection PLCopenXML du bundle"
+      statement: "Le décompte utilise la durée effective de la TON moins son ET, avec arrondi entier supérieur pendant le décompte puis 0 dès Q/Skip ; la TON et la transition AX13→AX14 restent inchangées."
+      verified_by: "Tests de secondes restantes, revue du calcul et non-régression AX13 (Q, Skip, PT effectif)."
     - id: AC6
-      statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste sans erreur."
-      verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report"
+      statement: "La conversion INT(s)↔TIME ne dépasse pas les bornes ; consigne 1..3600 s et valeur restante 0..3600 s."
+      verified_by: "Tests des bornes et compilation des conversions CODESYS."
+    - id: AC7
+      statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur ne comporte aucune erreur."
+      verified_by: "Bundle frais, rapport G200 et gates applicables."
+    - id: AC8
+      statement: "Le nom de fichier est identique au nom de POU pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Contrôle du nom de fichier/POU."
+    - id: AC9
+      statement: "Le suffixe de fichier est identique au langage déclaré dans le bundle pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Inspection du PLCopenXML généré."
   scope:
     allowed:
       - CODE/G_CYCLE/FB_CycleSemiAuto.st
-      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
       - CODE/J_SUPERVISION/_BRIDGES/FB_CfgPersistBridge_CycleCfg.st
       - CODE/GVL_PERSISTENT.st
       - CODE/M_MAIN/PRG_03_Modes_Cycle.st
       - CODE/M_MAIN/PRG_07_Supervision.st
       - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
-      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
       - TOOLS/AGENT_WORKFLOW/scripts/G499_check_t289_drain_time_seconds.py
       - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
       - CODE_XML/CODE_Bundle.xml
-      - DOC/WFLOW/TASKS.yaml
-      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T289_EGOUTTAGE_IHM_SECONDES.yaml
       - DOC/AF/AF_Partie-04_Mode_SemiAuto_Sequenceur_v2.3.md
+      - DOC/WFLOW/
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
-      - CODE/FB_Safety_Winch.st
       - CODE/B_AU_SECURITE/*
+      - Modification de la TON, de son PT métier ou de la transition AX13→AX14 hors nécessité démontrée et validée.
   conservation:
     must_survive:
-      - "Le bypass SkipDrainRequest et le comportement de la TON DrainingTimer."
-      - "La borne défaut interne (DrainingTime = T#5s) quand la consigne configurée est <= 0."
-    dropped_on_purpose: []
+      - "DrainTime_S reste l’unique consigne persistante, défaut 5 s, bornée 1..3600 s."
+      - "DrainingTimer reste une TON TIME, armée uniquement en AX13 avec son PT effectif et son Skip existant."
+      - "La mesure retourne à zéro hors AX13 et ne peut pas afficher une valeur négative."
+    dropped_on_purpose:
+      - "La sémantique publiée sous DrainTimeElapsed_S passe de temps écoulé (0→X) à temps restant (X→0) ; le nom du tag IHM reste inchangé pour préserver les liaisons graphiques."
   evidence_required:
     - check_linkage
     - run_all_gates
     - bundle
+    - "Tests de décompte normal, fin TON, Skip, sortie d’étape et réglage à la volée."
   models_allowed:
     - "omni/cx/gpt-5.6-terra"
     - "omni/cc/claude-sonnet-5"
   alert_duty: >
-    Toute ambiguïté sur le nommage des nouvelles variables IHM (consigne/écoulé
-    en secondes) ou sur la borne max représentable en INT doit être signalée
-    avant toute implémentation.
+    Si le décompte ne peut pas refléter le PT réellement utilisé par la TON,
+    arrêter et remonter l’écart avant code. Préserver la conversion et le
+    comportement déjà validés de la consigne persistante.
 status: PENDING
 execution:
   executed_by: ""
   completed_at: ""
   status: PENDING
   summary: >
-    Tâche créée pour cadrer l'ajout de champs IHM en secondes (consigne + temps
-    écoulé) pour la temporisation d'égouttage AX13, en conservant le champ TIME
-    TIME devenu sans role de configuration.
+    Delta de reprise : conserver le nom IHM DrainTimeElapsed_S pour compatibilité
+    et y publier le temps restant décroissant de la consigne effective jusqu’à zéro.
   evidence_submitted: []
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
   notes: >
-    Validation humaine et choix final du nommage des nouvelles variables requis
-    avant implémentation.
+    La simulation du décompte a été pré-validée par l’utilisateur le 2026-09-15.
+    La validation machine reste à faire ; le test automatisé corrigé est à relancer.

@@ -25,6 +25,12 @@ contract:
     - id: AC6
       statement: "Le nom de chaque fichier POU reste identique au nom du POU, et son suffixe correspond au langage généré dans le bundle."
       verified_by: "Gates structurels et bundle PLCopenXML frais."
+    - id: AC7
+      statement: "Un scénario SimBench désactivable reproduit de façon déterministe les rebonds des capteurs M3 aux franchissements Trémie/P1, sur une fenêtre bornée 500..1200 ms avec alternance nominale proche de 300 ms, puis publie un état final stable."
+      verified_by: "Tests scan-par-scan FB_Sim_Translation/FB_SimBench avec graine ou numéro d'épisode fixe."
+    - id: AC8
+      statement: "Le délai du retour frein M3 est simulé séparément du rebond capteur ; le mode nominal et l'override manuel restent inchangés quand le scénario est désactivé."
+      verified_by: "Tests nominal OFF, rebond seul, délai frein seul et combinaison."
   scope:
     allowed:
       - CODE/I_TRANSLATION/FB_Safety_Translation.st
@@ -32,6 +38,11 @@ contract:
       - CODE/I_TRANSLATION/_TYPES/
       - CODE/M_MAIN/PRG_05_Translation.st
       - CODE/M_MAIN/PRG_06_Outputs.st
+      - CODE/L_SIMULATION/FB_Sim_Translation.st
+      - CODE/L_SIMULATION/FB_SimBench.st
+      - CODE/L_SIMULATION/GVL_Simulation.st
+      - CODE/M_MAIN/PRG_02_Acquisition.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/
       - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translation.st
       - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_safety_translation.st
       - TOOLS/TEST_AUTO_CI/RESULTS/I_TRANSLATION/tests/test_fb_translationoutputinterlock.st
@@ -60,6 +71,7 @@ contract:
     - "G200 --report et palier de gates adapté, bundle frais après modification CODE/."
     - "Diff Git attestant l'absence de modification de FB_Brake."
     - "Recette CODESYS/terrain humaine : fréquence réelle, retour frein et arrêt aux deux extrémités."
+    - "Trace réelle corrélant capteurs, fronts AtPosition, fréquence, commande/retour frein et ErrorId."
   models_allowed:
     - "Codex"
   alert_duty: >
@@ -73,11 +85,12 @@ execution:
   completed_at: ""
   status: IN_PROGRESS
   summary: >
-    Phase 0 : compléter l'AF v2.4 (brouillon non actif) avec les oracles et inventorier les barrières des deux extrémités.
-    Phase 1 : préparer les tests CI ciblés, sans les exécuter sur le PLC actuel, ni toucher au code ou à FB_Brake.
-    Phase 2 : visa humain des tests et du comportement cible.
-    Phase 3 : modifier uniquement la logique M3 autorisée, puis valider CI, G200 et gates.
-    Phase 4 : recette humaine CODESYS/terrain et décision séparée sur un éventuel besoin FB_Brake.
+    Phase 0 : analyser la trace réelle et compléter l'AF avec les oracles des deux extrémités.
+    Phase 1 : préparer les tests CI ciblés, sans toucher au code ou à FB_Brake.
+    Phase 2 : implémenter uniquement le scénario SimBench déterministe, puis reproduire le défaut.
+    Phase 3 : visa humain du chronogramme et du comportement cible.
+    Phase 4 : modifier uniquement la logique M3 autorisée, puis valider CI, G200 et gates.
+    Phase 5 : recette humaine CODESYS/terrain et décision séparée sur un éventuel besoin FB_Brake.
   evidence_submitted: []
 validation:
   status: PENDING

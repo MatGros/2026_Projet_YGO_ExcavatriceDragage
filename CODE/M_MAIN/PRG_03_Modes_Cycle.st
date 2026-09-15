@@ -341,7 +341,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
     Data.SequenceState.CurrentCycleElapsed    := instCycleSemiAuto.CurrentCycleElapsed;
     Data.SequenceState.LastCycleDuration      := instCycleSemiAuto.LastCycleDuration;
-    Data.SequenceState.DrainTimeElapsed       := instCycleSemiAuto.DrainTimeElapsed;
+    Data.SequenceState.DrainTimeRemaining     := instCycleSemiAuto.DrainTimeRemaining;
     Data.SequenceState.CycleChecksInhibited   := instCycleSemiAuto.CycleChecksInhibited;
     Data.SequenceState.IgnoredCycleCheckId    := instCycleSemiAuto.IgnoredCycleCheckId;
     Data.SequenceState.ForceStepPrepared      := instCycleSemiAuto.ForceStepPrepared;
@@ -437,7 +437,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
     Data.SequenceState.CurrentCycleElapsed    := T#0s;
     Data.SequenceState.LastCycleDuration      := T#0s;
-    Data.SequenceState.DrainTimeElapsed       := T#0s;
+    Data.SequenceState.DrainTimeRemaining     := T#0s;
     Data.SequenceState.CycleChecksInhibited   := FALSE;
     Data.SequenceState.IgnoredCycleCheckId    := 0;
     Data.SequenceState.ForceStepPrepared      := FALSE;
@@ -508,7 +508,7 @@ ELSE
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
     Data.SequenceState.CurrentCycleElapsed     := T#0s;
     Data.SequenceState.LastCycleDuration       := T#0s;
-    Data.SequenceState.DrainTimeElapsed        := T#0s;
+    Data.SequenceState.DrainTimeRemaining      := T#0s;
     Data.SequenceState.CycleChecksInhibited    := FALSE;
     Data.SequenceState.IgnoredCycleCheckId     := 0;
     Data.SequenceState.ForceStepPrepared       := FALSE;
