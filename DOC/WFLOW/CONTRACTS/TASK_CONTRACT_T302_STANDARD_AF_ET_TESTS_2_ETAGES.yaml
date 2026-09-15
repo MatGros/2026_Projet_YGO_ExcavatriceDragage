@@ -1,0 +1,60 @@
+contract:
+  task_id: T302
+  criticality: C1
+  strategy: patch
+  objective: >
+    Formaliser et standardiser la nouvelle méthodologie de conception des analyses fonctionnelles
+    et de validation par tests en 2 étages (Étage 1 : Fonctions Principales boîte noire / Étage 2 :
+    Dynamique simulée via SimBench injecté sur HwSim), éprouvée sur l'AF11 v2.4 Translation M3.
+  acceptance:
+    - id: AC1
+      statement: "Le guide méthodologique GUIDE_METHODOLOGIE_AF_ET_TESTS_2_ETAGES_v1.0.md est rédigé et définit formellement la séparation entre Étage 1 (Non-régression statique) et Étage 2 (SIL SimBench)."
+      verified_by: "Revue du document DOC/STDS/GUIDES/GUIDE_METHODOLOGIE_AF_ET_TESTS_2_ETAGES_v1.0.md."
+    - id: AC2
+      statement: "L'Analyse Fonctionnelle AF_Partie-11_Fonction_Translation_v2.4.md applique rigoureusement ce standard en 2 étages sans mention obsolète de brouillon."
+      verified_by: "Revue de DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md."
+    - id: AC3
+      statement: "Le principe d'injection de simulation aux frontières matérielles (HwSim -> PRG_02_Acquisition) est formellement acté comme règle pour préserver la pureté du code métier."
+      verified_by: "Revue des sections 2 et 4 du guide méthodologique."
+    - id: AC4
+      statement: "Le catalogue TASKS.yaml intègre la tâche T302 documentée."
+      verified_by: "Vérification de DOC/WFLOW/TASKS.yaml."
+  scope:
+    allowed:
+      - DOC/STDS/GUIDES/GUIDE_METHODOLOGIE_AF_ET_TESTS_2_ETAGES_v1.0.md
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T302_STANDARD_AF_ET_TESTS_2_ETAGES.yaml
+      - DOC/WFLOW/TASKS.yaml
+    forbidden:
+      - Modification directe du code source métier hors spécification.
+  conservation:
+    must_survive:
+      - "La compatibilité ascendante avec les exigences de sécurité machine ISO 13849."
+      - "L'intégrité de la boucle fermée SIL SimBench existante."
+    dropped_on_purpose:
+      - "Suppression des micro-tests de variables privées internes dans les fiches AF."
+  evidence_required:
+    - "Guide méthodologique versionné."
+    - "AF11 v2.4 conforme."
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Veiller à ce que les agents futurs n'introduisent plus de micro-tests unitaires
+    portant sur des variables locales de FB, mais s'en tiennent aux interfaces de POU.
+status: COMPLETED
+execution:
+  executed_by: "Antigravity"
+  completed_at: "2026-09-16T01:35:00+02:00"
+  status: COMPLETED
+  summary: "Guide méthodologique (flat & fluide) rédigé et appliqué avec succès sur AF11 v2.4 avec contre-expertise Ollama."
+  evidence_submitted:
+    - "DOC/STDS/GUIDES/GUIDE_METHODOLOGIE_AF_ET_TESTS_2_ETAGES_v1.0.md"
+    - "DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md"
+    - "DOC/WFLOW/AUDITS/RFC_METHODOLOGIE_2_ETAGES_ET_CHALLENGE_EXPERTS.md"
+    - "DOC/WFLOW/AUDITS/AVIS_EXPERT_OLLAMA_METHODOLOGIE_2_ETAGES.md"
+validation:
+  status: VALIDATED
+  validated_by: "Humain (Orchestrateur)"
+  validated_at: "2026-09-16T01:35:00+02:00"
+  notes: "Accord humain sur la démarche flat, fluide et pragmatique sans blocage bureaucratique."
