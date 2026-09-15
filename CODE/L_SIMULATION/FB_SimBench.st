@@ -2,16 +2,16 @@
    🧪 FB_SimBench — Enveloppe unique de simulation pour banc d'essai
    ───────────────────────────────────────────────────────────────
    📄 Doc métier : DOC/AF/AF_Partie-13_Fonction_Simulation_v2.5.md
-   
+
    🎯 Rôle : Compose les 4 blocs de modèle de simulation existants :
       - FB_Sim_Encoder (instM1, instM2)
       - FB_Sim_Translation (instTranslation)
       - FB_Sim_Joystick (instJoystick)
       - FB_Sim_Safety (instSafety)
-   
+
    🔒 Brique réduite : 0 lecture de variable globale en interne.
       Toutes les entrées (commandes, stimuli, HwReal) sont passées en paramètres.
-   
+
    🔴 RÈGLES SÉCURITÉ ET POLARITÉ :
       - Modèle frein M1/M2/M3 : M1_BrakeIsOpen_DI := M1_BrakeCmd (1 = OUVERT).
         Ne JAMAIS faire NOT BrakeCmd !
@@ -90,7 +90,7 @@ VAR_INPUT
     SimKoboldAutoModeActive    : BOOL := FALSE;   (* --> [CFG] Kobold positionnel automatique armé *)
     SimKoboldAutoDepth_M       : REAL := -15.0;   (* --> [CFG] Fond Kobold signé *)
     SimKoboldPowerUpTime       : TIME := T#50ms;  (* --> [CFG] Temps de réponse sonde *)
-    SimKoboldCoast_M           : REAL := 1.0;     (* --> [CFG] Roulis déterministe plongée Kobold *)
+    SimKoboldCoast_M           : REAL := 1.0;     (* --> [CFG] Compatibilité interface ; dynamique historique utilisée *)
     KoboldMeasureEnable        : BOOL := FALSE;   (* --> [CMD] Alimentation Kobold effectivement arbitrée *)
     M1_CablePos_M              : REAL := 0.0;     (* --> [HW] Position M1 signée, référence homing effective *)
     BtnEmergencyStop           : BOOL := FALSE;    (* --> [TST] Simulation appui coup-de-poing AU *)
@@ -120,6 +120,8 @@ END_VAR
 
 VAR CONSTANT
     CST_M3FullTravelTimeS       : REAL := 8.0; // Temps de Trémie à Maintenance à 100 %, modèle banc uniquement
+    CST_M1EncoderInitialRaw     : UDINT := 1000000; // Comptage absolu plausible du device M1 simulé
+    CST_M2EncoderInitialRaw     : UDINT := 1100000; // Comptage absolu propre au device M2 simulé
 END_VAR
 
 VAR
@@ -149,20 +151,14 @@ VAR
     M2_RelayRevPrev            : BOOL;   (* . [LOC] Mémoire relais Rev N-1 *)
     RandomSeed                 : UDINT := 123456789; (* . [LOC] Générateur LCG pseudo-aléatoire *)
     M2_EffectiveCoastM         : REAL := 0.35;       (* . [LOC] Distance de roulis M2 courante *)
-    M1_EffectiveCoastM         : REAL := 0.35;       (* . [LOC] Distance de roulis M1 courante *)
-    M2CoupledDescentActive     : BOOL;                (* . [LOC] Conditions effectives du modèle positionnel *)
-    M2CoupledDescentPrevious   : BOOL;                (* . [LOC] Mémoire armement trajectoire M2 *)
-    M1CoupledDescentStartRaw   : UDINT;               (* . [LOC] Origine brute M1 de la trajectoire courante *)
-    M2CoupledDescentStartRaw   : UDINT;               (* . [LOC] Origine brute M2 propre à son référencement *)
-    M1CoupledDeltaRaw          : DINT;                (* . [LOC] Variation signée M1 depuis le début de descente *)
-    M2CoupledDeltaRaw          : DINT;                (* . [LOC] Variation signée M2 calculée depuis M1 *)
-    M2CoupledDeltaMagnitudeRaw : UDINT;               (* . [LOC] Valeur absolue du delta M2 pour bouclage UDINT *)
-    M2CoupledTargetRaw         : UDINT;               (* . [LOC] Position brute M2 dérivée, modulo 2^32 *)
+    M2CoupledDescentActive     : BOOL;                (* . [LOC] Ralentissement M2 actif en descente BOTH *)
+    M2EffectiveSpeedScaleFactor : REAL;               (* . [LOC] Facteur vitesse du producteur unique M2 *)
     KoboldMeasureEnablePrevious : BOOL;               (* . [LOC] Front alimentation Kobold *)
     KoboldAutoEpisodeActive    : BOOL;                (* . [LOC] Mode auto figé pour une plongée *)
     KoboldAutoDepthEpisode_M   : REAL;                (* . [LOC] Fond figé durant une plongée *)
     KoboldPowerUpEpisodeTime   : TIME;                (* . [LOC] Délai sonde figé durant une plongée *)
     instKoboldPowerUpTimer     : TON;                 (* . [LOC] Réponse sonde après alimentation *)
+    SimBenchWasEnabled         : BOOL;                (* . [LOC] Détection du premier scan de simulation *)
 END_VAR
 
 // === IMPLEMENTATION ===
@@ -170,10 +166,10 @@ END_VAR
 {region "§1 Repli image reelle banc desactive"}
 IF NOT Enable THEN
     // 🔌 Banc désactivé : repli sur l'image réelle, aucune simulation en cours
-    M2CoupledDescentPrevious := FALSE;
     KoboldMeasureEnablePrevious := FALSE;
     KoboldAutoEpisodeActive := FALSE;
     instKoboldPowerUpTimer(IN := FALSE);
+    SimBenchWasEnabled := FALSE;
     Ready       := FALSE;
     Busy        := FALSE;
     Done        := FALSE;
@@ -185,6 +181,19 @@ IF NOT Enable THEN
 END_IF;
 
 // ▶️ Banc actif : le cycle de simulation démarre pour ce scan
+// Un codeur absolu réel possède déjà un comptage avant le homing. On initialise
+// uniquement une mémoire vierge au premier scan ; une valeur persistante existante
+// n'est jamais remplacée. Le homing conserve ensuite sa transaction normale.
+IF NOT SimBenchWasEnabled THEN
+    IF RawPosM1 = 0 THEN
+        RawPosM1 := CST_M1EncoderInitialRaw;
+    END_IF;
+    IF RawPosM2 = 0 THEN
+        RawPosM2 := CST_M2EncoderInitialRaw;
+    END_IF;
+END_IF;
+SimBenchWasEnabled := TRUE;
+
 Ready := TRUE;
 Busy  := TRUE;
 Done  := FALSE;
@@ -212,13 +221,6 @@ IF KoboldMeasureEnable AND NOT KoboldMeasureEnablePrevious THEN
 END_IF;
 KoboldMeasureEnablePrevious := KoboldMeasureEnable;
 
-IF KoboldAutoEpisodeActive THEN
-    M1_EffectiveCoastM := SimKoboldCoast_M;
-    M2_EffectiveCoastM := SimKoboldCoast_M;
-ELSE
-    M1_EffectiveCoastM := SimWinchCoast_M;
-END_IF;
-
 // Instance modèle codeur M1
 instSimEncoderM1(
     Enable           := TRUE,
@@ -228,15 +230,14 @@ instSimEncoderM1(
     PresetCmd        := M1_PresetCmd,
     PresetValue      := M1_PresetValueOut,
     SpeedScaleFactor := SimEncoderSpeedFactor,
-    CoastDistanceM   := M1_EffectiveCoastM,
+    CoastDistanceM   := SimWinchCoast_M,
     TestOffsetCmd    := SimSyncDeviationInjectM1,
     TestOffsetPts    := M1_OffsetPts,
     RawPos           := RawPosM1
 );
 
-// Hors plongée Kobold, dispersion M2 renouvelée avant le prochain mouvement.
-IF NOT KoboldAutoEpisodeActive
-   AND ((M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev)) THEN
+// Détection coupure relais M2 pour renouveler la dispersion pseudo-aléatoire (±0.1m)
+IF (M2_RelayFwdPrev AND NOT M2_RelayFwd) OR (M2_RelayRevPrev AND NOT M2_RelayRev) THEN
     // Générateur LCG 32-bit standard : X_{n+1} = (1103515245 * X_n + 12345) MOD 2^31
     RandomSeed := (RandomSeed * 1103515245 + 12345) AND 16#7FFFFFFF;
     // Dispersion pseudo-aléatoire entre -0.10 m et +0.10 m
@@ -245,12 +246,15 @@ END_IF;
 M2_RelayFwdPrev := M2_RelayFwd;
 M2_RelayRevPrev := M2_RelayRev;
 
-// Le codeur absolu travaille modulo 2^32. Après un homing M2 effectué alors
-// que son brut vaut 0, une descente doit donc poursuivre à 16#FFFFFFFF.
-// FB_Sim_Encoder borne volontairement à 0 ; le banc rétablit ici le bouclage
-// physique avant son appel, y compris pour un mouvement M2 non couplé.
-IF M2_RelayRev AND NOT M2_RelayFwd AND (RawPosM2 = 0) THEN
-    RawPosM2 := 16#FFFFFFFF;
+// Le FB codeur reste l'unique producteur de RawPosM2. Le ralentissement mesuré
+// agit uniquement sur sa dynamique pendant une descente BOTH effectivement appliquée.
+M2CoupledDescentActive := SimM2CoupledDescentModelActive
+                          AND WinchBothDescentIntent
+                          AND M1_RelayRev AND M2_RelayRev
+                          AND NOT M1_RelayFwd AND NOT M2_RelayFwd;
+M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor;
+IF M2CoupledDescentActive THEN
+    M2EffectiveSpeedScaleFactor := SimEncoderSpeedFactor * MAX(0.0, SimM2CoupledDescentFactor);
 END_IF;
 
 // Instance modèle codeur M2 (avec roulis et dispersion)
@@ -261,59 +265,15 @@ instSimEncoderM2(
     StepNumber       := M2_StepNumber,
     PresetCmd        := M2_PresetCmd,
     PresetValue      := M2_PresetValueOut,
-    SpeedScaleFactor := SimEncoderSpeedFactor,
+    SpeedScaleFactor := M2EffectiveSpeedScaleFactor,
     CoastDistanceM   := M2_EffectiveCoastM,
     TestOffsetCmd    := SimSyncDeviationInjectM2,
     TestOffsetPts    := M2_OffsetPts,
     RawPos           := RawPosM2
 );
 
-// M2 est dérivé de M1 uniquement pendant la descente BOTH effectivement appliquée.
-// Les deux origines mémorisées évitent tout saut : l'écart initial est conservé.
-M2CoupledDescentActive := SimM2CoupledDescentModelActive
-                          AND WinchBothDescentIntent
-                          AND M1_RelayRev AND M2_RelayRev
-                          AND NOT M1_RelayFwd AND NOT M2_RelayFwd;
-IF M2CoupledDescentActive AND NOT M2CoupledDescentPrevious THEN
-    M1CoupledDescentStartRaw := RawPosM1;
-    M2CoupledDescentStartRaw := RawPosM2;
-END_IF;
-IF M2CoupledDescentActive THEN
-    // Chaque codeur conserve sa propre référence brute. Seul le déplacement de
-    // M1 est transposé sur M2 ; les origines brutes ne sont jamais égalisées.
-    IF RawPosM1 >= M1CoupledDescentStartRaw THEN
-        M1CoupledDeltaRaw := UDINT_TO_DINT(RawPosM1 - M1CoupledDescentStartRaw);
-    ELSE
-        M1CoupledDeltaRaw := -UDINT_TO_DINT(M1CoupledDescentStartRaw - RawPosM1);
-    END_IF;
-    M2CoupledDeltaRaw := REAL_TO_DINT(DINT_TO_REAL(M1CoupledDeltaRaw)
-                                      * SimM2CoupledDescentFactor);
-
-    // Addition signée explicite dans l'espace UDINT. Si M2 part de 0 et que
-    // le delta est négatif, le compteur boucle par 16#FFFFFFFF au lieu de rester figé.
-    IF M2CoupledDeltaRaw >= 0 THEN
-        M2CoupledDeltaMagnitudeRaw := DINT_TO_UDINT(M2CoupledDeltaRaw);
-        IF M2CoupledDeltaMagnitudeRaw <= (16#FFFFFFFF - M2CoupledDescentStartRaw) THEN
-            M2CoupledTargetRaw := M2CoupledDescentStartRaw + M2CoupledDeltaMagnitudeRaw;
-        ELSE
-            M2CoupledTargetRaw := M2CoupledDeltaMagnitudeRaw
-                                  - (16#FFFFFFFF - M2CoupledDescentStartRaw) - 1;
-        END_IF;
-    ELSE
-        M2CoupledDeltaMagnitudeRaw := DINT_TO_UDINT(-M2CoupledDeltaRaw);
-        IF M2CoupledDeltaMagnitudeRaw <= M2CoupledDescentStartRaw THEN
-            M2CoupledTargetRaw := M2CoupledDescentStartRaw - M2CoupledDeltaMagnitudeRaw;
-        ELSE
-            M2CoupledTargetRaw := 16#FFFFFFFF
-                                  - (M2CoupledDeltaMagnitudeRaw - M2CoupledDescentStartRaw) + 1;
-        END_IF;
-    END_IF;
-    RawPosM2 := M2CoupledTargetRaw;
-END_IF;
-M2CoupledDescentPrevious := M2CoupledDescentActive;
-
-// Le roulis de plongée doit rester chargé jusqu'au scan de retombée des relais.
-// Le contacteur Kobold peut tomber un scan avant les commandes treuils.
+// L'épisode Kobold ne produit que la DI. Le cycle commande l'arrêt ; les FB codeurs
+// conservent leur roulis historique après la retombée des relais.
 IF NOT KoboldMeasureEnable AND NOT M1_RelayRev AND NOT M2_RelayRev
    AND NOT M1_RelayFwd AND NOT M2_RelayFwd THEN
     KoboldAutoEpisodeActive := FALSE;
@@ -347,14 +307,8 @@ Winch.COD1_Alarms              := 0;
 Winch.COD1_Warnings            := 0;
 Winch.COD1_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING (bus OK)
 
-IF M2CoupledDescentActive THEN
-    Winch.COD2_PosValue := RawPosM2;
-    Winch.COD2_SpdValue := REAL_TO_DINT(DINT_TO_REAL(instSimEncoderM1.RawSpdOut)
-                                         * SimM2CoupledDescentFactor);
-ELSE
-    Winch.COD2_PosValue := instSimEncoderM2.RawPosOut;
-    Winch.COD2_SpdValue := instSimEncoderM2.RawSpdOut;
-END_IF;
+Winch.COD2_PosValue            := instSimEncoderM2.RawPosOut;
+Winch.COD2_SpdValue            := instSimEncoderM2.RawSpdOut;
 Winch.COD2_Alarms              := 0;
 Winch.COD2_Warnings            := 0;
 Winch.COD2_DeviceState         := DEVICE_STATE.RUNNING; // État device RUNNING

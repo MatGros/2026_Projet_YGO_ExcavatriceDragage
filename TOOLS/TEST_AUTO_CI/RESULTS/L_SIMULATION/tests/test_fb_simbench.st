@@ -45,6 +45,16 @@ TEST 'TC-P13-010 SimBench Enable=FALSE neutralise tout le banc'
     ASSERT_FALSE(FB_Bench.Done, 'Enable=FALSE -> Done=FALSE');
 END_TEST
 
+TEST 'TC-P13-014 SimBench initialise les codeurs absolus vierges a son activation'
+    FB_Bench(Enable := FALSE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    RawPosM1 := 0;
+    RawPosM2 := 0;
+    FB_Bench(Enable := TRUE, RawPosM1 := RawPosM1, RawPosM2 := RawPosM2);
+    ASSERT_TRUE(RawPosM1 <> 0, 'M1 vierge recoit un comptage absolu plausible');
+    ASSERT_TRUE(RawPosM2 <> 0, 'M2 vierge recoit un comptage absolu plausible');
+    ASSERT_TRUE(RawPosM1 <> RawPosM2, 'M1 et M2 conservent des origines device independantes');
+END_TEST
+
 TEST 'TC-P13-011 SimBench 0 lecture GVL en interne (essai manuel — stub)'
     (* Stub : TC-P13-011 verifie que FB_SimBench ne lit aucune variable GVL_* en interne
        (toutes les entrees passees en parametres par PRG_02_Acquisition). Verification

@@ -85,7 +85,7 @@ travaille et avec quels outils :
    ⛔ Règle d'or : tâche + plan validés humainement → GO ; ensuite le lot roule sans arrêt au fil de l'eau
 
 🛠️ OUTILS : TASKS.yaml · TASKS_ORCHESTRATOR.yaml · TASK_VIEWER.html
-   · subagent/subagent_fork · generate_codesys_bundle.py · G200_check_linkage.py
+   · subagent/subagent_fork · generate_codesys_bundle.py · generate_codesys_diff_bundle.py · G200_check_linkage.py
    · run_all_gates.py · ollama_subagent.py · check_task_contract.py
    🔗 Skills liées : task-planner (catalogue/contrats) · troubleshooting (diagnostic)
 ```
@@ -225,6 +225,7 @@ d'autres modèles via l'override `provider`/`model` de l'outil `workflow` :
 | Script | Rôle |
 |---|---|
 | `generate_codesys_bundle.py` | génère le bundle PLCopenXML `CODE_XML/CODE_Bundle.xml` |
+| `generate_codesys_diff_bundle.py` | génère le diff bundle `CODE_XML/CODE_DiffBundle.xml` pour tous les objets ST touchés ; complément obligatoire du bundle complet |
 | `G200_check_linkage.py --report` | **vérifie la liaison réelle** sur le bundle (BLOQUANT) |
 | `run_all_gates.py [--palier A/B/C/D]` | suite des 21 gates CI (fin de lot ou tous) |
 | `ollama_subagent.py` | subagent Ollama local (modèle `deepseek-v4-flash:cloud` par défaut) sans quota cloud |
@@ -250,7 +251,7 @@ L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agen
 |---|---|---|
 | R1 | **0 ancien identifiant** (grep) | `grep` des anciens noms/identifiants dans le périmètre |
 | R2 | **Liaison réelle** | `python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report` → 0 erreur |
-| R3 | **Bundle frais** | `python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .` |
+| R3 | **Bundle complet + diff frais** | `generate_codesys_bundle.py .` puis `generate_codesys_diff_bundle.py . <tous-les-fichiers-CODE-st-touches>` ; relever les objets du diff |
 | R4 | **Gates CI** | `python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py [--palier ...]` |
 | R5 | **Renommage pur** | vérifier qu'un renommage n'a pas altéré la sémantique (aucun changement de comportement) |
 | R6 | **Cohérence AF** | le code respecte la spec `AF_Partie-N` correspondante |
@@ -264,12 +265,13 @@ L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agen
 
 | Niveau | Quand | Commande | Coût |
 |---|---|---|---|
-| **① Minimum obligatoire** | à **chaque** livraison de code | `generate_codesys_bundle.py .` + `G200_check_linkage.py --report` (R2+R3) | ~secondes |
+| **① Minimum obligatoire** | à **chaque** livraison de code | `generate_codesys_bundle.py .` + `generate_codesys_diff_bundle.py . <fichiers ST touchés>` + `G200_check_linkage.py --report` (R2+R3) | ~secondes |
 | **② Suite complète** | à la livraison d'un **lot** (fin de lot) | `run_all_gates.py` (ou `--palier C`) (R4) | secondes |
 | **③ Palier ciblé** | pendant l'édition (micro-éditions) | `run_all_gates.py --palier A/B` (GUIDE_GATES_ET_TESTS §2) | instantané |
 
-- ⛔ **Ne pas sous-tester** : jamais livrer sans le minimum (bundle + G200) — seule preuve de
-  câblage réel (R2).
+- ⛔ **Ne pas sous-tester** : jamais livrer sans le minimum (bundle complet + diff bundle + G200) —
+  seule preuve de câblage réel (R2). Le diff complète le bundle, sans jamais s'y substituer ;
+  règle canonique : `AGENTS.md` § « Diff bundle ».
 - ⛔ **Ne pas sur-tester** : ne pas lancer la suite complète à chaque micro-édition (perte de
   temps) — la réserver à la fin de lot (R4).
 
@@ -308,5 +310,6 @@ L'orchestrateur lit le **`git diff` réel** — jamais la seule parole de l'agen
 - [ ] Sous-agents indépendants lancés en parallèle, avec `subagent_preamble.md`
 - [ ] Revue indépendante (R1→R7) par un agent différent de l'implémenteur
 - [ ] `git diff` réel lu par l'orchestrateur
+- [ ] Diff bundle frais généré depuis tous les fichiers `CODE/**/*.st` touchés et objets inclus relevés
 - [ ] Bloc `Auto-vérification liaison` (G200) collé dans la restitution
 - [ ] Aucun commit/push sans validation humaine explicite
