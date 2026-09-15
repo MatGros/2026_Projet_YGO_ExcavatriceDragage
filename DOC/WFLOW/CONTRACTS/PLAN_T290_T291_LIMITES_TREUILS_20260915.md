@@ -122,6 +122,22 @@ La conduite Both suit M1 pour approche et arrêt, mais les limites physiques de 
 restent prioritaires. En unitaire, chaque axe garde ses limites propres, M2 dans son référentiel pertinent.
 Ne pas recopier la mesure M1 dans les capteurs M2 pour réaliser ce changement.
 
+Décision utilisateur 2026-09-15 : en M1 seul et en M1+M2 Both, M1 est l'autorité du FDC logiciel
+nominal H et du profil d'approche. En Both, M2 est suiveur et reçoit le même palier que M1. En M2
+seul, la position M2 corrigée reste la référence. M2 corrigé ne doit pas arrêter nominalement le
+Both à H : il conserve ses filets indépendants SafeStop H+1 et PowerCutOff H+2.
+
+REX snapshot `Snapshot_Troubleshooting_20260915_111950.csv` : à M1=7,367 m, M1 était dans la zone
+haute et bridé P1 tandis que M2 corrigé, décalé d'environ 0,73 m, restait hors zone et demandait P5.
+La barrière d'égalité finale neutralise alors les demandes Both sans message. Ce mécanisme existe
+aussi hors simulation ; seule l'évolution physique de l'écart change.
+
+Audit Git indépendant 2026-09-15 : **régression identifiée, confiance 95 %**. `f36c4480` a introduit
+la neutralisation Both sur toute différence de demandes finales ; `92601d2c` a ensuite passé AX12
+de P4 à P5, rendant visible le couple P1/P5. T291-A (`196abd5c`) est limitée à la descente AX4..AX7.
+T292/T293 (`9a6aa738`, `885ad4b1`) n'ont pas modifié la commande réelle : la simulation a seulement
+révélé le défaut latent en reproduisant un écart M1/M2. La mesure codeur n'est pas mise en cause.
+
 ### L-B — filets hauts position et capteur
 
 Implémenter séparément SafeStop H+1 et capteur NC. Tests : M1 seul, M2 seul, Both, offset modifié,
