@@ -1,79 +1,106 @@
 contract:
   task_id: T288
-  criticality: C2
+  criticality: C4
   strategy: patch
   objective: >
-    Couvrir la discordance à l'enclenchement des contacteurs treuils M1/M2 :
-    si un ordre de mouvement (sens/vitesse/frein) est envoyé mais que le retour
-    ContactorsReleased_DI reste bloqué à 1 pendant un délai paramétré (3 s),
-    lever l'alarme bloquante SafeStop latched (ErrorID:16) sans alourdir le
-    catalogue d'alarmes, avec adaptation du libellé pour mentionner l'absence
-    de mouvement ou la discordance contacteurs.
+    Detecter, par axe M1 et M2, les incoherences durables entre commandes finales
+    direction/vitesse/frein, retour collectif de contacteurs, retour frein et mouvement
+    codeur. La surveillance est distincte de FB_SyncContactor (discordance M1<->M2).
+    Un retour collectif seul est un doute de retour et ne suffit jamais a declencher un
+    nouveau SafeStop : une correlation mouvement est obligatoire. Un seul defaut de
+    discordance est expose par axe, avec cause/message contextualise si utile.
   acceptance:
     - id: AC1
-      statement: "En commande active (sens + frein), si ContactorsReleased_DI reste à 1 pendant plus de 3 s, la Cause 15 (ErrorID:16) se lève et passe le treuil en SafeStop latched."
-      verified_by: "Test unitaire CI simulant commande sans retombée de ContactorsReleased_DI."
+      statement: "Une commande finale impossible est detectee apres une temporisation dediee : deux sens actifs, au moins un contacteur vitesse actif sans sens, ou frein ouvert sans sens."
+      verified_by: "tests unitaires de chaque vecteur final M1 et M2, y compris les vecteurs neutres et les ordres de relachement normaux"
     - id: AC2
-      statement: "Si ContactorsReleased_DI passe à 0 normalement (contacteurs collés) mais que le codeur ne bouge pas (delta < 2 cm), la Cause 15 continue de se déclencher à 3 s."
-      verified_by: "Test de non-régression sur le scénario nominal Cause 15 existant."
+      statement: "Sous commande valide, si Mx_ContactorsReleased_DI=TRUE mais le codeur confirme un mouvement, le systeme remonte le seul defaut de discordance en mode diagnostic/message de doute retour, sans nouveau SafeStop."
+      verified_by: "test CI : sens + vitesse + frein, ContactorsReleased_DI=TRUE et mouvement codeur confirme ; diagnostic unique, SafeStop absent"
     - id: AC3
-      statement: "Le libellé de l'ErrorID:16 dans FB_Safety_Winch et FB_Hmi_BannerFormatter affiche explicitement l'absence de mouvement ou discordance contacteurs."
-      verified_by: "Revue de code et inspection du banner formatter."
+      statement: "Sous commande valide, si Mx_ContactorsReleased_DI=TRUE et que le codeur ne confirme aucun mouvement apres le delai mesure, le meme defaut de discordance declenche le SafeStop latche : non-actionnement confirme, sans pretendre identifier le contacteur physique fautif."
+      verified_by: "test CI : sens + vitesse + frein, ContactorsReleased_DI=TRUE, delta position < 2 cm, declenchement apres delai valide"
     - id: AC4
-      statement: "Le réarmement du défaut exige la retombée de la commande et un front montant sur Reset."
-      verified_by: "Scénario CI vérifiant l'interdiction de réarmement automatique."
+      statement: "Si le retour collectif indique au moins un contacteur engage et que le codeur ne progresse pas sous commande valide, la surveillance absence de mouvement declenche le meme SafeStop apres le delai valide."
+      verified_by: "test CI : ContactorsReleased_DI=FALSE, delta position < 2 cm, declenchement apres delai valide"
     - id: AC5
-      statement: "Aucun éclatement du type ST_Fault (WORD 16 bits) : l'architecture des 16 causes FB_Safety_Winch reste stable et compatible."
-      verified_by: "Contrôle des structures ST et compilation bundle."
+      statement: "Sans commande de mouvement, un retour collectif durablement non retombe est diagnostique sans nouveau SafeStop fonde sur ce seul retour et sans attribution abusive a un contacteur particulier ; le comportement MecaB existant est conserve sans modification dans ce lot."
+      verified_by: "test CI : commande neutre, ContactorsReleased_DI=FALSE, retour frein coherent et incoherent ; absence de nouveau SafeStop T288"
     - id: AC6
-      statement: "G200 liaison et suite des gates 100% PASS."
-      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report et run_all_gates.py."
+      statement: "Les phases legitimement transitoires SenseHoldActive et ReleaseOrderActive restent exemptes uniquement pendant leur bornage existant ; le chronometre de discordance s appuie sur une condition physique continument malsaine et ne peut etre remis a zero par un cyclage rapide Hold/Release."
+      verified_by: "tests de non-regression FB_WinchOutputInterlock : relachement vitesse avant direction, timeout de maintien, SafeStop et cycle Hold/Release repete avec retour durablement malsain"
+    - id: AC7
+      statement: "FB_SyncContactor conserve son role exclusif de comparaison M1<->M2 ; la nouvelle surveillance interne par axe ne depend pas de SyncEnable."
+      verified_by: "revue du cablage + tests mode unitaire, mode both et synchronisme desactive"
+    - id: AC8
+      statement: "Le defaut choisi exige disparition de la cause puis front Reset conscient ; aucun redemarrage automatique n est introduit."
+      verified_by: "scenario CI de latch, disparition de cause, absence de Reset puis Reset"
+    - id: AC9
+      statement: "La temporisation de discordance est dediee. Sa valeur ne peut etre choisie qu apres releve de la fiche technique et mesure banc/terrain des temps maximum d etablissement et de retombee au pire cas (notamment froid et charge), avec marge explicite et validation humaine. Aucun intervalle arbitraire [1..2] s n est impose par ce contrat."
+      verified_by: "rapport de mesure date, marge justifiee, decision humaine tracee, puis chronogramme CI sur la valeur retenue"
+    - id: AC10
+      statement: "Le type ST_Fault et les 16 causes existantes de FB_Safety_Winch restent compatibles ; une seule alarme de discordance par axe est retenue. Sa severite et son message de cause sont definis avant code, sans multiplication d ErrorID."
+      verified_by: "decision tracee + compilation cible + controle structures"
+    - id: AC11
+      statement: "Critere structurel CODE/MAIN : pour chaque fichier modifie, le nom de fichier est identique au nom de POU ; aucun suffixe _CFC/_LD n est ajoute et le suffixe reste identique au langage genere dans le bundle (ST pur)."
+      verified_by: "G310_check_code_structure.py + inspection du bundle frais"
   scope:
     allowed:
       - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/H_TREUILS_BENNE/_TYPES/E_WinchFinalInterlockReason.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
       - CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchState.st
       - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_Safety_Winch_v1.0.md
+      - DOC/AF/AF_Partie-10_Fonction_Winch/FB_WinchOutputInterlock_v1.0.md
       - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/TASK_LOCKS.json
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T288_DISCORDANCE_CONTACTEURS_ABSENCE_MOUVEMENT.yaml
-      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/
+      - TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/
+      - TOOLS/AGENT_WORKFLOW/scripts/G498_check_t288_winch_contactor_coherence.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - CODE_XML/CODE_Bundle.xml
     forbidden:
       - CODE/A_COMMUN/FB_Brake.st
       - CODE/B_AU_SECURITE/
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - CODE_BACKUP/
+  architecture_constraints:
+    - "PRG_06_Outputs.st est autorise uniquement pour publier ou relayer en lecture seule un vecteur final ou un diagnostic deja calcule. Il ne porte ni temporisation, ni decision de coherence, ni etat d alarme, ni SafeStop."
+    - "Les decisions electriques finales restent dans FB_WinchOutputInterlock ; les correlations retour collectif/mouvement et la reaction de securite restent dans FB_Safety_Winch."
   conservation:
     must_survive:
-      - "Toutes les causes de sécurité existantes 0 à 15 de FB_Safety_Winch."
-      - "Les verrouillages Méca A, B, C, D, E."
-      - "L'encapsulation et le câblage PRG_04/PRG_06."
+      - "Les causes existantes 0 a 15 et leur politique SafeStop/PowerCutOff."
+      - "Les verrouillages Meca A, B, C, D et E."
+      - "Le couplage structurel BrakeCmd := RelayFwd OR RelayRev."
+      - "Le maintien borne SenseHoldActive, l ordre ReleaseOrderActive et les temps morts directionnels."
+      - "La comparaison inter-axes FB_SyncContactor et ses bypass existants."
     dropped_on_purpose:
-      - "L'inhibition aveugle du watchdog de mouvement lorsque ContactorsReleased_DI reste à 1."
-  implementation_details:
-    phase_1_safety_logic:
-      target: "CODE/H_TREUILS_BENNE/FB_Safety_Winch.st"
-      description: >
-        Dans TonNoMovement, surveiller (MovementCommanded AND BrakeFeedback) combiné à :
-        (FwdRevSpeedFeedbackOff OR NOT PositionMovementDetected).
-        Ainsi, si les contacteurs ne collent pas (FwdRevSpeedFeedbackOff = TRUE) après le timeout,
-        OU si les contacteurs collent mais le codeur ne progresse pas, TonNoMovement.Q passe à TRUE.
-        Mettre à jour instCauses[15].Texte := 'Absence mouvement ou discordance contacteurs';
-    phase_2_hmi_banner:
-      target: "CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st"
-      description: >
-        Actualiser les messages ErrorID:16 pour M1 et M2 dans les sections live et historique :
-        '[M1] ErrorID:16 - absence mouvement ou discordance contacteurs'
-        '[M2] ErrorID:16 - absence mouvement ou discordance contacteurs'
-    phase_3_documentation:
-      target: "DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md"
-      description: >
-        Documenter dans l'AF-10 §F10.xx que la Cause 15 couvre désormais le non-enclenchement
-        des contacteurs (discordance de commande) en plus de l'absence de déplacement codeur.
-    phase_4_mechanical_validation:
-      scripts:
-        - "python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py ."
-        - "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report"
-        - "python TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py --palier C"
+      - "L inhibition aveugle du watchdog NoMovement quand ContactorsReleased_DI reste a TRUE sous commande."
+  decisions_required_before_code:
+    - "Rapport de mesure : temps d etablissement et de retombee maximum du contacteur physique, fiche technique, conditions d essai et marge de diagnostic."
+    - "Politique de severite : le doute ContactorsReleased_DI seul reste diagnostic ; seul le croisement avec absence de mouvement peut produire le SafeStop T288."
+    - "Confirmation cablage et essai machine : ContactorsReleased_DI est exploitable sur M1 et M2, et ses modes de panne previsibles sont connus."
+    - "Politique de remontee unique : ErrorID existant ou diagnostic interlock distinct, avec message de cause mais sans multiplication d ErrorID."
   evidence_required:
-    - "Contrat contrôlé par check_task_contract.py."
-    - "Tests CI démontrant le déclenchement du défaut sous 3 s quand ContactorsReleased_DI = 1."
-    - "G200 --report 0 erreur."
+    - "Contrat valide par check_task_contract.py."
+    - "Matrice CI des commandes et retours par axe."
+    - "Garde automatique G498 anti-regression de la coherence des vecteurs, enregistree dans run_all_gates.py."
+    - "Bundle PLCopenXML frais, G200 --report sans erreur et gates palier C."
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: >
+    Cadrage C4 suspendu le 2026-09-15 apres challenge securite machine. Aucune
+    implementation autorisee avant mesures contacteurs, preuve du retour collectif
+    et validation humaine de la politique de severite.
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""

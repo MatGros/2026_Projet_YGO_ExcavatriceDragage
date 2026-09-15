@@ -119,19 +119,24 @@ tasks:
   bloque_par: []
 - id: T288
   parent_id: ''
-  statut: '⏳'
-  criticite: C2
-  domaine: TREUILS_BENNE
-  agent: Antigravity
-  date: '2026-09-14T13:14:00+02:00'
-  titre: Discordance commande contacteurs M1/M2 et couverture absence de mouvement
-  contexte: 'Quand un treuil est commandé (sens + vitesse + frein), si les contacteurs ne collent pas (ContactorsReleased_DI = 1), l absence de mouvement reste inhibée et aucune alarme ne se lève.'
-  description: 'Étude d impact et implémentation minimale bloquante (SafeStop) sans explosion du catalogue d alarmes. Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T288_DISCORDANCE_CONTACTEURS_ABSENCE_MOUVEMENT.yaml'
+  statut: '⏸️'
+  criticite: C4
+  domaine: TREUILS_BENNE / COHERENCE CONTACTEURS PAR AXE
+  agent: Codex
+  date: '2026-09-15T06:29:27+02:00'
+  titre: Cohérence commande/retour contacteurs par axe et couverture absence de mouvement
+  contexte: 'Besoin terrain consolidé 2026-09-15 : une commande de direction, vitesse ou frein incohérente peut subsister sans alarme. Le retour Mx_ContactorsReleased_DI est collectif : il affirme seulement que tous les contacteurs sont retombés, sans identifier un contacteur précis.'
+  description: 'C4 — charge suspendue : fusionner le trou initial commande sans mouvement et une matrice de cohérence par axe. Séparer impérativement : (1) cohérence des DQ finales direction/vitesse/frein, (2) retour physique collectif contacteurs/frein, (3) mouvement codeur, et (4) synchronisme M1↔M2 existant. Un retour collectif seul est un doute de retour : aucun nouveau SafeStop ne peut en découler sans corrélation mouvement. Le délai dédié sera déterminé par fiche technique et mesure banc/terrain (pire cas + marge), puis validé humainement. Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T288_DISCORDANCE_CONTACTEURS_ABSENCE_MOUVEMENT.yaml'
   objectifs:
-  - "Déclencher l ErrorID:16 après 3 s si ContactorsReleased_DI reste à 1 sous commande active"
-  - "Préserver le déclenchement nominal de l ErrorID:16 sur absence de progression codeur"
-  - "Actualiser le libellé IHM de l ErrorID:16 (absence mouvement ou discordance contacteurs)"
-  bloque_par: []
+  - "Détecter après temporisation dédiée les commandes finales impossibles : deux sens actifs, vitesse sans sens, frein ouvert sans sens ; exempter explicitement les phases transitoires bornées de maintien/relâchement existantes."
+  - "Utiliser un unique défaut de discordance par axe : commande valide + retour tous retombés + mouvement codeur = doute retour, diagnostic seul ; SafeStop seulement si l absence de mouvement confirme la discordance après délai mesuré."
+  - "Diagnostiquer après temporisation l absence de retour au repos quand aucune commande n est présente, sans SafeStop nouveau fondé sur le seul retour collectif ni attribution à un contacteur physique."
+  - "Préserver et isoler FB_SyncContactor : la discordance M1↔M2 n est pas une cohérence interne M1 ou M2."
+  - "Définir avant code la politique d alarme unique (ErrorID existant ou diagnostic interlock), la preuve de validité/câblage du retour collectif, et le délai issu des mesures contacteurs."
+  bloque_par:
+  - 'C4 — données d entrée manquantes : temps de retombée/établissement maximum documenté et mesuré au pire cas, plus marge de diagnostic validée humainement.'
+  - 'C4 — politique de sévérité à valider : un doute sur Mx_ContactorsReleased_DI seul ne doit pas produire le même SafeStop qu une absence de mouvement confirmée.'
+  - 'C4 — preuve de câblage et comportement machine de Mx_ContactorsReleased_DI sur M1 et M2 à obtenir avant code.'
 - id: T287
   parent_id: T286
   statut: '⏳'
