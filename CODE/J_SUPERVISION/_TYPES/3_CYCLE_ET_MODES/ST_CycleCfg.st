@@ -6,7 +6,7 @@ TYPE ST_CycleCfg :
 STRUCT
     SetDepth_M         : REAL := -29.0; (* 📐 Profondeur de dragage cible (m, négative) *)
     DepthStopMode      : E_CycleDepthStopMode := E_CycleDepthStopMode.KOBOLD_OR_SETPOINT; (* 🧭 Source arrêt AX7 *)
-    DrainTime          : TIME := T#5s;  (* ⏱️ Durée d'égouttage du godet en AX13 (configurable IHM) *)
+    DrainTime_S        : INT := 5;      (* ⏱️ Durée d'égouttage du godet en AX13 (configurable IHM, secondes entières [1..3600]) *)
     RaiseOffBottom_M   : REAL := 0.0;   (* 📐 0 = passage direct AX10 ; >0 = distance de décollement AX9 *)
     CtrlAscentMaxStep  : INT  := 2;     (* 🚀 Palier max montée contrôle AX11, borné [1..2] côté FB (GEL Q16) *)
     ForceStepTarget    : INT  := 0;     (* 🔧 Step GRAFCET cible du forçage (0=AX0 .. 20=AX_DIVING_RETRY), borné côté FB *)

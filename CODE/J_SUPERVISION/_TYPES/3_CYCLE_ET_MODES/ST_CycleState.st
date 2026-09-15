@@ -29,6 +29,7 @@ STRUCT
     SampleCount            : INT;         (* Compteur de prélèvements (RETAIN, Q3bis) *)
     CurrentCycleElapsed    : TIME;        (* ⏱️ Durée écoulée du cycle en cours *)
     LastCycleDuration      : TIME;        (* ⏱️ Durée du dernier cycle achevé (figée à X13) *)
+    DrainTimeElapsed_S     : INT;         (* ⏱️ Temps ecoule en AX13, secondes entieres ; 0 hors AX13 *)
     CycleChecksInhibited   : BOOL;        (* 🧪 Contrôles procédé cycle inhibés, protections machine actives *)
     IgnoredCycleCheckId    : WORD;        (* 🔎 Contrôles procédé actifs mais ignorés *)
     ForceStepPrepared      : BOOL;        (* 🔧 Step préparé, commandes neutres *)

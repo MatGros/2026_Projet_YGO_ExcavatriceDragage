@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T02:21:54.185327" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T02:21:54.185327">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T03:48:42.165222" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T03:48:42.165222">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1504,6 +1504,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)</xhtml>
               </documentation>
             </variable>
+            <variable name="DrainTimeElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Temps ecoule en AX13 ; zero hors AX13</xhtml>
+              </documentation>
+            </variable>
             <variable name="AutoDiveM1Step4M2Step5Active">
               <type>
                 <BOOL />
@@ -2439,6 +2447,7 @@ END_IF;
 // Egouttage AX13 : TON gaté sur l'étape (remis à 0 hors AX13). Remplace l'ancien IN:=TRUE câblé
 // qui pouvait laisser Q déjà vrai à l'entrée en AX13 (temps d'égouttage non respecté).
 DrainingTimer(IN := (State = E_AutoCycleStep.AX13_DRAIN_PAUSE), PT := DrainTimeEff);
+DrainTimeElapsed := DrainingTimer.ET;
 
 // ⏱️ Stabilisation alimentation Kobold (500ms en AX6 avant surveillance fond)
 KoboldStabTimer(IN := (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) AND DeadmanArmed AND JoystickPush AND KoboldImmersed, PT := CST_KoboldStabTime);

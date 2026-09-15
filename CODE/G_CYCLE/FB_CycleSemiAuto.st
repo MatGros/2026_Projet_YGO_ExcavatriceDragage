@@ -138,6 +138,7 @@ VAR_OUTPUT
     RequestActive           : BOOL;                 // <-- [STAT] Demande de mouvement active
     CurrentCycleElapsed     : TIME;                 // <-- [DIAG] Duree ecoulee du cycle en cours (chronometre sur Lifecycle.Busy)
     LastCycleDuration       : TIME;                 // <-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)
+    DrainTimeElapsed        : TIME;                 // <-- [DIAG] Temps ecoule en AX13 ; zero hors AX13
     AutoDiveM1Step4M2Step5Active : BOOL;            // <-- [STAT] Profil T291-A actif sur la phase plongee auto
 END_VAR
 VAR_IN_OUT
@@ -353,6 +354,7 @@ END_IF;
 // Egouttage AX13 : TON gaté sur l'étape (remis à 0 hors AX13). Remplace l'ancien IN:=TRUE câblé
 // qui pouvait laisser Q déjà vrai à l'entrée en AX13 (temps d'égouttage non respecté).
 DrainingTimer(IN := (State = E_AutoCycleStep.AX13_DRAIN_PAUSE), PT := DrainTimeEff);
+DrainTimeElapsed := DrainingTimer.ET;
 
 // ⏱️ Stabilisation alimentation Kobold (500ms en AX6 avant surveillance fond)
 KoboldStabTimer(IN := (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) AND DeadmanArmed AND JoystickPush AND KoboldImmersed, PT := CST_KoboldStabTime);

@@ -139,6 +139,7 @@ PLANS: list[tuple[str, str, str, list[str]]] = [
     ("C", "495", "G495 - Invariants cycle semi-auto SAT (T258)", [sys.executable, f"{S}/G495_check_cycle_sat_contract.py"]),
     ("C", "496", "G496 - Polarité NC FdC haut M1/M2 (T268)", [sys.executable, f"{S}/G496_check_top_sensor_polarity.py"]),
     ("C", "497", "G497 - MecaD protégé pendant manœuvre benne (T269)", [sys.executable, f"{S}/G497_check_mecad_bucket_guard.py"]),
+    ("C", "499", "G499 - Egouttage IHM en secondes, autorite unique (T289)", [sys.executable, f"{S}/G499_check_t289_drain_time_seconds.py", "."]),
     # Palier D â€” sur demande (G500)
     ("D", "500", "G500 â€” Compilation CODESYS (log)",                [sys.executable, f"{S}/G500_check_codesys_compile.py"]),
 ]

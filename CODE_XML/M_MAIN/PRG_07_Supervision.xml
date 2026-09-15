@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.409851" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.409851">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T03:50:07.743036" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T03:50:07.743036">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -260,15 +260,15 @@ Défaut TRUE (sécurisé) ; bouton IHM pour désactiver (permet descente treuils
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
               </documentation>
             </variable>
-            <variable name="DrainTime">
+            <variable name="DrainTime_S">
               <type>
-                <TIME />
+                <INT />
               </type>
               <initialValue>
-                <simpleValue value="TIME#5s0ms" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en AX13 (configurable IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Autorite IHM egouttage AX13, secondes entieres [1..3600]</xhtml>
               </documentation>
             </variable>
             <variable name="RaiseOffBottom_M">
@@ -7981,6 +7981,7 @@ IF GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M &lt; CycleDepthLowerBound_M THEN
     GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M := CycleDepthLowerBound_M;
 END_IF;
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
+GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 3600);
 IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
@@ -8401,6 +8402,7 @@ GVL_IHM.CycleSemiAuto.State.ResumeAfterFaultAvailable := PRG_03_Modes_Cycle.Data
 GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
+GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT(TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeElapsed) / DINT#1000);
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 // Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
 // pas être présenté comme un contact Kobold.

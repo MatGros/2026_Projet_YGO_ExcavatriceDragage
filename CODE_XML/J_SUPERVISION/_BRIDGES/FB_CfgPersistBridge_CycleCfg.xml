@@ -48,15 +48,15 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
               </documentation>
             </variable>
-            <variable name="DrainTime">
+            <variable name="DrainTime_S">
               <type>
-                <TIME />
+                <INT />
               </type>
               <initialValue>
-                <simpleValue value="TIME#5s0ms" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en AX13 (configurable IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Autorite IHM egouttage AX13, secondes entieres [1..3600]</xhtml>
               </documentation>
             </variable>
             <variable name="RaiseOffBottom_M">

@@ -5246,15 +5246,15 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
               </documentation>
             </variable>
-            <variable name="DrainTime">
+            <variable name="DrainTime_S">
               <type>
-                <TIME />
+                <INT />
               </type>
               <initialValue>
-                <simpleValue value="TIME#5s0ms" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en AX13 (configurable IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Autorite IHM egouttage AX13, secondes entieres [1..3600]</xhtml>
               </documentation>
             </variable>
             <variable name="RaiseOffBottom_M">
@@ -5857,6 +5857,14 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée du dernier cycle achevé (figée à X13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DrainTimeElapsed_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Temps ecoule en AX13, secondes entieres ; 0 hors AX13</xhtml>
               </documentation>
             </variable>
             <variable name="CycleChecksInhibited">
@@ -11321,6 +11329,14 @@ TRUE = Défaut sécurité actif</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Durée du dernier cycle SEMI_AUTO achevé (figée à X13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DrainTimeElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Temps ecoule en AX13 ; remis a zero hors AX13</xhtml>
               </documentation>
             </variable>
             <variable name="CycleChecksInhibited">
@@ -22081,6 +22097,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)</xhtml>
               </documentation>
             </variable>
+            <variable name="DrainTimeElapsed">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Temps ecoule en AX13 ; zero hors AX13</xhtml>
+              </documentation>
+            </variable>
             <variable name="AutoDiveM1Step4M2Step5Active">
               <type>
                 <BOOL />
@@ -23016,6 +23040,7 @@ END_IF;
 // Egouttage AX13 : TON gaté sur l'étape (remis à 0 hors AX13). Remplace l'ancien IN:=TRUE câblé
 // qui pouvait laisser Q déjà vrai à l'entrée en AX13 (temps d'égouttage non respecté).
 DrainingTimer(IN := (State = E_AutoCycleStep.AX13_DRAIN_PAUSE), PT := DrainTimeEff);
+DrainTimeElapsed := DrainingTimer.ET;
 
 // ⏱️ Stabilisation alimentation Kobold (500ms en AX6 avant surveillance fond)
 KoboldStabTimer(IN := (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) AND DeadmanArmed AND JoystickPush AND KoboldImmersed, PT := CST_KoboldStabTime);
@@ -48206,6 +48231,22 @@ Data.DataValid := NOT Data.InputModules.Fault
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne cycle bornée avant consommation par FB_CycleSemiAuto</xhtml>
               </documentation>
             </variable>
+            <variable name="CycleDrainTimeEffective_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne egouttage bornee [1..3600] avant conversion IEC TIME</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CycleDrainTimeEffective">
+              <type>
+                <TIME />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Consigne egouttage convertie en TIME pour FB_CycleSemiAuto</xhtml>
+              </documentation>
+            </variable>
             <variable name="CST_CycleInitWindowM">
               <type>
                 <REAL />
@@ -48247,6 +48288,8 @@ CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
                              MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M,
                                  _WinchM2CfgPersist.CfgCableLimitDescent_M));
 CycleSetDepthEffective_M := MAX(GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M, CycleDepthLowerBound_M);
+CycleDrainTimeEffective_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 3600);
+CycleDrainTimeEffective := DINT_TO_TIME(INT_TO_DINT(CycleDrainTimeEffective_S) * DINT#1000);
 
 // 📄 Événement changement de page IHM : sélection automatique du mode (page 5 = MAINT_N1, page 1 = SEMI_AUTO)
 IF NOT ModeBootInitialized THEN
@@ -48432,7 +48475,7 @@ instCycleSemiAuto(
     InitPositionOk          := CycleInitPositionOk,
     WinchesAtTopWindow      := CycleWinchesAtTopOk,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
-    CfgDrainTime            := GVL_IHM.CycleSemiAuto.Cfg.DrainTime,
+    CfgDrainTime            := CycleDrainTimeEffective,
     SkipDrainRequest        := GVL_IHM.CycleSemiAuto.Cmd.BtnSkipDrain,
     RepositionRequest       := GVL_IHM.CycleSemiAuto.Cmd.BtnReposition,
     CfgCommissioningEnable  := GVL_IHM.CycleSemiAuto.Cmd.TglCommissioning,
@@ -48525,6 +48568,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
     Data.SequenceState.CurrentCycleElapsed    := instCycleSemiAuto.CurrentCycleElapsed;
     Data.SequenceState.LastCycleDuration      := instCycleSemiAuto.LastCycleDuration;
+    Data.SequenceState.DrainTimeElapsed       := instCycleSemiAuto.DrainTimeElapsed;
     Data.SequenceState.CycleChecksInhibited   := instCycleSemiAuto.CycleChecksInhibited;
     Data.SequenceState.IgnoredCycleCheckId    := instCycleSemiAuto.IgnoredCycleCheckId;
     Data.SequenceState.ForceStepPrepared      := instCycleSemiAuto.ForceStepPrepared;
@@ -48620,6 +48664,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
     Data.SequenceState.CurrentCycleElapsed    := T#0s;
     Data.SequenceState.LastCycleDuration      := T#0s;
+    Data.SequenceState.DrainTimeElapsed       := T#0s;
     Data.SequenceState.CycleChecksInhibited   := FALSE;
     Data.SequenceState.IgnoredCycleCheckId    := 0;
     Data.SequenceState.ForceStepPrepared      := FALSE;
@@ -48690,6 +48735,7 @@ ELSE
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
     Data.SequenceState.CurrentCycleElapsed     := T#0s;
     Data.SequenceState.LastCycleDuration       := T#0s;
+    Data.SequenceState.DrainTimeElapsed        := T#0s;
     Data.SequenceState.CycleChecksInhibited    := FALSE;
     Data.SequenceState.IgnoredCycleCheckId     := 0;
     Data.SequenceState.ForceStepPrepared       := FALSE;
@@ -54174,6 +54220,7 @@ IF GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M &lt; CycleDepthLowerBound_M THEN
     GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M := CycleDepthLowerBound_M;
 END_IF;
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
+GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 3600);
 IF instCfgPersistBridgeCycle.JustRestored THEN
     GVL_IHM.Commun.ConfigRestoredFromPersistent := TRUE;
 END_IF;
@@ -54594,6 +54641,7 @@ GVL_IHM.CycleSemiAuto.State.ResumeAfterFaultAvailable := PRG_03_Modes_Cycle.Data
 GVL_IHM.CycleSemiAuto.State.SampleCount            := _CycleSampleCount;
 GVL_IHM.CycleSemiAuto.State.CurrentCycleElapsed    := PRG_03_Modes_Cycle.Data.SequenceState.CurrentCycleElapsed;
 GVL_IHM.CycleSemiAuto.State.LastCycleDuration      := PRG_03_Modes_Cycle.Data.SequenceState.LastCycleDuration;
+GVL_IHM.CycleSemiAuto.State.DrainTimeElapsed_S     := DINT_TO_INT(TIME_TO_DINT(PRG_03_Modes_Cycle.Data.SequenceState.DrainTimeElapsed) / DINT#1000);
 GVL_IHM.CycleSemiAuto.State.SelTarget              := GVL_IHM.M3Translation.Cmd.SelTarget;
 // Distinction obligatoire : un arrêt sur limite de travail/consigne ne doit
 // pas être présenté comme un contact Kobold.

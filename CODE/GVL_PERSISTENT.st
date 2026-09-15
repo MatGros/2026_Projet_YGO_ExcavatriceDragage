@@ -127,7 +127,7 @@ VAR_GLOBAL PERSISTENT RETAIN
     _JoystickCfgPersist : ST_fbJoystick_Cfg := (DeadbandRaw := 300); // reste des champs = defaults ST_fbJoystick_Cfg
 
     // 🔄 CYCLE (dragage semi-automatique)
-    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -29.0, DepthStopMode := E_CycleDepthStopMode.KOBOLD_OR_SETPOINT, RaiseOffBottom_M := 0.0, ExtractionControlDistance_M := 0.5, CtrlAscentMaxStep := 2); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
+    _CycleCfgPersist : ST_CycleCfg := (SetDepth_M := -29.0, DepthStopMode := E_CycleDepthStopMode.KOBOLD_OR_SETPOINT, DrainTime_S := 5, RaiseOffBottom_M := 0.0, ExtractionControlDistance_M := 0.5, CtrlAscentMaxStep := 2); // 🌉 Pont FB_CfgPersistBridge_CycleCfg
 
     // 🎯 CYCLE REFERENCEMENT MACHINE (homing) — reglage mise en service
     _CycleMachineHomingCfgPersist : ST_CycleMachineHomingCfg := (ForceStepTarget := 0); // 🌉 Pont FB_CfgPersistBridge_CycleMachineHomingCfg
