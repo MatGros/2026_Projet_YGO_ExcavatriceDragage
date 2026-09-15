@@ -11,6 +11,20 @@
 - 👷 **Objet de l'intervention du 15/09** : qualifier ce défaut avec le collègue, avancer les essais utiles (T291-A, T289) et disposer d'une alarme de discordance exploitable pour éviter un blocage silencieux.
 - 🛡️ **T288 phase 1 validée en simulation** : sous commande sans mouvement, avec retour collectif « tous contacteurs au repos », une alarme unique `ErrorID:16` est levée puis le **SafeStop** agit après 3 s. Aucun PowerCutOff ajouté.
 
+## 📋 Couverture demandes YGO/MGS du matin 15/09
+
+| Demande | Origine | Couvert par | Statut |
+|---|---|---|---|
+| Champ Égouttage (page réglage) | YGO + MGS | T289 | ✅ Validé simulation, à rejouer machine |
+| Palier 5 Moteur 2 (Ouverture) à la descente | MGS | T291-A | ✅ Validé simulation (effet réel mais modeste) |
+| Palier 2 à la montée | MGS | T290 | ✅ Validé simulation, recette réelle à faire |
+| Palier 2 montée en mode grappin pas fermé | MGS | T262 (phase B/C) | ⬜ Pas codé — cadrage seul |
+| Champ % fermeture benne avant remontée | YGO + MGS | T262 (phase A) | ⬜ Pas codé — cadrage seul |
+| Commencer la remontée avant fin de fermeture | MGS | T262 (phase B) | ⬜ Pas codé — C4, ordre expert T290→T291-B→T262 |
+| Vérifier bit de vie statut word | MGS | — | ⏸️ Décision 2026-09-14 : bit de vie IHM non implémenté (hors scope). À confirmer si demande = DriveStatusWord AC600 (T110/T184) |
+| 24V Variateurs | YGO | — | ❓ Non identifié en tâche logicielle — probable point matériel, à clarifier |
+| Retard sur la commande IHM | YGO | — | ❓ Non identifié — à préciser (latence cycle IHM ?) |
+
 ## 🚦 À tester sur machine — priorité
 
 | Prio | Essai | Action opérateur attendue | Résultat attendu | Statut |
@@ -94,3 +108,13 @@
 - `ddc2e39e` — outil de conversion de traces.
 
 > 📌 Catalogue : `DOC/WFLOW/TASKS.yaml` · T291-A et T289 restent à clôturer formellement après décision humaine.
+
+---
+
+## 📬 Bilan de fin de séance — Mail GCAM YGO (15/09/2026)
+
+Le rapport complet et la feuille de route consolidée suite aux essais de la journée sont archivés dans le document dédié :  
+👉 [**`REGISTRE_MES_Rapport_Mail_GCAM_20260915.md`**](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/DOC/WFLOW/REGISTRES/REGISTRE_MES_Rapport_Mail_GCAM_20260915.md)
+
+Ce rapport détaille les arbitrages (24 V variateurs, bit de vie abandonné, descente P4/P5, montée contrôlée 1,0 m) et ventile les actions techniques à engager (paliers sous condition de vitesse câble, FDC haut M1, diagnostic timeout benne AX15B, fréquences M3, homing et troubleshooting chronologique).
+

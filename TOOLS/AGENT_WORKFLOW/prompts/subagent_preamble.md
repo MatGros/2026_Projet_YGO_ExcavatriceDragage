@@ -156,6 +156,18 @@ Hors scope constaté (devoir d'alerte) : ...
   seulement utiliser le temp système hors dépôt ou son scratch autorisé par
   `STRUCTURE_AND_CLEANUP.md`. Avant et après tout test/gate : exécuter `git status --short`
   et signaler tout chemin hors table ; ne jamais l'ignorer pour le masquer.
+- **Rediriger une sortie shell (`>`, `>>`) vers `/tmp/...` ou tout chemin hors du répertoire de
+  travail** : le sandbox bloque systématiquement ces écritures/lectures (garde-fou
+  `blockReadsOutsideWorkingDirectories`) et déclenche une validation humaine évitable. Utiliser
+  le scratchpad de session fourni (dans le repo ou le dossier scratch autorisé de l'agent), jamais
+  `/tmp` en dur.
+- **Chaîner plusieurs commandes `awk`/`sed`/`grep` avec `&&`, `;` ou plusieurs invocations dans
+  une seule commande Bash** (ex. `cd ... && awk '...' f1; echo ---; awk '...' f2`) : le sandbox ne
+  peut pas analyser statiquement quels fichiers seront lus et redemande une validation humaine à
+  chaque fois, même pour une lecture triviale dans le repo. Utiliser l'outil `Read` natif avec
+  `offset`/`limit`, ou `Grep`, pour extraire une plage de lignes d'un fichier connu — c'est plus
+  rapide et ne déclenche aucun prompt. Réserver `awk` en Bash aux cas où aucun outil natif ne
+  convient, et **une seule invocation par commande Bash**.
 - Supprimer, déplacer ou désindexer automatiquement un artefact, même temporaire : l'outil doit
   seulement le détecter et signaler son chemin ; le nettoyage est une action humaine explicite.
 - Élargir le scope au-delà de la tâche : signaler, ne pas décider

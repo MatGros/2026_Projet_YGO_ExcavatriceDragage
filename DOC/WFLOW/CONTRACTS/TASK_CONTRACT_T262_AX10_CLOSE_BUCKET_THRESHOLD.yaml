@@ -2,19 +2,23 @@ contract:
   task_id: T262
   criticality: C4
   strategy: patch
+  technical_plan: DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
+  updated_at: '2026-09-15T15:10:00+02:00'
   objective: >
     Permettre la transition anticipée de AX10 vers AX11 par seuil configurable
     d ouverture benne, puis assurer un transfert continu et maîtrisé de M2 seul
-    vers M1+M2 Both et de AX11 vers AX12, sans supprimer les barrières de sécurité.
+    vers M1+M2 Both, extraction AX11 cible P2 puis AX12, sans supprimer les barrieres
+    de securite. Preparation au P1 sans arret franc ; repli historique si la
+    fermeture arrive avant la disponibilite du transfert. Plan soumis a validation.
   acceptance:
     - id: AC1
-      statement: "La configuration est bornée à 0..50 % et sa valeur par défaut est 0 %."
+      statement: "La configuration INT persistante proposee est bornee a 0..50 % et sa valeur par defaut est 0 % ; borne maximale a valider humainement."
       verified_by: "test unitaire de saturation et inspection de la valeur initiale"
     - id: AC2
-      statement: "Avec Cfg=0 %, AX10_CLOSE_BUCKET ne change pas de condition et attend l'information actuelle benne fermée."
+      statement: "Avec Cfg=0 %, conserver le critere historique Done AND (IsClosed OR IsRoughlyClosed) ; le transfert prepare ne prolonge jamais la fermeture M2 en attente de M1."
       verified_by: "test cycle auto avec benne à 1..10 % puis benne fermée"
     - id: AC3
-      statement: "Avec Cfg>0 %, le passage au step suivant est vrai lorsque ActualBucketOpeningPct < Cfg OU lorsque l'information benne fermée historique est vraie (OU logique, pas un remplacement du fallback)."
+      statement: "Avec Cfg>0 %, preparer le transfert lorsque BucketOpening_Pct valide <= Cfg OU lorsque la fin de fermeture historique est atteinte. L egalite est incluse pour atteindre le pourcentage demande ; aucun faux IsClosed ou Done fermeture au seuil partiel."
       verified_by: "tests aux valeurs seuil-1, seuil, seuil+1, 50 %, et cas fermé avec %>=seuil (dérive capteur)"
     - id: AC4
       statement: "Le seuil ne neutralise ni AU, ni FDC, ni freinage, ni défaut de mouvement et ne commande pas un redémarrage automatique."
@@ -37,33 +41,63 @@ contract:
     - id: AC10
       statement: "Tant que la fermeture franche n est pas confirmée, AX12 reste au palier lent même si le seuil pour entrer en AX11 est franchi."
       verified_by: "tests seuil franchi avec Benne_IsClosed faux puis vrai"
+    - id: AC11
+      statement: "Apres raccordement des deux axes au P1, AX11 demande P2 avec le cadenceur existant et CtrlAscentMaxStep ; l exception benne partielle ne releve aucun plafond mou de cable, limite, codeur, maintenance ou securite."
+      verified_by: "tests ST integration AX11 benne partielle, puis chaque plafond prioritaire ; trace des paliers reels"
+    - id: AC12
+      statement: "La liberation de propriete benne et la reprise Both sont effectives dans le meme scan PRG04 ; aucun retrait de sens M2 nominal n atteint les sorties finales pendant le transfert."
+      verified_by: "chronogramme PRG03/PRG04/PRG06 avec M2 initial P1..P5, M1 dernier sens montee et descente"
+    - id: AC13
+      statement: "La preparation logique M1 reste sans marche ni contacteurs ; disponibilite du FB mouvement et de l interlock final verifiee avant transfert, pas seulement Ready."
+      verified_by: "test M1 dernier sens descente, fermeture courte/longue, frein ouvert/ferme, purge ou inhibition finale"
+    - id: AC14
+      statement: "Perte du geste, du contexte ou d un permis annule la transaction ; une preparation insuffisante a la fermeture utilise l arret historique avec motif observable, sans effort M2 prolonge ni redemarrage automatique apres defaut."
+      verified_by: "injections avant, pendant et apres transfert ; reprise avec mesure et permis reevalues"
+    - id: AC15
+      statement: "La validite du seuil exige geometrie et references fiables ; un affichage 0 % issu d une configuration invalide n autorise pas de transfert."
+      verified_by: "tests references douteuses, geometrie invalide, mesure invalide et bornes de configuration"
   scope:
     allowed:
       - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/GVL_PERSISTENT.st
       - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/M_MAIN/PRG_06_Outputs.st
       - CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st
-      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM1.st
-      - CODE/H_TREUILS_BENNE/FB_WinchCmdArbitrationM2.st
-      - CODE/J_SUPERVISION/GVL_IHM.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
-      - CODE/J_SUPERVISION/_TYPES/7_COMMUN_CONFIG/ST_CommunCfg.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_ProgramBucketRequest.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_WinchInterPrg.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_OutputsInterPrg.st
       - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
       - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
       - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml
       - TOOLS/AGENT_WORKFLOW/scripts/G500_check_t262_bucket_ascent_handoff.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
+      - TOOLS/tests/integration/test_t262_bucket_ascent_handoff.py
     forbidden:
       - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
       - CODE/FB_Safety_Winch.st
       - CODE/B_AU_SECURITE/*
+      - CODE/H_TREUILS_BENNE/FB_WinchOutputInterlock.st
+      - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
+    restrictions:
+      - "PRG_06_Outputs : publication en lecture seule de la disponibilite finale ; aucune modification de commande, temporisation, regate ou bypass."
+      - "Cible 9 fichiers ST : reutiliser les arbitres et les messages/etats IHM existants ; tout besoin de fichier ST supplementaire doit etre justifie dans le plan avant edition."
   conservation:
     must_survive:
       - "La condition historique benne fermée lorsque le seuil vaut 0 %."
       - "Les contrôles FDC, AU, freinage, synchronisation et défaut mouvement."
       - "La convention ActualBucketOpeningPct : 0 % fermé, 100 % ouvert."
       - "La pleine vitesse AX12 exige toujours Benne_IsClosed."
-    dropped_on_purpose: []
+      - "Le calcul codeurs, la calibration et l algorithme d offset benne restent inchanges."
+      - "Les modes manuel/maintenance et le passage ouverture vers plongee restent inchanges."
+    dropped_on_purpose:
+      - "Attente d arret AX10b dans le seul cas du transfert nominal prepare et qualifie ; maintien comme repli."
+      - "Plafond benne partielle P1 en AX11 uniquement : cible P2 demandee par utilisateur, autres plafonds prioritaires conserves."
   evidence_required:
     - check_linkage
     - run_all_gates
@@ -76,27 +110,29 @@ contract:
     l'étape AX10 et la synchronisation M1/M2 doit être signalée avant toute
     implémentation.
   blocking_decisions:
-    - "A 0 %, confirmer si le comportement historique conserve Benne_IsRoughlyClosed en plus de Benne_IsClosed."
-    - "Confirmer la borne métier maximale 50 % et la comparaison stricte ActualBucketOpeningPct < seuil."
-    - "Définir le chronogramme de transfert de priorité M2 benne vers Both P1 sans supprimer directement AX10_WAIT_ASCENT_START."
+    - "Validation humaine du plan concret : borne proposee 50 %, comparaison <=, raccordement P1 vers cible P2 et repli historique si preparation insuffisante."
+    - "Demontrer le chronogramme de disponibilite M1 (interlock mouvement ET final), puis les vecteurs egaux au transfert et en hausse P2, avant activation du lot B."
   phases:
-    - "A : ajouter/publier le paramètre et le critère calculé, sans changer la séquence."
-    - "B : transfert explicite M2 seul vers Both au palier 1, scan-par-scan."
-    - "C : continuité AX11 vers AX12 ; paliers supérieurs seulement après Benne_IsClosed."
-status: PENDING
+    - "A : parametre persistant et critere observable, transfert non actif ; essai IHM."
+    - "B : preparation, raccordement P1 sans arret, transfert meme scan et AX11 cible P2 ; revue diff et preuves ST."
+    - "C : validation AX11 vers AX12 et MES ; vitesse de charge seulement apres Benne_IsClosed."
+status: IN_PROGRESS
 execution:
-  executed_by: ""
+  executed_by: "Codex"
   completed_at: ""
   status: PENDING
   summary: >
-    Tâche créée pour cadrer le seuil de transition configurable de la fermeture
-    de benne en cycle automatique.
-  evidence_submitted: []
+    Prise en charge et plan prepares le 2026-09-15, challenge lecture seule expert
+    automatisme. MAJOR sur plan initial : trou de commande au scan de fermeture,
+    atomicite Both, disponibilite direction M1 et plafond P1 benne partielle.
+    Plan revise documente ; aucun code ST modifie ni test T262 execute.
+  evidence_submitted:
+    - DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
   notes: >
-    Validation humaine du chronogramme de transfert M2 seul vers Both requise
-    avant implémentation. La suppression directe de AX10_WAIT_ASCENT_START sans
-    preuve de l atomicité contacteurs/freins est interdite.
+    Besoin utilisateur confirme : seuil, 0 % historique, AX11 cible P2, fluidite.
+    Plan concret de raccordement et repli a valider avant ST (AGENTS.md).
+    La revue de plan ne valide ni du code non ecrit ni le comportement machine.
