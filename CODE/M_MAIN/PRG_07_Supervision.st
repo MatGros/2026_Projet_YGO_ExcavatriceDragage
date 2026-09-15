@@ -192,6 +192,7 @@ CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
 IF GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M < CycleDepthLowerBound_M THEN
     GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M := CycleDepthLowerBound_M;
 END_IF;
+GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct := LIMIT(0, GVL_IHM.CycleSemiAuto.Cfg.ExtractionStartOpening_Pct, 50);
 instCfgPersistBridgeCycle(Hmi := GVL_IHM.CycleSemiAuto.Cfg, Persist := _CycleCfgPersist);
 GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 3600);
 IF instCfgPersistBridgeCycle.JustRestored THEN

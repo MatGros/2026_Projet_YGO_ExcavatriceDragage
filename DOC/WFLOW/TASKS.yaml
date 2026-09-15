@@ -1,4 +1,41 @@
 tasks:
+- id: T299
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: CYCLE_SEMI_AUTO / SUPERVISION
+  agent: '—'
+  date: '2026-09-15T20:38:00+02:00'
+  avancement: 'Cadré le 2026-09-15 suite demande utilisateur : vérification et fiabilisation du compteur de prélèvements (SampleCount / dépose grille trémie).'
+  titre: 'Cycle SEMI_AUTO — Fiabiliser et tester le compteur de prélèvements (SampleCount dépose trémie) et ajouter la RAZ IHM'
+  contexte: 'L automate dispose d une variable RETAIN _CycleSampleCount incrémentée en AX18_DONE_SYNC et projetée vers GVL_IHM.CycleSemiAuto.State.SampleCount. Cependant, l incrémentation réelle sur dépose de matière (AX15B) n est pas couverte par un test unitaire complet, et il n existe aucun bouton de remise à zéro (RAZ) sur l IHM.'
+  description: 'Valider le moment exact d incrémentation du compteur de cycles/prélèvements (dépose à la trémie AX15B / fin de cycle AX18), ajouter une commande IHM de remise à zéro consciente protégée (front montant), et rédiger un test unitaire CI vérifiant l incrémentation effective après vidage.'
+  objectifs:
+  - 'Vérifier la sémantique de déclenchement : incrémenter dès la dépose effective à la trémie (AX15B_DUMP_OPEN achevé).'
+  - 'Ajouter un bouton/commande de remise à zéro consciente (front montant) GVL_IHM.CycleSemiAuto.Cmd.BtnResetSampleCount.'
+  - 'Câbler la RAZ dans PRG_03_Modes_Cycle / PRG_07_Supervision vers la variable persistante _CycleSampleCount.'
+  - 'Rédiger le test unitaire CI dédié validant l incrément à la dépose et la RAZ.'
+  - 'Bundle PLCopenXML, G200 liaison et gates applicables PASS.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T299_CYCLE_SAMPLE_COUNT.yaml
+  bloque_par: []
+- id: T298
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: CYCLE_SEMI_AUTO / CONFIGURATION
+  agent: '—'
+  date: '2026-09-15T15:48:00+02:00'
+  avancement: 'Noté le 2026-09-15 suite retour essai MES : passage de ExtractionControlDistance_M de 0.5 m à 1.0 m.'
+  titre: 'Cycle SEMI_AUTO — ExtractionControlDistance_M passé de 0.5 m à 1.0 m (montée contrôlée AX11)'
+  contexte: 'Retour essai MES : le paramètre GVL_IHM.CycleSemiAuto.Cfg.ExtractionControlDistance_M (distance de montée en vitesse contrôlée palier 1 après fermeture benne en AX11) est passé de 0.5 m à 1.0 m.'
+  description: 'Reporter la nouvelle valeur de 1.0 m dans les structures de configuration et la zone persistante (ST_CycleCfg et GVL_PERSISTENT._CycleCfgPersist) afin d’aligner le code source et les valeurs de démarrage sur le réglage machine éprouvé.'
+  objectifs:
+  - 'Mettre à jour la valeur initiale dans ST_CycleCfg (ExtractionControlDistance_M := 1.0).'
+  - 'Mettre à jour la valeur persistante initiale dans GVL_PERSISTENT._CycleCfgPersist (ExtractionControlDistance_M := 1.0).'
+  - 'Vérifier la cohérence de consommation dans PRG_03_Modes_Cycle et PRG_04_Treuils_Benne.'
+  - 'Vérifier l absence de régression sur les cycles et exécuter les gates mécaniques applicables.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T298_EXTRACTION_CONTROL_DISTANCE.yaml
+  bloque_par: []
 - id: T297
   parent_id: ''
   statut: '⬜'
@@ -23,12 +60,12 @@ tasks:
   bloque_par: []
 - id: T296
   parent_id: ''
-  statut: '⬜'
+  statut: '⏳'
   criticite: C3
   domaine: TRANSLATION_M3 / CONFIGURATION
-  agent: '—'
-  date: '2026-09-15T13:05:00+02:00'
-  avancement: 'Demandé le 2026-09-15 ; à planifier ultérieurement, aucune modification automate engagée.'
+  agent: Antigravity
+  date: '2026-09-15T15:05:00+02:00'
+  avancement: 'Prise en charge par Antigravity. Cadrage et analyse de la persistance et des consignes M3 (50 Hz nominal / 15 Hz zone PV).'
   titre: 'M3 — fréquences configurables et persistantes : 50 Hz standard / 15 Hz en zone PV'
   contexte: 'Demande utilisateur : utiliser 50 Hz en régime normal et limiter M3 à 15 Hz en zone PV, avec ces consignes conservées en configuration persistante pour une mise en œuvre ultérieure.'
   description: 'Étudier puis intégrer deux consignes de fréquence M3 persistantes : 50 Hz hors zone PV et 15 Hz en zone PV. La zone PV doit être déterminée depuis l’état/les transitions M3 déjà validés ; les fréquences et leur persistance ne doivent pas contourner les limites, rampes, interlocks ou arrêts existants.'
@@ -150,7 +187,7 @@ tasks:
   agent: Codex
   date: '2026-09-15T08:10:00+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
-  avancement: 'Patch en cours : profil AUTO AX4..AX7 M1=P4/M2=P5, sans modification manuel/maintenance.'
+  avancement: 'Teste et valide par utilisateur 2026-09-15 : effet reel mais modeste (aide un peu, pas miraculeux). Profil AUTO AX4..AX7 M1=P4/M2=P5, sans modification manuel/maintenance.'
   titre: 'T291-A — Essai auto descente M1=P4 / M2=P5'
   contexte: 'Utilisateur a confirme : cycle automatique uniquement, M1 palier 4 comme actuellement, M2 palier 5, sequence existante conservee.'
   description: 'Ajouter un toggle essai non persistant, capturer le profil avant depart plongee, commander M2 au palier 5 sur AX4..AX7 et adapter les concordances pour ce profil exact.'
@@ -6348,25 +6385,29 @@ tasks:
   criticite: C4
   domaine: CYCLE_AUTO_BENNE
   agent: Codex
-  date: '2026-09-15T11:34:47+02:00'
-  avancement: 'Tache retrouvee et recadree. Plan C4 a valider avant code : seuil benne + transfert continu M2 seul vers Both.'
+  date: '2026-09-15T15:10:00+02:00'
+  avancement: 'Phase A codee : GVL/IHM persistant ExtractionStartOpening_Pct [0..50], defaut 0, sans lecture cycle. Interface IHM figee ; verification pre-CODESYS en cours. B conserve AX10b, C raccordement P1, D AX11 P2 puis AX12.'
+  plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T262_TRANSFERT_AX10_AX11_20260915.md
   titre: Seuil configurable benne et continuité AX10→AX11→AX12
   contexte: 'Demande client cycle automatique : réduire l effort appliqué sur M2 seul pendant la fermeture de benne. La benne est exprimée en pourcentage d ouverture : 0 % = benne fermée, 100 % = benne ouverte.'
-  description: 'Phase A : ajouter un seuil borné 0..50 %. A 0 %, conserver le critère benne fermée ; au-dessus, autoriser AX11 si ActualBucketOpeningPct < seuil OU benne fermée. Phase B : remplacer la pause dure AX10_WAIT_ASCENT_START par un transfert maîtrisé de M2 seul vers la montée Both, puis garantir AX11→AX12 sans retombée direction/contacteurs/freins. La benne peut finir de se fermer mécaniquement pendant AX11 ; tant qu elle n est pas confirmée fermée, AX12 reste au palier lent. Aucun contournement AU/FDC/synchronisme.'
+  description: 'Seuil ouverture propose 0..50 % : a 0, critere historique ; seuil positif atteint sur mesure valide (<=) ou fin historique. Preparer M1 sans marche et raccorder M2 au P1, puis transfert Both au meme scan et AX11 cible P2 avec cadence existante. Si preparation insuffisante a la fermeture, conserver arret historique pour ne pas prolonger effort M2 seul. AX12 garde P1 benne partielle puis vitesse de charge benne fermee. Plan technique C4 a valider.'
   objectifs:
   - 'Paramètre de configuration unique, borné et visible, avec valeur par défaut 0 %.'
   - 'À 0 %, AX10_CLOSE_BUCKET utilise exactement la condition actuelle benne fermée, sans régression.'
-  - 'À 1..50 %, la transition AX10_CLOSE_BUCKET est autorisée si ActualBucketOpeningPct < seuil OU si l information benne fermée est vraie (OU, jamais un remplacement du fallback historique).'
+  - 'À 1..50 % (borne proposee), la transition est preparee si ouverture mesuree valide <= seuil OU si la fin de fermeture historique est atteinte ; ne jamais fabriquer IsClosed au seuil partiel.'
   - 'Une valeur hors plage est saturée à 0..50 % et ne contourne aucune barrière de sécurité.'
   - 'Le comportement M2 seul est réduit sans suppression des contrôles FDC, AU, frein et défaut mouvement.'
   - 'Tests scan-par-scan et validation cycle auto couvrent 0 %, seuil actif, limite 50 %, valeurs hors plage, et le cas fermé-mais-%>seuil (dérive capteur).'
   - 'Le transfert AX10 vers AX11 ne produit pas d arrêt franc inutile, mais ne permet aucun départ M1 non maîtrisé ni mouvement M2 hors commande.'
   - 'Le passage AX11 vers AX12 conserve la demande et le sens ; seul le palier évolue avec le cadencement existant.'
   - 'Tant que Benne_IsClosed est faux, AX12 reste plafonnée au palier lent ; aucune pleine vitesse sur simple seuil de pourcentage.'
+  - 'AX11 vise P2 apres raccordement Both P1 ; exception benne partielle limitee au transfert automatique qualifie, aucun relevement des autres plafonds.'
+  - 'Preuve jusqu aux sorties finales : dernier sens M1 montee/descente, M2 initial P1..P5, interruption et reprise, preparation insuffisante a la fermeture.'
   phases:
-  - 'A ⬜ Parametre + critere calculé, sans changement du cycle.'
-  - 'B ⬜ Transfert M2 seul vers Both au palier 1.'
-  - 'C ⬜ Continuite AX11 vers AX12, montee rapide seulement benne fermee.'
+  - 'A ⬜ GVL/persistance : parametre visible et borne, aucun effet cycle ; validation IHM.'
+  - 'B ⬜ Critere : 0 % historique, seuil positif prepare seulement ; AX10b conserve ; validation traces.'
+  - 'C ⬜ Raccordement : preparation M1, P1 commun sans arret, repli AX10b ; DQ/freins valides.'
+  - 'D ⬜ AX11 cible P2 puis AX12 ; plafonds prioritaires et MES validates.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml
   bloque_par: []
 

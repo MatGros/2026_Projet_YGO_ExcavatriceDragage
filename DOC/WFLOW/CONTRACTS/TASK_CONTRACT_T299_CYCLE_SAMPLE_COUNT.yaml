@@ -1,0 +1,68 @@
+contract:
+  task_id: T299
+  criticality: C2
+  strategy: patch
+  objective: >
+    Valider et fiabiliser l'incrémentation du compteur de prélèvements/cycles
+    SampleCount sur dépose effective de matière à la trémie, ajouter un bouton de
+    remise à zéro sur l'IHM (front montant conscient) et fournir les tests CI associés.
+  acceptance:
+    - id: AC1
+      statement: "SampleCount s'incrémente de 1 exactement une seule fois par cycle lors du vidage complet à la trémie (AX15B)."
+      verified_by: "Test unitaire CI simulant le passage AX15B -> AX18 avec contrôle de l'incrément."
+    - id: AC2
+      statement: "Une commande de RAZ consciente (front montant) GVL_IHM.CycleSemiAuto.Cmd.BtnResetSampleCount remet à 0 le compteur RETAIN _CycleSampleCount."
+      verified_by: "Test unitaire CI sur impulsion BtnResetSampleCount."
+    - id: AC3
+      statement: "La valeur de SampleCount reste persistante (RETAIN) et restaurée après redémarrage automate."
+      verified_by: "Inspection de GVL_PERSISTENT.st et du flux PRG_03 / PRG_07."
+    - id: AC4
+      statement: "Le bundle PLCopenXML, la liaison G200 et les gates applicables sont PASS."
+      verified_by: "G200_check_linkage.py et run_all_gates.py."
+    - id: AC5
+      statement: "Le nom de fichier est identique au nom de POU pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Contrôle du nom de fichier/POU."
+    - id: AC6
+      statement: "Le suffixe de fichier est identique au langage déclaré dans le bundle pour tout POU modifié sous CODE/M_MAIN."
+      verified_by: "Contrôle du nom de fichier/POU et inspection du PLCopenXML généré."
+  scope:
+    allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCmd.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE_XML/
+      - TOOLS/TEST_AUTO_CI/
+      - DOC/WFLOW/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Remise à zéro automatique sans action opérateur explicite.
+  conservation:
+    must_survive:
+      - "La logique de séquencement du cycle semi-auto reste inchangée."
+      - "Le compteur conserve sa persistance RETAIN."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "Test unitaire CI FB_CycleSemiAuto avec scénario de vidage et vérification de l'incrément."
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Vérifier que la RAZ est strictement sur front montant et ne peut pas être
+    maintenue à l'état haut en continu.
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
