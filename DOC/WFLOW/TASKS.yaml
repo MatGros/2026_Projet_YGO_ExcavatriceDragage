@@ -4,6 +4,24 @@ archive_reference: DOC/WFLOW/ARCHIVES/TASKS_SNAPSHOT_20260915/TASKS_20260915_234
 note: Catalogue actif de la phase de Mise en Service (Septembre 2026). Les 213 tâches
   historiques antérieures au 01/09/2026 sont conservées dans archive_reference.
 tasks:
+- id: T302
+  parent_id: ''
+  statut: ✅
+  criticite: C1
+  domaine: METHODOLOGIE / STANDARD_AF_ET_TESTS
+  agent: Antigravity
+  date: '2026-09-16T01:05:00+02:00'
+  avancement: 'Terminée : guide méthodologique GUIDE_METHODOLOGIE_AF_ET_TESTS_2_ETAGES_v1.0.md créé (flat & fluide), contre-expertise Ollama versée aux audits, et éprouvé sur AF_Partie-11_Fonction_Translation_v2.4.md.'
+  titre: Méthodologie — Standard d Analyse Fonctionnelle & Tests en 2 Étages (Boîte Noire + SimBench HwSim)
+  contexte: 'Constat de sur-spécification et d inflation de micro-tests unitaires fragiles portant sur des variables privées de FB. Besoin d un standard simple, lisible et rapide en 2 étages : Étage 1 (Fonctions principales boîte noire) + Étage 2 (Dynamique simulée en boucle fermée via SimBench injecté sur HwSim).'
+  description: 'Établir et diffuser le standard de rédaction des analyses fonctionnelles et de qualification par test en deux étages étanches. Appliquer le standard sur l AF11 Translation M3 (nettoyage tag brouillon, réduction de 450 à 127 lignes, cadrage des 5 fonctions principales et des 3 scénarios dynamiques).'
+  objectifs:
+  - 'Rédiger le document méthodologique DOC/STDS/GUIDES/GUIDE_METHODOLOGIE_AF_ET_TESTS_2_ETAGES_v1.0.md.'
+  - 'Éprouver la structure sur AF_Partie-11_Fonction_Translation_v2.4.md en divisant la complexité par 4.'
+  - 'Formaliser le principe strict d injection de simulation sur HwSim -> PRG_02 pour préserver le code métier.'
+  - 'Rendre les tests boîte noire exécutables en 1 scan pour un feedback immédiat.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T302_STANDARD_AF_ET_TESTS_2_ETAGES.yaml
+  bloque_par: []
 - id: T301
   parent_id: ''
   statut: ⬜

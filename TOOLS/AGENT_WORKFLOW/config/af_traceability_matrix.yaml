@@ -1972,108 +1972,171 @@ domains:
         ref: §4
         etat: NV
   AF-11:
-    file: AF_Partie-11_Fonction_Translation_v2.3.md
+    file: AF_Partie-11_Fonction_Translation_v2.4.md
     functions:
       F11.01:
         fonction: Décoder la position M3 (5 capteurs)
-        description: Position qualifiée Travail/Trémie/Extrêmes ; incohérence → défaut
-          immédiat
+        description: Position qualifiée Travail/Trémie/Extrêmes ; odométrie recalée
+          ; incohérence → défaut immédiat
         realisee_par: FB_Translation_PositionDecoder
         criticite: 🟠 C3
         tc_couvrants:
         - TC-P11-001
         - '002'
-        statut: ⚠️ cible PRG‑05 ; code encore PRG‑02
-        etat: NV
+        statut: ✅
+        etat: V-I
       F11.02:
-        fonction: Protéger M3 (Méca A/B, incohérence, bypass)
-        description: Arrêt commandé mais mouvement résiduel / incohérence prolongée
-          → SafeStop+PowerCutOff ; produit les permits directionnels TremiePermit/MaintenancePermit
-          (source safety unique, §3bis)
+        fonction: Protéger M3 (Méca A/B, butées, AU)
+        description: Arrêt commandé mais mouvement résiduel / butée atteinte → SafeStop+PowerCutOff
+          ; produit les faits de limite TremieLimitClear/MaintenanceLimitClear. Permits
+          effectifs calculés en PRG_05 (§3bis).
         realisee_par: FB_Safety_Translation
         criticite: 🔴 C4
         tc_couvrants:
-        - TC-P11-002
-        - '010'
+        - TC-P11-010
         - '011'
         - '014'
         statut: ✅
-        etat: NV-I
+        etat: V-I
       F11.03:
-        fonction: Piloter le mouvement M3 (rampe, ralentissement, interlock sens)
-        description: Joystick/SemiAuto → rampe → AC600 ; ralentissement PV ; boutons
-          IHM MAINT exigent homme-mort
+        fonction: Piloter le mouvement M3 (Joystick, MAINT, Cycle)
+        description: Joystick / SemiAuto ➔ rampe 20 Hz/s ➔ AC600 ; ralentissement
+          PV 15 Hz ; boutons IHM MAINT sous Homme-Mort armé
         realisee_par: FB_Translation
         criticite: 🟠 C3
         tc_couvrants:
-        - TC-P11-003-005
+        - TC-P11-003
+        - '004'
+        - '005'
         - '013'
         statut: ✅
-        etat: NV-I
+        etat: V-I
       F11.04:
-        fonction: Barrière finale sorties + watchdog frein
-        description: Watchdog frein 500ms, réautorisation post-timeout, gate mot/fréquence,
-          reset AC600 sous inhibition
+        fonction: Barrière finale sorties & watchdog frein
+        description: Watchdog frein 500 ms, réautorisation post-timeout, coupure immédiate
+          mot/fréquence en cas de discordance
         realisee_par: FB_TranslationOutputInterlock
         criticite: 🔴 C4
         tc_couvrants:
-        - TC-P11-006-009
+        - TC-P11-006
+        - '007'
+        - 008
+        - 009
         statut: ✅
-        etat: NV-I
+        etat: V-I
       F11.05:
-        fonction: Anti-télescopage hauteur M1/M2 (collision benne/translation)
-        description: Bloque translation si câbles M1/M2 sous hauteur mini, sauf Bypass.MinHeight
-          conscient (jamais via BypassGlobal)
-        realisee_par: PRG_05_Translation §0 (câblage direct, hors FB dédié)
+        fonction: Anti-télescopage hauteur benne M1/M2
+        description: Bloque toute translation si câbles M1/M2 sous seuil mini (Bypass.MinHeight
+          conscient
+        realisee_par: PRG_05_Translation §0 (câblage direct inter-domaine)
         criticite: 🔴 C4
         tc_couvrants:
         - TC-P11-015
         statut: ✅
-        etat: NV
+        etat: V-I
+      F11.06:
+        fonction: Dynamique simulée boucle fermée (SIL)
+        description: 'Validation temporelle sous SimBench via HwSim : traversée nominale,
+          balancement de charge 10t avec rebond capteur 1s (T300), escalade graduée
+          butée 2.5s/5s (T287)'
+        realisee_par: PRG_05_Translation ◄► FB_SimBench
+        criticite: 🟠 C3
+        tc_couvrants:
+        - TC-P11-016
+        - '017'
+        - 018
+        statut: ⏳ T300
+        etat: NV-I
     validation_points:
       TC-P11-001/002:
-        intention: "\U0001F4A4 Étape 0 : 5 capteurs M3 lus, mot capteurs en formation\
-          \ \n        \U0001F680 Étape 1 : Décodage 5 capteurs → mot valide → position\
-          \ qualifiée (Travail/Trémie/Extrêmes) \n        ⚡ Étape 2 : Mot incohérent\
-          \ injecté → Incoherent=TRUE \n        ✅ Étape 3 : Safety bit7 → SafeStop+PowerCutOff"
+        intention: "\U0001F4A4 Étape 0 (Repos) : 5 entrées capteurs DI à zéro, position\
+          \ odométrique stationnaire. \n        \U0001F680 Étape 1 (Qualification)\
+          \ : Activation SensorP1_DI=TRUE ➔ AtP1=TRUE, PositionDiscrete=P1. \n   \
+          \     ⚡ Étape 2 (Incohérence) : Activation simultanée SensorTremie_DI=TRUE\
+          \ et SensorMaintenance_DI=TRUE. \n        ✅ Étape 3 (Sécurité) : Détection\
+          \ immédiate Incoherent=TRUE ➔ M3_SafeStop_Aggregate=TRUE + PowerCutOff."
         type: 💻 AUTO
-        ref: FB_Translation_PositionDecoder
-        etat: NV-I
+        ref: PRG_05
+        etat: V-I
+      TC-P11-003..005/013:
+        intention: "\U0001F4A4 Étape 0 (Repos neutre) : Joystick centré (RawX=5000,\
+          \ AtNeutralXY=TRUE, TargetFrequencyHz=0.0). \n        \U0001F512 Étape 1\
+          \ (Armement) : DeadmanArmed=TRUE, EffectivePermitM3_Tremie=TRUE. \n    \
+          \    \U0001F680 Étape 2 (Zone morte & décollement) : Déflexion +20% ➔ Direction=+1,\
+          \ BrakeReleaseCmd=TRUE, rampe 20 Hz/s démarre. \n        ⚡ Étape 3 (Plein\
+          \ régime) : Déflexion +90% ➔ Rampe jusqu'à TargetFrequencyHz=50.0 Hz (nominal).\
+          \ En mode MAINT : vitesse bornée à 15.0 Hz (PV). \n        \U0001F504 Étape\
+          \ 4 (Retour neutre) : Retour RawX=5000 ➔ Décélération 20 Hz/s jusqu'à 0\
+          \ Hz ➔ BrakeReleaseCmd=FALSE (frein retombe)."
+        type: ⚡ AUTO_PLC
+        ref: PRG_05
+        etat: V-I
+      TC-P11-006..009:
+        intention: "\U0001F4A4 Étape 0 (Sorties prêtes) : Sorties autorisées, frein\
+          \ fermé (BrakeReleaseCmd=FALSE). \n        \U0001F680 Étape 1 (Ordre de\
+          \ marche) : Commande BrakeReleaseCmd=TRUE ➔ Attente retour contact auxiliaire\
+          \ BrakeFeedback_DI. \n        ⚡ Étape 2 (Défaut frein) : Perte de BrakeFeedback_DI\
+          \ en mouvement pendant > 500 ms ➔ Alarme watchdog frein + coupure immédiate\
+          \ mot/vitesse. \n        \U0001F504 Étape 3 (Anti-redémarrage) : Réapparition\
+          \ du feedback ➔ La commande reste verrouillée (exige Cause disparue + Front\
+          \ Reset + Retour neutre)."
+        type: ⚡ AUTO_PLC
+        ref: PRG_05
+        etat: V-I
       TC-P11-010/011/014:
-        intention: "\U0001F4A4 Étape 0 : M3 en mouvement nominal, BypassGlobal=FALSE\
-          \ \n        \U0001F680 Étape 1 : Injection défaut (Méca A : mouvement résiduel\
-          \ ; Méca B : incohérence prolongée) \n        ⚡ Étape 2 : SafeStop+PowerCutOff\
-          \ déclenchés \n        ✅ Étape 3 : BypassGlobal efface ErrorId (vérifié\
-          \ séparément)"
+        intention: "\U0001F4A4 Étape 0 (Nominal) : Chariot en marche normale, BypassGlobal=FALSE.\
+          \ \n        \U0001F680 Étape 1 (Injection anomalie) : Méca A (vitesse variateur\
+          \ active mais consigne arrêt) ou Méca B (glissement prolongé). \n      \
+          \  ⚡ Étape 2 (Déclenchement) : Escalade en SafeStop + PowerCutOff. \n  \
+          \      \U0001F504 Étape 3 (Acquittement) : Réarmement conditionné par disparition\
+          \ du mouvement + appui conscient sur Reset."
         type: ⚡ AUTO_PLC
-        ref: FB_Safety_Translation
-        etat: NV-I
-      TC-P11-003/004/005/013:
-        intention: "\U0001F4A4 Étape 0 : M3 au repos, joystick au neutre \n      \
-          \  \U0001F680 Étape 1 : Consigne joystick/SemiAuto → rampe → AC600 \n  \
-          \      ⚡ Étape 2 : Ralentissement PV si Direction=1+capteur ; interlock\
-          \ sens 200ms si vitesse≠0 \n        ✅ Étape 3 : Boutons IHM MAINT exigent\
-          \ DeadmanArmed — mouvement validé"
-        type: ⚡ AUTO_PLC
-        ref: FB_Translation
-        etat: NV
-      TC-P11-006-009:
-        intention: "\U0001F4A4 Étape 0 : Sorties M3 autorisées, frein OK \n      \
-          \  \U0001F680 Étape 1 : Perte BrakeFeedback pendant mouvement \n       \
-          \ ⚡ Étape 2 : Watchdog frein 500ms sans confirmation → FAULT+Inhibit \n\
-          \        ✅ Étape 3 : Réautorisation = Cause+Reset+Mot 0+nouvelle demande\
-          \ — zéro redémarrage auto"
-        type: ⚡ AUTO_PLC
-        ref: FB_TranslationOutputInterlock
-        etat: NV
+        ref: PRG_05
+        etat: V-I
       TC-P11-015:
-        intention: "\U0001F4A4 Étape 0 : CablePosM1/CablePosM2 > _TranslationMinHeightM1M2_M\
-          \ (6.0m) \n        \U0001F680 Étape 1 : Descente treuils sous 6.0m → M3_HeightInterlockOk=FALSE\
-          \ \n        ⚡ Étape 2 : Translation bloquée ; Bypass.MinHeight (dédié) lève\
-          \ l'interlock, BypassGlobal non \n        ✅ Étape 3 : Interlock anti-télescopage\
-          \ actif — câblé PRG_05_Translation.st §0 (hors FB dédié)"
+        intention: "\U0001F4A4 Étape 0 (Benne haute) : Câbles CablePosM1/M2 > 6.0\
+          \ m ➔ M3_HeightInterlockOk=TRUE. \n        \U0001F680 Étape 1 (Descente\
+          \ benne) : CablePosM1 descend à 5.5 m (M3_HeightInterlockOk=FALSE. \n  \
+          \      ⚡ Étape 2 (Blocage axe) : Toute commande de translation est neutralisée\
+          \ au même scan (consigne=0, frein fermé). \n        \U0001F504 Étape 3 (Bypass\
+          \ dédié) : Seul Bypass.MinHeight=TRUE (action explicite) lève l'interlock\
+          \ ; BypassGlobal ne le lève jamais."
         type: 💻 AUTO
-        ref: PRG_05_Translation
+        ref: PRG_05
+        etat: V-I
+      TC-P11-016:
+        intention: "\U0001F4A4 Étape 0 (Départ Trémie) : Chariot à 0.0 m simulé sous\
+          \ FB_SimBench (SensorTremie_DI=TRUE). \n        \U0001F680 Étape 1 (Consigne\
+          \ 50 Hz) : Ordre continu vers Maintenance (Direction=-1). \n        ⚡ Étape\
+          \ 2 (Défilement des 5 capteurs) : Passage successif sur PV (5m), P2 (15m),\
+          \ P1 (20m), Maintenance (30m). \n        \U0001F504 Étape 3 (Recalage dynamique)\
+          \ : À chaque front de capteur dans HwSim, l'odométrie EstimatedPos_M se\
+          \ recale sur la cote exacte sans glitch ni saut discontinu."
+        type: 🔄 SIL
+        ref: SimBench
+        etat: NV-I
+      TC-P11-017:
+        intention: "\U0001F4A4 Étape 0 (Vitesse établie) : Chariot approche du capteur\
+          \ P1 à 50 Hz sous charge suspendue oscillante (10 t). \n        \U0001F680\
+          \ Étape 1 (1er franchissement) : Front montant SensorP1_DI=TRUE généré par\
+          \ HwSim. \n        ⚡ Étape 2 (Oscillation pendulaire) : L'oscillation fait\
+          \ sortir puis ré-entrer la cible : le signal bascule 1 ➔ 0 ➔ 1 sur 1 seconde.\
+          \ \n        \U0001F504 Étape 3 (Filtrage automate) : Le décodeur filtre\
+          \ la perte momentanée : AtP1 reste qualifié, pas de claquement du frein\
+          \ ni de faux défaut."
+        type: 🔄 SIL
+        ref: SimBench
+        etat: NV-I
+      TC-P11-018:
+        intention: "\U0001F4A4 Étape 0 (Heurt butée) : Chariot arrive en fin de course\
+          \ Trémie sous commande vitesse maintenue. \n        \U0001F680 Étape 1 (T=0\
+          \ s) : SensorTremie_DI=TRUE ➔ Arrêt directionnel immédiat du variateur (consigne=0\
+          \ Hz). \n        ⚡ Étape 2 (T > 2.5 s) : La commande vers Trémie reste maintenue\
+          \ ➔ Déclenchement alarme SafeStop (code ErrorLimitSwitch). \n        \U0001F504\
+          \ Étape 3 (T > 5.0 s) : Persistance anormale ➔ Escalade en coupure générale\
+          \ PowerCutOff mémorisée (exige Reset conscient)."
+        type: 🔄 SIL
+        ref: SimBench
         etat: NV-I
       TC-P11-002:
         intention: "\U0001F4A4 Étape 0 : Décodage actif, mot capteurs lu \n      \
