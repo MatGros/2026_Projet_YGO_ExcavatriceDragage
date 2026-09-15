@@ -1,5 +1,5 @@
 version: 2.0.0
-derniere_mise_a_jour: '2026-09-16T00:12:00+02:00'
+derniere_mise_a_jour: '2026-09-16T00:36:00+02:00'
 archive_reference: DOC/WFLOW/ARCHIVES/TASKS_SNAPSHOT_20260915/TASKS_20260915_234600.yaml
 note: Catalogue actif de la phase de Mise en Service (Septembre 2026). Les 213 tâches
   historiques antérieures au 01/09/2026 sont conservées dans archive_reference.
@@ -218,7 +218,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: TRANSLATION_M3 / CONFIGURATION
-  agent: Antigravity
+  agent: —
   date: '2026-09-15T15:05:00+02:00'
   avancement: Prise en charge par Antigravity. Cadrage et analyse de la persistance
     et des consignes M3 (50 Hz nominal / 15 Hz zone PV).
@@ -495,7 +495,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: TREUILS_BENNE
-  agent: Codex
+  agent: —
   date: '2026-09-15T11:34:47+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
   avancement: '✅ Essai simulation utilisateur 2026-09-15 : AX11 monte M1+M2 au palier
@@ -558,7 +558,7 @@ tasks:
   statut: ⏳
   criticite: C4
   domaine: TREUILS_BENNE / COHERENCE CONTACTEURS PAR AXE
-  agent: Codex
+  agent: —
   date: '2026-09-15T09:17:55+02:00'
   avancement: 'Phase 1 validee en simulation. Revue C4 phase 2 terminee : verdict
     MAJOR, pas pret a coder. Architecture recommandee : registre dedie extensible
@@ -809,10 +809,10 @@ tasks:
   bloque_par: []
 - id: T208
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: TREUILS / SÉCURITÉ
-  agent: DSH-02
+  agent: —
   date: '2026-09-01T00:00:00'
   titre: Cohérence ActiveOffsetM / état benne — correction validée (2 challenges MAJOR)
   contexte: 'Intitulé complet : Corriger la cohérence ActiveOffsetM / état benne (IsOpen/IsClosed)
@@ -842,6 +842,7 @@ tasks:
   - 'Auto-vérification : contrat PASS + bundle frais + G200 liaison PASS + gates palier
     C PASS'
   bloque_par: []
+  avancement: 'Terminée : cohérence ActiveOffsetM / état benne (absorbée par T241).'
 - id: T210
   parent_id: ''
   statut: ✅
@@ -1128,11 +1129,10 @@ tasks:
   bloque_par: []
 - id: T222
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: JOYSTICK / SÉCURITÉ MOUVEMENT
-  agent: CDX (exécution) — décisions A/C/D/B tranchées orchestrateur ; revues nommage
-    + qualité obligatoires avant validation
+  agent: —
   date: '2026-09-02T11:35:00+02:00'
   locked_at: '2026-09-02T12:05:00+02:00'
   titre: Désarmement joystick sur inversion inter-scan sans neutre observé
@@ -1159,12 +1159,14 @@ tasks:
   - Mettre à jour AF08 et valider bundle, G200 et gates
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T222_JOYSTICK_INVERSION_NEUTRE.yaml
   bloque_par: []
+  avancement: 'Terminée et validée : désarmement joystick sur inversion inter-scan
+    sans neutre (commit 9d613dd2).'
 - id: T223
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C4
   domaine: JOYSTICK / COMMANDE VITESSE
-  agent: Codex
+  agent: —
   date: '2026-09-02T12:45:00+02:00'
   locked_at: '2026-09-02T12:45:00+02:00'
   titre: Liaison table paliers centrale vers configuration effective joystick
@@ -1186,6 +1188,8 @@ tasks:
   - Non-regression arming, safety et sorties
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T223_JOYSTICK_SPEEDSTEP_TABLE_LINK.yaml
   bloque_par: []
+  avancement: 'Terminée et validée : liaison table paliers centrale vers config joystick
+    (commit 03e88d0d).'
 - id: T224
   parent_id: ''
   statut: 🔎
@@ -1470,10 +1474,10 @@ tasks:
   bloque_par: []
 - id: T233
   parent_id: T226
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: CYCLE / HOMING MACHINE (G_CYCLE)
-  agent: CC-01
+  agent: —
   date: '2026-09-03T09:30:00+02:00'
   titre: Implementation du GRAFCET de homing machine (FB_MachineHomingCycle HX0..HX6)
   contexte: 'Realise la spec figee DOC/WFLOW/CONTRACTS/GEL_GRAFCET_HOMING_CYCLE_20260903.md
@@ -1499,12 +1503,14 @@ tasks:
   - Suite test_fb_machinehomingcycle reconstruite sur le modele GRAFCET
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T233_IMPL_GRAFCET_HOMING_MACHINE.yaml
   bloque_par: []
+  avancement: 'Terminée et validée : FB_CycleMachineHoming implémenté et opérationnel
+    (commit d06019f9).'
 - id: T234
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: DOCUMENTATION (REFONTE CYCLE SEMI_AUTO)
-  agent: CC-01
+  agent: —
   date: '2026-09-03T08:10:00+02:00'
   titre: Mise a jour documentaire de la refonte du cycle SEMI_AUTO (ex-T232, renumerote)
   contexte: 'Regroupe la dette documentaire des lots cycle codes pendant la MES 2026-09
@@ -1525,6 +1531,8 @@ tasks:
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T234_MAJ_DOC_REFONTE_CYCLE.yaml
   bloque_par:
   - T233
+  avancement: 'Terminée : mise à jour documentaire de la refonte du cycle SEMI_AUTO
+    effectuée.'
 - id: T235
   parent_id: ''
   statut: ⬜
@@ -1561,10 +1569,10 @@ tasks:
   bloque_par: []
 - id: T237
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: SEQUENCEUR SEMI_AUTO / FB_CYCLE
-  agent: CC-01
+  agent: —
   date: '2026-09-03T12:00:00+02:00'
   titre: FB_CycleSemiAuto - gel GRAFCET SEMI_AUTO + renommage FB_Cycle
   contexte: 'Demande utilisateur (urgent, avant MES) : meme demarche que le homing
@@ -1593,12 +1601,14 @@ tasks:
   - Bundle regenere, G200 PASS, gates palier C au niveau baseline
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T237_FB_CYCLESEMIAUTO_GEL_RENOMMAGE.yaml
   bloque_par: []
+  avancement: 'Terminée et validée en production : FB_CycleSemiAuto remplace FB_Cycle,
+    GRAFCET 20 étapes gelé.'
 - id: T238
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: SEQUENCEUR SEMI_AUTO / ASSISTANTS
-  agent: ''
+  agent: —
   date: '2026-09-03T17:00:00+02:00'
   titre: Retrait du sous-systeme assistants DiveSearch / ExtractionAssist / DumpAtTremie
   contexte: 'Demande utilisateur (2026-09-03). Depuis T237, le diving (AX4..AX8 +
@@ -1670,12 +1680,14 @@ tasks:
     BANC
   contrat: ''
   bloque_par: []
+  avancement: 'Terminée : retrait effectif du sous-système assistants (DiveSearch
+    / ExtractionAssist).'
 - id: T239
   parent_id: ''
   statut: ✅
   criticite: C2
   domaine: HOMING MACHINE / NOMMAGE
-  agent: ''
+  agent: —
   date: '2026-09-03T17:00:00+02:00'
   titre: Renommage FB_MachineHomingCycle -> FB_CycleMachineHoming (homogeneite Cycle*)
   contexte: 'Demande utilisateur (2026-09-03). GVL_IHM.CycleMachineHoming a ete pose
@@ -1696,12 +1708,14 @@ tasks:
   - Bundle regenere, G200 PASS, FB_CycleMachineHoming tests verts
   contrat: ''
   bloque_par: []
+  avancement: 'Terminée : renommage FB_MachineHomingCycle -> FB_CycleMachineHoming
+    dans CODE/ et PRG_03.'
 - id: T240
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: HOMING MACHINE / GRAFCET
-  agent: ''
+  agent: —
   date: '2026-09-03T18:45:00+02:00'
   updated_at: '2026-09-03T19:45:00+02:00'
   titre: Homing machine possible benne OUVERTE ou FERMEE (capteur top partage M1/M2)
@@ -1738,12 +1752,14 @@ tasks:
   - FB_CycleMachineHoming tests verts, bundle regenere, G200 PASS
   contrat: ''
   bloque_par: []
+  avancement: 'Terminée : homing machine benne ouverte ou fermée pris en charge dans
+    FB_CycleMachineHoming.'
 - id: T241
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: TREUILS BENNE / MESURE ET OFFSET
-  agent: ''
+  agent: —
   date: '2026-09-03T19:40:00+02:00'
   titre: Fiabiliser etat benne + calcul ActiveOffsetM + defauts benne (mesure physique)
   contexte: 'Mise en service 2026-09-03 (MES-045). Serie de defauts en cascade en
@@ -1797,12 +1813,14 @@ tasks:
   - Alarme non bloquante en cas d'incoherence offset/mesure persistante
   contrat: ''
   bloque_par: []
+  avancement: 'Terminée et validée machine : ActiveOffsetM et homing WinchSel-agnostique
+    (commit d1b283aa).'
 - id: T242
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: TRANSLATION M3 / POSITION
-  agent: ''
+  agent: —
   date: '2026-09-04T08:00:00+02:00'
   titre: M3 translation - bits at position (tremie / P1 / zone maintenance) ne s activent
     pas
@@ -1827,6 +1845,8 @@ tasks:
   - Seuils / logique documentes dans l inventaire des defauts bloquants
   contrat: ''
   bloque_par: []
+  avancement: 'Terminée : bits de position M3 AtTremie / AtP1 / AtMaintenance décodés
+    dans FB_Translation_PositionDecoder.'
 - id: T243
   parent_id: ''
   statut: ⏳
@@ -1961,10 +1981,10 @@ tasks:
   bloque_par: []
 - id: T249
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: TRANSLATION M3 / IHM / SECURITE
-  agent: ''
+  agent: —
   date: '2026-09-04T11:45:00+02:00'
   titre: Remontee statut position M3 (bannier/messages) + verrou descente treuil general
   contexte: 'MES 2026-09-04. (1) Aucune info M3 dans la banniere : l''operateur ne
@@ -1995,12 +2015,14 @@ tasks:
   - Bascule banniere M3 <-> treuil selon contexte, niveau INFO (jamais alarme)
   contrat: ''
   bloque_par: []
+  avancement: 'Terminée : remontée statut et messages de position M3 dans PRG_05_Translation
+    et GVL_IHM.'
 - id: T248
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: BENNE / MODES / SEQUENCE COUPLEE
-  agent: CC
+  agent: —
   date: '2026-09-04T15:30:00+02:00'
   titre: Gestion bucket auto en MAINT couple (WinchSel=0) - ouverture/fermeture benne
     auto via le VRAI selecteur
@@ -2051,6 +2073,8 @@ tasks:
   - TC CI: atomicite demarrage couple + sequencement selecteur reel
   contrat: ''
   bloque_par: []
+  avancement: 'Terminée et validée CI : gestion bucket auto en MAINT couplé WinchSel=0
+    (commit e57baacc).'
 - id: T250
   parent_id: ''
   statut: ⬜
@@ -2137,10 +2161,10 @@ tasks:
   bloque_par: []
 - id: T252
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: REGISTRE MES 2026-09-04 - A TRAITER DEMAIN
-  agent: ''
+  agent: —
   date: '2026-09-04T20:10:00+02:00'
   titre: Registre des points ouverts session MES 2026-09-04 (a traiter/verifier demain)
   contexte: 'Session MES longue 2026-09-04. Point general : validation operateur confirmee
@@ -2184,6 +2208,7 @@ tasks:
   - Dette outillage (harnais casses) planifiee
   contrat: ''
   bloque_par: []
+  avancement: 'Terminée : registre des points ouverts session MES du 2026-09-04 clos.'
 - id: T253
   parent_id: ''
   statut: ⏳
@@ -2233,10 +2258,10 @@ tasks:
   bloque_par: []
 - id: T255
   parent_id: ''
-  statut: 🔒
+  statut: ⏳
   criticite: C2
   domaine: SUPERVISION_IHM
-  agent: AGY-01
+  agent: —
   date: '2026-09-05T10:25:00+02:00'
   locked_at: '2026-09-05T10:25:00+02:00'
   titre: Guidage dynamique précis des messages opérateur et conditions IHM (Retours
@@ -2327,10 +2352,10 @@ tasks:
   bloque_par: []
 - id: T256
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C1
   domaine: SECURITE_CYCLE
-  agent: ''
+  agent: —
   date: '2026-09-05T16:00:00+02:00'
   titre: Reactiver instFault + gate Abort/Reset dans FB_CycleSemiAuto (desactives
     pour essai)
@@ -2350,12 +2375,14 @@ tasks:
   - Bundle regenere + G200/gates verts
   contrat: ''
   bloque_par: []
+  avancement: 'Terminée : instance instFault et barrières Abort/Reset actives dans
+    FB_CycleSemiAuto.'
 - id: T258
   parent_id: ''
-  statut: 🔒
+  statut: ⏳
   criticite: C3
   domaine: CYCLE_SEMI_AUTO_SAT
-  agent: Codex
+  agent: —
   date: '2026-09-05T23:30:27+02:00'
   titre: Fiabiliser le cycle semi-auto pour SAT J2
   contexte: 'Revue croisee automatisme/safety, CI et IHM du 2026-09-05 : plan initial
@@ -2376,7 +2403,7 @@ tasks:
   statut: ⏳
   criticite: C3
   domaine: TEST_CI_CYCLE
-  agent: Codex
+  agent: —
   date: '2026-09-06T00:05:00+02:00'
   titre: Etablir le socle de preuve STruC++ cycle et inter-PRG
   contexte: Les tests actuels ne cablent ni Kobold reel, ni commissioning/forçage
@@ -2472,10 +2499,10 @@ tasks:
   - T258-D
 - id: T259
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: MAINTENANCE_N2_IHM
-  agent: Codex
+  agent: —
   date: '2026-09-07T15:30:00+02:00'
   titre: Forçage parallèle (OR //) sorties hardware en MAINT_N2 sous mot de passe
     IHM
@@ -2495,12 +2522,14 @@ tasks:
   - Rebouclage propre dans Data.* vers le banc de simulation FB_SimBench
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T259.yaml
   bloque_par: []
+  avancement: 'Terminée et validée machine : forçage parallèle sorties hardware en
+    MAINT_N2 (commit 99313315).'
 - id: T261
   parent_id: ''
   statut: ⏳
   criticite: C3
   domaine: AU_SECURITE
-  agent: Claude Code
+  agent: —
   date: '2026-09-07T03:05:00'
   titre: Bypass granulaire auto-test redondance AU par canal keepalive A / B
   contexte: En MES un seul canal PowerKeepAlive (A ou B) peut avoir son cablage/DI
@@ -2528,7 +2557,7 @@ tasks:
   statut: ⏳
   criticite: C4
   domaine: CYCLE_AUTO_BENNE
-  agent: Codex
+  agent: —
   date: '2026-09-15T15:10:00+02:00'
   avancement: 'Phase A codee : GVL/IHM persistant ExtractionStartOpening_Pct [0..50],
     defaut 0, sans lecture cycle. Interface IHM figee ; verification pre-CODESYS en
@@ -2676,10 +2705,10 @@ tasks:
   bloque_par: []
 - id: T271
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C3
   domaine: CYCLE_AUTO_EXTRACTION
-  agent: Codex
+  agent: —
   date: '2026-09-07T15:00:00+02:00'
   titre: 'RaiseOffBottom à zéro : passage direct fermeture benne AX10'
   contexte: La configuration GVL_IHM.CycleSemiAuto.Cfg.RaiseOffBottom_M = 0 ne doit
@@ -2694,6 +2723,7 @@ tasks:
   - Conditions de plongée AX4..AX8 et sécurités inchangées.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T271_RAISE_OFF_BOTTOM_ZERO_DIRECT_AX10.yaml
   bloque_par: []
+  avancement: 'Terminée : RaiseOffBottom_M fixé à 0.0 m par défaut dans GVL_PERSISTENT.'
 - id: T272
   parent_id: ''
   statut: ⏳
@@ -2741,10 +2771,10 @@ tasks:
   bloque_par: []
 - id: T274
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: CYCLE_AUTO_EXTRACTION
-  agent: Antigravity
+  agent: —
   date: '2026-09-07T16:55:00+02:00'
   titre: Alignement des limites de profondeur (SetDepth_M -29m, Limite Légale -30m,
     Max Treuils -50m)
@@ -2760,12 +2790,13 @@ tasks:
   - Vérification de non-régression et régénération du bundle XML.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T274_ALIGNEMENT_LIMITES_PROFONDEUR.yaml
   bloque_par: []
+  avancement: 'Terminée : profondeur SetDepth_M alignée à -29.0 m dans GVL_PERSISTENT.'
 - id: T275
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: SUPERVISION_IHM
-  agent: Antigravity
+  agent: —
   date: '2026-09-07T17:35:00+02:00'
   titre: 'Conversion IHM timers : configuration en INT et exposition des temps écoulés
     en INT'
@@ -2784,12 +2815,13 @@ tasks:
   - Valider la conformité de liaison G200 et la précision temporelle.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T275_IHM_TIMER_INT_TIME_CONVERSION.yaml
   bloque_par: []
+  avancement: 'Terminée : conversion des timers IHM en INT secondes (T289 DrainTime_S).'
 - id: T276
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C3
   domaine: TREUILS_BENNE_TRANSLATION
-  agent: Antigravity
+  agent: —
   date: '2026-09-07T17:55:00+02:00'
   titre: Déblocage translation M3 depuis AtP1 vers Maintenance lors de l activation
     zone maintenance (FdC soft)
@@ -2808,12 +2840,14 @@ tasks:
     est désactivé.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T276_M3_P1_TO_MAINTENANCE_UNBLOCK.yaml
   bloque_par: []
+  avancement: 'Terminée : déblocage translation M3 AtP1 vers Maintenance intégré dans
+    PRG_05_Translation.'
 - id: T277
   parent_id: ''
-  statut: ⬜
+  statut: ✅
   criticite: C2
   domaine: MODES_ET_AUTORISATIONS
-  agent: Antigravity
+  agent: —
   date: '2026-09-07T18:05:00+02:00'
   titre: 'Sortie mode maintenance N2 : désactivation automatique du bouton zone maintenance'
   contexte: Le bouton IHM TglMaintenanceZoneAccess ne doit pas rester actif à 1 si
@@ -2828,6 +2862,8 @@ tasks:
   - Vérification non-régression et régénération bundle XML.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T277_AUTO_RESET_MAINTENANCE_ZONE_ACCESS.yaml
   bloque_par: []
+  avancement: 'Terminée : sortie mode maintenance N2 avec désactivation automatique
+    du bouton dans FB_Modes.'
 - id: T278
   parent_id: ''
   statut: ⬜
@@ -2853,10 +2889,10 @@ tasks:
   bloque_par: []
 - id: T279
   parent_id: ''
-  statut: ⏳
+  statut: ✅
   criticite: C2
   domaine: OUTILLAGE
-  agent: Codex
+  agent: —
   date: '2026-09-13T17:10:56+02:00'
   titre: Hygiène workspace agents et CI
   contexte: Des scratchs .tmp_* et .dsh_tmp sont apparus à la racine ; la convention
@@ -2870,3 +2906,4 @@ tasks:
   - Confinir les scratchs CI et gates dans leurs répertoires outillage dédiés.
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T279_WORKSPACE_HYGIENE.yaml
   bloque_par: []
+  avancement: 'Terminée : hygiène workspace agents et CI cadrée (STRUCTURE_AND_CLEANUP.md).'
