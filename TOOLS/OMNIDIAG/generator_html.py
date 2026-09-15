@@ -1403,9 +1403,6 @@ def generate_html_viewer(items: List[Dict[str, Any]], output_path: Path, rack_da
               <span class="badge ${{isBlocking ? 'badge-blocking' : (isHisto ? 'badge-histo' : '')}}">
                 ${{item.level || item.category}}
               </span>
-              <span class="badge ${{isValidated ? 'badge-val-ok' : 'badge-val-todo'}}">
-                ${{item.statut_validation}}
-              </span>
             </div>
             <div class="card-actions">
               <button class="btn-edit" onclick="openEditModal('${{item.id}}')">✏️ Proposer</button>

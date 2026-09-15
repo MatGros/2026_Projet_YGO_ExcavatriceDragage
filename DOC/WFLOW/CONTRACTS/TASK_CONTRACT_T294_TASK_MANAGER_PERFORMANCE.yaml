@@ -1,0 +1,75 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE ET SUIVI DE CYCLE DE VIE — projet Excavatrice Dragage
+# ═══════════════════════════════════════════════════════════════════════════
+
+contract:
+  # ── Identification ────────────────────────────────────────────────────────
+  task_id: T294
+  criticality: C2
+  strategy: patch
+
+  # ── 1. Objectif metier ────────────────────────────────────────────────────
+  objective: >
+    Eliminer les ralentissements du curseur souris (mouse lag) et les gels DWM Windows
+    lies au serveur Task Manager local et a l'IHM Task Viewer, en supprimant les parsings
+    YAML repetitifs cote Python, en coupant les destructions/reciterations DOM aveugles
+    cote JS et en neutralisant la mutation CSS destructive sous 760px lors de la reduction Chrome.
+
+  # ── 2. Criteres testables ─────────────────────────────────────────────────
+  acceptance:
+    - id: AC1
+      statement: "Le serveur task_server.py met en cache memoire le resultat de TASKS.yaml base sur le tuple (st_mtime_ns, st_size, st_ino) et ne re-parse plus le YAML au repos (temps CPU /api/status et polling < 1 ms contre 422 ms)."
+      verified_by: "Test unitaire Python verifiant que tasks() renvoie les donnees depuis le cache si mtime_ns/size/ino sont inchanges."
+    - id: AC2
+      statement: "Le endpoint /api/tasks/json supporte le protocole If-None-Match / ETag HTTP 304, transferant 0 octet et evitant tout parsing JSON/re-rendu si aucun fichier n'a bouge."
+      verified_by: "Requete curl/requests avec header If-None-Match recevant HTTP 304 Not Modified."
+    - id: AC3
+      statement: "Les revisions de taches SHA-256 sont precalculees a la mise en cache au lieu d'etre re-hashees 380 fois a chaque poll de 8s."
+      verified_by: "Audit code et profilage d execution de /api/tasks/json sous charge."
+    - id: AC4
+      statement: "L'IHM TASK_VIEWER.html suspend son polling en arriere-plan des que document.hidden est actif (Page Visibility API) et declenche un rafraichissement immediat des la reprise du focus."
+      verified_by: "Test d'evenement visibilitychange et arret des requetes reseau quand l'onglet est masque."
+    - id: AC5
+      statement: "La regle CSS @media (max-width: 760px) avec display: block sur la table est supprimee au profit d un scroll horizontal, eliminant le blocage DWM Windows a la reduction de la fenetre."
+      verified_by: "Inspection visuelle et verification de l absence de saccade DWM/souris lors de la minimisation de la fenetre Chrome."
+    - id: AC6
+      statement: "Zéro tache perdue, zero regression sur les verrous TASK_LOCKS.json, compatibilite 100% preservee avec task_lock.py et TASKS.yaml."
+      verified_by: "Suite pytest TASK_MANAGER/test_task_manager.py et test_check_task_contract.py."
+
+  # ── 3. Perimetre ──────────────────────────────────────────────────────────
+  scope:
+    allowed:
+      - TOOLS/TASK_MANAGER/task_server.py
+      - DOC/WFLOW/TASK_VIEWER.html
+      - TOOLS/TASK_MANAGER/test_task_manager.py
+    forbidden:
+      - CODE/**
+      - DOC/AF/**
+      - DOC/STDS/**
+
+  # ── 4. Contrat de conservation ────────────────────────────────────────────
+  conservation:
+    must_survive:
+      - "Integrite stricte et schema exact de TASKS.yaml et TASK_LOCKS.json."
+      - "Fonctionnalite complete d edition, creation, verrouillage HUM/Agent et suppression de tache."
+      - "Fonctionnement hors-ligne / fallback en mode autonome de TASK_VIEWER.html."
+    dropped_on_purpose:
+      - "Bascule destructive display: block des colonnes de table sous 760px (remplacee par overflow-x: auto)."
+      - "Polling actif aveugle lorsque la fenetre du navigateur est reduite ou masquee."
+
+  # ── 5. Preuves attendues en restitution ───────────────────────────────────
+  evidence_required:
+    - pytest_task_manager
+    - check_task_contract
+
+  # ── 6. Modeles autorises ──────────────────────────────────────────────────
+  models_allowed:
+    - "inherit"
+    - "pro"
+
+  # ── 7. Devoir d'alerte ────────────────────────────────────────────────────
+  alert_duty:
+    active: true
+
+lifecycle:
+  status: PENDING

@@ -1,4 +1,24 @@
 tasks:
+- id: T294
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: OUTILLAGE
+  agent: '—'
+  date: '2026-09-15T06:50:00+02:00'
+  avancement: 'Cadré et challengé par expert web le 2026-09-15. À traiter ultérieurement.'
+  titre: 'Task Manager & Viewer — Optimisation serveur (cache YAML/ETag 304) et IHM (zéro reflow DWM/GC)'
+  contexte: 'Saccades observées sur le curseur souris et gel DWM Windows lors de la réduction de la fenêtre Chrome du Task Manager. Diagnostic initial et audit critique menés le 2026-09-15 avec un sous-agent expert en moteurs Chromium/Blink/V8 et systèmes.'
+  description: 'Plan en 3 volets validé : 1) Cache thread-safe sur TASKS.yaml basé sur (mtime_ns, size, ino) + ETag HTTP 304 sur /api/tasks/json + précalcul des SHA-256 révisions dans task_server.py ; 2) Suppression de la media query 760px display:block éliminant le gel DWM Windows ; 3) Pause du polling sur document.hidden (Page Visibility API) et arrêt des destructions/recréations DOM aveugles toutes les 8s.'
+  objectifs:
+  - 'Serveur Python : éliminer le parsing YAML répété au repos (422 ms -> 0 ms via cache signature nanosecondes).'
+  - 'Serveur Python : supporter ETag / HTTP 304 sur /api/tasks/json et renvoyer le statut /api/status sans relecture disque.'
+  - 'IHM JS : conditionner render() à une signature de données modifiée (zéro re-rendu DOM inutile au repos).'
+  - 'IHM CSS : supprimer la bascule display:block sous 760px (suppression du blocage DWM lors de la réduction de Chrome).'
+  - 'IHM JS : suspendre le polling en arrière-plan via Page Visibility API (document.hidden).'
+  - 'Intégrité absolue des données : zéro tâche perdue, zéro régression sur les verrous TASK_LOCKS.json et l atomicité des écritures.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T294_TASK_MANAGER_PERFORMANCE.yaml
+  bloque_par: []
 - id: T293
   parent_id: ''
   statut: '✅'
@@ -119,24 +139,24 @@ tasks:
   bloque_par: []
 - id: T288
   parent_id: ''
-  statut: '⏸️'
+  statut: '⏳'
   criticite: C4
   domaine: TREUILS_BENNE / COHERENCE CONTACTEURS PAR AXE
   agent: Codex
-  date: '2026-09-15T06:29:27+02:00'
+  date: '2026-09-15T07:53:25+02:00'
+  avancement: 'Phase 1 validee par utilisateur en simulation : ErrorID 16 + SafeStop apres 3 s, sans PowerCutOff. Defaut memorise; cause disparue + Reset conscient requis. Phases 2/3 non demarrees.'
   titre: Cohérence commande/retour contacteurs par axe et couverture absence de mouvement
   contexte: 'Besoin terrain consolidé 2026-09-15 : une commande de direction, vitesse ou frein incohérente peut subsister sans alarme. Le retour Mx_ContactorsReleased_DI est collectif : il affirme seulement que tous les contacteurs sont retombés, sans identifier un contacteur précis.'
-  description: 'C4 — charge suspendue : fusionner le trou initial commande sans mouvement et une matrice de cohérence par axe. Séparer impérativement : (1) cohérence des DQ finales direction/vitesse/frein, (2) retour physique collectif contacteurs/frein, (3) mouvement codeur, et (4) synchronisme M1↔M2 existant. Un retour collectif seul est un doute de retour : aucun nouveau SafeStop ne peut en découler sans corrélation mouvement. Le délai dédié sera déterminé par fiche technique et mesure banc/terrain (pire cas + marge), puis validé humainement. Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T288_DISCORDANCE_CONTACTEURS_ABSENCE_MOUVEMENT.yaml'
+  description: 'C4 — Phase 1 implémentée : couvrir le trou commande active + retour collectif tous contacteurs retombés + absence mouvement, par ErrorID 16 existant et SafeStop existant après 3 s. Message IHM unique de discordance commande/retour. Aucun nouveau ErrorID, aucune nouvelle temporisation et aucun PowerCutOff. Les autres discordances restent des phases séparées. Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T288_DISCORDANCE_CONTACTEURS_ABSENCE_MOUVEMENT.yaml'
   objectifs:
-  - "Détecter après temporisation dédiée les commandes finales impossibles : deux sens actifs, vitesse sans sens, frein ouvert sans sens ; exempter explicitement les phases transitoires bornées de maintien/relâchement existantes."
-  - "Utiliser un unique défaut de discordance par axe : commande valide + retour tous retombés + mouvement codeur = doute retour, diagnostic seul ; SafeStop seulement si l absence de mouvement confirme la discordance après délai mesuré."
-  - "Diagnostiquer après temporisation l absence de retour au repos quand aucune commande n est présente, sans SafeStop nouveau fondé sur le seul retour collectif ni attribution à un contacteur physique."
-  - "Préserver et isoler FB_SyncContactor : la discordance M1↔M2 n est pas une cohérence interne M1 ou M2."
-  - "Définir avant code la politique d alarme unique (ErrorID existant ou diagnostic interlock), la preuve de validité/câblage du retour collectif, et le délai issu des mesures contacteurs."
-  bloque_par:
-  - 'C4 — données d entrée manquantes : temps de retombée/établissement maximum documenté et mesuré au pire cas, plus marge de diagnostic validée humainement.'
-  - 'C4 — politique de sévérité à valider : un doute sur Mx_ContactorsReleased_DI seul ne doit pas produire le même SafeStop qu une absence de mouvement confirmée.'
-  - 'C4 — preuve de câblage et comportement machine de Mx_ContactorsReleased_DI sur M1 et M2 à obtenir avant code.'
+  - "Sous commande, ErrorID 16 existant déclenche le SafeStop existant après 3 s si le codeur ne bouge pas, quel que soit le retour collectif contacteurs."
+  - "Message IHM unique : discordance commande/retour, sans nouveau ErrorID ni PowerCutOff."
+  - "Préserver les cas existants NoMovement, Meca A-E, synchronisme FB_SyncContactor, manuel et maintenance."
+  phases:
+  - "Phase 1 ✅ VALIDEE SIMULATION 2026-09-15 : ErrorID 16 existant couvre commande + frein ouvert + codeur immobile, quel que soit le retour collectif. SafeStop apres 3 s, sans PowerCutOff."
+  - "Phase 2 ⬜ A CADRER : stimulus simulation explicite et gate pour injecter le retour collectif incoherent, sans Force sur HwIn/HwSim re-ecrits chaque scan."
+  - "Phase 3 ⬜ A CADRER C4 : autres discordances contacteurs/frein/vecteurs, avec temps de retombee physique mesure et politique SafeStop distincte du doute capteur."
+  bloque_par: []
 - id: T287
   parent_id: T286
   statut: '⏳'
