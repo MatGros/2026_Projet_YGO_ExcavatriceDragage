@@ -1,4 +1,35 @@
 tasks:
+- id: T300
+  parent_id: ''
+  statut: '⏳'
+  criticite: C3
+  domaine: SIMULATION / TRANSLATION_M3
+  agent: 'Codex'
+  date: '2026-09-15T23:40:00+02:00'
+  plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T300_SIMBENCH_M3_SENSOR_DYNAMICS.md
+  avancement: 'Prise en charge explicite par Codex : implémentation principale, tests et gates. Reviews expertes read-only demandées pour challenger architecture physique, conventions, AF et stratégie de tests. Paramètres matériels inconnus restent profilés comme hypothèses synthétiques.'
+  titre: 'SimBench M3 — Dynamique de franchissement des capteurs et perte intermittente aux extrêmes'
+  contexte: 'Au franchissement d un capteur M3, le retour terrain décrit une séquence active, perte, reprise, puis perte/reprise liée au balancement de la charge. FB_Sim_Translation ne publie actuellement que des mots thermomètre monotones et ne peut donc pas reproduire les perturbations de position qui affectent fortement l axe Translation.'
+  description: 'Étudier puis modéliser dans SimBench, uniquement en simulation, la trajectoire M3 avec franchissement de seuil et oscillation amortie. Produire les cinq DI M3 dans HwSim depuis une position mécanique simulée, puis laisser PRG_02 sélectionner HwIn et PRG_05 générer ses mémoires/états aval ; aucun état de position ne doit être forcé après HwSim. La forme, l amplitude, la période, l amortissement et les capteurs concernés sont à caler sur trace/observation terrain avant codage.'
+  objectifs:
+  - 'Appliquer les contrats P0-P5 et critères Q01-Q14 du plan ; figer les oracles de test à R2 avant code, puis tracer toute modification des attendus avec justification et revue.'
+  - 'Modéliser fréquence commandée/retournée, vitesse mécanique, magnétisation, frein mécanique et contact auxiliaire comme grandeurs distinctes ; mesurer erreur estimateur vs position vraie indépendante.'
+  - 'Auditer en lecture seule utilité et coût des TC existants ; aucun changement de tests ou CI dans le présent lot de planification.'
+  - 'Garantir la boucle M3 sorties finales -> SimBench -> HwSim -> HwIn et déplacer les stimuli boutons lus directement dans PRG_05 vers une frontière opérateur explicite.'
+  - 'Intégrer le retour terrain : stabilisation du signal capteur environ 1 s ; godet chargé environ 10 tonnes et longueur suspendue évoquée 1 à 2 m, valeurs estimées à confirmer.'
+  - 'Composer des briques entraînement/chariot, charge suspendue et capteurs ; reproduire les variations du déplacement sous charge pendant marche, décélération et arrêt, avec réaction de la charge sur le chariot.'
+  - 'Ajouter des scénarios pseudo-aléatoires bornés et reproductibles par graine, centrés sur environ 1 s de stabilisation capteur, avec paramètres et graine enregistrés pour chaque défaut.'
+  - 'Cartographier pour chaque fin de course extrême M3 la polarité, la zone de détection, la séquence observée actif/perdu/repris et le consommateur aval jusqu à FB_Translation_PositionDecoder, FB_Safety_Translation et PRG_05.'
+  - 'Conserver une position mécanique M3 unique ; le signal de chaque capteur est dérivé de cette position et de sa géométrie, sans écriture directe de DI dans la logique métier.'
+  - 'Reproduire, après franchissement d un seuil configuré, le balancement amorti qui peut faire sortir puis rentrer la cible dans la zone du capteur ; aucun rebond ne doit être inventé hors simulation active.'
+  - 'Les mots capteurs transitoires, y compris une perte momentanée de fin de course, passent inchangés par HwSim puis HwIn afin de qualifier la réaction réelle du décodeur, des interlocks et des protections M3.'
+  - 'Prouver scan par scan que les fronts montants/descendants issus de HwSim atteignent FB_Translation_PositionDecoder puis les mémoires et états M3 existants, sans injection directe d un état aval.'
+  - 'Les positions nominales stationnaires, le déplacement monotone sans oscillation et l override manuel SimM3SensorsWord restent disponibles et déterministes.'
+  - 'Tests CI couvrent les deux sens, les deux extrêmes, le premier franchissement, oscillation amortie, arrêt au voisinage du seuil, override, retour hors simulation et absence de commande/sortie réelle.'
+  - 'Bundle PLCopenXML, diff bundle, G200 liaison et gates applicables PASS avant intégration CODESYS.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T300_SIMBENCH_M3_SENSOR_DYNAMICS.yaml
+  bloque_par:
+  - 'Plan de conception rédigé ; validation avant ST. Calibrage restant : amplitudes, géométrie capteurs, couplage mécanique, masse et longueur effective. Des profils synthétiques explicitement identifiés permettent les essais exploratoires.'
 - id: T299
   parent_id: ''
   statut: '⬜'
