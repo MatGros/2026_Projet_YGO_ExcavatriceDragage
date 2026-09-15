@@ -116,8 +116,12 @@ exigeait `SimSafetyActive`). Règle complète : `DOC/STDS/CODE_QUALITY_STANDARDS
 **① Minimum obligatoire — à CHAQUE livraison de code** (rapide, ~secondes) :
 ```powershell
 python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py .   # bundle frais
+python TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_diff_bundle.py . <tous-les-fichiers-CODE-st-touches>
 python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report # liaison bloquante (sur le bundle frais)
 ```
+Le diff bundle `CODE_XML/CODE_DiffBundle.xml` est **systématique** : il complète le bundle
+complet, ne le remplace jamais. Le restituer avec la liste des objets inclus ; ne jamais proposer
+un import POU par POU. Règle canonique : `AGENTS.md` § « Diff bundle ».
 ⛔ **Jamais livrer sans ce minimum** : un bundle généré ou des tests Python verts **ne prouvent
 pas** qu'une fonction est reliée. Seul `G200_check_linkage.py` le prouve. Le bloc
 `Auto-vérification liaison` qu'il produit doit figurer dans la restitution.
@@ -137,6 +141,7 @@ Auto-vérification liaison (G200_check_linkage.py) — PASS|FAIL
   OK  <instance> : <FB> — déclarée <fichier>:<ligne> · appelée :<ligne>
   ...
 Gates : structure / style / liaison / persistance / bundle / pytest = PASS|FAIL
+Diff bundle : `CODE_XML/CODE_DiffBundle.xml` — objets : <liste>
 Fichiers modifiés : ...
 Hors scope constaté (devoir d'alerte) : ...
 ```

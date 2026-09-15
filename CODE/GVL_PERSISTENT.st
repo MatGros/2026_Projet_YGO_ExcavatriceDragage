@@ -56,7 +56,7 @@ VAR_GLOBAL PERSISTENT RETAIN
 
     // ⚖️ SYNCHRONISATION (M1 ↔ M2)
     _SyncCfgPersist : ST_SyncCfg := (CfgSyncTolerance_M := 3.0, CfgSyncCriticalTolerance_M := 6.0); // 🌉 Pont FB_CfgPersistBridge_SyncCfg — seuils projet Warn 3.0m / Fault 6.0m
-    _WinchCriticalSyncTolerance_M : REAL := 2.5; // Méca E : écart critique (Zone 3: SafeStop dès 2.5m)
+    _WinchCriticalSyncTolerance_M : REAL := 7.0; // Méca E : dernier recours au-delà des seuils synchro 3m/6m
     _SyncSoftStopEnable : BOOL := FALSE; // Rattrapage directionnel (Défaut: OFF)
 
     // 🪣 BENNE
