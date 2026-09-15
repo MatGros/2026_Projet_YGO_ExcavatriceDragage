@@ -1,0 +1,74 @@
+contract:
+  task_id: T288
+  criticality: C4
+  strategy: patch_then_local_rebuild
+  phase: "2/3 - registre erreurs treuils distinct"
+  status: REVIEWED_MAJOR_NOT_READY_TO_CODE
+  objective: >
+    Distinguer formellement l'absence de mouvement (preuve codeur) de la
+    discordance commande contacteurs / retour collectif (preuve E/S), sans
+    multiplier les alarmes operateur ni reutiliser ErrorID 16 pour deux causes.
+  facts:
+    - "FB_FaultCore et ST_Fault sont limites a ARRAY[0..15] et WORD."
+    - "Les 16 positions de FB_Safety_Winch sont deja affectees."
+    - "Le retour FwdRevSpeedFeedbackOff est collectif : il ne designe pas un contacteur precis."
+    - "L'incident 14/09 est commande active + retour collectif au repos ; le codeur n'est pas une preuve requise de cette discordance."
+  acceptance:
+    - id: AC1
+      statement: "Absence de mouvement et discordance commande/retour restent deux causes nommees, observables et acquittables distinctement."
+      verified_by: "tests unitaires independants, lecture IHM et trace simulation"
+    - id: AC2
+      statement: "Une commande de mouvement avec retour collectif tous contacteurs au repos declenche la cause DiscordanceCommandeRetour apres un delai unique valide, sans condition EncoderAvailable ni position codeur."
+      verified_by: "test injection E/S seule : codeur disponible, indisponible et en mouvement"
+    - id: AC3
+      statement: "La cause DiscordanceCommandeRetour declenche SafeStop, jamais PowerCutOff ; elle impose disparition de cause puis front Reset, sans redemarrage automatique."
+      verified_by: "test de routage safety et essai simulation"
+    - id: AC4
+      statement: "L'operateur voit un seul message de discordance contacteurs par axe, sans diagnostic fictif du contacteur fautif."
+      verified_by: "bandeau IHM et historique"
+    - id: AC5
+      statement: "Le choix d'architecture conserve tous les consommateurs ST_Fault existants ou documente chaque migration avec preuve de liaison."
+      verified_by: "inventaire des consommateurs, G200 et revue C4"
+    - id: AC6
+      statement: "Le delai de confirmation est justifie par mesure terrain du temps maximal de collage/retombee ou conserve provisoirement a 3 s par decision humaine explicite."
+      verified_by: "fiche MES et decision humaine"
+  candidate_architectures:
+    - id: A
+      name: "Extension transverse ST_Fault / FB_FaultCore de WORD16 vers registre extensible"
+      risk: "Tres large : tous les FB et consommateurs IHM/diagnostic utilisant ST_Fault."
+    - id: B
+      name: "Registre d'erreurs treuil dedie, ST_Fault conserve pour compatibilite"
+      risk: "Doit etre un vrai registre extensible avec producteur unique, latches, reset et routage explicites ; ST_SafetyWinch reste une projection HMI."
+  review:
+    verdict: MAJOR
+    reviewed_by: "Revue automatismes/surete independante, lecture seule"
+    recommendation: "Retenir B ; ne pas etendre ST_Fault/FB_FaultCore global dans T288."
+    blockers:
+      - "La phase 1 actuelle melange encore absence mouvement et retour collectif dans TonNoMovement ; il faut restaurer ErrorID16 = absence mouvement/codeur uniquement."
+      - "L'IHM affiche actuellement ErrorID16 comme discordance commande/retour/mouvement et le conditionne au codeur ; ce mapping est a corriger."
+      - "Le nouveau registre doit definir IDs stables, vues live/latchee, reset front, disparition de cause, Enable, BypassGlobal, SafeStop/PowerCutOff et producteur unique."
+      - "Le cas incident peut activer simultanement absence mouvement et discordance contacteurs ; le contrat doit conserver deux identites, meme si le carrousel limite le nombre de messages visibles."
+      - "La discordance ne doit jamais identifier un contacteur precis : le retour est collectif et peut aussi etre un defaut de cablage DI."
+      - "Le delai 3 s est conserve provisoirement sur decision de phase 1 ; toute baisse exige une mesure terrain."
+    out_of_scope_for_phase_2:
+      - "Extension globale de ST_Fault/FB_FaultCore et migration des 32 consommateurs."
+      - "Attribution direction/vitesse/frein du contacteur fautif."
+  scope:
+    allowed:
+      - "DOC/WFLOW/CONTRACTS/"
+      - "DOC/WFLOW/TASKS.yaml"
+      - "DOC/WFLOW/TASK_LOCKS.json"
+    forbidden_until_human_plan_approval:
+      - "CODE/"
+      - "CODE_XML/"
+      - "PRJ_CODESYS/PROJ_Full_ImportExport/Device.export"
+  safety_alert: >
+    Un retour collectif au repos peut etre un collage non obtenu, une rupture de fil
+    ou un defaut du retour. La cause doit signaler une discordance E/S sans pretendre
+    identifier l'organe physique. Aucun seuil inferieur a 3 s ne sera applique sans
+    mesure terrain et validation humaine.
+  evidence_required:
+    - "Revue C4 versionnee avec verdict et recommandation d'architecture."
+    - "Design d'essais couvrant les causes separees, les latches, Reset, Enable et BypassGlobal."
+    - "Avant implementation : inventaire des consommateurs, contrat de conservation et plan de migration."
+    - "Apres implementation seulement : bundle frais, diff bundle, G200 PASS et essais de non-regression."
