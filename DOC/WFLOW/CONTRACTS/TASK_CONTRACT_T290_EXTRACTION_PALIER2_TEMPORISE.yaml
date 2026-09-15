@@ -3,33 +3,36 @@ contract:
   criticality: C3
   strategy: patch
   objective: >
-    Remplacer le plafond palier 1 fixe pendant toute la durée de l'extraction
-    (PRG_04_Treuils_Benne.st §5ter, CommonMaxStepAscent sous ExtractionControlActive)
-    par un plafond temporisé : palier 1 pendant les 1-2 premières secondes, puis
-    palier 2 tant que l'extraction reste active, sans affaiblir aucune autre
-    source de clamp du §5ter.
+    Autoriser directement le palier 2 pendant la montee controlee AX11 du cycle
+    automatique, sans nouvelle temporisation, en conservant prioritaires tous
+    les interlocks, ralentissements et plafonds existants.
   acceptance:
     - id: AC1
-      statement: "Dès le front de ExtractionControlActive, CommonMaxStepAscent reste plafonné à 1 pendant une durée configurée/fixe (1-2 s, valeur à valider avec l'utilisateur)."
-      verified_by: "test scan-par-scan : chronogramme du plafond depuis le front ExtractionControlActive"
+      statement: "En AX11 du cycle SEMI_AUTO, M1 et M2 peuvent atteindre le palier 2 avec le joystick de montee maintenu."
+      verified_by: "test cycle ciblé et essai utilisateur"
     - id: AC2
-      statement: "Après ce délai, CommonMaxStepAscent est plafonné à 2 (jamais plus) tant que ExtractionControlActive reste vrai."
-      verified_by: "test scan-par-scan : plafond = 2 après le délai, retombe à l'état antérieur à la retombée d'ExtractionControlActive"
+      statement: "Aucune temporisation nouvelle n est ajoutée pour autoriser le palier 2."
+      verified_by: "revue du code et absence de TON dédiée T290"
     - id: AC3
-      statement: "Aucune autre source de clamp du §5ter (hors-homing HomedAndReliable, SyncDeviationWarn, position Maintenance M3, benne non fermée/mou de câble en pilotage couplé) n'est affaiblie, contournée ou retardée par ce changement."
-      verified_by: "revue de code + tests combinés : chaque source déclenchée seule ramène bien le plafond à 1 malgré le délai extraction écoulé"
+      statement: "Les limitations existantes restent prioritaires et peuvent ramener le palier sous 2."
+      verified_by: "tests combinés avec chaque source de clamp existante"
     - id: AC4
-      statement: "Le MIN final entre toutes les sources de plafond du §5ter continue de s'appliquer : le palier 2 n'est effectif que si aucune autre source ne plafonne plus bas."
-      verified_by: "test combiné : ExtractionControlActive + une autre source active simultanément -> plafond le plus bas gagne"
+      statement: "Le changement reste strictement limité à AX11 SEMI_AUTO ; manuel, MAINT_N1 et MAINT_N2 sont inchangés."
+      verified_by: "tests par mode et inspection des producteurs de commande"
     - id: AC5
-      statement: "Le délai est isolé dans une temporisation dédiée (TON), gatée strictement sur ExtractionControlActive, sans réutiliser ni modifier un timer existant d'un autre usage."
-      verified_by: "revue de code : nouvelle instance TON dédiée, remise à zéro hors ExtractionControlActive"
+      statement: "La valeur par défaut CtrlAscentMaxStep vaut 2 et reste bornée à 1..2 côté FB_CycleSemiAuto."
+      verified_by: "inspection configuration persistante et test de saturation"
     - id: AC6
       statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste sans erreur."
       verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report"
+    - id: AC7
+      statement: "Pour chaque fichier ST autorisé, le nom de fichier est identique au nom de POU et le suffixe correspond au langage généré dans le bundle."
+      verified_by: "gates structurels et revue du bundle"
   scope:
     allowed:
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
       - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
       - CODE_XML/CODE_Bundle.xml
       - DOC/WFLOW/TASKS.yaml
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T290_EXTRACTION_PALIER2_TEMPORISE.yaml
@@ -54,24 +57,22 @@ contract:
     - "omni/cx/gpt-5.6-terra"
     - "omni/cc/claude-sonnet-5"
   alert_duty: >
-    La valeur exacte du délai (1 s, 1.5 s, 2 s) n'est pas encore validée par
-    l'utilisateur — la signaler et obtenir confirmation avant implémentation.
-    Toute interaction possible entre ce nouveau plafond temporisé et une autre
-    source de clamp du §5ter doit être signalée avant tout code.
-status: PENDING
+    Toute interaction entre AX11 P2 et une source de clamp existante doit être
+    signalée. Ne pas ajouter de temporisation ni modifier manuel/maintenance.
+status: IN_PROGRESS
 execution:
-  executed_by: ""
+  executed_by: "Codex"
   completed_at: ""
-  status: PENDING
+  status: IN_PROGRESS
   summary: >
-    Tâche créée pour cadrer le déplafonnement temporisé palier 1 -> palier 2
-    pendant l'extraction, afin de réduire l'échauffement moteur en conservant
-    toutes les autres barrières de sécurité du §5ter.
-  evidence_submitted: []
+    AX11 P2 est présent dans le code et validé en simulation par l utilisateur
+    le 2026-09-15. Recette réelle et preuves mécaniques finales restantes.
+  evidence_submitted:
+    - "Essai simulation utilisateur 2026-09-15 : M1+M2 atteignent P2 en AX11."
 validation:
   status: PENDING
   validated_by: ""
   validated_at: ""
   notes: >
-    Validation humaine de la durée exacte du délai et de l'absence d'effet de
-    bord sur les autres sources de clamp requise avant implémentation.
+    Validation simulation acquise. Clôture après tests ciblés, G200, gates C et
+    essai réel à faible hauteur.

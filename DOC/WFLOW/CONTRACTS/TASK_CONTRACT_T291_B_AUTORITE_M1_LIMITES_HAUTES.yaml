@@ -1,0 +1,86 @@
+contract:
+  task_id: T291-B
+  criticality: C4
+  strategy: patch
+  objective: >
+    En M1 seul et en M1+M2 Both, utiliser M1 comme autorite du FDC logiciel
+    nominal et appliquer aux deux treuils un profil de vitesse commun, tout en
+    conservant les protections independantes de M2 sur sa position corrigee.
+  acceptance:
+    - id: AC1
+      statement: "M1 seul et Both utilisent M1 pour l approche et l arret logiciel nominal H."
+      verified_by: "tests aux positions H-0.51, H-0.50, H-epsilon et H"
+    - id: AC2
+      statement: "En Both, M1 et M2 recoivent le meme palier effectif pendant l approche haute ; aucun vecteur P1/P5 n est neutralise silencieusement."
+      verified_by: "test scan-par-scan avec ecart M1/M2 realiste et inspection des demandes finales"
+    - id: AC3
+      statement: "En M2 seul, la limite de position utilise M2 corrige valide et non la position brute."
+      verified_by: "tests avec offsets ouvert/ferme et variation de M1 immobile"
+    - id: AC4
+      statement: "M2 corrige a H+1 declenche SafeStop et a H+2 declenche PowerCutOff sans temporisation."
+      verified_by: "tests aux bornes H+1 et H+2"
+    - id: AC5
+      statement: "Le capteur TOP mecanique commun arrete M1 et M2 et conserve l escalade temporelle si mouvement ou contacteurs persistent."
+      verified_by: "tests capteur NC, mouvement mesure et retour collectif contacteurs"
+    - id: AC6
+      statement: "Le diagnostic M2 publie la reference corrigee et le seuil effectif ; aucun faux blocage n est affiche par comparaison M2 brut/H."
+      verified_by: "snapshot GVL_Troubleshooting et test de projection"
+    - id: AC7
+      statement: "Manuel, maintenance, homing, descente et limites cable propres restent inchanges hors matrice visee."
+      verified_by: "matrice de non-regression par mode et direction"
+    - id: AC8
+      statement: "Bundle complet et diff bundle generes ; G200 et gates palier C passent."
+      verified_by: "rapports outillage obligatoires"
+    - id: AC9
+      statement: "Pour chaque fichier ST autorise, le nom de fichier est identique au nom de POU et le suffixe correspond au langage genere dans le bundle."
+      verified_by: "gates structurels et revue du bundle PLCopenXML"
+  scope:
+    allowed:
+      - DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+      - CODE/G_CYCLE/FB_CycleSemiAuto.st
+      - CODE/H_TREUILS_BENNE/FB_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_Safety_Winch.st
+      - CODE/H_TREUILS_BENNE/FB_WinchStateProjection.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_04_Treuils_Benne.st
+      - CODE/J_SUPERVISION/FB_TroubleshootingView.st
+      - CODE/J_SUPERVISION/_TYPES/1_TREUILS_BENNE/ST_Chain_Winch_Safety.st
+      - TOOLS/AGENT_WORKFLOW/scripts/G499_check_t291b_top_authority.py
+      - CODE_XML/CODE_Bundle.xml
+      - CODE_XML/CODE_DiffBundle.xml
+      - DOC/WFLOW/TASKS.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T291_B_AUTORITE_M1_LIMITES_HAUTES.yaml
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - CODE/B_AU_SECURITE/*
+  conservation:
+    must_survive:
+      - "Capteur TOP mecanique commun et chaine AU independante."
+      - "Limites cable propres M1/M2 et deplacement descendant de degagement."
+      - "Aucun redemarrage automatique apres defaut."
+    dropped_on_purpose: []
+  evidence_required:
+    - test_scan_by_scan
+    - guard_fix
+    - check_linkage
+    - run_all_gates_palier_c
+    - bundle
+    - diff_bundle
+  alert_duty: >
+    La reference M2 corrigee doit etre valide et independante pour servir aux
+    seuils H+1/H+2. Toute ambiguite sur ActiveOffsetM, DisplayOffsetM ou le
+    comportement au capteur mecanique impose un arret avant code.
+  blocking_decisions:
+    - "Definir la reference M2 corrigee independante utilisable pendant une position benne intermediaire ; ActiveOffsetM ne convient pas seul car il peut suivre M2-M1."
+    - "Definir le repli si la reference M2 corrigee est invalide : aucune hypothese autorisee avant validation humaine."
+  phases:
+    - "B0 : spec et diagnostic seulement ; corriger la projection M2 sans toucher aux commandes."
+    - "B1 : autorite M1 et profil commun en M1/Both ; M2 seul sur reference corrigee."
+    - "B2 : SafeStop M2 corrige H+1."
+    - "B3 : PowerCutOff M2 corrige H+2 et qualification separee du capteur TOP commun."
+status: PENDING
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: "Plan technique et matrice de securite a valider humainement avant implementation."

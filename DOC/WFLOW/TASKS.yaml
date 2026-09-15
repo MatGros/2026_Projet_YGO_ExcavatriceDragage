@@ -65,9 +65,9 @@ tasks:
   criticite: C4
   domaine: SECURITE_SYNCHRO_TREUILS
   agent: Codex
-  date: '2026-09-15T03:25:20+02:00'
+  date: '2026-09-15T11:34:47+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
-  avancement: 'Implementation T291-A en cours : essai cycle automatique uniquement, M1 palier 4 et M2 palier 5, sequence existante conservee.'
+  avancement: 'T291-A validee par utilisateur. T291-B cadree apres diagnostic AX12 a 7,37 m : autorite M1 en M1/Both, M2 corrige reserve aux protections independantes.'
   titre: 'Profil essai cycle auto — descente M1 palier 4 / M2 palier 5'
   contexte: 'Precision utilisateur 2026-09-15 : uniquement en cycle automatique SEMI_AUTO, pas en manuel ni maintenance N1/N2. Objectif essai rapide : descente M1 palier 4 comme actuellement et M2 palier 5, avec cadencement existant 1->2->3->4->5 conserve et table contacteurs inchangee.'
   description: 'Parent de cadrage. Premier lot T291-A : toggle IHM non persistant, capture a l arret avant AX4, publication du profil actif AX4..AX7 et adaptation stricte des concordances amont/finale pour accepter uniquement le vecteur descente M1=P4/M2=P5. Les limites haut/bas et T290 restent des lots separes.'
@@ -98,15 +98,42 @@ tasks:
   - 'M1 palier 5, mauvais sens ou vecteur contacteur non conforme restent sanctionnes.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T291_A_AUTO_DESCENT_P4_P5.yaml
   bloque_par: []
+- id: T291-B
+  parent_id: T291
+  statut: '⏳'
+  criticite: C4
+  domaine: SECURITE_LIMITES_HAUTES_TREUILS
+  agent: Codex
+  date: '2026-09-15T11:34:47+02:00'
+  plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
+  avancement: 'Cadrage uniquement. Audit Git independant : REGRESSION IDENTIFIEE confiance 95 %, interaction f36c4480 + 92601d2c ; mesure codeur et SimBench hors cause.'
+  titre: 'T291-B — Autorite M1 en Both et filets hauts independants M2 corrige'
+  contexte: 'Decision utilisateur 2026-09-15 : en M1 seul ou M1+M2 Both, le FDC logiciel nominal et la reduction de vitesse sont pilotes par M1. M2 est suiveur et recoit le meme profil de contacteurs. En M2 seul, la position M2 corrigee geometrie benne reste la reference. Le capteur TOP mecanique commun reste independant.'
+  description: 'En Both, appliquer aux deux treuils le profil derive de M1 jusqu a l arret nominal H. Conserver M2 corrige comme surveillance independante : SafeStop a H+1 et PowerCutOff a H+2 sans temporisation. Le capteur TOP mecanique provoque le stop commun et son escalade si mouvement ou contacteurs persistent.'
+  objectifs:
+  - 'M1 seul : approche et FDC logiciel nominal bases sur M1.'
+  - 'Both : approche, paliers et arret nominal bases sur M1 ; commandes vitesse identiques M1/M2, sans neutralisation silencieuse P1/P5.'
+  - 'M2 seul : limites de position basees sur M2 corrige valide, jamais sur M2 brut.'
+  - 'M2 corrige >= H+1 declenche SafeStop ; M2 corrige >= H+2 declenche PowerCutOff sans TON.'
+  - 'Capteur TOP mecanique commun conserve son stop commun et son escalade.'
+  - 'Le diagnostic expose le seuil M2 corrige effectif et la cause exacte de neutralisation.'
+  - 'Tests M1 seul, M2 seul, Both, offset benne, ecart M1/M2, H/H+1/H+2 et non-regression descente.'
+  phases:
+  - 'B0 ⬜ Spec + correction diagnostic uniquement, sans commande.'
+  - 'B1 ⬜ Autorite M1 et profil commun pour M1/Both ; M2 seul sur reference corrigee.'
+  - 'B2 ⬜ SafeStop M2 corrige a H+1.'
+  - 'B3 ⬜ PowerCutOff M2 corrige a H+2 + qualification capteur TOP commun.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T291_B_AUTORITE_M1_LIMITES_HAUTES.yaml
+  bloque_par: []
 - id: T290
   parent_id: ''
   statut: '⏳'
   criticite: C3
   domaine: TREUILS_BENNE
   agent: Codex
-  date: '2026-09-15T03:25:20+02:00'
+  date: '2026-09-15T11:34:47+02:00'
   plan_reprise: DOC/WFLOW/CONTRACTS/PLAN_T290_T291_LIMITES_TREUILS_20260915.md
-  avancement: 'Recadre par utilisateur : pas de temporisation nouvelle ; implementation apres T291-A et recette separee.'
+  avancement: '✅ Essai simulation utilisateur 2026-09-15 : AX11 monte M1+M2 au palier 2. Validation terrain reel et gates finaux encore requis avant cloture.'
   titre: 'Cycle auto extraction — autoriser palier 2 en remontee controle'
   contexte: 'Correction utilisateur 2026-09-15 : les paliers/interlocks existants sont OK ; besoin uniquement en remontee extraction du cycle auto controle, actuellement limitee palier 1 max, pour autoriser palier 2 si les limitations existantes le permettent.'
   description: 'Lot separe. En cycle automatique, sur la remontee extraction controlee, relever le plafond max a 2 sans ajouter de temporisation et sans modifier manuel/maintenance.'
@@ -6232,14 +6259,15 @@ tasks:
 
 - id: T262
   parent_id: ''
-  statut: ⬜
-  criticite: C2
+  statut: ⏳
+  criticite: C4
   domaine: CYCLE_AUTO_BENNE
-  agent: ''
-  date: '2026-09-07T12:45:00+02:00'
-  titre: Seuil configurable de transition AX10_CLOSE_BUCKET avant fermeture complète
+  agent: Codex
+  date: '2026-09-15T11:34:47+02:00'
+  avancement: 'Tache retrouvee et recadree. Plan C4 a valider avant code : seuil benne + transfert continu M2 seul vers Both.'
+  titre: Seuil configurable benne et continuité AX10→AX11→AX12
   contexte: 'Demande client cycle automatique : réduire l effort appliqué sur M2 seul pendant la fermeture de benne. La benne est exprimée en pourcentage d ouverture : 0 % = benne fermée, 100 % = benne ouverte.'
-  description: 'Ajouter un paramètre de seuil de transition, borné de 0 à 50 %. Si le paramètre vaut 0 %, conserver strictement le comportement actuel fondé sur l information benne fermée. Si le paramètre est supérieur à 0 %, autoriser le passage au step suivant de AX10_CLOSE_BUCKET lorsque ActualBucketOpeningPct < seuil configuré, OU lorsque l information benne fermée historique est vraie (filet de sécurité en cas de dérive du capteur %). Les protections de mouvement, FDC, AU, freinage et validation de fin de cycle restent inchangées. Précision utilisateur (2026-09-14) : à seuil >0 %, la transition ne doit jamais perdre le fallback "benne fermée" — les deux conditions sont un OU, pas un remplacement.'
+  description: 'Phase A : ajouter un seuil borné 0..50 %. A 0 %, conserver le critère benne fermée ; au-dessus, autoriser AX11 si ActualBucketOpeningPct < seuil OU benne fermée. Phase B : remplacer la pause dure AX10_WAIT_ASCENT_START par un transfert maîtrisé de M2 seul vers la montée Both, puis garantir AX11→AX12 sans retombée direction/contacteurs/freins. La benne peut finir de se fermer mécaniquement pendant AX11 ; tant qu elle n est pas confirmée fermée, AX12 reste au palier lent. Aucun contournement AU/FDC/synchronisme.'
   objectifs:
   - 'Paramètre de configuration unique, borné et visible, avec valeur par défaut 0 %.'
   - 'À 0 %, AX10_CLOSE_BUCKET utilise exactement la condition actuelle benne fermée, sans régression.'
@@ -6247,6 +6275,13 @@ tasks:
   - 'Une valeur hors plage est saturée à 0..50 % et ne contourne aucune barrière de sécurité.'
   - 'Le comportement M2 seul est réduit sans suppression des contrôles FDC, AU, frein et défaut mouvement.'
   - 'Tests scan-par-scan et validation cycle auto couvrent 0 %, seuil actif, limite 50 %, valeurs hors plage, et le cas fermé-mais-%>seuil (dérive capteur).'
+  - 'Le transfert AX10 vers AX11 ne produit pas d arrêt franc inutile, mais ne permet aucun départ M1 non maîtrisé ni mouvement M2 hors commande.'
+  - 'Le passage AX11 vers AX12 conserve la demande et le sens ; seul le palier évolue avec le cadencement existant.'
+  - 'Tant que Benne_IsClosed est faux, AX12 reste plafonnée au palier lent ; aucune pleine vitesse sur simple seuil de pourcentage.'
+  phases:
+  - 'A ⬜ Parametre + critere calculé, sans changement du cycle.'
+  - 'B ⬜ Transfert M2 seul vers Both au palier 1.'
+  - 'C ⬜ Continuite AX11 vers AX12, montee rapide seulement benne fermee.'
   contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T262_AX10_CLOSE_BUCKET_THRESHOLD.yaml
   bloque_par: []
 
