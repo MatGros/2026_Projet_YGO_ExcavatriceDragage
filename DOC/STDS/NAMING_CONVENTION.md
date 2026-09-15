@@ -18,7 +18,7 @@
 3. **Sémantique > Implémentation** : Le nom décrit la fonction, le rôle physique ou l'état, jamais son adresse ou sa technique d'implémentation.
 4. **Bannissement de `Ref` pour les consignes** : Éviter absolument le terme `Ref` pour désigner une consigne (trop ambigu avec le *référencement / Homing* d'axe).
 5. **Cohérence globale (1 notion = 1 nom)** : Une même notion garde exactement le même nom dans tout le projet (code ST, structures DUT, E/S, supervision IHM et documentation AF).
-6. **Suffixes d'unité standardisés** : Précédés d'un underscore `_` (`_M`, `_Pct`, `_Hz`, `_Ms`, `_Mps`).
+6. **Suffixes d'unité standardisés** : Précédés d'un underscore `_` (`_M`, `_Pct`, `_Hz`, `_S`, `_Ms`, `_Mps`).
 
 ---
 
@@ -118,7 +118,7 @@ Le nom doit permettre de comprendre ce que représente la donnée **sans connaî
 |---|---|---|---|---|
 | <nobr><code>NC-010</code></nobr> | Instance de FB préfixée `inst<Rôle>` | Déclaration `<Nom> : FB_Xxx` — nom commence par `inst` | 🤖 AUTO | §Préfixes structurels |
 | <nobr><code>NC-020</code></nobr> | Pas de notation hongroise (`bFlag`, `iCounter`, `rValue`) | Aucun nom débutant par `b`/`i`/`r` minuscule suivi d'une majuscule | 🤖 AUTO | §Principes |
-| <nobr><code>NC-030</code></nobr> | Suffixe d'unité précédé d'un underscore (`_M`, `_Pct`, `_Hz`, `_Ms`, `_Mps`) | Toute variable finissant par une unité connue respecte le `_` | 🤖 AUTO | §Suffixes d'unité |
+| <nobr><code>NC-030</code></nobr> | Suffixe d'unité précédé d'un underscore (`_M`, `_Pct`, `_Hz`, `_S`, `_Ms`, `_Mps`) | Toute variable finissant par une unité connue respecte le `_` | 🤖 AUTO | §Suffixes d'unité |
 | <nobr><code>NC-040</code></nobr> | `_DI`/`_DQ`/`_RQ` jamais redéclaré comme variable locale hors `PRG_02_Acquisition` | Déjà couvert par `G350_check_hw_name_collision.py` (GATE 2quinquies) | 🤖 AUTO (existant) | `CODE_QUALITY_STANDARDS.md §3bis` |
 | <nobr><code>NC-050</code></nobr> | `Cmd`/`Req` toujours en préfixe sur une **nouvelle** variable, jamais en suffixe | Aucune nouvelle occurrence `XxxCmd`/`XxxReq` hors baseline legacy | 🤖 AUTO | §`Req` vs `Cmd` |
 | <nobr><code>NC-060</code></nobr> | `ST_*HMI` : préfixes `Btn`/`Sel`/`Set`/`Tgl`/`Cfg`/`Tst` sans underscore après le préfixe, jamais `Cmd`/`Req` dedans | Champs des structs `ST_*HMI` respectent `<Préfixe><PascalCase>` | 🤖 AUTO | §Variables IHM |
@@ -577,10 +577,11 @@ Toujours précédés d'un underscore `_` pour lisibilité immédiate (évite la 
 CablePos_M       → position en mètres (2 déc)
 Speed_Pct        → vitesse en % nominal
 RampTime_Ms      → temps de rampe en ms
+DrainTime_S      → temps d'égouttage en secondes entières
 Freq_Hz          → fréquence en Hz
 Speed_Mps        → vitesse linéaire en m/s
 ```
-*Exception* : les suffixes `_DI`/`_DQ`/`_RQ` (I/O physique, voir §suffixes hardware) et `_Pct`/`_M`/`_Hz`/`_Ms`/`_Mps` (unités physiques) gardent l'underscore systématique.
+*Exception* : les suffixes `_DI`/`_DQ`/`_RQ` (I/O physique, voir §suffixes hardware) et `_Pct`/`_M`/`_Hz`/`_S`/`_Ms`/`_Mps` (unités physiques) gardent l'underscore systématique.
 Les variables PERSISTENT ajoutent en plus le préfixe `_` global (ex. `_CableLimitM1Descent_M`).
 
 ---
@@ -634,7 +635,7 @@ Les structures d'échange IHM (`ST_WinchHMI`, `ST_BucketHMI`, `ST_TranslationHMI
 - **Jamais** de `Cmd` dans `ST_*HMI` — `Cmd` réservé aux signaux finaux vers actionneur/bus (niveau 2 pipeline `Req`→`Cmd`)
 - **Jamais** de `Req` dans `ST_*HMI` — `Req` = requête brute entrant dans arbitrage
 - **Pas d'underscore** après le préfixe — format `<Préfixe><PascalCase>` (ex: `BtnReset`, `SelTarget`, `SetFreq_Hz`)
-- Underscore **uniquement** pour suffixes d'unité (`_M`, `_Hz`, `_Pct`, `_Mps`, `_Ms`)
+- Underscore **uniquement** pour suffixes d'unité (`_M`, `_Hz`, `_Pct`, `_Mps`, `_S`, `_Ms`)
 - État (`Ready`, `Busy`, `Error`...), Mesure (`Position_M`, `Speed_Mps`...), Diagnostic (`ErrorId`...), Sortie physique (`RelayFwd`, `Brake`...) : **pas de préfixe**, forme établie conservée
 
 > ⚠️ **Migration** : toute modification de ces noms dans `CODE/SUPERVISION/*.st` casse les liaisons IHM (tags graphiques). Ne renommer **qu'en migration planifiée** (bundle PLCopenXML + mise à jour IHM simultanée, mapping `OldName → NewName` documenté). L'existant (`CmdReset`, `BtnFwd`, `SetFreq_Hz`...) reste valide tant que la migration n'est pas décidée.

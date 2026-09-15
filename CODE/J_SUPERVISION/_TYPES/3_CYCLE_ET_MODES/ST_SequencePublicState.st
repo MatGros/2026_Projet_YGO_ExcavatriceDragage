@@ -25,6 +25,7 @@ STRUCT
     SpeedMismatchConfirmed : BOOL;          // Écart vitesse confirmé pendant timeout
     CurrentCycleElapsed : TIME;             // Durée écoulée du cycle SEMI_AUTO en cours
     LastCycleDuration   : TIME;             // Durée du dernier cycle SEMI_AUTO achevé (figée à X13)
+    DrainTimeElapsed    : TIME;             // Temps ecoule en AX13 ; remis a zero hors AX13
     CycleChecksInhibited: BOOL;             // Mode essai : controles procede inhibes
     IgnoredCycleCheckId : WORD;             // Causes procede actives mais ignorees
     ForceStepPrepared   : BOOL;             // Cible forcee preparee, commandes neutres

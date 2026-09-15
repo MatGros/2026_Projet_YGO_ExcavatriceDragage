@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.363374" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.363374">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T03:50:06.824583" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T03:50:06.824583">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -48,15 +48,15 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧭 Source arrêt AX7</xhtml>
               </documentation>
             </variable>
-            <variable name="DrainTime">
+            <variable name="DrainTime_S">
               <type>
-                <TIME />
+                <INT />
               </type>
               <initialValue>
-                <simpleValue value="TIME#5s0ms" />
+                <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en AX13 (configurable IHM)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Autorite IHM egouttage AX13, secondes entieres [1..3600]</xhtml>
               </documentation>
             </variable>
             <variable name="RaiseOffBottom_M">

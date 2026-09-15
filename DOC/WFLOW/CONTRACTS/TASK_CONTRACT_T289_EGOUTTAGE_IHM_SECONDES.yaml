@@ -4,32 +4,47 @@ contract:
   strategy: patch
   objective: >
     Ajouter des champs IHM en secondes (INT) pour la consigne et le temps écoulé
-    de la temporisation d'égouttage AX13, en conservant le champ TIME existant
-    (informatif) et sans modifier le comportement réel de la tempo PLC (TON).
+    de la temporisation d'égouttage AX13, en supprimant l'ancien champ de
+    configuration TIME devenu ambigu, sans modifier le comportement réel du TON.
   acceptance:
     - id: AC1
-      statement: "Une nouvelle variable IHM de consigne égouttage en INT secondes existe, convertie en TIME en interne, bornée de la même façon que CfgDrainTime actuel (<=0 -> défaut interne)."
-      verified_by: "revue de code + test unitaire de conversion et de saturation"
+      statement: "DrainTime_S est l'unique autorite de consigne, borne dans [1..3600] s et converti explicitement en TIME sans overflow."
+      verified_by: "revue de code + compilation cible + tests -1, 0, 1, 5, 3599, 3600, 3601 et 32767"
     - id: AC2
-      statement: "Une nouvelle variable IHM de temps écoulé égouttage en INT secondes existe, alimentée depuis DrainingTimer.ET converti, mise à jour à chaque scan pendant AX13."
-      verified_by: "test cycle auto : valeur croît de 0 à la consigne effective pendant AX13, puis se fige/retombe hors AX13"
+      statement: "DrainTimeElapsed_S existe dans State, progresse par secondes entieres depuis DrainingTimer.ET pendant AX13 et revient a 0 hors AX13 et apres Skip."
+      verified_by: "test cycle auto : progression monotone, transition Q, Skip, sortie puis reentree AX13 et changement de mode"
     - id: AC3
-      statement: "Le champ TIME existant (CfgDrainTime / ST_CycleCfg.DrainTime) reste présent, inchangé dans son typage et son câblage, à titre informatif."
-      verified_by: "diff ciblé : aucune suppression ni changement de type sur CfgDrainTime / ST_CycleCfg.DrainTime"
+      statement: "L'ancien champ ST_CycleCfg.DrainTime est supprime ; aucun faux parametre TIME modifiable ne subsiste dans Cfg."
+      verified_by: "diff cible + recherche globale des lectures GVL_IHM.CycleSemiAuto.Cfg.DrainTime"
     - id: AC4
       statement: "Le comportement de l'étape AX13 (SkipDrainRequest/bypass, PT effectif de DrainingTimer, transition AX13->AX14) est strictement inchangé."
       verified_by: "test de non-régression AX13 : bypass immédiat, tempo par défaut, tempo configurée"
     - id: AC5
-      statement: "La conversion INT(s) <-> TIME ne produit aucun dépassement silencieux ni valeur négative exploitable en entrée PLC."
-      verified_by: "test aux bornes (0, valeur max INT plausible, valeur négative rejetée/saturée)"
+      statement: "La conversion INT(s) <-> TIME ne produit aucun depassement silencieux ; la consigne est bornee a 1..3600 s et elapsed a 0..3600 s."
+      verified_by: "test des bornes et compilation de DINT_TO_TIME/TIME_TO_DINT sur la cible"
+    - id: AC7
+      statement: "La nouvelle consigne persistante DrainTime_S est initialisee a 5 s ; la rupture du tag IHM DrainTime est explicite et controlee."
+      verified_by: "inspection ST_CycleCfg/GVL_PERSISTENT + compilation cible + remplacement du tag IHM"
+    - id: AC8
+      statement: "Critere structurel CODE/MAIN : pour chaque fichier modifie, le nom de fichier est identique au nom de POU ; aucun suffixe de langage _CFC/_LD n'est ajoute et le suffixe reste identique au langage genere dans le bundle (ST pur)."
+      verified_by: "revue des noms PRG_03_Modes_Cycle.st / PRG_07_Supervision.st et inspection PLCopenXML du bundle"
     - id: AC6
       statement: "Le bundle PLCopenXML est régénéré et la liaison producteur-consommateur reste sans erreur."
       verified_by: "generate_codesys_bundle.py puis G200_check_linkage.py --report"
   scope:
     allowed:
       - CODE/G_CYCLE/FB_CycleSemiAuto.st
-      - CODE/J_SUPERVISION/GVL_IHM.st
       - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleState.st
+      - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_SequencePublicState.st
+      - CODE/J_SUPERVISION/_BRIDGES/FB_CfgPersistBridge_CycleCfg.st
+      - CODE/GVL_PERSISTENT.st
+      - CODE/M_MAIN/PRG_03_Modes_Cycle.st
+      - CODE/M_MAIN/PRG_07_Supervision.st
+      - TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclesemiauto.st
+      - TOOLS/TEST_AUTO_CI/scripts/config/registry.yaml
+      - TOOLS/AGENT_WORKFLOW/scripts/G499_check_t289_drain_time_seconds.py
+      - TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py
       - CODE_XML/CODE_Bundle.xml
       - DOC/WFLOW/TASKS.yaml
       - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T289_EGOUTTAGE_IHM_SECONDES.yaml
@@ -40,7 +55,6 @@ contract:
       - CODE/B_AU_SECURITE/*
   conservation:
     must_survive:
-      - "Le champ TIME existant CfgDrainTime / ST_CycleCfg.DrainTime, inchangé."
       - "Le bypass SkipDrainRequest et le comportement de la TON DrainingTimer."
       - "La borne défaut interne (DrainingTime = T#5s) quand la consigne configurée est <= 0."
     dropped_on_purpose: []
@@ -63,7 +77,7 @@ execution:
   summary: >
     Tâche créée pour cadrer l'ajout de champs IHM en secondes (consigne + temps
     écoulé) pour la temporisation d'égouttage AX13, en conservant le champ TIME
-    existant à titre informatif.
+    TIME devenu sans role de configuration.
   evidence_submitted: []
 validation:
   status: PENDING

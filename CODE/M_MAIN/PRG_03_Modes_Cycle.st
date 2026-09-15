@@ -44,6 +44,8 @@ VAR
     ModeBootInitialized            : BOOL; // . [LOC] Applique SEMI_AUTO une seule fois au démarrage PLC
     CycleDepthLowerBound_M        : REAL; // . [LOC] Borne sûre commune : légale et limites descentes M1/M2
     CycleSetDepthEffective_M      : REAL; // . [LOC] Consigne cycle bornée avant consommation par FB_CycleSemiAuto
+    CycleDrainTimeEffective_S     : INT;  // . [LOC] Consigne egouttage bornee [1..3600] avant conversion IEC TIME
+    CycleDrainTimeEffective       : TIME; // . [LOC] Consigne egouttage convertie en TIME pour FB_CycleSemiAuto
 END_VAR
 
 VAR CONSTANT
@@ -59,6 +61,8 @@ CycleDepthLowerBound_M := MAX(_CommunCfgPersist.LimitLegalDepthMinAllowed_M,
                              MAX(_WinchM1CfgPersist.CfgCableLimitDescent_M,
                                  _WinchM2CfgPersist.CfgCableLimitDescent_M));
 CycleSetDepthEffective_M := MAX(GVL_IHM.CycleSemiAuto.Cfg.SetDepth_M, CycleDepthLowerBound_M);
+CycleDrainTimeEffective_S := LIMIT(1, GVL_IHM.CycleSemiAuto.Cfg.DrainTime_S, 3600);
+CycleDrainTimeEffective := DINT_TO_TIME(INT_TO_DINT(CycleDrainTimeEffective_S) * DINT#1000);
 
 // 📄 Événement changement de page IHM : sélection automatique du mode (page 5 = MAINT_N1, page 1 = SEMI_AUTO)
 IF NOT ModeBootInitialized THEN
@@ -244,7 +248,7 @@ instCycleSemiAuto(
     InitPositionOk          := CycleInitPositionOk,
     WinchesAtTopWindow      := CycleWinchesAtTopOk,
     HomingRequest           := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome OR GVL_IHM.M2TreuilBenne.Cmd.BtnHome,
-    CfgDrainTime            := GVL_IHM.CycleSemiAuto.Cfg.DrainTime,
+    CfgDrainTime            := CycleDrainTimeEffective,
     SkipDrainRequest        := GVL_IHM.CycleSemiAuto.Cmd.BtnSkipDrain,
     RepositionRequest       := GVL_IHM.CycleSemiAuto.Cmd.BtnReposition,
     CfgCommissioningEnable  := GVL_IHM.CycleSemiAuto.Cmd.TglCommissioning,
@@ -337,6 +341,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.SpeedMismatchConfirmed := instCycleSemiAuto.SpeedMismatchConfirmed;
     Data.SequenceState.CurrentCycleElapsed    := instCycleSemiAuto.CurrentCycleElapsed;
     Data.SequenceState.LastCycleDuration      := instCycleSemiAuto.LastCycleDuration;
+    Data.SequenceState.DrainTimeElapsed       := instCycleSemiAuto.DrainTimeElapsed;
     Data.SequenceState.CycleChecksInhibited   := instCycleSemiAuto.CycleChecksInhibited;
     Data.SequenceState.IgnoredCycleCheckId    := instCycleSemiAuto.IgnoredCycleCheckId;
     Data.SequenceState.ForceStepPrepared      := instCycleSemiAuto.ForceStepPrepared;
@@ -432,6 +437,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
     Data.SequenceState.SpeedMismatchConfirmed := FALSE;
     Data.SequenceState.CurrentCycleElapsed    := T#0s;
     Data.SequenceState.LastCycleDuration      := T#0s;
+    Data.SequenceState.DrainTimeElapsed       := T#0s;
     Data.SequenceState.CycleChecksInhibited   := FALSE;
     Data.SequenceState.IgnoredCycleCheckId    := 0;
     Data.SequenceState.ForceStepPrepared      := FALSE;
@@ -502,6 +508,7 @@ ELSE
     Data.SequenceState.SpeedMismatchConfirmed  := FALSE;
     Data.SequenceState.CurrentCycleElapsed     := T#0s;
     Data.SequenceState.LastCycleDuration       := T#0s;
+    Data.SequenceState.DrainTimeElapsed        := T#0s;
     Data.SequenceState.CycleChecksInhibited    := FALSE;
     Data.SequenceState.IgnoredCycleCheckId     := 0;
     Data.SequenceState.ForceStepPrepared       := FALSE;

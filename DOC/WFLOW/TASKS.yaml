@@ -100,11 +100,12 @@ tasks:
   bloque_par: []
 - id: T289
   parent_id: ''
-  statut: '⬜'
+  statut: '⏳'
   criticite: C2
   domaine: CYCLE_AUTO / IHM
-  agent: ''
-  date: '2026-09-14T00:00:00+02:00'
+  agent: Codex
+  date: '2026-09-15T05:38:02+02:00'
+  avancement: 'Cadrage detaille en cours ; plan technique a challenger par un expert automaticien avant toute implementation.'
   titre: Égouttage AX13 — champs IHM consigne et temps écoulé en secondes (INT)
   contexte: 'Demande client : le champ IHM actuel de durée d égouttage (CfgDrainTime / ST_CycleCfg.DrainTime, type TIME, écriture T#5s) est compliqué à manipuler côté panel. Le client veut aussi voir le temps écoulé pendant l égouttage (pas seulement la fin de tempo). Décision utilisateur (Mathieu, 2026-09-14) : conserver le champ TIME existant tel quel dans l IHM, à titre informatif uniquement, et ajouter en parallèle deux nouvelles variables INT en secondes (consigne + temps écoulé) exposées à l IHM. La tempo réelle côté PLC reste une TON de type TIME ; conversion INT(s) <-> TIME aux deux bouts.'
   description: 'Ajouter à FB_CycleSemiAuto (AX13) une consigne IHM en INT secondes (convertie en TIME, bornée comme l actuel CfgDrainTime) et un temps écoulé en INT secondes alimenté depuis DrainingTimer.ET converti, sans supprimer ni modifier le champ TIME existant (CfgDrainTime / ST_CycleCfg.DrainTime).'

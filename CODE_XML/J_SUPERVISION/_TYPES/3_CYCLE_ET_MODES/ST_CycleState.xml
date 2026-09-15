@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.369812" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.369812">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T03:48:40.801150" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T03:48:40.801150">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -232,6 +232,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée du dernier cycle achevé (figée à X13)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DrainTimeElapsed_S">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Temps ecoule en AX13, secondes entieres ; 0 hors AX13</xhtml>
               </documentation>
             </variable>
             <variable name="CycleChecksInhibited">
