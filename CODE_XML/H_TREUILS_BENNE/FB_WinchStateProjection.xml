@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.322049" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.322049">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T03:29:48.838951" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T03:29:48.838951">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -2975,7 +2975,7 @@ Seuils de changement de palier (0..100%)</xhtml>
         (via ce FB), consommés par PRG_07/IHM.
    🔒 Non-régression : chaque assignation de la §8 de PRG_04 est déplacée
       telle quelle (bit-identique, aucune logique modifiée).
-   📄 Doc : DOC/WFLOW/AUDITS/FB_WinchStateProjection_DESIGN.md 
+   📄 Doc : DOC/WFLOW/AUDITS/FB_WinchStateProjection_DESIGN.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>

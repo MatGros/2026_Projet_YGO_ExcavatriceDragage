@@ -75,6 +75,7 @@ VAR
     WinchBothMotionActive : BOOL;
     WinchBothMotionReady         : BOOL;                         // . [LOC] Verrou atomicite demarrage couple : les 2 treuils prets (hors dead-time D18, hors defaut latche)
     WinchBothFinalRequestsCoherent : BOOL;                       // . [LOC] Egalite effective des demandes physiques M1/M2 du scan
+    WinchBothFinalStep45Coherent : BOOL;                         // . [LOC] Exception T291-A exacte : descente M1=P4 / M2=P5 en auto AX4..AX7
     WinchBothReqAscent           : BOOL;
     WinchBothReqDescend          : BOOL;
     ManualBottomPositionConfirmed  : BOOL;
@@ -642,7 +643,9 @@ instWinchSync(
                        OR GVL_IHM.M1TreuilRetenue.Bypass.Safety
                        OR GVL_IHM.M2TreuilBenne.Bypass.Safety
                        OR GVL_IHM.M1TreuilRetenue.Bypass.Process
-                       OR GVL_IHM.M2TreuilBenne.Bypass.Process
+                       OR GVL_IHM.M2TreuilBenne.Bypass.Process,
+    DescentStep45Permit := PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active,
+    SpeedStepTable  := _WinchSpeedStepTable
 );
 
 // Pas de reconstruction de table M2 : le clamp §5ter (M2MaxStep* := 1) suffit
@@ -1232,6 +1235,15 @@ CommonMinStepDown := MAX(0, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStep
 // --- M2-propre (jamais vu par M1) ---
 M2MaxStepUp   := CommonMaxStepAscent;
 M2MaxStepDown := CommonMaxStepDescent;
+// T291-A : le plafond nominal commun reste configure a 4 afin que M1 et tous
+// les autres modes restent inchanges. Pendant la seule plongee auto AX4..AX7,
+// M2 peut atteindre P5. Ne jamais relever ici un plafond deja reduit par une
+// protection amont (codeurs non fiables, ecart synchro, position maintenance).
+IF PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active
+   AND (EffectiveMaxStepDescent = 4)
+   AND (CommonMaxStepDescent = EffectiveMaxStepDescent) THEN
+    M2MaxStepDown := 5;
+END_IF;
 // Auto-séquencement benne (FB_Bucket) : palier 1 sur toute la manœuvre.
 IF instBucket.M2_BucketJogLimit THEN
     M2MaxStepUp   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
@@ -1551,14 +1563,32 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitApplied;
 WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitApplied;
 
+WinchBothFinalStep45Coherent :=
+    PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active
+    AND NOT WinchM1FinalInterlockRequest.RequestedRelayFwd
+    AND NOT WinchM2FinalInterlockRequest.RequestedRelayFwd
+    AND WinchM1FinalInterlockRequest.RequestedRelayRev
+    AND WinchM2FinalInterlockRequest.RequestedRelayRev
+    AND (WinchM1FinalInterlockRequest.RequestedStep = 4)
+    AND (WinchM2FinalInterlockRequest.RequestedStep = 5)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor1 = _WinchSpeedStepTable.P4R1)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor2 = _WinchSpeedStepTable.P4R2)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor3 = _WinchSpeedStepTable.P4R3)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor4 = _WinchSpeedStepTable.P4R4)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor1 = _WinchSpeedStepTable.P5R1)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor2 = _WinchSpeedStepTable.P5R2)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor3 = _WinchSpeedStepTable.P5R3)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor4 = _WinchSpeedStepTable.P5R4);
+
 WinchBothFinalRequestsCoherent :=
-    (WinchM1FinalInterlockRequest.RequestedRelayFwd = WinchM2FinalInterlockRequest.RequestedRelayFwd)
-    AND (WinchM1FinalInterlockRequest.RequestedRelayRev = WinchM2FinalInterlockRequest.RequestedRelayRev)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor1 = WinchM2FinalInterlockRequest.RequestedContactor1)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor2 = WinchM2FinalInterlockRequest.RequestedContactor2)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor3 = WinchM2FinalInterlockRequest.RequestedContactor3)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor4 = WinchM2FinalInterlockRequest.RequestedContactor4)
-    AND (WinchM1FinalInterlockRequest.RequestedStep = WinchM2FinalInterlockRequest.RequestedStep);
+    WinchBothFinalStep45Coherent
+    OR ((WinchM1FinalInterlockRequest.RequestedRelayFwd = WinchM2FinalInterlockRequest.RequestedRelayFwd)
+        AND (WinchM1FinalInterlockRequest.RequestedRelayRev = WinchM2FinalInterlockRequest.RequestedRelayRev)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor1 = WinchM2FinalInterlockRequest.RequestedContactor1)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor2 = WinchM2FinalInterlockRequest.RequestedContactor2)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor3 = WinchM2FinalInterlockRequest.RequestedContactor3)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor4 = WinchM2FinalInterlockRequest.RequestedContactor4)
+        AND (WinchM1FinalInterlockRequest.RequestedStep = WinchM2FinalInterlockRequest.RequestedStep));
 
 // Defense en profondeur apres les deux FB : en intention couplee, aucun actionneur ne
 // peut etre publie seul. Les FB continuent d'evaluer leurs interlocks internes, mais les
@@ -1835,6 +1865,7 @@ Data.WinchSyncError               := instWinchSync.SyncDeviationFault
                                      OR WinchM1Safety.ErrorMecaE
                                      OR WinchM2Safety.ErrorMecaE;
 Data.WinchSyncSignedDeltaPosM     := instWinchSync.SignedDeltaPosM;
+Data.AutoDiveM1Step4M2Step5Active := PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active;
 Data.BucketState                  := BucketState;
 Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
 Data.BucketBusy                   := instBucket.Lifecycle.Busy;

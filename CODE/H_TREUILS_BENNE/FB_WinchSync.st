@@ -45,6 +45,8 @@ VAR_INPUT
 
     // === BYPASSES ET SIMULATION ===
     BypassGlobal                    : BOOL := FALSE;                  // --> [TST] Force ErrorId=0 global
+    DescentStep45Permit             : BOOL := FALSE;                  // --> [CMD] Autorise uniquement le profil descente M1=P4 / M2=P5
+    SpeedStepTable                  : ST_SpeedStepTable;              // --> [CFG] Table officielle paliers -> contacteurs
 END_VAR
 VAR_OUTPUT
     // === ETATS IEC ET SYNOPTIQUE ===
@@ -60,6 +62,7 @@ VAR_OUTPUT
     SyncDeviationWarn               : BOOL;                           // <-- [DIAG] Ecart seuil 1 depasse (force palier 1)
     SyncDeviationFault              : BOOL;                           // <-- [SAFE] Ecart seuil 2 critique (block signal)
     ContactorMismatch              : BOOL;                           // <-- [SAFE] Discordance contacteurs M1/M2 confirmee (miroir instContactor, nom -> plus de masque hexa cote PRG_04)
+    DescentStep45Matched            : BOOL;                           // <-- [STAT] Profil T291-A reconnu par la surveillance contacteurs
 END_VAR
 VAR
     // === DETECTEURS ET TIMERS INTERNES ===
@@ -94,6 +97,7 @@ IF NOT Enable THEN
     SyncActive := FALSE;
     SyncWarn := FALSE; SyncDeviationWarn := FALSE; SyncDeviationFault := FALSE;
     ContactorMismatch := FALSE;
+    DescentStep45Matched := FALSE;
     instCauses[0].Active := FALSE;
     instCauses[1].Active := FALSE;
     instCauses[2].Active := FALSE;
@@ -156,7 +160,9 @@ instContactor(
     Contactor3_M2   := Contactor3_M2,
     Contactor4_M1   := Contactor4_M1,
     Contactor4_M2   := Contactor4_M2,
-    BypassGlobal    := BypassGlobal
+    BypassGlobal    := BypassGlobal,
+    DescentStep45Permit := DescentStep45Permit,
+    SpeedStepTable  := SpeedStepTable
 );
 {endregion}
 
@@ -189,6 +195,7 @@ Ready := Enable AND NOT Fault.Latched;
 // Miroir nomme de la discordance contacteurs (le consommateur lit ce booleen,
 // plus le masque hexa sur Fault.ErrorId). BypassGlobal deja gere dans instContactor.
 ContactorMismatch := instContactor.ContactorMismatch;
+DescentStep45Matched := instContactor.DescentStep45Matched;
 {endregion}
 
 END_FUNCTION_BLOCK

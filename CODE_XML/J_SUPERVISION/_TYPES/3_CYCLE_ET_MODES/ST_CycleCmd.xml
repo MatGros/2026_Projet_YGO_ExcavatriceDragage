@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.364646" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.364646">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T02:09:00.654491" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T02:09:00.654491">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -102,6 +102,17 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Mode essai : inhibe uniquement les controles procede autorises. NON persiste.</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TglAutoDiveM2Step5Trial">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste.</xhtml>
               </documentation>
             </variable>
             <variable name="BtnForceStepApply">

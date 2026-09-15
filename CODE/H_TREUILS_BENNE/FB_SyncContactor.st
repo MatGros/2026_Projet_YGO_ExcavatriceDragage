@@ -39,11 +39,15 @@ VAR_INPUT
 
     // === BYPASSES ET SIMULATION ===
     BypassGlobal                    : BOOL := FALSE;                  // --> [TST] Neutralise la surveillance contacteurs
+    DescentStep45Permit             : BOOL := FALSE;                  // --> [CMD] Autorise uniquement le profil descente M1=P4 / M2=P5
+    SpeedStepTable                  : ST_SpeedStepTable;              // --> [CFG] Table officielle paliers -> contacteurs
 END_VAR
 VAR_OUTPUT
     // === RESULTAT (reponse graduee) ===
     ContactorMismatch               : BOOL;                           // <-- [SAFE] Niveau 1 : discordance commande/contacteurs confirmee (debounce) -> SafeStop
     ContactorMismatchEscalated      : BOOL;                           // <-- [SAFE] Niveau 2 : discordance persistante -> escalade PowerCutOff
+    CommandsCoherent                : BOOL;                           // <-- [STAT] TRUE si le vecteur instantane est coherent ou derogation T291-A exacte
+    DescentStep45Matched            : BOOL;                           // <-- [STAT] TRUE si le profil M1=P4 / M2=P5 est exactement reconnu
     Diag                            : ST_SyncContactorDiag;           // <-- [DIAG] Detail : quel contacteur diverge + niveau atteint
 END_VAR
 VAR CONSTANT
@@ -58,6 +62,8 @@ VAR
     // === VARIABLES LOCALES INTERNES ===
     MismatchActive                  : BOOL;                           // . [LOC] Discordance instantanee (avant debounce)
     BothCommanded                   : BOOL;                           // . [LOC] Les 2 treuils sont commandes (relais ou contacteur)
+    DescentStep4M1                  : BOOL;                           // . [LOC] M1 en descente avec vecteur table P4 exact
+    DescentStep5M2                  : BOOL;                           // . [LOC] M2 en descente avec vecteur table P5 exact
 END_VAR
 
 {region "§1 Gate neutralisation"}
@@ -65,8 +71,12 @@ END_VAR
 IF NOT Enable OR BypassGlobal THEN
     ContactorMismatch := FALSE;
     ContactorMismatchEscalated := FALSE;
+    CommandsCoherent := FALSE;
+    DescentStep45Matched := FALSE;
     MismatchActive := FALSE;
     BothCommanded := FALSE;
+    DescentStep4M1 := FALSE;
+    DescentStep5M2 := FALSE;
     MismatchTimer(IN := FALSE);
     EscalationTimer(IN := FALSE);
     Diag.RelayFwdMismatch := FALSE;
@@ -98,9 +108,33 @@ Diag.Step2Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor2_M1 <> Con
 Diag.Step3Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor3_M1 <> Contactor3_M2);
 Diag.Step4Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor4_M1 <> Contactor4_M2);
 
+DescentStep4M1 := RelayRevM1 AND NOT RelayFwdM1
+                  AND (Contactor1_M1 = SpeedStepTable.P4R1)
+                  AND (Contactor2_M1 = SpeedStepTable.P4R2)
+                  AND (Contactor3_M1 = SpeedStepTable.P4R3)
+                  AND (Contactor4_M1 = SpeedStepTable.P4R4);
+DescentStep5M2 := RelayRevM2 AND NOT RelayFwdM2
+                  AND (Contactor1_M2 = SpeedStepTable.P5R1)
+                  AND (Contactor2_M2 = SpeedStepTable.P5R2)
+                  AND (Contactor3_M2 = SpeedStepTable.P5R3)
+                  AND (Contactor4_M2 = SpeedStepTable.P5R4);
+DescentStep45Matched := DescentStep45Permit
+                        AND NOT RelayFwdM2
+                        AND NOT RelayFwdM1
+                        AND DescentStep4M1
+                        AND DescentStep5M2;
+
+IF DescentStep45Matched THEN
+    Diag.Step1Mismatch := FALSE;
+    Diag.Step2Mismatch := FALSE;
+    Diag.Step3Mismatch := FALSE;
+    Diag.Step4Mismatch := FALSE;
+END_IF;
+
 MismatchActive := Diag.RelayFwdMismatch OR Diag.RelayRevMismatch
     OR Diag.Step1Mismatch OR Diag.Step2Mismatch
     OR Diag.Step3Mismatch OR Diag.Step4Mismatch;
+CommandsCoherent := NOT MismatchActive;
 
 // Niveau 1 : discordance confirmee apres MismatchDebounce.
 MismatchTimer(IN := MismatchActive, PT := MismatchDebounce);

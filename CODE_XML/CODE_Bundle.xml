@@ -5440,6 +5440,17 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🧪 Mode essai : inhibe uniquement les controles procede autorises. NON persiste.</xhtml>
               </documentation>
             </variable>
+            <variable name="TglAutoDiveM2Step5Trial">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A : en SEMI_AUTO AX4..AX7, M1 reste palier 4 et M2 peut monter au palier 5. NON persiste.</xhtml>
+              </documentation>
+            </variable>
             <variable name="BtnForceStepApply">
               <type>
                 <BOOL />
@@ -8906,6 +8917,14 @@ sélection treuil (M1/M2/Couplé), appliquée IDENTIQUEMENT quelle que soit la s
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🎮 Intention both continue opérateur (source unique PRG_03, TOUS modes)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AutoDiveM1Step4M2Step5Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A actif : SEMI_AUTO AX4..AX7, descente M1 palier 4 / M2 palier 5</xhtml>
               </documentation>
             </variable>
             <variable name="ReqProgram">
@@ -13652,6 +13671,14 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Ecart signe M2 - M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AutoDiveM1Step4M2Step5Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A relaye vers PRG_06 : profil final asymetrique autorise uniquement AX4..AX7</xhtml>
               </documentation>
             </variable>
             <variable name="BucketState">
@@ -21774,6 +21801,14 @@ FirstScanDone := TRUE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Palier vitesse effectivement applique M2 (0 = inconnu)</xhtml>
               </documentation>
             </variable>
+            <variable name="CfgAutoDiveM2Step5Trial">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Essai T291-A : M2 palier 5 en descente auto AX4..AX7, non persistant</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -22046,6 +22081,14 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Duree du dernier cycle acheve (figee a X13, persiste au cycle suivant)</xhtml>
               </documentation>
             </variable>
+            <variable name="AutoDiveM1Step4M2Step5Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Profil T291-A actif sur la phase plongee auto</xhtml>
+              </documentation>
+            </variable>
           </outputVars>
           <inOutVars>
             <variable name="SampleCount">
@@ -22155,6 +22198,28 @@ ST_fbCycle_*CmdDemand redondants ni de re-mapping champ-à-champ (NC-090).
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] M1 ET M2 confirmes au palier 4 (mesure Kobold fiable seulement a vitesse stabilisee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AutoDiveM2Step5TrialLatched">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Capture essai T291-A avant depart plongee, figee jusqu'a sortie AX4..AX7</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DiveM2StepTgt">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="4" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Palier cible M2 plongee : 4 nominal, 5 essai T291-A</xhtml>
               </documentation>
             </variable>
             <variable name="SampleCountDone">
@@ -22749,7 +22814,18 @@ Palier lent : retente AX9, controle AX11, repositionnement AX15C</xhtml>
                 <simpleValue value="4" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier plongee Kobold AX4..AX7 : palier 4 MINI ET MAXI impose, palier 5 interdit (GEL Q9)</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier plongee Kobold AX4..AX7 : M1 reste palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CST_StepDiveM2Trial">
+              <type>
+                <INT />
+              </type>
+              <initialValue>
+                <simpleValue value="5" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A : M2 seul peut viser le palier 5 en AX4..AX7</xhtml>
               </documentation>
             </variable>
             <variable name="CST_StepLoaded">
@@ -22954,7 +23030,15 @@ RetryJoyReleaseTimer(IN := ((State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                              OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                             AND NOT (DeadmanArmed AND JoystickPush),
                      PT := T#200ms);
-WinchesAtDiveStep := (M1_SpeedStepApplied = CST_StepDive) AND (M2_SpeedStepApplied = CST_StepDive);
+DiveM2StepTgt := SEL(AutoDiveM2Step5TrialLatched, CST_StepDive, CST_StepDiveM2Trial);
+AutoDiveM1Step4M2Step5Active :=
+    AutoDiveM2Step5TrialLatched
+    AND ((State = E_AutoCycleStep.AX4_DESCEND_DIVING)
+      OR (State = E_AutoCycleStep.AX5_KOBOLD_INIT)
+      OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
+      OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM));
+
+WinchesAtDiveStep := (M1_SpeedStepApplied = CST_StepDive) AND (M2_SpeedStepApplied = DiveM2StepTgt);
 PalierNot4Timer(IN := ((State = E_AutoCycleStep.AX6_SEARCH_IMMERSION) OR (State = E_AutoCycleStep.AX7_SEARCH_BOTTOM))
                          AND DeadmanArmed AND JoystickPush AND NOT WinchesAtDiveStep,
                     PT := T#2s);
@@ -23040,10 +23124,10 @@ instCauses[7].Active   := NOT CycleChecksInhibited
 instCauses[7].Latching := TRUE;
 instCauses[7].Texte    := 'Treuils M1/M2 hors FDC haut pendant la translation vers P1';
 
-// GEL cause 8 : palier vitesse &gt; 4 (palier 5) applique pendant la plongee. Le FB commande
-// toujours CST_StepDive = 4 ; un palier 5 en retour feedback = anomalie aval -&gt; defaut latche.
+// GEL cause 8 : M1 &gt; 4 ou M2 au-dessus de son palier attendu pendant la plongee.
+// En nominal, M2 attendu = 4 ; en essai T291-A capture avant AX4, M2 attendu = 5.
 // (Un palier &lt; 4 en retour est traite en reprise par GT-dive-retry, pas ici.)
-instCauses[8].Active   := (((M1_SpeedStepApplied &gt; CST_StepDive) OR (M2_SpeedStepApplied &gt; CST_StepDive)))
+instCauses[8].Active   := (((M1_SpeedStepApplied &gt; CST_StepDive) OR (M2_SpeedStepApplied &gt; DiveM2StepTgt)))
                           AND ((State = E_AutoCycleStep.AX4_DESCEND_DIVING)
                             OR (State = E_AutoCycleStep.AX5_KOBOLD_INIT)
                             OR (State = E_AutoCycleStep.AX6_SEARCH_IMMERSION)
@@ -23185,6 +23269,8 @@ IF ResetEdge.Q THEN
     BottomContextValid := FALSE;
     StopPositionCaptured := FALSE;
     KoboldImmersionQualified := FALSE;
+    AutoDiveM2Step5TrialLatched := FALSE;
+    AutoDiveM1Step4M2Step5Active := FALSE;
     IF State = E_AutoCycleStep.AX_STAB THEN
         State := E_AutoCycleStep.AX0_REPOS;
     END_IF;
@@ -23260,6 +23346,7 @@ IF NOT Enable OR NOT PowerContactorEngaged OR EncoderFaultPresent THEN
     WaitingForOperator := FALSE;
     WaitingForProcess := FALSE;
     RequestActive := FALSE;
+    AutoDiveM1Step4M2Step5Active := FALSE;
     RETURN;
 END_IF;
 
@@ -23320,6 +23407,7 @@ END_IF;
 // GT-dive-retry (GEL Q11) : reprise de plongee (PAS un defaut latche). Prioritaire
 // apres le repli defaut : une vraie erreur (ErrorEdge) l'emporte.
 IF DivingRetryTrig AND (State &lt;&gt; E_AutoCycleStep.AX_STAB) THEN
+    AutoDiveM2Step5TrialLatched := FALSE;
     State := E_AutoCycleStep.AX_DIVING_RETRY;
 END_IF;
 
@@ -23362,6 +23450,8 @@ CASE State OF
         BottomStopByKobold := FALSE;
         BottomStopBySetpoint := FALSE;
         BottomStopSource := '';
+        AutoDiveM2Step5TrialLatched := FALSE;
+        AutoDiveM1Step4M2Step5Active := FALSE;
 
         // Transition si système sain et réarmé (front reset ou démarrage).
         // 🔫 D2 : démarrage par bouton IHM (StartEdge) OU armement homme-mort joystick
@@ -23512,6 +23602,7 @@ CASE State OF
         // l'arret est confirme. Une perte d'homme-mort desarme FB_Joystick et exige son
         // nouveau front physique avant que DeadmanArmed puisse redevenir vrai.
         IF DiveStartStopTimer.Q AND DeadmanArmed AND JoystickPush THEN
+            AutoDiveM2Step5TrialLatched := CfgAutoDiveM2Step5Trial;
             State := E_AutoCycleStep.AX4_DESCEND_DIVING;
         END_IF;
 
@@ -23529,15 +23620,15 @@ CASE State OF
         OperatorActionId := 16#0404;
         OperatorAction := 'AX4 - Maintenir la descente palier 4 (Kobold pas encore enclenche).';
 
-        // Palier 4 MINI ET MAXI (CST_StepDive), palier 5 interdit (cause 8). Tempo
-        // sequencement contacteurs conservee en aval (PRG_04 : montee progressive 1-&gt;4).
+        // M1 reste palier 4. M2 reste palier 4 nominal, ou palier 5 si l'essai
+        // T291-A a ete capture avant AX4. Sequencement contacteurs conserve en aval.
         // Contacteur Kobold PAS enclenche a cette etape.
         WinchM1Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM1Cmd.ReqAscent := FALSE; WinchM1Cmd.ReqDescend := TRUE;
         WinchM1Cmd.StepTgt  := CST_StepDive;
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.StepTgt  := DiveM2StepTgt;
         BucketCmd.ReqKoboldMeasureEnable := FALSE;
 
         // AT4 : altimetrie de lancement atteinte (M1 &lt;= DiveStartMinEff).
@@ -23564,7 +23655,7 @@ CASE State OF
         WinchM1Cmd.StepTgt  := CST_StepDive;
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.StepTgt  := DiveM2StepTgt;
         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode &lt;&gt; E_CycleDepthStopMode.SETPOINT_ONLY)
                                              AND DeadmanArmed AND JoystickPush;
 
@@ -23593,7 +23684,7 @@ CASE State OF
         WinchM1Cmd.StepTgt  := CST_StepDive;
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.StepTgt  := DiveM2StepTgt;
         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode &lt;&gt; E_CycleDepthStopMode.SETPOINT_ONLY)
                                              AND DeadmanArmed AND JoystickPush;
 
@@ -23624,7 +23715,7 @@ CASE State OF
         WinchM1Cmd.StepTgt  := CST_StepDive;
         WinchM2Cmd.RunRequest := DeadmanArmed AND JoystickPush;
         WinchM2Cmd.ReqAscent := FALSE; WinchM2Cmd.ReqDescend := TRUE;
-        WinchM2Cmd.StepTgt  := CST_StepDive;
+        WinchM2Cmd.StepTgt  := DiveM2StepTgt;
         BucketCmd.ReqKoboldMeasureEnable := (DepthStopMode &lt;&gt; E_CycleDepthStopMode.SETPOINT_ONLY)
                                              AND DeadmanArmed AND JoystickPush;
 
@@ -23652,6 +23743,7 @@ CASE State OF
 
     E_AutoCycleStep.AX8_BOTTOM_CONFIRMED:
         CycleStep := E_AutoCycleStep.AX8_BOTTOM_CONFIRMED;
+        AutoDiveM2Step5TrialLatched := FALSE;
         CycleStateStr := CONCAT('AX8 - Fond confirme par ', BottomStopSource);
         Lifecycle.Busy := TRUE;
         Lifecycle.Done := FALSE;
@@ -38046,6 +38138,25 @@ END_CASE;
 --&gt; [TST] Neutralise la surveillance contacteurs</xhtml>
               </documentation>
             </variable>
+            <variable name="DescentStep45Permit">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorise uniquement le profil descente M1=P4 / M2=P5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table officielle paliers -&gt; contacteurs</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="ContactorMismatch">
@@ -38063,6 +38174,22 @@ END_CASE;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Niveau 2 : discordance persistante -&gt; escalade PowerCutOff</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandsCoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE si le vecteur instantane est coherent ou derogation T291-A exacte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescentStep45Matched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE si le profil M1=P4 / M2=P5 est exactement reconnu</xhtml>
               </documentation>
             </variable>
             <variable name="Diag">
@@ -38131,6 +38258,22 @@ END_CASE;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Les 2 treuils sont commandes (relais ou contacteur)</xhtml>
               </documentation>
             </variable>
+            <variable name="DescentStep4M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] M1 en descente avec vecteur table P4 exact</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescentStep5M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] M2 en descente avec vecteur table P5 exact</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -38161,8 +38304,12 @@ END_CASE;
 IF NOT Enable OR BypassGlobal THEN
     ContactorMismatch := FALSE;
     ContactorMismatchEscalated := FALSE;
+    CommandsCoherent := FALSE;
+    DescentStep45Matched := FALSE;
     MismatchActive := FALSE;
     BothCommanded := FALSE;
+    DescentStep4M1 := FALSE;
+    DescentStep5M2 := FALSE;
     MismatchTimer(IN := FALSE);
     EscalationTimer(IN := FALSE);
     Diag.RelayFwdMismatch := FALSE;
@@ -38194,9 +38341,33 @@ Diag.Step2Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor2_M1 &lt;&g
 Diag.Step3Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor3_M1 &lt;&gt; Contactor3_M2);
 Diag.Step4Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor4_M1 &lt;&gt; Contactor4_M2);
 
+DescentStep4M1 := RelayRevM1 AND NOT RelayFwdM1
+                  AND (Contactor1_M1 = SpeedStepTable.P4R1)
+                  AND (Contactor2_M1 = SpeedStepTable.P4R2)
+                  AND (Contactor3_M1 = SpeedStepTable.P4R3)
+                  AND (Contactor4_M1 = SpeedStepTable.P4R4);
+DescentStep5M2 := RelayRevM2 AND NOT RelayFwdM2
+                  AND (Contactor1_M2 = SpeedStepTable.P5R1)
+                  AND (Contactor2_M2 = SpeedStepTable.P5R2)
+                  AND (Contactor3_M2 = SpeedStepTable.P5R3)
+                  AND (Contactor4_M2 = SpeedStepTable.P5R4);
+DescentStep45Matched := DescentStep45Permit
+                        AND NOT RelayFwdM2
+                        AND NOT RelayFwdM1
+                        AND DescentStep4M1
+                        AND DescentStep5M2;
+
+IF DescentStep45Matched THEN
+    Diag.Step1Mismatch := FALSE;
+    Diag.Step2Mismatch := FALSE;
+    Diag.Step3Mismatch := FALSE;
+    Diag.Step4Mismatch := FALSE;
+END_IF;
+
 MismatchActive := Diag.RelayFwdMismatch OR Diag.RelayRevMismatch
     OR Diag.Step1Mismatch OR Diag.Step2Mismatch
     OR Diag.Step3Mismatch OR Diag.Step4Mismatch;
+CommandsCoherent := NOT MismatchActive;
 
 // Niveau 1 : discordance confirmee apres MismatchDebounce.
 MismatchTimer(IN := MismatchActive, PT := MismatchDebounce);
@@ -45675,7 +45846,7 @@ TableComplete := (CellsFilled &gt;= CellsTotal);
         (via ce FB), consommés par PRG_07/IHM.
    🔒 Non-régression : chaque assignation de la §8 de PRG_04 est déplacée
       telle quelle (bit-identique, aucune logique modifiée).
-   📄 Doc : DOC/WFLOW/AUDITS/FB_WinchStateProjection_DESIGN.md 
+   📄 Doc : DOC/WFLOW/AUDITS/FB_WinchStateProjection_DESIGN.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -46224,6 +46395,25 @@ END_IF;
 --&gt; [TST] Force ErrorId=0 global</xhtml>
               </documentation>
             </variable>
+            <variable name="DescentStep45Permit">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorise uniquement le profil descente M1=P4 / M2=P5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table officielle paliers -&gt; contacteurs</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -46298,6 +46488,14 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Discordance contacteurs M1/M2 confirmee (miroir instContactor, nom -&gt; plus de masque hexa cote PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescentStep45Matched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Profil T291-A reconnu par la surveillance contacteurs</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -46389,6 +46587,7 @@ IF NOT Enable THEN
     SyncActive := FALSE;
     SyncWarn := FALSE; SyncDeviationWarn := FALSE; SyncDeviationFault := FALSE;
     ContactorMismatch := FALSE;
+    DescentStep45Matched := FALSE;
     instCauses[0].Active := FALSE;
     instCauses[1].Active := FALSE;
     instCauses[2].Active := FALSE;
@@ -46451,7 +46650,9 @@ instContactor(
     Contactor3_M2   := Contactor3_M2,
     Contactor4_M1   := Contactor4_M1,
     Contactor4_M2   := Contactor4_M2,
-    BypassGlobal    := BypassGlobal
+    BypassGlobal    := BypassGlobal,
+    DescentStep45Permit := DescentStep45Permit,
+    SpeedStepTable  := SpeedStepTable
 );
 {endregion}
 
@@ -46484,6 +46685,7 @@ Ready := Enable AND NOT Fault.Latched;
 // Miroir nomme de la discordance contacteurs (le consommateur lit ce booleen,
 // plus le masque hexa sur Fault.ErrorId). BypassGlobal deja gere dans instContactor.
 ContactorMismatch := instContactor.ContactorMismatch;
+DescentStep45Matched := instContactor.DescentStep45Matched;
 {endregion}
 </xhtml>
           </ST>
@@ -48235,6 +48437,7 @@ instCycleSemiAuto(
     RepositionRequest       := GVL_IHM.CycleSemiAuto.Cmd.BtnReposition,
     CfgCommissioningEnable  := GVL_IHM.CycleSemiAuto.Cmd.TglCommissioning,
     CfgCycleChecksInhibit   := GVL_IHM.CycleSemiAuto.Cmd.TglCycleChecksInhibit,
+    CfgAutoDiveM2Step5Trial := GVL_IHM.CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial,
     CfgForceStepTarget      := GVL_IHM.CycleSemiAuto.Cfg.ForceStepTarget,
     CfgForceStepApply       := GVL_IHM.CycleSemiAuto.Cmd.BtnForceStepApply,
     // Config diving / extraction (GEL 2026-09-03)
@@ -48331,6 +48534,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.BottomTouchConfirmed   := instCycleSemiAuto.BottomTouched;
     Data.SequenceState.BottomStopByKobold     := instCycleSemiAuto.BottomStopByKobold;
     Data.SequenceState.BottomStopBySetpoint   := instCycleSemiAuto.BottomStopBySetpoint;
+    Data.AutoDiveM1Step4M2Step5Active          := instCycleSemiAuto.AutoDiveM1Step4M2Step5Active;
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
@@ -48342,6 +48546,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
         OR GVL_IHM.M3Translation.Bypass.Global;
 
 ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2) THEN
+    Data.AutoDiveM1Step4M2Step5Active := FALSE;
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
     Data.ReqProgram.ReqWinchM1.RunRequest := FALSE;
     Data.ReqProgram.ReqWinchM1.ReqAscent := FALSE;
@@ -48438,6 +48643,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
         OR GVL_IHM.M3Translation.Bypass.Global;
 
 ELSE
+    Data.AutoDiveM1Step4M2Step5Active := FALSE;
     // Neutralisation déterministe (DISABLE)
     Data.ReqProgram.ReqWinchM1.RunRequest := FALSE;
     Data.ReqProgram.ReqWinchM1.ReqAscent := FALSE;
@@ -48800,6 +49006,14 @@ les structs WinchRequest / Sensors / Config sont remplies champ par champ ici.
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Egalite effective des demandes physiques M1/M2 du scan</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchBothFinalStep45Coherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Exception T291-A exacte : descente M1=P4 / M2=P5 en auto AX4..AX7</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothReqAscent">
@@ -50010,7 +50224,9 @@ instWinchSync(
                        OR GVL_IHM.M1TreuilRetenue.Bypass.Safety
                        OR GVL_IHM.M2TreuilBenne.Bypass.Safety
                        OR GVL_IHM.M1TreuilRetenue.Bypass.Process
-                       OR GVL_IHM.M2TreuilBenne.Bypass.Process
+                       OR GVL_IHM.M2TreuilBenne.Bypass.Process,
+    DescentStep45Permit := PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active,
+    SpeedStepTable  := _WinchSpeedStepTable
 );
 
 // Pas de reconstruction de table M2 : le clamp §5ter (M2MaxStep* := 1) suffit
@@ -50600,6 +50816,15 @@ CommonMinStepDown := MAX(0, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStep
 // --- M2-propre (jamais vu par M1) ---
 M2MaxStepUp   := CommonMaxStepAscent;
 M2MaxStepDown := CommonMaxStepDescent;
+// T291-A : le plafond nominal commun reste configure a 4 afin que M1 et tous
+// les autres modes restent inchanges. Pendant la seule plongee auto AX4..AX7,
+// M2 peut atteindre P5. Ne jamais relever ici un plafond deja reduit par une
+// protection amont (codeurs non fiables, ecart synchro, position maintenance).
+IF PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active
+   AND (EffectiveMaxStepDescent = 4)
+   AND (CommonMaxStepDescent = EffectiveMaxStepDescent) THEN
+    M2MaxStepDown := 5;
+END_IF;
 // Auto-séquencement benne (FB_Bucket) : palier 1 sur toute la manœuvre.
 IF instBucket.M2_BucketJogLimit THEN
     M2MaxStepUp   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
@@ -50919,14 +51144,32 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitApplied;
 WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitApplied;
 
+WinchBothFinalStep45Coherent :=
+    PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active
+    AND NOT WinchM1FinalInterlockRequest.RequestedRelayFwd
+    AND NOT WinchM2FinalInterlockRequest.RequestedRelayFwd
+    AND WinchM1FinalInterlockRequest.RequestedRelayRev
+    AND WinchM2FinalInterlockRequest.RequestedRelayRev
+    AND (WinchM1FinalInterlockRequest.RequestedStep = 4)
+    AND (WinchM2FinalInterlockRequest.RequestedStep = 5)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor1 = _WinchSpeedStepTable.P4R1)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor2 = _WinchSpeedStepTable.P4R2)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor3 = _WinchSpeedStepTable.P4R3)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor4 = _WinchSpeedStepTable.P4R4)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor1 = _WinchSpeedStepTable.P5R1)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor2 = _WinchSpeedStepTable.P5R2)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor3 = _WinchSpeedStepTable.P5R3)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor4 = _WinchSpeedStepTable.P5R4);
+
 WinchBothFinalRequestsCoherent :=
-    (WinchM1FinalInterlockRequest.RequestedRelayFwd = WinchM2FinalInterlockRequest.RequestedRelayFwd)
-    AND (WinchM1FinalInterlockRequest.RequestedRelayRev = WinchM2FinalInterlockRequest.RequestedRelayRev)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor1 = WinchM2FinalInterlockRequest.RequestedContactor1)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor2 = WinchM2FinalInterlockRequest.RequestedContactor2)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor3 = WinchM2FinalInterlockRequest.RequestedContactor3)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor4 = WinchM2FinalInterlockRequest.RequestedContactor4)
-    AND (WinchM1FinalInterlockRequest.RequestedStep = WinchM2FinalInterlockRequest.RequestedStep);
+    WinchBothFinalStep45Coherent
+    OR ((WinchM1FinalInterlockRequest.RequestedRelayFwd = WinchM2FinalInterlockRequest.RequestedRelayFwd)
+        AND (WinchM1FinalInterlockRequest.RequestedRelayRev = WinchM2FinalInterlockRequest.RequestedRelayRev)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor1 = WinchM2FinalInterlockRequest.RequestedContactor1)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor2 = WinchM2FinalInterlockRequest.RequestedContactor2)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor3 = WinchM2FinalInterlockRequest.RequestedContactor3)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor4 = WinchM2FinalInterlockRequest.RequestedContactor4)
+        AND (WinchM1FinalInterlockRequest.RequestedStep = WinchM2FinalInterlockRequest.RequestedStep));
 
 // Defense en profondeur apres les deux FB : en intention couplee, aucun actionneur ne
 // peut etre publie seul. Les FB continuent d'evaluer leurs interlocks internes, mais les
@@ -51203,6 +51446,7 @@ Data.WinchSyncError               := instWinchSync.SyncDeviationFault
                                      OR WinchM1Safety.ErrorMecaE
                                      OR WinchM2Safety.ErrorMecaE;
 Data.WinchSyncSignedDeltaPosM     := instWinchSync.SignedDeltaPosM;
+Data.AutoDiveM1Step4M2Step5Active := PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active;
 Data.BucketState                  := BucketState;
 Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
 Data.BucketBusy                   := instBucket.Lifecycle.Busy;
@@ -53169,7 +53413,9 @@ instSyncContactorFinal(
                      OR GVL_IHM.M1TreuilRetenue.Bypass.Safety
                      OR GVL_IHM.M2TreuilBenne.Bypass.Safety
                      OR GVL_IHM.M1TreuilRetenue.Bypass.Process
-                     OR GVL_IHM.M2TreuilBenne.Bypass.Process
+                     OR GVL_IHM.M2TreuilBenne.Bypass.Process,
+    DescentStep45Permit := PRG_04_Treuils_Benne.Data.AutoDiveM1Step4M2Step5Active,
+    SpeedStepTable  := _WinchSpeedStepTable
 );
 Data.ContactorMismatch          := instSyncContactorFinal.ContactorMismatch;
 Data.ContactorMismatchEscalated := instSyncContactorFinal.ContactorMismatchEscalated;

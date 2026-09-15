@@ -307,6 +307,7 @@ FB_WinchSync:
   - CODE/A_COMMUN/_TYPES/ST_FaultCause.st
   - CODE/A_COMMUN/FB_FaultCore.st
   - CODE/F_MODES/E_Mode.st
+  - CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st
   - CODE/H_TREUILS_BENNE/_TYPES/ST_SyncContactorDiag.st
   - CODE/H_TREUILS_BENNE/FB_SyncDeviation.st
   - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
@@ -320,6 +321,7 @@ FB_SyncContactor:
     file: CODE/M_MAIN/PRG_06_Outputs.st
     name: instSyncContactorFinal
   sources:
+  - CODE/H_TREUILS_BENNE/_TYPES/ST_SpeedStepTable.st
   - CODE/H_TREUILS_BENNE/_TYPES/ST_SyncContactorDiag.st
   - CODE/H_TREUILS_BENNE/FB_SyncContactor.st
   test: TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/tests/test_fb_synccontactor.st
@@ -1307,6 +1309,7 @@ MAIN_GLOBAL:
   - CODE/F_MODES/E_Mode.st
   - CODE/F_MODES/FB_Modes.st
   - CODE/G_CYCLE/_TYPES/E_AutoCycleStep.st
+  - CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/E_CycleDepthStopMode.st
   - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_SpeedCfg.st
   - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinchLoadEstimator_Table.st
   - CODE/H_TREUILS_BENNE/_TYPES/ST_fbWinch_Symmetry_Cfg.st

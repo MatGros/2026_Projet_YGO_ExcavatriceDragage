@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.405340" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.405340">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T02:53:19.713957" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T02:53:19.713957">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1119,6 +1119,14 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">📏 Ecart signe M2 - M1 (m)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AutoDiveM1Step4M2Step5Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Essai T291-A relaye vers PRG_06 : profil final asymetrique autorise uniquement AX4..AX7</xhtml>
               </documentation>
             </variable>
             <variable name="BucketState">
@@ -3900,6 +3908,204 @@ palier : 1..5</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_SpeedStepTable">
+        <baseType>
+          <struct>
+            <variable name="P1R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 1 (VITESSE MINIMALE) ===
+Contacteur 1 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P1R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 2 ===
+Contacteur 1 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P2R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 3 ===
+Contacteur 1 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P3R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 3</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 4 ===
+Contacteur 1 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P4R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 5 (VITESSE MAXIMALE) ===
+Contacteur 1 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="P5R4">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepThreshold_Pct">
+              <type>
+                <array>
+                  <dimension lower="1" upper="5" />
+                  <baseType>
+                    <REAL />
+                  </baseType>
+                </array>
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SEUILS DE TRANSITION (%) ===
+Seuils de changement de palier (0..100%)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>fbfd953e-d8b9-5242-babe-f7521771609a</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
+   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_State">
         <baseType>
           <enum>
@@ -4335,204 +4541,6 @@ palier : 1..5</xhtml>
    ───────────────────────────────────────────────────────────────
    🎨 Destiné à l'affichage des informations et diagnostics des codeurs.
    ═══════════════════════════════════════════════════════════════</xhtml>
-        </documentation>
-      </dataType>
-      <dataType name="ST_SpeedStepTable">
-        <baseType>
-          <struct>
-            <variable name="P1R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 1 (VITESSE MINIMALE) ===
-Contacteur 1 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P1R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P1R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P1R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 1</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 2 ===
-Contacteur 1 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P2R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 2</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 3 ===
-Contacteur 1 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P3R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 3</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 4 ===
-Contacteur 1 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P4R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 4</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R1">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== PALIER 5 (VITESSE MAXIMALE) ===
-Contacteur 1 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R2">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 2 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R3">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 3 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="P5R4">
-              <type>
-                <BOOL />
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contacteur 4 pour Palier 5</xhtml>
-              </documentation>
-            </variable>
-            <variable name="StepThreshold_Pct">
-              <type>
-                <array>
-                  <dimension lower="1" upper="5" />
-                  <baseType>
-                    <REAL />
-                  </baseType>
-                </array>
-              </type>
-              <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== SEUILS DE TRANSITION (%) ===
-Seuils de changement de palier (0..100%)</xhtml>
-              </documentation>
-            </variable>
-          </struct>
-        </baseType>
-        <addData>
-          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
-            <ObjectId>fbfd953e-d8b9-5242-babe-f7521771609a</ObjectId>
-          </data>
-        </addData>
-        <documentation>
-          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
-   🪜 ST_SpeedStepTable — Table des paliers de vitesse contacteurs
-   ───────────────────────────────────────────────────────────────
-   🎯 Rôle : Structure de configuration des contacteurs et seuils par palier
-   📄 Doc métier : DOC/AF/AF_Partie-10_Fonction_Winch_v2.1.md
-   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_fbJoystick_AxisCmd">
@@ -5237,6 +5245,14 @@ les structs WinchRequest / Sensors / Config sont remplies champ par champ ici.
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Egalite effective des demandes physiques M1/M2 du scan</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchBothFinalStep45Coherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Exception T291-A exacte : descente M1=P4 / M2=P5 en auto AX4..AX7</xhtml>
               </documentation>
             </variable>
             <variable name="WinchBothReqAscent">
@@ -6447,7 +6463,9 @@ instWinchSync(
                        OR GVL_IHM.M1TreuilRetenue.Bypass.Safety
                        OR GVL_IHM.M2TreuilBenne.Bypass.Safety
                        OR GVL_IHM.M1TreuilRetenue.Bypass.Process
-                       OR GVL_IHM.M2TreuilBenne.Bypass.Process
+                       OR GVL_IHM.M2TreuilBenne.Bypass.Process,
+    DescentStep45Permit := PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active,
+    SpeedStepTable  := _WinchSpeedStepTable
 );
 
 // Pas de reconstruction de table M2 : le clamp §5ter (M2MaxStep* := 1) suffit
@@ -7037,6 +7055,15 @@ CommonMinStepDown := MAX(0, PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.MinStep
 // --- M2-propre (jamais vu par M1) ---
 M2MaxStepUp   := CommonMaxStepAscent;
 M2MaxStepDown := CommonMaxStepDescent;
+// T291-A : le plafond nominal commun reste configure a 4 afin que M1 et tous
+// les autres modes restent inchanges. Pendant la seule plongee auto AX4..AX7,
+// M2 peut atteindre P5. Ne jamais relever ici un plafond deja reduit par une
+// protection amont (codeurs non fiables, ecart synchro, position maintenance).
+IF PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active
+   AND (EffectiveMaxStepDescent = 4)
+   AND (CommonMaxStepDescent = EffectiveMaxStepDescent) THEN
+    M2MaxStepDown := 5;
+END_IF;
 // Auto-séquencement benne (FB_Bucket) : palier 1 sur toute la manœuvre.
 IF instBucket.M2_BucketJogLimit THEN
     M2MaxStepUp   := LIMIT(1, _BucketCfgPersist.Config.MaxStepUp, 5);
@@ -7356,14 +7383,32 @@ WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitApplied;
 WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitApplied;
 
+WinchBothFinalStep45Coherent :=
+    PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active
+    AND NOT WinchM1FinalInterlockRequest.RequestedRelayFwd
+    AND NOT WinchM2FinalInterlockRequest.RequestedRelayFwd
+    AND WinchM1FinalInterlockRequest.RequestedRelayRev
+    AND WinchM2FinalInterlockRequest.RequestedRelayRev
+    AND (WinchM1FinalInterlockRequest.RequestedStep = 4)
+    AND (WinchM2FinalInterlockRequest.RequestedStep = 5)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor1 = _WinchSpeedStepTable.P4R1)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor2 = _WinchSpeedStepTable.P4R2)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor3 = _WinchSpeedStepTable.P4R3)
+    AND (WinchM1FinalInterlockRequest.RequestedContactor4 = _WinchSpeedStepTable.P4R4)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor1 = _WinchSpeedStepTable.P5R1)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor2 = _WinchSpeedStepTable.P5R2)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor3 = _WinchSpeedStepTable.P5R3)
+    AND (WinchM2FinalInterlockRequest.RequestedContactor4 = _WinchSpeedStepTable.P5R4);
+
 WinchBothFinalRequestsCoherent :=
-    (WinchM1FinalInterlockRequest.RequestedRelayFwd = WinchM2FinalInterlockRequest.RequestedRelayFwd)
-    AND (WinchM1FinalInterlockRequest.RequestedRelayRev = WinchM2FinalInterlockRequest.RequestedRelayRev)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor1 = WinchM2FinalInterlockRequest.RequestedContactor1)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor2 = WinchM2FinalInterlockRequest.RequestedContactor2)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor3 = WinchM2FinalInterlockRequest.RequestedContactor3)
-    AND (WinchM1FinalInterlockRequest.RequestedContactor4 = WinchM2FinalInterlockRequest.RequestedContactor4)
-    AND (WinchM1FinalInterlockRequest.RequestedStep = WinchM2FinalInterlockRequest.RequestedStep);
+    WinchBothFinalStep45Coherent
+    OR ((WinchM1FinalInterlockRequest.RequestedRelayFwd = WinchM2FinalInterlockRequest.RequestedRelayFwd)
+        AND (WinchM1FinalInterlockRequest.RequestedRelayRev = WinchM2FinalInterlockRequest.RequestedRelayRev)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor1 = WinchM2FinalInterlockRequest.RequestedContactor1)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor2 = WinchM2FinalInterlockRequest.RequestedContactor2)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor3 = WinchM2FinalInterlockRequest.RequestedContactor3)
+        AND (WinchM1FinalInterlockRequest.RequestedContactor4 = WinchM2FinalInterlockRequest.RequestedContactor4)
+        AND (WinchM1FinalInterlockRequest.RequestedStep = WinchM2FinalInterlockRequest.RequestedStep));
 
 // Defense en profondeur apres les deux FB : en intention couplee, aucun actionneur ne
 // peut etre publie seul. Les FB continuent d'evaluer leurs interlocks internes, mais les
@@ -7640,6 +7685,7 @@ Data.WinchSyncError               := instWinchSync.SyncDeviationFault
                                      OR WinchM1Safety.ErrorMecaE
                                      OR WinchM2Safety.ErrorMecaE;
 Data.WinchSyncSignedDeltaPosM     := instWinchSync.SignedDeltaPosM;
+Data.AutoDiveM1Step4M2Step5Active := PRG_03_Modes_Cycle.Data.AutoDiveM1Step4M2Step5Active;
 Data.BucketState                  := BucketState;
 Data.Benne_IsRoughlyClosed        := Benne_IsRoughlyClosed;
 Data.BucketBusy                   := instBucket.Lifecycle.Busy;
@@ -13237,7 +13283,7 @@ TableComplete := (CellsFilled &gt;= CellsTotal);
         (via ce FB), consommés par PRG_07/IHM.
    🔒 Non-régression : chaque assignation de la §8 de PRG_04 est déplacée
       telle quelle (bit-identique, aucune logique modifiée).
-   📄 Doc : DOC/WFLOW/AUDITS/FB_WinchStateProjection_DESIGN.md 
+   📄 Doc : DOC/WFLOW/AUDITS/FB_WinchStateProjection_DESIGN.md
    ═══════════════════════════════════════════════════════════════</xhtml>
           </documentation>
         </interface>
@@ -13673,6 +13719,25 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
 --&gt; [TST] Force ErrorId=0 global</xhtml>
               </documentation>
             </variable>
+            <variable name="DescentStep45Permit">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorise uniquement le profil descente M1=P4 / M2=P5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table officielle paliers -&gt; contacteurs</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -13747,6 +13812,14 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Discordance contacteurs M1/M2 confirmee (miroir instContactor, nom -&gt; plus de masque hexa cote PRG_04)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescentStep45Matched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] Profil T291-A reconnu par la surveillance contacteurs</xhtml>
               </documentation>
             </variable>
           </outputVars>
@@ -13838,6 +13911,7 @@ IF NOT Enable THEN
     SyncActive := FALSE;
     SyncWarn := FALSE; SyncDeviationWarn := FALSE; SyncDeviationFault := FALSE;
     ContactorMismatch := FALSE;
+    DescentStep45Matched := FALSE;
     instCauses[0].Active := FALSE;
     instCauses[1].Active := FALSE;
     instCauses[2].Active := FALSE;
@@ -13900,7 +13974,9 @@ instContactor(
     Contactor3_M2   := Contactor3_M2,
     Contactor4_M1   := Contactor4_M1,
     Contactor4_M2   := Contactor4_M2,
-    BypassGlobal    := BypassGlobal
+    BypassGlobal    := BypassGlobal,
+    DescentStep45Permit := DescentStep45Permit,
+    SpeedStepTable  := SpeedStepTable
 );
 {endregion}
 
@@ -13933,6 +14009,7 @@ Ready := Enable AND NOT Fault.Latched;
 // Miroir nomme de la discordance contacteurs (le consommateur lit ce booleen,
 // plus le masque hexa sur Fault.ErrorId). BypassGlobal deja gere dans instContactor.
 ContactorMismatch := instContactor.ContactorMismatch;
+DescentStep45Matched := instContactor.DescentStep45Matched;
 {endregion}
 </xhtml>
           </ST>
@@ -16051,6 +16128,25 @@ END_IF;
 --&gt; [TST] Neutralise la surveillance contacteurs</xhtml>
               </documentation>
             </variable>
+            <variable name="DescentStep45Permit">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Autorise uniquement le profil descente M1=P4 / M2=P5</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SpeedStepTable">
+              <type>
+                <derived name="ST_SpeedStepTable" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Table officielle paliers -&gt; contacteurs</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="ContactorMismatch">
@@ -16068,6 +16164,22 @@ END_IF;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [SAFE] Niveau 2 : discordance persistante -&gt; escalade PowerCutOff</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CommandsCoherent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE si le vecteur instantane est coherent ou derogation T291-A exacte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescentStep45Matched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE si le profil M1=P4 / M2=P5 est exactement reconnu</xhtml>
               </documentation>
             </variable>
             <variable name="Diag">
@@ -16136,6 +16248,22 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Les 2 treuils sont commandes (relais ou contacteur)</xhtml>
               </documentation>
             </variable>
+            <variable name="DescentStep4M1">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] M1 en descente avec vecteur table P4 exact</xhtml>
+              </documentation>
+            </variable>
+            <variable name="DescentStep5M2">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] M2 en descente avec vecteur table P5 exact</xhtml>
+              </documentation>
+            </variable>
           </localVars>
           <documentation>
             <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
@@ -16166,8 +16294,12 @@ END_IF;
 IF NOT Enable OR BypassGlobal THEN
     ContactorMismatch := FALSE;
     ContactorMismatchEscalated := FALSE;
+    CommandsCoherent := FALSE;
+    DescentStep45Matched := FALSE;
     MismatchActive := FALSE;
     BothCommanded := FALSE;
+    DescentStep4M1 := FALSE;
+    DescentStep5M2 := FALSE;
     MismatchTimer(IN := FALSE);
     EscalationTimer(IN := FALSE);
     Diag.RelayFwdMismatch := FALSE;
@@ -16199,9 +16331,33 @@ Diag.Step2Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor2_M1 &lt;&g
 Diag.Step3Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor3_M1 &lt;&gt; Contactor3_M2);
 Diag.Step4Mismatch    := (BothCommanded OR SyncEnable) AND (Contactor4_M1 &lt;&gt; Contactor4_M2);
 
+DescentStep4M1 := RelayRevM1 AND NOT RelayFwdM1
+                  AND (Contactor1_M1 = SpeedStepTable.P4R1)
+                  AND (Contactor2_M1 = SpeedStepTable.P4R2)
+                  AND (Contactor3_M1 = SpeedStepTable.P4R3)
+                  AND (Contactor4_M1 = SpeedStepTable.P4R4);
+DescentStep5M2 := RelayRevM2 AND NOT RelayFwdM2
+                  AND (Contactor1_M2 = SpeedStepTable.P5R1)
+                  AND (Contactor2_M2 = SpeedStepTable.P5R2)
+                  AND (Contactor3_M2 = SpeedStepTable.P5R3)
+                  AND (Contactor4_M2 = SpeedStepTable.P5R4);
+DescentStep45Matched := DescentStep45Permit
+                        AND NOT RelayFwdM2
+                        AND NOT RelayFwdM1
+                        AND DescentStep4M1
+                        AND DescentStep5M2;
+
+IF DescentStep45Matched THEN
+    Diag.Step1Mismatch := FALSE;
+    Diag.Step2Mismatch := FALSE;
+    Diag.Step3Mismatch := FALSE;
+    Diag.Step4Mismatch := FALSE;
+END_IF;
+
 MismatchActive := Diag.RelayFwdMismatch OR Diag.RelayRevMismatch
     OR Diag.Step1Mismatch OR Diag.Step2Mismatch
     OR Diag.Step3Mismatch OR Diag.Step4Mismatch;
+CommandsCoherent := NOT MismatchActive;
 
 // Niveau 1 : discordance confirmee apres MismatchDebounce.
 MismatchTimer(IN := MismatchActive, PT := MismatchDebounce);
@@ -16573,9 +16729,9 @@ END_IF;
             <Object Name="ST_fbWinchSpeedLearning_Cell" ObjectId="8341fe63-7ea1-5607-8731-d295248cd6cb" />
             <Object Name="ST_fbWinchSpeedLearning_Cfg" ObjectId="e33b18ad-d4ff-5cd1-939b-74be82c01450" />
             <Object Name="ST_fbWinchSpeedLearning_Table" ObjectId="e53cb50d-fd3d-5709-9494-4694f689ff17" />
+            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
             <Object Name="E_WinchFinalInterlockReason" ObjectId="6c58fa53-306e-500d-a9d6-db062ea6d497" />
             <Object Name="E_WinchFinalInterlockState" ObjectId="f4ffbe06-67c2-52e4-817f-cab830f42ec8" />
-            <Object Name="ST_SpeedStepTable" ObjectId="fbfd953e-d8b9-5242-babe-f7521771609a" />
             <Object Name="ST_SyncContactorDiag" ObjectId="e71417df-d1db-5140-ade6-a84ec0d571c8" />
           </Folder>
         </Folder>

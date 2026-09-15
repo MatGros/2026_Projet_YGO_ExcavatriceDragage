@@ -249,6 +249,7 @@ instCycleSemiAuto(
     RepositionRequest       := GVL_IHM.CycleSemiAuto.Cmd.BtnReposition,
     CfgCommissioningEnable  := GVL_IHM.CycleSemiAuto.Cmd.TglCommissioning,
     CfgCycleChecksInhibit   := GVL_IHM.CycleSemiAuto.Cmd.TglCycleChecksInhibit,
+    CfgAutoDiveM2Step5Trial := GVL_IHM.CycleSemiAuto.Cmd.TglAutoDiveM2Step5Trial,
     CfgForceStepTarget      := GVL_IHM.CycleSemiAuto.Cfg.ForceStepTarget,
     CfgForceStepApply       := GVL_IHM.CycleSemiAuto.Cmd.BtnForceStepApply,
     // Config diving / extraction (GEL 2026-09-03)
@@ -345,6 +346,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
     Data.SequenceState.BottomTouchConfirmed   := instCycleSemiAuto.BottomTouched;
     Data.SequenceState.BottomStopByKobold     := instCycleSemiAuto.BottomStopByKobold;
     Data.SequenceState.BottomStopBySetpoint   := instCycleSemiAuto.BottomStopBySetpoint;
+    Data.AutoDiveM1Step4M2Step5Active          := instCycleSemiAuto.AutoDiveM1Step4M2Step5Active;
 
     // === RESET ÉTATS ASSISTANTS (neutralisation déterministe au passage SEMI_AUTO) ===
     // Aucun assistant de dragage n'est actif en SEMI_AUTO : mêmes valeurs neutres que la branche DISABLE.
@@ -356,6 +358,7 @@ IF instModes.Auth.Mode = E_Mode.SEMI_AUTO THEN
         OR GVL_IHM.M3Translation.Bypass.Global;
 
 ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAINT_N2) THEN
+    Data.AutoDiveM1Step4M2Step5Active := FALSE;
     // Mode Manuel / Maintenance : Publication des requêtes issues des assistants
     Data.ReqProgram.ReqWinchM1.RunRequest := FALSE;
     Data.ReqProgram.ReqWinchM1.ReqAscent := FALSE;
@@ -452,6 +455,7 @@ ELSIF (instModes.Auth.Mode = E_Mode.MAINT_N1 OR instModes.Auth.Mode = E_Mode.MAI
         OR GVL_IHM.M3Translation.Bypass.Global;
 
 ELSE
+    Data.AutoDiveM1Step4M2Step5Active := FALSE;
     // Neutralisation déterministe (DISABLE)
     Data.ReqProgram.ReqWinchM1.RunRequest := FALSE;
     Data.ReqProgram.ReqWinchM1.ReqAscent := FALSE;
