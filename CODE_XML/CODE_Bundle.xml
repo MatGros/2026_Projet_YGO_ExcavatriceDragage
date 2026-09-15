@@ -5254,7 +5254,7 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
                 <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Autorite IHM egouttage AX13, secondes entieres [1..3600]</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en AX13 (configurable IHM, secondes entières [1..3600])</xhtml>
               </documentation>
             </variable>
             <variable name="RaiseOffBottom_M">
@@ -29327,7 +29327,7 @@ IF WinchM1Safety.ErrorOppositeDir AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxA
     AlarmArray[AlarmCount] := '[M1] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorNoMovement AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M1] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M1] ErrorID:16 - discordance commande/retour/mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM1Safety.ErrorOverspeed AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Survitesse treuil detectee (SafeStop)'; AlarmCount := AlarmCount + 1;
@@ -29362,7 +29362,7 @@ IF WinchM2Safety.ErrorOppositeDir AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxA
     AlarmArray[AlarmCount] := '[M2] ErrorID:15 - sens oppose'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorNoMovement AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
-    AlarmArray[AlarmCount] := '[M2] ErrorID:16 - absence mouvement'; AlarmCount := AlarmCount + 1;
+    AlarmArray[AlarmCount] := '[M2] ErrorID:16 - discordance commande/retour/mouvement'; AlarmCount := AlarmCount + 1;
 END_IF;
 IF WinchM2Safety.ErrorOverspeed AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M2] Survitesse treuil detectee (SafeStop)'; AlarmCount := AlarmCount + 1;
@@ -34817,9 +34817,11 @@ IF NOT BypassGlobal THEN
     // La vitesse derivee n'est pas la source de verite : en montee lente elle
     // peut rester nulle alors que la position codeur progresse. La surveillance
     // s'appuie donc sur le codeur disponible + le delta de position confirme.
+    // Le retour collectif contacteurs ne discrimine pas cette cause : sous
+    // commande, les deux retours (au repos ou engage) doivent etre surveilles.
     TonNoMovement(
         IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND EncoderAvailable
-              AND MovementCommanded AND BrakeFeedback AND NOT FwdRevSpeedFeedbackOff
+              AND MovementCommanded AND BrakeFeedback
               AND NOT InReferencingMode
               AND NOT PositionMovementDetected,
         PT := NoMovementTimeout

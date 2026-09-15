@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T23:14:48.478517" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T23:14:48.478517">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T05:11:23.283614" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T05:11:23.283614">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1584,9 +1584,11 @@ IF NOT BypassGlobal THEN
     // La vitesse derivee n'est pas la source de verite : en montee lente elle
     // peut rester nulle alors que la position codeur progresse. La surveillance
     // s'appuie donc sur le codeur disponible + le delta de position confirme.
+    // Le retour collectif contacteurs ne discrimine pas cette cause : sous
+    // commande, les deux retours (au repos ou engage) doivent etre surveilles.
     TonNoMovement(
         IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND EncoderAvailable
-              AND MovementCommanded AND BrakeFeedback AND NOT FwdRevSpeedFeedbackOff
+              AND MovementCommanded AND BrakeFeedback
               AND NOT InReferencingMode
               AND NOT PositionMovementDetected,
         PT := NoMovementTimeout

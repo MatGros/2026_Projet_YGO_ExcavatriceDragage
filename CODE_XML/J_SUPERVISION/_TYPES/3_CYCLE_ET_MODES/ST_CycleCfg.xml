@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T03:50:06.824583" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T03:50:06.824583">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-15T03:53:50.298413" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-09-15T03:53:50.298413">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -56,7 +56,7 @@
                 <simpleValue value="5" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Autorite IHM egouttage AX13, secondes entieres [1..3600]</xhtml>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">⏱️ Durée d'égouttage du godet en AX13 (configurable IHM, secondes entières [1..3600])</xhtml>
               </documentation>
             </variable>
             <variable name="RaiseOffBottom_M">

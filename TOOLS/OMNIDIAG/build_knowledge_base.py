@@ -1,4 +1,25 @@
-{
+"""
+===============================================================================
+🧠 OMNIDIAG — Générateur de la Knowledge Base (Preflight + 71 Alarmes Bloquantes)
+===============================================================================
+🎯 Rôle : Alimente knowledge_base.json avec une rigueur absolue :
+   - ZÉRO mot 'cabine' -> 'poste de conduite' ou 'pupitre de commande'.
+   - ZÉRO 'appeler la maintenance' -> actions directes physiques.
+   - Polarité EDM rigoureuse : contacts miroirs NC fermés en série = 24V sur %IX0.0/%IX0.2.
+   - Zéro capteur physique sur mâchoires/disques de frein (recopies contacteurs armoire).
+   - Format des points de test normalisé :
+     [LOCALISATION & ADRESSE] ➔ [MESURE ÉLECTRIQUE ATTENDUE] ➔ [CONDITION NORMALE]
+===============================================================================
+"""
+
+import json
+import sys
+from pathlib import Path
+
+sys.stdout.reconfigure(encoding='utf-8')
+
+# --- 1. LOT PREFLIGHT RÉVISÉ (PRE_01 à PRE_16) ---
+kb_data = {
   "PRE_01": {
     "cause_racine": "⚡ Contacteur frein M1 resté enclenché en armoire ou contact de recopie bloqué (aucun capteur sur treuil).",
     "action_conducteur": "🕹️ Mettre les manipulateurs au neutre sur le pupitre. Relancer le Preflight.",
@@ -94,7 +115,12 @@
     "action_conducteur": "🛑 Ne pas tenter de déplacer le chariot au pupitre. Relever le code variateur sur l'IHM.",
     "action_maintenance": "🧰 Armoire : vérifier affichage LED sur le variateur AC600. Contrôler disjoncteur drive Q_Drive et câble RJ45 EtherCAT.",
     "points_test": "Variateur AC600 ➔ Afficheur de façade (Attendu : état 'rdy' ou fréquence 0.0) | Câble RJ45 EtherCAT Port IN"
-  },
+  }
+}
+
+# --- 2. LES 71 ALARMES BLOQUANTES IHM (ALM_001 à ALM_071) ---
+active_alarms_kb = {
+  # FAMILLE 1 : BUS & MODULES MATÉRIELS (ALM_001 à ALM_011)
   "ALM_001": {
     "cause_racine": "🔌 Défaut de communication interne ou panne matérielle du module CPU Local_Digital_IO (Slot 1).",
     "action_conducteur": "🛑 Arrêt immédiat de la machine. Couper la commande au pupitre. Noter le code ALM_001.",
@@ -161,6 +187,8 @@
     "action_maintenance": "🧰 Armoire : vérifier disjoncteur alimentation Q_Drive variateur. Contrôler voyant LINK sur port RJ45 EtherCAT du drive AC600.",
     "points_test": "Variateur AC600 ➔ Port RJ45 EtherCAT IN ➔ Attendu : LED Link verte fixe/clignotante ➔ Disjoncteur drive enclenché"
   },
+
+  # FAMILLE 2 : SÉCURITÉ MÉCANIQUE TREUIL M1 (ALM_012 à ALM_022)
   "ALM_012": {
     "cause_racine": "📡 Perte de communication avec le pupitre ou heartbeat IHM interrompu pendant la commande de levage M1.",
     "action_conducteur": "🕹️ Mettre les manipulateurs au neutre au pupitre. Vérifier l'écran IHM.",
@@ -227,6 +255,8 @@
     "action_maintenance": "🧰 Contrôler l'accouplement mécanique du codeur COD1. Vérifier si la charge n'entraîne pas le tambour au-delà de la vitesse nominale.",
     "points_test": "Diagnostic IHM ➔ Vitesse mesurée Speed_Mps > SpeedBandMaxMps[5] ➔ SafeStop actif sans PowerCutOff"
   },
+
+  # FAMILLE 2 BIS : SÉCURITÉ MÉCANIQUE TREUIL M2 (ALM_023 à ALM_033)
   "ALM_023": {
     "cause_racine": "📡 Perte de communication opérateur ou coupure heartbeat IHM pendant la commande du treuil benne M2.",
     "action_conducteur": "🕹️ Ramener manipulateur benne au neutre au pupitre. Contrôler l'écran tactile.",
@@ -293,6 +323,8 @@
     "action_maintenance": "🧰 Contrôler l'accouplement du codeur COD2. Vérifier absence d'emballement sous le poids de la benne.",
     "points_test": "Diagnostic IHM ➔ Vitesse mesurée Speed_Mps > SpeedBandMaxMps[5] ➔ SafeStop actif"
   },
+
+  # FAMILLE 3 : TRANSLATION PORTIQUE M3 (ALM_034 à ALM_044)
   "ALM_034": {
     "cause_racine": "📡 Perte de communication opérateur pupitre pendant la commande de translation portique M3.",
     "action_conducteur": "🕹️ Mettre le manipulateur translation au neutre au pupitre de commande.",
@@ -359,6 +391,8 @@
     "action_maintenance": "💻 Vérifier mot d'état TranslationFinalInterlockErrorId sur l'écran de diagnostic IHM.",
     "points_test": "Pupitre / IHM ➔ Diagnostic variable TranslationFinalInterlockErrorId ➔ Attendu : Valeur 0 après front montant bouton Reset"
   },
+
+  # FAMILLE 4 : GÉOMÉTRIE BENNE, SYNCHRO & PLONGÉE (ALM_045 à ALM_062)
   "ALM_045": {
     "cause_racine": "⚙️ Configuration géométrie benne invalide (offset fermé inférieur ou égal à l'offset ouvert en mémoire).",
     "action_conducteur": "🛑 Ne pas tenter de manœuvrer la benne au pupitre.",
@@ -467,6 +501,8 @@
     "action_maintenance": "💻 Revoir paramètres de la phase extraction sur l'écran IHM.",
     "points_test": "IHM Recettes Dragage ➔ Variables GVL_IHM.CycleSemiAuto.Cfg ➔ Attendu : Cohérence paramètres d'extraction"
   },
+
+  # FAMILLE 5 : SÉCURITÉ MACHINE & CHAÎNE D'URGENCE (ALM_063 à ALM_065)
   "ALM_063": {
     "cause_racine": "🚨 Discordance redondance contacteurs de puissance ligne ou relais de sécurité AU (contact miroir non retombé).",
     "action_conducteur": "🛑 COUPURE GÉNÉRALE. Frapper coup de poing Arrêt d'Urgence pupitre. Condamner le poste de conduite.",
@@ -485,6 +521,8 @@
     "action_maintenance": "🧰 Contrôler les contacts de recopie de tous les relais de sécurité en armoire électrique.",
     "points_test": "Bloc Sécurité FB_Safety_EmergencyManagement ➔ Contrôle retombée des canaux d'urgence ➔ Attendu : 0V strict sur toutes les lignes avant réarmement"
   },
+
+  # FAMILLE 6 : SUPERVISION CYCLE & PROCESS (ALM_066 à ALM_071)
   "ALM_066": {
     "cause_racine": "🛑 Profondeur limite légale atteinte en cycle automatique (arrêt fond de fouille autorisé).",
     "action_conducteur": "🕹️ Inverser les commandes au pupitre pour remonter la benne. Ne pas descendre plus bas.",
@@ -520,5 +558,14 @@
     "action_conducteur": "🕹️ Repasser en mode Manuel au pupitre de commande. Dégager la machine si nécessaire.",
     "action_maintenance": "💻 Contrôler le numéro d'étape bloquée E_AutoCycleStep sur la page de supervision.",
     "points_test": "FB_CycleSemiAuto ➔ Temporisateur d'étape active ➔ Attendu : Transition d'étape accomplie avant expiration timeout"
-  }
+  },
 }
+
+# Fusion des deux dictionnaires
+kb_data.update(active_alarms_kb)
+
+output_file = Path(__file__).resolve().parent / "knowledge_base.json"
+with open(output_file, "w", encoding="utf-8") as f:
+    json.dump(kb_data, f, indent=2, ensure_ascii=False)
+
+print(f"✅ knowledge_base.json généré avec succès ! Total entrées : {len(kb_data)}")

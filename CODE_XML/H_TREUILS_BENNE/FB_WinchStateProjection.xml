@@ -4597,9 +4597,11 @@ IF NOT BypassGlobal THEN
     // La vitesse derivee n'est pas la source de verite : en montee lente elle
     // peut rester nulle alors que la position codeur progresse. La surveillance
     // s'appuie donc sur le codeur disponible + le delta de position confirme.
+    // Le retour collectif contacteurs ne discrimine pas cette cause : sous
+    // commande, les deux retours (au repos ou engage) doivent etre surveilles.
     TonNoMovement(
         IN := NOT BypassProcess AND NOT RefWindowActive AND NOT BenneBusy AND EncoderAvailable
-              AND MovementCommanded AND BrakeFeedback AND NOT FwdRevSpeedFeedbackOff
+              AND MovementCommanded AND BrakeFeedback
               AND NOT InReferencingMode
               AND NOT PositionMovementDetected,
         PT := NoMovementTimeout
