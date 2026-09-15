@@ -1,0 +1,58 @@
+contract:
+  task_id: T301
+  criticality: C1
+  strategy: patch
+  objective: >
+    Fournir la procédure d'étalonnage terrain du gain odométrique de translation
+    GainMetersPerHzSec (ratio Hz vers m/s) et de mesure des positions réelles des
+    5 capteurs physiques, en documentant les conventions d'axe (zéro à la Trémie).
+  acceptance:
+    - id: AC1
+      statement: "La documentation explicite le point de référence zéro (0.0 m = Trémie) et les sens physiques (+1 vers Trémie, -1 vers Maintenance)."
+      verified_by: "Revue de la documentation et du contrat de tâche."
+    - id: AC2
+      statement: "La formule de calcul du nouveau ratio odométrique GainMetersPerHzSec = (Delta_L / Temps) / Freq est formalisée avec un exemple chiffré à 50 Hz."
+      verified_by: "Revue de la procédure d'étalonnage."
+    - id: AC3
+      statement: "La mise à jour des cotes réelles des 5 capteurs et du gain dans GVL_PERSISTENT est prête à accueillir les mesures terrain sans altérer le fonctionnement du bloc FB_Translation_PositionEstimator."
+      verified_by: "Inspection de GVL_PERSISTENT.st et tests de régression."
+    - id: AC4
+      statement: "Bundle PLCopenXML, rapport de liaison G200 et gates applicables sont PASS."
+      verified_by: "Exécution de G200_check_linkage.py et run_all_gates.py."
+  scope:
+    allowed:
+      - CODE/GVL_PERSISTENT.st
+      - DOC/AF/AF_Partie-11_Fonction_Translation_v2.4.md
+      - DOC/WFLOW/
+      - CODE_XML/
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - Modification des seuils de sécurité ou des rampes du variateur M3.
+  conservation:
+    must_survive:
+      - "Le recalage automatique de position sur front montant de chaque capteur physique reste prioritaire."
+      - "La persistance RETAIN de la position estimée au reboot est préservée."
+    dropped_on_purpose: []
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - "Fiche de procédure d'étalonnage avec relevé des cotes réelles."
+  models_allowed:
+    - "omni/cc/claude-sonnet-5"
+    - "omni/cx/gpt-5.6-terra"
+  alert_duty: >
+    Rappeler que l'odométrie par fréquence reste une estimation sujette au glissement
+    mécanique des galets, et que seuls les capteurs physiques font foi.
+status: PENDING
+execution:
+  executed_by: ""
+  completed_at: ""
+  status: PENDING
+  summary: ""
+  evidence_submitted: []
+validation:
+  status: PENDING
+  validated_by: ""
+  validated_at: ""
+  notes: ""
