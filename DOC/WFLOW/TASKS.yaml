@@ -143,8 +143,8 @@ tasks:
   criticite: C4
   domaine: TREUILS_BENNE / COHERENCE CONTACTEURS PAR AXE
   agent: Codex
-  date: '2026-09-15T07:53:25+02:00'
-  avancement: 'Phase 1 validee par utilisateur en simulation : ErrorID 16 + SafeStop apres 3 s, sans PowerCutOff. Defaut memorise; cause disparue + Reset conscient requis. Phases 2/3 non demarrees.'
+  date: '2026-09-15T09:17:55+02:00'
+  avancement: 'Phase 1 validee en simulation. Revue C4 phase 2 terminee : verdict MAJOR, pas pret a coder. Architecture recommandee : registre dedie extensible des erreurs treuils ; absence mouvement et discordance contacteurs restent distinctes. Contrat et design essais mis a jour.'
   titre: Cohérence commande/retour contacteurs par axe et couverture absence de mouvement
   contexte: 'Besoin terrain consolidé 2026-09-15 : une commande de direction, vitesse ou frein incohérente peut subsister sans alarme. Le retour Mx_ContactorsReleased_DI est collectif : il affirme seulement que tous les contacteurs sont retombés, sans identifier un contacteur précis.'
   description: 'C4 — Phase 1 implémentée : couvrir le trou commande active + retour collectif tous contacteurs retombés + absence mouvement, par ErrorID 16 existant et SafeStop existant après 3 s. Message IHM unique de discordance commande/retour. Aucun nouveau ErrorID, aucune nouvelle temporisation et aucun PowerCutOff. Les autres discordances restent des phases séparées. Contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T288_DISCORDANCE_CONTACTEURS_ABSENCE_MOUVEMENT.yaml'
@@ -154,8 +154,13 @@ tasks:
   - "Préserver les cas existants NoMovement, Meca A-E, synchronisme FB_SyncContactor, manuel et maintenance."
   phases:
   - "Phase 1 ✅ VALIDEE SIMULATION 2026-09-15 : ErrorID 16 existant couvre commande + frein ouvert + codeur immobile, quel que soit le retour collectif. SafeStop apres 3 s, sans PowerCutOff."
-  - "Phase 2 ⬜ A CADRER : stimulus simulation explicite et gate pour injecter le retour collectif incoherent, sans Force sur HwIn/HwSim re-ecrits chaque scan."
+  - "Phase 2 🟠 REVUE MAJOR : registre dedie extensible a definir ; ErrorID16 revient a absence mouvement/codeur et discordance contacteurs recoit un ID distinct sans garde codeur."
   - "Phase 3 ⬜ A CADRER C4 : autres discordances contacteurs/frein/vecteurs, avec temps de retombee physique mesure et politique SafeStop distincte du doute capteur."
+  livrables:
+  - 'DOC/WFLOW/REGISTRES/REGISTRE_Suivi_MiseEnService_20260915.md'
+  - 'DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T288_PHASE2_REGISTRE_ERREURS.yaml'
+  - 'DOC/WFLOW/CONTRACTS/TEST_DESIGN_T288_PHASE2_REGISTRE_ERREURS_20260915.md'
+  - 'DOC/WFLOW/REVIEWS/REVIEW_T288_PHASE2_REGISTRE_ERREURS_20260915.md'
   bloque_par: []
 - id: T287
   parent_id: T286
