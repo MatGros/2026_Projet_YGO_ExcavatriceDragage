@@ -5,6 +5,52 @@
 
 ---
 
+## ▶️ Comment tester
+
+**Prérequis** : Python 3.11+ et PyYAML (`pip install pyyaml`). Rien d'autre.
+
+```bash
+# 1. Deux scénarios — chaîne de cames saine, puis came Maintenance bloquée
+python TOOLS/TWINBENCH/cli.py run --scenario nominal --seed 4172
+python TOOLS/TWINBENCH/cli.py run --scenario came_hs  --seed 4172 \
+       --fault SensorMaintenance=stuck_high
+
+# 2. Assembler la vue 2D
+python TOOLS/TWINBENCH/ui/pack_traces.py
+python TOOLS/TWINBENCH/ui/build.py
+
+# 3. Ouvrir TOOLS/TWINBENCH/out/twinbench.html dans un navigateur
+```
+
+**Ce que tu dois voir** :
+
+| Scénario | Position finale | Évènement |
+|---|---|---|
+| `nominal` | **30,203 m** | surcourse de 0,003 m — l'arrêt sur mot `00000` arrive après la dernière came |
+| `came_hs` | **37,102 m** | **+7,10 m hors course** — panne simple, plus rien n'arrête le chariot |
+
+Dans les deux cas, le CLI affiche `niveau CALCULE : L1`, les paramètres non
+vérifiés, et **2 invariants bloqués** en verdict `UNKNOWN`.
+
+**Vérifier la reproductibilité par graine** :
+
+```bash
+python TOOLS/TWINBENCH/cli.py run --seed 4172 --out /tmp/a.json
+python TOOLS/TWINBENCH/cli.py run --seed 4172 --out /tmp/b.json
+cmp /tmp/a.json /tmp/b.json && echo "identiques"      # même graine
+python TOOLS/TWINBENCH/cli.py run --seed 9001 --out /tmp/c.json
+cmp /tmp/a.json /tmp/c.json || echo "différentes"     # graine différente
+```
+
+**Jouer avec le modèle** : édite
+`PROJECTS/excavatrice_dragage/machine.twin.yaml` (fréquence max, temps de
+frein, positions de cames) et relance. Aucune recompilation.
+
+> ⚠️ Le pilotage interactif (joystick et consignes en direct) **n'existe pas
+> encore** : les scénarios sont joués par le moteur. C'est la prochaine brique.
+
+---
+
 ## 🎯 Ce que c'est
 
 Un **outil générique** de simulation électromécanique et de jumeau visuel pour projets
