@@ -1,6 +1,6 @@
 # 📐 SPEC 01 — Modèle de composants `.twin.yaml`
 
-> **Statut** : v0.1 — éprouvée par le POC `T300` (joystick + axe de translation).
+> **Statut** : v0.1 — éprouvée par le POC `T304` (joystick + axe de translation).
 > **Portée** : générique. Ce document ne nomme **aucun** équipement d'une machine réelle.
 
 ---
@@ -22,7 +22,7 @@
 ## 1. Trois catégories de grandeurs
 
 La confusion de ces trois natures est la cause racine des divergences de modèle observées
-(REX T300 : une même grandeur d'environnement figée en constante dans une implémentation,
+(REX T304 : une même grandeur d'environnement figée en constante dans une implémentation,
 paramétrable dans l'autre — les deux bancs testaient des machines différentes sans le dire).
 
 | Catégorie | Nature | Qui la fixe | Rôle en test |

@@ -1,5 +1,5 @@
 contract:
-  task_id: T300
+  task_id: T304
   criticality: C2
   strategy: patch
   objective: >
@@ -48,7 +48,7 @@ contract:
   scope:
     allowed:
       - TOOLS/TWINBENCH/
-      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T300_POC_TWINBENCH_JOYSTICK_M3.yaml
+      - DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T304_POC_TWINBENCH_JOYSTICK_M3.yaml
       - DOC/WFLOW/TASKS.yaml
     forbidden:
       - CODE/

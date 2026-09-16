@@ -1,5 +1,5 @@
 tasks:
-- id: T300
+- id: T304
   parent_id: ''
   statut: '⬜'
   criticite: C2
@@ -8,7 +8,7 @@ tasks:
   date: '2026-09-16T11:27:22+02:00'
   avancement: 'Cadré le 2026-09-16 suite étude Phase 1 sur la simulation électromécanique : POC vertical du nouvel outil TwinBench, périmètre volontairement réduit à Joystick + M3 Translation.'
   titre: 'TwinBench — POC vertical du simulateur électromécanique et du jumeau 2D (périmètre Joystick + M3 Translation)'
-  contexte: 'Le modèle physique de la machine est aujourd''hui écrit à trois endroits : les FB ST de CODE/L_SIMULATION, le JavaScript du banc engine/cycle_bench.html, et les stimuli du harnais anim_bench. Ces trois implémentations divergent sans contrôle (constat T300 : une grandeur d''environnement paramétrable côté ST est figée en constante côté JS, rendant inatteignable un pan entier de l''espace de test). Aucun outil commun, éditable et visuel n''existe. L''étude de conception TEST_AUTO_CI/DIGITAL_TWIN/ a défini le contrat Frame et la règle du pur rendu, mais n''a jamais tranché qui porte la physique côté source.'
+  contexte: 'Le modèle physique de la machine est aujourd''hui écrit à trois endroits : les FB ST de CODE/L_SIMULATION, le JavaScript du banc engine/cycle_bench.html, et les stimuli du harnais anim_bench. Ces trois implémentations divergent sans contrôle (constat T304 : une grandeur d''environnement paramétrable côté ST est figée en constante côté JS, rendant inatteignable un pan entier de l''espace de test). Aucun outil commun, éditable et visuel n''existe. L''étude de conception TEST_AUTO_CI/DIGITAL_TWIN/ a défini le contrat Frame et la règle du pur rendu, mais n''a jamais tranché qui porte la physique côté source.'
   description: 'Éprouver par un POC vertical le format de modèle .twin.yaml et la chaîne complète TwinBench : modèle déclaratif unique, moteur Python, frames, vue 2D générée, injection joystick bidirectionnelle, invariant de sécurité balayé sur les modes de panne, et génération du ST du profil embarqué. Périmètre restreint à un seul axe non couplé (M3 Translation) et au joystick, afin de valider la chaîne de bout en bout sans toucher aux treuils. Aucune écriture dans CODE/ : la sortie générée reste dans TOOLS/TWINBENCH/out/ et sa recopie éventuelle est une décision humaine distincte.'
   objectifs:
   - 'Valider que le format .twin.yaml exprime réellement un axe, ses capteurs et le joystick, avec les 3 classes de grandeurs (machine / config / environment) et les niveaux L0-L1-L2.'
@@ -19,7 +19,7 @@ tasks:
   - 'Générer FB_Sim_Translation.st en profil embarqué dans out/, avec rapport de différences face au ST existant.'
   - 'Produire le rapport de couverture croisée AF <-> modèle <-> code ST réel.'
   - 'Objectif étendu décrochable : gate d''équivalence trace Python <-> trace ST compilé.'
-  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T300_POC_TWINBENCH_JOYSTICK_M3.yaml
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T304_POC_TWINBENCH_JOYSTICK_M3.yaml
   bloque_par: []
 - id: T299
   parent_id: ''
