@@ -1,4 +1,24 @@
 tasks:
+- id: T305
+  parent_id: ''
+  statut: '⬜'
+  criticite: C2
+  domaine: TREUILS / SECURITE MACHINE / ELECTROTHERMIQUE
+  agent: '—'
+  date: '2026-09-16T12:00:28+02:00'
+  avancement: 'Cadré le 2026-09-16 suite analyse des contraintes électromécaniques : trois questions sans réponse écrite sur le plancher de commutation de palier et la tenue thermique des moteurs de treuil.'
+  titre: 'Treuils — Tracer l''origine du plancher de commutation 400 ms, statuer sur l''asymétrie montée/descente et évaluer la marge thermique à la cadence nominale'
+  contexte: 'FB_WinchOutputInterlock.st:136 porte CST_StepRampFloorDelay := T#400ms, plancher dur de cadence de montée de palier à la barrière finale. Le commentaire justifie le mécanisme logiciel (filet de sécurité si FB_WinchStepShaper déraille) mais la contrainte physique sous-jacente n''est écrite nulle part : moteur à rotor bobiné, commutation trop rapide entre paliers, surintensité, déclenchement disjoncteur et à terme échauffement puis destruction du bobinage. Conséquences : l''origine du chiffre 400 est inconnue, et l''asymétrie déclarée (descente non limitée) n''est ni justifiée ni vérifiable. En parallèle, le thermique moteur est uniquement subi (retours matériels M1ThermalOk / M2ThermalOk câblés, latchés, affichés) : aucun compteur de démarrages, aucune limitation de cadence, aucun modèle thermique logiciel. Or en SEMI_AUTO la cadence de cycle est fixée par le programme.'
+  description: 'Tâche d''investigation et de documentation sur machine en service, sans modification de CODE/. Établir et consigner l''origine de la valeur 400 ms avec sa source et sa date de vérification, écrire en clair la contrainte électrique réelle, conclure explicitement sur l''asymétrie montée/descente parmi trois issues possibles, inventorier les protections thermiques en séparant détection et prévention, et produire une première évaluation chiffrée de la marge thermique à la cadence nominale à partir des 63 traces PLC disponibles. Toute correction de code découlant des conclusions fera l''objet d''une tâche distincte.'
+  objectifs:
+  - 'Tracer l''origine du 400 ms : notice constructeur, plaque, essai, reprise d''affaire ou estimation — et le consigner avec sa date de vérification.'
+  - 'Écrire la contrainte physique elle-même (rotor bobiné, surintensité à la commutation) et non seulement le comportement logiciel attendu.'
+  - 'Statuer sur l''asymétrie montée/descente : justifiée, insuffisante, ou indécidable et renvoyée à mesure.'
+  - 'Inventorier les protections thermiques en distinguant ce qui est détecté de ce qui est prévenu.'
+  - 'Évaluer si la cadence de cycle nominale laisse une marge thermique aux moteurs, à partir des traces existantes.'
+  - 'Convertir les données manquantes en points de relevé de mise en service.'
+  contrat: DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T305_TREUILS_CONTRAINTES_ELECTROTHERMIQUES.yaml
+  bloque_par: []
 - id: T304
   parent_id: ''
   statut: '⬜'

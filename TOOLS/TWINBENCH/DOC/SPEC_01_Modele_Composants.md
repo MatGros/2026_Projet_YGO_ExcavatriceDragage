@@ -64,22 +64,99 @@ d'être incomplet **explicitement**, plutôt que d'être rempli de valeurs inven
 | `L1` **Comportement** | Après analyse fonctionnelle | Polarités, ordres, seuils, interlocks | Squelette de tests · stubs |
 | `L2` **Dynamique** | Après relevés / mise en service | Vitesses, inerties, retards, jeu, roulis | Simulation complète · invariants |
 
+Un quatrième niveau existe : `off` — *« je sais que cet aspect existe, je ne le modélise pas »*.
+C'est une décision assumée et tracée, jamais un oubli.
+
+### 2.1 Le niveau est **par aspect**, pas par équipement
+
+On connaît souvent très bien la cinématique d'un axe (mesurée en trace) et absolument rien de
+la tenue de sa butée. Un niveau unique par équipement forcerait à aligner le tout sur le pire.
+
 ```yaml
 instances:
   AxisA:
     from: actuators/gearmotor
-    level: L0
+    af_ref: [F11.01]
+    level:
+      kinematics:   L2      # mesuré en trace PLC
+      non_ideality: L1      # collage contacteur estimé, pas mesuré
+      limits:       L1      # « butée tôle, non dimensionnée » — drapeau levé
+      degradation:  off     # non modélisé, et c'est assumé
     topology: [gearmotor, chain, pulley, carriage]
     photos:   [refs/2026-09-16_motoreducteur.jpg]
-    note:     "plaque signalétique illisible — à relever en MES"
-    unknowns: [gear_ratio, nominal_speed_mps, brake_type]
+    unknowns: [end_stop_max_impact_J, brake_type]
 ```
 
 🎯 **`unknowns:` est contractuel** : la liste des inconnues vit dans le modèle, pas dans la
 tête de l'automaticien. Elle se génère en **checklist de mise en service** — on arrive sur
 site avec la liste exacte de ce qui manque.
 
-⛔ Un gate refuse qu'un composant déclare `level: L2` tout en conservant des `unknowns`.
+⛔ Un gate refuse qu'un aspect déclare `L2` tout en conservant des `unknowns` le concernant.
+
+### 2.2 Le niveau n'est pas déclaré, il est **calculé**
+
+Déclarer `L2` avec des chiffres inventés est la faute que ce format doit rendre impossible.
+Le niveau atteignable découle donc de la **provenance** des paramètres (§2.3), et le gate
+refuse toute déclaration plus optimiste que ce que les provenances autorisent.
+
+| `provenance.source` | Niveau maximal autorisé |
+|---|---|
+| `measured` (trace PLC, relevé) · `nameplate` · `manufacturer_doc` · `standard` | `L2` |
+| `estimated` · `web_search` · `inherited_from_project` | `L1` |
+| `guessed` | `L1` |
+| *absent* | `L0` |
+
+### 2.3 Provenance et vérification — deux attributs distincts
+
+Confondre les deux produit des constantes orphelines dont plus personne ne sait d'où elles
+sortent (REX 2026-09-16 : un plancher temporel de commutation présent dans le code, correct,
+mais sans aucune trace de son origine ni de sa justification physique).
+
+| Attribut | Question |
+|---|---|
+| 📍 `provenance` | **D'où vient le chiffre**, et quelle référence permet de le recontrôler |
+| ✍️ `verification` | **Quelqu'un l'a-t-il confronté à cette source**, quand, comment, et sous quelle signature |
+
+Un paramètre peut annoncer `source: manufacturer_doc` sans avoir jamais été vérifié — saisi
+de mémoire. Les deux attributs sont indépendants.
+
+```yaml
+commutation_min_ms:
+  class: machine
+  value: 400
+  provenance:
+    source: manufacturer_doc     # nameplate | measured | standard | estimated
+                                 # web_search | guessed | inherited_from_project
+    reference: "notice constructeur, chapitre temps de retablissement"
+  verification:
+    status: verified             # unverified | verified | disputed | stale
+    by: "<nom>"
+    at: '2026-09-16T11:30:00+02:00'
+    method: "lecture notice, equipement identifie par plaque"
+```
+
+| # | Règle |
+|---|---|
+| P-01 | **Défaut pessimiste** : un paramètre sans bloc explicite vaut `guessed` + `unverified`. Le silence n'est jamais une caution |
+| P-02 | `disputed` est un état légitime — deux sources, deux valeurs. Visible, jamais tranché en douce |
+| P-03 | `stale` retombe automatiquement quand l'équipement référencé change (remplacement, rebobinage) |
+
+### 2.4 Trois verdicts, jamais deux
+
+| Verdict | Signification |
+|---|---|
+| ✅ `PASS` | Vérifié, sur des données suffisantes |
+| ❌ `FAIL` | Violation prouvée |
+| ⚠️ `UNKNOWN` | **Indéterminable — la donnée manquante est nommée** |
+
+> ⛔ Un invariant de sévérité `safety` qui dépend d'un paramètre `unverified`, ou d'un aspect
+> sous-renseigné, **ne rend jamais `PASS`**. Une conclusion de sécurité adossée à un chiffre
+> non vérifié n'est pas une conclusion — c'est le mensonge optimiste déplacé du modèle vers
+> le rapport, où il est plus dangereux encore.
+
+`UNKNOWN` n'est pas un échec : c'est le livrable le plus utile de l'outil quand les données
+manquent. Le rapport trie les paramètres non vérifiés **par nombre d'invariants `safety`
+qu'ils bloquent** — la checklist de mise en service se priorise ainsi par impact réel.
 
 ---
 
@@ -121,6 +198,41 @@ faults: [stuck, drift, overspeed, brake_stuck_released]
 | T-03 | Tout paramètre porte sa `class` (§1) |
 | T-04 | `dynamics.embedded` est **toujours** une simplification de `dynamics.host`, jamais une autre loi |
 | T-05 | Aucun état caché entre deux pas de temps hors état déclaré |
+| T-06 | ⛔ **Aucun écrêtage silencieux d'une grandeur physique** — voir §3.1 |
+
+### 3.1 ⛔ L'écrêtage silencieux est interdit
+
+Borner une position par un `MIN`/`MAX` simule une machine qui s'arrête **toujours proprement
+en butée, à n'importe quelle vitesse, sans jamais rien casser**. La surcourse devient
+inreprésentable : le test ne peut plus échouer, donc il passe, donc personne ne voit rien.
+C'est une zone aveugle silencieuse, la pire classe de défaut sur de la sécurité machine.
+
+> Franchir une limite **émet un événement**, horodaté, portant la vitesse et l'énergie au
+> franchissement. Le moteur ne décide pas de la conséquence (hors périmètre de cette spec),
+> mais il ne fait **jamais** semblant que rien ne s'est passé.
+
+```yaml
+events:
+  - { t_ms: 8420, kind: overtravel, instance: AxisA, limit: travel_m.upper,
+      speed_mps: 0.34, kinetic_energy_J: 10.4 }
+```
+
+### 3.2 Graine et reproductibilité
+
+Aucune grandeur dynamique réelle n'est parfaitement répétable : dispersion de collage des
+contacteurs, phase entre le monde continu et le scan automate, retour de ressort d'un
+joystick vu sur un nombre variable de cycles. Un modèle à valeurs nominales rejoue toujours
+la même trajectoire idéale et ne trouvera jamais les défauts de phase.
+
+Sans variabilité on ne trouve rien ; sans reproductibilité on ne peut rien déboguer. La
+résolution est la **graine** :
+
+| # | Règle |
+|---|---|
+| S-01 | Tout run porte une graine, et elle figure dans **chaque** rapport et chaque trace |
+| S-02 | Même graine ⟹ run identique, à l'octet près |
+| S-03 | Le balayage tire des graines ; un run en échec est rejouable exactement par la sienne |
+| S-04 | 🔒 Le profil `embedded` est **strictement déterministe** : valeurs nominales, aucun tirage. Le gate d'équivalence tourne donc dispersion désactivée — le profil hôte à dispersion nulle **est** le profil embarqué |
 
 ---
 

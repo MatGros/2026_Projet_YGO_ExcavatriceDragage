@@ -13,6 +13,22 @@ contract:
       statement: "Le modele PROJECTS/excavatrice_dragage/machine.twin.yaml decrit l'axe M3 et le joystick, chaque parametre portant sa classe machine/config/environment, et le validateur refuse avec un code de retour non nul un modele dont une instance perd son af_ref."
       verified_by: "python TOOLS/TWINBENCH/cli.py validate PROJECTS/excavatrice_dragage/machine.twin.yaml (exit 0) puis rejeu du meme fichier ampute de l'af_ref de M3 (exit non nul)."
 
+    - id: AC1b
+      statement: "Chaque instance porte un niveau par aspect (kinematics / non_ideality / limits / degradation) et chaque parametre porte un bloc provenance et un bloc verification ; un parametre sans bloc explicite est traite par defaut comme guessed et unverified, et le validateur refuse un aspect declare L2 dont les provenances n'autorisent que L1."
+      verified_by: "python TOOLS/TWINBENCH/cli.py validate sur un modele declarant kinematics L2 avec un parametre source guessed (exit non nul, message nommant le parametre fautif)."
+
+    - id: AC1c
+      statement: "Un invariant de severite safety dont un parametre dependant est unverified rend le verdict UNKNOWN en nommant ce parametre, et jamais PASS ; le rapport liste les parametres non verifies tries par nombre d'invariants safety bloques."
+      verified_by: "TOOLS/TWINBENCH/tests/test_verdict_unknown.py : meme scenario joue deux fois, parametre unverified puis verified, verdicts UNKNOWN puis PASS."
+
+    - id: AC1d
+      statement: "Franchir une borne de course n'ecrete jamais silencieusement la position : le moteur emet un evenement overtravel horodate portant la vitesse et l'energie cinetique au franchissement, et cet evenement apparait dans la trace."
+      verified_by: "TOOLS/TWINBENCH/tests/test_no_silent_clamp.py : commande de M3 au-dela de sa course, assertion de presence de l'evenement overtravel et absence de MIN/MAX sur la position dans le moteur."
+
+    - id: AC1e
+      statement: "Tout run porte une graine figurant dans son rapport et sa trace ; deux executions de meme graine produisent des traces identiques octet pour octet, et deux graines differentes produisent des micro-timings differents sur au moins une brique de non-idealite."
+      verified_by: "TOOLS/TWINBENCH/tests/test_seed_reproducibility.py : double execution a graine fixe (traces identiques) et a graines distinctes (traces differentes)."
+
     - id: AC2
       statement: "Le moteur Python execute le scenario m3_p1_to_tremie et produit une trace ou le chariot part de P1, atteint TREMIE, et les 5 capteurs M3 commutent dans l'ordre declare par le modele."
       verified_by: "python TOOLS/TWINBENCH/cli.py run --scenario m3_p1_to_tremie --out out/trace_m3.json, puis assertions d'ordre de commutation dans TOOLS/TWINBENCH/tests/test_m3_sequence.py."
